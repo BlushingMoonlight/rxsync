@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- ===================== SEO & METADADOS PROFISSIONAIS ===================== -->
-    <title>RXSync | Automação e Inteligência Artificial para Clínicas Médicas</title>
-    <meta name="description" content="Transforme o WhatsApp da sua clínica em um motor de crescimento. Atendimento em 3 segundos, agenda sincronizada em tempo real, segurança jurídica (CFM/LGPD) e zero faltas.">
+    <title>RXSync | Automação e Inteligência Artificial para Clínicas</title>
+    <meta name="description" content="A RXSync programa, integra e instala sua automação médica. Atendimento agradável, português impecável e agenda 100% sincronizada com seu sistema atual.">
     <meta name="keywords" content="chatbot clinica medica, automacao whatsapp medico, inteligencia artificial saude, agendamento automatico iClinic, rxsync, secretaria digital">
     <meta name="author" content="RXSync Tecnologia">
     <meta name="robots" content="index, follow">
+    
+    <!-- GOOGLE SEARCH CONSOLE - Verificação (Substitua o content pelo seu código HTML tag) -->
+    <meta name="google-site-verification" content="COLOQUE_SEU_CODIGO_DE_VERIFICACAO_AQUI" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://rxsync.com.br/">
@@ -17,38 +20,36 @@
     <!-- ===================== OPEN GRAPH / WHATSAPP SHARE PREVIEW ===================== -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://rxsync.com.br/">
-    <meta property="og:title" content="RXSync | Automação e Inteligência Artificial para Clínicas Médicas">
-    <meta property="og:description" content="Atendimento em 3 segundos, agendamento via IA e blindagem jurídica total (CFM e LGPD). Descubra o parceiro tecnológico da sua clínica.">
-    <meta property="og:image" content="https://rxsync.com.br/assets/og-image.jpg"> <!-- Substitua pela URL absoluta da imagem de compartilhamento -->
+    <meta property="og:title" content="RXSync | Automação e IA para Clínicas">
+    <meta property="og:description" content="Nós integramos e instalamos tudo. Sua clínica ganha atendimento instantâneo em português impecável, sem precisar aprender sistemas novos.">
+    <meta property="og:image" content="https://rxsync.com.br/assets/og-image.jpg"> <!-- Imagem 1200x630 -->
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="pt_BR">
 
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="RXSync | Automação e IA para Clínicas">
-    <meta name="twitter:description" content="Atendimento em 3 segundos e agendamento inteligente no WhatsApp.">
+    <meta name="twitter:description" content="Atendimento agradável e agendamento inteligente sem novos softwares.">
     <meta name="twitter:image" content="https://rxsync.com.br/assets/og-image.jpg">
 
-    <!-- ===================== FAVICON / ÍCONES ===================== -->
+    <!-- ===================== FAVICON ===================== -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M22 12h-4l-3 9L9 3l-3 9H2'/></svg>">
 
     <!-- ===================== GOOGLE ANALYTICS (GA4) ESPAÇO RESERVADO ===================== -->
-    <!-- Substitua 'G-XXXXXXXXXX' pelo seu código real do Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      // Consent Mode v2 padrão LGPD (Bloqueia até aceitar os cookies)
       gtag('consent','default',{
         'ad_storage':'denied', 'ad_user_data':'denied', 'ad_personalization':'denied',
         'analytics_storage':'denied', 'wait_for_update':500
       });
       gtag('js', new Date());
+      // Substitua G-XXXXXXXXXX pelo seu ID real
       gtag('config', 'G-XXXXXXXXXX');
     </script>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -63,23 +64,10 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: {
-                            50: '#f0f5f9',
-                            100: '#e0ebf4',
-                            500: '#3b82f6',
-                            800: '#1e3a8a',
-                            900: '#0f172a', // Azul Marinho Profundo
-                        },
-                        emerald: {
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669', // Verde Botão Principal
-                            700: '#047857',
-                        }
+                        primary: { 50: '#f0f5f9', 100: '#e0ebf4', 500: '#3b82f6', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
+                        emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
                     },
                     boxShadow: {
                         'glow': '0 0 50px -12px rgba(16, 185, 129, 0.4)',
@@ -90,60 +78,44 @@
         }
     </script>
     <style>
-        .faq-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .faq-item.active .faq-content {
-            max-height: 500px;
-        }
-        .faq-item.active .faq-icon {
-            transform: rotate(180deg);
-        }
-        .mockup-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-        .mockup-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .mockup-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
+        .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .faq-item.active .faq-content { max-height: 500px; }
+        .faq-item.active .faq-icon { transform: rotate(180deg); }
+        .mockup-scroll::-webkit-scrollbar { width: 4px; }
+        .mockup-scroll::-webkit-scrollbar-track { background: transparent; }
+        .mockup-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-emerald-200 selection:text-emerald-900 overflow-x-hidden">
 
     <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="fixed w-full z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200 transition-all duration-300">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navegação Principal">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center gap-2">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary-900 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                        <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+                        <i data-lucide="activity" class="w-6 h-6 text-white" aria-hidden="true"></i>
                     </div>
                     <span class="font-extrabold text-2xl tracking-tight text-primary-900">RXSync</span>
                 </div>
                 
-                <!-- Desktop Menu -->
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#dores" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">O Problema</a>
                     <a href="#solucao" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">Plataforma</a>
                     <a href="#seguranca" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">Segurança</a>
                     <a href="#precos" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">Planos</a>
-                    <a href="#contato" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all hover:shadow-glow">
+                    <button onclick="scrollToForm('')" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all hover:shadow-glow">
                         Falar com Especialista
-                    </a>
+                    </button>
                 </div>
 
                 <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-primary-900 focus:outline-none">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-primary-900 focus:outline-none" aria-label="Abrir Menu">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
                 </div>
             </div>
-        </div>
+        </nav>
 
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full">
             <div class="px-4 pt-2 pb-6 space-y-1 shadow-2xl">
@@ -151,499 +123,571 @@
                 <a href="#solucao" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-md">Plataforma</a>
                 <a href="#seguranca" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-md">Segurança</a>
                 <a href="#precos" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-md">Planos</a>
-                <a href="#contato" class="block w-full text-center mt-4 px-6 py-3 text-base font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700">
+                <button onclick="scrollToForm('')" class="block w-full text-center mt-4 px-6 py-3 text-base font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700">
                     Falar com Especialista
-                </a>
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 bg-primary-900 overflow-hidden">
-        <div class="absolute inset-0 opacity-10">
-            <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-                <defs><pattern id="grid-hero" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
-                <rect width="100%" height="100%" fill="url(#grid-hero)" />
-            </svg>
-        </div>
-        
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 mb-6 border border-emerald-500/20 shadow-glow">
-                <span class="flex h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                Infraestrutura Premium para Clínicas
-            </span>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
-                Transformamos o WhatsApp da sua clínica em um <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">motor de crescimento</span> previsível.
-            </h1>
-            <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-                Zere a perda de pacientes por demora na resposta e reduza faltas. Uma IA treinada com a voz da sua clínica, orquestrando agendas 24 horas por dia.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16">
-                <a href="#contato" class="w-full sm:w-auto px-8 py-4 text-lg font-semibold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl transition-all hover:scale-105">
-                    Agendar Demonstração
-                </a>
+    <main>
+        <!-- Hero Section -->
+        <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 bg-primary-900 overflow-hidden">
+            <div class="absolute inset-0 opacity-10 pointer-events-none">
+                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                    <defs><pattern id="grid-hero" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
+                    <rect width="100%" height="100%" fill="url(#grid-hero)" />
+                </svg>
             </div>
-
-            <!-- Dashboard Mockup -->
-            <div class="relative max-w-5xl mx-auto hidden md:block mt-8 perspective-1000">
-                <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-primary-500 rounded-2xl blur opacity-30 animate-pulse"></div>
-                <div class="relative rounded-2xl bg-slate-900 border border-slate-700 shadow-mac overflow-hidden flex flex-col">
-                    <div class="bg-slate-800/80 px-4 py-3 flex items-center border-b border-slate-700 backdrop-blur-md">
-                        <div class="flex gap-2">
-                            <div class="w-3 h-3 rounded-full bg-red-500/80 border border-red-600"></div>
-                            <div class="w-3 h-3 rounded-full bg-amber-500/80 border border-amber-600"></div>
-                            <div class="w-3 h-3 rounded-full bg-emerald-500/80 border border-emerald-600"></div>
-                        </div>
-                        <div class="flex-1 text-center">
-                            <span class="text-xs font-medium text-slate-400 flex items-center justify-center gap-1">
-                                <i data-lucide="lock" class="w-3 h-3"></i> rxsync-dashboard.app
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex h-80 bg-slate-900">
-                        <div class="w-20 border-r border-slate-800 flex flex-col items-center py-6 gap-6 bg-slate-900/50">
-                            <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i data-lucide="message-square" class="w-5 h-5"></i></div>
-                            <div class="w-10 h-10 rounded-lg text-slate-500 flex items-center justify-center"><i data-lucide="calendar" class="w-5 h-5"></i></div>
-                            <div class="w-10 h-10 rounded-lg text-slate-500 flex items-center justify-center mt-auto"><i data-lucide="settings" class="w-5 h-5"></i></div>
-                        </div>
-                        <div class="flex-1 p-8 grid grid-cols-3 gap-6">
-                            <div class="col-span-2 space-y-6">
-                                <div class="h-32 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4 flex items-end gap-2">
-                                    <div class="w-full bg-emerald-500/20 rounded-t-sm h-[30%]"></div>
-                                    <div class="w-full bg-emerald-500/40 rounded-t-sm h-[50%]"></div>
-                                    <div class="w-full bg-emerald-500/60 rounded-t-sm h-[70%]"></div>
-                                    <div class="w-full bg-emerald-500/80 rounded-t-sm h-[90%]"></div>
-                                    <div class="w-full bg-emerald-400 rounded-t-sm h-[100%] shadow-[0_0_15px_rgba(52,211,153,0.5)] relative">
-                                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-[10px] px-2 py-1 rounded">Hoje</div>
-                                    </div>
-                                </div>
-                                <div class="flex gap-4">
-                                    <div class="flex-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
-                                        <div class="text-xs text-slate-400 mb-1">Taxa de Resposta</div>
-                                        <div class="text-2xl font-bold text-white">&lt; 3 seg</div>
-                                    </div>
-                                    <div class="flex-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
-                                        <div class="text-xs text-slate-400 mb-1">Agendamentos (IA)</div>
-                                        <div class="text-2xl font-bold text-emerald-400">+142%</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-span-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
-                                <div class="text-xs font-semibold text-slate-300 mb-4 uppercase tracking-wider">Atividade ao Vivo</div>
-                                <div class="space-y-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
-                                        <div class="text-xs text-slate-300">Consulta confirmada (Carlos)</div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
-                                        <div class="text-xs text-slate-300">Lembrete enviado (Ana)</div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full bg-amber-400"></div>
-                                        <div class="text-xs text-slate-300">Reagendamento (Maria)</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 mb-6 border border-emerald-500/20 shadow-glow">
+                    <span class="flex h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                    Nós instalamos, você não se preocupa com nada
+                </span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
+                    Transformamos o WhatsApp da sua clínica em um <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">motor de crescimento</span> previsível.
+                </h1>
+                <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
+                    Nossa IA eleva a organização do seu atendimento em português impecável. Zere as faltas, deixe o robô agendar, e sua equipe continua usando os mesmos sistemas de sempre.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16">
+                    <button onclick="scrollToForm('')" class="w-full sm:w-auto px-8 py-4 text-lg font-semibold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl transition-all hover:scale-105">
+                        Fazer Orçamento Agora
+                    </button>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- O Diagnóstico -->
-    <section id="dores" class="py-24 bg-white relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-extrabold text-primary-900 sm:text-4xl tracking-tight">O gargalo silencioso que drena a sua clínica</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Sua equipe trabalha muito, mas processos manuais no WhatsApp geram perdas diárias que não aparecem no balanço financeiro.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div class="w-14 h-14 bg-red-50 group-hover:bg-red-100 rounded-xl flex items-center justify-center mb-6 border border-red-100 transition-colors">
-                        <i data-lucide="clock-alert" class="text-red-500 w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-primary-900 mb-3">A Regra dos 5 Minutos</h3>
-                    <p class="text-slate-600 leading-relaxed text-sm">Pacientes não esperam. Se sua secretária está atarefada no balcão, o paciente sem resposta rápida no WhatsApp vai para o médico concorrente da lista do Google.</p>
-                </div>
-                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div class="w-14 h-14 bg-amber-50 group-hover:bg-amber-100 rounded-xl flex items-center justify-center mb-6 border border-amber-100 transition-colors">
-                        <i data-lucide="smartphone" class="text-amber-500 w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-primary-900 mb-3">O Risco do Celular Físico</h3>
-                    <p class="text-slate-600 leading-relaxed text-sm">Usar aparelhos espalhados na recepção cria silos de informação, perde o histórico clínico e gera graves riscos de vazamento de dados, ferindo a LGPD.</p>
-                </div>
-                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                    <div class="w-14 h-14 bg-primary-50 group-hover:bg-primary-100 rounded-xl flex items-center justify-center mb-6 border border-primary-100 transition-colors">
-                        <i data-lucide="calendar-off" class="text-primary-600 w-7 h-7"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-primary-900 mb-3">O Custo do Absenteísmo</h3>
-                    <p class="text-slate-600 leading-relaxed text-sm">Consultas desmarcadas em cima da hora corroem a previsibilidade de receita, deixando horários valiosos ociosos que poderiam ter sido preenchidos automaticamente.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- A Prescrição -->
-    <section id="solucao" class="py-24 bg-slate-50 border-y border-slate-200 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-20">
-                <h2 class="text-3xl font-extrabold text-primary-900 sm:text-4xl">Tecnologia de ponta nos bastidores.<br/>Acolhimento na linha de frente.</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Não vendemos um software para você aprender a usar. Nós mapeamos sua operação, parametrizamos a inteligência artificial e entregamos o sistema rodando.</p>
-            </div>
-
-            <!-- Feature 1 -->
-            <div class="flex flex-col lg:flex-row items-center gap-16 mb-32">
-                <div class="lg:w-1/2">
-                    <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="bot" class="text-emerald-600 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-primary-900 mb-4">Triagem e Atendimento em 3 Segundos</h3>
-                    <p class="text-slate-600 text-lg leading-relaxed mb-6">Nossa Inteligência Artificial é treinada com os documentos, preços e diretrizes da sua clínica. Ela captura o paciente instataneamente a qualquer hora do dia ou da noite, garantindo que o interesse não esfrie.</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Treinamento com a "voz" da clínica.</li>
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Coleta automatizada de consentimento (LGPD).</li>
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Orçamentos e informações precisas 24/7.</li>
-                    </ul>
-                </div>
-                <div class="lg:w-1/2 w-full">
-                    <div class="rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden relative transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
-                        <div class="bg-slate-100 px-4 py-3 flex items-center border-b border-slate-200">
+                <!-- Dashboard Mockup (Visual) -->
+                <div class="relative max-w-5xl mx-auto hidden md:block mt-8 perspective-1000">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-primary-500 rounded-2xl blur opacity-30 animate-pulse"></div>
+                    <div class="relative rounded-2xl bg-slate-900 border border-slate-700 shadow-mac overflow-hidden flex flex-col">
+                        <div class="bg-slate-800/80 px-4 py-3 flex items-center border-b border-slate-700 backdrop-blur-md">
                             <div class="flex gap-2">
-                                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                                <div class="w-3 h-3 rounded-full bg-red-500/80 border border-red-600"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber-500/80 border border-amber-600"></div>
+                                <div class="w-3 h-3 rounded-full bg-emerald-500/80 border border-emerald-600"></div>
                             </div>
-                            <span class="mx-auto text-xs font-semibold text-slate-500">RXSync Chat AI</span>
-                        </div>
-                        <div class="p-6 bg-slate-50 flex flex-col gap-5 h-[350px] overflow-y-auto mockup-scroll">
-                            <div class="flex gap-3">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center shrink-0"><i data-lucide="user" class="w-4 h-4 text-slate-600"></i></div>
-                                <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-100">
-                                    Olá, gostaria de agendar um retorno com a Dra. Mariana para essa semana, se possível à tarde.
-                                </div>
-                            </div>
-                            <div class="flex gap-3 flex-row-reverse">
-                                <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shrink-0 shadow-sm text-white font-bold text-[10px]">RX</div>
-                                <div class="bg-emerald-50 p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-emerald-900 border border-emerald-100 max-w-[85%] relative">
-                                    Olá! Sou a assistente virtual da clínica. 😊<br><br>Verifiquei a agenda da Dra. Mariana. Temos disponibilidade nesta <strong>Quinta-feira às 15:30</strong> ou <strong>Sexta-feira às 14:00</strong>.<br><br>Qual dos dois horários fica melhor para você?
-                                    <span class="absolute -bottom-5 right-1 text-[10px] text-slate-400 font-medium">Respondido às 23:45</span>
-                                </div>
+                            <div class="flex-1 text-center">
+                                <span class="text-xs font-medium text-slate-400 flex items-center justify-center gap-1">
+                                    <i data-lucide="lock" class="w-3 h-3"></i> rxsync-monitoramento.app
+                                </span>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feature 2 -->
-            <div class="flex flex-col-reverse lg:flex-row items-center gap-16 mb-32">
-                <div class="lg:w-1/2 w-full">
-                    <div class="rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden relative transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
-                        <div class="bg-slate-100 px-4 py-3 flex items-center border-b border-slate-200">
-                            <div class="flex gap-2">
-                                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                        <div class="flex h-80 bg-slate-900">
+                            <!-- Left Bar -->
+                            <div class="w-20 border-r border-slate-800 flex flex-col items-center py-6 gap-6 bg-slate-900/50">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i data-lucide="activity" class="w-5 h-5"></i></div>
+                                <div class="w-10 h-10 rounded-lg text-slate-500 flex items-center justify-center"><i data-lucide="calendar" class="w-5 h-5"></i></div>
                             </div>
-                            <span class="mx-auto text-xs font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> Integração Prontuário API</span>
-                        </div>
-                        <div class="p-4 bg-white h-[350px]">
-                            <div class="grid grid-cols-5 gap-2 h-full text-xs">
-                                <div class="col-span-5 flex justify-between items-center mb-2 px-2 text-slate-500 font-bold">
-                                    <span>Quinta-feira</span>
-                                    <span>Outubro 2026</span>
-                                </div>
-                                <div class="flex flex-col gap-4 text-slate-400 text-right pr-2 border-r border-slate-100 font-medium">
-                                    <div class="h-10 mt-2">14:00</div>
-                                    <div class="h-10 mt-4">15:00</div>
-                                    <div class="h-10 mt-4">16:00</div>
-                                </div>
-                                <div class="col-span-4 relative border-t border-slate-100 pt-2">
-                                    <div class="h-12 w-full rounded bg-slate-100 mb-2 p-2 text-slate-400">Livre</div>
-                                    <div class="h-14 w-full rounded-lg bg-emerald-100 border-l-4 border-emerald-500 p-2 shadow-sm animate-pulse flex flex-col justify-center relative overflow-hidden">
-                                        <div class="absolute inset-0 bg-white/40"></div>
-                                        <div class="relative z-10 flex justify-between items-center">
-                                            <span class="font-bold text-emerald-800 text-sm">Carlos Eduardo</span>
-                                            <span class="bg-emerald-500 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">Via Bot</span>
+                            <!-- Main Data -->
+                            <div class="flex-1 p-8 grid grid-cols-3 gap-6">
+                                <div class="col-span-2 space-y-6">
+                                    <div class="h-32 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4 flex items-end gap-2">
+                                        <div class="w-full bg-emerald-500/20 rounded-t-sm h-[30%]"></div>
+                                        <div class="w-full bg-emerald-500/40 rounded-t-sm h-[50%]"></div>
+                                        <div class="w-full bg-emerald-500/80 rounded-t-sm h-[90%]"></div>
+                                        <div class="w-full bg-emerald-400 rounded-t-sm h-[100%] shadow-[0_0_15px_rgba(52,211,153,0.5)] relative">
+                                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-700 text-white text-[10px] px-2 py-1 rounded">Hoje</div>
                                         </div>
-                                        <span class="relative z-10 text-emerald-600 text-xs mt-1">Retorno (Dra. Mariana)</span>
                                     </div>
-                                    <div class="h-12 w-full rounded bg-slate-100 mt-2 p-2 text-slate-400">Livre</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="lg:w-1/2">
-                    <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="calendar-check" class="text-primary-600 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-primary-900 mb-4">Sincronização Bidirecional Direta</h3>
-                    <p class="text-slate-600 text-lg leading-relaxed mb-6">A RXSync não cria uma agenda paralela. Nosso sistema se comunica em tempo real via API com o seu software de gestão (iClinic, Amplimed, etc). A IA lê os horários livres e marca a consulta lá dentro automaticamente.</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Zero *Double Booking* (Conflito de horários).</li>
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Lembretes automáticos 48h e 24h antes.</li>
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Acionamento automático de lista de espera em caso de cancelamento.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Feature 3 -->
-            <div class="flex flex-col lg:flex-row items-center gap-16">
-                <div class="lg:w-1/2">
-                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="headset" class="text-amber-600 w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-primary-900 mb-4">Transição Perfeita e Flexível</h3>
-                    <p class="text-slate-600 text-lg leading-relaxed mb-6">Sua equipe pode optar por usar nosso painel inteligente (CRM) ou continuar usando o WhatsApp Web exatamente como faz hoje — você decide! Em ambos os casos, a interface é fluida: se o paciente relatar algo urgente, a IA pausa instataneamente para a secretária assumir.</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> <strong>CRM Opcional:</strong> Mantenha seu fluxo atual se preferir.</li>
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Intervenção humana instantânea a qualquer momento.</li>
-                        <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Proteção total contra quebras das regras do CFM.</li>
-                    </ul>
-                </div>
-                <div class="lg:w-1/2 w-full">
-                    <div class="rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden relative">
-                        <div class="bg-slate-100 px-4 py-3 flex items-center border-b border-slate-200">
-                            <div class="flex gap-2">
-                                <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
-                                <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
-                            </div>
-                            <span class="mx-auto text-xs font-semibold text-slate-500">Exemplo de Intervenção Humana</span>
-                        </div>
-                        <div class="flex h-[350px]">
-                            <div class="w-full bg-white p-4 flex flex-col relative">
-                                <div class="absolute top-0 left-0 w-full bg-red-500 text-white text-[10px] font-bold text-center py-1 flex justify-center items-center gap-1 z-10 shadow-sm">
-                                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> Automação Pausada (Palavra-chave: Sangramento)
-                                </div>
-                                <div class="mt-6 flex flex-col gap-3">
-                                    <div class="bg-slate-100 p-2 rounded-lg rounded-tl-none text-xs text-slate-700 w-fit self-start">
-                                        Fiz um procedimento ontem e o local está com muito sangramento. O que eu faço?
-                                    </div>
-                                    <div class="text-[10px] text-center text-slate-400 font-medium my-1 flex items-center justify-center gap-2">
-                                        <hr class="w-12 border-slate-200"> Atendimento Transferido (Equipe assumiu) <hr class="w-12 border-slate-200">
-                                    </div>
-                                    <div class="bg-primary-50 p-2 rounded-lg rounded-tr-none text-xs text-primary-900 border border-primary-100 w-fit self-end">
-                                        Olá Roberto, aqui é a Camila da recepção. Por favor, aguarde que estou passando seu caso para o médico plantonista agora mesmo.
+                                    <div class="flex gap-4">
+                                        <div class="flex-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
+                                            <div class="text-xs text-slate-400 mb-1">Tempo de Resposta</div>
+                                            <div class="text-2xl font-bold text-white">Instatâneo</div>
+                                        </div>
+                                        <div class="flex-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
+                                            <div class="text-xs text-slate-400 mb-1">Agendamentos (IA)</div>
+                                            <div class="text-2xl font-bold text-emerald-400">Automatizado</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="mt-auto border-t border-slate-100 pt-3 flex gap-2">
-                                    <div class="flex-1 bg-slate-50 border border-slate-200 rounded text-xs p-2 text-slate-400">A equipe humana responde por aqui...</div>
-                                    <div class="w-8 h-8 bg-primary-600 rounded flex justify-center items-center"><i data-lucide="send" class="w-3 h-3 text-white"></i></div>
+                                <div class="col-span-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
+                                    <div class="text-xs font-semibold text-slate-300 mb-4 uppercase tracking-wider">Sistema Rodando</div>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                            <div class="text-xs text-slate-300">Integração API (Ativa)</div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                            <div class="text-xs text-slate-300">Lembretes Automáticos (On)</div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                                            <div class="text-xs text-slate-300">Proteção LGPD (Ativa)</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-        </div>
-    </section>
-
-    <!-- Segurança e LGPD -->
-    <section id="seguranca" class="py-24 bg-primary-900 text-white border-b-8 border-emerald-500">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <i data-lucide="shield-check" class="w-16 h-16 text-emerald-400 mx-auto mb-6"></i>
-                <h2 class="text-3xl font-bold sm:text-4xl">Blindagem Jurídica e Ética Inegociável.</h2>
-                <p class="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
-                    Nossa infraestrutura é desenhada exclusivamente para o setor de saúde, protegendo o seu registro médico (CRM) e os dados dos seus pacientes.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
-                    <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <i data-lucide="server" class="w-8 h-8 text-emerald-400"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3 text-white">Servidores Nacionais</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Seus dados e de pacientes ficam em servidores (VPS) de alta segurança localizados fisicamente no Brasil, sem cruzar fronteiras.</p>
+        <!-- O Diagnóstico -->
+        <section id="dores" class="py-24 bg-white relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-extrabold text-primary-900 sm:text-4xl tracking-tight">O gargalo silencioso que drena a sua clínica</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Sua equipe trabalha muito, mas processos manuais no WhatsApp geram perdas diárias que não aparecem no balanço financeiro.</p>
                 </div>
-                <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
-                    <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <i data-lucide="scale" class="w-8 h-8 text-emerald-400"></i>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="w-14 h-14 bg-red-50 group-hover:bg-red-100 rounded-xl flex items-center justify-center mb-6 border border-red-100 transition-colors">
+                            <i data-lucide="clock-alert" class="text-red-500 w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">A Regra dos 5 Minutos</h3>
+                        <p class="text-slate-600 leading-relaxed text-sm">Pacientes não esperam. Se sua secretária está atarefada no balcão, o paciente sem resposta rápida no WhatsApp vai para o médico concorrente da lista do Google.</p>
                     </div>
-                    <h3 class="text-xl font-bold mb-3 text-white">Diretrizes do CFM</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">Nossa IA recebe "Guardrails" estritos. É expressamente proibida de ler laudos ou dar conselhos médicos, atuando 100% como apoio administrativo.</p>
-                </div>
-                <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
-                    <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                        <i data-lucide="file-check-2" class="w-8 h-8 text-emerald-400"></i>
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="w-14 h-14 bg-amber-50 group-hover:bg-amber-100 rounded-xl flex items-center justify-center mb-6 border border-amber-100 transition-colors">
+                            <i data-lucide="smartphone" class="text-amber-500 w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">O Risco do Celular Físico</h3>
+                        <p class="text-slate-600 leading-relaxed text-sm">Usar aparelhos espalhados na recepção cria silos de informação, perde o histórico clínico e gera graves riscos de vazamento de dados, ferindo a LGPD.</p>
                     </div>
-                    <h3 class="text-xl font-bold mb-3 text-white">Conformidade LGPD</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">O fluxo exige e registra o aceite automatizado do paciente sobre as políticas de privacidade antes de qualquer tráfego de informação clínica sensível.</p>
+                    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="w-14 h-14 bg-primary-50 group-hover:bg-primary-100 rounded-xl flex items-center justify-center mb-6 border border-primary-100 transition-colors">
+                            <i data-lucide="calendar-off" class="text-primary-600 w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-primary-900 mb-3">O Custo do Absenteísmo</h3>
+                        <p class="text-slate-600 leading-relaxed text-sm">Consultas desmarcadas em cima da hora corroem a previsibilidade de receita, deixando horários valiosos ociosos que poderiam ter sido preenchidos automaticamente.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- ROI Banner -->
-    <section class="bg-emerald-50 py-16 border-b border-emerald-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden flex flex-col md:flex-row">
-                <div class="p-10 md:w-1/2 flex flex-col justify-center">
-                    <h2 class="text-3xl font-extrabold text-primary-900 mb-4">Um sistema que se paga sozinho.</h2>
-                    <p class="text-slate-600 text-lg mb-6">Ao usar nossa automação inteligente de lembretes (24h/48h) para derrubar o número de faltas, a receita da sua agenda sobe automaticamente:</p>
-                    <div class="bg-emerald-50 border border-emerald-200 p-6 rounded-xl text-primary-900 shadow-inner">
-                        <p class="text-lg font-medium">Salvar a falta de apenas</p>
-                        <p class="text-4xl font-black text-emerald-600 my-2">2 a 3 pacientes</p>
-                        <p class="font-medium">já cobre integralmente o seu investimento mensal.</p>
+        <!-- A Prescrição (Solução em Z-Pattern) -->
+        <section id="solucao" class="py-24 bg-slate-50 border-y border-slate-200 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20">
+                    <h2 class="text-3xl font-extrabold text-primary-900 sm:text-4xl">Tecnologia nos bastidores.<br/>Acolhimento na linha de frente.</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Nós não vendemos um software para você aprender a usar. A RXSync integra, instala, programa e entrega a automação pronta, com suporte integral.</p>
+                </div>
+
+                <!-- Feature 1: IA Impecável -->
+                <div class="flex flex-col lg:flex-row items-center gap-16 mb-32">
+                    <div class="lg:w-1/2">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="bot" class="text-emerald-600 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary-900 mb-4">Experiência Agradável e Português Impecável</h3>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Nossa Inteligência Artificial traz um novo nível de padronização e organização para a sua clínica. Ela redige textos em português correto, é extremamente educada e garante uma experiência fluida que os pacientes adoram e elogiam.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Resolução imediata do problema em 3 segundos.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Comunicação padronizada, acolhedora e agradável.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Coleta automatizada de consentimento (LGPD) no primeiro contato.</li>
+                        </ul>
+                    </div>
+                    <div class="lg:w-1/2 w-full">
+                        <div class="rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden relative transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
+                            <div class="bg-slate-100 px-4 py-3 flex items-center border-b border-slate-200">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+                                </div>
+                                <span class="mx-auto text-xs font-semibold text-slate-500">Interação com Paciente</span>
+                            </div>
+                            <div class="p-6 bg-slate-50 flex flex-col gap-5 h-[350px] overflow-y-auto mockup-scroll">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center shrink-0"><i data-lucide="user" class="w-4 h-4 text-slate-600"></i></div>
+                                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm border border-slate-100">
+                                        Olá, gostaria de agendar um retorno com a Dra. Mariana para essa semana, de preferência à tarde.
+                                    </div>
+                                </div>
+                                <div class="flex gap-3 flex-row-reverse">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center shrink-0 shadow-sm text-white font-bold text-[10px]">IA</div>
+                                    <div class="bg-emerald-50 p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-emerald-900 border border-emerald-100 max-w-[85%] relative">
+                                        Olá! Tudo bem? Sou a assistente virtual da clínica e será um prazer ajudar com seu agendamento.<br><br>Acabei de verificar a agenda da Dra. Mariana e encontrei os seguintes horários livres à tarde:<br>• <strong>Quinta-feira às 15:30</strong><br>• <strong>Sexta-feira às 14:00</strong><br><br>Qual destas opções fica melhor para você?
+                                        <span class="absolute -bottom-5 right-1 text-[10px] text-slate-400 font-medium">Lido e respondido instantaneamente</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="bg-slate-900 p-10 md:w-1/2 flex flex-col justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/40 via-slate-900 to-slate-900 pointer-events-none"></div>
-                    <h3 class="text-white text-sm font-bold uppercase tracking-wider mb-8 text-center relative z-10">Taxa de Consultas Realizadas (Faturamento)</h3>
+
+                <!-- Feature 2: API Integration -->
+                <div class="flex flex-col-reverse lg:flex-row items-center gap-16 mb-32">
+                    <div class="lg:w-1/2 w-full">
+                        <div class="rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden relative transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
+                            <div class="bg-slate-100 px-4 py-3 flex items-center border-b border-slate-200">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+                                    <div class="w-3 h-3 rounded-full bg-slate-300"></div>
+                                </div>
+                                <span class="mx-auto text-xs font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> Integração API Invisível</span>
+                            </div>
+                            <div class="p-4 bg-white h-[350px]">
+                                <div class="grid grid-cols-5 gap-2 h-full text-xs">
+                                    <div class="col-span-5 flex justify-between items-center mb-2 px-2 text-slate-500 font-bold">
+                                        <span>Software da sua Clínica</span>
+                                        <span>Outubro 2026</span>
+                                    </div>
+                                    <div class="flex flex-col gap-4 text-slate-400 text-right pr-2 border-r border-slate-100 font-medium">
+                                        <div class="h-10 mt-2">14:00</div>
+                                        <div class="h-10 mt-4">15:00</div>
+                                        <div class="h-10 mt-4">16:00</div>
+                                    </div>
+                                    <div class="col-span-4 relative border-t border-slate-100 pt-2">
+                                        <div class="h-12 w-full rounded bg-slate-100 mb-2 p-2 text-slate-400">Livre</div>
+                                        <div class="h-14 w-full rounded-lg bg-emerald-100 border-l-4 border-emerald-500 p-2 shadow-sm animate-pulse flex flex-col justify-center relative overflow-hidden">
+                                            <div class="absolute inset-0 bg-white/40"></div>
+                                            <div class="relative z-10 flex justify-between items-center">
+                                                <span class="font-bold text-emerald-800 text-sm">Carlos Eduardo</span>
+                                                <span class="bg-emerald-500 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">Inserido pela IA</span>
+                                            </div>
+                                            <span class="relative z-10 text-emerald-600 text-xs mt-1">Retorno (Dra. Mariana)</span>
+                                        </div>
+                                        <div class="h-12 w-full rounded bg-slate-100 mt-2 p-2 text-slate-400">Livre</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2">
+                        <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="calendar-check" class="text-primary-600 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary-900 mb-4">Integrado ao Software que você já usa</h3>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Nós não inventamos uma nova agenda para você gerenciar. A RXSync atua nos bastidores conectando-se via API ao software de gestão que sua clínica já utiliza hoje. A IA lê horários e faz o agendamento lá dentro, silenciosamente.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Instalação feita 100% por nós (zero dor de cabeça).</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Lembretes automáticos 48h e 24h antes da consulta.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Reposição inteligente acionando a lista de espera.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 3: ZERO CRM novo -->
+                <div class="flex flex-col lg:flex-row items-center gap-16">
+                    <div class="lg:w-1/2">
+                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="headset" class="text-amber-600 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary-900 mb-4">Sua equipe continua usando as ferramentas de sempre</h3>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6"><strong>Nós não temos CRM próprio para te vender.</strong> Acreditamos que a tecnologia deve facilitar, não complicar. Nossa inteligência é plugada no WhatsApp que a sua equipe já opera hoje. A secretária só acompanha a tela e assume se necessário.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Zero tempo perdido aprendendo ferramentas novas.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Se o paciente relata urgência, a IA pausa instataneamente.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> O humano assume o controle na mesma janela do WhatsApp Web.</li>
+                        </ul>
+                    </div>
+                    <div class="lg:w-1/2 w-full">
+                        <div class="rounded-2xl bg-[#e5ddd5] border border-slate-200 shadow-2xl overflow-hidden relative">
+                            <div class="bg-[#f0f2f5] px-4 py-3 flex items-center border-b border-[#d1d7db]">
+                                <div class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center mr-3"><i data-lucide="user" class="text-white w-5 h-5"></i></div>
+                                <span class="font-semibold text-slate-700">Paciente Roberto</span>
+                            </div>
+                            <div class="flex h-[350px]">
+                                <div class="w-full p-4 flex flex-col relative bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-cover">
+                                    <div class="absolute top-0 left-0 w-full bg-amber-500 text-white text-[10px] font-bold text-center py-1 flex justify-center items-center gap-1 z-10 shadow-sm">
+                                        <i data-lucide="alert-triangle" class="w-3 h-3"></i> Alerta: Paciente usou palavra-chave (Sangramento). IA pausada.
+                                    </div>
+                                    <div class="mt-8 flex flex-col gap-3">
+                                        <div class="bg-white p-2 rounded-lg rounded-tl-none text-xs text-slate-800 w-fit self-start shadow-sm relative">
+                                            Fiz um procedimento ontem e o local está com muito sangramento. O que eu faço?
+                                        </div>
+                                        <div class="bg-[#d9fdd3] p-2 rounded-lg rounded-tr-none text-xs text-slate-800 w-fit self-end shadow-sm">
+                                            Olá Roberto, aqui é a Camila da recepção. Por favor, aguarde na linha que estou repassando seu caso ao Dr. Carlos agora mesmo.
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto bg-[#f0f2f5] -mx-4 -mb-4 p-3 flex gap-2 items-center">
+                                        <div class="w-6 h-6 text-slate-500 flex justify-center items-center"><i data-lucide="paperclip" class="w-5 h-5"></i></div>
+                                        <div class="flex-1 bg-white border border-transparent rounded-lg text-sm p-2 text-slate-400">Digite uma mensagem</div>
+                                        <div class="w-8 h-8 flex justify-center items-center"><i data-lucide="mic" class="w-5 h-5 text-slate-500"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Segurança -->
+        <section id="seguranca" class="py-24 bg-primary-900 text-white border-b-8 border-emerald-500">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <i data-lucide="shield-check" class="w-16 h-16 text-emerald-400 mx-auto mb-6"></i>
+                    <h2 class="text-3xl font-bold sm:text-4xl">Blindagem Jurídica e Ética Inegociável.</h2>
+                    <p class="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
+                        Nossa infraestrutura é desenhada exclusivamente para o setor de saúde, protegendo o seu registro médico e os dados dos seus pacientes.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
+                        <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                            <i data-lucide="server" class="w-8 h-8 text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Servidores Nacionais</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Seus dados e de pacientes ficam em servidores (VPS) de alta segurança localizados fisicamente no Brasil, sem cruzar fronteiras.</p>
+                    </div>
+                    <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
+                        <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                            <i data-lucide="scale" class="w-8 h-8 text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Diretrizes do CFM</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">Nossa IA recebe "Guardrails" estritos. É expressamente proibida de ler laudos ou dar conselhos médicos, atuando 100% como apoio administrativo.</p>
+                    </div>
+                    <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
+                        <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                            <i data-lucide="file-check-2" class="w-8 h-8 text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Conformidade LGPD</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">O fluxo exige e registra o aceite automatizado do paciente sobre as políticas de privacidade antes de trafegar informação clínica sensível.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ROI Banner -->
+        <section class="bg-emerald-50 py-16 border-b border-emerald-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl shadow-xl border border-emerald-100 overflow-hidden flex flex-col md:flex-row">
+                    <div class="p-10 md:w-1/2 flex flex-col justify-center">
+                        <h2 class="text-3xl font-extrabold text-primary-900 mb-4">Um sistema que se paga sozinho.</h2>
+                        <p class="text-slate-600 text-lg mb-6">Ao usar nossa automação inteligente de lembretes (24h/48h) para derrubar o número de faltas, a receita da sua agenda sobe automaticamente:</p>
+                        <div class="bg-emerald-50 border border-emerald-200 p-6 rounded-xl text-primary-900 shadow-inner">
+                            <p class="text-lg font-medium">Salvar a falta de apenas</p>
+                            <p class="text-4xl font-black text-emerald-600 my-2">2 a 3 pacientes</p>
+                            <p class="font-medium">já cobre integralmente o seu investimento mensal.</p>
+                        </div>
+                    </div>
                     
-                    <div class="flex items-end justify-center gap-6 h-48 relative z-10 w-full max-w-sm mx-auto">
-                        <div class="flex flex-col items-center gap-2 w-1/3">
-                            <span class="text-slate-300 font-bold">72%</span>
-                            <div class="w-full bg-slate-600/80 rounded-t-lg h-24"></div>
-                            <span class="text-slate-400 text-xs">Sem automação</span>
-                        </div>
-                        <div class="flex items-center justify-center pb-8 w-1/6">
-                            <i data-lucide="arrow-right" class="w-6 h-6 text-slate-500"></i>
-                        </div>
-                        <div class="flex flex-col items-center gap-2 w-1/3">
-                            <span class="text-emerald-400 font-bold text-2xl drop-shadow-md">96%</span>
-                            <div class="w-full bg-emerald-500 rounded-t-lg h-40 shadow-[0_0_20px_rgba(16,185,129,0.6)] border-t border-emerald-300 relative">
-                                <div class="absolute -top-3 -right-6 bg-white text-primary-900 text-[10px] font-bold px-2 py-1 rounded-full shadow-lg whitespace-nowrap">+ Receita</div>
+                    <div class="bg-slate-900 p-10 md:w-1/2 flex flex-col justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/40 via-slate-900 to-slate-900 pointer-events-none"></div>
+                        <h3 class="text-white text-sm font-bold uppercase tracking-wider mb-8 text-center relative z-10">Taxa de Consultas Realizadas (Faturamento)</h3>
+                        
+                        <div class="flex items-end justify-center gap-6 h-48 relative z-10 w-full max-w-sm mx-auto">
+                            <div class="flex flex-col items-center gap-2 w-1/3">
+                                <span class="text-slate-300 font-bold">72%</span>
+                                <div class="w-full bg-slate-600/80 rounded-t-lg h-24"></div>
+                                <span class="text-slate-400 text-xs">Sem automação</span>
                             </div>
-                            <span class="text-white font-bold text-xs">Com RXSync</span>
+                            <div class="flex items-center justify-center pb-8 w-1/6">
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-slate-500"></i>
+                            </div>
+                            <div class="flex flex-col items-center gap-2 w-1/3">
+                                <span class="text-emerald-400 font-bold text-2xl drop-shadow-md">96%</span>
+                                <div class="w-full bg-emerald-500 rounded-t-lg h-40 shadow-[0_0_20px_rgba(16,185,129,0.6)] border-t border-emerald-300 relative">
+                                    <div class="absolute -top-3 -right-6 bg-white text-primary-900 text-[10px] font-bold px-2 py-1 rounded-full shadow-lg whitespace-nowrap">+ Receita</div>
+                                </div>
+                                <span class="text-white font-bold text-xs">Com RXSync</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Planos e Preços -->
-    <section id="precos" class="py-24 bg-white relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-extrabold text-primary-900 sm:text-4xl">Planos de Blindagem Operacional</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                    Transparência total. Foco em resolver a operação de clínicas de diferentes portes.
-                </p>
-            </div>
-
-            <div class="max-w-3xl mx-auto mb-16 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm text-center flex flex-col md:flex-row items-center justify-center gap-6">
-                <div class="w-16 h-16 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center shrink-0">
-                    <i data-lucide="settings-2" class="w-8 h-8"></i>
+        <!-- Planos e Preços -->
+        <section id="precos" class="py-24 bg-white relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-extrabold text-primary-900 sm:text-4xl">Planos de Blindagem Operacional</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                        A RXSync entrega a solução rodando. Foco total em resolver o seu problema sem gerar demandas técnicas para você.
+                    </p>
                 </div>
-                <div class="text-left">
-                    <h3 class="text-xl font-bold text-primary-900 mb-2">Taxa Única de Implantação (Setup "White-Glove")</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">A partir de <strong class="text-primary-900 text-base">R$ 1.500</strong>. Nós mapeamos as regras da sua clínica, alimentamos a IA com seus dados, configuramos as integrações e treinamos sua equipe. Você não precisa programar absolutamente nada.</p>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow p-8 flex flex-col h-full">
-                    <h3 class="text-xl font-bold text-primary-900 mb-2">Essencial</h3>
-                    <p class="text-slate-500 text-sm mb-6 h-10">Para consultórios independentes que precisam organizar o atendimento.</p>
-                    <div class="mb-8 pb-8 border-b border-slate-100">
-                        <span class="text-4xl font-black text-primary-900">R$ 399</span><span class="text-slate-500 font-medium">/mês</span>
+                <div class="max-w-3xl mx-auto mb-16 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm text-center flex flex-col md:flex-row items-center justify-center gap-6">
+                    <div class="w-16 h-16 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center shrink-0">
+                        <i data-lucide="settings-2" class="w-8 h-8"></i>
                     </div>
-                    <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Triagem automatizada 24/7 (Nome, Intenção, Convênio)</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">IA treinada para tirar dúvidas frequentes e passar valores</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Painel CRM opcional (ou use seu WhatsApp Web)</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Adesão à LGPD e Guardrails CFM</span></li>
-                    </ul>
-                    <a href="#contato" class="w-full text-center px-4 py-3.5 border-2 border-primary-900 text-primary-900 font-bold rounded-xl hover:bg-primary-900 hover:text-white transition-colors">Selecionar Essencial</a>
+                    <div class="text-left">
+                        <h3 class="text-xl font-bold text-primary-900 mb-2">Taxa Única de Implantação (Setup e Integração)</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">A partir de <strong class="text-primary-900 text-base">R$ 1.500</strong>. Nós mapeamos as regras da sua clínica, alimentamos a IA, configuramos a integração com seu software atual e te entregamos funcionando. Você não programa nada.</p>
+                    </div>
                 </div>
 
-                <div class="bg-primary-900 rounded-3xl border-2 border-emerald-500 shadow-2xl p-8 flex flex-col h-full relative transform md:-translate-y-4">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg whitespace-nowrap">
-                        Mais Recomendado
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
+                    <!-- Plano 1 -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow p-8 flex flex-col h-full">
+                        <h3 class="text-xl font-bold text-primary-900 mb-2">Essencial</h3>
+                        <p class="text-slate-500 text-sm mb-6 h-10">Para consultórios independentes que precisam organizar o atendimento.</p>
+                        <div class="mb-8 pb-8 border-b border-slate-100">
+                            <span class="text-4xl font-black text-primary-900">R$ 399</span><span class="text-slate-500 font-medium">/mês</span>
+                        </div>
+                        <ul class="space-y-4 mb-8 flex-1">
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Triagem automatizada 24/7 (Nome, Convênio)</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">IA em português impecável para dúvidas e valores</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Integrado direto no seu WhatsApp atual</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Adesão à LGPD e Guardrails CFM</span></li>
+                        </ul>
+                        <button onclick="scrollToForm('Essencial')" class="w-full text-center px-4 py-3.5 border-2 border-primary-900 text-primary-900 font-bold rounded-xl hover:bg-primary-900 hover:text-white transition-colors">
+                            Selecionar Essencial
+                        </button>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Gestão Inteligente</h3>
-                    <p class="text-white/80 text-sm mb-6 h-10">Para clínicas de múltiplas salas buscando maximizar a agenda.</p>
-                    <div class="mb-8 pb-8 border-b border-primary-700/50">
-                        <span class="text-4xl font-black text-white">R$ 799</span><span class="text-white/70 font-medium">/mês</span>
-                    </div>
-                    <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-start"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white font-bold text-sm">Tudo do Plano Essencial</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Integração API Direta com Prontuário (Autoagendamento)</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Cadência de Lembretes Anti-Falta (24h e 48h)</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Follow-up automático de orçamentos</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Gestão inteligente de fila de espera</span></li>
-                    </ul>
-                    <a href="#contato" class="w-full text-center px-4 py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 shadow-lg transition-colors">Selecionar Gestão</a>
-                </div>
 
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow p-8 flex flex-col h-full">
-                    <h3 class="text-xl font-bold text-primary-900 mb-2">Enterprise</h3>
-                    <p class="text-slate-500 text-sm mb-6 h-10">Para redes de policlínicas ou franquias em expansão.</p>
-                    <div class="mb-8 pb-8 border-b border-slate-100 flex items-center h-[52px]">
-                        <span class="text-3xl font-black text-primary-900">Sob Consulta</span>
+                    <!-- Plano 2 -->
+                    <div class="bg-primary-900 rounded-3xl border-2 border-emerald-500 shadow-2xl p-8 flex flex-col h-full relative transform md:-translate-y-4">
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg whitespace-nowrap">
+                            Mais Recomendado
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Gestão Inteligente</h3>
+                        <p class="text-white/80 text-sm mb-6 h-10">Para clínicas buscando maximizar e lotar a agenda médica.</p>
+                        <div class="mb-8 pb-8 border-b border-primary-700/50">
+                            <span class="text-4xl font-black text-white">R$ 799</span><span class="text-white/70 font-medium">/mês</span>
+                        </div>
+                        <ul class="space-y-4 mb-8 flex-1">
+                            <li class="flex items-start"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white font-bold text-sm">Tudo do Plano Essencial</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Integração API Direta com Prontuário (Autoagendamento)</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Cadência de Lembretes Anti-Falta (24h e 48h)</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Follow-up automático de orçamentos</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Gestão inteligente de fila de espera</span></li>
+                        </ul>
+                        <button onclick="scrollToForm('Gestão Inteligente')" class="w-full text-center px-4 py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 shadow-lg transition-colors">
+                            Selecionar Gestão
+                        </button>
                     </div>
-                    <ul class="space-y-4 mb-8 flex-1">
-                        <li class="flex items-start"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3 shrink-0"></i><span class="text-primary-900 font-bold text-sm">Tudo do Gestão Inteligente</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Triagem distribuída (Múltiplas unidades físicas)</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">SLA de atendimento agressivo</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Desenvolvimento de fluxos customizados</span></li>
-                        <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Gerente de Conta Dedicado</span></li>
-                    </ul>
-                    <a href="#contato" class="w-full text-center px-4 py-3.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">Falar com Consultor</a>
+
+                    <!-- Plano 3 -->
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow p-8 flex flex-col h-full">
+                        <h3 class="text-xl font-bold text-primary-900 mb-2">Enterprise</h3>
+                        <p class="text-slate-500 text-sm mb-6 h-10">Para redes de policlínicas ou franquias em expansão.</p>
+                        <div class="mb-8 pb-8 border-b border-slate-100 flex items-center h-[52px]">
+                            <span class="text-3xl font-black text-primary-900">Sob Consulta</span>
+                        </div>
+                        <ul class="space-y-4 mb-8 flex-1">
+                            <li class="flex items-start"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3 shrink-0"></i><span class="text-primary-900 font-bold text-sm">Tudo do Gestão Inteligente</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Triagem distribuída (Múltiplas unidades físicas)</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">SLA de atendimento agressivo</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Desenvolvimento de fluxos customizados</span></li>
+                            <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-slate-400 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Gerente de Conta Dedicado</span></li>
+                        </ul>
+                        <button onclick="scrollToForm('Enterprise')" class="w-full text-center px-4 py-3.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                            Falar com Consultor
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- FAQ -->
-    <section id="faq" class="py-24 bg-slate-50">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-extrabold text-primary-900">Perguntas Frequentes</h2>
-                <p class="mt-4 text-slate-600">Esclareça suas dúvidas operacionais.</p>
+        <!-- FAQ -->
+        <section id="faq" class="py-24 bg-slate-50">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-extrabold text-primary-900">Perguntas Frequentes</h2>
+                    <p class="mt-4 text-slate-600">Esclareça suas dúvidas sobre a instalação e uso.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                            <span class="font-bold text-primary-900">Nossa equipe precisa aprender um sistema novo (CRM)?</span>
+                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content bg-slate-50">
+                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                Absolutamente não. Não vendemos e não obrigamos você a usar um CRM novo. Nossa automação é invisível: ela atua conectada ao sistema de agendamento que você já usa e ao WhatsApp Web atual da clínica. Sua recepção continua trabalhando exatamente como hoje, apenas com a vantagem de não precisar mais responder a perguntas repetitivas.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                            <span class="font-bold text-primary-900">O paciente percebe que está falando com um robô?</span>
+                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content bg-slate-50">
+                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                Sim, pois a LGPD exige transparência logo no primeiro contato. E isso é excelente! O paciente moderno adora a clareza, a educação extrema, o português perfeito e a rapidez absurda de ter seu problema resolvido em 3 segundos, ao invés de esperar 40 minutos para ser atendido por um humano ocupado. O nível de organização percebido pela clínica dispara.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                            <span class="font-bold text-primary-900">Eu preciso configurar a Inteligência Artificial?</span>
+                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content bg-slate-50">
+                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                Não. A RXSync cuida de todo o "Setup White-Glove". Você nos passa os documentos de serviços e valores da sua clínica, e a nossa engenharia cria o fluxo, programa as regras de segurança e entrega o sistema pronto, validado e rodando para você.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="space-y-4">
-                <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
-                        <span class="font-bold text-primary-900">Nossa equipe precisa aprender um sistema novo?</span>
-                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+        <!-- Formulário Inteligente (Contato / Lead Capture) -->
+        <section id="contato" class="bg-primary-900 pt-24 pb-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Adeque sua clínica para o futuro, hoje.</h2>
+                    <!-- CONTRASTE CORRIGIDO: texto claro (slate-200) e fonte com peso (font-medium) para destacar do fundo escuro -->
+                    <p class="text-slate-200 font-medium text-lg">Preencha o formulário e nossa equipe entrará em contato para agendar uma demonstração exclusiva com a sua estrutura de atendimento.</p>
+                </div>
+
+                <!-- Formulário Formspree Real -->
+                <form action="https://formspree.io/f/xkjwrgjk" method="POST" class="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-8 md:p-10 mb-8" onsubmit="trackFormSubmit()">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="nome" class="block text-sm font-semibold text-slate-700 mb-2">Nome Completo do Responsável</label>
+                            <input type="text" id="nome" name="nome" required placeholder="Ex: Dr. Carlos Eduardo" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800">
+                        </div>
+                        <div>
+                            <label for="clinica" class="block text-sm font-semibold text-slate-700 mb-2">Nome da Clínica</label>
+                            <input type="text" id="clinica" name="clinica" required placeholder="Ex: Clínica Vida Integrada" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">E-mail Corporativo</label>
+                            <input type="email" id="email" name="email" required placeholder="contato@suaclinica.com.br" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800">
+                        </div>
+                        <div>
+                            <label for="telefone" class="block text-sm font-semibold text-slate-700 mb-2">Seu WhatsApp</label>
+                            <input type="tel" id="telefone" name="telefone" required placeholder="(00) 00000-0000" class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label for="software" class="block text-sm font-semibold text-slate-700 mb-2">Sistema de Gestão que usam hoje?</label>
+                            <select id="software" name="software_gestao" required class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800 appearance-none">
+                                <option value="" disabled selected>Selecione seu software...</option>
+                                <option value="iClinic">iClinic</option>
+                                <option value="Amplimed">Amplimed</option>
+                                <option value="Doctoralia">Doctoralia (Agenda)</option>
+                                <option value="Feegow">Feegow</option>
+                                <option value="Outro">Outro sistema (Apenas WhatsApp hoje)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="plano" class="block text-sm font-semibold text-slate-700 mb-2">Plano de Interesse</label>
+                            <select id="plano" name="plano_interesse" required class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-emerald-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-primary-900 font-semibold appearance-none">
+                                <option value="" disabled selected>Indeciso (Quero recomendação)</option>
+                                <option value="Essencial">Plano Essencial</option>
+                                <option value="Gestão Inteligente">Plano Gestão Inteligente</option>
+                                <option value="Enterprise">Plano Enterprise</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-1 flex justify-center items-center gap-2">
+                        Solicitar Orçamento e Demonstração <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
-                    <div class="faq-content bg-slate-50">
-                        <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                            Não necessariamente. Nosso painel centralizado (CRM) é opcional e entregue para organizar a gestão, mas caso sua equipe prefira, vocês podem continuar respondendo e intervindo pelo WhatsApp Web da mesma maneira simples e fluida que já fazem hoje. A transição entre a IA e o humano é automática de qualquer forma.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
-                        <span class="font-bold text-primary-900">O paciente percebe que está falando com um robô?</span>
-                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                    </button>
-                    <div class="faq-content bg-slate-50">
-                        <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                            Sim, e isso gera um impacto extremamente positivo. A transparência de se identificar logo de cara como assistente virtual da clínica (junto com o aviso de consentimento da LGPD), aliada à simpatia de um tom de voz humanizado, faz com que o paciente valorize a rapidez. O paciente moderno prefere um assistente que resolve o problema dele em 3 segundos do que aguardar 40 minutos por uma resposta humana.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                    <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)">
-                        <span class="font-bold text-primary-900">E se a Inteligência Artificial errar ou sugerir tratamentos?</span>
-                        <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                    </button>
-                    <div class="faq-content bg-slate-50">
-                        <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                            Isso não tem como ocorrer em nossa arquitetura. Nós não usamos um robô genérico. Utilizamos uma tecnologia de ancoragem restrita (RAG). O banco de dados da IA é bloqueado: ela só tem autorização para gerar respostas baseadas exclusivamente nos documentos oficias, preços e diretrizes que você nos repassar. Se o paciente relatar um sintoma, o sistema pausa e chama o humano.
-                        </div>
-                    </div>
-                </div>
+                    <p class="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
+                        <i data-lucide="lock" class="w-3 h-3"></i> Suas informações são protegidas e não compartilhamos seus dados.
+                    </p>
+                </form>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Footer & Formulário de Contato / Espaço para Formspree -->
-    <footer id="contato" class="bg-primary-900 text-white pt-20 pb-8 border-t border-primary-800 relative overflow-hidden">
+    <!-- RODAPÉ ROBUSTO RESTAURADO -->
+    <footer class="bg-primary-900 text-white pt-8 pb-8 border-t border-primary-800 relative overflow-hidden">
         <div class="absolute inset-0 opacity-5 pointer-events-none">
             <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
                 <defs><pattern id="grid-footer" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
@@ -652,17 +696,6 @@
         </div>
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <!-- Bloco de Conversão (Pronto para Formspree se desejar substituir o botão por formulário) -->
-            <div class="bg-gradient-to-br from-primary-800 to-primary-900 rounded-3xl p-8 md:p-16 mb-20 text-center border border-primary-700 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-                <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-white">Pronto para blindar a operação da sua clínica?</h2>
-                <p class="text-primary-200 mb-10 max-w-2xl mx-auto text-lg leading-relaxed">Agende uma demonstração ao vivo de 20 minutos e veja, na prática, nossa tecnologia conversando com você e fechando um agendamento no nosso número de laboratório.</p>
-                
-                <!-- ESPAÇO FORMSPREE: Para usar formulário direto no site, substitua a tag <a> por <form action="https://formspree.io/f/seu-id-aqui" method="POST"> -->
-                <a href="#" onclick="alert('Neste momento, a ação abriria o seu Calendly ou WhatsApp para o Lead agendar o Meet.')" class="inline-flex items-center justify-center px-10 py-5 text-lg font-bold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl shadow-white/10 transition-transform hover:-translate-y-1">
-                    <i data-lucide="calendar" class="w-6 h-6 mr-3 text-emerald-500"></i> Agendar Demonstração Gratuita
-                </a>
-            </div>
-
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12 border-b border-primary-800 pb-12">
                 <div class="col-span-1 md:col-span-2">
                     <div class="flex items-center gap-2 mb-6">
@@ -688,7 +721,7 @@
                     <h4 class="font-bold mb-6 text-white uppercase tracking-wider text-sm">Contato Legal</h4>
                     <ul class="space-y-3 text-sm text-primary-300 font-medium">
                         <li><a href="#" class="hover:text-emerald-400 transition-colors">Termos de Serviço</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-cards">Política de Privacidade (LGPD)</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Política de Privacidade (LGPD)</a></li>
                         <li class="mt-6 flex items-center gap-3 text-white">
                             <div class="w-8 h-8 rounded-full bg-primary-800 flex items-center justify-center">
                                 <i data-lucide="mail" class="w-4 h-4"></i> 
@@ -708,28 +741,60 @@
     <script>
         lucide.createIcons();
 
+        // FAQ Toggle
         function toggleFaq(button) {
             const faqItem = button.parentElement;
             document.querySelectorAll('.faq-item').forEach(item => {
                 if(item !== faqItem && item.classList.contains('active')) {
                     item.classList.remove('active');
+                    item.querySelector('button').setAttribute('aria-expanded', 'false');
                 }
             });
             faqItem.classList.toggle('active');
+            button.setAttribute('aria-expanded', faqItem.classList.contains('active'));
         }
 
+        // Mobile Menu
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
-
-        btn.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
+        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+        document.querySelectorAll('#mobile-menu a, #mobile-menu button').forEach(el => {
+            el.addEventListener('click', () => menu.classList.add('hidden'));
         });
 
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                menu.classList.add('hidden');
-            });
-        });
+        // Função de Scroll Inteligente e Preenchimento Automático do Formulário + Evento Google
+        function scrollToForm(planName) {
+            // Rastreamento GA4 nativo
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_cta_form', { 'plan_selected': planName || 'Não especificado' });
+            }
+
+            // Define o plano se passado por parâmetro
+            if (planName) {
+                const planSelect = document.getElementById('plano');
+                if(planSelect) {
+                    for(let i=0; i<planSelect.options.length; i++){
+                        if(planSelect.options[i].value === planName){
+                            planSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Desliza suavemente até o formulário
+            document.getElementById('contato').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Rastreamento GA4 ao Enviar Formulário
+        function trackFormSubmit() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'generate_lead', {
+                    'event_category': 'formulario',
+                    'event_label': 'Solicitacao_Demo_RXSync'
+                });
+            }
+        }
     </script>
 </body>
 </html>
