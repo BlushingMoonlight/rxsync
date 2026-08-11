@@ -36,19 +36,13 @@
     <link rel="icon" type="image/png" href="assets/favicon-rxsync.png">
     <link rel="apple-touch-icon" href="assets/favicon-rxsync.png">
 
-    <!-- ===================== GOOGLE ANALYTICS (GA4) ===================== -->
-    <!-- Google tag (gtag.js) atualizada com o seu ID -->
+    <!-- ===================== GOOGLE ANALYTICS (GA4) RASTREIO DIRETO ===================== -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-G5ZS8DRHNM"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
-      // Regras de Consentimento LGPD (Mantidas para segurança)
-      gtag('consent','default',{
-        'ad_storage':'denied', 'ad_user_data':'denied', 'ad_personalization':'denied',
-        'analytics_storage':'denied', 'wait_for_update':500
-      });
-      
+      // Script limpo e direto: rastreia imediatamente ao carregar a página
       gtag('js', new Date());
       gtag('config', 'G-G5ZS8DRHNM');
     </script>
@@ -722,7 +716,7 @@
                     <h4 class="font-bold mb-6 text-white uppercase tracking-wider text-sm">Contato Legal</h4>
                     <ul class="space-y-3 text-sm text-primary-300 font-medium">
                         <li><a href="#" class="hover:text-emerald-400 transition-colors">Termos de Serviço</a></li>
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Política de Privacidade (LGPD)</a></li>
+                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Política de Privacidade</a></li>
                         <li class="mt-6 flex items-center gap-3 text-white">
                             <div class="w-8 h-8 rounded-full bg-primary-800 flex items-center justify-center">
                                 <i data-lucide="mail" class="w-4 h-4"></i> 
@@ -763,7 +757,7 @@
             el.addEventListener('click', () => menu.classList.add('hidden'));
         });
 
-        // Função de Scroll Inteligente e Preenchimento Automático do Formulário + Evento Google
+        // Função de Scroll Inteligente e Preenchimento Automático do Formulário
         function scrollToForm(planName) {
             if (typeof gtag === 'function') {
                 gtag('event', 'click_cta_form', { 'plan_selected': planName || 'Não especificado' });
