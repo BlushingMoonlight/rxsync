@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rxsync.com.br/sitemap.xml
