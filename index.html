@@ -408,7 +408,7 @@
                             <i data-lucide="bot" class="text-emerald-600 w-6 h-6"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-primary-900 mb-4">Experiência Agradável e Português Impecável</h3>
-                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Treinada com uma base de conhecimento exclusiva da sua clínica e rodando em servidores no Brasil, nossa IA responde em português correto e garante uma experiência fluida que os pacientes elogiam.</p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Treinada com uma base de conhecimento exclusiva da sua clínica e com histórico armazenado em servidores no Brasil, nossa IA responde em português correto e garante uma experiência fluida que os pacientes elogiam.</p>
                         <ul class="space-y-3">
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Resposta em segundos, dentro da janela de 5 minutos em que a chance de agendar é maior.</li>
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Comunicação padronizada, acolhedora e agradável.</li>
@@ -681,9 +681,9 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
                     <i data-lucide="shield-check" class="w-16 h-16 text-emerald-400 mx-auto mb-6"></i>
-                    <h2 class="text-3xl font-bold sm:text-4xl">Blindagem Jurídica e Ética Inegociável.</h2>
+                    <h2 class="text-3xl font-bold sm:text-4xl">Conformidade tratada com o rigor que a medicina exige.</h2>
                     <p class="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
-                        Nossa infraestrutura é desenhada exclusivamente para o setor de saúde, protegendo o seu registro médico e os dados dos seus pacientes.
+                        Nossa infraestrutura é desenhada exclusivamente para o setor de saúde. Cada decisão técnica existe para reduzir o risco regulatório da sua clínica e proteger os dados dos seus pacientes.
                     </p>
                 </div>
 
@@ -692,8 +692,8 @@
                         <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
                             <i data-lucide="server" class="w-8 h-8 text-emerald-400"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3 text-white">Servidores Nacionais</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">Dados em VPS localizados no Brasil, evitando as complexas exigências de transferência internacional da Resolução ANPD nº 19/2024.</p>
+                        <h3 class="text-xl font-bold mb-3 text-white">Armazenamento no Brasil</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">O histórico dos seus pacientes fica armazenado em servidores no Brasil, criptografado. O processamento da resposta pelo modelo de IA ocorre no exterior, de forma pseudonimizada e documentada em contrato, conforme a Resolução ANPD nº 19/2024.</p>
                     </div>
                     <div class="bg-primary-800/40 border border-primary-700 p-8 rounded-2xl text-center hover:bg-primary-800/60 transition-colors">
                         <div class="bg-primary-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
@@ -911,7 +911,7 @@
                         </button>
                         <div class="faq-content bg-slate-50">
                             <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Sim, pois a LGPD exige transparência logo no primeiro contato. E isso é excelente! O paciente moderno adora a clareza, a educação extrema, o português perfeito e a rapidez absurda de ter seu problema resolvido em 3 segundos, ao invés de esperar 40 minutos para ser atendido por um humano ocupado. O nível de organização percebido pela clínica dispara.
+                                Sim, pois a LGPD exige transparência logo no primeiro contato. E isso é excelente! O paciente moderno adora a clareza, a educação extrema, o português perfeito e a rapidez de ter seu problema resolvido em segundos, ao invés de esperar 40 minutos para ser atendido por um humano ocupado. O nível de organização percebido pela clínica dispara.
                             </div>
                         </div>
                     </div>
@@ -935,7 +935,19 @@
                         </button>
                         <div class="faq-content bg-slate-50">
                             <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                A sua clínica, sempre. Perante a LGPD, sua clínica é a controladora dos dados dos pacientes; a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado, sem uso comercial ou compartilhamento com terceiros.
+                                A sua clínica, sempre. Perante a LGPD, sua clínica é a controladora dos dados dos pacientes; a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado, sem uso comercial e sem utilizá-las para treinar modelos de inteligência artificial de terceiros.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                            <span class="font-bold text-primary-900">Onde os dados dos meus pacientes ficam e por onde eles passam?</span>
+                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
+                        </button>
+                        <div class="faq-content bg-slate-50">
+                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                O armazenamento (histórico de conversas, cadastro, agendamentos) fica em servidor no Brasil, criptografado. Para gerar a resposta, o trecho necessário da conversa é enviado ao provedor do modelo de inteligência artificial, cuja infraestrutura fica no exterior — o mesmo ocorre em qualquer solução de IA disponível hoje no mercado. Removemos identificadores diretos sempre que possível, essa transferência é formalizada no contrato com base no art. 33 da LGPD e nas cláusulas-padrão da Resolução ANPD nº 19/2024, e o provedor não utiliza esses dados para treinar seus modelos. Preferimos explicar isso na primeira reunião a deixar sua clínica descobrir depois.
                             </div>
                         </div>
                     </div>
@@ -947,7 +959,7 @@
                         </button>
                         <div class="faq-content bg-slate-50">
                             <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Como não cobramos por mensagem enviada, seguimos protocolos rigorosos de aquecimento do número e boas práticas anti-spam para minimizar esse risco ao máximo. Também orientamos a manutenção de um número reserva, para que sua operação nunca fique parada.
+                                Existe, e preferimos ser transparentes: qualquer número de WhatsApp pode ser restringido pela Meta, automatizado ou não. Por isso seguimos protocolos rigorosos de aquecimento, nunca fazemos disparos em massa ou para listas frias, e recomendamos que a clínica mantenha um número reserva. Se houver bloqueio, reconectamos sua operação no número reserva em até 1 dia útil. Para clínicas que preferem risco ainda menor, oferecemos a migração para a API Oficial da Meta, com custo por conversa repassado.
                             </div>
                         </div>
                     </div>
@@ -1050,7 +1062,7 @@
                     <ul class="space-y-3 text-sm text-primary-300 font-medium">
                         <li><a href="#dores" class="hover:text-emerald-400 transition-colors">O Problema Oculto</a></li>
                         <li><a href="#solucao" class="hover:text-emerald-400 transition-colors">Nossa Plataforma</a></li>
-                        <li><a href="#seguranca" class="hover:text-emerald-400 transition-colors">Blindagem Jurídica</a></li>
+                        <li><a href="#seguranca" class="hover:text-emerald-400 transition-colors">Segurança e Conformidade</a></li>
                         <li><a href="#precos" class="hover:text-emerald-400 transition-colors">Planos e Preços</a></li>
                     </ul>
                 </div>
