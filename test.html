@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ===================== SEO & METADADOS PROFISSIONAIS ===================== -->
+    <title>RXSync | Automação e Inteligência Artificial para Clínicas</title>
+    <meta name="description" content="A RXSync programa, integra e instala sua automação médica. Atendimento agradável, português impecável e agenda 100% sincronizada com seu sistema atual.">
+    <meta name="keywords" content="chatbot clinica medica, automacao whatsapp medico, inteligencia artificial saude, agendamento automatico iClinic, rxsync, secretaria digital">
+    <meta name="author" content="RXSync Tecnologia">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://rxsync.com.br/">
+
+    <!-- ===================== OPEN GRAPH / WHATSAPP SHARE PREVIEW ===================== -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rxsync.com.br/">
+    <meta property="og:title" content="RXSync | Automação e IA para Clínicas">
+    <meta property="og:description" content="Atendimento humanizado via IA no WhatsApp 24/7. Agende consultas e reduza faltas sem esforço.">
+    <!-- IMAGEM PARA COMPARTILHAMENTO (Crie uma imagem 1200x630 e coloque o link aqui) -->
+    <meta property="og:image" content="https://rxsync.com.br/assets/og-image.png">
+
+    <!-- ===================== GOOGLE ANALYTICS 4 (GA4) ===================== -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SEUCODIGO"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SEUCODIGO'); // Substitua pelo seu ID
+    </script>
+
+    <!-- Tailwind CSS (via CDN para este arquivo único) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fontes do Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Configuração Personalizada -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6', // Teal principal
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            900: '#134e4a',
+                            dark: '#0f172a' // Slate escuro
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer">
+                    <i data-lucide="activity" class="h-8 w-8 text-brand-600 mr-2"></i>
+                    <span class="font-heading font-bold text-2xl text-brand-dark tracking-tight">RXSync</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#como-funciona" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Como Funciona</a>
+                    <a href="#beneficios" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Benefícios</a>
+                    <a href="#planos" class="text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Planos e Valores</a>
+                    <button onclick="scrollToForm()" class="bg-brand-dark text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition-all transform hover:scale-105 shadow-md">
+                        Transformar minha Clínica
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-600 focus:outline-none p-2">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="#como-funciona" class="block px-3 py-3 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-lg">Como Funciona</a>
+                <a href="#beneficios" class="block px-3 py-3 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-lg">Benefícios</a>
+                <a href="#planos" class="block px-3 py-3 text-base font-medium text-gray-800 hover:bg-gray-50 rounded-lg">Planos e Valores</a>
+                <div class="pt-4">
+                    <button onclick="scrollToForm()" class="w-full bg-brand-600 text-white px-6 py-3 rounded-xl text-base font-semibold shadow-md">
+                        Ver Planos e Valores
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-gradient-to-b from-brand-50 to-white">
+        <!-- Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+            <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div class="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-teal-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Hero Copy -->
+                <div class="max-w-2xl opacity-0 animate-fade-in-up">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-brand-100 text-brand-600 text-sm font-semibold mb-6 shadow-sm">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                        </span>
+                        Setup 100% feito por nós.
+                    </div>
+                    <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-extrabold text-brand-dark leading-[1.1] tracking-tight mb-6">
+                        O Futuro do Atendimento: Uma Recepcionista com <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-blue-600">IA no WhatsApp</span> da sua Clínica.
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Esqueça a demora e as mensagens genéricas. Nossa Inteligência Artificial atende seus pacientes 24 horas por dia com empatia, tira dúvidas complexas, realiza triagem e agenda consultas de forma humanizada. A experiência premium que sua clínica merece.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="scrollToForm()" class="bg-brand-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/30 flex items-center justify-center">
+                            Ver Planos e Valores
+                            <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">*Responder nos primeiros 5 minutos aumenta as chances de agendamento em até 21x (Fonte: MIT Lead Response Study).</p>
+                </div>
+
+                <!-- Hero Image / Visual -->
+                <div class="relative hidden lg:block opacity-0 animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="relative bg-white rounded-3xl shadow-2xl border border-gray-100 p-2 overflow-hidden transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                        <!-- Mac OS Window Header -->
+                        <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center rounded-t-2xl">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            </div>
+                            <div class="mx-auto text-xs font-semibold text-gray-500 font-sans">WhatsApp Business - RXSync</div>
+                        </div>
+                        <!-- Chat Body -->
+                        <div class="bg-[#efeae2] p-6 space-y-4 h-[400px] overflow-y-auto rounded-b-2xl">
+                            <div class="flex justify-end">
+                                <div class="bg-[#d9fdd3] text-gray-800 p-3 rounded-lg max-w-[80%] rounded-tr-none shadow-sm text-sm">
+                                    Olá, gostaria de saber se vocês atendem Unimed e se tem horário com o Dr. Carlos para essa semana.
+                                    <span class="text-[10px] text-gray-500 block text-right mt-1">10:14</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-start">
+                                <div class="bg-white text-gray-800 p-3 rounded-lg max-w-[85%] rounded-tl-none shadow-sm text-sm relative">
+                                    <div class="absolute -left-2 top-0 w-0 h-0 border-t-8 border-t-white border-l-8 border-l-transparent"></div>
+                                    <p class="font-semibold text-brand-600 text-xs mb-1">Clínica (Assistente IA)</p>
+                                    Olá! Tudo bem? Sim, nós atendemos Unimed! 😊 <br><br>
+                                    O Dr. Carlos (Cardiologista) tem os seguintes horários disponíveis para esta semana:<br>
+                                    • Quinta-feira (15/08) às 14:00<br>
+                                    • Sexta-feira (16/08) às 09:30<br><br>
+                                    Algum desses horários fica bom para você?
+                                    <span class="text-[10px] text-gray-500 block text-right mt-1">10:14</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <div class="bg-[#d9fdd3] text-gray-800 p-3 rounded-lg max-w-[80%] rounded-tr-none shadow-sm text-sm">
+                                    Pode ser sexta as 09:30!
+                                    <span class="text-[10px] text-gray-500 block text-right mt-1">10:16</span>
+                                </div>
+                            </div>
+                             <div class="flex justify-start">
+                                <div class="bg-white text-gray-800 p-3 rounded-lg max-w-[85%] rounded-tl-none shadow-sm text-sm">
+                                    <p class="font-semibold text-brand-600 text-xs mb-1">Clínica (Assistente IA)</p>
+                                    Perfeito! Consulta agendada com sucesso para <strong>Sexta-feira às 09:30</strong> com o Dr. Carlos. ✅<br><br>
+                                    Já inseri no sistema. Um dia antes, enviarei uma mensagem aqui para confirmar sua presença, combinado? Excelente semana!
+                                    <span class="text-[10px] text-gray-500 block text-right mt-1">10:16</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOGOS SECTION -->
+    <section class="py-10 bg-white border-y border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-6">Integração nativa com os melhores sistemas do mercado</p>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Placeholder para logos dos softwares parceiros/integrados -->
+                <div class="flex items-center font-bold text-xl text-gray-800"><i data-lucide="database" class="mr-2"></i> Doctoralia</div>
+                <div class="flex items-center font-bold text-xl text-gray-800"><i data-lucide="server" class="mr-2"></i> Feegow</div>
+                <div class="flex items-center font-bold text-xl text-gray-800"><i data-lucide="calendar" class="mr-2"></i> iClinic</div>
+                <div class="flex items-center font-bold text-xl text-gray-800"><i data-lucide="layout" class="mr-2"></i> Amplimed</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROBLEMA VS SOLUÇÃO -->
+    <section id="como-funciona" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="font-heading text-3xl font-bold text-brand-dark mb-4">O método tradicional de agendamento está ultrapassado.</h2>
+                <p class="text-lg text-gray-600">Se a sua recepção divide a atenção entre quem está no balcão e um celular tocando sem parar, você está perdendo pacientes todos os dias.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                    <div class="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center mb-6 text-red-600">
+                        <i data-lucide="clock" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-dark mb-3">Fim da Espera</h3>
+                    <p class="text-gray-600">61% dos pacientes desistem se não recebem resposta rápida. Nossa IA atende todos simultaneamente, em segundos, não importa o volume de mensagens.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-shadow duration-300 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">IA Generativa</div>
+                    <div class="w-14 h-14 bg-brand-100 rounded-xl flex items-center justify-center mb-6 text-brand-600">
+                        <i data-lucide="message-square" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-dark mb-3">Diálogo Humanizado</h3>
+                    <p class="text-gray-600">Não é um "robô de menus (digite 1, 2, 3)". A IA da RXSync entende áudios, interpreta dúvidas sobre convênios e conversa de forma natural, igual a um humano.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
+                        <i data-lucide="calendar-check" class="h-7 w-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-dark mb-3">Agenda Sincronizada</h3>
+                    <p class="text-gray-600">A IA consulta a disponibilidade real dos médicos e insere o paciente direto no seu prontuário eletrônico (Feegow, iClinic, etc), sem intervenção humana.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: REDUÇÃO DE FALTAS (NO-SHOW) -->
+    <section id="beneficios" class="py-24 bg-brand-dark text-white relative overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute right-0 top-0 w-1/2 h-full bg-brand-900 opacity-20 transform skew-x-12 translate-x-32"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div>
+                    <h2 class="font-heading text-3xl md:text-4xl font-bold mb-6">Diga adeus às faltas e horários ociosos na agenda.</h2>
+                    <p class="text-gray-300 text-lg mb-8">
+                        Um paciente que falta não apenas deixa um buraco na agenda, mas custa o valor da consulta e o investimento feito para atraí-lo.
+                    </p>
+                    
+                    <ul class="space-y-6">
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center mt-1 mr-4">
+                                <i data-lucide="check" class="h-4 w-4 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold">Lembretes 100% Personalizados</h4>
+                                <p class="text-gray-400">Configure a IA para chamar o paciente 48h, 24h, na manhã da consulta ou até 1 hora antes. O timing perfeito, configurado para a realidade da sua clínica.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center mt-1 mr-4">
+                                <i data-lucide="check" class="h-4 w-4 text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold">Reagendamento Automático</h4>
+                                <p class="text-gray-400">Se o paciente não puder comparecer, a própria IA cancela o horário no sistema e já sugere novas datas, liberando a vaga imediatamente para outro paciente da fila de espera.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="mt-10 p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm">
+                        <p class="text-xl font-medium">Lembretes proativos e humanizados reduzem o volume crônico de faltas em até <span class="text-brand-400 font-bold text-3xl">38%*</span>.</p>
+                        <p class="text-xs text-gray-400 mt-3">*Fonte: Estudos de gestão em saúde suplementar sobre automação de confirmações prévias e redução de No-Shows.</p>
+                    </div>
+                </div>
+
+                <!-- Gráfico Mockup -->
+                <div class="bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-2xl relative">
+                    <h3 class="text-center text-gray-300 font-semibold mb-6">Taxa de Consultas Realizadas (Faturamento)</h3>
+                    
+                    <div class="flex items-end h-64 gap-4 justify-center">
+                        <!-- Barras -->
+                        <div class="w-16 bg-gray-600 rounded-t-lg relative group">
+                            <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity">62%</div>
+                            <div class="h-[62%] bg-gray-500 rounded-t-lg w-full"></div>
+                            <div class="text-center text-xs mt-2 text-gray-400">Sem RXSync</div>
+                        </div>
+                        
+                        <div class="w-16 bg-brand-500 rounded-t-lg relative group">
+                            <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-sm font-bold text-brand-300 opacity-100">92%</div>
+                            <div class="h-[92%] bg-brand-400 rounded-t-lg w-full"></div>
+                            <div class="text-center text-xs mt-2 text-gray-300 font-semibold">Com RXSync</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: API INVISÍVEL E INTEGRAÇÃO -->
+    <section class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Mockup do Sistema de Gestão Interno -->
+                <div class="order-2 lg:order-1 bg-white rounded-xl shadow-lg border border-gray-200 p-1">
+                    <div class="bg-gray-100 rounded-t-lg px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+                        <span class="text-xs font-semibold text-gray-500">Seu Sistema Atual (Feegow / iClinic / etc)</span>
+                        <i data-lucide="lock" class="w-3 h-3 text-gray-400"></i>
+                    </div>
+                    <div class="p-6 bg-gray-50 space-y-4">
+                        <div class="h-4 bg-gray-200 rounded w-1/3 mb-6"></div>
+                        
+                        <!-- Log Inserido pela Recepção Humana -->
+                        <div class="bg-white p-4 rounded shadow-sm border-l-4 border-blue-400 relative">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="bg-blue-100 rounded-full w-8 h-8 flex items-center justify-center">
+                                    <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">Mariana (Recepção)</p>
+                                    <p class="text-xs text-gray-500">Agendamento Manual via Balcão</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-gray-800 text-sm">João da Silva - Retorno</p>
+                                    <p class="text-xs text-gray-500">Hoje, 14:00</p>
+                                </div>
+                                <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded font-semibold">Confirmado</span>
+                            </div>
+                        </div>
+
+                        <!-- Log Inserido pela IA RXSync -->
+                        <div class="bg-white p-4 rounded shadow-sm border-l-4 border-brand-500 relative transform transition-transform hover:-translate-y-1">
+                            <div class="absolute -right-2 -top-2">
+                                <span class="flex h-4 w-4 relative">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-4 w-4 bg-brand-500 border-2 border-white"></span>
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="bg-brand-100 rounded-full w-8 h-8 flex items-center justify-center">
+                                    <i data-lucide="bot" class="w-4 h-4 text-brand-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">RXSync (IA)</p>
+                                    <p class="text-xs text-gray-500">Agendamento Automático via WhatsApp</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-gray-800 text-sm">Maria Oliveira - Primeira Consulta</p>
+                                    <p class="text-xs text-gray-500">Hoje, 15:30</p>
+                                </div>
+                                <span class="bg-brand-100 text-brand-700 text-xs px-2 py-1 rounded font-semibold">Confirmado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <h2 class="font-heading text-3xl font-bold text-brand-dark mb-4">Tecnologia avançada, mas invisível para você.</h2>
+                    <p class="text-gray-600 text-lg mb-6">
+                        Você não precisa aprender a usar um sistema novo. A RXSync se conecta ao prontuário médico que você <strong>já utiliza</strong>.
+                    </p>
+                    <p class="text-gray-600 text-lg mb-8">
+                        A IA atende o paciente, negocia o melhor horário e apenas insere a ficha pronta na sua tela. Humanos e Inteligência Artificial trabalhando no mesmo ambiente de forma harmoniosa.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center text-gray-700 font-medium">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-500 mr-3"></i> Nenhum aplicativo extra para instalar.
+                        </div>
+                        <div class="flex items-center text-gray-700 font-medium">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-500 mr-3"></i> A recepção humana continua operando normalmente.
+                        </div>
+                        <div class="flex items-center text-gray-700 font-medium">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-brand-500 mr-3"></i> Segurança absoluta de dados (Em conformidade com a LGPD).
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO: PLANOS E PREÇOS -->
+    <section id="planos" class="py-24 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="font-heading text-3xl font-bold text-brand-dark mb-4">Escolha a inteligência certa para sua clínica.</h2>
+                <p class="text-gray-600 text-lg">Modelos transparentes, sem multas rescisórias. O setup é feito por nossa equipe de engenharia.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                
+                <!-- Plano Básico -->
+                <div class="border border-gray-200 rounded-3xl p-8 bg-white flex flex-col relative hover:shadow-lg transition-shadow">
+                    <h3 class="text-xl font-bold text-gray-800">IA Básico</h3>
+                    <p class="text-gray-500 text-sm mt-2 mb-6">Ideal para clínicas que desejam usar a IA apenas para triar pacientes e tirar dúvidas no WhatsApp, sem necessidade de integrar à agenda.</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-extrabold text-brand-dark">R$ 397</span>
+                        <span class="text-gray-500 font-medium">/mês</span>
+                    </div>
+                    
+                    <ul class="space-y-4 flex-1 mb-8">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-500 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600">Assistente IA para dúvidas (Convênios, Exames, Endereço)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-500 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600">Transbordo para Atendente Humano</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-500 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600 font-semibold">Até 1.000 atendimentos de IA por mês</span>
+                        </li>
+                        <li class="flex items-start opacity-40">
+                            <i data-lucide="x" class="w-5 h-5 text-gray-400 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600 line-through">Integração com Agenda Eletrônica</span>
+                        </li>
+                    </ul>
+                    <button onclick="scrollToForm('Basico')" class="w-full border-2 border-brand-600 text-brand-600 py-3 rounded-xl font-bold hover:bg-brand-50 transition-colors">
+                        Selecionar Básico
+                    </button>
+                </div>
+
+                <!-- Plano PRO (Destaque) -->
+                <div class="border-2 border-brand-500 rounded-3xl p-8 bg-brand-50 flex flex-col relative transform md:-translate-y-4 shadow-xl">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-brand-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-md">
+                        Mais Escolhido
+                    </div>
+                    <h3 class="text-xl font-bold text-brand-900">Premium Integrado</h3>
+                    <p class="text-gray-600 text-sm mt-2 mb-6">Automação completa. A IA acessa sua agenda, marca consultas e envia os lembretes de forma 100% autônoma.</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-extrabold text-brand-900">R$ 897</span>
+                        <span class="text-gray-600 font-medium">/mês</span>
+                    </div>
+                    
+                    <ul class="space-y-4 flex-1 mb-8">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-600 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-brand-900 font-medium">Todas as funções do Básico</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-600 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-brand-900 font-bold">Integração API (Doctoralia, Feegow, iClinic, etc)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-600 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-brand-900">Lembretes Personalizados (Redução de Faltas)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-brand-600 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-brand-900 font-semibold">Até 3.000 atendimentos de IA por mês</span>
+                        </li>
+                    </ul>
+                    <button onclick="scrollToForm('Pro')" class="w-full bg-brand-600 text-white py-3 rounded-xl font-bold hover:bg-brand-700 transition-colors shadow-lg">
+                        Selecionar Premium
+                    </button>
+                </div>
+
+                <!-- Plano Enterprise -->
+                <div class="border border-gray-200 rounded-3xl p-8 bg-white flex flex-col relative hover:shadow-lg transition-shadow">
+                    <h3 class="text-xl font-bold text-gray-800">Redes e Hospitais</h3>
+                    <p class="text-gray-500 text-sm mt-2 mb-6">Para redes de clínicas com múltiplos médicos, filiais ou altíssimo volume de atendimentos simultâneos.</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-extrabold text-brand-dark">Sob Consulta</span>
+                    </div>
+                    
+                    <ul class="space-y-4 flex-1 mb-8">
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-gray-700 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600">Servidor Dedicado e Infraestrutura Exclusiva</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-gray-700 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600">Múltiplos números de WhatsApp</span>
+                        </li>
+                         <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-gray-700 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600 font-semibold">Volume ilimitado / personalizado de IA</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check" class="w-5 h-5 text-gray-700 mr-3 flex-shrink-0 mt-0.5"></i>
+                            <span class="text-gray-600">SLA Rigoroso e Gerente de Sucesso Dedicado</span>
+                        </li>
+                    </ul>
+                    <button onclick="scrollToForm('Enterprise')" class="w-full border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">
+                        Falar com Consultor
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FORMULÁRIO DE CONTATO / LEAD -->
+    <section id="contato" class="py-24 bg-gray-900 text-white relative">
+        <!-- SVG Wave Top -->
+        <div class="absolute top-0 left-0 w-full overflow-hidden leading-none rotate-180">
+            <svg class="relative block w-full h-12" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#ffffff"></path>
+            </svg>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+            <div class="bg-gray-800 rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-700">
+                <div class="text-center mb-10">
+                    <h2 class="font-heading text-3xl font-bold mb-4">Pronto para modernizar sua clínica?</h2>
+                    <p class="text-gray-400">Preencha os dados abaixo. Nossa equipe entrará em contato em menos de 30 minutos para alinhar sua instalação.</p>
+                </div>
+
+                <form onsubmit="event.preventDefault(); trackFormSubmit(); alert('Obrigado! Um consultor entrará em contato via WhatsApp em breve.');" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Nome Completo</label>
+                            <input type="text" required class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all" placeholder="Dr. João da Silva">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">WhatsApp da Clínica</label>
+                            <input type="tel" required class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Qual sistema vocês usam hoje?</label>
+                            <select class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                                <option value="">Selecione...</option>
+                                <option value="Feegow">Feegow Clinic</option>
+                                <option value="Doctoralia">Doctoralia</option>
+                                <option value="iClinic">iClinic</option>
+                                <option value="Amplimed">Amplimed</option>
+                                <option value="Outro">Outro / Nenhum</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Plano de Interesse</label>
+                            <select id="plano" class="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all">
+                                <option value="">Gostaria de recomendação</option>
+                                <option value="Basico">IA Básico</option>
+                                <option value="Pro">Premium Integrado</option>
+                                <option value="Enterprise">Redes e Hospitais (Enterprise)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-500 text-white font-bold text-lg py-4 rounded-xl hover:bg-brand-600 transition-colors mt-4 shadow-lg shadow-brand-500/20">
+                        Solicitar Contato Especializado
+                    </button>
+                    <p class="text-center text-xs text-gray-500 mt-4 flex items-center justify-center">
+                        <i data-lucide="lock" class="w-3 h-3 mr-1"></i> Seus dados estão seguros. Não enviamos spam.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-950 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                
+                <div>
+                    <div class="flex items-center justify-center md:justify-start mb-4">
+                        <i data-lucide="activity" class="h-6 w-6 text-brand-500 mr-2"></i>
+                        <span class="font-heading font-bold text-xl text-white tracking-tight">RXSync</span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Elevando o padrão de atendimento na saúde com Inteligência Artificial e automação de alta performance.</p>
+                </div>
+                
+                <div class="text-gray-500 text-sm space-y-2">
+                    <p>CNPJ: 00.000.000/0001-00</p>
+                    <p>suporte@rxsync.com.br</p>
+                </div>
+                
+                <div class="text-gray-500 text-sm md:text-right">
+                    <a href="#" class="hover:text-white transition-colors block mb-2">Termos de Uso</a>
+                    <a href="#" class="hover:text-white transition-colors block mb-2">Política de Privacidade (LGPD)</a>
+                    <p class="mt-4">© 2026 RXSync. Todos os direitos reservados.</p>
+                </div>
+                
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Icons & Scripts -->
+    <script>
+        // Inicializa ícones Lucide
+        lucide.createIcons();
+
+        // Controle do Menu Mobile
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+        document.querySelectorAll('#mobile-menu a, #mobile-menu button').forEach(el => {
+            el.addEventListener('click', () => menu.classList.add('hidden'));
+        });
+
+        // Função de Scroll Inteligente e Preenchimento Automático do Formulário
+        function scrollToForm(planName) {
+            if (typeof gtag === 'function') {
+                gtag('event', 'click_cta_form', { 'plan_selected': planName || 'Não especificado' });
+            }
+
+            if (planName) {
+                const planSelect = document.getElementById('plano');
+                if(planSelect) {
+                    for(let i=0; i<planSelect.options.length; i++){
+                        if(planSelect.options[i].value === planName){
+                            planSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            document.getElementById('contato').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Rastreamento GA4 ao Enviar Formulário
+        function trackFormSubmit() {
+            if (typeof gtag === 'function') {
+                gtag('event', 'generate_lead', {
+                    'event_category': 'formulario',
+                    'event_label': 'Solicitacao_Demo_RXSync'
+                });
+            }
+        }
+    </script>
+</body>
+</html>
+
