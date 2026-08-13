@@ -5,31 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- ===================== SEO & METADADOS PROFISSIONAIS ===================== -->
-    <title>RXSync | Automação e Inteligência Artificial para Clínicas</title>
-    <meta name="description" content="A RXSync programa, integra e instala sua automação médica. Atendimento agradável, português impecável e agenda 100% sincronizada com seu sistema atual.">
+    <title>RXSync | Atendimento com Inteligência Artificial no WhatsApp para Clínicas</title>
+    <meta name="description" content="Assistente virtual com IA que atende os pacientes da sua clínica em segundos, 24h por dia, e agenda direto no seu sistema. Implantação feita por nós, conforme LGPD e CFM. Planos a partir de R$ 399/mês.">
     <meta name="keywords" content="chatbot clinica medica, automacao whatsapp medico, inteligencia artificial saude, agendamento automatico iClinic, rxsync, secretaria digital">
     <meta name="author" content="RXSync Tecnologia">
     <meta name="robots" content="index, follow">
     
-    <!-- GOOGLE SEARCH CONSOLE - Verificação (Substitua o content pelo seu código HTML tag) -->
-    <meta name="google-site-verification" content="COLOQUE_SEU_CODIGO_DE_VERIFICACAO_AQUI" />
+    <meta name="theme-color" content="#0f172a">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- GOOGLE SEARCH CONSOLE: descomente a linha abaixo e cole seu código de verificação -->
+    <!-- <meta name="google-site-verification" content="SEU_CODIGO_AQUI" /> -->
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://rxsync.com.br/">
 
     <!-- ===================== OPEN GRAPH / WHATSAPP SHARE PREVIEW ===================== -->
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="RXSync">
     <meta property="og:url" content="https://rxsync.com.br/">
     <meta property="og:title" content="RXSync | Automação e IA para Clínicas">
-    <meta property="og:description" content="Nós integramos e instalamos tudo. Sua clínica ganha atendimento instantâneo em português impecável, sem precisar aprender sistemas novos.">
+    <meta property="og:description" content="Seus pacientes atendidos em segundos por Inteligência Artificial, 24h por dia, com agendamento direto no sistema que sua clínica já usa.">
     <meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png"> <!-- Imagem 1200x630 -->
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="RXSync — atendimento com Inteligência Artificial para clínicas médicas">
     <meta property="og:locale" content="pt_BR">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="RXSync | Automação e IA para Clínicas">
-    <meta name="twitter:description" content="Atendimento agradável e agendamento inteligente sem novos softwares.">
+    <meta name="twitter:description" content="Seus pacientes atendidos em segundos por Inteligência Artificial, com agendamento direto no sistema da sua clínica.">
     <meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
 
     <!-- ===================== FAVICON ===================== -->
@@ -52,6 +57,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -64,7 +72,7 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: { 50: '#f0f5f9', 100: '#e0ebf4', 500: '#3b82f6', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
+                        primary: { 50: '#f0f5f9', 100: '#e0ebf4', 200: '#cbdcec', 300: '#a3b8cf', 400: '#60a5fa', 500: '#3b82f6', 600: '#1d4ed8', 700: '#1e40af', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
                         emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
                     },
                     boxShadow: {
@@ -76,13 +84,133 @@
         }
     </script>
     <style>
-        .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .faq-item.active .faq-content { max-height: 500px; }
+        section[id], main [id] { scroll-margin-top: 6rem; }
+        .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .faq-item.active .faq-content { max-height: 1000px; }
+        .select-field {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.1rem; padding-right: 2.75rem;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .animate-pulse { animation: none; }
+        }
         .faq-item.active .faq-icon { transform: rotate(180deg); }
         .mockup-scroll::-webkit-scrollbar { width: 4px; }
         .mockup-scroll::-webkit-scrollbar-track { background: transparent; }
         .mockup-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
+
+    <!-- ===================== DADOS ESTRUTURADOS (SCHEMA.ORG) ===================== -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://rxsync.com.br/#organizacao",
+          "name": "RXSync",
+          "alternateName": "RXSync Tecnologia e Automação em Saúde",
+          "url": "https://rxsync.com.br/",
+          "logo": "https://rxsync.com.br/assets/og-rxsync.png",
+          "email": "contato@rxsync.com.br",
+          "description": "Automação de atendimento com Inteligência Artificial para clínicas médicas, odontológicas e estéticas, com integração aos principais sistemas de gestão do mercado brasileiro.",
+          "areaServed": { "@type": "Country", "name": "Brasil" }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://rxsync.com.br/#site",
+          "url": "https://rxsync.com.br/",
+          "name": "RXSync",
+          "inLanguage": "pt-BR",
+          "publisher": { "@id": "https://rxsync.com.br/#organizacao" }
+        },
+        {
+          "@type": "Service",
+          "name": "Assistente virtual com IA para clínicas",
+          "serviceType": "Automação de atendimento e agendamento para clínicas médicas",
+          "provider": { "@id": "https://rxsync.com.br/#organizacao" },
+          "areaServed": { "@type": "Country", "name": "Brasil" },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Planos RXSync",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "name": "Plano Essencial",
+                "description": "Atendimento com IA 24/7 no WhatsApp da clínica, triagem automatizada e até 5.000 mensagens por mês. Funciona sem integração de agenda.",
+                "price": "399.00",
+                "priceCurrency": "BRL",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "399.00",
+                  "priceCurrency": "BRL",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "MON"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Plano Gestão Inteligente",
+                "description": "Tudo do Essencial mais integração direta com o prontuário, autoagendamento, lembretes anti-falta personalizados e até 15.000 mensagens por mês.",
+                "price": "799.00",
+                "priceCurrency": "BRL",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "799.00",
+                  "priceCurrency": "BRL",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "MON"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Plano Enterprise",
+                "description": "Para redes de policlínicas e franquias: triagem distribuída entre unidades, SLA dedicado e fluxos customizados."
+              }
+            ]
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Nossa equipe precisa trocar de sistema ou assinar um CRM?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Não. Seu sistema de gestão e a sua agenda continuam sendo os mesmos e você não paga assinatura extra de CRM. A recepção passa a atender por um painel próprio, já configurado, com histórico completo do paciente, alertas de urgência e botão para assumir a conversa. Está incluso na mensalidade e treinamos sua equipe na implantação." }
+            },
+            {
+              "@type": "Question",
+              "name": "E se eu quiser só a IA no WhatsApp, sem integrar minha agenda?",
+              "acceptedAnswer": { "@type": "Answer", "text": "É possível e é para isso que existe o plano Essencial. Nele a IA atende o WhatsApp da clínica, responde dúvidas, informa valores, convênios e horários, sem nenhuma conexão com agenda ou prontuário." }
+            },
+            {
+              "@type": "Question",
+              "name": "O paciente percebe que está falando com um robô?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Sim, porque a LGPD exige transparência no primeiro contato. A assistente se identifica como virtual e responde com clareza, português correto e rapidez, resolvendo o pedido do paciente em segundos." }
+            },
+            {
+              "@type": "Question",
+              "name": "Eu preciso configurar a Inteligência Artificial?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Não. A RXSync cuida de todo o setup. Você envia os documentos de serviços e valores da clínica e a nossa equipe cria o fluxo, programa as regras de segurança e entrega o sistema validado e rodando." }
+            },
+            {
+              "@type": "Question",
+              "name": "Quem é o dono dos dados dos meus pacientes?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A clínica, sempre. Perante a LGPD a clínica é a controladora dos dados e a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado." }
+            },
+            {
+              "@type": "Question",
+              "name": "Existe risco de bloqueio do número de WhatsApp?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Seguimos protocolos rigorosos de aquecimento do número e boas práticas anti-spam para minimizar o risco. Também orientamos a manutenção de um número reserva para que a operação nunca fique parada." }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 </head>
 <body class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-emerald-200 selection:text-emerald-900 overflow-x-hidden">
 
@@ -97,7 +225,7 @@
                     <span class="font-extrabold text-2xl tracking-tight text-primary-900">RXSync</span>
                 </div>
                 
-                <div class="hidden md:flex space-x-8 items-center">
+                <div class="hidden lg:flex space-x-6 xl:space-x-8 items-center">
                     <a href="#dores" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">O Problema</a>
                     <a href="#solucao" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">Plataforma</a>
                     <a href="#integracoes" class="text-sm font-medium text-slate-600 hover:text-primary-900 transition-colors">Integrações</a>
@@ -108,15 +236,15 @@
                     </button>
                 </div>
 
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-primary-900 focus:outline-none" aria-label="Abrir Menu">
+                <div class="lg:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-primary-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-md p-1" aria-label="Abrir menu de navegação" aria-controls="mobile-menu" aria-expanded="false">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
                 </div>
             </div>
         </nav>
 
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full">
+        <div id="mobile-menu" class="hidden bg-white border-t border-slate-100 absolute w-full">
             <div class="px-4 pt-2 pb-6 space-y-1 shadow-2xl">
                 <a href="#dores" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-md">O Problema</a>
                 <a href="#solucao" class="block px-3 py-2 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-md">Plataforma</a>
@@ -134,7 +262,7 @@
         <!-- Hero Section -->
         <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 bg-primary-900 overflow-hidden">
             <div class="absolute inset-0 opacity-10 pointer-events-none">
-                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true" focusable="false">
                     <defs><pattern id="grid-hero" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
                     <rect width="100%" height="100%" fill="url(#grid-hero)" />
                 </svg>
@@ -151,8 +279,8 @@
                 <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
                     Uma assistente virtual treinada com as regras da sua clínica tira dúvidas, passa valores e agenda direto no seu sistema — em português impecável, com a educação que a sua recepção teria se tivesse tempo. É assim que o atendimento em saúde vai funcionar, e você pode começar hoje.
                 </p>
-                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16">
-                    <a href="#precos" class="w-full sm:w-auto px-8 py-4 text-lg font-semibold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl transition-all hover:scale-105 text-center">
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4 md:mb-16">
+                    <a href="#precos" onclick="trackCta('hero_ver_planos')" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl transition-all hover:scale-105 text-center">
                         Ver planos e preços
                     </a>
                     <button onclick="scrollToForm('')" class="w-full sm:w-auto px-8 py-4 text-lg font-semibold rounded-xl text-white border border-white/30 hover:bg-white/10 transition-all">
@@ -196,7 +324,7 @@
                                     <div class="flex gap-4">
                                         <div class="flex-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
                                             <div class="text-xs text-slate-400 mb-1">Tempo de Resposta</div>
-                                            <div class="text-2xl font-bold text-white">Instatâneo</div>
+                                            <div class="text-2xl font-bold text-white">Instantâneo</div>
                                         </div>
                                         <div class="flex-1 rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
                                             <div class="text-xs text-slate-400 mb-1">Agendamentos (IA)</div>
@@ -328,39 +456,41 @@
                                 </div>
                                 <span class="mx-auto text-xs font-semibold text-slate-500 flex items-center gap-1"><i data-lucide="link" class="w-3 h-3"></i> Integração API Invisível</span>
                             </div>
-                            <div class="p-4 bg-white h-[350px]">
-                                <div class="grid grid-cols-5 gap-2 h-full text-xs">
-                                    <div class="col-span-5 flex justify-between items-center mb-2 px-2 text-slate-500 font-bold">
-                                        <span>Software da sua Clínica</span>
-                                        <span>Outubro 2026</span>
-                                    </div>
-                                    <div class="flex flex-col gap-4 text-slate-400 text-right pr-2 border-r border-slate-100 font-medium">
-                                        <div class="h-10 mt-2">14:00</div>
-                                        <div class="h-10 mt-4">15:00</div>
-                                        <div class="h-10 mt-4">16:00</div>
-                                    </div>
-                                    <div class="col-span-4 relative border-t border-slate-100 pt-2">
-                                        <div class="h-14 w-full rounded-lg bg-slate-100 border-l-4 border-slate-400 p-2 shadow-sm mb-2 flex flex-col justify-center">
-                                            <div class="flex justify-between items-center">
-                                                <span class="font-bold text-slate-700 text-sm">Helena Duarte</span>
-                                                <span class="bg-slate-500 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">Inserido pela recepção</span>
+                            <div class="p-4 sm:p-5 bg-white h-[350px] flex flex-col">
+                                <div class="flex justify-between items-center mb-3 px-1 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                                    <span>Software da sua Clínica</span>
+                                    <span class="text-slate-400">Outubro 2026</span>
+                                </div>
+                                <div class="flex-1 flex flex-col gap-2 border-t border-slate-100 pt-3">
+                                    <div class="flex items-stretch gap-3">
+                                        <div class="w-12 shrink-0 text-right text-[11px] text-slate-400 font-medium pt-1 border-r border-slate-100 pr-2">14:00</div>
+                                        <div class="flex-1 h-14 rounded-lg bg-slate-100 border-l-4 border-slate-400 px-3 py-2 shadow-sm flex flex-col justify-center min-w-0">
+                                            <div class="flex justify-between items-center gap-2">
+                                                <span class="font-bold text-slate-700 text-[13px] truncate">Helena Duarte</span>
+                                                <span class="bg-slate-500 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0">Recepção</span>
                                             </div>
-                                            <span class="text-slate-500 text-xs mt-1">Consulta (Dra. Mariana)</span>
+                                            <span class="text-slate-500 text-[11px] mt-0.5 truncate">Consulta (Dra. Mariana)</span>
                                         </div>
-                                        <div class="h-14 w-full rounded-lg bg-emerald-100 border-l-4 border-emerald-500 p-2 shadow-sm animate-pulse flex flex-col justify-center relative overflow-hidden">
-                                            <div class="absolute inset-0 bg-white/40"></div>
-                                            <div class="relative z-10 flex justify-between items-center">
-                                                <span class="font-bold text-emerald-800 text-sm">Carlos Eduardo</span>
-                                                <span class="bg-emerald-500 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">Inserido pela IA</span>
+                                    </div>
+                                    <div class="flex items-stretch gap-3">
+                                        <div class="w-12 shrink-0 text-right text-[11px] text-slate-400 font-medium pt-1 border-r border-slate-100 pr-2">15:00</div>
+                                        <div class="flex-1 h-14 rounded-lg bg-emerald-100 border-l-4 border-emerald-500 px-3 py-2 shadow-sm flex flex-col justify-center min-w-0 relative overflow-hidden">
+                                            <div class="absolute inset-0 bg-white/30"></div>
+                                            <div class="relative z-10 flex justify-between items-center gap-2">
+                                                <span class="font-bold text-emerald-800 text-[13px] truncate">Carlos Eduardo</span>
+                                                <span class="bg-emerald-500 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0">IA</span>
                                             </div>
-                                            <span class="relative z-10 text-emerald-600 text-xs mt-1">Retorno (Dra. Mariana)</span>
+                                            <span class="relative z-10 text-emerald-700 text-[11px] mt-0.5 truncate">Retorno (Dra. Mariana)</span>
                                         </div>
-                                        <div class="h-12 w-full rounded bg-slate-100 mt-2 p-2 text-slate-400">Livre</div>
                                     </div>
-                                    <div class="col-span-5 flex items-center justify-center gap-2 text-[11px] text-slate-500 pt-3 mt-1 border-t border-slate-100">
-                                        <i data-lucide="users" class="w-3 h-3 text-slate-400"></i>
-                                        <span>Mesma agenda: sua recepção continua marcando normalmente, lado a lado com a IA.</span>
+                                    <div class="flex items-stretch gap-3">
+                                        <div class="w-12 shrink-0 text-right text-[11px] text-slate-400 font-medium pt-1 border-r border-slate-100 pr-2">16:00</div>
+                                        <div class="flex-1 h-14 rounded-lg bg-slate-50 border border-dashed border-slate-200 px-3 flex items-center text-slate-400 text-[11px]">Livre</div>
                                     </div>
+                                </div>
+                                <div class="flex items-center justify-center gap-2 text-[11px] text-slate-500 pt-3 mt-3 border-t border-slate-100 text-center">
+                                    <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                                    <span>Mesma agenda: sua recepção continua marcando normalmente, lado a lado com a IA.</span>
                                 </div>
                             </div>
                         </div>
@@ -385,11 +515,11 @@
                         <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
                             <i data-lucide="headset" class="text-amber-600 w-6 h-6"></i>
                         </div>
-                        <h3 class="text-2xl font-bold text-primary-900 mb-4">Sua equipe continua usando as ferramentas de sempre</h3>
-                        <p class="text-slate-600 text-lg leading-relaxed mb-6"><strong>Não temos CRM próprio para te vender.</strong> Nossa IA é plugada no WhatsApp que sua equipe já usa hoje; a secretária só acompanha a tela e assume se necessário.</p>
+                        <h3 class="text-2xl font-bold text-primary-900 mb-4">Sua equipe no controle, sem trocar de sistema</h3>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6"><strong>Você não migra de prontuário nem assina um CRM à parte.</strong> Junto com a IA entregamos um painel de atendimento simples, já configurado e incluso na mensalidade, onde a recepção acompanha todas as conversas em tempo real e assume o comando com um clique.</p>
                         <ul class="space-y-3">
-                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Zero tempo perdido aprendendo ferramentas novas.</li>
-                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Se o paciente relata urgência, a IA pausa instataneamente.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Painel entregue pronto, com sua equipe treinada por nós.</li>
+                            <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Se o paciente relata urgência, a IA pausa instantaneamente.</li>
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Áudios do paciente chegam transcritos em texto para sua equipe.</li>
                         </ul>
                     </div>
@@ -655,8 +785,8 @@
                     <!-- Plano 1 -->
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow p-8 flex flex-col h-full">
                         <h3 class="text-xl font-bold text-primary-900 mb-2">Essencial</h3>
-                        <p class="text-slate-500 text-sm mb-6 h-10">Para consultórios independentes que precisam organizar o atendimento.</p>
-                        <div class="mb-4">
+                        <p class="text-slate-500 text-sm mb-6 min-h-[2.5rem]">Para consultórios independentes que precisam organizar o atendimento.</p>
+                        <div class="mb-4 flex items-end h-11">
                             <span class="text-4xl font-black text-primary-900">R$ 399</span><span class="text-slate-500 font-medium">/mês</span>
                         </div>
                         <div class="mb-8 pb-8 border-b border-slate-100">
@@ -680,8 +810,8 @@
                             Mais Recomendado
                         </div>
                         <h3 class="text-xl font-bold text-white mb-2">Gestão Inteligente</h3>
-                        <p class="text-white/80 text-sm mb-6 h-10">Para clínicas buscando maximizar e lotar a agenda médica.</p>
-                        <div class="mb-4">
+                        <p class="text-white/80 text-sm mb-6 min-h-[2.5rem]">Para clínicas buscando maximizar e lotar a agenda médica.</p>
+                        <div class="mb-4 flex items-end h-11">
                             <span class="text-4xl font-black text-white">R$ 799</span><span class="text-white/70 font-medium">/mês</span>
                         </div>
                         <div class="mb-8 pb-8 border-b border-primary-700/50">
@@ -702,8 +832,8 @@
                     <!-- Plano 3 -->
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-shadow p-8 flex flex-col h-full">
                         <h3 class="text-xl font-bold text-primary-900 mb-2">Enterprise</h3>
-                        <p class="text-slate-500 text-sm mb-6 h-10">Para redes de policlínicas ou franquias em expansão.</p>
-                        <div class="mb-4 flex items-center h-[52px]">
+                        <p class="text-slate-500 text-sm mb-6 min-h-[2.5rem]">Para redes de policlínicas ou franquias em expansão.</p>
+                        <div class="mb-4 flex items-end h-11">
                             <span class="text-3xl font-black text-primary-900">Sob Consulta</span>
                         </div>
                         <div class="mb-8 pb-8 border-b border-slate-100">
@@ -752,12 +882,12 @@
                 <div class="space-y-4">
                     <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
                         <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">Nossa equipe precisa aprender um sistema novo (CRM)?</span>
+                            <span class="font-bold text-primary-900">Nossa equipe precisa trocar de sistema ou assinar um CRM?</span>
                             <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
                         </button>
                         <div class="faq-content bg-slate-50">
                             <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Absolutamente não. Não vendemos e não obrigamos você a usar um CRM novo. Nossa automação é invisível: ela atua conectada ao sistema de agendamento que você já usa e ao WhatsApp Web atual da clínica. Sua recepção continua trabalhando exatamente como hoje, apenas com a vantagem de não precisar mais responder a perguntas repetitivas.
+                                Não. Seu sistema de gestão e a sua agenda continuam sendo os mesmos — nós nos conectamos a eles, você não migra nada e não paga assinatura extra de CRM. A única mudança na rotina da recepção é a tela: em vez do WhatsApp Web, sua equipe passa a atender por um painel próprio que já entregamos configurado, com o histórico completo de cada paciente, alertas de urgência e o botão para assumir a conversa. É mais simples que o WhatsApp Web, permite vários atendentes ao mesmo tempo e está incluso na mensalidade — treinamos sua equipe no dia da implantação.
                             </div>
                         </div>
                     </div>
@@ -828,7 +958,7 @@
         <!-- Formulário Inteligente (Contato / Lead Capture) -->
         <section id="contato" class="bg-primary-900 pt-24 pb-16 border-t border-primary-800 relative">
             <div class="absolute inset-0 opacity-5 pointer-events-none">
-                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true" focusable="false">
                     <defs><pattern id="grid-form" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
                     <rect width="100%" height="100%" fill="url(#grid-form)" />
                 </svg>
@@ -841,6 +971,9 @@
                 </div>
 
                 <form action="https://formspree.io/f/xkjwrgjk" method="POST" class="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-8 md:p-10 mb-8" onsubmit="trackFormSubmit()">
+                    <input type="hidden" name="_subject" value="Novo lead pelo site RXSync">
+                    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label for="nome" class="block text-sm font-semibold text-slate-700 mb-2">Nome Completo do Responsável</label>
@@ -866,7 +999,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
                             <label for="software" class="block text-sm font-semibold text-slate-700 mb-2">Sistema de Gestão atual</label>
-                            <select id="software" name="software_gestao" required class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800 appearance-none">
+                            <select id="software" name="software_gestao" required class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-800 appearance-none select-field">
                                 <option value="" disabled selected>Selecione seu software...</option>
                                 <option value="iClinic">iClinic</option>
                                 <option value="Amplimed">Amplimed</option>
@@ -877,7 +1010,7 @@
                         </div>
                         <div>
                             <label for="plano" class="block text-sm font-semibold text-slate-700 mb-2">Plano de Interesse</label>
-                            <select id="plano" name="plano_interesse" required class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-emerald-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-primary-900 font-semibold appearance-none">
+                            <select id="plano" name="plano_interesse" required class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-emerald-50 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-primary-900 font-semibold appearance-none select-field">
                                 <option value="" disabled selected>Indeciso (Quero recomendação)</option>
                                 <option value="Essencial">Plano Essencial</option>
                                 <option value="Gestão Inteligente">Plano Gestão Inteligente</option>
@@ -961,9 +1094,22 @@
         // Mobile Menu
         const btn = document.getElementById('mobile-menu-btn');
         const menu = document.getElementById('mobile-menu');
-        btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+        btn.addEventListener('click', () => {
+            const aberto = menu.classList.toggle('hidden') === false;
+            btn.setAttribute('aria-expanded', aberto);
+        });
         document.querySelectorAll('#mobile-menu a, #mobile-menu button').forEach(el => {
-            el.addEventListener('click', () => menu.classList.add('hidden'));
+            el.addEventListener('click', () => {
+                menu.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+        });
+        // Fecha o menu ao voltar para o desktop, evitando ficar preso aberto
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                menu.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            }
         });
 
         // Função de Scroll Inteligente e Preenchimento Automático do Formulário
@@ -986,15 +1132,58 @@
             document.getElementById('contato').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Rastreamento GA4 ao Enviar Formulário
-        function trackFormSubmit() {
+        // Rastreamento GA4 de cliques em CTA
+        function trackCta(label) {
             if (typeof gtag === 'function') {
-                gtag('event', 'generate_lead', {
-                    'event_category': 'formulario',
-                    'event_label': 'Solicitacao_Demo_RXSync'
-                });
+                gtag('event', 'click_cta', { 'event_category': 'cta', 'event_label': label });
             }
         }
+
+        // Rastreamento GA4 ao Enviar Formulário
+        // transport_type 'beacon' garante o envio mesmo com o redirect do Formspree
+        function trackFormSubmit() {
+            if (typeof gtag === 'function') {
+                const plano = document.getElementById('plano');
+                const software = document.getElementById('software');
+                gtag('event', 'generate_lead', {
+                    'event_category': 'formulario',
+                    'event_label': 'Solicitacao_Demo_RXSync',
+                    'plano_interesse': plano ? plano.value : '',
+                    'software_gestao': software ? software.value : '',
+                    'currency': 'BRL',
+                    'value': 399,
+                    'transport_type': 'beacon'
+                });
+            }
+            return true;
+        }
+
+        // Rastreia a profundidade de leitura da página (qualidade do tráfego)
+        (function () {
+            const marcos = [25, 50, 75, 90];
+            const vistos = new Set();
+            let travado = false;
+            window.addEventListener('scroll', function () {
+                if (travado) return;
+                travado = true;
+                window.requestAnimationFrame(function () {
+                    const doc = document.documentElement;
+                    const total = doc.scrollHeight - window.innerHeight;
+                    if (total > 0) {
+                        const pct = (window.scrollY / total) * 100;
+                        marcos.forEach(function (m) {
+                            if (pct >= m && !vistos.has(m)) {
+                                vistos.add(m);
+                                if (typeof gtag === 'function') {
+                                    gtag('event', 'scroll_depth', { 'event_category': 'engajamento', 'event_label': m + '%', 'value': m });
+                                }
+                            }
+                        });
+                    }
+                    travado = false;
+                });
+            }, { passive: true });
+        })();
     </script>
 </body>
 </html>
