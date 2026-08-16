@@ -117,6 +117,10 @@
       <h2 class="text-lg font-bold text-primary-900 mb-1">Quem vamos atender</h2>
       <p class="text-slate-500 text-sm mb-6">Começamos pelo básico. Leva menos de um minuto.</p>
       <div class="space-y-4">
+        <div aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden">
+          <label for="empresa_site">Não preencher</label>
+          <input id="empresa_site" tabindex="-1" autocomplete="off">
+        </div>
         <div><label class="rotulo" for="nome">Seu nome completo</label><input id="nome" class="campo" autocomplete="name"><p class="msg-erro" data-de="nome">Informe nome e sobrenome.</p></div>
         <div><label class="rotulo" for="clinica">Nome da clínica ou consultório</label><input id="clinica" class="campo" autocomplete="organization"><p class="msg-erro" data-de="clinica">Informe o nome do seu negócio.</p></div>
         <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p></div>
@@ -210,8 +214,20 @@
   </section>
 </main>
 
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G5ZS8DRHNM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-G5ZS8DRHNM');
+</script>
+
 <script>
 const WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
+// Chave de origem: não é segredo (fica visível no navegador), serve só para
+// descartar chamadas automatizadas triviais. A proteção real é o rate limit no n8n.
+const ORIGEM_CHAVE = 'rxsync-site-2026';
 const VERSAO = '2026-08-v1';
 
 const BASE = [
@@ -243,6 +259,7 @@ let ciclo = q.get('ciclo') === 'anual' ? 'anual' : 'mensal';
 let forma = 'parcelado';
 let tipo  = 'pj';
 let etapa = 1;
+const INICIO = Date.now();
 
 const sel = (on) => on ? 'border-primary-900 bg-primary-900 text-white' : 'border-slate-200 text-slate-600 bg-white';
 
@@ -399,8 +416,12 @@ function validarEtapa(n) {
   });
 });
 
+function ev(nome, extra) {
+  if (typeof gtag === 'function') gtag('event', nome, Object.assign({ plano: plano, ciclo: ciclo }, extra || {}));
+}
 function mostrar(n) {
   etapa = n;
+  ev('checkout_etapa_' + n);
   document.querySelectorAll('.etapa').forEach(s => s.classList.toggle('ativa', +s.dataset.etapa === n));
   document.querySelectorAll('#progresso div').forEach(d => d.className = 'h-1.5 flex-1 rounded-full ' + (+d.dataset.p <= n ? 'bg-emerald-500' : 'bg-slate-200'));
   if (n === 3) carregarTermos();
@@ -485,17 +506,24 @@ document.getElementById('form').addEventListener('submit', async ev => {
     _cidade: v('cidade'),
     _uf: v('uf'),
     _aceite_termos: true,
+    _armadilha: (document.getElementById('empresa_site').value || ''),
+    _tempo_preenchimento_s: Math.round((Date.now() - INICIO) / 1000),
     _origem: document.referrer || 'direto',
     _user_agent: navigator.userAgent
   };
 
   try {
-    const r = await fetch(WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dados) });
+    const r = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
+      body: JSON.stringify(dados)
+    });
     if (!r.ok) throw new Error();
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
     document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
     document.getElementById('sucesso').classList.remove('hidden');
+    ev('contratacao_registrada', { forma: ciclo === 'anual' ? forma : 'mensal' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {
     btn.disabled = false; btn.textContent = 'Concluir contratação';
