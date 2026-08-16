@@ -52,9 +52,10 @@
   .campo { width:100%; border:1px solid #cbd5e1; border-radius:.75rem; padding:.8rem 1rem; font-size:1rem; color:#0f172a; background:#fff; }
   .campo:focus { outline:none; border-color:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.15); }
   .campo.erro { border-color:#dc2626; background:#fef2f2; }
+  .msg-erro { font-size:.75rem; color:#dc2626; margin-top:.35rem; display:none; }
+  .msg-erro.on { display:block; }
   .rotulo { display:block; font-size:.8rem; font-weight:700; color:#334155; margin-bottom:.35rem; }
-  .etapa { display:none; }
-  .etapa.ativa { display:block; }
+  .etapa { display:none; } .etapa.ativa { display:block; }
   .termos-box { height:300px; overflow-y:auto; border:1px solid #cbd5e1; border-radius:.75rem; background:#fff; }
   .termos-box iframe { width:100%; height:100%; border:0; }
 </style>
@@ -70,26 +71,26 @@
 
 <main class="max-w-3xl mx-auto px-5 py-8">
 
-  <!-- Resumo do plano -->
   <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
-    <div class="flex items-start justify-between gap-4 flex-wrap">
-      <div>
-        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Plano selecionado</p>
-        <h1 id="nomePlano" class="text-xl font-extrabold text-primary-900">Essencial</h1>
-        <p id="precoPlano" class="text-slate-600 text-sm mt-1">R$ 299/mês + R$ 999 de implantação</p>
-      </div>
-      <div class="flex rounded-xl border border-slate-200 overflow-hidden text-sm font-bold shrink-0">
-        <button type="button" data-ciclo="mensal" class="btnCiclo px-4 py-2">Mensal</button>
-        <button type="button" data-ciclo="anual" class="btnCiclo px-4 py-2">Anual</button>
-      </div>
-    </div>
-    <div class="mt-4 flex gap-2">
+    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Plano selecionado</p>
+    <div class="flex gap-2 mb-4">
       <button type="button" data-plano="essencial" class="btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Essencial</button>
       <button type="button" data-plano="gestao" class="btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Gestão Inteligente</button>
     </div>
+    <div class="flex gap-2 mb-4">
+      <button type="button" data-ciclo="mensal" class="btnCiclo flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Mensal</button>
+      <button type="button" data-ciclo="anual" class="btnCiclo flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Anual <span class="text-emerald-600">&minus;10%</span></button>
+    </div>
+    <div id="blocoForma" class="hidden flex gap-2 mb-4">
+      <button type="button" data-forma="parcelado" class="btnForma flex-1 text-xs font-bold py-2 rounded-lg border-2">Em 12x</button>
+      <button type="button" data-forma="avista" class="btnForma flex-1 text-xs font-bold py-2 rounded-lg border-2">À vista <span class="text-emerald-600">(pague 10, leve 12)</span></button>
+    </div>
+    <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+      <p id="precoPrincipal" class="text-2xl font-black text-primary-900">R$ 299<span class="text-base font-medium text-slate-500">/mês</span></p>
+      <p id="precoDetalhe" class="text-sm text-slate-600 mt-1">+ R$ 999 de implantação, uma única vez &middot; sem fidelidade</p>
+    </div>
   </div>
 
-  <!-- Progresso -->
   <div class="flex items-center gap-2 mb-6" id="progresso">
     <div class="h-1.5 flex-1 rounded-full bg-emerald-500" data-p="1"></div>
     <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="2"></div>
@@ -98,201 +99,261 @@
 
   <form id="form" novalidate>
 
-    <!-- ETAPA 1 -->
     <section class="etapa ativa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="1">
       <h2 class="text-lg font-bold text-primary-900 mb-1">Quem vamos atender</h2>
       <p class="text-slate-500 text-sm mb-6">Começamos pelo básico. Leva menos de um minuto.</p>
       <div class="space-y-4">
-        <div><label class="rotulo" for="nome">Seu nome completo</label><input id="nome" name="nome" class="campo" autocomplete="name"></div>
-        <div><label class="rotulo" for="clinica">Nome da clínica</label><input id="clinica" name="clinica" class="campo" autocomplete="organization"></div>
-        <div><label class="rotulo" for="email">E-mail</label><input id="email" name="email" type="email" class="campo" autocomplete="email" inputmode="email"></div>
-        <div><label class="rotulo" for="whatsapp">WhatsApp</label><input id="whatsapp" name="whatsapp" class="campo" inputmode="tel" placeholder="(00) 00000-0000"></div>
+        <div><label class="rotulo" for="nome">Seu nome completo</label><input id="nome" class="campo" autocomplete="name"><p class="msg-erro" data-de="nome">Informe nome e sobrenome.</p></div>
+        <div><label class="rotulo" for="clinica">Nome da clínica ou consultório</label><input id="clinica" class="campo" autocomplete="organization"><p class="msg-erro" data-de="clinica">Informe o nome do seu negócio.</p></div>
+        <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p></div>
+        <div><label class="rotulo" for="whatsapp">WhatsApp com DDD</label><input id="whatsapp" class="campo" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"><p class="msg-erro" data-de="whatsapp">Telefone inválido.</p></div>
       </div>
       <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
       <p class="text-xs text-slate-400 mt-4 text-center">Seus dados são usados apenas para esta contratação.</p>
     </section>
 
-    <!-- ETAPA 2 -->
     <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="2">
       <h2 class="text-lg font-bold text-primary-900 mb-1">Dados de faturamento</h2>
-      <p class="text-slate-500 text-sm mb-6">Precisamos disso para emitir a nota fiscal e identificar a contratante nos Termos.</p>
+      <p class="text-slate-500 text-sm mb-5">Para emitir a nota fiscal e identificar quem está contratando nos Termos.</p>
+
+      <div class="flex gap-2 mb-5">
+        <button type="button" data-tipo="pj" class="btnTipo flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Pessoa jurídica</button>
+        <button type="button" data-tipo="pf" class="btnTipo flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Pessoa física</button>
+      </div>
+
       <div class="space-y-4">
-        <div>
+        <div id="wrapCnpj">
           <label class="rotulo" for="cnpj">CNPJ</label>
-          <input id="cnpj" name="cnpj" class="campo" inputmode="numeric" placeholder="00.000.000/0000-00">
+          <input id="cnpj" class="campo" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00">
+          <p class="msg-erro" data-de="cnpj">CNPJ inválido.</p>
           <p id="cnpjMsg" class="text-xs mt-1.5 hidden"></p>
         </div>
-        <div><label class="rotulo" for="razao">Razão social</label><input id="razao" name="razao_social" class="campo"></div>
-        <div><label class="rotulo" for="endereco">Endereço completo da sede</label><input id="endereco" name="endereco" class="campo" autocomplete="street-address"></div>
-        <div><label class="rotulo" for="cpf">CPF de quem está contratando</label><input id="cpf" name="cpf" class="campo" inputmode="numeric" placeholder="000.000.000-00"></div>
+        <div id="wrapRazao"><label class="rotulo" for="razao">Razão social</label><input id="razao" class="campo"><p class="msg-erro" data-de="razao">Informe a razão social.</p></div>
+        <div><label class="rotulo" for="endereco">Endereço completo</label><input id="endereco" class="campo" autocomplete="street-address"><p class="msg-erro" data-de="endereco">Informe o endereço completo.</p></div>
+        <div><label class="rotulo" for="cpf"><span id="rotuloCpf">CPF de quem está contratando</span></label><input id="cpf" class="campo" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><p class="msg-erro" data-de="cpf">CPF inválido.</p></div>
       </div>
+
       <div class="flex gap-3 mt-6">
         <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
         <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
       </div>
     </section>
 
-    <!-- ETAPA 3 -->
     <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="3">
       <h2 class="text-lg font-bold text-primary-900 mb-1">Termos da contratação</h2>
-      <p class="text-slate-500 text-sm mb-5">Leia antes de aceitar. Este é o contrato entre a sua clínica e a RXSync.</p>
+      <p class="text-slate-500 text-sm mb-5">Leia antes de aceitar. Este é o contrato entre você e a RXSync, já preenchido com os seus dados.</p>
 
-      <div class="termos-box mb-3">
-        <iframe src="/termos/2026-08-v1.html" title="Termos de Uso RXSync versão 2026-08-v1" loading="lazy"></iframe>
-      </div>
-      <p class="text-xs text-slate-500 mb-5">
-        Versão <strong>2026-08-v1</strong> ·
-        <a href="/termos/2026-08-v1.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a>
-      </p>
+      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-08-v1"></iframe></div>
+      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-08-v1</strong> · <a id="linkTermos" href="/termos/2026-08-v1.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
 
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteTermos" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
         <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-08-v1.</span>
       </label>
-
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteDpa" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
-        <span class="text-sm text-slate-700">Li e aceito o <strong>Acordo de Tratamento de Dados Pessoais</strong> (Anexo II), na condição de controladora dos dados dos meus pacientes.</span>
+        <span class="text-sm text-slate-700">Li e aceito o <strong>Acordo de Tratamento de Dados Pessoais</strong> (Anexo II), na condição de controlador dos dados dos meus pacientes.</span>
       </label>
 
-      <div id="erroAceite" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 mb-4"></div>
+      <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-5">
+        <p class="text-xs text-slate-600 leading-relaxed"><strong class="text-primary-900">Sete dias para desistir.</strong> Você pode cancelar sem custo e sem justificativa em até 7 dias corridos, e devolvemos integralmente o que tiver sido pago.</p>
+      </div>
 
+      <div id="erroAceite" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 mb-4"></div>
       <div class="flex gap-3">
         <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
         <button type="submit" id="btnEnviar" class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-400 transition-colors shadow-lg">Concluir contratação</button>
       </div>
     </section>
-
   </form>
 
-  <!-- SUCESSO -->
   <section id="sucesso" class="hidden bg-white rounded-2xl border border-emerald-200 shadow-sm p-8 text-center">
     <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4 text-3xl">&check;</div>
     <h2 class="text-xl font-extrabold text-primary-900 mb-2">Contratação registrada</h2>
-    <p class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">
-      Enviamos a confirmação para o seu e-mail com a versão dos Termos que você aceitou.
-      Em até um dia útil entramos em contato pelo WhatsApp para combinar a implantação e o pagamento.
-    </p>
+    <p class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">Enviamos a confirmação para o seu e-mail com a versão dos Termos que você aceitou. Em até um dia útil entramos em contato pelo WhatsApp para combinar a implantação e o pagamento.</p>
     <a href="/" class="inline-block mt-6 text-sm font-bold text-primary-700 underline">Voltar ao site</a>
   </section>
-
 </main>
 
 <script>
 const WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
+const VERSAO = '2026-08-v1';
 
 const PLANOS = {
-  essencial: { nome: 'Essencial',
-    mensal: 'R$ 299/mês + R$ 999 de implantação · sem fidelidade',
-    anual:  '12x R$ 269,10 ou R$ 3.229,20 à vista · implantação isenta · 12 meses' },
-  gestao: { nome: 'Gestão Inteligente',
-    mensal: 'R$ 599/mês + R$ 999 de implantação · sem fidelidade',
-    anual:  '12x R$ 539,10 ou R$ 6.469,20 à vista · implantação isenta · 12 meses' }
+  essencial: { nome:'Essencial', mensal:299, anual12:'269,10', anualTotal:'3.229,20', avista:'2.990,00' },
+  gestao:    { nome:'Gestão Inteligente', mensal:599, anual12:'539,10', anualTotal:'6.469,20', avista:'5.990,00' }
 };
 
-const params = new URLSearchParams(location.search);
-let plano = PLANOS[params.get('plano')] ? params.get('plano') : 'essencial';
-let ciclo = params.get('ciclo') === 'anual' ? 'anual' : 'mensal';
+const q = new URLSearchParams(location.search);
+let plano = PLANOS[q.get('plano')] ? q.get('plano') : 'essencial';
+let ciclo = q.get('ciclo') === 'anual' ? 'anual' : 'mensal';
+let forma = 'parcelado';
+let tipo  = 'pj';
 let etapa = 1;
 
+const sel = (on) => on ? 'border-primary-900 bg-primary-900 text-white' : 'border-slate-200 text-slate-600 bg-white';
+
 function pintar() {
-  document.getElementById('nomePlano').textContent = PLANOS[plano].nome;
-  document.getElementById('precoPlano').textContent = PLANOS[plano][ciclo];
-  document.querySelectorAll('.btnPlano').forEach(b => {
-    const on = b.dataset.plano === plano;
-    b.className = 'btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2 ' +
-      (on ? 'border-primary-900 bg-primary-900 text-white' : 'border-slate-200 text-slate-600');
-  });
-  document.querySelectorAll('.btnCiclo').forEach(b => {
-    const on = b.dataset.ciclo === ciclo;
-    b.className = 'btnCiclo px-4 py-2 ' + (on ? 'bg-emerald-500 text-white' : 'bg-white text-slate-500');
-  });
-  const u = new URL(location); u.searchParams.set('plano', plano); u.searchParams.set('ciclo', ciclo);
+  const P = PLANOS[plano];
+  document.querySelectorAll('.btnPlano').forEach(b => b.className = 'btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2 ' + sel(b.dataset.plano === plano));
+  document.querySelectorAll('.btnCiclo').forEach(b => b.className = 'btnCiclo flex-1 text-sm font-bold py-2.5 rounded-xl border-2 ' + sel(b.dataset.ciclo === ciclo));
+  document.querySelectorAll('.btnForma').forEach(b => b.className = 'btnForma flex-1 text-xs font-bold py-2 rounded-lg border-2 ' + sel(b.dataset.forma === forma));
+  document.getElementById('blocoForma').className = (ciclo === 'anual' ? 'flex' : 'hidden') + ' gap-2 mb-4';
+
+  const pp = document.getElementById('precoPrincipal');
+  const pd = document.getElementById('precoDetalhe');
+  if (ciclo === 'mensal') {
+    pp.innerHTML = 'R$ ' + P.mensal + '<span class="text-base font-medium text-slate-500">/mês</span>';
+    pd.textContent = '+ R$ 999 de implantação, uma única vez · sem fidelidade';
+  } else if (forma === 'parcelado') {
+    pp.innerHTML = '12x R$ ' + P.anual12 + '<span class="text-base font-medium text-slate-500"> (R$ ' + P.anualTotal + ')</span>';
+    pd.textContent = 'Implantação isenta · permanência de 12 meses';
+  } else {
+    pp.innerHTML = 'R$ ' + P.avista + '<span class="text-base font-medium text-slate-500"> à vista</span>';
+    pd.textContent = 'Equivale a 10 mensalidades com 12 meses de serviço · implantação isenta · permanência de 12 meses';
+  }
+  const u = new URL(location);
+  u.searchParams.set('plano', plano); u.searchParams.set('ciclo', ciclo);
   history.replaceState(null, '', u);
 }
-
 document.querySelectorAll('.btnPlano').forEach(b => b.onclick = () => { plano = b.dataset.plano; pintar(); });
 document.querySelectorAll('.btnCiclo').forEach(b => b.onclick = () => { ciclo = b.dataset.ciclo; pintar(); });
+document.querySelectorAll('.btnForma').forEach(b => b.onclick = () => { forma = b.dataset.forma; pintar(); });
+
+document.querySelectorAll('.btnTipo').forEach(b => b.onclick = () => {
+  tipo = b.dataset.tipo;
+  document.querySelectorAll('.btnTipo').forEach(x => x.className = 'btnTipo flex-1 text-sm font-bold py-2.5 rounded-xl border-2 ' + sel(x.dataset.tipo === tipo));
+  const pj = tipo === 'pj';
+  document.getElementById('wrapCnpj').style.display = pj ? '' : 'none';
+  document.getElementById('wrapRazao').style.display = pj ? '' : 'none';
+  document.getElementById('rotuloCpf').textContent = pj ? 'CPF de quem está contratando' : 'Seu CPF';
+});
+
+/* ---------- máscaras ---------- */
+const dig = v => (v || '').replace(/\D/g, '');
+function mascara(el, fn, max) {
+  el.addEventListener('input', () => {
+    const p = el.selectionStart === el.value.length;
+    el.value = fn(dig(el.value).slice(0, max));
+    if (p) el.selectionStart = el.selectionEnd = el.value.length;
+  });
+}
+mascara(document.getElementById('whatsapp'), d =>
+  d.length <= 2 ? d.replace(/(\d{0,2})/, '($1')
+  : d.length <= 6 ? d.replace(/(\d{2})(\d+)/, '($1) $2')
+  : d.length <= 10 ? d.replace(/(\d{2})(\d{4})(\d+)/, '($1) $2-$3')
+  : d.replace(/(\d{2})(\d{5})(\d+)/, '($1) $2-$3'), 11);
+mascara(document.getElementById('cpf'), d =>
+  d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2'), 11);
+mascara(document.getElementById('cnpj'), d =>
+  d.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2'), 14);
+
+/* ---------- validações ---------- */
+function cpfOk(v) {
+  const c = dig(v);
+  if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
+  let s = 0;
+  for (let i = 0; i < 9; i++) s += +c[i] * (10 - i);
+  let r = (s * 10) % 11; if (r === 10) r = 0;
+  if (r !== +c[9]) return false;
+  s = 0;
+  for (let i = 0; i < 10; i++) s += +c[i] * (11 - i);
+  r = (s * 10) % 11; if (r === 10) r = 0;
+  return r === +c[10];
+}
+function cnpjOk(v) {
+  const c = dig(v);
+  if (c.length !== 14 || /^(\d)\1{13}$/.test(c)) return false;
+  const calc = (base) => {
+    let p = base.length === 12 ? 5 : 6, s = 0;
+    for (let i = 0; i < base.length; i++) { s += +base[i] * p; p = p === 2 ? 9 : p - 1; }
+    const r = s % 11;
+    return r < 2 ? 0 : 11 - r;
+  };
+  return calc(c.slice(0, 12)) === +c[12] && calc(c.slice(0, 13)) === +c[13];
+}
+function telOk(v) {
+  const d = dig(v);
+  if (d.length < 10 || d.length > 11) return false;
+  if (/^(\d)\1+$/.test(d)) return false;
+  if (+d.slice(0, 2) < 11) return false;
+  if (d.length === 11 && d[2] !== '9') return false;
+  return true;
+}
+const nomeOk = v => {
+  const partes = (v || '').trim().split(/\s+/).filter(p => p.length >= 2);
+  return partes.length >= 2 && /^[A-Za-zÀ-ÿ'\s.-]+$/.test(v.trim());
+};
+const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v || '').trim());
+
+function checar(id, teste) {
+  const el = document.getElementById(id);
+  const msg = document.querySelector('.msg-erro[data-de="' + id + '"]');
+  const bom = teste(el.value);
+  el.classList.toggle('erro', !bom);
+  if (msg) msg.classList.toggle('on', !bom);
+  return bom;
+}
+function validarEtapa(n) {
+  let ok = true, primeiro = null;
+  const testar = (id, fn) => { const r = checar(id, fn); if (!r && !primeiro) primeiro = id; ok = ok && r; };
+  if (n === 1) {
+    testar('nome', nomeOk); testar('clinica', v => v.trim().length > 1);
+    testar('email', emailOk); testar('whatsapp', telOk);
+  }
+  if (n === 2) {
+    if (tipo === 'pj') { testar('cnpj', cnpjOk); testar('razao', v => v.trim().length > 2); }
+    testar('endereco', v => v.trim().length > 8);
+    testar('cpf', cpfOk);
+  }
+  if (primeiro) document.getElementById(primeiro).focus();
+  return ok;
+}
+['nome','clinica','email','whatsapp','cnpj','razao','endereco','cpf'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('blur', () => {
+    if (!el.value) return;
+    const mapa = { nome:nomeOk, email:emailOk, whatsapp:telOk, cpf:cpfOk, cnpj:cnpjOk,
+                   clinica:v=>v.trim().length>1, razao:v=>v.trim().length>2, endereco:v=>v.trim().length>8 };
+    checar(id, mapa[id]);
+  });
+});
 
 function mostrar(n) {
   etapa = n;
   document.querySelectorAll('.etapa').forEach(s => s.classList.toggle('ativa', +s.dataset.etapa === n));
-  document.querySelectorAll('#progresso div').forEach(d => {
-    d.className = 'h-1.5 flex-1 rounded-full ' + (+d.dataset.p <= n ? 'bg-emerald-500' : 'bg-slate-200');
-  });
+  document.querySelectorAll('#progresso div').forEach(d => d.className = 'h-1.5 flex-1 rounded-full ' + (+d.dataset.p <= n ? 'bg-emerald-500' : 'bg-slate-200'));
+  if (n === 3) carregarTermos();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-const soDigitos = v => (v || '').replace(/\D/g, '');
-const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v || '').trim());
-
-function marcarErro(el, erro) {
-  el.classList.toggle('erro', erro);
-}
-
-function validarEtapa(n) {
-  let ok = true;
-  const checar = (id, teste) => {
-    const el = document.getElementById(id);
-    const bom = teste(el.value);
-    marcarErro(el, !bom);
-    if (!bom && ok) el.focus();
-    ok = ok && bom;
-  };
-  if (n === 1) {
-    checar('nome', v => v.trim().length > 2);
-    checar('clinica', v => v.trim().length > 1);
-    checar('email', emailOk);
-    checar('whatsapp', v => soDigitos(v).length >= 10);
-  }
-  if (n === 2) {
-    checar('cnpj', v => soDigitos(v).length === 14);
-    checar('razao', v => v.trim().length > 2);
-    checar('endereco', v => v.trim().length > 5);
-    checar('cpf', v => soDigitos(v).length === 11);
-  }
-  return ok;
-}
-
-document.querySelectorAll('.proximo').forEach(b => b.onclick = () => {
-  if (validarEtapa(etapa)) mostrar(etapa + 1);
-});
+document.querySelectorAll('.proximo').forEach(b => b.onclick = () => { if (validarEtapa(etapa)) mostrar(etapa + 1); });
 document.querySelectorAll('.voltar').forEach(b => b.onclick = () => mostrar(etapa - 1));
 
-// Consulta de CNPJ para preencher razão social e endereço
-const cnpjEl = document.getElementById('cnpj');
-const cnpjMsg = document.getElementById('cnpjMsg');
-cnpjEl.addEventListener('blur', async () => {
-  const d = soDigitos(cnpjEl.value);
-  if (d.length !== 14) return;
-  cnpjMsg.className = 'text-xs mt-1.5 text-slate-500';
-  cnpjMsg.textContent = 'Buscando dados da empresa...';
-  try {
-    const r = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + d);
-    if (!r.ok) throw new Error();
-    const j = await r.json();
-    const razao = document.getElementById('razao');
-    const end = document.getElementById('endereco');
-    if (!razao.value) razao.value = j.razao_social || '';
-    if (!end.value) {
-      end.value = [j.descricao_tipo_de_logradouro, j.logradouro, j.numero, j.complemento, j.bairro, j.municipio, j.uf, j.cep]
-        .filter(Boolean).join(', ');
-    }
-    cnpjMsg.className = 'text-xs mt-1.5 text-emerald-700';
-    cnpjMsg.textContent = 'Dados encontrados. Confira e ajuste se precisar.';
-  } catch (e) {
-    cnpjMsg.className = 'text-xs mt-1.5 text-slate-500';
-    cnpjMsg.textContent = 'Não consegui buscar automaticamente. Preencha os campos abaixo.';
-  }
-});
+function descricaoPlano() {
+  const P = PLANOS[plano];
+  if (ciclo === 'mensal') return P.nome + ' — mensal, R$ ' + P.mensal + '/mês, com implantação de R$ 999';
+  if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$ ' + P.anual12 + ', implantação isenta';
+  return P.nome + ' — anual à vista de R$ ' + P.avista + ', implantação isenta';
+}
+function carregarTermos() {
+  const p = new URLSearchParams({
+    tipo,
+    doc: tipo === 'pj' ? document.getElementById('cnpj').value : document.getElementById('cpf').value,
+    razao: document.getElementById('razao').value,
+    nome: document.getElementById('nome').value,
+    end: document.getElementById('endereco').value,
+    rep: document.getElementById('nome').value + ', CPF nº ' + document.getElementById('cpf').value,
+    plano: descricaoPlano()
+  });
+  const url = '/termos/' + VERSAO + '.html?' + p.toString();
+  document.getElementById('frameTermos').src = url;
+  document.getElementById('linkTermos').href = url;
+}
 
-// Envio
 document.getElementById('form').addEventListener('submit', async ev => {
   ev.preventDefault();
-  const t = document.getElementById('aceiteTermos').checked;
-  const d = document.getElementById('aceiteDpa').checked;
   const box = document.getElementById('erroAceite');
-  if (!t || !d) {
+  if (!document.getElementById('aceiteTermos').checked || !document.getElementById('aceiteDpa').checked) {
     box.classList.remove('hidden');
     box.textContent = 'Para concluir, é necessário aceitar os Termos de Uso e o Acordo de Tratamento de Dados Pessoais.';
     return;
@@ -302,32 +363,29 @@ document.getElementById('form').addEventListener('submit', async ev => {
   btn.disabled = true; btn.textContent = 'Registrando...';
 
   const dados = {
-    plano, ciclo,
-    versao_termos: '2026-08-v1',
-    aceite_termos: true,
-    aceite_dpa: true,
+    plano, ciclo, forma_pagamento: ciclo === 'anual' ? forma : 'mensal',
+    tipo_pessoa: tipo,
+    plano_descricao: descricaoPlano(),
+    versao_termos: VERSAO, aceite_termos: true, aceite_dpa: true,
     aceite_em: new Date().toISOString(),
     nome: document.getElementById('nome').value.trim(),
     clinica: document.getElementById('clinica').value.trim(),
     email: document.getElementById('email').value.trim(),
-    whatsapp: document.getElementById('whatsapp').value.trim(),
-    cnpj: soDigitos(document.getElementById('cnpj').value),
-    razao_social: document.getElementById('razao').value.trim(),
+    whatsapp: dig(document.getElementById('whatsapp').value),
+    cnpj: tipo === 'pj' ? dig(document.getElementById('cnpj').value) : '',
+    razao_social: tipo === 'pj' ? document.getElementById('razao').value.trim() : document.getElementById('nome').value.trim(),
     endereco: document.getElementById('endereco').value.trim(),
-    cpf: soDigitos(document.getElementById('cpf').value),
+    cpf: dig(document.getElementById('cpf').value),
     origem: document.referrer || 'direto',
     user_agent: navigator.userAgent
   };
 
   try {
-    const r = await fetch(WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dados)
-    });
-    if (!r.ok) throw new Error('falha');
+    const r = await fetch(WEBHOOK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dados) });
+    if (!r.ok) throw new Error();
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
+    document.querySelector('main > div').classList.add('hidden');
     document.getElementById('sucesso').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {
@@ -337,6 +395,25 @@ document.getElementById('form').addEventListener('submit', async ev => {
   }
 });
 
+/* consulta de CNPJ */
+const cnpjEl = document.getElementById('cnpj'), cnpjMsg = document.getElementById('cnpjMsg');
+cnpjEl.addEventListener('blur', async () => {
+  if (!cnpjOk(cnpjEl.value)) return;
+  cnpjMsg.className = 'text-xs mt-1.5 text-slate-500'; cnpjMsg.textContent = 'Buscando dados da empresa...';
+  try {
+    const r = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + dig(cnpjEl.value));
+    if (!r.ok) throw new Error();
+    const j = await r.json();
+    const razao = document.getElementById('razao'), end = document.getElementById('endereco');
+    if (!razao.value) razao.value = j.razao_social || '';
+    if (!end.value) end.value = [j.descricao_tipo_de_logradouro, j.logradouro, j.numero, j.complemento, j.bairro, j.municipio, j.uf, j.cep].filter(Boolean).join(', ');
+    cnpjMsg.className = 'text-xs mt-1.5 text-emerald-700'; cnpjMsg.textContent = 'Dados encontrados. Confira e ajuste se precisar.';
+  } catch (e) {
+    cnpjMsg.className = 'text-xs mt-1.5 text-slate-500'; cnpjMsg.textContent = 'Não consegui buscar automaticamente. Preencha os campos abaixo.';
+  }
+});
+
+document.querySelector('[data-tipo="pj"]').click();
 pintar();
 </script>
 </body>
