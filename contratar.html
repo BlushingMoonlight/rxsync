@@ -71,23 +71,37 @@
 
 <main class="max-w-3xl mx-auto px-5 py-8">
 
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6">
-    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Plano selecionado</p>
-    <div class="flex gap-2 mb-4">
-      <button type="button" data-plano="essencial" class="btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Essencial</button>
-      <button type="button" data-plano="gestao" class="btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Gestão Inteligente</button>
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+    <div class="px-5 pt-5">
+      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Escolha o plano</p>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button type="button" data-plano="essencial" class="btnPlano text-sm font-bold py-3 rounded-xl border-2">Essencial</button>
+        <button type="button" data-plano="gestao" class="btnPlano text-sm font-bold py-3 rounded-xl border-2">Gestão Inteligente</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button type="button" data-ciclo="mensal" class="btnCiclo text-sm font-bold py-2.5 rounded-xl border-2">Mensal</button>
+        <button type="button" data-ciclo="anual" class="btnCiclo text-sm font-bold py-2.5 rounded-xl border-2">Anual <span class="text-emerald-600">economize</span></button>
+      </div>
+      <div id="blocoForma" class="hidden grid-cols-2 gap-2 mb-3">
+        <button type="button" data-forma="parcelado" class="btnForma text-xs font-bold py-2.5 rounded-lg border-2">Parcelado em 12x</button>
+        <button type="button" data-forma="avista" class="btnForma text-xs font-bold py-2.5 rounded-lg border-2">À vista <span class="text-emerald-600">(10 pelo preço de 12)</span></button>
+      </div>
     </div>
-    <div class="flex gap-2 mb-4">
-      <button type="button" data-ciclo="mensal" class="btnCiclo flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Mensal</button>
-      <button type="button" data-ciclo="anual" class="btnCiclo flex-1 text-sm font-bold py-2.5 rounded-xl border-2">Anual <span class="text-emerald-600">&minus;10%</span></button>
+
+    <div class="bg-primary-900 text-white px-5 py-5">
+      <div class="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <p id="precoPrincipal" class="text-3xl font-black leading-none">R$ 299<span class="text-base font-medium text-white/60">/mês</span></p>
+          <p id="precoDetalhe" class="text-sm text-white/70 mt-2">+ R$ 999 de implantação, uma única vez &middot; sem fidelidade</p>
+        </div>
+        <span id="selo" class="hidden text-xs font-bold bg-emerald-500 text-white rounded-full px-3 py-1.5 shrink-0"></span>
+      </div>
     </div>
-    <div id="blocoForma" class="hidden flex gap-2 mb-4">
-      <button type="button" data-forma="parcelado" class="btnForma flex-1 text-xs font-bold py-2 rounded-lg border-2">Em 12x</button>
-      <button type="button" data-forma="avista" class="btnForma flex-1 text-xs font-bold py-2 rounded-lg border-2">À vista <span class="text-emerald-600">(pague 10, leve 12)</span></button>
-    </div>
-    <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-      <p id="precoPrincipal" class="text-2xl font-black text-primary-900">R$ 299<span class="text-base font-medium text-slate-500">/mês</span></p>
-      <p id="precoDetalhe" class="text-sm text-slate-600 mt-1">+ R$ 999 de implantação, uma única vez &middot; sem fidelidade</p>
+
+    <div class="px-5 py-5 bg-slate-50 border-t border-slate-200">
+      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">O que está incluso</p>
+      <ul id="features" class="space-y-2.5"></ul>
+      <p id="notaUpgrade" class="text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200"></p>
     </div>
   </div>
 
@@ -129,8 +143,29 @@
           <p id="cnpjMsg" class="text-xs mt-1.5 hidden"></p>
         </div>
         <div id="wrapRazao"><label class="rotulo" for="razao">Razão social</label><input id="razao" class="campo"><p class="msg-erro" data-de="razao">Informe a razão social.</p></div>
-        <div><label class="rotulo" for="endereco">Endereço completo</label><input id="endereco" class="campo" autocomplete="street-address"><p class="msg-erro" data-de="endereco">Informe o endereço completo.</p></div>
+
+        <div>
+          <label class="rotulo" for="cep">CEP</label>
+          <input id="cep" class="campo" inputmode="numeric" maxlength="9" placeholder="00000-000">
+          <p class="msg-erro" data-de="cep">CEP não encontrado.</p>
+          <p id="cepMsg" class="text-xs mt-1.5 hidden"></p>
+        </div>
+
+        <div id="blocoEndereco" class="hidden space-y-4">
+          <div><label class="rotulo" for="logradouro">Rua / avenida</label><input id="logradouro" class="campo"><p class="msg-erro" data-de="logradouro">Informe o logradouro.</p></div>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label class="rotulo" for="numero">Número</label><input id="numero" class="campo" inputmode="numeric" maxlength="8"><p class="msg-erro" data-de="numero">Obrigatório.</p></div>
+            <div class="col-span-2"><label class="rotulo" for="complemento">Complemento</label><input id="complemento" class="campo" placeholder="Sala 302, bloco B..."></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="col-span-2"><label class="rotulo" for="bairro">Bairro</label><input id="bairro" class="campo"><p class="msg-erro" data-de="bairro">Informe o bairro.</p></div>
+            <div><label class="rotulo" for="uf">UF</label><input id="uf" class="campo" maxlength="2"></div>
+          </div>
+          <div><label class="rotulo" for="cidade">Cidade</label><input id="cidade" class="campo"><p class="msg-erro" data-de="cidade">Informe a cidade.</p></div>
+        </div>
+
         <div><label class="rotulo" for="cpf"><span id="rotuloCpf">CPF de quem está contratando</span></label><input id="cpf" class="campo" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><p class="msg-erro" data-de="cpf">CPF inválido.</p></div>
+        <div id="wrapTitular" class="hidden"><label class="rotulo" for="titular">Nome do titular do CPF</label><input id="titular" class="campo"><p class="text-xs text-slate-500 mt-1.5">Preenchido a partir da etapa anterior. Ajuste se necessário.</p></div>
       </div>
 
       <div class="flex gap-3 mt-6">
@@ -179,9 +214,27 @@
 const WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
 const VERSAO = '2026-08-v1';
 
+const BASE = [
+  'Assistente virtual 24h no WhatsApp e no chat do seu site',
+  'Painel de atendimento para a equipe, com histórico por paciente',
+  'Transbordo automático para humano em caso de urgência',
+  'Áudios do paciente transcritos em texto',
+  'Profissional da RXSync dedicado, acessível por WhatsApp',
+  'Treinamento da equipe e ajustes no primeiro mês',
+  'Até 5.000 mensagens por mês'
+];
 const PLANOS = {
-  essencial: { nome:'Essencial', mensal:299, anual12:'269,10', anualTotal:'3.229,20', avista:'2.990,00' },
-  gestao:    { nome:'Gestão Inteligente', mensal:599, anual12:'539,10', anualTotal:'6.469,20', avista:'5.990,00' }
+  essencial: { nome:'Essencial', mensal:299, anual12:'269,10', anualTotal:'3.229,20', avista:'2.990,00',
+    features: BASE.concat(['Agendamentos confirmados pela sua equipe no sistema de vocês']) },
+  gestao: { nome:'Gestão Inteligente', mensal:599, anual12:'539,10', anualTotal:'6.469,20', avista:'5.990,00',
+    features: BASE.concat([
+      'Integração com a sua agenda ou prontuário',
+      'Cadência automática de lembretes de confirmação',
+      'Fila de espera para reposição de horários liberados',
+      'Follow-up de orçamentos sem resposta',
+      'Pesquisa de satisfação após a consulta',
+      'Painel de indicadores com acesso próprio da clínica'
+    ]) }
 };
 
 const q = new URLSearchParams(location.search);
@@ -195,22 +248,37 @@ const sel = (on) => on ? 'border-primary-900 bg-primary-900 text-white' : 'borde
 
 function pintar() {
   const P = PLANOS[plano];
-  document.querySelectorAll('.btnPlano').forEach(b => b.className = 'btnPlano flex-1 text-sm font-bold py-2.5 rounded-xl border-2 ' + sel(b.dataset.plano === plano));
-  document.querySelectorAll('.btnCiclo').forEach(b => b.className = 'btnCiclo flex-1 text-sm font-bold py-2.5 rounded-xl border-2 ' + sel(b.dataset.ciclo === ciclo));
-  document.querySelectorAll('.btnForma').forEach(b => b.className = 'btnForma flex-1 text-xs font-bold py-2 rounded-lg border-2 ' + sel(b.dataset.forma === forma));
-  document.getElementById('blocoForma').className = (ciclo === 'anual' ? 'flex' : 'hidden') + ' gap-2 mb-4';
+  document.querySelectorAll('.btnPlano').forEach(b => b.className = 'btnPlano text-sm font-bold py-3 rounded-xl border-2 ' + sel(b.dataset.plano === plano));
+  document.querySelectorAll('.btnCiclo').forEach(b => b.className = 'btnCiclo text-sm font-bold py-2.5 rounded-xl border-2 ' + sel(b.dataset.ciclo === ciclo));
+  document.querySelectorAll('.btnForma').forEach(b => b.className = 'btnForma text-xs font-bold py-2.5 rounded-lg border-2 ' + sel(b.dataset.forma === forma));
+  document.getElementById('blocoForma').className = (ciclo === 'anual' ? 'grid' : 'hidden') + ' grid-cols-2 gap-2 mb-3';
+
+  const ul = document.getElementById('features');
+  ul.innerHTML = P.features.map(f =>
+    '<li class="flex items-start gap-2.5 text-sm text-slate-700"><svg class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd"/></svg><span>' + f + '</span></li>'
+  ).join('');
+
+  const selo = document.getElementById('selo');
+  if (ciclo === 'anual') {
+    selo.classList.remove('hidden');
+    selo.textContent = forma === 'avista' ? 'Economia de 2 mensalidades' : 'Implantação isenta';
+  } else { selo.classList.add('hidden'); }
+
+  document.getElementById('notaUpgrade').textContent = (ciclo === 'mensal')
+    ? 'A implantação é cobrada uma única vez. Se depois você migrar de plano, não paga de novo. E você tem 7 dias para desistir sem custo.'
+    : 'A implantação é isenta no plano anual. Se depois você migrar de plano, não há nova cobrança. E você tem 7 dias para desistir sem custo.';
 
   const pp = document.getElementById('precoPrincipal');
   const pd = document.getElementById('precoDetalhe');
   if (ciclo === 'mensal') {
-    pp.innerHTML = 'R$ ' + P.mensal + '<span class="text-base font-medium text-slate-500">/mês</span>';
+    pp.innerHTML = 'R$ ' + P.mensal + '<span class="text-base font-medium text-white/60">/mês</span>';
     pd.textContent = '+ R$ 999 de implantação, uma única vez · sem fidelidade';
   } else if (forma === 'parcelado') {
-    pp.innerHTML = '12x R$ ' + P.anual12 + '<span class="text-base font-medium text-slate-500"> (R$ ' + P.anualTotal + ')</span>';
+    pp.innerHTML = '12x R$ ' + P.anual12 + '<span class="text-base font-medium text-white/60"> (R$ ' + P.anualTotal + ')</span>';
     pd.textContent = 'Implantação isenta · permanência de 12 meses';
   } else {
-    pp.innerHTML = 'R$ ' + P.avista + '<span class="text-base font-medium text-slate-500"> à vista</span>';
-    pd.textContent = 'Equivale a 10 mensalidades com 12 meses de serviço · implantação isenta · permanência de 12 meses';
+    pp.innerHTML = 'R$ ' + P.avista + '<span class="text-base font-medium text-white/60"> à vista</span>';
+    pd.textContent = 'Equivale a 10 mensalidades, com 12 meses de serviço · implantação isenta · permanência de 12 meses';
   }
   const u = new URL(location);
   u.searchParams.set('plano', plano); u.searchParams.set('ciclo', ciclo);
@@ -227,6 +295,11 @@ document.querySelectorAll('.btnTipo').forEach(b => b.onclick = () => {
   document.getElementById('wrapCnpj').style.display = pj ? '' : 'none';
   document.getElementById('wrapRazao').style.display = pj ? '' : 'none';
   document.getElementById('rotuloCpf').textContent = pj ? 'CPF de quem está contratando' : 'Seu CPF';
+  document.getElementById('wrapTitular').className = pj ? 'hidden' : '';
+  if (!pj) {
+    const t = document.getElementById('titular');
+    if (!t.value) t.value = document.getElementById('nome').value.trim();
+  }
 });
 
 /* ---------- máscaras ---------- */
@@ -245,6 +318,7 @@ mascara(document.getElementById('whatsapp'), d =>
   : d.replace(/(\d{2})(\d{5})(\d+)/, '($1) $2-$3'), 11);
 mascara(document.getElementById('cpf'), d =>
   d.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2'), 11);
+mascara(document.getElementById('cep'), d => d.replace(/(\d{5})(\d)/, '$1-$2'), 8);
 mascara(document.getElementById('cnpj'), d =>
   d.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2'), 14);
 
@@ -303,18 +377,24 @@ function validarEtapa(n) {
   }
   if (n === 2) {
     if (tipo === 'pj') { testar('cnpj', cnpjOk); testar('razao', v => v.trim().length > 2); }
-    testar('endereco', v => v.trim().length > 8);
+    testar('cep', v => dig(v).length === 8);
+    testar('logradouro', v => v.trim().length > 2);
+    testar('numero', v => v.trim().length > 0);
+    testar('bairro', v => v.trim().length > 1);
+    testar('cidade', v => v.trim().length > 1);
     testar('cpf', cpfOk);
   }
   if (primeiro) document.getElementById(primeiro).focus();
   return ok;
 }
-['nome','clinica','email','whatsapp','cnpj','razao','endereco','cpf'].forEach(id => {
+['nome','clinica','email','whatsapp','cnpj','razao','cep','logradouro','numero','bairro','cidade','cpf'].forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('blur', () => {
     if (!el.value) return;
     const mapa = { nome:nomeOk, email:emailOk, whatsapp:telOk, cpf:cpfOk, cnpj:cnpjOk,
-                   clinica:v=>v.trim().length>1, razao:v=>v.trim().length>2, endereco:v=>v.trim().length>8 };
+                   clinica:v=>v.trim().length>1, razao:v=>v.trim().length>2,
+                   cep:v=>dig(v).length===8, logradouro:v=>v.trim().length>2,
+                   numero:v=>v.trim().length>0, bairro:v=>v.trim().length>1, cidade:v=>v.trim().length>1 };
     checar(id, mapa[id]);
   });
 });
@@ -341,7 +421,7 @@ function carregarTermos() {
     doc: tipo === 'pj' ? document.getElementById('cnpj').value : document.getElementById('cpf').value,
     razao: document.getElementById('razao').value,
     nome: document.getElementById('nome').value,
-    end: document.getElementById('endereco').value,
+    end: enderecoCompleto(),
     rep: document.getElementById('nome').value + ', CPF nº ' + document.getElementById('cpf').value,
     plano: descricaoPlano()
   });
@@ -362,22 +442,51 @@ document.getElementById('form').addEventListener('submit', async ev => {
   const btn = document.getElementById('btnEnviar');
   btn.disabled = true; btn.textContent = 'Registrando...';
 
+  const v = id => (document.getElementById(id).value || '').trim();
+  const P = PLANOS[plano];
+
+  // As chaves abaixo têm exatamente o nome das colunas da aba "cadastro" da planilha.
   const dados = {
-    plano, ciclo, forma_pagamento: ciclo === 'anual' ? forma : 'mensal',
-    tipo_pessoa: tipo,
-    plano_descricao: descricaoPlano(),
-    versao_termos: VERSAO, aceite_termos: true, aceite_dpa: true,
-    aceite_em: new Date().toISOString(),
-    nome: document.getElementById('nome').value.trim(),
-    clinica: document.getElementById('clinica').value.trim(),
-    email: document.getElementById('email').value.trim(),
-    whatsapp: dig(document.getElementById('whatsapp').value),
-    cnpj: tipo === 'pj' ? dig(document.getElementById('cnpj').value) : '',
-    razao_social: tipo === 'pj' ? document.getElementById('razao').value.trim() : document.getElementById('nome').value.trim(),
-    endereco: document.getElementById('endereco').value.trim(),
-    cpf: dig(document.getElementById('cpf').value),
-    origem: document.referrer || 'direto',
-    user_agent: navigator.userAgent
+    // --- colunas da aba cadastro ---
+    cliente_id: '',
+    inbox_id: '',
+    status: 'Em implantação',
+    plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
+    razao_social: tipo === 'pj' ? v('razao') : v('titular') || v('nome'),
+    cnpj: tipo === 'pj' ? dig(v('cnpj')) : '',
+    endereco: enderecoCompleto(),
+    representante_nome: v('nome'),
+    representante_cpf: dig(v('cpf')),
+    email: v('email'),
+    telefone: dig(v('whatsapp')),
+    data_aceite: new Date().toISOString(),
+    versao_termos: VERSAO,
+    ip_aceite: '',            // preenchido pelo n8n a partir do cabeçalho da requisição
+    aceite_dpa: 'SIM',
+    valor_mensal: ciclo === 'mensal' ? P.mensal : (forma === 'parcelado' ? P.anual12 : P.avista),
+    valor_setup: ciclo === 'mensal' ? '999' : '0',
+    data_golive: '',
+    resp_tecnico_nome: '', resp_tecnico_conselho: '',
+    numero_whatsapp: '', numero_reserva: '', sistema_gestao: '',
+    usuarios_painel: '', website_token: '',
+    aprovacao_conteudo: 'NAO', data_aprovacao: '',
+    observacoes: 'Contratação pelo site. ' + descricaoPlano() + '.',
+
+    // --- campos extras, não vão para a planilha ---
+    _tipo_pessoa: tipo,
+    _ciclo: ciclo,
+    _forma_pagamento: ciclo === 'anual' ? forma : 'mensal',
+    _nome_fantasia: v('clinica'),
+    _cep: dig(v('cep')),
+    _logradouro: v('logradouro'),
+    _numero: v('numero'),
+    _complemento: v('complemento'),
+    _bairro: v('bairro'),
+    _cidade: v('cidade'),
+    _uf: v('uf'),
+    _aceite_termos: true,
+    _origem: document.referrer || 'direto',
+    _user_agent: navigator.userAgent
   };
 
   try {
@@ -385,7 +494,7 @@ document.getElementById('form').addEventListener('submit', async ev => {
     if (!r.ok) throw new Error();
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
-    document.querySelector('main > div').classList.add('hidden');
+    document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
     document.getElementById('sucesso').classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {
@@ -394,6 +503,47 @@ document.getElementById('form').addEventListener('submit', async ev => {
     box.textContent = 'Não consegui registrar agora. Tente de novo em instantes ou fale com a gente pelo WhatsApp.';
   }
 });
+
+/* consulta de CEP */
+const cepEl = document.getElementById('cep'), cepMsg = document.getElementById('cepMsg');
+function abrirEndereco() { document.getElementById('blocoEndereco').className = 'space-y-4'; }
+async function buscarCep() {
+  const d = dig(cepEl.value);
+  if (d.length !== 8) return;
+  cepMsg.className = 'text-xs mt-1.5 text-slate-500'; cepMsg.textContent = 'Buscando endereço...';
+  try {
+    const r = await fetch('https://brasilapi.com.br/api/cep/v2/' + d);
+    if (!r.ok) throw new Error();
+    const j = await r.json();
+    document.getElementById('logradouro').value = j.street || '';
+    document.getElementById('bairro').value = j.neighborhood || '';
+    document.getElementById('cidade').value = j.city || '';
+    document.getElementById('uf').value = j.state || '';
+    abrirEndereco();
+    cepMsg.className = 'text-xs mt-1.5 text-emerald-700';
+    cepMsg.textContent = 'Endereço encontrado. Falta só o número e o complemento.';
+    document.getElementById('numero').focus();
+  } catch (e) {
+    abrirEndereco();
+    cepMsg.className = 'text-xs mt-1.5 text-slate-500';
+    cepMsg.textContent = 'Não localizei esse CEP. Preencha o endereço manualmente.';
+  }
+}
+cepEl.addEventListener('blur', buscarCep);
+cepEl.addEventListener('input', () => { if (dig(cepEl.value).length === 8) buscarCep(); });
+
+/* titular do CPF: reaproveita o nome da etapa 1 */
+document.getElementById('cpf').addEventListener('blur', () => {
+  const t = document.getElementById('titular');
+  if (!t.value) t.value = document.getElementById('nome').value.trim();
+});
+
+function enderecoCompleto() {
+  const v = id => document.getElementById(id).value.trim();
+  const linha1 = [v('logradouro'), v('numero')].filter(Boolean).join(', ');
+  return [linha1, v('complemento'), v('bairro'), v('cidade') + (v('uf') ? '/' + v('uf') : ''), 'CEP ' + v('cep')]
+    .filter(s => s && s !== 'CEP ').join(', ');
+}
 
 /* consulta de CNPJ */
 const cnpjEl = document.getElementById('cnpj'), cnpjMsg = document.getElementById('cnpjMsg');
@@ -404,12 +554,15 @@ cnpjEl.addEventListener('blur', async () => {
     const r = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + dig(cnpjEl.value));
     if (!r.ok) throw new Error();
     const j = await r.json();
-    const razao = document.getElementById('razao'), end = document.getElementById('endereco');
+    const razao = document.getElementById('razao');
     if (!razao.value) razao.value = j.razao_social || '';
-    if (!end.value) end.value = [j.descricao_tipo_de_logradouro, j.logradouro, j.numero, j.complemento, j.bairro, j.municipio, j.uf, j.cep].filter(Boolean).join(', ');
-    cnpjMsg.className = 'text-xs mt-1.5 text-emerald-700'; cnpjMsg.textContent = 'Dados encontrados. Confira e ajuste se precisar.';
+    if (!document.getElementById('cep').value && j.cep) {
+      document.getElementById('cep').value = String(j.cep).replace(/(\d{5})(\d{3})/, '$1-$2');
+      buscarCep();
+    }
+    cnpjMsg.className = 'text-xs mt-1.5 text-emerald-700'; cnpjMsg.textContent = 'Razão social encontrada. Confira e ajuste se precisar.';
   } catch (e) {
-    cnpjMsg.className = 'text-xs mt-1.5 text-slate-500'; cnpjMsg.textContent = 'Não consegui buscar automaticamente. Preencha os campos abaixo.';
+    cnpjMsg.className = 'text-xs mt-1.5 text-slate-500'; cnpjMsg.textContent = 'Não consegui buscar automaticamente. Preencha a razão social abaixo.';
   }
 });
 
