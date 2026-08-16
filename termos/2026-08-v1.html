@@ -49,17 +49,18 @@
         .mockup-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 <style>
-  .doc h1 { font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 2.25rem 0 .75rem; padding-bottom: .5rem; border-bottom: 1px solid #e2e8f0; }
-  .doc h2 { font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 1.5rem 0 .5rem; }
-  .doc p { margin: .7rem 0; line-height: 1.75; color: #334155; }
-  .doc strong { color: #0f172a; }
-  .doc ul { margin: .7rem 0 .7rem 1.25rem; list-style: disc; }
-  .doc li { margin: .35rem 0; line-height: 1.7; color: #334155; }
-  .doc blockquote { border-left: 4px solid #10b981; background:#ecfdf5; padding: 1rem 1.25rem; margin: 1.25rem 0; border-radius: .5rem; }
-  .doc blockquote p { margin: 0; color:#065f46; }
-  .doc table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+  .doc h1 { font-size:1.3rem; font-weight:800; color:#0f172a; margin:2.25rem 0 .75rem; padding-bottom:.5rem; border-bottom:1px solid #e2e8f0; }
+  .doc p { margin:.7rem 0; line-height:1.75; color:#334155; }
+  .doc strong { color:#0f172a; }
+  .doc ul { margin:.7rem 0 .7rem 1.25rem; list-style:disc; }
+  .doc li { margin:.35rem 0; line-height:1.7; color:#334155; }
+  .doc blockquote { border-left:4px solid #10b981; background:#ecfdf5; padding:1rem 1.25rem; margin:1.25rem 0; border-radius:.5rem; }
+  .doc blockquote p { margin:0; color:#065f46; }
+  .doc table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.9rem; }
   .doc th { background:#f1f5f9; text-align:left; font-weight:700; color:#0f172a; }
-  .doc th, .doc td { border: 1px solid #e2e8f0; padding: .55rem .75rem; vertical-align: top; }
+  .doc th, .doc td { border:1px solid #e2e8f0; padding:.55rem .75rem; vertical-align:top; }
+  .doc [data-cli], .doc [data-rx] { font-weight:700; color:#065f46; background:#ecfdf5; padding:.05rem .3rem; border-radius:.25rem; }
+  .doc .pend { color:#64748b; background:#f1f5f9; font-weight:500; font-style:italic; }
 </style>
 </head>
 <body class="bg-slate-50 font-sans antialiased">
@@ -69,7 +70,6 @@
       <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-08-v1</span>
     </div>
   </header>
-
   <main class="max-w-4xl mx-auto px-5 py-10">
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-10">
       <h1 class="text-2xl md:text-3xl font-extrabold text-primary-900 leading-tight">Termos de Uso e Condições de Contratação</h1>
@@ -78,8 +78,11 @@
 <p><strong>Versão 2026-08-v1</strong> · Vigente a partir de
 ___/___/2026</p>
 <p><strong>RXSync Tecnologia e Automação em Saúde Ltda.</strong>, CNPJ
-nº __________, com sede em __________, e-mail contato@rxsync.com.br
+nº <span data-rx="cnpj">__________</span>, com sede em <span data-rx="sede">__________</span>, e-mail contato@rxsync.com.br
 (“RXSync”).</p>
+<p><strong>Cliente:</strong> <span data-cli="ident" class="pend">a identificar no ato do aceite</span></p>
+<p><strong>Representante:</strong> <span data-cli="rep" class="pend">a identificar no ato do aceite</span></p>
+<p><strong>Plano contratado:</strong> <span data-cli="plano" class="pend">a definir no ato do aceite</span></p>
 <blockquote>
 <p><strong>Leia antes de aceitar.</strong> Este documento é um contrato.
 Ao marcar a caixa de aceite e concluir a contratação, você celebra com a
@@ -87,25 +90,25 @@ RXSync um vínculo jurídico vinculante, nos termos abaixo. Se você não
 concorda com alguma condição, não aceite e procure a RXSync antes de
 contratar.</p>
 </blockquote>
-<section id="aceite-eletrônico-e-prova-da-contratação" class="level1">
-<h1>1. ACEITE ELETRÔNICO E PROVA DA CONTRATAÇÃO</h1>
+<h1 id="aceite-eletrônico-e-prova-da-contratação">1. ACEITE ELETRÔNICO E
+PROVA DA CONTRATAÇÃO</h1>
 <p><strong>1.1. Como se contrata.</strong> A contratação se aperfeiçoa
 quando o Cliente, por meio da página de contratação disponibilizada pela
-RXSync: (i) informa os dados cadastrais solicitados; (ii) marca, em
-caixas distintas e desmarcadas por padrão, o aceite destes Termos e o
-aceite do Anexo II (Acordo de Tratamento de Dados Pessoais); e (iii)
-confirma o pagamento ou a autorização de cobrança da primeira parcela
-devida.</p>
+RXSync: (i) informa os dados cadastrais solicitados, na condição de
+pessoa jurídica (CNPJ) ou de pessoa física (CPF); (ii) marca, em caixas
+distintas e desmarcadas por padrão, o aceite destes Termos e o aceite do
+Anexo II (Acordo de Tratamento de Dados Pessoais); e (iii) confirma o
+pagamento ou a autorização de cobrança da primeira parcela devida.</p>
 <p><strong>1.2. Poderes de representação.</strong> Quem realiza o aceite
 declara ter poderes para obrigar a pessoa jurídica indicada no cadastro,
 respondendo pessoalmente por eventual excesso.</p>
 <p><strong>1.3. Registro do aceite.</strong> A RXSync registrará e
 conservará, pelo prazo mínimo de 5 (cinco) anos após o término da
-relação: razão social e CNPJ do Cliente; nome, CPF e e-mail de quem
-aceitou; data e hora do aceite; endereço IP de origem; e a
-<strong>identificação da versão</strong> destes Termos e do Anexo II
-exibidos no momento. Esse registro constitui prova da contratação e do
-seu conteúdo.</p>
+relação: identificação do Cliente (razão social e CNPJ, ou nome e CPF);
+nome, CPF e e-mail de quem aceitou; data e hora do aceite; endereço IP
+de origem; e a <strong>identificação da versão</strong> destes Termos e
+do Anexo II exibidos no momento. Esse registro constitui prova da
+contratação e do seu conteúdo.</p>
 <p><strong>1.4. Versionamento.</strong> Cada versão destes Termos recebe
 identificação própria e permanece acessível de forma inalterada em
 endereço permanente indicado pela RXSync. A alteração de versão não
@@ -119,9 +122,7 @@ nos termos do art. 107 do Código Civil, do art. 10, §2º, da MP
 RXSync enviará ao e-mail cadastrado a confirmação contendo o plano
 contratado, os valores, a data do aceite e o link permanente da versão
 aceita.</p>
-</section>
-<section id="definições" class="level1">
-<h1>2. DEFINIÇÕES</h1>
+<h1 id="definições">2. DEFINIÇÕES</h1>
 <p><strong>Assistente Virtual:</strong> agente conversacional operado
 por modelo de linguagem (IA generativa), configurado pela RXSync para
 atuar exclusivamente na camada administrativa do atendimento do
@@ -150,9 +151,8 @@ Virtual.</p>
 <p><strong>LGPD:</strong> Lei nº 13.709/2018. <strong>ANPD:</strong>
 Autoridade Nacional de Proteção de Dados. <strong>CFM:</strong> Conselho
 Federal de Medicina.</p>
-</section>
-<section id="objeto-e-natureza-da-relação" class="level1">
-<h1>3. OBJETO E NATUREZA DA RELAÇÃO</h1>
+<h1 id="objeto-e-natureza-da-relação">3. OBJETO E NATUREZA DA
+RELAÇÃO</h1>
 <p><strong>3.1.</strong> Constituem objeto destes Termos (i) a prestação
 de serviços técnicos de implantação, parametrização e integração da
 Plataforma no ambiente operacional do Cliente e (ii) o licenciamento de
@@ -162,28 +162,33 @@ contratado e o escopo do Anexo I.</p>
 prestação de serviços e licenciamento de uso, razão pela qual a Taxa de
 Implantação e a Mensalidade possuem naturezas distintas e regimes
 próprios de cobrança e reembolso.</p>
-<p><strong>3.3. Relação empresarial.</strong> Estes Termos são
-celebrados entre empresários, no exercício de suas respectivas
-atividades econômicas. O Cliente declara contratar a Plataforma como
-insumo de sua atividade-fim, e não como destinatário final. Aplicam-se
-os arts. 421, 421-A e 422 do Código Civil, presumindo-se paridade e
+<p><strong>3.3. Contratação por pessoa jurídica.</strong> Quando o
+Cliente contratar como pessoa jurídica, no exercício de sua atividade
+econômica, declara fazê-lo na condição de destinatário intermediário,
+empregando a Plataforma como insumo de sua atividade-fim. Aplicam-se os
+arts. 421, 421-A e 422 do Código Civil, presumindo-se paridade e
 simetria entre as Partes, sem prejuízo da incidência de normas
 cogentes.</p>
-<p><strong>3.4. Ausência de garantia de resultado.</strong> A obrigação
+<p><strong>3.4. Contratação por pessoa física.</strong> A RXSync admite
+a contratação por profissional de saúde pessoa física, com CPF. Nessa
+hipótese, e sempre que a legislação assim determinar, aplicam-se as
+normas de proteção ao consumidor, prevalecendo sobre qualquer disposição
+destes Termos que com elas conflite, notadamente quanto ao direito de
+arrependimento (Cláusula 4.9) e ao foro competente (Cláusula 21.7).</p>
+<p><strong>3.5. Ausência de garantia de resultado.</strong> A obrigação
 da RXSync é de meio quanto ao desempenho comercial do Cliente.
 Estatísticas de mercado eventualmente apresentadas em materiais
 comerciais são referências setoriais e <strong>não constituem garantia
 contratual de resultado, faturamento, número de agendamentos ou redução
 de absenteísmo</strong>.</p>
-<p><strong>3.5. Ausência de aconselhamento jurídico.</strong> A RXSync
+<p><strong>3.6. Ausência de aconselhamento jurídico.</strong> A RXSync
 fornece recursos técnicos que auxiliam o Cliente em sua conformidade
 regulatória, mas não presta serviços de advocacia nem de consultoria
 jurídica. A responsabilidade final pela conformidade perante o CFM, o
 respectivo Conselho Regional, a ANPD e demais autoridades é
 exclusivamente do Cliente.</p>
-</section>
-<section id="planos-preços-e-modalidades" class="level1">
-<h1>4. PLANOS, PREÇOS E MODALIDADES</h1>
+<h1 id="planos-preços-e-modalidades">4. PLANOS, PREÇOS E
+MODALIDADES</h1>
 <p><strong>4.1. Planos.</strong> O escopo funcional de cada plano consta
 do Anexo I.</p>
 <p><strong>4.2. Modalidade Mensal (sem fidelidade).</strong></p>
@@ -226,17 +231,19 @@ meses).</strong></p>
 <tr class="odd">
 <td>Essencial</td>
 <td>Isenta</td>
-<td>R$ 3.229,20</td>
+<td>R$ 2.990,00</td>
 <td>12x R$ 269,10</td>
 </tr>
 <tr class="even">
 <td>Gestão Inteligente</td>
 <td>Isenta</td>
-<td>R$ 6.469,20</td>
+<td>R$ 5.990,00</td>
 <td>12x R$ 539,10</td>
 </tr>
 </tbody>
 </table>
+<p>O pagamento à vista da modalidade Anual equivale a 10 (dez)
+mensalidades da modalidade Mensal, com 12 (doze) meses de serviço.</p>
 <p><strong>4.4. Natureza da isenção.</strong> A isenção da Taxa de
 Implantação na modalidade Anual não é liberalidade: é contrapartida
 direta do compromisso de permanência de 12 meses, e seu valor é
@@ -253,12 +260,22 @@ por mensagem enviada.</strong></p>
 <p><strong>4.7. Plano Enterprise.</strong> Redes, franquias e operações
 com múltiplas unidades são atendidas mediante proposta específica, que,
 aceita, integra estes Termos.</p>
-<p><strong>4.8. Alterações de preço.</strong> Alterações da tabela de
+<p><strong>4.8. Direito de arrependimento.</strong> O Cliente poderá
+desistir da contratação, sem qualquer ônus e sem necessidade de
+justificativa, no prazo de <strong>7 (sete) dias corridos</strong>
+contados do aceite, mediante comunicação a qualquer canal de suporte.
+Exercido o direito, a RXSync restituirá integralmente os valores
+eventualmente pagos em até 10 (dez) dias.</p>
+<p><strong>4.9. Início dos trabalhos.</strong> Os trabalhos de
+implantação somente se iniciam após o decurso do prazo da Cláusula 4.8,
+salvo se o Cliente solicitar expressamente o início imediato. Nessa
+hipótese, o direito de arrependimento permanece, ficando o Cliente
+ciente de que a Taxa de Implantação passa a ser devida proporcionalmente
+ao trabalho já executado, na forma da Cláusula 11.1.</p>
+<p><strong>4.10. Alterações de preço.</strong> Alterações da tabela de
 preços não afetam contratações já em curso durante o período contratado,
 aplicando-se apenas na renovação, observada a Cláusula 11.3.</p>
-</section>
-<section id="escopo-e-fases-de-execução" class="level1">
-<h1>5. ESCOPO E FASES DE EXECUÇÃO</h1>
+<h1 id="escopo-e-fases-de-execução">5. ESCOPO E FASES DE EXECUÇÃO</h1>
 <p><strong>5.1. Fase 1 — Diagnóstico e Setup.</strong> A RXSync
 realizará o mapeamento das regras de negócio do Cliente (serviços,
 valores, convênios, profissionais, horários, condutas de recepção), a
@@ -293,9 +310,7 @@ I; e suporte a softwares de terceiros não integrados.</p>
 impliquem novos fluxos, nova unidade, novo profissional, novo canal ou
 nova integração serão orçadas separadamente e somente executadas
 mediante aprovação escrita do Cliente.</p>
-</section>
-<section id="obrigações-da-rxsync" class="level1">
-<h1>6. OBRIGAÇÕES DA RXSYNC</h1>
+<h1 id="obrigações-da-rxsync">6. OBRIGAÇÕES DA RXSYNC</h1>
 <p><strong>6.1.</strong> Implantar a Plataforma conforme o Anexo I e
 mantê-la disponível nos termos do Anexo III.</p>
 <p><strong>6.2.</strong> Hospedar a Plataforma e as bases de dados
@@ -323,9 +338,7 @@ indisponibilidade, salvo correções emergenciais de segurança.</p>
 <p><strong>6.8.</strong> Tratar os dados pessoais na qualidade de
 operadora, exclusivamente conforme as instruções do Cliente e o Anexo
 II.</p>
-</section>
-<section id="obrigações-do-cliente" class="level1">
-<h1>7. OBRIGAÇÕES DO CLIENTE</h1>
+<h1 id="obrigações-do-cliente">7. OBRIGAÇÕES DO CLIENTE</h1>
 <p><strong>7.1.</strong> Fornecer, de forma completa, correta e
 atualizada, todos os insumos do Anexo IV, respondendo integralmente pela
 veracidade de valores, convênios, horários, orientações de preparo e
@@ -363,10 +376,8 @@ usuários.</p>
 <p><strong>7.9.</strong> Instituir e manter política de privacidade
 própria, colher a base legal adequada para o tratamento dos dados de
 seus pacientes e indicar Encarregado, na qualidade de controlador.</p>
-</section>
-<section id="limites-de-atuação-da-inteligência-artificial"
-class="level1">
-<h1>8. LIMITES DE ATUAÇÃO DA INTELIGÊNCIA ARTIFICIAL</h1>
+<h1 id="limites-de-atuação-da-inteligência-artificial">8. LIMITES DE
+ATUAÇÃO DA INTELIGÊNCIA ARTIFICIAL</h1>
 <p><strong>8.1.</strong> O Assistente Virtual atua exclusivamente como
 apoio administrativo de primeira linha (agendamento, valores, convênios,
 endereço, horários, orientações operacionais previamente fornecidas e
@@ -394,10 +405,8 @@ da Mensalidade.</p>
 disciplinares praticadas pelo corpo clínico do Cliente, inclusive quando
 decorrentes de delegação, à Plataforma, de atividade que a norma reserva
 ao profissional de saúde.</p>
-</section>
-<section id="aprovação-de-conteúdo-pelo-responsável-técnico"
-class="level1">
-<h1>9. APROVAÇÃO DE CONTEÚDO PELO RESPONSÁVEL TÉCNICO</h1>
+<h1 id="aprovação-de-conteúdo-pelo-responsável-técnico">9. APROVAÇÃO DE
+CONTEÚDO PELO RESPONSÁVEL TÉCNICO</h1>
 <p><strong>9.1.</strong> Todo o conteúdo que o Assistente Virtual
 utilizará — roteiro de atendimento, respostas padrão, orientações de
 preparo, política de preços e regras de agendamento — será submetido ao
@@ -413,9 +422,8 @@ pelo Assistente Virtual.</p>
 <p><strong>9.4. Alterações posteriores.</strong> Alterações relevantes
 de conteúdo solicitadas ao longo da vigência seguem o mesmo procedimento
 de aprovação registrada.</p>
-</section>
-<section id="canal-de-mensageria-e-risco-de-bloqueio" class="level1">
-<h1>10. CANAL DE MENSAGERIA E RISCO DE BLOQUEIO</h1>
+<h1 id="canal-de-mensageria-e-risco-de-bloqueio">10. CANAL DE MENSAGERIA
+E RISCO DE BLOQUEIO</h1>
 <p><strong>10.1.</strong> A RXSync não possui qualquer vínculo,
 afiliação, parceria ou representação em relação à Meta Platforms,
 Inc. ou às demais fornecedoras do Canal de Mensageria, cujos termos de
@@ -446,14 +454,17 @@ Oficial da plataforma de mensageria, os custos por conversa cobrados
 pela fornecedora serão repassados integralmente e o Cliente deverá
 cumprir os requisitos de verificação e aprovação de modelos de mensagem
 exigidos por aquela.</p>
-</section>
-<section id="pagamento-reajuste-e-inadimplemento" class="level1">
-<h1>11. PAGAMENTO, REAJUSTE E INADIMPLEMENTO</h1>
+<h1 id="pagamento-reajuste-e-inadimplemento">11. PAGAMENTO, REAJUSTE E
+INADIMPLEMENTO</h1>
 <p><strong>11.1. Taxa de Implantação.</strong> Devida no aceite, na
-modalidade Mensal. <strong>Iniciados os trabalhos de parametrização, a
-Taxa de Implantação torna-se integralmente não reembolsável</strong>,
-ainda que o Cliente desista antes do Go-live, dado o caráter
-personalizado e não reaproveitável da configuração desenvolvida.</p>
+modalidade Mensal. Observado o direito de arrependimento da Cláusula
+4.8, e <strong>decorrido esse prazo, iniciados os trabalhos de
+parametrização, a Taxa de Implantação torna-se não
+reembolsável</strong>, ainda que o Cliente desista antes do Go-live,
+dado o caráter personalizado e não reaproveitável da configuração
+desenvolvida. Havendo desistência após o início autorizado dos trabalhos
+e dentro do prazo de arrependimento, a restituição observará o
+percentual de trabalho ainda não executado.</p>
 <p><strong>11.2. Mensalidade.</strong> Devida a partir do Go-live, ou a
 partir do 30º (trigésimo) dia contado da conclusão da Fase 1, caso o
 Go-live não ocorra por causa atribuível ao Cliente.</p>
@@ -486,9 +497,7 @@ relação.</p>
 suspensão por inadimplemento poderá ensejar taxa de reativação de até
 30% (trinta por cento) da Mensalidade vigente, a título de recomposição
 de custos técnicos.</p>
-</section>
-<section id="nível-de-serviço" class="level1">
-<h1>12. NÍVEL DE SERVIÇO</h1>
+<h1 id="nível-de-serviço">12. NÍVEL DE SERVIÇO</h1>
 <p><strong>12.1.</strong> A RXSync envidará seus melhores esforços para
 manter a disponibilidade mensal da Plataforma em, no mínimo, 99%
 (noventa e nove por cento), apurada na forma do Anexo III.</p>
@@ -499,9 +508,7 @@ de disponibilidade dará ao Cliente direito, <strong>como remédio único e
 exclusivo</strong>, a crédito proporcional na Mensalidade subsequente,
 calculado na forma do Anexo III, excluída qualquer outra forma de
 indenização.</p>
-</section>
-<section id="proteção-de-dados-pessoais" class="level1">
-<h1>13. PROTEÇÃO DE DADOS PESSOAIS</h1>
+<h1 id="proteção-de-dados-pessoais">13. PROTEÇÃO DE DADOS PESSOAIS</h1>
 <p><strong>13.1.</strong> As Partes obrigam-se a observar a LGPD e a
 regulamentação da ANPD, nos termos do <strong>Anexo II — Acordo de
 Tratamento de Dados Pessoais</strong>, aceito em ato próprio e distinto
@@ -518,9 +525,7 @@ notificará <strong>em até 24 (vinte e quatro) horas</strong> contadas da
 confirmação, com os elementos técnicos necessários para que o Cliente,
 na condição de controlador, cumpra o prazo de comunicação à ANPD e aos
 titulares previsto na Resolução CD/ANPD nº 15/2024.</p>
-</section>
-<section id="confidencialidade" class="level1">
-<h1>14. CONFIDENCIALIDADE</h1>
+<h1 id="confidencialidade">14. CONFIDENCIALIDADE</h1>
 <p><strong>14.1.</strong> Cada Parte obriga-se a manter sigilo sobre
 toda informação não pública a que tenha acesso em razão desta relação,
 empregando ao menos o mesmo grau de diligência que dedica às próprias
@@ -531,9 +536,7 @@ pessoais sensíveis e a segredos de negócio.</p>
 <p><strong>14.3.</strong> Não se considera violação a divulgação exigida
 por lei, ordem judicial ou autoridade competente, devendo a Parte
 intimada comunicar a outra previamente, quando legalmente possível.</p>
-</section>
-<section id="propriedade-intelectual" class="level1">
-<h1>15. PROPRIEDADE INTELECTUAL</h1>
+<h1 id="propriedade-intelectual">15. PROPRIEDADE INTELECTUAL</h1>
 <p><strong>15.1.</strong> A RXSync concede ao Cliente licença de uso da
 Plataforma <strong>limitada, revogável, não exclusiva, intransferível e
 insuscetível de sublicenciamento</strong>, restrita ao ambiente
@@ -559,9 +562,8 @@ atendimentos e o conteúdo por ele inserido na Plataforma.</p>
 mencionar o nome e a marca do Cliente em seu portfólio comercial, salvo
 manifestação escrita em contrário, vedada em qualquer caso a divulgação
 de dados de pacientes ou de métricas específicas sem autorização.</p>
-</section>
-<section id="limitação-de-responsabilidade" class="level1">
-<h1>16. LIMITAÇÃO DE RESPONSABILIDADE</h1>
+<h1 id="limitação-de-responsabilidade">16. LIMITAÇÃO DE
+RESPONSABILIDADE</h1>
 <p><strong>16.1. Exclusão de danos indiretos.</strong> <strong>A RXSYNC
 NÃO RESPONDERÁ, SOB QUALQUER FUNDAMENTO, POR LUCROS CESSANTES, DANOS
 INDIRETOS, PERDA DE CHANCE, PERDA DE OPORTUNIDADE DE NEGÓCIO, OCIOSIDADE
@@ -587,9 +589,7 @@ indisponibilidades prolongadas de datacenter, da plataforma de
 mensageria, do provedor de modelo de linguagem ou do Sistema de Gestão,
 bem como ataques cibernéticos de terceiros a despeito da adoção das
 medidas de segurança do Anexo II.</p>
-</section>
-<section id="indenidade" class="level1">
-<h1>17. INDENIDADE</h1>
+<h1 id="indenidade">17. INDENIDADE</h1>
 <p><strong>17.1.</strong> O Cliente defenderá e manterá a RXSync indene
 de reclamações, processos judiciais, administrativos ou
 ético-disciplinares promovidos por pacientes ou terceiros, incluindo
@@ -608,9 +608,8 @@ seguro de responsabilidade civil profissional ou empresarial, obriga-se
 a envidar seus melhores esforços para nele fazer constar renúncia da
 seguradora ao direito de regresso contra a RXSync, salvo dolo ou culpa
 grave desta.</p>
-</section>
-<section id="vigência-cancelamento-e-renovação" class="level1">
-<h1>18. VIGÊNCIA, CANCELAMENTO E RENOVAÇÃO</h1>
+<h1 id="vigência-cancelamento-e-renovação">18. VIGÊNCIA, CANCELAMENTO E
+RENOVAÇÃO</h1>
 <p><strong>18.1. Modalidade Mensal.</strong> Vigora por prazo
 indeterminado a partir do Go-live. <strong>Qualquer das Partes pode
 encerrar a qualquer tempo, sem multa</strong>, mediante aviso escrito
@@ -652,9 +651,7 @@ RXSync não sanado; (ii) indisponibilidade da Plataforma superior a 5
 <p><strong>18.7.</strong> O encerramento por inadimplemento do Cliente
 equipara-se, para os fins da Cláusula 18.4, ao encerramento antecipado
 imotivado.</p>
-</section>
-<section id="transição-de-saída" class="level1">
-<h1>19. TRANSIÇÃO DE SAÍDA</h1>
+<h1 id="transição-de-saída">19. TRANSIÇÃO DE SAÍDA</h1>
 <p><strong>19.1.</strong> Encerrada a relação, a RXSync revogará as
 integrações com o Sistema de Gestão, desconectará o Canal de Mensageria
 e inativará as credenciais de acesso.</p>
@@ -669,9 +666,7 @@ retenção mínima exigida por lei, emitindo, se solicitado, declaração de
 expurgo.</p>
 <p><strong>19.4.</strong> A titularidade do número de telefone e da
 conta de mensageria permanece, em qualquer hipótese, com o Cliente.</p>
-</section>
-<section id="alterações-destes-termos" class="level1">
-<h1>20. ALTERAÇÕES DESTES TERMOS</h1>
+<h1 id="alterações-destes-termos">20. ALTERAÇÕES DESTES TERMOS</h1>
 <p><strong>20.1.</strong> A RXSync poderá alterar estes Termos e seus
 Anexos, publicando nova versão identificada.</p>
 <p><strong>20.2. Comunicação.</strong> Alterações serão comunicadas ao
@@ -687,9 +682,7 @@ entrada em vigor implica aceite da nova versão, cujo registro observará
 a Cláusula 1.3.</p>
 <p><strong>20.5.</strong> Alterações de preço em contratações vigentes
 somente se aplicam na renovação, observada a Cláusula 11.3.</p>
-</section>
-<section id="disposições-gerais" class="level1">
-<h1>21. DISPOSIÇÕES GERAIS</h1>
+<h1 id="disposições-gerais">21. DISPOSIÇÕES GERAIS</h1>
 <p><strong>21.1. Não exclusividade e ausência de vínculo.</strong> Esta
 relação não gera exclusividade, sociedade, <em>joint venture</em>,
 mandato ou vínculo empregatício entre as Partes ou seus
@@ -711,12 +704,13 @@ de qualquer disposição não afeta as demais, devendo a cláusula inválida
 ser substituída por outra de efeito econômico equivalente.</p>
 <p><strong>21.6. Anticorrupção.</strong> As Partes obrigam-se a observar
 a Lei nº 12.846/2013.</p>
-<p><strong>21.7. Foro.</strong> Fica eleito o foro da comarca de
-__________, com renúncia a qualquer outro, sem prejuízo da faculdade de
+<p><strong>21.7. Foro.</strong> Para o Cliente pessoa jurídica, fica
+eleito o foro da comarca de <span data-rx="comarca">__________</span>, com renúncia a qualquer
+outro. Para o Cliente pessoa física, prevalece o foro de seu domicílio,
+na forma da lei. Em ambos os casos, sem prejuízo da faculdade de
 submissão prévia a mediação.</p>
-</section>
-<section id="anexo-i-escopo-funcional-por-plano" class="level1">
-<h1>ANEXO I — ESCOPO FUNCIONAL POR PLANO</h1>
+<h1 id="anexo-i-escopo-funcional-por-plano">ANEXO I — ESCOPO FUNCIONAL
+POR PLANO</h1>
 <p><strong>1. Comum a todos os planos</strong></p>
 <ul>
 <li><p>Assistente Virtual em português, disponível 24 horas por dia,
@@ -771,10 +765,8 @@ recursos necessários, a RXSync (i) comunicará o Cliente em até 5 dias
 possível, converterá o plano para o escalão imediatamente inferior, com
 redução proporcional da Mensalidade, sem incidência de recomposição a
 qualquer das Partes.</p>
-</section>
-<section id="anexo-ii-acordo-de-tratamento-de-dados-pessoais"
-class="level1">
-<h1>ANEXO II — ACORDO DE TRATAMENTO DE DADOS PESSOAIS</h1>
+<h1 id="anexo-ii-acordo-de-tratamento-de-dados-pessoais">ANEXO II —
+ACORDO DE TRATAMENTO DE DADOS PESSOAIS</h1>
 <p><em>Aceito em ato próprio e distinto, na forma da Cláusula
 1.1.</em></p>
 <p><strong>1. Papéis.</strong> O Cliente é <strong>controlador</strong>;
@@ -845,12 +837,12 @@ resposta:</p>
 </thead>
 <tbody>
 <tr class="odd">
-<td>______ (provedor de VPS)</td>
+<td>Hostinger International Ltd. (datacenter em São Paulo)</td>
 <td>Hospedagem da Plataforma e bases de dados</td>
 <td>Brasil</td>
 </tr>
 <tr class="even">
-<td>______ (provedor de modelo de linguagem)</td>
+<td>OpenAI, L.L.C.</td>
 <td>Geração de respostas e transcrição de áudio</td>
 <td>Exterior</td>
 </tr>
@@ -865,7 +857,7 @@ resposta:</p>
 <td>Exterior</td>
 </tr>
 <tr class="odd">
-<td>______ (Sistema de Gestão do Cliente)</td>
+<td>Sistema de Gestão do Cliente, quando integrado</td>
 <td>Agendamento e prontuário</td>
 <td>Conforme contrato próprio do Cliente</td>
 </tr>
@@ -890,9 +882,8 @@ mediante aviso de 30 dias e às suas expensas, solicitar evidências
 documentais das medidas de segurança, preservados os segredos de negócio
 da RXSync e os dados de outros clientes. Auditoria presencial em
 infraestrutura compartilhada é vedada.</p>
-</section>
-<section id="anexo-iii-nível-de-serviço-e-suporte" class="level1">
-<h1>ANEXO III — NÍVEL DE SERVIÇO E SUPORTE</h1>
+<h1 id="anexo-iii-nível-de-serviço-e-suporte">ANEXO III — NÍVEL DE
+SERVIÇO E SUPORTE</h1>
 <p><strong>1. Horário de suporte.</strong> Segunda a sexta, das 9h às
 18h, exceto feriados nacionais.</p>
 <p><strong>2. Disponibilidade.</strong> Meta mensal de 99%, apurada
@@ -996,10 +987,8 @@ número principal, a RXSync iniciará a reconexão do número reserva em até
 1 (um) dia útil do recebimento da solicitação e do acesso ao
 aparelho/linha, sem que isso implique reconhecimento de
 responsabilidade.</p>
-</section>
-<section id="anexo-iv-insumos-e-responsabilidades-de-implantação"
-class="level1">
-<h1>ANEXO IV — INSUMOS E RESPONSABILIDADES DE IMPLANTAÇÃO</h1>
+<h1 id="anexo-iv-insumos-e-responsabilidades-de-implantação">ANEXO IV —
+INSUMOS E RESPONSABILIDADES DE IMPLANTAÇÃO</h1>
 <p>O Cliente fornecerá, no prazo de até 5 (cinco) dias úteis do
 aceite:</p>
 <ul>
@@ -1032,11 +1021,27 @@ projeto e dos usuários do Painel de Atendimento.</p></li>
 (trinta) dias corridos na entrega dos insumos autoriza a RXSync a (i)
 suspender a implantação e (ii) iniciar a cobrança da Mensalidade, na
 forma da Cláusula 11.2.</p>
-</section>
 
       </div>
     </div>
     <p class="text-center text-xs text-slate-400 mt-8">Documento imutável. Alterações futuras são publicadas em nova versão, com endereço próprio.</p>
   </main>
+<script>
+// Dados fixos da RXSync — preencher uma vez, quando o CNPJ existir
+const RX = { cnpj: '__________', sede: '__________', comarca: '__________' };
+document.querySelectorAll('[data-rx]').forEach(el => { const v = RX[el.dataset.rx]; if (v) el.textContent = v; });
+
+// Personalização com os dados de quem está contratando (vem da página de contratação)
+const q = new URLSearchParams(location.search);
+const posto = (chave, texto) => {
+  const el = document.querySelector('[data-cli="' + chave + '"]');
+  if (el && texto) { el.textContent = texto; el.classList.remove('pend'); }
+};
+const tipo = q.get('tipo');
+if (tipo === 'pj' && q.get('razao')) posto('ident', q.get('razao') + ', CNPJ nº ' + (q.get('doc') || '') + ', com sede em ' + (q.get('end') || ''));
+if (tipo === 'pf' && q.get('nome')) posto('ident', q.get('nome') + ', CPF nº ' + (q.get('doc') || '') + ', residente em ' + (q.get('end') || ''));
+if (q.get('rep')) posto('rep', q.get('rep'));
+if (q.get('plano')) posto('plano', q.get('plano'));
+</script>
 </body>
 </html>
