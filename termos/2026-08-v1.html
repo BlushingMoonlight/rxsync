@@ -59,7 +59,7 @@
   .doc table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.9rem; }
   .doc th { background:#f1f5f9; text-align:left; font-weight:700; color:#0f172a; }
   .doc th, .doc td { border:1px solid #e2e8f0; padding:.55rem .75rem; vertical-align:top; }
-  .doc [data-cli], .doc [data-rx] { font-weight:700; color:#065f46; background:#ecfdf5; padding:.05rem .3rem; border-radius:.25rem; }
+  .doc [data-cli] { font-weight:700; color:#065f46; background:#ecfdf5; padding:.05rem .3rem; border-radius:.25rem; }
   .doc .pend { color:#64748b; background:#f1f5f9; font-weight:500; font-style:italic; }
 </style>
 </head>
@@ -77,8 +77,9 @@
       <div class="doc">
 <p><strong>Versão 2026-08-v1</strong> · Vigente a partir de
 ___/___/2026</p>
-<p><strong>RXSync Tecnologia e Automação em Saúde Ltda.</strong>, CNPJ
-nº <span data-rx="cnpj">__________</span>, com sede em <span data-rx="sede">__________</span>, e-mail contato@rxsync.com.br
+<p><strong>52.970.673 LUAN DUARTE CAVALHEIRO</strong>, inscrita no CNPJ
+sob o nº 52.970.673/0001-78, com sede em Canoinhas/SC, que opera sob o
+nome fantasia <strong>RXSync</strong>, e-mail contato@rxsync.com.br
 (“RXSync”).</p>
 <p><strong>Cliente:</strong> <span data-cli="ident" class="pend">a identificar no ato do aceite</span></p>
 <p><strong>Representante:</strong> <span data-cli="rep" class="pend">a identificar no ato do aceite</span></p>
@@ -705,10 +706,10 @@ ser substituída por outra de efeito econômico equivalente.</p>
 <p><strong>21.6. Anticorrupção.</strong> As Partes obrigam-se a observar
 a Lei nº 12.846/2013.</p>
 <p><strong>21.7. Foro.</strong> Para o Cliente pessoa jurídica, fica
-eleito o foro da comarca de <span data-rx="comarca">__________</span>, com renúncia a qualquer
-outro. Para o Cliente pessoa física, prevalece o foro de seu domicílio,
-na forma da lei. Em ambos os casos, sem prejuízo da faculdade de
-submissão prévia a mediação.</p>
+eleito o foro da comarca de Canoinhas/SC, com renúncia a qualquer outro.
+Para o Cliente pessoa física, prevalece o foro de seu domicílio, na
+forma da lei. Em ambos os casos, sem prejuízo da faculdade de submissão
+prévia a mediação.</p>
 <h1 id="anexo-i-escopo-funcional-por-plano">ANEXO I — ESCOPO FUNCIONAL
 POR PLANO</h1>
 <p><strong>1. Comum a todos os planos</strong></p>
@@ -1027,10 +1028,6 @@ forma da Cláusula 11.2.</p>
     <p class="text-center text-xs text-slate-400 mt-8">Documento imutável. Alterações futuras são publicadas em nova versão, com endereço próprio.</p>
   </main>
 <script>
-// Dados fixos da RXSync — preencher uma vez, quando o CNPJ existir
-const RX = { cnpj: '__________', sede: '__________', comarca: '__________' };
-document.querySelectorAll('[data-rx]').forEach(el => { const v = RX[el.dataset.rx]; if (v) el.textContent = v; });
-
 // Personalização com os dados de quem está contratando (vem da página de contratação)
 const q = new URLSearchParams(location.search);
 const posto = (chave, texto) => {
