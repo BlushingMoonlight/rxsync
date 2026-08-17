@@ -260,6 +260,8 @@ let forma = 'parcelado';
 let tipo  = 'pj';
 let etapa = 1;
 const INICIO = Date.now();
+let CLIENTE_ID = '';   // devolvido pelo n8n quando o lead é registrado
+let LEAD_ENVIADO = false;
 
 const sel = (on) => on ? 'border-primary-900 bg-primary-900 text-white' : 'border-slate-200 text-slate-600 bg-white';
 
@@ -427,7 +429,41 @@ function mostrar(n) {
   if (n === 3) carregarTermos();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-document.querySelectorAll('.proximo').forEach(b => b.onclick = () => { if (validarEtapa(etapa)) mostrar(etapa + 1); });
+document.querySelectorAll('.proximo').forEach(b => b.onclick = () => {
+  if (!validarEtapa(etapa)) return;
+  if (etapa === 1) registrarLead();   // grava o lead antes do aceite
+  mostrar(etapa + 1);
+});
+
+// Registra o interessado assim que temos nome, clínica, e-mail e WhatsApp.
+// Se ele abandonar antes de aceitar os termos, ainda assim sabemos que existiu.
+async function registrarLead() {
+  if (LEAD_ENVIADO) return;
+  LEAD_ENVIADO = true;
+  const v = id => (document.getElementById(id).value || '').trim();
+  try {
+    const r = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
+      body: JSON.stringify({
+        _evento: 'lead',
+        status: 'Lead sem aceite',
+        representante_nome: v('nome'),
+        email: v('email'),
+        telefone: dig(v('whatsapp')),
+        plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
+        observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
+        _nome_fantasia: v('clinica'),
+        _ciclo: ciclo,
+        _origem: document.referrer || 'direto'
+      })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (j && j.cliente_id) CLIENTE_ID = j.cliente_id;
+  } catch (e) {
+    LEAD_ENVIADO = false;   // deixa tentar de novo se falhar
+  }
+}
 document.querySelectorAll('.voltar').forEach(b => b.onclick = () => mostrar(etapa - 1));
 
 function descricaoPlano() {
@@ -468,10 +504,11 @@ document.getElementById('form').addEventListener('submit', async ev => {
 
   // As chaves abaixo têm exatamente o nome das colunas da aba "cadastro" da planilha.
   const dados = {
+    _evento: 'aceite',
     // --- colunas da aba cadastro ---
-    cliente_id: '',
+    cliente_id: CLIENTE_ID,
     inbox_id: '',
-    status: 'Em implantação',
+    status: 'Aceite registrado',
     plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
     razao_social: tipo === 'pj' ? v('razao') : v('titular') || v('nome'),
     cnpj: tipo === 'pj' ? dig(v('cnpj')) : '',
