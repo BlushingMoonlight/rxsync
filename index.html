@@ -274,10 +274,11 @@
                     Implantação feita por nós
                 </span>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
-                    Seus pacientes atendidos em segundos por <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Inteligência Artificial</span>. 24 horas por dia.
+                    Seus pacientes atendidos em segundos por <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Inteligência Artificial</span>.
+                    <span class="block mt-3 min-h-[2.5em] sm:min-h-[1.25em]"><span id="digitando"></span><span id="cursor" class="text-emerald-400 font-light">|</span></span>
                 </h1>
                 <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-                    Uma assistente virtual treinada com as regras da sua clínica tira dúvidas, passa valores e agenda direto no seu sistema — em português impecável, com a educação que a sua recepção teria se tivesse tempo. É assim que o atendimento em saúde vai funcionar, e você pode começar hoje.
+                    Uma assistente virtual treinada com as regras da sua clínica tira dúvidas, passa valores e agenda direto no seu sistema — em português impecável, com a educação que a sua recepção teria se tivesse tempo.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4 md:mb-16">
                     <a href="#precos" onclick="trackCta('hero_ver_planos')" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl transition-all hover:scale-105 text-center">
@@ -394,6 +395,31 @@
         </section>
 
         <!-- A Prescrição (Solução em Z-Pattern) -->
+        <!-- Demonstração ao vivo -->
+        <section class="py-24 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10" aria-hidden="true">
+                <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid-demo" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M0 32V0h32" fill="none" stroke="white" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid-demo)"/></svg>
+            </div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <div class="inline-flex items-center gap-2 bg-white/15 border border-white/25 text-white text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 mb-6">
+                    <span class="flex h-2 w-2 rounded-full bg-white animate-pulse"></span> Demonstração ao vivo
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-6 leading-tight">
+                    A mesma IA que vai atender a sua clínica está atendendo a nossa agora.
+                </h2>
+                <p class="text-white/90 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
+                    O chat no canto da tela não é um formulário nem uma gravação. É a nossa assistente trabalhando de verdade:
+                    ela explica os planos, tira dúvidas sobre a implantação e agenda uma conversa com a gente.
+                    <strong class="text-white">É exatamente o que ela vai fazer pela sua clínica</strong> — só que com os seus horários,
+                    os seus convênios e os seus pacientes.
+                </p>
+                <button onclick="abrirChat()" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold rounded-xl text-emerald-700 bg-white hover:bg-emerald-50 shadow-xl transition-all hover:scale-105">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i> Conversar com a assistente
+                </button>
+                <p class="text-white/70 text-sm mt-6">Sem cadastro. Sem compromisso. Ela responde na hora.</p>
+            </div>
+        </section>
+
         <section id="solucao" class="py-24 bg-slate-50 border-y border-slate-200 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-20">
@@ -408,7 +434,7 @@
                             <i data-lucide="bot" class="text-emerald-600 w-6 h-6"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-primary-900 mb-4">Experiência Agradável e Português Impecável</h3>
-                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Treinada com uma base de conhecimento exclusiva da sua clínica e com histórico armazenado em servidores no Brasil, nossa IA responde em português correto e garante uma experiência fluida que os pacientes elogiam.</p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Treinada com as regras da sua clínica e com histórico guardado em servidores no Brasil. Responde em português correto, sem parecer robô.</p>
                         <ul class="space-y-3">
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Resposta em segundos, dentro da janela de 5 minutos em que a chance de agendar é maior.</li>
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 mr-3"></i> Comunicação padronizada, acolhedora e agradável.</li>
@@ -500,7 +526,7 @@
                             <i data-lucide="calendar-check" class="text-primary-600 w-6 h-6"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-primary-900 mb-4">Integrado ao Software que você já usa</h3>
-                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Nada de agenda nova para gerenciar. A RXSync se conecta via API ao software que sua clínica já usa e faz o agendamento lá dentro, silenciosamente.</p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6">Nada de agenda nova para gerenciar. A RXSync se conecta ao software que você já usa e agenda lá dentro.</p>
                         <ul class="space-y-3">
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Instalação feita inteiramente por nós.</li>
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-primary-500 mr-3"></i> Lembretes automáticos nos horários que você escolher (48h, 24h, na manhã do dia ou 1h antes).</li>
@@ -516,7 +542,7 @@
                             <i data-lucide="headset" class="text-amber-600 w-6 h-6"></i>
                         </div>
                         <h3 class="text-2xl font-bold text-primary-900 mb-4">Sua equipe no controle, sem trocar de sistema</h3>
-                        <p class="text-slate-600 text-lg leading-relaxed mb-6"><strong>Você não migra de prontuário nem assina um CRM à parte.</strong> Junto com a IA entregamos um painel de atendimento simples, já configurado e incluso na mensalidade, onde a recepção acompanha todas as conversas em tempo real e assume o comando com um clique.</p>
+                        <p class="text-slate-600 text-lg leading-relaxed mb-6"><strong>Você não migra de prontuário nem assina um CRM à parte.</strong> Entregamos um painel simples, já configurado e incluso na mensalidade, onde a recepção acompanha as conversas e assume o comando com um clique.</p>
                         <ul class="space-y-3">
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Painel entregue pronto, com sua equipe treinada por nós.</li>
                             <li class="flex items-center text-slate-700"><i data-lucide="check-circle-2" class="w-5 h-5 text-amber-500 mr-3"></i> Se o paciente relata urgência, a IA pausa instantaneamente.</li>
@@ -629,7 +655,7 @@
                     <i data-lucide="shield-check" class="w-16 h-16 text-emerald-400 mx-auto mb-6"></i>
                     <h2 class="text-3xl font-bold sm:text-4xl">Conformidade tratada com o rigor que a medicina exige.</h2>
                     <p class="mt-4 text-lg text-slate-300 max-w-2xl mx-auto">
-                        Nossa infraestrutura é desenhada exclusivamente para o setor de saúde. Cada decisão técnica existe para reduzir o risco regulatório da sua clínica e proteger os dados dos seus pacientes.
+                        Infraestrutura feita para saúde. Cada decisão técnica existe para reduzir o risco regulatório da sua clínica.
                     </p>
                 </div>
 
@@ -669,38 +695,6 @@
         
 
         <!-- Planos e Preços -->
-        <!-- Teste a IA aqui -->
-        <section class="py-20 bg-primary-900 text-white border-y border-primary-800">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 mb-6">
-                    <i data-lucide="message-circle" class="w-4 h-4"></i> Experimente agora
-                </div>
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-5">Aquele botão no canto da tela é a nossa IA. E é a mesma que vai atender a sua clínica.</h2>
-                <p class="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto mb-8">
-                    Não é uma demonstração gravada nem um formulário disfarçado. É exatamente a mesma assistente que instalamos nas clínicas,
-                    rodando agora com as informações da RXSync. Converse com ela como se fosse um paciente seu.
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mb-8">
-                    <div class="bg-primary-800/50 border border-primary-700 rounded-xl p-5">
-                        <p class="font-bold text-white text-sm mb-1">Peça para marcar um horário</p>
-                        <p class="text-slate-400 text-sm">Veja como ela conduz o agendamento até o fim.</p>
-                    </div>
-                    <div class="bg-primary-800/50 border border-primary-700 rounded-xl p-5">
-                        <p class="font-bold text-white text-sm mb-1">Pergunte horários e profissionais</p>
-                        <p class="text-slate-400 text-sm">Ela responde com o que estiver cadastrado, e só com isso.</p>
-                    </div>
-                    <div class="bg-primary-800/50 border border-primary-700 rounded-xl p-5">
-                        <p class="font-bold text-white text-sm mb-1">Tente confundir ela</p>
-                        <p class="text-slate-400 text-sm">É assim que você entende onde estão os limites.</p>
-                    </div>
-                </div>
-                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
-                    Na sua clínica, essa mesma assistente atende pelo WhatsApp, pelo chat do seu site ou por qualquer canal que você usar —
-                    com os seus horários, os seus convênios e as suas regras no lugar das nossas.
-                </p>
-            </div>
-        </section>
-
         <section id="precos" class="py-24 bg-white relative">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="text-center mb-16">
@@ -708,16 +702,6 @@
                     <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
                         A RXSync entrega a solução rodando. Preço fixo, sem cobrança por disparo e sem surpresa na fatura — você contrata só o nível de automação que a sua clínica precisa hoje.
                     </p>
-                </div>
-
-                <div class="max-w-3xl mx-auto mb-16 bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm text-center flex flex-col md:flex-row items-center justify-center gap-6">
-                    <div class="w-16 h-16 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center shrink-0">
-                        <i data-lucide="settings-2" class="w-8 h-8"></i>
-                    </div>
-                    <div class="text-left">
-                        <h3 class="text-xl font-bold text-primary-900 mb-2">Implantação completa: R$ 999, uma única vez</h3>
-                        <p class="text-slate-600 text-sm leading-relaxed">Nós mapeamos as regras da sua clínica, alimentamos a assistente, configuramos tudo e entregamos funcionando. Sua equipe não precisa de ninguém dedicado a isso: um profissional da RXSync fica em contato direto pelo WhatsApp com quem precisar, para qualquer dúvida ou ajuste. <strong class="text-primary-900">Isenta nos planos anuais</strong> e válida também se você fizer upgrade de plano depois — paga uma vez, vale para sempre.</p>
-                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
@@ -736,8 +720,9 @@
                             <p class="text-sm text-primary-900 font-bold">12x R$ 269,10 <span class="font-medium text-slate-600">ou R$ 2.990 à vista</span></p>
                             <p class="text-xs text-slate-600 mt-1">Sem taxa de implantação &middot; permanência de 12 meses</p>
                         </div>
-                        <div class="mb-8 pb-8 border-b border-slate-100">
+                        <div class="mb-8 pb-8 border-b border-slate-100 flex flex-wrap gap-2">
                             <span class="inline-flex items-center gap-2 text-xs font-bold text-primary-700 bg-primary-50 border border-primary-100 rounded-full px-3 py-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Até 5.000 mensagens/mês</span>
+                            <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7 dias para desistir sem custo</span>
                         </div>
                         <ul class="space-y-4 mb-8 flex-1">
                             <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Triagem automatizada 24/7 (Nome, Convênio)</span></li>
@@ -769,7 +754,8 @@
                             <p class="text-sm text-white font-bold">12x R$ 539,10 <span class="font-medium text-white/70">ou R$ 5.990 à vista</span></p>
                             <p class="text-xs text-white/70 mt-1">Sem taxa de implantação &middot; permanência de 12 meses</p>
                         </div>
-                        <div class="mb-8 pb-8 border-b border-primary-700/50">
+                        <div class="mb-8 pb-8 border-b border-primary-700/50 flex flex-wrap gap-2">
+                            <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-3 py-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7 dias para desistir sem custo</span>
                             <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Até 15.000 mensagens/mês</span>
                         </div>
                         <ul class="space-y-4 mb-8 flex-1">
@@ -807,23 +793,7 @@
                     </div>
                 </div>
 
-                <div class="max-w-5xl mx-auto mt-14 bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 bg-slate-50 border border-slate-200 text-primary-700 rounded-xl flex items-center justify-center shrink-0"><i data-lucide="calendar-check" class="w-5 h-5"></i></div>
-                        <h3 class="font-bold text-primary-900">Mensal ou anual: a diferença</h3>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <p class="font-bold text-primary-900 text-sm mb-2">Mensal, sem fidelidade</p>
-                            <p class="text-slate-600 text-sm leading-relaxed">Você paga a implantação de R$ 999 uma vez e a mensalidade do plano escolhido. Pode sair quando quiser, avisando com 30 dias.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-primary-900 text-sm mb-2">Anual, com permanência de 12 meses</p>
-                            <p class="text-slate-600 text-sm leading-relaxed">A implantação é isenta e a mensalidade fica 10% menor no parcelado. À vista, você paga o equivalente a 10 mensalidades e usa os 12 meses. Em troca, o compromisso é de 12 meses.</p>
-                        </div>
-                    </div>
-                    <p class="text-slate-500 text-xs mt-5 pt-5 border-t border-slate-100">A implantação é cobrada uma única vez. Se você começar no Essencial e depois migrar para o Gestão Inteligente, não paga nada de novo. E você tem 7 dias para desistir sem custo, com devolução integral do que tiver pago.</p>
-                </div>
+                
 
                 <div class="max-w-5xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-slate-50 border border-slate-200 rounded-2xl p-7">
@@ -1054,7 +1024,7 @@
                 </div>
             </div>
             <div class="text-center text-primary-500 text-sm font-medium">
-                &copy; 2026 RXSync Tecnologia e Automação em Saúde. Todos os direitos reservados. CNPJ: XX.XXX.XXX/0001-XX.
+                &copy; 2026 RXSync Tecnologia e Automação em Saúde. Todos os direitos reservados. CNPJ: 52.970.673/0001-78.
             </div>
         </div>
     </footer>
@@ -1098,6 +1068,36 @@
         });
 
         // Função de Scroll Inteligente e Preenchimento Automático do Formulário
+        // Abre o widget do Chatwoot
+        function abrirChat() {
+            if (typeof gtag === 'function') gtag('event', 'abrir_chat_demo');
+            if (window.$chatwoot && typeof window.$chatwoot.toggle === 'function') {
+                window.$chatwoot.toggle('open');
+            }
+        }
+
+        // Efeito de digitação no título
+        (function () {
+            const frases = ['24 horas por dia.', '7 dias por semana.', 'nos feriados.', 'de madrugada.', 'no domingo à noite.', 'depois que a recepção vai embora.'];
+            const alvo = document.getElementById('digitando');
+            const cursor = document.getElementById('cursor');
+            if (!alvo) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                alvo.textContent = frases[0];
+                return;
+            }
+            let i = 0, pos = 0, apagando = false;
+            (function passo() {
+                const f = frases[i];
+                alvo.textContent = apagando ? f.slice(0, pos--) : f.slice(0, pos++);
+                let espera = apagando ? 45 : 75;
+                if (!apagando && pos > f.length) { apagando = true; espera = 1800; }
+                else if (apagando && pos < 0) { apagando = false; pos = 0; i = (i + 1) % frases.length; espera = 300; }
+                setTimeout(passo, espera);
+            })();
+            setInterval(function () { cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0'; }, 530);
+        })();
+
         function irParaContratacao(plano, rotulo) {
             if (typeof gtag === 'function') {
                 gtag('event', 'click_cta_plano', { 'plan_selected': rotulo, 'ciclo': 'mensal' });
