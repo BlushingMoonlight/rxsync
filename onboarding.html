@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ===================== SEO ===================== -->
 <title>Configurar sua assistente | RXSync</title>
 <meta name="description" content="Conte como a sua clínica funciona para a assistente virtual da RXSync atender do jeito de vocês.">
 <meta name="author" content="RXSync">
@@ -17,7 +16,6 @@
 <meta name="theme-color" content="#0f172a">
 <meta name="format-detection" content="telephone=no">
 
-<!-- ===================== OPEN GRAPH ===================== -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RXSync">
 <meta property="og:url" content="https://rxsync.com.br/onboarding.html">
@@ -39,278 +37,331 @@
 <link rel="icon" type="image/png" href="assets/favicon-rxsync.png">
 <link rel="apple-touch-icon" href="assets/favicon-rxsync.png">
 
+<!-- Analytics. O endereço é reescrito sem a query porque o ?t= é o token
+     do link mágico: mandá-lo ao Google seria vazar a credencial da cliente. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-G5ZS8DRHNM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-G5ZS8DRHNM', {
+    page_location: location.origin + location.pathname,
+    page_path: location.pathname
+  });
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+
 <script>
-tailwind.config = { theme: { extend: {
-  fontFamily: { sans: ['Inter', 'sans-serif'] },
-  colors: {
-    primary: { 100:'#e0ebf4', 200:'#cbdcec', 300:'#a3b8cf', 800:'#1e3a8a', 900:'#0f172a' },
-    accent:  { 50:'#ecfdf5', 300:'#6ee7b7', 400:'#34d399', 500:'#10b981', 600:'#059669', 700:'#047857' }
-  }
-}}}
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: { sans: ['Inter', 'sans-serif'] },
+                colors: {
+                    primary: { 50: '#f0f5f9', 100: '#e0ebf4', 200: '#cbdcec', 300: '#a3b8cf', 400: '#60a5fa', 500: '#3b82f6', 600: '#1d4ed8', 700: '#1e40af', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
+                    emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
+                },
+                boxShadow: {
+                    'glow': '0 0 50px -12px rgba(16, 185, 129, 0.4)',
+                    'mac': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                }
+            }
+        }
+    }
 </script>
 <style>
-  .campo { width:100%; padding:.75rem 1rem; border:1px solid #cbd5e1; border-radius:.5rem; outline:none; transition:.15s; background:#fff; }
-  .campo:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.15); }
-  .campo::placeholder { color:#94a3b8; }
-  textarea.campo { min-height:96px; resize:vertical; line-height:1.55; }
-  .rotulo { display:block; font-weight:600; color:#0f172a; margin-bottom:.35rem; font-size:.925rem; }
-  .ajuda { display:block; font-size:.8125rem; color:#64748b; margin-bottom:.5rem; line-height:1.5; }
-  @media (prefers-reduced-motion: reduce) { .animate-spin { animation:none; } }
+    section[id], main [id] { scroll-margin-top: 6rem; }
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .animate-pulse, .animate-spin { animation: none; }
+    }
+
+    .campo { width:100%; border:1px solid #cbd5e1; border-radius:.75rem; padding:.8rem 1rem; font-size:1rem; color:#0f172a; background:#fff; }
+    .campo:focus { outline:none; border-color:#10b981; box-shadow:0 0 0 3px rgba(16,185,129,.15); }
+    .campo.erro { border-color:#dc2626; background:#fef2f2; }
+    .campo::placeholder { color:#94a3b8; }
+    textarea.campo { min-height:96px; resize:vertical; line-height:1.55; }
+    .msg-erro { font-size:.75rem; color:#dc2626; margin-top:.35rem; display:none; }
+    .msg-erro.on { display:block; }
+    .rotulo { display:block; font-size:.8rem; font-weight:700; color:#334155; margin-bottom:.35rem; }
+    .ajuda { display:block; font-size:.75rem; color:#64748b; margin-bottom:.5rem; line-height:1.5; }
+    .etapa { display:none; } .etapa.ativa { display:block; }
 </style>
 </head>
 
 <body class="bg-slate-50 font-sans text-slate-700 antialiased">
 
-<header class="bg-white border-b border-slate-200 sticky top-0 z-10">
-  <div class="max-w-3xl mx-auto px-4 h-20 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2.5">
-      <span class="w-9 h-9 rounded-lg bg-accent-600 flex items-center justify-center">
-        <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
-      </span>
-      <span class="text-xl font-extrabold tracking-tight text-primary-900">RXSync</span>
-    </a>
-    <span id="selo" class="hidden text-sm text-slate-500">
+<header class="bg-primary-900 text-white sticky top-0 z-20">
+  <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
+    <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
+    <span id="selo" class="hidden text-xs text-white/70">
       Passo <span id="passoAtual">1</span> de 6
     </span>
   </div>
-  <div class="h-1 bg-slate-100">
-    <div id="barra" class="h-1 bg-accent-600 transition-all duration-300" style="width:0%"></div>
-  </div>
 </header>
 
-<main class="max-w-3xl mx-auto px-4 py-10">
+<main class="max-w-3xl mx-auto px-5 py-8">
 
   <!-- ================= CARREGANDO ================= -->
-  <section id="telaCarregando" class="bg-white rounded-2xl border border-slate-200 p-10 text-center">
-    <i data-lucide="loader-circle" class="w-10 h-10 text-accent-600 mx-auto animate-spin"></i>
-    <p class="mt-6 text-slate-600">Abrindo seu formulário...</p>
+  <section id="telaCarregando" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 text-center">
+    <i data-lucide="loader-circle" class="w-10 h-10 text-emerald-600 mx-auto animate-spin"></i>
+    <p class="mt-6 text-slate-500 text-sm">Abrindo seu formulário...</p>
   </section>
 
   <!-- ================= ERRO ================= -->
-  <section id="telaErro" class="hidden bg-white rounded-2xl border border-slate-200 p-10 text-center">
-    <span class="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto">
-      <i data-lucide="triangle-alert" class="w-8 h-8 text-red-500"></i>
+  <section id="telaErro" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+    <span class="w-14 h-14 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center mx-auto">
+      <i data-lucide="triangle-alert" class="w-7 h-7 text-red-500"></i>
     </span>
-    <h1 class="mt-6 text-2xl font-extrabold text-primary-900">Não consegui abrir este formulário</h1>
-    <p id="msgErro" class="mt-4 text-slate-600 leading-relaxed max-w-lg mx-auto"></p>
-    <button onclick="location.reload()" class="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white bg-accent-600 hover:bg-accent-700 font-semibold">
+    <h1 class="mt-5 text-lg font-bold text-primary-900">Não consegui abrir este formulário</h1>
+    <p id="msgErro" class="mt-2 text-slate-500 text-sm leading-relaxed max-w-md mx-auto"></p>
+    <button type="button" onclick="location.reload()"
+            class="mt-6 w-full sm:w-auto sm:px-10 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">
       Tentar de novo
     </button>
-    <p class="mt-6 text-sm text-slate-500">Se continuar assim, fale com a gente pelo chat aqui do lado.</p>
+    <p class="mt-5 text-xs text-slate-500">Se continuar assim, fale com a gente pelo chat aqui do lado.</p>
   </section>
 
   <!-- ================= FORMULÁRIO ================= -->
-  <section id="telaForm" class="hidden">
+  <div id="telaForm" class="hidden">
 
-    <h1 id="titulo" class="text-2xl sm:text-3xl font-extrabold text-primary-900">Vamos configurar sua assistente</h1>
-    <p class="mt-3 text-slate-600 leading-relaxed">
+    <h1 id="titulo" class="text-2xl font-extrabold tracking-tight text-primary-900">Vamos configurar sua assistente</h1>
+    <p class="mt-2 mb-6 text-slate-500 text-sm leading-relaxed">
       Tudo que você escrever aqui é o que ela vai saber sobre a clínica. Uns 10 minutos.
       Pode fechar e voltar depois: o que você digitar fica guardado neste navegador.
     </p>
 
-    <div id="avisoRascunho" class="hidden mt-5 rounded-xl bg-accent-50 border border-accent-300 p-4">
-      <p class="text-sm text-accent-700">
-        <strong>Recuperamos o que você já tinha preenchido.</strong> Confira os campos antes de enviar.
+    <div id="avisoRascunho" class="hidden mb-6 rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4">
+      <p class="text-xs text-emerald-700 font-medium">
+        Recuperamos o que você já tinha preenchido. Confira os campos antes de enviar.
       </p>
     </div>
 
-    <!-- ---------- ETAPA 1 ---------- -->
-    <div class="etapa mt-8 space-y-6" data-etapa="1">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-primary-900">A clínica</h2>
-          <p class="text-sm text-slate-500 mt-1">Como ela se apresenta para quem chega no WhatsApp.</p>
-        </div>
-
-        <div>
-          <label class="rotulo" for="nome_exibicao">Nome da clínica <span class="text-red-500">*</span></label>
-          <span class="ajuda">Do jeito que a assistente deve falar. Sem "Ltda", sem razão social.</span>
-          <input id="nome_exibicao" class="campo" maxlength="80" placeholder="Clínica Pediátrica Bem Crescer">
-        </div>
-
-        <div>
-          <label class="rotulo" for="descricao_curta">Em duas linhas, o que vocês fazem</label>
-          <span class="ajuda">É o que ela responde quando perguntam "vocês atendem o quê?".</span>
-          <textarea id="descricao_curta" class="campo" maxlength="600" placeholder="Clínica de pediatria com atendimento de puericultura, consultas de rotina e acompanhamento do desenvolvimento, do recém-nascido ao adolescente."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="endereco_atendimento">Endereço do atendimento</label>
-          <span class="ajuda">Rua, número, complemento, bairro e cidade.</span>
-          <textarea id="endereco_atendimento" class="campo" style="min-height:72px" maxlength="300" placeholder="Rua das Acácias, 210, sala 12 — Bairro Jardim, Porto Alegre/RS"></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="como_chegar">Como chegar, estacionamento, acessibilidade</label>
-          <span class="ajuda">Referências que ajudam quem vem com criança no colo.</span>
-          <textarea id="como_chegar" class="campo" style="min-height:72px" maxlength="500" placeholder="Em frente à praça. Estacionamento conveniado no prédio ao lado. Elevador e acesso para carrinho de bebê."></textarea>
-        </div>
-      </div>
+    <div class="flex items-center gap-2 mb-6" id="progresso">
+      <div class="h-1.5 flex-1 rounded-full bg-emerald-500" data-p="1"></div>
+      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="2"></div>
+      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="3"></div>
+      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="4"></div>
+      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="5"></div>
+      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="6"></div>
     </div>
 
-    <!-- ---------- ETAPA 2 ---------- -->
-    <div class="etapa hidden mt-8 space-y-6" data-etapa="2">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-primary-900">Atendimentos e valores</h2>
-          <p class="text-sm text-slate-500 mt-1">A parte que mais define se ela responde certo.</p>
-        </div>
+    <form id="form" novalidate>
 
-        <div>
-          <label class="rotulo" for="servicos">O que vocês atendem <span class="text-red-500">*</span></label>
-          <span class="ajuda">Um por linha. Ela usa <strong>estritamente</strong> esta lista — o que não estiver aqui, ela não oferece.</span>
-          <textarea id="servicos" class="campo" style="min-height:140px" maxlength="3000" placeholder="Consulta pediátrica de rotina
+      <!-- ---------- ETAPA 1 ---------- -->
+      <section class="etapa ativa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="1">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">A clínica</h2>
+        <p class="text-slate-500 text-sm mb-6">Como ela se apresenta para quem chega no WhatsApp.</p>
+        <div class="space-y-4">
+
+          <div aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden">
+            <label for="empresa_site">Não preencher</label>
+            <input id="empresa_site" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div>
+            <label class="rotulo" for="nome_exibicao">Nome da clínica</label>
+            <span class="ajuda">Do jeito que a assistente deve falar. Sem "Ltda", sem razão social.</span>
+            <input id="nome_exibicao" class="campo" maxlength="80" placeholder="Clínica Pediátrica Bem Crescer">
+            <p class="msg-erro" data-de="nome_exibicao">Escreva como sua assistente deve chamar a clínica.</p>
+          </div>
+
+          <div>
+            <label class="rotulo" for="descricao_curta">Em duas linhas, o que vocês fazem</label>
+            <span class="ajuda">É o que ela responde quando perguntam "vocês atendem o quê?".</span>
+            <textarea id="descricao_curta" class="campo" maxlength="600" placeholder="Clínica de pediatria com consultas de rotina, puericultura e acompanhamento do desenvolvimento, do recém-nascido ao adolescente."></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="endereco_atendimento">Endereço do atendimento</label>
+            <span class="ajuda">Rua, número, complemento, bairro e cidade.</span>
+            <textarea id="endereco_atendimento" class="campo" style="min-height:72px" maxlength="300" placeholder="Rua das Acácias, 210, sala 12 — Bairro Jardim, Porto Alegre/RS"></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="como_chegar">Como chegar, estacionamento, acessibilidade</label>
+            <span class="ajuda">Referências que ajudam quem vem com criança no colo.</span>
+            <textarea id="como_chegar" class="campo" style="min-height:72px" maxlength="500" placeholder="Em frente à praça. Estacionamento conveniado no prédio ao lado. Elevador e acesso para carrinho."></textarea>
+          </div>
+
+        </div>
+        <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+      </section>
+
+      <!-- ---------- ETAPA 2 ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="2">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Atendimentos e valores</h2>
+        <p class="text-slate-500 text-sm mb-6">A parte que mais define se ela responde certo.</p>
+        <div class="space-y-4">
+
+          <div>
+            <label class="rotulo" for="servicos">O que vocês atendem</label>
+            <span class="ajuda">Um por linha. Ela usa <strong>estritamente</strong> esta lista — o que não estiver aqui, ela não oferece.</span>
+            <textarea id="servicos" class="campo" style="min-height:140px" maxlength="3000" placeholder="Consulta pediátrica de rotina
 Puericultura (acompanhamento do crescimento)
 Primeira consulta do recém-nascido
 Consulta de retorno
 Atestado e declaração de comparecimento
 Orientação sobre vacinas"></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="politica_precos">Preços <span class="text-red-500">*</span></label>
-          <span class="ajuda">Se não puder passar valor pelo WhatsApp, escreva aqui exatamente o que ela deve responder no lugar.</span>
-          <textarea id="politica_precos" class="campo" maxlength="1500" placeholder="Consulta particular: R$ 350. Retorno em até 30 dias: sem custo. Para convênio, o valor depende do plano — nesses casos, pedir o nome do convênio e a carteirinha."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="convenios_parcerias">Convênios aceitos</label>
-          <span class="ajuda">Liste os que vocês atendem. Se não atendem nenhum, escreva isso.</span>
-          <textarea id="convenios_parcerias" class="campo" style="min-height:72px" maxlength="1000" placeholder="Unimed, Bradesco Saúde e IPE. Não atendemos SUS."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="nao_oferecemos">O que vocês NÃO fazem</label>
-          <span class="ajuda">Importante. É o que impede a assistente de prometer o que a clínica não entrega.</span>
-          <textarea id="nao_oferecemos" class="campo" style="min-height:72px" maxlength="1500" placeholder="Não fazemos atendimento de urgência nem pronto-socorro. Não aplicamos vacinas na clínica. Não atendemos adultos. Não fazemos teleconsulta."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="profissionais">Quem atende</label>
-          <span class="ajuda">Nome, especialidade e, se fizer diferença, os dias de cada um.</span>
-          <textarea id="profissionais" class="campo" style="min-height:72px" maxlength="1200" placeholder="Dra. Luciana Tudech — pediatria, atende de segunda a quinta.
-Dr. Marcos Ferraz — pediatria e alergologia, atende às sextas."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="formas_pagamento">Formas de pagamento</label>
-          <textarea id="formas_pagamento" class="campo" style="min-height:72px" maxlength="600" placeholder="Dinheiro, Pix, débito e crédito em até 3x sem juros. Não parcelamos consulta de convênio."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ---------- ETAPA 3 ---------- -->
-    <div class="etapa hidden mt-8 space-y-6" data-etapa="3">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-primary-900">Horários</h2>
-          <p class="text-sm text-slate-500 mt-1">Marque os dias em que a clínica atende.</p>
-        </div>
-
-        <div id="grade" class="space-y-3"></div>
-
-        <div>
-          <label class="rotulo" for="horario_funcionamento">Como ela conta o horário para o paciente</label>
-          <span class="ajuda">A gente escreve pela grade acima. Reescreva se quiser dizer de outro jeito.</span>
-          <textarea id="horario_funcionamento" class="campo" style="min-height:72px" maxlength="600"></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="horario_humano">Quando tem alguém da equipe disponível</label>
-          <span class="ajuda">A assistente responde 24h. Isto é para ela saber quando dá para transferir para uma pessoa.</span>
-          <input id="horario_humano" class="campo" maxlength="200" placeholder="Segunda a sexta, das 8h às 18h">
-        </div>
-
-        <div>
-          <label class="rotulo" for="mensagem_fora_horario">O que ela diz fora do horário</label>
-          <textarea id="mensagem_fora_horario" class="campo" style="min-height:72px" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Posso já deixar seu horário marcado, e a equipe confirma assim que abrir."></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- ---------- ETAPA 4 ---------- -->
-    <div class="etapa hidden mt-8 space-y-6" data-etapa="4">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-primary-900">Agendamento</h2>
-          <p class="text-sm text-slate-500 mt-1">Como ela marca uma consulta na agenda de vocês.</p>
-        </div>
-
-        <div>
-          <label class="rotulo" for="politica_agendamento">Regras de agendamento</label>
-          <span class="ajuda">Encaixe, remarcação, falta, o que pedir antes de confirmar.</span>
-          <textarea id="politica_agendamento" class="campo" maxlength="1500" placeholder="Primeira consulta precisa de 40 minutos. Remarcação com no mínimo 24h de antecedência. Duas faltas seguidas sem aviso: só remarcamos falando com a recepção."></textarea>
-        </div>
-
-        <div class="grid sm:grid-cols-2 gap-5">
-          <div>
-            <label class="rotulo" for="duracao_padrao_min">Duração da consulta (minutos)</label>
-            <input id="duracao_padrao_min" class="campo" type="number" min="5" max="480" step="5" placeholder="30">
+            <p class="msg-erro" data-de="servicos">Liste pelo menos os atendimentos principais.</p>
           </div>
+
           <div>
-            <label class="rotulo" for="buffer_min">Intervalo entre consultas (minutos)</label>
-            <input id="buffer_min" class="campo" type="number" min="0" max="240" step="5" placeholder="10">
+            <label class="rotulo" for="politica_precos">Preços</label>
+            <span class="ajuda">Se não puder passar valor pelo WhatsApp, escreva exatamente o que ela deve responder no lugar.</span>
+            <textarea id="politica_precos" class="campo" maxlength="1500" placeholder="Consulta particular: R$ 350. Retorno em até 30 dias: sem custo. Para convênio, o valor depende do plano — nesses casos, pedir o nome do convênio e a carteirinha."></textarea>
+            <p class="msg-erro" data-de="politica_precos">Sem isto aqui, ela não sabe o que responder sobre valor.</p>
           </div>
+
           <div>
-            <label class="rotulo" for="antecedencia_minima_h">Antecedência mínima (horas)</label>
-            <span class="ajuda">Não oferecer horário mais perto do que isso.</span>
-            <input id="antecedencia_minima_h" class="campo" type="number" min="0" max="720" step="1" placeholder="4">
+            <label class="rotulo" for="convenios_parcerias">Convênios aceitos</label>
+            <span class="ajuda">Liste os que vocês atendem. Se não atendem nenhum, escreva isso.</span>
+            <textarea id="convenios_parcerias" class="campo" style="min-height:72px" maxlength="1000" placeholder="Unimed, Bradesco Saúde e IPE. Não atendemos SUS."></textarea>
           </div>
+
           <div>
-            <label class="rotulo" for="janela_agendamento_dias">Até quantos dias à frente</label>
-            <span class="ajuda">Quanto tempo de agenda ela pode oferecer.</span>
-            <input id="janela_agendamento_dias" class="campo" type="number" min="1" max="180" step="1" placeholder="14">
+            <label class="rotulo" for="nao_oferecemos">O que vocês NÃO fazem</label>
+            <span class="ajuda">Importante. É o que impede a assistente de prometer o que a clínica não entrega.</span>
+            <textarea id="nao_oferecemos" class="campo" style="min-height:72px" maxlength="1500" placeholder="Não fazemos urgência nem pronto-socorro. Não aplicamos vacinas na clínica. Não atendemos adultos. Não fazemos teleconsulta."></textarea>
           </div>
-        </div>
 
-        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-          <p class="text-sm text-slate-600">
-            <strong class="text-primary-900">A agenda em si a gente conecta com vocês.</strong>
-            Depois que a assistente estiver no ar, combinamos qual agenda ela lê e em qual ela escreve.
-          </p>
-        </div>
-      </div>
-    </div>
+          <div>
+            <label class="rotulo" for="profissionais">Quem atende</label>
+            <span class="ajuda">Nome, especialidade e, se fizer diferença, os dias de cada um.</span>
+            <textarea id="profissionais" class="campo" style="min-height:72px" maxlength="1200" placeholder="Dra. Luciana Tudech — pediatria, de segunda a quinta.
+Dr. Marcos Ferraz — pediatria e alergologia, às sextas."></textarea>
+          </div>
 
-    <!-- ---------- ETAPA 5 ---------- -->
-    <div class="etapa hidden mt-8 space-y-6" data-etapa="5">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-primary-900">Contatos e responsabilidade</h2>
-          <p class="text-sm text-slate-500 mt-1">Números com DDD.</p>
-        </div>
+          <div>
+            <label class="rotulo" for="formas_pagamento">Formas de pagamento</label>
+            <textarea id="formas_pagamento" class="campo" style="min-height:72px" maxlength="600" placeholder="Dinheiro, Pix, débito e crédito em até 3x sem juros. Não parcelamos consulta de convênio."></textarea>
+          </div>
 
-        <div>
-          <label class="rotulo" for="numero_whatsapp">WhatsApp que ela vai atender <span class="text-red-500">*</span></label>
-          <span class="ajuda">É neste número que a assistente responde. Precisa ser um WhatsApp com acesso ao celular na hora de conectar.</span>
-          <input id="numero_whatsapp" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 99999-0000">
         </div>
-
-        <div>
-          <label class="rotulo" for="whatsapp_alerta">WhatsApp para nossos avisos</label>
-          <span class="ajuda">Onde a gente avisa se algo sair do ar. Pode ser o seu pessoal.</span>
-          <input id="whatsapp_alerta" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 98888-0000">
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
+          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
+      </section>
 
-        <div>
-          <label class="rotulo" for="numero_reserva">Telefone da recepção</label>
-          <span class="ajuda">Para ela passar quando alguém pedir falar com uma pessoa.</span>
-          <input id="numero_reserva" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 3333-0000">
+      <!-- ---------- ETAPA 3 ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="3">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Horários</h2>
+        <p class="text-slate-500 text-sm mb-6">Marque os dias em que a clínica atende.</p>
+        <div class="space-y-4">
+
+          <div id="grade" class="space-y-3"></div>
+
+          <div class="pt-2">
+            <label class="rotulo" for="horario_funcionamento">Como ela conta o horário para o paciente</label>
+            <span class="ajuda">A gente escreve pela grade acima. Reescreva se quiser dizer de outro jeito.</span>
+            <textarea id="horario_funcionamento" class="campo" style="min-height:72px" maxlength="600"></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="horario_humano">Quando tem alguém da equipe disponível</label>
+            <span class="ajuda">A assistente responde 24h. Isto é para ela saber quando dá para transferir para uma pessoa.</span>
+            <input id="horario_humano" class="campo" maxlength="200" placeholder="Segunda a sexta, das 8h às 18h">
+          </div>
+
+          <div>
+            <label class="rotulo" for="mensagem_fora_horario">O que ela diz fora do horário</label>
+            <textarea id="mensagem_fora_horario" class="campo" style="min-height:72px" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Posso já deixar seu horário marcado, e a equipe confirma assim que abrir."></textarea>
+          </div>
+
         </div>
-
-        <div>
-          <label class="rotulo" for="telefone_urgencia">Telefone para urgência</label>
-          <span class="ajuda">O que ela passa quando a situação não pode esperar.</span>
-          <input id="telefone_urgencia" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 3333-0001">
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
+          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
+      </section>
 
-        <div class="pt-2 border-t border-slate-100">
-          <div class="grid sm:grid-cols-2 gap-5 mt-6">
+      <!-- ---------- ETAPA 4 ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="4">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Agendamento</h2>
+        <p class="text-slate-500 text-sm mb-6">Como ela marca uma consulta na agenda de vocês.</p>
+        <div class="space-y-4">
+
+          <div>
+            <label class="rotulo" for="politica_agendamento">Regras de agendamento</label>
+            <span class="ajuda">Encaixe, remarcação, falta, o que pedir antes de confirmar.</span>
+            <textarea id="politica_agendamento" class="campo" maxlength="1500" placeholder="Primeira consulta precisa de 40 minutos. Remarcação com no mínimo 24h de antecedência. Duas faltas seguidas sem aviso: só remarcamos falando com a recepção."></textarea>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="rotulo" for="duracao_padrao_min">Duração da consulta (minutos)</label>
+              <input id="duracao_padrao_min" class="campo" type="number" min="5" max="480" step="5" placeholder="30">
+            </div>
+            <div>
+              <label class="rotulo" for="buffer_min">Intervalo entre consultas (minutos)</label>
+              <input id="buffer_min" class="campo" type="number" min="0" max="240" step="5" placeholder="10">
+            </div>
+            <div>
+              <label class="rotulo" for="antecedencia_minima_h">Antecedência mínima (horas)</label>
+              <span class="ajuda">Não oferecer horário mais perto do que isso.</span>
+              <input id="antecedencia_minima_h" class="campo" type="number" min="0" max="720" step="1" placeholder="4">
+            </div>
+            <div>
+              <label class="rotulo" for="janela_agendamento_dias">Até quantos dias à frente</label>
+              <span class="ajuda">Quanto tempo de agenda ela pode oferecer.</span>
+              <input id="janela_agendamento_dias" class="campo" type="number" min="1" max="180" step="1" placeholder="14">
+            </div>
+          </div>
+
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
+            <p class="text-xs text-slate-500 leading-relaxed">
+              <strong class="text-primary-900">A agenda em si a gente conecta com vocês.</strong>
+              Depois que a assistente estiver no ar, combinamos qual agenda ela lê e em qual ela escreve.
+            </p>
+          </div>
+
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
+          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+        </div>
+      </section>
+
+      <!-- ---------- ETAPA 5 ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="5">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Contatos e responsabilidade</h2>
+        <p class="text-slate-500 text-sm mb-6">Números com DDD.</p>
+        <div class="space-y-4">
+
+          <div>
+            <label class="rotulo" for="numero_whatsapp">WhatsApp que ela vai atender</label>
+            <span class="ajuda">É neste número que a assistente responde. Você vai precisar do celular em mãos na hora de conectar.</span>
+            <input id="numero_whatsapp" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 99999-0000">
+            <p class="msg-erro" data-de="numero_whatsapp">Precisamos do WhatsApp que ela vai atender.</p>
+          </div>
+
+          <div>
+            <label class="rotulo" for="whatsapp_alerta">WhatsApp para nossos avisos</label>
+            <span class="ajuda">Onde a gente avisa se algo sair do ar. Pode ser o seu pessoal.</span>
+            <input id="whatsapp_alerta" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 98888-0000">
+          </div>
+
+          <div>
+            <label class="rotulo" for="numero_reserva">Telefone da recepção</label>
+            <span class="ajuda">Para ela passar quando alguém pedir falar com uma pessoa.</span>
+            <input id="numero_reserva" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 3333-0000">
+          </div>
+
+          <div>
+            <label class="rotulo" for="telefone_urgencia">Telefone para urgência</label>
+            <span class="ajuda">O que ela passa quando a situação não pode esperar.</span>
+            <input id="telefone_urgencia" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 3333-0001">
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+            <div class="sm:col-span-2 pt-2"></div>
             <div>
               <label class="rotulo" for="resp_tecnico_nome">Responsável técnico</label>
               <input id="resp_tecnico_nome" class="campo" maxlength="120" placeholder="Dra. Luciana Tudech">
@@ -320,133 +371,121 @@ Dr. Marcos Ferraz — pediatria e alergologia, atende às sextas."></textarea>
               <input id="resp_tecnico_conselho" class="campo" maxlength="60" placeholder="CRM/RS 00000">
             </div>
           </div>
-        </div>
 
-        <div>
-          <label class="rotulo" for="sistema_gestao">Sistema que vocês usam hoje</label>
-          <span class="ajuda">Prontuário, agenda, o que for. Se for papel ou caderno, escreva assim mesmo.</span>
-          <input id="sistema_gestao" class="campo" maxlength="200" placeholder="Google Agenda e prontuário em papel">
-        </div>
+          <div>
+            <label class="rotulo" for="sistema_gestao">Sistema que vocês usam hoje</label>
+            <span class="ajuda">Prontuário, agenda, o que for. Se for papel ou caderno, escreva assim mesmo.</span>
+            <input id="sistema_gestao" class="campo" maxlength="200" placeholder="Google Agenda e prontuário em papel">
+          </div>
 
-        <div>
-          <label class="rotulo" for="usuarios_painel">Quem mais atende neste WhatsApp</label>
-          <span class="ajuda">Nome e função de cada pessoa. Ajuda a assistente a não responder por cima de quem já está falando com o paciente.</span>
-          <textarea id="usuarios_painel" class="campo" style="min-height:72px" maxlength="600" placeholder="Luciana — médica
+          <div>
+            <label class="rotulo" for="usuarios_painel">Quem mais atende neste WhatsApp</label>
+            <span class="ajuda">Nome e função de cada pessoa. Ajuda a assistente a não responder por cima de quem já está falando com o paciente.</span>
+            <textarea id="usuarios_painel" class="campo" style="min-height:72px" maxlength="600" placeholder="Luciana — médica
 Rita — recepção, atende de manhã"></textarea>
-        </div>
-      </div>
-    </div>
+          </div>
 
-    <!-- ---------- ETAPA 6 ---------- -->
-    <div class="etapa hidden mt-8 space-y-6" data-etapa="6">
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        <div>
-          <h2 class="text-lg font-bold text-primary-900">Jeito de falar e limites</h2>
-          <p class="text-sm text-slate-500 mt-1">O último passo, e o que mais muda a cara dela.</p>
         </div>
-
-        <div>
-          <label class="rotulo" for="saudacao">Primeira frase da conversa</label>
-          <textarea id="saudacao" class="campo" style="min-height:72px" maxlength="400" placeholder="Oi! Aqui é a assistente da Clínica Bem Crescer. Em que posso ajudar?"></textarea>
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
+          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
+      </section>
 
-        <div>
-          <label class="rotulo" for="tom_de_voz">Como ela deve falar</label>
-          <textarea id="tom_de_voz" class="campo" style="min-height:72px" maxlength="800" placeholder="Acolhedora e tranquila, como quem fala com mãe ou pai preocupado. Frases curtas. Trata por você. Sem termo médico difícil."></textarea>
+      <!-- ---------- ETAPA 6 ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="6">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Jeito de falar e limites</h2>
+        <p class="text-slate-500 text-sm mb-6">O último passo, e o que mais muda a cara dela.</p>
+        <div class="space-y-4">
+
+          <div>
+            <label class="rotulo" for="saudacao">Primeira frase da conversa</label>
+            <textarea id="saudacao" class="campo" style="min-height:72px" maxlength="400" placeholder="Oi! Aqui é a assistente da Clínica Bem Crescer. Em que posso ajudar?"></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="tom_de_voz">Como ela deve falar</label>
+            <textarea id="tom_de_voz" class="campo" style="min-height:72px" maxlength="800" placeholder="Acolhedora e tranquila, como quem fala com mãe ou pai preocupado. Frases curtas. Trata por você. Sem termo médico difícil."></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="nunca_dizer">Palavras e frases proibidas</label>
+            <span class="ajuda">Separe por vírgula. Ela nunca vai usar nada daqui.</span>
+            <textarea id="nunca_dizer" class="campo" style="min-height:72px" maxlength="800" placeholder="garantido, cura, é normal, não se preocupe, com certeza é, sou humana"></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="restricoes">Limites do que ela pode responder</label>
+            <span class="ajuda">Já vem com o básico de clínica. Acrescente o que for de vocês.</span>
+            <textarea id="restricoes" class="campo" maxlength="1500" placeholder="Nunca dar diagnóstico, prognóstico ou prescrição. Nunca interpretar exame, foto ou sintoma. Nunca dizer se um caso é grave. Nunca opinar sobre medicação ou dose."></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="gatilhos_escalonamento">Quando ela deve chamar uma pessoa</label>
+            <textarea id="gatilhos_escalonamento" class="campo" style="min-height:72px" maxlength="800" placeholder="Reclamação, pedido de reembolso, dúvida sobre cobrança, pedido de laudo ou atestado retroativo, qualquer coisa jurídica."></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="gatilhos_urgencia">O que é urgência</label>
+            <span class="ajuda">Sinais que fazem ela parar de agendar e mandar buscar atendimento.</span>
+            <textarea id="gatilhos_urgencia" class="campo" style="min-height:72px" maxlength="800" placeholder="Febre alta em bebê de menos de 3 meses, dificuldade para respirar, convulsão, criança muito molinha ou que não acorda, engasgo, queda com batida na cabeça, sangramento que não para."></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="resposta_urgencia">O que ela responde na urgência</label>
+            <span class="ajuda">Texto exato. É a mensagem mais importante do formulário.</span>
+            <textarea id="resposta_urgencia" class="campo" style="min-height:72px" maxlength="800" placeholder="Isso precisa de atendimento agora, não dá para esperar consulta marcada. Procure o pronto-socorro pediátrico mais próximo ou ligue 192. Assim que der, me avise como foi."></textarea>
+          </div>
+
         </div>
+      </section>
 
-        <div>
-          <label class="rotulo" for="nunca_dizer">Palavras e frases proibidas</label>
-          <span class="ajuda">Separe por vírgula. Ela nunca vai usar nada daqui.</span>
-          <textarea id="nunca_dizer" class="campo" style="min-height:72px" maxlength="800" placeholder="garantido, cura, é normal, não se preocupe, com certeza é, sou humana"></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="restricoes">Limites do que ela pode responder</label>
-          <span class="ajuda">Já vem com o básico de clínica. Acrescente o que for de vocês.</span>
-          <textarea id="restricoes" class="campo" maxlength="1500" placeholder="Nunca dar diagnóstico, prognóstico ou prescrição. Nunca interpretar exame, foto ou sintoma. Nunca dizer se um caso é grave ou não. Nunca opinar sobre medicação ou dose."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="gatilhos_escalonamento">Quando ela deve chamar uma pessoa</label>
-          <textarea id="gatilhos_escalonamento" class="campo" style="min-height:72px" maxlength="800" placeholder="Reclamação, pedido de reembolso, dúvida sobre cobrança, pedido de laudo ou atestado retroativo, qualquer coisa jurídica."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="gatilhos_urgencia">O que é urgência</label>
-          <span class="ajuda">Sinais que fazem ela parar de agendar e mandar buscar atendimento.</span>
-          <textarea id="gatilhos_urgencia" class="campo" style="min-height:72px" maxlength="800" placeholder="Febre alta em bebê de menos de 3 meses, dificuldade para respirar, convulsão, criança muito molinha ou que não acorda, engasgo, queda com batida na cabeça, sangramento que não para."></textarea>
-        </div>
-
-        <div>
-          <label class="rotulo" for="resposta_urgencia">O que ela responde na urgência</label>
-          <span class="ajuda">Texto exato. É a mensagem mais importante do formulário.</span>
-          <textarea id="resposta_urgencia" class="campo" style="min-height:72px" maxlength="800" placeholder="Isso precisa de atendimento agora, não dá para esperar consulta marcada. Procure o pronto-socorro pediátrico mais próximo ou ligue 192. Assim que der, me avise como foi."></textarea>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8">
-        <h2 class="text-lg font-bold text-primary-900">Perguntas que vocês mais recebem</h2>
-        <p class="text-sm text-slate-500 mt-1 mb-5">
+      <!-- ---------- FAQ, junto da etapa 6 ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-4" data-etapa="6">
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Perguntas que vocês mais recebem</h2>
+        <p class="text-slate-500 text-sm mb-6">
           Opcional, mas é o que mais melhora as respostas dela. Escreva do jeito que a recepção responderia.
         </p>
         <div id="listaFaq" class="space-y-4"></div>
-        <button type="button" onclick="addFaq()" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-accent-700 hover:text-accent-600">
+        <button type="button" onclick="addFaq()" class="mt-4 inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-600">
           <i data-lucide="plus" class="w-4 h-4"></i> Adicionar pergunta
         </button>
-      </div>
-    </div>
 
-    <!-- armadilha invisível: humano nenhum preenche -->
-    <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
-      <label for="empresa_site">Site</label>
-      <input id="empresa_site" type="text" tabindex="-1" autocomplete="off">
-    </div>
+        <p id="erroForm" class="msg-erro mt-5"></p>
 
-    <p id="erroForm" class="hidden mt-6 rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600"></p>
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
+          <button type="button" id="btnEnviar" onclick="enviar()" class="flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Enviar e continuar</button>
+        </div>
+      </section>
 
-    <div class="mt-8 flex items-center justify-between gap-3">
-      <button id="btnVoltar" type="button" onclick="irPara(passo - 1)"
-              class="hidden px-6 py-3 rounded-lg border border-slate-300 font-medium text-slate-600 hover:bg-white">
-        Voltar
-      </button>
-      <div class="flex-1"></div>
-      <button id="btnAvancar" type="button" onclick="irPara(passo + 1)"
-              class="px-7 py-3 rounded-lg text-white bg-accent-600 hover:bg-accent-700 font-semibold">
-        Continuar
-      </button>
-      <button id="btnEnviar" type="button" onclick="enviar()"
-              class="hidden px-7 py-3 rounded-lg text-white bg-accent-600 hover:bg-accent-700 font-semibold">
-        Enviar e continuar
-      </button>
-    </div>
+    </form>
 
     <p class="mt-6 text-center text-xs text-slate-400">
       Você pode mudar qualquer coisa disso depois. Nada aqui é definitivo.
     </p>
-  </section>
+  </div>
 
   <!-- ================= SUCESSO ================= -->
-  <section id="telaOk" class="hidden bg-white rounded-2xl border border-slate-200 p-10 text-center">
-    <span class="w-16 h-16 rounded-full bg-accent-50 border border-accent-300 flex items-center justify-center mx-auto">
-      <i data-lucide="check" class="w-8 h-8 text-accent-600"></i>
+  <section id="telaOk" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
+    <span class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-900 to-emerald-600 shadow-md flex items-center justify-center mx-auto">
+      <i data-lucide="check" class="w-7 h-7 text-white"></i>
     </span>
-    <h1 class="mt-6 text-2xl font-extrabold text-primary-900">Recebemos tudo</h1>
-    <p class="mt-4 text-slate-600 leading-relaxed max-w-lg mx-auto">
+    <h1 class="mt-5 text-xl font-extrabold tracking-tight text-primary-900">Recebemos tudo</h1>
+    <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-md mx-auto">
       Sua assistente já sabe como a clínica funciona. Falta só conectar o WhatsApp — leva menos de um minuto.
     </p>
-    <a id="linkConectar" href="#" class="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white bg-accent-600 hover:bg-accent-700 font-semibold">
+    <a id="linkConectar" href="#"
+       class="mt-6 w-full sm:w-auto sm:px-10 inline-flex items-center justify-center gap-2 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">
       Conectar o WhatsApp agora
       <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </a>
-    <p class="mt-6 text-sm text-slate-500 max-w-lg mx-auto">
-      Se preferir fazer depois, o link também está no seu e-mail.
-    </p>
+    <p class="mt-5 text-xs text-slate-500">Se preferir fazer depois, o link também está no seu e-mail.</p>
   </section>
 
 </main>
 
-<footer class="max-w-3xl mx-auto px-4 pb-12">
+<footer class="max-w-3xl mx-auto px-5 pb-10">
   <p class="text-center text-xs text-slate-400">
     RXSync — 52.970.673 LUAN DUARTE CAVALHEIRO — CNPJ 52.970.673/0001-78
   </p>
@@ -479,11 +518,9 @@ lucide.createIcons();
    Para unificar os dois arquivos no futuro, troque só este bloco.
    ===================================================================== */
 const PERFIL = {
-  vertical:        'clinica',
+  vertical:    'clinica',
   // Terça a sábado é padrão de salão; clínica costuma ser segunda a sexta.
-  gradePadrao:     { dias: ['seg','ter','qua','qui','sex'], de: '08:00', ate: '18:00' },
-  conselhoSempre:  true,   // responsável técnico é obrigatório por conselho na saúde
-  chatwootToken:   'umo8eLwQSe9QsAzdQAMKAQVu'
+  gradePadrao: { dias: ['seg','ter','qua','qui','sex'], de: '08:00', ate: '18:00' }
 };
 
 const WEBHOOK      = 'https://n8n.rxsync.com.br/webhook/onboarding';
@@ -522,7 +559,6 @@ function mostrar(qual) {
 function falhar(msg) {
   $('msgErro').textContent = msg;
   $('selo').classList.add('hidden');
-  $('barra').style.width = '0%';
   mostrar('telaErro');
   lucide.createIcons();
 }
@@ -531,13 +567,13 @@ function falhar(msg) {
 function montarGrade() {
   $('grade').innerHTML = DIAS.map(([id, nome]) => `
     <div class="flex items-center gap-3 flex-wrap">
-      <label class="flex items-center gap-2 w-32 shrink-0 cursor-pointer">
+      <label class="flex items-center gap-2 w-28 shrink-0 cursor-pointer">
         <input type="checkbox" id="ab_${id}" class="w-4 h-4 accent-emerald-600" onchange="alternarDia('${id}')">
-        <span class="text-sm font-medium text-slate-700">${nome}</span>
+        <span class="text-sm font-medium text-slate-600">${nome}</span>
       </label>
-      <input type="time" id="de_${id}" class="campo" style="width:7.5rem;padding:.5rem .65rem" disabled>
-      <span class="text-sm text-slate-400">às</span>
-      <input type="time" id="ate_${id}" class="campo" style="width:7.5rem;padding:.5rem .65rem" disabled>
+      <input type="time" id="de_${id}" class="campo" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem" disabled>
+      <span class="text-xs text-slate-400">às</span>
+      <input type="time" id="ate_${id}" class="campo" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem" disabled>
     </div>
   `).join('');
 
@@ -591,18 +627,16 @@ function descreverHorario() {
 }
 
 /* ===================== FAQ ===================== */
-let nFaq = 0;
 function addFaq(p = '', r = '') {
-  nFaq++;
   const div = document.createElement('div');
-  div.className = 'rounded-xl border border-slate-200 p-4 bg-slate-50';
+  div.className = 'rounded-xl border border-slate-200 bg-slate-50 p-4';
   div.innerHTML = `
     <div class="flex items-start gap-3">
       <div class="flex-1 space-y-3">
         <input class="campo faq-p" maxlength="200" placeholder="Vocês atendem no mesmo dia?">
         <textarea class="campo faq-r" maxlength="800" style="min-height:72px" placeholder="Temos encaixe quase todo dia de manhã. Me diz o que está acontecendo que eu vejo o horário mais próximo."></textarea>
       </div>
-      <button type="button" class="shrink-0 p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-white" title="Remover">
+      <button type="button" class="shrink-0 p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-white transition-colors" title="Remover">
         <i data-lucide="trash-2" class="w-4 h-4"></i>
       </button>
     </div>`;
@@ -664,27 +698,29 @@ function lerRascunho() {
 }
 
 /* ===================== NAVEGAÇÃO ===================== */
-const OBRIGATORIOS = {
-  1: [['nome_exibicao', 'Escreva como sua assistente deve chamar a clínica.']],
-  2: [['servicos', 'Liste pelo menos os atendimentos principais.'],
-      ['politica_precos', 'Sem isto aqui, ela não sabe o que responder sobre valor.']],
-  5: [['numero_whatsapp', 'Precisamos do WhatsApp que ela vai atender.']]
-};
+const OBRIGATORIOS = { 1: ['nome_exibicao'], 2: ['servicos', 'politica_precos'], 5: ['numero_whatsapp'] };
+
+function limparErro(id) {
+  $(id).classList.remove('erro');
+  const m = document.querySelector(`.msg-erro[data-de="${id}"]`);
+  if (m) m.classList.remove('on');
+}
 
 function validar(n) {
-  const regras = OBRIGATORIOS[n] || [];
-  for (const [id, msg] of regras) {
+  let ok = true, primeiro = null;
+  for (const id of (OBRIGATORIOS[n] || [])) {
     if (!$(id).value.trim()) {
-      $('erroForm').textContent = msg;
-      $('erroForm').classList.remove('hidden');
-      $(id).focus();
-      $(id).style.borderColor = '#ef4444';
-      return false;
+      $(id).classList.add('erro');
+      const m = document.querySelector(`.msg-erro[data-de="${id}"]`);
+      if (m) m.classList.add('on');
+      if (!primeiro) primeiro = id;
+      ok = false;
+    } else {
+      limparErro(id);
     }
-    $(id).style.borderColor = '';
   }
-  $('erroForm').classList.add('hidden');
-  return true;
+  if (primeiro) $(primeiro).focus();
+  return ok;
 }
 
 function irPara(n) {
@@ -693,14 +729,12 @@ function irPara(n) {
 
   passo = n;
   document.querySelectorAll('.etapa').forEach(el =>
-    el.classList.toggle('hidden', Number(el.dataset.etapa) !== passo));
+    el.classList.toggle('ativa', Number(el.dataset.etapa) === passo));
+
+  document.querySelectorAll('#progresso [data-p]').forEach(el =>
+    el.className = 'h-1.5 flex-1 rounded-full ' + (Number(el.dataset.p) <= passo ? 'bg-emerald-500' : 'bg-slate-200'));
 
   $('passoAtual').textContent = passo;
-  $('barra').style.width = (passo / TOTAL_ETAPAS * 100) + '%';
-  $('btnVoltar').classList.toggle('hidden', passo === 1);
-  $('btnAvancar').classList.toggle('hidden', passo === TOTAL_ETAPAS);
-  $('btnEnviar').classList.toggle('hidden', passo !== TOTAL_ETAPAS);
-
   salvarRascunho();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -718,22 +752,26 @@ async function chamar(corpo) {
 
 async function enviar() {
   if (enviando) return;
-  if (!validar(1) || !validar(2) || !validar(5)) return;
 
-  // Armadilha de robô: se veio preenchido, finge que deu certo e não grava nada.
+  // Valida as três etapas obrigatórias e leva o cliente até a primeira que falhar.
+  for (const n of [1, 2, 5]) {
+    if (!validar(n)) { irPara(n); return; }
+  }
+
+  // Armadilha de robô: se veio preenchida, finge que deu certo e não grava nada.
   if ($('empresa_site').value.trim() !== '') { mostrar('telaOk'); return; }
 
   enviando = true;
   $('btnEnviar').disabled = true;
   $('btnEnviar').textContent = 'Enviando...';
-  $('erroForm').classList.add('hidden');
+  $('erroForm').classList.remove('on');
 
   try {
     const d = await chamar({ token: TOKEN, acao: 'salvar', dados: coletar() });
 
     if (!d || d.ok === false) {
       $('erroForm').textContent = (d && d.mensagem) || 'Não consegui salvar agora. Tente de novo em instantes.';
-      $('erroForm').classList.remove('hidden');
+      $('erroForm').classList.add('on');
       return;
     }
 
@@ -742,13 +780,12 @@ async function enviar() {
     else $('linkConectar').classList.add('hidden');
 
     $('selo').classList.add('hidden');
-    $('barra').style.width = '100%';
     mostrar('telaOk');
     lucide.createIcons();
 
   } catch (e) {
     $('erroForm').textContent = 'Não consegui falar com o servidor. Confira sua internet e tente de novo.';
-    $('erroForm').classList.remove('hidden');
+    $('erroForm').classList.add('on');
   } finally {
     enviando = false;
     $('btnEnviar').disabled = false;
@@ -781,7 +818,14 @@ async function abrir() {
     if ($('listaFaq').children.length === 0) addFaq();
 
     $('horario_funcionamento').addEventListener('input', function () { this.dataset.editado = '1'; });
-    document.querySelectorAll('.campo').forEach(el => el.addEventListener('change', salvarRascunho));
+
+    document.querySelectorAll('.proximo').forEach(b => b.onclick = () => irPara(passo + 1));
+    document.querySelectorAll('.voltar').forEach(b => b.onclick = () => irPara(passo - 1));
+
+    document.querySelectorAll('.campo').forEach(el => {
+      el.addEventListener('change', salvarRascunho);
+      el.addEventListener('input', () => { if (el.id) limparErro(el.id); });
+    });
 
     $('selo').classList.remove('hidden');
     mostrar('telaForm');
@@ -796,7 +840,9 @@ async function abrir() {
 abrir();
 </script>
 
-<!-- Chatwoot — widget da inbox de CLÍNICA (CLI-000, inbox 1) -->
+<!-- Chatwoot — widget da inbox de clínica (CLI-000, inbox 1).
+     O contratar.html não tem widget; o conectar.html tem. Mantive aqui
+     porque é um formulário de 10 minutos e a cliente pode travar no meio. -->
 <script>
 (function (d, t) {
   var BASE_URL = "https://app.rxsync.com.br";
