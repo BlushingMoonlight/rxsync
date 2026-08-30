@@ -448,6 +448,12 @@ async function registrarLead() {
       body: JSON.stringify({
         _evento: 'lead',
         status: 'Lead sem aceite',
+        // Classificação da linha. O 2/4 usa 'produto' para escolher o domínio
+        // do link de onboarding, e a IA de atendimento usa 'tipo_negocio'
+        // para achar o roteiro do nicho na aba "nichos".
+        // 'clínica médica' precisa do acento: é o valor exato daquela aba.
+        produto: 'Clinica',
+        tipo_negocio: 'clínica médica',
         representante_nome: v('nome'),
         email: v('email'),
         telefone: dig(v('whatsapp')),
@@ -510,6 +516,8 @@ document.getElementById('form').addEventListener('submit', async ev => {
     inbox_id: '',
     status: 'Aceite registrado',
     plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
+    produto: 'Clinica',
+    tipo_negocio: 'clínica médica',
     razao_social: tipo === 'pj' ? v('razao') : v('titular') || v('nome'),
     cnpj: tipo === 'pj' ? dig(v('cnpj')) : '',
     endereco: enderecoCompleto(),
