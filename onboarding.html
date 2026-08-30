@@ -168,7 +168,7 @@
           <div>
             <label class="rotulo" for="nome_exibicao">Nome da clínica</label>
             <span class="ajuda">Do jeito que a assistente deve falar. Sem "Ltda", sem razão social.</span>
-            <input id="nome_exibicao" class="campo" maxlength="80" placeholder="Clínica Pediátrica Bem Crescer">
+            <input id="nome_exibicao" class="campo" maxlength="80" placeholder="Clínica Pediátrica [nome]">
             <p class="msg-erro" data-de="nome_exibicao">Escreva como sua assistente deve chamar a clínica.</p>
           </div>
 
@@ -181,7 +181,7 @@
           <div>
             <label class="rotulo" for="endereco_atendimento">Endereço do atendimento</label>
             <span class="ajuda">Rua, número, complemento, bairro e cidade.</span>
-            <textarea id="endereco_atendimento" class="campo" style="min-height:72px" maxlength="300" placeholder="Rua das Acácias, 210, sala 12 — Bairro Jardim, Porto Alegre/RS"></textarea>
+            <textarea id="endereco_atendimento" class="campo" style="min-height:72px" maxlength="300" placeholder="Rua, número, sala — Bairro, Cidade/UF"></textarea>
           </div>
 
           <div>
@@ -234,8 +234,8 @@ Orientação sobre vacinas"></textarea>
           <div>
             <label class="rotulo" for="profissionais">Quem atende</label>
             <span class="ajuda">Nome, especialidade e, se fizer diferença, os dias de cada um.</span>
-            <textarea id="profissionais" class="campo" style="min-height:72px" maxlength="1200" placeholder="Dra. Luciana Tudech — pediatria, de segunda a quinta.
-Dr. Marcos Ferraz — pediatria e alergologia, às sextas."></textarea>
+            <textarea id="profissionais" class="campo" style="min-height:72px" maxlength="1200" placeholder="Dra. [nome] — pediatria, de segunda a quinta.
+Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
           <div>
@@ -338,37 +338,37 @@ Dr. Marcos Ferraz — pediatria e alergologia, às sextas."></textarea>
           <div>
             <label class="rotulo" for="numero_whatsapp">WhatsApp que ela vai atender</label>
             <span class="ajuda">É neste número que a assistente responde. Você vai precisar do celular em mãos na hora de conectar.</span>
-            <input id="numero_whatsapp" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 99999-0000">
+            <input id="numero_whatsapp" class="campo" inputmode="tel" maxlength="20" placeholder="(00) 00000-0000">
             <p class="msg-erro" data-de="numero_whatsapp">Precisamos do WhatsApp que ela vai atender.</p>
           </div>
 
           <div>
             <label class="rotulo" for="whatsapp_alerta">WhatsApp para nossos avisos</label>
             <span class="ajuda">Onde a gente avisa se algo sair do ar. Pode ser o seu pessoal.</span>
-            <input id="whatsapp_alerta" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 98888-0000">
+            <input id="whatsapp_alerta" class="campo" inputmode="tel" maxlength="20" placeholder="(00) 00000-0000">
           </div>
 
           <div>
             <label class="rotulo" for="numero_reserva">Telefone da recepção</label>
             <span class="ajuda">Para ela passar quando alguém pedir falar com uma pessoa.</span>
-            <input id="numero_reserva" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 3333-0000">
+            <input id="numero_reserva" class="campo" inputmode="tel" maxlength="20" placeholder="(00) 0000-0000">
           </div>
 
           <div>
             <label class="rotulo" for="telefone_urgencia">Telefone para urgência</label>
             <span class="ajuda">O que ela passa quando a situação não pode esperar.</span>
-            <input id="telefone_urgencia" class="campo" inputmode="tel" maxlength="20" placeholder="(51) 3333-0001">
+            <input id="telefone_urgencia" class="campo" inputmode="tel" maxlength="20" placeholder="(00) 0000-0000">
           </div>
 
           <div class="grid sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
             <div class="sm:col-span-2 pt-2"></div>
             <div>
               <label class="rotulo" for="resp_tecnico_nome">Responsável técnico</label>
-              <input id="resp_tecnico_nome" class="campo" maxlength="120" placeholder="Dra. Luciana Tudech">
+              <input id="resp_tecnico_nome" class="campo" maxlength="120" placeholder="Dra. [nome do responsável técnico]">
             </div>
             <div>
               <label class="rotulo" for="resp_tecnico_conselho">Registro no conselho</label>
-              <input id="resp_tecnico_conselho" class="campo" maxlength="60" placeholder="CRM/RS 00000">
+              <input id="resp_tecnico_conselho" class="campo" maxlength="60" placeholder="CRM/UF 00000">
             </div>
           </div>
 
@@ -381,8 +381,8 @@ Dr. Marcos Ferraz — pediatria e alergologia, às sextas."></textarea>
           <div>
             <label class="rotulo" for="usuarios_painel">Quem mais atende neste WhatsApp</label>
             <span class="ajuda">Nome e função de cada pessoa. Ajuda a assistente a não responder por cima de quem já está falando com o paciente.</span>
-            <textarea id="usuarios_painel" class="campo" style="min-height:72px" maxlength="600" placeholder="Luciana — médica
-Rita — recepção, atende de manhã"></textarea>
+            <textarea id="usuarios_painel" class="campo" style="min-height:72px" maxlength="600" placeholder="[nome] — médica
+[nome] — recepção, atende de manhã"></textarea>
           </div>
 
         </div>
@@ -400,7 +400,7 @@ Rita — recepção, atende de manhã"></textarea>
 
           <div>
             <label class="rotulo" for="saudacao">Primeira frase da conversa</label>
-            <textarea id="saudacao" class="campo" style="min-height:72px" maxlength="400" placeholder="Oi! Aqui é a assistente da Clínica Bem Crescer. Em que posso ajudar?"></textarea>
+            <textarea id="saudacao" class="campo" style="min-height:72px" maxlength="400" placeholder="Oi! Aqui é a assistente da [nome da clínica]. Em que posso ajudar?"></textarea>
           </div>
 
           <div>
