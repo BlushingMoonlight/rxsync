@@ -275,7 +275,14 @@
                 </span>
                 <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
                     Seus pacientes atendidos em segundos por <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Inteligência Artificial</span>.
-                    <span class="block mt-3 min-h-[2.5em] sm:min-h-[1.25em]"><span id="digitando"></span><span id="cursor" class="text-emerald-400 font-light">|</span></span>
+                    <!-- A altura desta linha é reservada por um fantasma invisível com a frase
+                         mais longa. Assim a caixa nunca muda de tamanho quando o texto é digitado,
+                         e a página para de pular. min-h com valor fixo não resolvia: a frase longa
+                         quebra em mais linhas dependendo da largura da tela. -->
+                    <span class="block mt-3 relative">
+                        <span class="invisible" aria-hidden="true">depois que a recepção vai embora.</span>
+                        <span class="absolute inset-0"><span id="digitando"></span><span id="cursor" class="text-emerald-400 font-light">|</span></span>
+                    </span>
                 </h1>
                 <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
                     Uma assistente virtual treinada com as regras da sua clínica tira dúvidas, passa valores e agenda direto no seu sistema — em português impecável, com a educação que a sua recepção teria se tivesse tempo.
@@ -1025,6 +1032,11 @@
             </div>
             <div class="text-center text-primary-500 text-sm font-medium">
                 &copy; 2026 RXSync Tecnologia e Automação em Saúde. Todos os direitos reservados. CNPJ: 52.970.673/0001-78.
+            </div>
+            <div class="mt-4 text-center">
+                <span class="inline-flex items-center gap-2 text-primary-400 text-xs font-medium">
+                    made in floripa <span aria-label="Brasil" role="img">&#127463;&#127479;</span>
+                </span>
             </div>
         </div>
     </footer>
