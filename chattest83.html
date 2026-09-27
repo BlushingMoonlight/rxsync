@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Ambiente de Teste IA | RXSync</title>
-    <meta name="description" content="Ambiente de homologação e testes da Inteligência Artificial RXSync.">
-    <meta name="robots" content="noindex, nofollow"> <!-- Evita que o Google indexe essa página de teste -->
-    
+    <title>Ambiente de Teste | Inteligência Artificial</title>
+    <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#0f172a">
-
-    <!-- ===================== FAVICON ===================== -->
-    <link rel="icon" type="image/png" href="assets/favicon-rxsync.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +17,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Configuração de Cores da Marca (Extraído do site original) -->
+    <!-- Configuração de Cores da Marca (Mantendo o padrão RXSync) -->
     <script>
         tailwind.config = {
             theme: {
@@ -31,51 +26,35 @@
                     colors: {
                         primary: { 50: '#f0f5f9', 100: '#e0ebf4', 200: '#cbdcec', 300: '#a3b8cf', 400: '#60a5fa', 500: '#3b82f6', 600: '#1d4ed8', 700: '#1e40af', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
                         emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
-                    },
-                    boxShadow: {
-                        'glow': '0 0 50px -12px rgba(16, 185, 129, 0.4)',
                     }
                 }
             }
         }
     </script>
-    <style>
-        /* Animação para chamar atenção para o chat */
-        @keyframes bounce-right {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(25%); }
-        }
-        .animate-bounce-right {
-            animation: bounce-right 1.5s infinite;
-        }
-    </style>
 </head>
-<body class="font-sans text-slate-800 bg-slate-50 antialiased selection:bg-emerald-200 selection:text-emerald-900 min-h-screen flex flex-col">
+<body class="font-sans text-slate-800 bg-slate-50 antialiased min-h-screen flex flex-col relative">
 
-    <!-- Navigation / Header Simplificado -->
+    <!-- Header Simples -->
     <header class="w-full bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center gap-2">
                     <div class="w-10 h-10 bg-gradient-to-br from-primary-900 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                        <i data-lucide="activity" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                        <i data-lucide="bot" class="w-6 h-6 text-white" aria-hidden="true"></i>
                     </div>
-                    <span class="font-extrabold text-2xl tracking-tight text-primary-900">RXSync</span>
+                    <span class="font-extrabold text-xl tracking-tight text-primary-900">RXSync | <span class="font-medium text-slate-500">Homologação</span></span>
                 </div>
                 
-                <div>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-100 text-emerald-700 border border-emerald-200">
-                        <span class="flex h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                        Ambiente de Teste
-                    </span>
-                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-amber-100 text-amber-700 border border-amber-200">
+                    Ambiente de Teste
+                </span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content (Área de Instrução) -->
+    <!-- Main Content -->
     <main class="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
-        <!-- Background Grid Pattern (Mesmo do site original) -->
+        <!-- Background Grid Pattern -->
         <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-primary-900">
             <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true">
                 <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
@@ -83,88 +62,66 @@
             </svg>
         </div>
 
-        <div class="max-w-2xl mx-auto w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 sm:p-12 relative z-10 text-center">
+        <div class="max-w-xl mx-auto w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 sm:p-12 relative z-10 text-center">
             
-            <div class="w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <i data-lucide="bot" class="w-8 h-8 text-emerald-600"></i>
-            </div>
-            
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-primary-900 tracking-tight mb-4">
-                Teste sua Assistente Virtual
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-primary-900 tracking-tight mb-4">
+                Teste sua Inteligência Artificial
             </h1>
             
-            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
-                Olá, Doutora! Preparamos este ambiente seguro para você validar como a inteligência artificial vai interagir com seus pacientes. 
-                Sinta-se à vontade para testar o agendamento, fazer perguntas simulando um paciente e avaliar as respostas.
+            <p class="text-base text-slate-600 mb-8 leading-relaxed">
+                Este é um ambiente seguro simulando o atendimento da sua clínica. 
+                Envie mensagens no chat que acabou de se abrir na tela e veja como a IA conduz os agendamentos e responde dúvidas.
             </p>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8 text-left">
-                <h3 class="font-bold text-primary-900 mb-3 flex items-center gap-2">
-                    <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i> Como testar:
-                </h3>
-                <ul class="space-y-3 text-sm text-slate-600">
-                    <li class="flex items-start gap-2">
-                        <span class="font-bold text-primary-900">1.</span> 
-                        Clique no ícone de chat no canto inferior direito da tela.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="font-bold text-primary-900">2.</span> 
-                        Inicie a conversa simulando ser um paciente querendo marcar uma consulta.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="font-bold text-primary-900">3.</span> 
-                        Faça perguntas sobre horários, valores ou funcionamento da clínica.
-                    </li>
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-left text-sm text-slate-600">
+                <p class="font-bold text-primary-900 mb-2 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-primary-500"></i> O que testar:
+                </p>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Simule o agendamento de uma consulta.</li>
+                    <li>Faça perguntas sobre horários de funcionamento.</li>
+                    <li>Pergunte sobre convênios ou valores.</li>
                 </ul>
             </div>
-
-            <!-- Botão que apenas abre o chat -->
-            <button onclick="abrirChat()" class="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold rounded-xl text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg transition-all hover:-translate-y-1 w-full sm:w-auto">
-                <i data-lucide="message-circle" class="w-5 h-5"></i>
-                Iniciar Teste Agora
-            </button>
             
-        </div>
-        
-        <!-- Seta indicativa apontando para o canto inferior direito -->
-        <div class="fixed bottom-24 right-10 z-40 hidden md:flex flex-col items-end gap-2 pointer-events-none opacity-60">
-            <span class="text-sm font-bold text-emerald-600 bg-white px-3 py-1 rounded-full shadow-sm border border-emerald-100">
-                A IA está aqui
-            </span>
-            <i data-lucide="corner-right-down" class="w-8 h-8 text-emerald-500 animate-bounce"></i>
         </div>
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-6 text-center">
         <p class="text-sm text-slate-500 font-medium">
-            Ambiente exclusivo para homologação &middot; Desenvolvido por <strong class="text-primary-900">RXSync Tecnologia</strong>
+            Desenvolvido por <strong class="text-primary-900">RXSync Tecnologia</strong>
         </p>
     </footer>
 
-    <!-- Inicialização dos ícones Lucide -->
+    <!-- Inicialização dos ícones -->
     <script>
         lucide.createIcons();
-
-        // Função para abrir o Chatwoot manualmente caso a pessoa clique no botão do centro
-        function abrirChat() {
-            if (window.$chatwoot && typeof window.$chatwoot.toggle === 'function') {
-                window.$chatwoot.toggle('open');
-            }
-        }
     </script>
 
-    <!-- ===================== SCRIPT DO CHATWOOT (Exatamente como fornecido) ===================== -->
+    <!-- ========================================================================= -->
+    <!-- WIDGET DO CHATWOOT - IA DA CLÍNICA -->
+    <!-- Substitua "URL_DA_SUA_API_CHATWOOT" e "TOKEN_DA_CLINICA" pelos dados reais -->
+    <!-- ========================================================================= -->
     <script>
         (function (d, t) {
-            var BASE_URL = "https://app.rxsync.com.br";
+            // EX: https://chatwoot.seudominio.com.br
+            var BASE_URL = "URL_DA_SUA_API_CHATWOOT"; 
+            
             var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
             g.src = BASE_URL + "/packs/js/sdk.js";
             g.async = true;
             s.parentNode.insertBefore(g, s);
+            
             g.onload = function () {
                 window.chatwootSDK.run({
-                    websiteToken: 'umo8eLwQSe9QsAzdQAMKAQVu',
+                    websiteToken: 'TOKEN_DA_CLINICA', // <<<< COLOQUE O TOKEN DA CAIXA DE ENTRADA AQUI
                     baseUrl: BASE_URL
+                });
+
+                // Este evento força o chat a abrir assim que carregar, 
+                // para o usuário não precisar clicar no botãozinho flutuante.
+                window.addEventListener("chatwoot:ready", function () {
+                    window.$chatwoot.toggle("open");
                 });
             };
         })(document, "script");
