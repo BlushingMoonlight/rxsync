@@ -17,7 +17,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Configuração de Cores da Marca (Mantendo o padrão RXSync) -->
+    <!-- Configuração de Cores da Marca RXSync -->
     <script>
         tailwind.config = {
             theme: {
@@ -32,99 +32,63 @@
         }
     </script>
 </head>
-<body class="font-sans text-slate-800 bg-slate-50 antialiased min-h-screen flex flex-col relative">
+<body class="font-sans text-slate-800 bg-slate-50 antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- Header Simples -->
-    <header class="w-full bg-white/80 backdrop-blur-lg border-b border-slate-200 sticky top-0 z-50">
+    <header class="w-full bg-white/80 backdrop-blur-lg border-b border-slate-200 shrink-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex justify-between items-center h-16 sm:h-20">
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gradient-to-br from-primary-900 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                        <i data-lucide="bot" class="w-6 h-6 text-white" aria-hidden="true"></i>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-900 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                        <i data-lucide="bot" class="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden="true"></i>
                     </div>
-                    <span class="font-extrabold text-xl tracking-tight text-primary-900">RXSync | <span class="font-medium text-slate-500">Homologação</span></span>
+                    <span class="font-extrabold text-lg sm:text-xl tracking-tight text-primary-900">RXSync | <span class="font-medium text-slate-500">Homologação</span></span>
                 </div>
                 
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-amber-100 text-amber-700 border border-amber-200">
+                <span class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase bg-amber-100 text-amber-700 border border-amber-200">
                     Ambiente de Teste
                 </span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
+    <!-- Main Content com Iframe Fixo -->
+    <main class="flex-grow relative flex flex-col items-center justify-start sm:justify-center p-0 sm:p-6 h-full">
         <!-- Background Grid Pattern -->
-        <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-primary-900">
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-primary-900 z-0">
             <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true">
                 <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
                 <rect width="100%" height="100%" fill="url(#grid)" />
             </svg>
         </div>
 
-        <div class="max-w-xl mx-auto w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 sm:p-12 relative z-10 text-center">
+        <!-- Container do Chat -->
+        <div class="w-full sm:max-w-3xl h-full sm:h-[80vh] sm:min-h-[600px] bg-white sm:rounded-2xl border-0 sm:border border-slate-200 shadow-2xl flex flex-col relative z-10 overflow-hidden">
             
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-primary-900 tracking-tight mb-4">
-                Teste sua Inteligência Artificial
-            </h1>
-            
-            <p class="text-base text-slate-600 mb-8 leading-relaxed">
-                Este é um ambiente seguro simulando o atendimento da sua clínica. 
-                Envie mensagens no chat que acabou de se abrir na tela e veja como a IA conduz os agendamentos e responde dúvidas.
-            </p>
-
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-left text-sm text-slate-600">
-                <p class="font-bold text-primary-900 mb-2 flex items-center gap-2">
-                    <i data-lucide="info" class="w-4 h-4 text-primary-500"></i> O que testar:
+            <!-- Faixa de aviso superior no chat -->
+            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center gap-3 shrink-0">
+                <i data-lucide="info" class="w-5 h-5 text-primary-600"></i>
+                <p class="text-sm text-slate-600 font-medium">
+                    Envie uma mensagem abaixo para iniciar o teste da Inteligência Artificial.
                 </p>
-                <ul class="list-disc pl-5 space-y-1">
-                    <li>Simule o agendamento de uma consulta.</li>
-                    <li>Faça perguntas sobre horários de funcionamento.</li>
-                    <li>Pergunte sobre convênios ou valores.</li>
-                </ul>
             </div>
-            
+
+            <!-- CHATWOOT EMBED (IFRAME) -->
+            <!-- Substitua URL_DA_SUA_API_CHATWOOT e TOKEN_DA_CLINICA abaixo -->
+            <div class="flex-grow w-full bg-white">
+                <iframe 
+                    src="https://URL_DA_SUA_API_CHATWOOT/widget?website_token=TOKEN_DA_CLINICA" 
+                    class="w-full h-full border-0"
+                    allow="camera; microphone; fullscreen; display-capture; picture-in-picture; clipboard-write;"
+                ></iframe>
+            </div>
+
         </div>
     </main>
-
-    <footer class="bg-white border-t border-slate-200 py-6 text-center">
-        <p class="text-sm text-slate-500 font-medium">
-            Desenvolvido por <strong class="text-primary-900">RXSync Tecnologia</strong>
-        </p>
-    </footer>
 
     <!-- Inicialização dos ícones -->
     <script>
         lucide.createIcons();
-    </script>
-
-    <!-- ========================================================================= -->
-    <!-- WIDGET DO CHATWOOT - IA DA CLÍNICA -->
-    <!-- Substitua "URL_DA_SUA_API_CHATWOOT" e "TOKEN_DA_CLINICA" pelos dados reais -->
-    <!-- ========================================================================= -->
-    <script>
-        (function (d, t) {
-            // EX: https://chatwoot.seudominio.com.br
-            var BASE_URL = "URL_DA_SUA_API_CHATWOOT"; 
-            
-            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-            g.src = BASE_URL + "/packs/js/sdk.js";
-            g.async = true;
-            s.parentNode.insertBefore(g, s);
-            
-            g.onload = function () {
-                window.chatwootSDK.run({
-                    websiteToken: 'TOKEN_DA_CLINICA', // <<<< COLOQUE O TOKEN DA CAIXA DE ENTRADA AQUI
-                    baseUrl: BASE_URL
-                });
-
-                // Este evento força o chat a abrir assim que carregar, 
-                // para o usuário não precisar clicar no botãozinho flutuante.
-                window.addEventListener("chatwoot:ready", function () {
-                    window.$chatwoot.toggle("open");
-                });
-            };
-        })(document, "script");
     </script>
 </body>
 </html>
