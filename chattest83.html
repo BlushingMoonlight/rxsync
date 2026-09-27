@@ -1,92 +1,77 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Ambiente de Teste | Inteligência Artificial</title>
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#0f172a">
-
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS & Lucide Icons -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Configuração de Cores da Marca RXSync -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: { 50: '#f0f5f9', 100: '#e0ebf4', 200: '#cbdcec', 300: '#a3b8cf', 400: '#60a5fa', 500: '#3b82f6', 600: '#1d4ed8', 700: '#1e40af', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
-                        emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
+                        primary: { 900: '#0f172a' },
+                        emerald: { 500: '#10b981', 600: '#059669' }
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="font-sans text-slate-800 bg-slate-50 antialiased h-screen flex flex-col overflow-hidden">
 
-    <!-- Header Simples -->
-    <header class="w-full bg-white/80 backdrop-blur-lg border-b border-slate-200 shrink-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16 sm:h-20">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-900 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
-                        <i data-lucide="bot" class="w-5 h-5 sm:w-6 sm:h-6 text-white" aria-hidden="true"></i>
-                    </div>
-                    <span class="font-extrabold text-lg sm:text-xl tracking-tight text-primary-900">RXSync | <span class="font-medium text-slate-500">Homologação</span></span>
-                </div>
-                
-                <span class="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase bg-amber-100 text-amber-700 border border-amber-200">
-                    Ambiente de Teste
-                </span>
+<!-- O h-[100dvh] garante que a tela ocupe exatamente a altura visível em celulares e PCs -->
+<body class="font-sans text-slate-800 bg-slate-100 flex flex-col h-[100dvh] overflow-hidden">
+
+    <!-- Cabeçalho Fixo -->
+    <header class="w-full bg-white border-b border-slate-200 shrink-0 z-10 px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-primary-900 rounded-lg flex items-center justify-center">
+                <i data-lucide="bot" class="w-5 h-5 text-emerald-500"></i>
             </div>
+            <span class="font-bold text-lg text-primary-900">RXSync</span>
         </div>
+        <span class="px-2 py-1 bg-amber-100 text-amber-800 text-[10px] sm:text-xs font-bold uppercase tracking-wide rounded">
+            Ambiente de Teste
+        </span>
     </header>
 
-    <!-- Main Content com Iframe Fixo -->
-    <main class="flex-grow relative flex flex-col items-center justify-start sm:justify-center p-0 sm:p-6 h-full">
-        <!-- Background Grid Pattern -->
-        <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-primary-900 z-0">
-            <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" aria-hidden="true">
-                <defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
-            </svg>
-        </div>
-
+    <!-- Área Principal -->
+    <main class="flex-1 w-full max-w-4xl mx-auto flex flex-col p-2 sm:p-6 h-full">
+        
         <!-- Container do Chat -->
-        <div class="w-full sm:max-w-3xl h-full sm:h-[80vh] sm:min-h-[600px] bg-white sm:rounded-2xl border-0 sm:border border-slate-200 shadow-2xl flex flex-col relative z-10 overflow-hidden">
+        <div class="flex-1 w-full bg-white sm:rounded-xl shadow-lg border border-slate-200 flex flex-col overflow-hidden">
             
-            <!-- Faixa de aviso superior no chat -->
-            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center gap-3 shrink-0">
-                <i data-lucide="info" class="w-5 h-5 text-primary-600"></i>
-                <p class="text-sm text-slate-600 font-medium">
-                    Envie uma mensagem abaixo para iniciar o teste da Inteligência Artificial.
-                </p>
+            <!-- Aviso rápido -->
+            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center gap-2 shrink-0">
+                <i data-lucide="info" class="w-4 h-4 text-slate-500"></i>
+                <span class="text-sm text-slate-600 font-medium">Envie uma mensagem abaixo para iniciar o teste.</span>
             </div>
 
-            <!-- CHATWOOT EMBED (IFRAME) -->
-            <!-- Substitua URL_DA_SUA_API_CHATWOOT e TOKEN_DA_CLINICA abaixo -->
-            <div class="flex-grow w-full bg-white">
-                <iframe 
-                    src="https://URL_DA_SUA_API_CHATWOOT/widget?website_token=TOKEN_DA_CLINICA" 
-                    class="w-full h-full border-0"
-                    allow="camera; microphone; fullscreen; display-capture; picture-in-picture; clipboard-write;"
-                ></iframe>
-            </div>
-
+            <!-- IFRAME DO CHATWOOT -->
+            <!-- Importante: O flex-1 w-full h-full garante que ele não vai bugar e vai preencher a tela -->
+            <iframe 
+                src="https://app.rxsync.com.br/widget?website_token=COLOQUE_O_TOKEN_AQUI" 
+                class="flex-1 w-full h-full border-0"
+                allow="camera; microphone; fullscreen; display-capture; picture-in-picture; clipboard-write;"
+            ></iframe>
+            
         </div>
     </main>
 
-    <!-- Inicialização dos ícones -->
     <script>
         lucide.createIcons();
     </script>
