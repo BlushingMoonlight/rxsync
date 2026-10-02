@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar minhas informações | RXSync</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen py-10 px-4">
+  <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+
+    <div id="carregando" class="text-slate-500 text-sm">Carregando suas informações...</div>
+
+    <div id="erro" class="hidden text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-4 text-sm"></div>
+
+    <div id="conteudo" class="hidden">
+      <h1 class="text-xl font-semibold text-slate-900 mb-1">Olá, <span id="nome"></span></h1>
+      <p class="text-sm text-slate-500 mb-6">Plano <span id="plano" class="font-medium"></span> — aqui você pode atualizar algumas informações da sua assistente a qualquer momento.</p>
+
+      <label class="block text-sm font-medium text-slate-700 mb-1">Informações extras para a assistente saber</label>
+      <p class="text-xs text-slate-500 mb-2">Qualquer coisa pontual: um aviso, uma exceção temporária, uma regra nova. A IA lê isso em toda conversa.</p>
+      <textarea id="catalogo" rows="6" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+      <div class="text-xs text-right mt-1"><span id="contagem">0</span> / <span id="limite">500</span> caracteres</div>
+
+      <label class="block text-sm font-medium text-slate-700 mt-6 mb-1">Números que a assistente NÃO deve responder</label>
+      <p class="text-xs text-slate-500 mb-2">Separe por vírgula, com DDD. Ex: 11999998888, 11988887777</p>
+      <input id="numeros" type="text" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="11999998888, 11988887777">
+
+      <button id="salvar" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Salvar</button>
+      <div id="mensagemSalvar" class="text-sm mt-3"></div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  var WEBHOOK = "https://n8n.rxsync.com.br/webhook/autoedicao";
+  var ORIGEM = "rxsync-site-2026";
+
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get("t") || "";
+
+  var elCarregando = document.getElementById("carregando");
+  var elErro = document.getElementById("erro");
+  var elConteudo = document.getElementById("conteudo");
+  var elNome = document.getElementById("nome");
+  var elPlano = document.getElementById("plano");
+  var elCatalogo = document.getElementById("catalogo");
+  var elNumeros = document.getElementById("numeros");
+  var elContagem = document.getElementById("contagem");
+  var elLimite = document.getElementById("limite");
+  var elSalvar = document.getElementById("salvar");
+  var elMsg = document.getElementById("mensagemSalvar");
+
+  var limiteAtual = 500;
+
+  function mostrarErro(msg) {
+    elCarregando.classList.add("hidden");
+    elConteudo.classList.add("hidden");
+    elErro.classList.remove("hidden");
+    elErro.textContent = msg;
+  }
+
+  function chamar(acao, dados) {
+    return fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM },
+      body: JSON.stringify({ acao: acao, token: token, dados: dados || {} })
+    }).then(function (r) { return r.json(); });
+  }
+
+  if (!token) {
+    mostrarErro("Link incompleto. Use o link exato que você salvou.");
+    return;
+  }
+
+  chamar("abrir").then(function (resp) {
+    elCarregando.classList.add("hidden");
+    if (!resp.ok) {
+      mostrarErro(resp.mensagem || "Não consegui abrir este link.");
+      return;
+    }
+    elConteudo.classList.remove("hidden");
+    elNome.textContent = resp.nome_exibicao || "";
+    elPlano.textContent = resp.plano || "";
+    limiteAtual = resp.limite || 500;
+    elLimite.textContent = limiteAtual;
+    elCatalogo.value = resp.catalogo_de_vendas || "";
+    elNumeros.value = resp.numeros_sem_ia || "";
+    elContagem.textContent = elCatalogo.value.length;
+  }).catch(function () {
+    mostrarErro("Não consegui falar com o servidor. Tenta de novo em instantes.");
+  });
+
+  elCatalogo.addEventListener("input", function () {
+    elContagem.textContent = elCatalogo.value.length;
+    elContagem.classList.toggle("text-rose-600", elCatalogo.value.length > limiteAtual);
+  });
+
+  elSalvar.addEventListener("click", function () {
+    elSalvar.disabled = true;
+    elSalvar.textContent = "Salvando...";
+    elMsg.textContent = "";
+    chamar("salvar", {
+      catalogo_de_vendas: elCatalogo.value,
+      numeros_sem_ia: elNumeros.value
+    }).then(function (resp) {
+      elSalvar.disabled = false;
+      elSalvar.textContent = "Salvar";
+      if (resp.ok) {
+        elMsg.textContent = "Salvo com sucesso!";
+        elMsg.className = "text-sm mt-3 text-emerald-700";
+      } else {
+        elMsg.textContent = resp.mensagem || "Não consegui salvar.";
+        elMsg.className = "text-sm mt-3 text-rose-700";
+      }
+    }).catch(function () {
+      elSalvar.disabled = false;
+      elSalvar.textContent = "Salvar";
+      elMsg.textContent = "Erro ao salvar. Tenta de novo.";
+      elMsg.className = "text-sm mt-3 text-rose-700";
+    });
+  });
+})();
+</script>
+</body>
+</html>
