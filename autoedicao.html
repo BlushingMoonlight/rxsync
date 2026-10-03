@@ -2,125 +2,226 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Editar minhas informações | RXSync</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  .campo label { display:block; font-size:0.8rem; font-weight:500; color:#334155; margin-bottom:4px; }
+  .campo input, .campo textarea { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:0.875rem; }
+  .campo textarea { min-height:80px; }
+  .secao h2 { font-size:0.95rem; font-weight:600; color:#0f172a; margin:28px 0 12px; padding-top:16px; border-top:1px solid #e2e8f0; }
+  .secao:first-of-type h2 { border-top:none; padding-top:0; }
+  .ro-row { display:flex; justify-content:space-between; gap:12px; font-size:0.8rem; padding:6px 0; border-bottom:1px dashed #e2e8f0; }
+  .ro-row .lbl { color:#64748b; }
+  .ro-row .val { color:#334155; font-weight:500; text-align:right; }
 </style>
 </head>
-<body class="bg-slate-50 min-h-screen py-10 px-4">
-  <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+<body class="bg-slate-50 min-h-screen py-8 px-4" style="padding-top:calc(env(safe-area-inset-top,0px) + 2rem); padding-bottom:calc(env(safe-area-inset-bottom,0px) + 2rem);">
+  <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
 
     <div id="carregando" class="text-slate-500 text-sm">Carregando suas informações...</div>
+
+    <div id="semToken" class="hidden">
+      <h1 class="text-xl font-semibold text-slate-900 mb-2">Esqueceu seu link?</h1>
+      <p class="text-sm text-slate-500 mb-4">Digite o e-mail que você usou no cadastro e a gente reenvia.</p>
+      <input id="emailRecuperar" type="email" placeholder="seu@email.com" class="w-full border border-slate-300 rounded-lg p-3 text-sm mb-3">
+      <button id="btnRecuperar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Enviar meu link</button>
+      <div id="msgRecuperar" class="text-sm mt-3"></div>
+    </div>
 
     <div id="erro" class="hidden text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-4 text-sm"></div>
 
     <div id="conteudo" class="hidden">
-      <h1 class="text-xl font-semibold text-slate-900 mb-1">Olá, <span id="nome"></span></h1>
-      <p class="text-sm text-slate-500 mb-6">Plano <span id="plano" class="font-medium"></span> — aqui você pode atualizar algumas informações da sua assistente a qualquer momento.</p>
+      <h1 class="text-xl font-semibold text-slate-900 mb-1">Editar minhas informações</h1>
+      <p class="text-sm text-slate-500 mb-6">Essas informações alimentam sua assistente de atendimento. Edite o que quiser e salve.</p>
 
-      <label class="block text-sm font-medium text-slate-700 mb-1">Informações extras para a assistente saber</label>
-      <p class="text-xs text-slate-500 mb-2">Qualquer coisa pontual: um aviso, uma exceção temporária, uma regra nova. A IA lê isso em toda conversa.</p>
-      <textarea id="catalogo" rows="6" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-      <div class="text-xs text-right mt-1"><span id="contagem">0</span> / <span id="limite">500</span> caracteres</div>
+      <div class="secao">
+        <h2>Dados do contrato (só leitura)</h2>
+        <div id="somenteLeitura"></div>
+      </div>
 
-      <label class="block text-sm font-medium text-slate-700 mt-6 mb-1">Números que a assistente NÃO deve responder</label>
-      <p class="text-xs text-slate-500 mb-2">Separe por vírgula, com DDD. Ex: 11999998888, 11988887777</p>
-      <input id="numeros" type="text" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="11999998888, 11988887777">
+      <div id="camposGerados"></div>
 
-      <button id="salvar" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Salvar</button>
+      <div class="secao">
+        <h2>Grade de horários de agendamento</h2>
+        <p class="text-xs text-slate-500 mb-3">Deixe em branco os dias em que não atende.</p>
+        <div id="gradeHorarios" class="space-y-2"></div>
+      </div>
+
+      <div class="secao">
+        <h2>Agendamento automático</h2>
+        <label class="flex items-center gap-2 text-sm text-slate-700">
+          <input type="checkbox" id="confirmacaoAutomatica" class="w-4 h-4">
+          A assistente pode marcar consulta de verdade na agenda (sem isso, ela só conversa e não agenda)
+        </label>
+      </div>
+
+      <div class="secao">
+        <h2>Informações extras para a assistente saber</h2>
+        <p class="text-xs text-slate-500 mb-2">Qualquer coisa pontual: um aviso, uma exceção temporária, uma regra nova.</p>
+        <textarea id="catalogo" rows="5" class="w-full border border-slate-300 rounded-lg p-3 text-sm"></textarea>
+        <div class="text-xs text-right mt-1"><span id="contagem">0</span> / <span id="limite">500</span> caracteres</div>
+      </div>
+
+      <div class="secao">
+        <h2>Números que a assistente NÃO deve responder</h2>
+        <p class="text-xs text-slate-500 mb-2">Separe por vírgula, com DDD.</p>
+        <input id="numeros" type="text" class="w-full border border-slate-300 rounded-lg p-3 text-sm" placeholder="11999998888, 11988887777">
+      </div>
+
+      <button id="salvar" class="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Salvar tudo</button>
       <div id="mensagemSalvar" class="text-sm mt-3"></div>
     </div>
   </div>
 
 <script>
+var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text"}, {"key": "telefone", "label": "Telefone", "tipo": "tel"}, {"key": "numero_whatsapp", "label": "Número do WhatsApp conectado", "tipo": "tel"}, {"key": "numero_reserva", "label": "Número de reserva", "tipo": "tel"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico - nome", "tipo": "text"}, {"key": "resp_tecnico_conselho", "label": "Responsável técnico - conselho", "tipo": "text"}, {"key": "sistema_gestao", "label": "Sistema de gestão usado", "tipo": "text"}, {"key": "usuarios_painel", "label": "Usuários do painel", "tipo": "textarea"}, {"key": "nome_exibicao", "label": "Nome de exibição", "tipo": "text"}, {"key": "descricao_curta", "label": "Descrição curta", "tipo": "textarea"}, {"key": "servicos", "label": "Serviços oferecidos", "tipo": "textarea"}, {"key": "nao_oferecemos", "label": "O que NÃO oferecemos", "tipo": "textarea"}, {"key": "profissionais", "label": "Profissionais", "tipo": "textarea"}, {"key": "como_chegar", "label": "Como chegar", "tipo": "textarea"}, {"key": "endereco_atendimento", "label": "Endereço de atendimento", "tipo": "textarea"}, {"key": "horario_funcionamento", "label": "Horário de funcionamento (texto)", "tipo": "text"}, {"key": "horario_humano", "label": "Horário de atendimento humano", "tipo": "text"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea"}, {"key": "convenios_parcerias", "label": "Convênios e parcerias", "tipo": "textarea"}, {"key": "politica_agendamento", "label": "Política de agendamento", "tipo": "textarea"}, {"key": "politica_precos", "label": "Política de preços", "tipo": "textarea"}, {"key": "tom_de_voz", "label": "Tom de voz", "tipo": "textarea"}, {"key": "saudacao", "label": "Saudação inicial", "tipo": "textarea"}, {"key": "restricoes", "label": "Restrições", "tipo": "textarea"}, {"key": "nunca_dizer", "label": "Nunca dizer", "tipo": "textarea"}, {"key": "gatilhos_escalonamento", "label": "Gatilhos de escalonamento p/ humano", "tipo": "textarea"}, {"key": "gatilhos_urgencia", "label": "Gatilhos de urgência", "tipo": "textarea"}, {"key": "resposta_urgencia", "label": "Resposta em caso de urgência", "tipo": "textarea"}, {"key": "mensagem_fora_horario", "label": "Mensagem fora do horário", "tipo": "textarea"}, {"key": "telefone_urgencia", "label": "Telefone de urgência", "tipo": "tel"}, {"key": "whatsapp_alerta", "label": "WhatsApp de alerta interno", "tipo": "tel"}, {"key": "duracao_padrao_min", "label": "Duração padrão da consulta (min)", "tipo": "number"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number"}, {"key": "janela_agendamento_dias", "label": "Janela de agendamento (dias)", "tipo": "number"}, {"key": "buffer_min", "label": "Intervalo entre consultas (min)", "tipo": "number"}];
+var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}, {"key": "valor_setup", "label": "Valor de implantação"}, {"key": "data_aceite", "label": "Data de aceite do contrato"}];
+var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
+
 (function () {
   var WEBHOOK = "https://n8n.rxsync.com.br/webhook/autoedicao";
   var ORIGEM = "rxsync-site-2026";
-
   var params = new URLSearchParams(window.location.search);
   var token = params.get("t") || "";
 
-  var elCarregando = document.getElementById("carregando");
-  var elErro = document.getElementById("erro");
-  var elConteudo = document.getElementById("conteudo");
-  var elNome = document.getElementById("nome");
-  var elPlano = document.getElementById("plano");
-  var elCatalogo = document.getElementById("catalogo");
-  var elNumeros = document.getElementById("numeros");
-  var elContagem = document.getElementById("contagem");
-  var elLimite = document.getElementById("limite");
-  var elSalvar = document.getElementById("salvar");
-  var elMsg = document.getElementById("mensagemSalvar");
+  var el = function(id){ return document.getElementById(id); };
+  var elCarregando = el("carregando"), elSemToken = el("semToken"), elErro = el("erro"), elConteudo = el("conteudo");
 
-  var limiteAtual = 500;
+  function chamar(acao, dados, email) {
+    var body = { acao: acao, token: token, dados: dados || {} };
+    if (email) body.email = email;
+    return fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); });
+  }
+
+  // monta os inputs genéricos
+  var wrap = el("camposGerados");
+  CAMPOS.forEach(function (c) {
+    var div = document.createElement("div");
+    div.className = "campo mb-4";
+    var input = c.tipo === "textarea" ? document.createElement("textarea") : document.createElement("input");
+    if (c.tipo !== "textarea") input.type = c.tipo;
+    input.id = "campo_" + c.key;
+    div.innerHTML = "<label>" + c.label + "</label>";
+    div.appendChild(input);
+    wrap.appendChild(div);
+  });
+
+  // grade de horários
+  var gradeDiv = el("gradeHorarios");
+  DIAS.forEach(function (d) {
+    var row = document.createElement("div");
+    row.className = "flex items-center gap-2";
+    row.innerHTML =
+      '<span class="w-20 text-xs text-slate-600">' + d.label + '</span>' +
+      '<input type="time" id="abre_' + d.key + '" class="border border-slate-300 rounded-lg p-2 text-sm flex-1">' +
+      '<span class="text-xs text-slate-400">até</span>' +
+      '<input type="time" id="fecha_' + d.key + '" class="border border-slate-300 rounded-lg p-2 text-sm flex-1">';
+    gradeDiv.appendChild(row);
+  });
+
+  if (!token) {
+    elCarregando.classList.add("hidden");
+    elSemToken.classList.remove("hidden");
+    el("btnRecuperar").addEventListener("click", function () {
+      var email = el("emailRecuperar").value.trim();
+      if (!email) return;
+      el("btnRecuperar").disabled = true;
+      chamar("reenviar", {}, email).then(function (resp) {
+        el("msgRecuperar").textContent = resp.mensagem || "Pronto.";
+        el("btnRecuperar").disabled = false;
+      }).catch(function () {
+        el("msgRecuperar").textContent = "Erro ao enviar. Tenta de novo.";
+        el("btnRecuperar").disabled = false;
+      });
+    });
+    return;
+  }
 
   function mostrarErro(msg) {
     elCarregando.classList.add("hidden");
-    elConteudo.classList.add("hidden");
     elErro.classList.remove("hidden");
     elErro.textContent = msg;
   }
 
-  function chamar(acao, dados) {
-    return fetch(WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM },
-      body: JSON.stringify({ acao: acao, token: token, dados: dados || {} })
-    }).then(function (r) { return r.json(); });
-  }
-
-  if (!token) {
-    mostrarErro("Link incompleto. Use o link exato que você salvou.");
-    return;
-  }
+  var limiteAtual = 500;
 
   chamar("abrir").then(function (resp) {
     elCarregando.classList.add("hidden");
-    if (!resp.ok) {
-      mostrarErro(resp.mensagem || "Não consegui abrir este link.");
-      return;
-    }
+    if (!resp.ok) { mostrarErro(resp.mensagem || "Não consegui abrir este link."); return; }
     elConteudo.classList.remove("hidden");
-    elNome.textContent = resp.nome_exibicao || "";
-    elPlano.textContent = resp.plano || "";
-    limiteAtual = resp.limite || 500;
-    elLimite.textContent = limiteAtual;
-    elCatalogo.value = resp.catalogo_de_vendas || "";
-    elNumeros.value = resp.numeros_sem_ia || "";
-    elContagem.textContent = elCatalogo.value.length;
+
+    var roDiv = el("somenteLeitura");
+    READONLY.forEach(function (c) {
+      var v = (resp.somenteLeitura || {})[c.key] || "";
+      var row = document.createElement("div");
+      row.className = "ro-row";
+      row.innerHTML = "<span class='lbl'>" + c.label + "</span><span class='val'>" + (v || "—") + "</span>";
+      roDiv.appendChild(row);
+    });
+
+    CAMPOS.forEach(function (c) {
+      var v = (resp.editaveis || {})[c.key] || "";
+      el("campo_" + c.key).value = v;
+    });
+
+    var h = {};
+    try { h = JSON.parse((resp.editaveis || {}).horarios_estruturados || "{}"); } catch (e) { h = {}; }
+    DIAS.forEach(function (d) {
+      var f = h[d.key];
+      if (f && f.abre && f.fecha) {
+        el("abre_" + d.key).value = f.abre;
+        el("fecha_" + d.key).value = f.fecha;
+      }
+    });
+
+    el("confirmacaoAutomatica").checked = String((resp.editaveis || {}).confirmacao_automatica).toUpperCase() === "SIM";
+
+    limiteAtual = resp.limite_catalogo || 500;
+    el("limite").textContent = limiteAtual;
+    el("catalogo").value = (resp.editaveis || {}).catalogo_de_vendas || "";
+    el("contagem").textContent = el("catalogo").value.length;
+    el("numeros").value = (resp.editaveis || {}).numeros_sem_ia || "";
+
   }).catch(function () {
     mostrarErro("Não consegui falar com o servidor. Tenta de novo em instantes.");
   });
 
-  elCatalogo.addEventListener("input", function () {
-    elContagem.textContent = elCatalogo.value.length;
-    elContagem.classList.toggle("text-rose-600", elCatalogo.value.length > limiteAtual);
+  el("catalogo").addEventListener("input", function () {
+    el("contagem").textContent = el("catalogo").value.length;
+    el("contagem").classList.toggle("text-rose-600", el("catalogo").value.length > limiteAtual);
   });
 
-  elSalvar.addEventListener("click", function () {
-    elSalvar.disabled = true;
-    elSalvar.textContent = "Salvando...";
-    elMsg.textContent = "";
-    chamar("salvar", {
-      catalogo_de_vendas: elCatalogo.value,
-      numeros_sem_ia: elNumeros.value
-    }).then(function (resp) {
-      elSalvar.disabled = false;
-      elSalvar.textContent = "Salvar";
-      if (resp.ok) {
-        elMsg.textContent = "Salvo com sucesso!";
-        elMsg.className = "text-sm mt-3 text-emerald-700";
-      } else {
-        elMsg.textContent = resp.mensagem || "Não consegui salvar.";
-        elMsg.className = "text-sm mt-3 text-rose-700";
-      }
+  el("salvar").addEventListener("click", function () {
+    var dados = {};
+    CAMPOS.forEach(function (c) { dados[c.key] = el("campo_" + c.key).value; });
+    dados.catalogo_de_vendas = el("catalogo").value;
+    dados.numeros_sem_ia = el("numeros").value;
+    dados.confirmacao_automatica = el("confirmacaoAutomatica").checked ? "SIM" : "NAO";
+
+    var grade = {};
+    DIAS.forEach(function (d) {
+      var abre = el("abre_" + d.key).value, fecha = el("fecha_" + d.key).value;
+      grade[d.key] = (abre && fecha) ? { abre: abre, fecha: fecha } : null;
+    });
+    dados.horarios_estruturados = JSON.stringify(grade);
+
+    var btn = el("salvar");
+    btn.disabled = true; btn.textContent = "Salvando...";
+    el("mensagemSalvar").textContent = "";
+    chamar("salvar", dados).then(function (resp) {
+      btn.disabled = false; btn.textContent = "Salvar tudo";
+      el("mensagemSalvar").textContent = resp.mensagem || (resp.ok ? "Salvo!" : "Não consegui salvar.");
+      el("mensagemSalvar").className = "text-sm mt-3 " + (resp.ok ? "text-emerald-700" : "text-rose-700");
     }).catch(function () {
-      elSalvar.disabled = false;
-      elSalvar.textContent = "Salvar";
-      elMsg.textContent = "Erro ao salvar. Tenta de novo.";
-      elMsg.className = "text-sm mt-3 text-rose-700";
+      btn.disabled = false; btn.textContent = "Salvar tudo";
+      el("mensagemSalvar").textContent = "Erro ao salvar. Tenta de novo.";
+      el("mensagemSalvar").className = "text-sm mt-3 text-rose-700";
     });
   });
 })();
