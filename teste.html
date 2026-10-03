@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ambiente de Teste | RXSync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      fontFamily: { sans: ['Inter','sans-serif'] },
+      colors: { primary: { 50:'#f0f5f9',100:'#e0ebf4',200:'#cbdcec',300:'#a3b8cf',400:'#60a5fa',500:'#3b82f6',600:'#1d4ed8',700:'#1e40af',800:'#1e3a8a',900:'#0f172a',950:'#080c17' } }
+    } }
+  }
+</script>
+<style> body { font-family: 'Inter', -apple-system, Segoe UI, Roboto, Arial, sans-serif; } </style>
+</head>
+<body class="bg-slate-50 min-h-screen" style="padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);">
+
+  <header class="bg-primary-900 text-white">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-2.5">
+      <div class="w-9 h-9 bg-gradient-to-br from-primary-700 to-emerald-500 rounded-lg flex items-center justify-center shadow-md shrink-0">
+        <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+      </div>
+      <div class="leading-tight">
+        <div class="font-extrabold tracking-tight text-base">RXSync</div>
+        <div class="text-[11px] text-slate-400 -mt-0.5">Ambiente de Teste</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center">
+      <h1 class="text-lg font-extrabold text-primary-900 mb-1">Converse com sua assistente</h1>
+      <p class="text-sm text-slate-500">Isto é um ambiente de teste. Nenhuma mensagem aqui vai para o seu WhatsApp de verdade. Mande uma mensagem no balão no canto da tela.</p>
+    </div>
+  </div>
+
+<script>
+(function (d, t) {
+  if (window.lucide) lucide.createIcons();
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get("token");
+  if (!token) { document.body.insertAdjacentHTML("beforeend", "<p style='text-align:center;color:#e11d48;padding:20px'>Link incompleto: falta o token do teste.</p>"); return; }
+
+  var BASE_URL = "https://app.rxsync.com.br";
+  var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+  g.src = BASE_URL + "/packs/js/sdk.js";
+  g.async = true;
+  s.parentNode.insertBefore(g, s);
+  g.onload = function () {
+    window.chatwootSDK.run({ websiteToken: token, baseUrl: BASE_URL });
+  };
+})(document, "script");
+</script>
+</body>
+</html>
