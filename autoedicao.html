@@ -3,91 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Editar minhas informações | RXSync</title>
+<title>Painel do Cliente | RXSync</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
   .campo label { display:block; font-size:0.8rem; font-weight:500; color:#334155; margin-bottom:4px; }
-  .campo input, .campo textarea { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:0.875rem; }
+  .campo input, .campo textarea, .campo select { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; font-size:0.875rem; }
   .campo textarea { min-height:80px; }
-  .secao h2 { font-size:0.95rem; font-weight:600; color:#0f172a; margin:28px 0 12px; padding-top:16px; border-top:1px solid #e2e8f0; }
-  .secao:first-of-type h2 { border-top:none; padding-top:0; }
   .ro-row { display:flex; justify-content:space-between; gap:12px; font-size:0.8rem; padding:6px 0; border-bottom:1px dashed #e2e8f0; }
   .ro-row .lbl { color:#64748b; }
   .ro-row .val { color:#334155; font-weight:500; text-align:right; }
+  .tab-btn { white-space:nowrap; padding:10px 14px; font-size:0.8rem; font-weight:500; color:#64748b; border-bottom:2px solid transparent; }
+  .tab-btn.ativa { color:#0f766e; border-bottom-color:#0f766e; }
+  .tab-conteudo { display:none; }
+  .tab-conteudo.ativa { display:block; }
+  #toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); background:#0f172a; color:#fff; padding:10px 18px; border-radius:999px; font-size:0.8rem; opacity:0; transition:all .25s; pointer-events:none; z-index:50; }
+  #toast.mostrar { opacity:1; transform:translate(-50%,0); }
 </style>
 </head>
-<body class="bg-slate-50 min-h-screen py-8 px-4" style="padding-top:calc(env(safe-area-inset-top,0px) + 2rem); padding-bottom:calc(env(safe-area-inset-bottom,0px) + 2rem);">
-  <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+<body class="bg-slate-50 min-h-screen" style="padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);">
 
-    <div id="carregando" class="text-slate-500 text-sm">Carregando suas informações...</div>
+  <header class="bg-slate-900 text-white">
+    <div class="max-w-2xl mx-auto px-4 py-5 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center font-bold text-slate-900">R</div>
+      <div>
+        <div class="font-semibold tracking-tight">RXSync</div>
+        <div class="text-xs text-slate-400">Painel do Cliente</div>
+      </div>
+    </div>
+  </header>
 
-    <div id="semToken" class="hidden">
-      <h1 class="text-xl font-semibold text-slate-900 mb-2">Esqueceu seu link?</h1>
-      <p class="text-sm text-slate-500 mb-4">Digite o e-mail que você usou no cadastro e a gente reenvia.</p>
-      <input id="emailRecuperar" type="email" placeholder="seu@email.com" class="w-full border border-slate-300 rounded-lg p-3 text-sm mb-3">
-      <button id="btnRecuperar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Enviar meu link</button>
-      <div id="msgRecuperar" class="text-sm mt-3"></div>
+  <div class="max-w-2xl mx-auto px-4 py-8">
+
+    <div id="carregando" class="text-slate-500 text-sm text-center py-10">Carregando suas informações...</div>
+
+    <div id="semToken" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 text-center">
+      <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 text-xl">🔑</div>
+      <h1 class="text-xl font-semibold text-slate-900 mb-1">Acesse seu painel</h1>
+      <p class="text-sm text-slate-500 mb-6">Informe o e-mail que você usou no cadastro e a gente envia o link de acesso.</p>
+      <input id="emailRecuperar" type="email" placeholder="seu@email.com" class="w-full border border-slate-300 rounded-lg p-3 text-sm mb-3 text-center">
+      <button id="btnRecuperar" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Enviar link de acesso</button>
+      <div id="msgRecuperar" class="text-sm mt-3 text-slate-600"></div>
     </div>
 
     <div id="erro" class="hidden text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-4 text-sm"></div>
 
-    <div id="conteudo" class="hidden">
-      <h1 class="text-xl font-semibold text-slate-900 mb-1">Editar minhas informações</h1>
-      <p class="text-sm text-slate-500 mb-6">Essas informações alimentam sua assistente de atendimento. Edite o que quiser e salve.</p>
-
-      <div class="secao">
-        <h2>Dados do contrato (só leitura)</h2>
-        <div id="somenteLeitura"></div>
+    <div id="conteudo" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 sm:px-8 pt-6">
+        <h1 class="text-xl font-semibold text-slate-900 mb-1">Editar minhas informações</h1>
+        <p class="text-sm text-slate-500 mb-4">Cada campo salva sozinho assim que você sai dele.</p>
       </div>
 
-      <div id="camposGerados"></div>
+      <div class="flex overflow-x-auto border-b border-slate-200 px-2" id="tabBar"></div>
 
-      <div class="secao">
-        <h2>Grade de horários de agendamento</h2>
-        <p class="text-xs text-slate-500 mb-3">Deixe em branco os dias em que não atende.</p>
-        <div id="gradeHorarios" class="space-y-2"></div>
+      <div class="px-6 sm:px-8 py-6">
+        <div class="tab-conteudo" data-tab="contato">
+          <div class="mb-5">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Dados do contrato (só leitura)</h2>
+            <div id="somenteLeitura"></div>
+          </div>
+          <div id="campos_contato"></div>
+        </div>
+        <div class="tab-conteudo" data-tab="negocio"><div id="campos_negocio"></div></div>
+        <div class="tab-conteudo" data-tab="atendimento"><div id="campos_atendimento"></div></div>
+        <div class="tab-conteudo" data-tab="urgencia"><div id="campos_urgencia"></div></div>
+        <div class="tab-conteudo" data-tab="agendamento">
+          <div id="campos_agendamento"></div>
+          <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mt-6 mb-2">Grade de horários de agendamento</h2>
+          <p class="text-xs text-slate-500 mb-3">Deixe em branco os dias em que não atende.</p>
+          <div id="gradeHorarios" class="space-y-2 mb-6"></div>
+          <div class="campo">
+            <label>Agendamento automático</label>
+            <select id="confirmacaoAutomatica">
+              <option value="SIM">Sim, a assistente marca sozinha na agenda</option>
+              <option value="NAO">Não, ela só conversa e não marca</option>
+              <option value="PEDIR_AJUDA">Quero ajuda da RXSync para configurar isso</option>
+            </select>
+          </div>
+        </div>
+        <div class="tab-conteudo" data-tab="ia"><div id="campos_ia"></div></div>
       </div>
 
-      <div class="secao">
-        <h2>Agendamento automático</h2>
-        <label class="flex items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" id="confirmacaoAutomatica" class="w-4 h-4">
-          A assistente pode marcar consulta de verdade na agenda (sem isso, ela só conversa e não agenda)
-        </label>
+      <div class="px-6 sm:px-8 pb-6">
+        <button id="salvar" class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-medium py-3 rounded-lg transition" disabled>Salvar tudo</button>
       </div>
-
-      <div class="secao">
-        <h2>Informações extras para a assistente saber</h2>
-        <p class="text-xs text-slate-500 mb-2">Qualquer coisa pontual: um aviso, uma exceção temporária, uma regra nova.</p>
-        <textarea id="catalogo" rows="5" class="w-full border border-slate-300 rounded-lg p-3 text-sm"></textarea>
-        <div class="text-xs text-right mt-1"><span id="contagem">0</span> / <span id="limite">500</span> caracteres</div>
-      </div>
-
-      <div class="secao">
-        <h2>Números que a assistente NÃO deve responder</h2>
-        <p class="text-xs text-slate-500 mb-2">Separe por vírgula, com DDD.</p>
-        <input id="numeros" type="text" class="w-full border border-slate-300 rounded-lg p-3 text-sm" placeholder="11999998888, 11988887777">
-      </div>
-
-      <button id="salvar" class="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition">Salvar tudo</button>
-      <div id="mensagemSalvar" class="text-sm mt-3"></div>
     </div>
   </div>
 
+  <div id="toast"></div>
+
 <script>
-var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text"}, {"key": "telefone", "label": "Telefone", "tipo": "tel"}, {"key": "numero_whatsapp", "label": "Número do WhatsApp conectado", "tipo": "tel"}, {"key": "numero_reserva", "label": "Número de reserva", "tipo": "tel"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico - nome", "tipo": "text"}, {"key": "resp_tecnico_conselho", "label": "Responsável técnico - conselho", "tipo": "text"}, {"key": "sistema_gestao", "label": "Sistema de gestão usado", "tipo": "text"}, {"key": "usuarios_painel", "label": "Usuários do painel", "tipo": "textarea"}, {"key": "nome_exibicao", "label": "Nome de exibição", "tipo": "text"}, {"key": "descricao_curta", "label": "Descrição curta", "tipo": "textarea"}, {"key": "servicos", "label": "Serviços oferecidos", "tipo": "textarea"}, {"key": "nao_oferecemos", "label": "O que NÃO oferecemos", "tipo": "textarea"}, {"key": "profissionais", "label": "Profissionais", "tipo": "textarea"}, {"key": "como_chegar", "label": "Como chegar", "tipo": "textarea"}, {"key": "endereco_atendimento", "label": "Endereço de atendimento", "tipo": "textarea"}, {"key": "horario_funcionamento", "label": "Horário de funcionamento (texto)", "tipo": "text"}, {"key": "horario_humano", "label": "Horário de atendimento humano", "tipo": "text"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea"}, {"key": "convenios_parcerias", "label": "Convênios e parcerias", "tipo": "textarea"}, {"key": "politica_agendamento", "label": "Política de agendamento", "tipo": "textarea"}, {"key": "politica_precos", "label": "Política de preços", "tipo": "textarea"}, {"key": "tom_de_voz", "label": "Tom de voz", "tipo": "textarea"}, {"key": "saudacao", "label": "Saudação inicial", "tipo": "textarea"}, {"key": "restricoes", "label": "Restrições", "tipo": "textarea"}, {"key": "nunca_dizer", "label": "Nunca dizer", "tipo": "textarea"}, {"key": "gatilhos_escalonamento", "label": "Gatilhos de escalonamento p/ humano", "tipo": "textarea"}, {"key": "gatilhos_urgencia", "label": "Gatilhos de urgência", "tipo": "textarea"}, {"key": "resposta_urgencia", "label": "Resposta em caso de urgência", "tipo": "textarea"}, {"key": "mensagem_fora_horario", "label": "Mensagem fora do horário", "tipo": "textarea"}, {"key": "telefone_urgencia", "label": "Telefone de urgência", "tipo": "tel"}, {"key": "whatsapp_alerta", "label": "WhatsApp de alerta interno", "tipo": "tel"}, {"key": "duracao_padrao_min", "label": "Duração padrão da consulta (min)", "tipo": "number"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number"}, {"key": "janela_agendamento_dias", "label": "Janela de agendamento (dias)", "tipo": "number"}, {"key": "buffer_min", "label": "Intervalo entre consultas (min)", "tipo": "number"}];
-var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}, {"key": "valor_setup", "label": "Valor de implantação"}, {"key": "data_aceite", "label": "Data de aceite do contrato"}];
+var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "Número do WhatsApp conectado", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Número de reserva", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico - nome", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Responsável técnico - conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema de gestão usado", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Usuários do painel", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome de exibição", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Descrição curta", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "Serviços oferecidos", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que NÃO oferecemos", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Profissionais", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço de atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Horário de funcionamento (texto)", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Horário de atendimento humano", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios e parcerias", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Tom de voz", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Saudação inicial", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Restrições", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Nunca dizer", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Gatilhos de escalonamento p/ humano", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "Gatilhos de urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "Resposta em caso de urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "Mensagem fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone de urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp de alerta interno", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Política de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Política de preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "duracao_padrao_min", "label": "Duração padrão da consulta (min)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Janela de agendamento (dias)", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (min)", "tipo": "number", "tab": "agendamento"}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
+var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
+var TABS = [{"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
+var LIMITE_CATALOGO = 500;
 
 (function () {
   var WEBHOOK = "https://n8n.rxsync.com.br/webhook/autoedicao";
   var ORIGEM = "rxsync-site-2026";
   var params = new URLSearchParams(window.location.search);
   var token = params.get("t") || "";
+  var el = function (id) { return document.getElementById(id); };
 
-  var el = function(id){ return document.getElementById(id); };
-  var elCarregando = el("carregando"), elSemToken = el("semToken"), elErro = el("erro"), elConteudo = el("conteudo");
+  var savedValues = {};
+  var dirty = {};
+
+  function toast(msg) {
+    var t = el("toast");
+    t.textContent = msg;
+    t.classList.add("mostrar");
+    clearTimeout(toast._h);
+    toast._h = setTimeout(function () { t.classList.remove("mostrar"); }, 2200);
+  }
 
   function chamar(acao, dados, email) {
     var body = { acao: acao, token: token, dados: dados || {} };
@@ -99,35 +127,116 @@ var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda
     }).then(function (r) { return r.json(); });
   }
 
-  // monta os inputs genéricos
-  var wrap = el("camposGerados");
+  function atualizarBotao() {
+    var algumSujo = Object.keys(dirty).some(function (k) { return dirty[k]; });
+    el("salvar").disabled = !algumSujo;
+  }
+
+  function marcarSujo(key) { dirty[key] = true; atualizarBotao(); }
+  function marcarLimpo(key) { dirty[key] = false; atualizarBotao(); }
+
+  function autosaveCampo(key, valor) {
+    if (savedValues[key] === valor) return;
+    chamar("salvar", (function () { var o = {}; o[key] = valor; return o; })()).then(function (resp) {
+      if (resp.ok) {
+        savedValues[key] = valor;
+        marcarLimpo(key);
+        toast(resp.mensagem && resp.mensagem !== "Salvo!" ? resp.mensagem : "Salvo ✓");
+      } else {
+        toast(resp.mensagem || "Não consegui salvar esse campo.");
+      }
+    }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
+  }
+
+  // tabs
+  var tabBar = el("tabBar");
+  TABS.forEach(function (t, i) {
+    var b = document.createElement("button");
+    b.className = "tab-btn" + (i === 0 ? " ativa" : "");
+    b.textContent = t.label;
+    b.onclick = function () {
+      document.querySelectorAll(".tab-btn").forEach(function (x) { x.classList.remove("ativa"); });
+      document.querySelectorAll(".tab-conteudo").forEach(function (x) { x.classList.remove("ativa"); });
+      b.classList.add("ativa");
+      document.querySelector(".tab-conteudo[data-tab='" + t.key + "']").classList.add("ativa");
+    };
+    tabBar.appendChild(b);
+  });
+  document.querySelector(".tab-conteudo[data-tab='" + TABS[0].key + "']").classList.add("ativa");
+
+  // campos genéricos, um grupo por aba
   CAMPOS.forEach(function (c) {
+    var destino = el("campos_" + c.tab);
     var div = document.createElement("div");
     div.className = "campo mb-4";
-    var input = c.tipo === "textarea" ? document.createElement("textarea") : document.createElement("input");
-    if (c.tipo !== "textarea") input.type = c.tipo;
+    var input = (c.tipo === "textarea" || c.tipo === "textarea_limite") ? document.createElement("textarea") : document.createElement("input");
+    if (c.tipo === "text" || c.tipo === "tel" || c.tipo === "number") input.type = c.tipo;
     input.id = "campo_" + c.key;
     div.innerHTML = "<label>" + c.label + "</label>";
     div.appendChild(input);
-    wrap.appendChild(div);
+    if (c.tipo === "textarea_limite") {
+      var contagem = document.createElement("div");
+      contagem.className = "text-xs text-right mt-1 text-slate-400";
+      contagem.id = "contagem_" + c.key;
+      div.appendChild(contagem);
+    }
+    destino.appendChild(div);
+    marcarLimpo(c.key);
+    input.addEventListener("blur", function () { autosaveCampo(c.key, input.value); });
+    input.addEventListener("input", function () {
+      if (savedValues[c.key] !== input.value) marcarSujo(c.key); else marcarLimpo(c.key);
+      if (c.tipo === "textarea_limite") {
+        var cont = el("contagem_" + c.key);
+        cont.textContent = input.value.length + " / " + LIMITE_CATALOGO + " caracteres";
+        cont.classList.toggle("text-rose-600", input.value.length > LIMITE_CATALOGO);
+      }
+    });
   });
 
   // grade de horários
   var gradeDiv = el("gradeHorarios");
+  function horariosAtuais() {
+    var g = {};
+    DIAS.forEach(function (d) {
+      var abre = el("abre_" + d.key).value, fecha = el("fecha_" + d.key).value;
+      g[d.key] = (abre && fecha) ? { abre: abre, fecha: fecha } : null;
+    });
+    return g;
+  }
+  function autosaveHorarios() {
+    var valor = JSON.stringify(horariosAtuais());
+    if (savedValues.horarios_estruturados === valor) return;
+    autosaveCampo("horarios_estruturados", valor);
+  }
   DIAS.forEach(function (d) {
     var row = document.createElement("div");
     row.className = "flex items-center gap-2";
     row.innerHTML =
-      '<span class="w-20 text-xs text-slate-600">' + d.label + '</span>' +
+      '<span class="w-20 text-xs text-slate-600 shrink-0">' + d.label + '</span>' +
       '<input type="time" id="abre_' + d.key + '" class="border border-slate-300 rounded-lg p-2 text-sm flex-1">' +
       '<span class="text-xs text-slate-400">até</span>' +
       '<input type="time" id="fecha_' + d.key + '" class="border border-slate-300 rounded-lg p-2 text-sm flex-1">';
     gradeDiv.appendChild(row);
+    row.querySelectorAll("input").forEach(function (inp) { inp.addEventListener("blur", autosaveHorarios); });
+  });
+  marcarLimpo("horarios_estruturados");
+
+  // confirmação automática
+  el("confirmacaoAutomatica").addEventListener("change", function () {
+    var v = el("confirmacaoAutomatica").value;
+    chamar("salvar", { confirmacao_automatica: v }).then(function (resp) {
+      if (resp.ok) {
+        savedValues.confirmacao_automatica = v;
+        toast(v === "PEDIR_AJUDA" ? "Pedido enviado! A equipe vai te procurar." : "Salvo ✓");
+      } else {
+        toast(resp.mensagem || "Não consegui salvar.");
+      }
+    }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
   });
 
   if (!token) {
-    elCarregando.classList.add("hidden");
-    elSemToken.classList.remove("hidden");
+    el("carregando").classList.add("hidden");
+    el("semToken").classList.remove("hidden");
     el("btnRecuperar").addEventListener("click", function () {
       var email = el("emailRecuperar").value.trim();
       if (!email) return;
@@ -144,17 +253,15 @@ var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda
   }
 
   function mostrarErro(msg) {
-    elCarregando.classList.add("hidden");
-    elErro.classList.remove("hidden");
-    elErro.textContent = msg;
+    el("carregando").classList.add("hidden");
+    el("erro").classList.remove("hidden");
+    el("erro").textContent = msg;
   }
 
-  var limiteAtual = 500;
-
   chamar("abrir").then(function (resp) {
-    elCarregando.classList.add("hidden");
+    el("carregando").classList.add("hidden");
     if (!resp.ok) { mostrarErro(resp.mensagem || "Não consegui abrir este link."); return; }
-    elConteudo.classList.remove("hidden");
+    el("conteudo").classList.remove("hidden");
 
     var roDiv = el("somenteLeitura");
     READONLY.forEach(function (c) {
@@ -168,60 +275,49 @@ var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda
     CAMPOS.forEach(function (c) {
       var v = (resp.editaveis || {})[c.key] || "";
       el("campo_" + c.key).value = v;
+      savedValues[c.key] = v;
     });
+
+    LIMITE_CATALOGO = resp.limite_catalogo || 500;
+    var cc = el("contagem_catalogo_de_vendas");
+    if (cc) cc.textContent = (resp.editaveis.catalogo_de_vendas || "").length + " / " + LIMITE_CATALOGO + " caracteres";
 
     var h = {};
     try { h = JSON.parse((resp.editaveis || {}).horarios_estruturados || "{}"); } catch (e) { h = {}; }
     DIAS.forEach(function (d) {
       var f = h[d.key];
-      if (f && f.abre && f.fecha) {
-        el("abre_" + d.key).value = f.abre;
-        el("fecha_" + d.key).value = f.fecha;
-      }
+      if (f && f.abre && f.fecha) { el("abre_" + d.key).value = f.abre; el("fecha_" + d.key).value = f.fecha; }
     });
+    savedValues.horarios_estruturados = JSON.stringify(horariosAtuais());
 
-    el("confirmacaoAutomatica").checked = String((resp.editaveis || {}).confirmacao_automatica).toUpperCase() === "SIM";
-
-    limiteAtual = resp.limite_catalogo || 500;
-    el("limite").textContent = limiteAtual;
-    el("catalogo").value = (resp.editaveis || {}).catalogo_de_vendas || "";
-    el("contagem").textContent = el("catalogo").value.length;
-    el("numeros").value = (resp.editaveis || {}).numeros_sem_ia || "";
+    var conf = (resp.editaveis || {}).confirmacao_automatica === "SIM" ? "SIM" : "NAO";
+    el("confirmacaoAutomatica").value = conf;
+    savedValues.confirmacao_automatica = conf;
 
   }).catch(function () {
     mostrarErro("Não consegui falar com o servidor. Tenta de novo em instantes.");
   });
 
-  el("catalogo").addEventListener("input", function () {
-    el("contagem").textContent = el("catalogo").value.length;
-    el("contagem").classList.toggle("text-rose-600", el("catalogo").value.length > limiteAtual);
-  });
-
   el("salvar").addEventListener("click", function () {
     var dados = {};
     CAMPOS.forEach(function (c) { dados[c.key] = el("campo_" + c.key).value; });
-    dados.catalogo_de_vendas = el("catalogo").value;
-    dados.numeros_sem_ia = el("numeros").value;
-    dados.confirmacao_automatica = el("confirmacaoAutomatica").checked ? "SIM" : "NAO";
-
-    var grade = {};
-    DIAS.forEach(function (d) {
-      var abre = el("abre_" + d.key).value, fecha = el("fecha_" + d.key).value;
-      grade[d.key] = (abre && fecha) ? { abre: abre, fecha: fecha } : null;
-    });
-    dados.horarios_estruturados = JSON.stringify(grade);
+    dados.horarios_estruturados = JSON.stringify(horariosAtuais());
+    dados.confirmacao_automatica = el("confirmacaoAutomatica").value;
 
     var btn = el("salvar");
     btn.disabled = true; btn.textContent = "Salvando...";
-    el("mensagemSalvar").textContent = "";
     chamar("salvar", dados).then(function (resp) {
-      btn.disabled = false; btn.textContent = "Salvar tudo";
-      el("mensagemSalvar").textContent = resp.mensagem || (resp.ok ? "Salvo!" : "Não consegui salvar.");
-      el("mensagemSalvar").className = "text-sm mt-3 " + (resp.ok ? "text-emerald-700" : "text-rose-700");
+      btn.textContent = "Salvar tudo";
+      if (resp.ok) {
+        Object.keys(dados).forEach(function (k) { savedValues[k] = dados[k]; marcarLimpo(k); });
+        toast("Tudo salvo ✓");
+      } else {
+        btn.disabled = false;
+        toast(resp.mensagem || "Não consegui salvar.");
+      }
     }).catch(function () {
       btn.disabled = false; btn.textContent = "Salvar tudo";
-      el("mensagemSalvar").textContent = "Erro ao salvar. Tenta de novo.";
-      el("mensagemSalvar").className = "text-sm mt-3 text-rose-700";
+      toast("Erro ao salvar. Tenta de novo.");
     });
   });
 })();
