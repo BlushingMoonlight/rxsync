@@ -104,8 +104,13 @@
             <select id="confirmacaoAutomatica">
               <option value="SIM">Sim, a assistente marca sozinha na agenda</option>
               <option value="NAO">Não, ela só conversa e não marca</option>
-              <option value="PEDIR_AJUDA">Quero ajuda da RXSync para configurar isso</option>
             </select>
+          </div>
+          <div class="mt-3">
+            <button id="btnPedirAjudaAgendamento" class="w-full border border-slate-300 hover:border-primary-900 text-slate-700 hover:text-primary-900 text-sm font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
+              <i data-lucide="life-buoy" class="w-4 h-4"></i> Preciso de ajuda para configurar isso
+            </button>
+            <div id="msgPedirAjuda" class="text-xs text-center mt-2 text-slate-500"></div>
           </div>
         </div>
         <div class="tab-conteudo" data-tab="ia"><div id="campos_ia"></div></div>
@@ -263,11 +268,21 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   el("confirmacaoAutomatica").addEventListener("change", function () {
     var v = el("confirmacaoAutomatica").value;
     chamar("salvar", { confirmacao_automatica: v }).then(function (resp) {
-      if (resp.ok) {
-        savedValues.confirmacao_automatica = v;
-        toast(v === "PEDIR_AJUDA" ? "Pedido enviado! A equipe vai te procurar." : "Salvo ✓");
-      } else { toast(resp.mensagem || "Não consegui salvar."); }
+      if (resp.ok) { savedValues.confirmacao_automatica = v; toast("Salvo ✓"); }
+      else { toast(resp.mensagem || "Não consegui salvar."); }
     }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
+  });
+
+  el("btnPedirAjudaAgendamento").addEventListener("click", function () {
+    var btn = el("btnPedirAjudaAgendamento");
+    btn.disabled = true;
+    chamar("salvar", { pedir_ajuda_agendamento: true }).then(function (resp) {
+      btn.disabled = false;
+      el("msgPedirAjuda").textContent = resp.ok ? "Pedido enviado! A equipe vai te procurar." : (resp.mensagem || "Não consegui enviar.");
+    }).catch(function () {
+      btn.disabled = false;
+      el("msgPedirAjuda").textContent = "Erro ao enviar. Tenta de novo.";
+    });
   });
 
   if (!token) {
