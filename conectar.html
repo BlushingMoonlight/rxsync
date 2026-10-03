@@ -144,12 +144,21 @@
 
   el("btnConfirmarTestar").addEventListener("click", function () {
     el("btnConfirmarTestar").disabled = true;
+    el("btnConfirmarTestar").textContent = "Preparando...";
     chamar("testar").then(function (resp) {
-      el("msgTestar").textContent = resp.mensagem || "Pedido enviado! Em breve a equipe te manda o link de teste por e-mail.";
       el("btnConfirmarTestar").disabled = false;
+      el("btnConfirmarTestar").textContent = "Quero testar antes";
+      if (resp.ok && resp.link) {
+        el("msgTestar").innerHTML =
+          (resp.mensagem || "Pronto!") +
+          '<br><a href="' + resp.link + '" target="_blank" class="inline-block mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 px-5 rounded-lg transition">Abrir meu ambiente de teste</a>';
+      } else {
+        el("msgTestar").textContent = resp.mensagem || "Pedido enviado! Em breve a equipe te manda o link de teste por e-mail.";
+      }
     }).catch(function () {
-      el("msgTestar").textContent = "Erro ao enviar o pedido. Tenta de novo.";
       el("btnConfirmarTestar").disabled = false;
+      el("btnConfirmarTestar").textContent = "Quero testar antes";
+      el("msgTestar").textContent = "Erro ao enviar o pedido. Tenta de novo.";
     });
   });
 })();
