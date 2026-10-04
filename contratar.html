@@ -123,7 +123,7 @@
         </div>
         <div><label class="rotulo" for="nome">Seu nome completo</label><input id="nome" class="campo" autocomplete="name"><p class="msg-erro" data-de="nome">Informe nome e sobrenome.</p></div>
         <div><label class="rotulo" for="clinica">Nome da clínica ou consultório</label><input id="clinica" class="campo" autocomplete="organization"><p class="msg-erro" data-de="clinica">Informe o nome do seu negócio.</p></div>
-        <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p></div>
+        <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p><p id="avisoEmailExiste" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">Esse e-mail já está em nossa base. Se continuar, os dados serão atualizados no cadastro já existente, em vez de criar um novo.</p></div>
         <div><label class="rotulo" for="whatsapp">Seu WhatsApp, com DDD</label><p class="text-xs text-slate-500 mb-2 leading-relaxed">É por aqui que falamos com você durante a implantação. Pode ser o seu pessoal, ou o de quem responde pela contratação.<br><strong class="text-slate-600">Não é o número que a assistente vai atender</strong> — esse você escolhe depois, na configuração.</p><input id="whatsapp" class="campo" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"><p class="msg-erro" data-de="whatsapp">Telefone inválido.</p></div>
       </div>
       <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
@@ -225,6 +225,26 @@
 
 <script>
 const WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
+
+document.addEventListener('DOMContentLoaded', function () {
+  const emailEl = document.getElementById('email');
+  const aviso = document.getElementById('avisoEmailExiste');
+  if (!emailEl || !aviso) return;
+  emailEl.addEventListener('blur', async function () {
+    const valor = emailEl.value.trim();
+    aviso.classList.add('hidden');
+    if (!valor || !valor.includes('@')) return;
+    try {
+      const r = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
+        body: JSON.stringify({ acao: 'checar_email', email: valor })
+      });
+      const d = await r.json();
+      if (d && d.existe) aviso.classList.remove('hidden');
+    } catch (e) { /* checagem é só um aviso; falhar aqui não deve travar o formulário */ }
+  });
+});
 // Chave de origem: não é segredo (fica visível no navegador), serve só para
 // descartar chamadas automatizadas triviais. A proteção real é o rate limit no n8n.
 const ORIGEM_CHAVE = 'rxsync-site-2026';
