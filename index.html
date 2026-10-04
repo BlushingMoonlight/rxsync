@@ -96,6 +96,11 @@
             .animate-pulse { animation: none; }
         }
         .faq-item.active .faq-icon { transform: rotate(180deg); }
+        .faq-tabs { scrollbar-width: none; }
+        .faq-tabs::-webkit-scrollbar { display: none; }
+        .faq-tab { background: #fff; color: #475569; border-color: #e2e8f0; }
+        .faq-tab:hover { color: #0f172a; border-color: #94a3b8; }
+        .faq-tab[aria-selected="true"] { background: #0f172a; color: #fff; border-color: #0f172a; }
         .mockup-scroll::-webkit-scrollbar { width: 4px; }
         .mockup-scroll::-webkit-scrollbar-track { background: transparent; }
         .mockup-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -178,33 +183,171 @@
           "mainEntity": [
             {
               "@type": "Question",
+              "name": "O paciente percebe que está falando com uma assistente virtual?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim, e isso é uma escolha nossa: a assistente se identifica como virtual já na primeira mensagem. A transparência com o paciente é o que a Resolução CFM nº 2.454/2026 espera de qualquer uso de IA em saúde, e é também o que sustenta a confiança na sua clínica. O que o paciente percebe na prática é resposta imediata, em português correto, a qualquer hora — inclusive nos momentos em que a recepção está, com toda razão, cuidando de quem está na frente dela."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "O que a IA faz quando chega uma mensagem de urgência?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Durante a implantação definimos com você as palavras e situações de urgência (por exemplo, sangramento). Quando uma delas aparece, a IA não continua a conversa: ela avisa o paciente que a mensagem será encaminhada e notifica você ou a equipe na hora, porque conduzir uma urgência cabe ao profissional. A IA considera o contexto — um relato antigo (“ano passado eu tive um sangramento”) não é tratado como urgência — e, quando a situação é nebulosa, pode pedir uma confirmação antes de decidir. A IA não substitui um serviço de emergência: em caso de risco imediato, o paciente deve procurar atendimento de urgência."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Posso assumir uma conversa quando quiser?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. Pelo botão de assumir conversa, a IA para de responder naquele atendimento e só você ou sua equipe falam com o paciente. A IA só volta a atender se o paciente escrever novamente depois de 24 horas. Nas conversas sem palavra de urgência, a escolha é sua: deixar a IA seguir ou assumir."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "A IA responde dúvidas médicas, como “esse remédio precisa ficar na geladeira?”",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não. Alinhada à Resolução CFM nº 2.454/2026, a IA atua exclusivamente no apoio administrativo: agendamentos, valores, convênios, horários, além de separar e encaminhar pedidos de exame, relatórios e outros assuntos administrativos. Ela não lê laudos, não orienta tratamento e não responde dúvidas clínicas. Esses assuntos vão para a sua equipe, e o paciente é avisado de que receberá o retorno."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "E os pacientes que preferem falar com uma pessoa ou têm dificuldade com tecnologia?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A IA se identifica como virtual desde a primeira mensagem e conversa por texto, áudio ou foto, como uma atendente humana faria. Se perceber que o paciente não está conseguindo se entender com ela, encaminha a conversa para a sua equipe. O tom também é ajustável: mais formal, mais direto ou mais acolhedor, conforme o perfil dos seus pacientes."
+              }
+            },
+            {
+              "@type": "Question",
               "name": "Nossa equipe precisa trocar de sistema ou assinar um CRM?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Não. Seu sistema de gestão e a sua agenda continuam sendo os mesmos e você não paga assinatura extra de CRM. A recepção passa a atender por um painel próprio, já configurado, com histórico completo do paciente, alertas de urgência e botão para assumir a conversa. Está incluso na mensalidade e treinamos sua equipe na implantação." }
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não. Seu sistema de gestão e a sua agenda continuam sendo os mesmos — nós nos conectamos a eles, você não migra nada e não paga assinatura extra de CRM. A única mudança na rotina da recepção é a tela: em vez do WhatsApp Web, sua equipe passa a atender por um painel próprio que já entregamos configurado, com o histórico completo de cada paciente, alertas de urgência e o botão para assumir a conversa. É mais simples que o WhatsApp Web, permite vários atendentes ao mesmo tempo e está incluso na mensalidade — treinamos sua equipe no dia da implantação."
+              }
             },
             {
               "@type": "Question",
               "name": "E se eu quiser só a IA no WhatsApp, sem integrar minha agenda?",
-              "acceptedAnswer": { "@type": "Answer", "text": "É possível e é para isso que existe o plano Essencial. Nele a IA atende o WhatsApp da clínica, responde dúvidas, informa valores, convênios e horários, sem nenhuma conexão com agenda ou prontuário." }
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Perfeitamente possível, e é exatamente para isso que existe o plano Essencial. Nele a IA atende o WhatsApp da clínica, responde dúvidas, informa valores, convênios e horários de funcionamento e organiza o que chega até a recepção — sem nenhuma conexão com agenda ou prontuário. Muitos consultórios começam assim, resolvem o problema do tempo de resposta e só depois avaliam a integração automática da agenda. Você nunca é obrigado a contratar o que não vai usar."
+              }
             },
             {
               "@type": "Question",
-              "name": "O paciente percebe que está falando com uma assistente virtual?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Sim, e por escolha nossa: a assistente se identifica como virtual logo na primeira mensagem. Transparência com o paciente é o que a Resolução CFM nº 2.454/2026 e as boas práticas de proteção de dados esperam de qualquer uso de IA em saúde." }
+              "name": "Com quais sistemas de agenda vocês se integram?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Integramos com o iClinic e com outros sistemas de agenda e prontuário do mercado. Se a sua clínica usa outro sistema, informe qual no formulário de contato e verificamos a integração antes da contratação."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Meus pacientes precisam abrir links ou instalar algum aplicativo para agendar?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não. Tudo acontece dentro do WhatsApp, por mensagem. Com a agenda integrada (plano Gestão Inteligente), a IA consulta os horários livres, sugere as opções mais próximas quando o horário pedido não está disponível e confirma no mesmo chat — sem link externo e sem o paciente precisar descobrir se o agendamento foi confirmado."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "A IA respeita tempos de consulta diferentes para convênio, particular e retorno?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. Na configuração você cadastra os serviços, os convênios atendidos e a duração de cada combinação (por exemplo, convênio, particular presencial, particular online e retorno, cada um com seu tempo). Com a agenda integrada, a IA pergunta se a consulta é por convênio, identifica qual e agenda no horário conforme a regra cadastrada. Você pode alterar esses tempos sempre que precisar."
+              }
             },
             {
               "@type": "Question",
               "name": "Eu preciso configurar a Inteligência Artificial?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Não. A RXSync cuida de todo o setup. Você envia os documentos de serviços e valores da clínica e a nossa equipe cria o fluxo, programa as regras de segurança e entrega o sistema validado e rodando." }
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Não. A RXSync cuida de todo o \"Setup White-Glove\". Você nos passa os documentos de serviços e valores da sua clínica, e a nossa engenharia cria o fluxo, programa as regras de segurança e entrega o sistema pronto, validado e rodando para você."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quanto trabalho dá preencher as informações da clínica?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O cadastro inicial (serviços, valores, convênios, durações, tom de voz) costuma levar cerca de 10 minutos. Se preferir, antes enviamos a lista dos dados necessários para você ver com calma, ou você nos manda documentos e o link do seu site e fazemos o cadastro por você. Não lemos site ou redes sociais automaticamente: o que a IA sabe sobre a sua clínica entra pelo cadastro que fazemos juntos."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Posso testar antes de colocar a IA no WhatsApp da clínica?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. Liberamos um número de teste para você e sua equipe conversarem com a IA como se fossem pacientes, e ajustamos o que for preciso antes de ela atender o WhatsApp oficial. Além disso, você tem sete dias para desistir sem custo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Como faço ajustes depois que a IA já está no ar?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "É só nos chamar pelo WhatsApp, direto com a nossa equipe: não há limite de ajustes nem prazo. Novo serviço, mudança de horário, convênio com outra duração, tom mais direto ou mais educado — fazemos e publicamos na hora. Mudanças simples você mesmo também pode fazer no painel de configurações."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Divido a clínica com outros médicos e uma secretária. A IA pode atender só o meu número?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Pode. A IA pode operar apenas no número de um profissional, enquanto a recepção continua atendendo os demais. Números que você não quer que a IA responda podem ser excluídos, e se mais tarde você quiser mudar a IA de número, fazemos a troca mantendo a configuração."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Como funciona o contrato e o pagamento?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Você recebe um link para assinar os termos e o contrato, sem nenhum pagamento nessa etapa. Depois da assinatura, começa a implantação. No plano mensal, sem fidelidade, você paga a mensalidade mais a taxa única de implantação de R$ 999 (que não é parcelada). No plano anual não há taxa de implantação, e há permanência de 12 meses. Em ambos você tem sete dias para desistir sem custo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Como as mensagens são contadas?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Conta cada mensagem trocada entre a IA e os pacientes, e não a conversa inteira. Cinco mil mensagens por mês equivalem a uma média de cerca de 166 por dia e costumam atender com folga um consultório de um a dois profissionais. Se a clínica passar do limite, avisamos antes e ajustamos o plano com você, sem cobrança surpresa."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Posso começar no plano Essencial e mudar depois?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. Você pode fazer o upgrade quando precisar de mais mensagens ou das funções do Gestão Inteligente, como integração direta com o prontuário, autoagendamento e lembretes anti-falta."
+              }
             },
             {
               "@type": "Question",
               "name": "Quem é o dono dos dados dos meus pacientes?",
-              "acceptedAnswer": { "@type": "Answer", "text": "A clínica, sempre. Perante a LGPD a clínica é a controladora dos dados e a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado." }
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "A sua clínica, sempre. Perante a LGPD, sua clínica é a controladora dos dados dos pacientes; a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado, sem uso comercial e sem utilizá-las para treinar modelos de inteligência artificial de terceiros."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Onde os dados dos meus pacientes ficam e por onde eles passam?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O armazenamento (histórico de conversas, cadastro, agendamentos) fica em servidor no Brasil, em banco de dados sem exposição à internet, com acesso individualizado, autenticação em dois fatores e cópias de segurança criptografadas. Todo o tráfego entre os sistemas é cifrado (TLS 1.2 ou superior). Para gerar a resposta, o trecho necessário da conversa é enviado ao provedor do modelo de inteligência artificial, cuja infraestrutura fica no exterior — o mesmo ocorre em qualquer solução de IA disponível hoje no mercado. Removemos identificadores diretos sempre que possível, essa transferência é formalizada no contrato com base no art. 33 da LGPD e nas cláusulas-padrão da Resolução ANPD nº 19/2024, e o provedor não utiliza esses dados para treinar seus modelos. Preferimos explicar isso na primeira reunião a deixar sua clínica descobrir depois."
+              }
             },
             {
               "@type": "Question",
               "name": "Existe risco de bloqueio do número de WhatsApp?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Seguimos protocolos rigorosos de aquecimento do número e boas práticas anti-spam para minimizar o risco. Também orientamos a manutenção de um número reserva para que a operação nunca fique parada." }
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Existe, e preferimos ser transparentes: qualquer número de WhatsApp pode ser restringido pela Meta, automatizado ou não. Por isso seguimos protocolos rigorosos de aquecimento, nunca fazemos disparos em massa ou para listas frias, e recomendamos que a clínica mantenha um número reserva. Se houver bloqueio, reconectamos sua operação no número reserva em até 1 dia útil. Para clínicas que preferem risco ainda menor, oferecemos a migração para a API Oficial da Meta, com custo por conversa repassado."
+              }
             }
           ]
         }
@@ -829,96 +972,276 @@
         <!-- FAQ -->
         <section id="faq" class="py-24 bg-slate-50">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
+                <div class="text-center mb-10">
                     <h2 class="text-3xl font-extrabold text-primary-900">Perguntas Frequentes</h2>
                     <p class="mt-4 text-slate-600">Esclareça suas dúvidas sobre a instalação e uso.</p>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">Nossa equipe precisa trocar de sistema ou assinar um CRM?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Não. Seu sistema de gestão e a sua agenda continuam sendo os mesmos — nós nos conectamos a eles, você não migra nada e não paga assinatura extra de CRM. A única mudança na rotina da recepção é a tela: em vez do WhatsApp Web, sua equipe passa a atender por um painel próprio que já entregamos configurado, com o histórico completo de cada paciente, alertas de urgência e o botão para assumir a conversa. É mais simples que o WhatsApp Web, permite vários atendentes ao mesmo tempo e está incluso na mensalidade — treinamos sua equipe no dia da implantação.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">E se eu quiser só a IA no WhatsApp, sem integrar minha agenda?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Perfeitamente possível, e é exatamente para isso que existe o plano Essencial. Nele a IA atende o WhatsApp da clínica, responde dúvidas, informa valores, convênios e horários de funcionamento e organiza o que chega até a recepção — sem nenhuma conexão com agenda ou prontuário. Muitos consultórios começam assim, resolvem o problema do tempo de resposta e só depois avaliam a integração automática da agenda. Você nunca é obrigado a contratar o que não vai usar.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">O paciente percebe que está falando com uma assistente virtual?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Sim, e isso é uma escolha nossa: a assistente se identifica como virtual já na primeira mensagem. A transparência com o paciente é o que a Resolução CFM nº 2.454/2026 espera de qualquer uso de IA em saúde, e é também o que sustenta a confiança na sua clínica. O que o paciente percebe na prática é resposta imediata, em português correto, a qualquer hora — inclusive nos momentos em que a recepção está, com toda razão, cuidando de quem está na frente dela.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">Eu preciso configurar a Inteligência Artificial?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Não. A RXSync cuida de todo o "Setup White-Glove". Você nos passa os documentos de serviços e valores da sua clínica, e a nossa engenharia cria o fluxo, programa as regras de segurança e entrega o sistema pronto, validado e rodando para você.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">Quem é o dono dos dados dos meus pacientes?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                A sua clínica, sempre. Perante a LGPD, sua clínica é a controladora dos dados dos pacientes; a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado, sem uso comercial e sem utilizá-las para treinar modelos de inteligência artificial de terceiros.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">Onde os dados dos meus pacientes ficam e por onde eles passam?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                O armazenamento (histórico de conversas, cadastro, agendamentos) fica em servidor no Brasil, em banco de dados sem exposição à internet, com acesso individualizado, autenticação em dois fatores e cópias de segurança criptografadas. Todo o tráfego entre os sistemas é cifrado (TLS 1.2 ou superior). Para gerar a resposta, o trecho necessário da conversa é enviado ao provedor do modelo de inteligência artificial, cuja infraestrutura fica no exterior — o mesmo ocorre em qualquer solução de IA disponível hoje no mercado. Removemos identificadores diretos sempre que possível, essa transferência é formalizada no contrato com base no art. 33 da LGPD e nas cláusulas-padrão da Resolução ANPD nº 19/2024, e o provedor não utiliza esses dados para treinar seus modelos. Preferimos explicar isso na primeira reunião a deixar sua clínica descobrir depois.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                        <button class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
-                            <span class="font-bold text-primary-900">Existe risco de bloqueio do número de WhatsApp?</span>
-                            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-slate-400 transition-transform duration-300"></i>
-                        </button>
-                        <div class="faq-content bg-slate-50">
-                            <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                Existe, e preferimos ser transparentes: qualquer número de WhatsApp pode ser restringido pela Meta, automatizado ou não. Por isso seguimos protocolos rigorosos de aquecimento, nunca fazemos disparos em massa ou para listas frias, e recomendamos que a clínica mantenha um número reserva. Se houver bloqueio, reconectamos sua operação no número reserva em até 1 dia útil. Para clínicas que preferem risco ainda menor, oferecemos a migração para a API Oficial da Meta, com custo por conversa repassado.
-                            </div>
-                        </div>
-                    </div>
+                <div role="tablist" aria-label="Categorias de perguntas frequentes" class="faq-tabs flex gap-2 overflow-x-auto pb-2 mb-6 sm:flex-wrap sm:justify-center sm:overflow-visible">
+                    <button type="button" role="tab" id="faq-tab-0" data-faq-tab="0" aria-controls="faq-panel-0" aria-selected="true" tabindex="0" onclick="showFaqTab(0)" class="faq-tab shrink-0 px-4 py-2 rounded-full text-sm font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Atendimento e IA</button>
+                    <button type="button" role="tab" id="faq-tab-1" data-faq-tab="1" aria-controls="faq-panel-1" aria-selected="false" tabindex="-1" onclick="showFaqTab(1)" class="faq-tab shrink-0 px-4 py-2 rounded-full text-sm font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Agenda e integrações</button>
+                    <button type="button" role="tab" id="faq-tab-2" data-faq-tab="2" aria-controls="faq-panel-2" aria-selected="false" tabindex="-1" onclick="showFaqTab(2)" class="faq-tab shrink-0 px-4 py-2 rounded-full text-sm font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Implantação e suporte</button>
+                    <button type="button" role="tab" id="faq-tab-3" data-faq-tab="3" aria-controls="faq-panel-3" aria-selected="false" tabindex="-1" onclick="showFaqTab(3)" class="faq-tab shrink-0 px-4 py-2 rounded-full text-sm font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Planos e contratação</button>
+                    <button type="button" role="tab" id="faq-tab-4" data-faq-tab="4" aria-controls="faq-panel-4" aria-selected="false" tabindex="-1" onclick="showFaqTab(4)" class="faq-tab shrink-0 px-4 py-2 rounded-full text-sm font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">Dados e segurança</button>
                 </div>
+
+                    <div role="tabpanel" id="faq-panel-0" aria-labelledby="faq-tab-0" class="faq-panel space-y-4">
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">O paciente percebe que está falando com uma assistente virtual?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Sim, e isso é uma escolha nossa: a assistente se identifica como virtual já na primeira mensagem. A transparência com o paciente é o que a Resolução CFM nº 2.454/2026 espera de qualquer uso de IA em saúde, e é também o que sustenta a confiança na sua clínica. O que o paciente percebe na prática é resposta imediata, em português correto, a qualquer hora — inclusive nos momentos em que a recepção está, com toda razão, cuidando de quem está na frente dela.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">O que a IA faz quando chega uma mensagem de urgência?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Durante a implantação definimos com você as palavras e situações de urgência (por exemplo, sangramento). Quando uma delas aparece, a IA não continua a conversa: ela avisa o paciente que a mensagem será encaminhada e notifica você ou a equipe na hora, porque conduzir uma urgência cabe ao profissional. A IA considera o contexto — um relato antigo (“ano passado eu tive um sangramento”) não é tratado como urgência — e, quando a situação é nebulosa, pode pedir uma confirmação antes de decidir. A IA não substitui um serviço de emergência: em caso de risco imediato, o paciente deve procurar atendimento de urgência.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Posso assumir uma conversa quando quiser?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Sim. Pelo botão de assumir conversa, a IA para de responder naquele atendimento e só você ou sua equipe falam com o paciente. A IA só volta a atender se o paciente escrever novamente depois de 24 horas. Nas conversas sem palavra de urgência, a escolha é sua: deixar a IA seguir ou assumir.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">A IA responde dúvidas médicas, como “esse remédio precisa ficar na geladeira?”</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Não. Alinhada à Resolução CFM nº 2.454/2026, a IA atua exclusivamente no apoio administrativo: agendamentos, valores, convênios, horários, além de separar e encaminhar pedidos de exame, relatórios e outros assuntos administrativos. Ela não lê laudos, não orienta tratamento e não responde dúvidas clínicas. Esses assuntos vão para a sua equipe, e o paciente é avisado de que receberá o retorno.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">E os pacientes que preferem falar com uma pessoa ou têm dificuldade com tecnologia?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    A IA se identifica como virtual desde a primeira mensagem e conversa por texto, áudio ou foto, como uma atendente humana faria. Se perceber que o paciente não está conseguindo se entender com ela, encaminha a conversa para a sua equipe. O tom também é ajustável: mais formal, mais direto ou mais acolhedor, conforme o perfil dos seus pacientes.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="faq-panel-1" aria-labelledby="faq-tab-1" class="faq-panel space-y-4 hidden">
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Nossa equipe precisa trocar de sistema ou assinar um CRM?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Não. Seu sistema de gestão e a sua agenda continuam sendo os mesmos — nós nos conectamos a eles, você não migra nada e não paga assinatura extra de CRM. A única mudança na rotina da recepção é a tela: em vez do WhatsApp Web, sua equipe passa a atender por um painel próprio que já entregamos configurado, com o histórico completo de cada paciente, alertas de urgência e o botão para assumir a conversa. É mais simples que o WhatsApp Web, permite vários atendentes ao mesmo tempo e está incluso na mensalidade — treinamos sua equipe no dia da implantação.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">E se eu quiser só a IA no WhatsApp, sem integrar minha agenda?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Perfeitamente possível, e é exatamente para isso que existe o plano Essencial. Nele a IA atende o WhatsApp da clínica, responde dúvidas, informa valores, convênios e horários de funcionamento e organiza o que chega até a recepção — sem nenhuma conexão com agenda ou prontuário. Muitos consultórios começam assim, resolvem o problema do tempo de resposta e só depois avaliam a integração automática da agenda. Você nunca é obrigado a contratar o que não vai usar.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Com quais sistemas de agenda vocês se integram?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Integramos com o iClinic e com outros sistemas de agenda e prontuário do mercado. Se a sua clínica usa outro sistema, informe qual no formulário de contato e verificamos a integração antes da contratação.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Meus pacientes precisam abrir links ou instalar algum aplicativo para agendar?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Não. Tudo acontece dentro do WhatsApp, por mensagem. Com a agenda integrada (plano Gestão Inteligente), a IA consulta os horários livres, sugere as opções mais próximas quando o horário pedido não está disponível e confirma no mesmo chat — sem link externo e sem o paciente precisar descobrir se o agendamento foi confirmado.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">A IA respeita tempos de consulta diferentes para convênio, particular e retorno?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Sim. Na configuração você cadastra os serviços, os convênios atendidos e a duração de cada combinação (por exemplo, convênio, particular presencial, particular online e retorno, cada um com seu tempo). Com a agenda integrada, a IA pergunta se a consulta é por convênio, identifica qual e agenda no horário conforme a regra cadastrada. Você pode alterar esses tempos sempre que precisar.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="faq-panel-2" aria-labelledby="faq-tab-2" class="faq-panel space-y-4 hidden">
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Eu preciso configurar a Inteligência Artificial?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Não. A RXSync cuida de todo o "Setup White-Glove". Você nos passa os documentos de serviços e valores da sua clínica, e a nossa engenharia cria o fluxo, programa as regras de segurança e entrega o sistema pronto, validado e rodando para você.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Quanto trabalho dá preencher as informações da clínica?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    O cadastro inicial (serviços, valores, convênios, durações, tom de voz) costuma levar cerca de 10 minutos. Se preferir, antes enviamos a lista dos dados necessários para você ver com calma, ou você nos manda documentos e o link do seu site e fazemos o cadastro por você. Não lemos site ou redes sociais automaticamente: o que a IA sabe sobre a sua clínica entra pelo cadastro que fazemos juntos.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Posso testar antes de colocar a IA no WhatsApp da clínica?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Sim. Liberamos um número de teste para você e sua equipe conversarem com a IA como se fossem pacientes, e ajustamos o que for preciso antes de ela atender o WhatsApp oficial. Além disso, você tem sete dias para desistir sem custo.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Como faço ajustes depois que a IA já está no ar?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    É só nos chamar pelo WhatsApp, direto com a nossa equipe: não há limite de ajustes nem prazo. Novo serviço, mudança de horário, convênio com outra duração, tom mais direto ou mais educado — fazemos e publicamos na hora. Mudanças simples você mesmo também pode fazer no painel de configurações.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Divido a clínica com outros médicos e uma secretária. A IA pode atender só o meu número?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Pode. A IA pode operar apenas no número de um profissional, enquanto a recepção continua atendendo os demais. Números que você não quer que a IA responda podem ser excluídos, e se mais tarde você quiser mudar a IA de número, fazemos a troca mantendo a configuração.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="faq-panel-3" aria-labelledby="faq-tab-3" class="faq-panel space-y-4 hidden">
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Como funciona o contrato e o pagamento?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Você recebe um link para assinar os termos e o contrato, sem nenhum pagamento nessa etapa. Depois da assinatura, começa a implantação. No plano mensal, sem fidelidade, você paga a mensalidade mais a taxa única de implantação de R$ 999 (que não é parcelada). No plano anual não há taxa de implantação, e há permanência de 12 meses. Em ambos você tem sete dias para desistir sem custo.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Como as mensagens são contadas?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Conta cada mensagem trocada entre a IA e os pacientes, e não a conversa inteira. Cinco mil mensagens por mês equivalem a uma média de cerca de 166 por dia e costumam atender com folga um consultório de um a dois profissionais. Se a clínica passar do limite, avisamos antes e ajustamos o plano com você, sem cobrança surpresa.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Posso começar no plano Essencial e mudar depois?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Sim. Você pode fazer o upgrade quando precisar de mais mensagens ou das funções do Gestão Inteligente, como integração direta com o prontuário, autoagendamento e lembretes anti-falta.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="faq-panel-4" aria-labelledby="faq-tab-4" class="faq-panel space-y-4 hidden">
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Quem é o dono dos dados dos meus pacientes?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    A sua clínica, sempre. Perante a LGPD, sua clínica é a controladora dos dados dos pacientes; a RXSync atua apenas como operadora técnica, processando as informações estritamente para prestar o serviço contratado, sem uso comercial e sem utilizá-las para treinar modelos de inteligência artificial de terceiros.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Onde os dados dos meus pacientes ficam e por onde eles passam?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    O armazenamento (histórico de conversas, cadastro, agendamentos) fica em servidor no Brasil, em banco de dados sem exposição à internet, com acesso individualizado, autenticação em dois fatores e cópias de segurança criptografadas. Todo o tráfego entre os sistemas é cifrado (TLS 1.2 ou superior). Para gerar a resposta, o trecho necessário da conversa é enviado ao provedor do modelo de inteligência artificial, cuja infraestrutura fica no exterior — o mesmo ocorre em qualquer solução de IA disponível hoje no mercado. Removemos identificadores diretos sempre que possível, essa transferência é formalizada no contrato com base no art. 33 da LGPD e nas cláusulas-padrão da Resolução ANPD nº 19/2024, e o provedor não utiliza esses dados para treinar seus modelos. Preferimos explicar isso na primeira reunião a deixar sua clínica descobrir depois.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                            <button class="w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none" onclick="toggleFaq(this)" aria-expanded="false">
+                                <span class="font-bold text-primary-900">Existe risco de bloqueio do número de WhatsApp?</span>
+                                <i data-lucide="chevron-down" class="faq-icon w-5 h-5 shrink-0 text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="faq-content bg-slate-50">
+                                <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
+                                    Existe, e preferimos ser transparentes: qualquer número de WhatsApp pode ser restringido pela Meta, automatizado ou não. Por isso seguimos protocolos rigorosos de aquecimento, nunca fazemos disparos em massa ou para listas frias, e recomendamos que a clínica mantenha um número reserva. Se houver bloqueio, reconectamos sua operação no número reserva em até 1 dia útil. Para clínicas que preferem risco ainda menor, oferecemos a migração para a API Oficial da Meta, com custo por conversa repassado.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </section>
 
@@ -1062,6 +1385,31 @@
             faqItem.classList.toggle('active');
             button.setAttribute('aria-expanded', faqItem.classList.contains('active'));
         }
+
+        // FAQ Tabs
+        function showFaqTab(index, focus) {
+            document.querySelectorAll('.faq-item.active').forEach(item => {
+                item.classList.remove('active');
+                item.querySelector('button').setAttribute('aria-expanded', 'false');
+            });
+            document.querySelectorAll('[data-faq-tab]').forEach(tab => {
+                const ativa = Number(tab.dataset.faqTab) === index;
+                tab.setAttribute('aria-selected', ativa);
+                tab.setAttribute('tabindex', ativa ? '0' : '-1');
+                if (ativa && focus) tab.focus();
+            });
+            document.querySelectorAll('.faq-panel').forEach((panel, i) => {
+                panel.classList.toggle('hidden', i !== index);
+            });
+        }
+        document.querySelectorAll('[data-faq-tab]').forEach(tab => {
+            tab.addEventListener('keydown', e => {
+                const total = document.querySelectorAll('[data-faq-tab]').length;
+                const atual = Number(tab.dataset.faqTab);
+                if (e.key === 'ArrowRight') { e.preventDefault(); showFaqTab((atual + 1) % total, true); }
+                if (e.key === 'ArrowLeft') { e.preventDefault(); showFaqTab((atual - 1 + total) % total, true); }
+            });
+        });
 
         // Mobile Menu
         const btn = document.getElementById('mobile-menu-btn');
@@ -1212,4 +1560,4 @@
         })(document, "script");
     </script>
 </body>
-</html>
+</html
