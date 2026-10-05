@@ -124,7 +124,7 @@
         <div><label class="rotulo" for="nome">Seu nome completo</label><input id="nome" class="campo" autocomplete="name"><p class="msg-erro" data-de="nome">Informe nome e sobrenome.</p></div>
         <div><label class="rotulo" for="clinica">Nome da clínica ou consultório</label><input id="clinica" class="campo" autocomplete="organization"><p class="msg-erro" data-de="clinica">Informe o nome do seu negócio.</p></div>
         <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p><p id="avisoEmailExiste" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">Esse e-mail já está em nossa base. Se continuar, os dados serão atualizados no cadastro já existente, em vez de criar um novo.</p></div>
-        <div><label class="rotulo" for="whatsapp">Seu WhatsApp, com DDD</label><p class="text-xs text-slate-500 mb-2 leading-relaxed">É por aqui que falamos com você durante a implantação. Pode ser o seu pessoal, ou o de quem responde pela contratação.<br><strong class="text-slate-600">Não é o número que a assistente vai atender</strong> — esse você escolhe depois, na configuração.</p><input id="whatsapp" class="campo" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"><p class="msg-erro" data-de="whatsapp">Telefone inválido.</p></div>
+        <div><label class="rotulo" for="whatsapp">Seu WhatsApp, com DDD</label><p class="text-xs text-slate-500 mb-2 leading-relaxed">É por hierarquia que falamos com você durante a implantação. Pode ser o seu pessoal, ou o de quem responde pela contratação.<br><strong class="text-slate-600">Não é o número que a assistente vai atender</strong> — esse você escolhe depois, na configuração.</p><input id="whatsapp" class="campo" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"><p class="msg-erro" data-de="whatsapp">Telefone inválido.</p></div>
       </div>
       <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
       <p class="text-xs text-slate-400 mt-4 text-center">Seus dados são usados apenas para esta contratação.</p>
@@ -224,36 +224,7 @@
 </script>
 
 <script>
-// --- ATUALIZAÇÃO: DUAL WEBHOOK ---
-const OLD_WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
-const NEW_WEBHOOK = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cadastro';
-
-// Função auxiliar para enviar para os dois ambientes simultaneamente
-function fetchDual(payload) {
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-rxsync-origem': ORIGEM_CHAVE
-        },
-        body: JSON.stringify(payload)
-    };
-
-    return Promise.allSettled([
-        fetch(OLD_WEBHOOK, requestOptions),
-        fetch(NEW_WEBHOOK, requestOptions)
-    ])
-    .then((results) => {
-        // Baseamos a resposta do site sempre no n8n de produção original
-        const resProducao = results[0];
-        if (resProducao.status === 'fulfilled' && resProducao.value.ok) {
-            return resProducao.value; // Retorna a response para ser lida (ex: .json())
-        } else {
-            throw new Error('Falha na comunicação com o servidor principal.');
-        }
-    });
-}
-// -----------------------------------
+const WEBHOOK = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cadastro';
 
 document.addEventListener('DOMContentLoaded', function () {
   const emailEl = document.getElementById('email');
@@ -264,15 +235,17 @@ document.addEventListener('DOMContentLoaded', function () {
     aviso.classList.add('hidden');
     if (!valor || !valor.includes('@')) return;
     try {
-      // Usa a nova função dual
-      const r = await fetchDual({ acao: 'checar_email', email: valor });
+      const r = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
+        body: JSON.stringify({ acao: 'checar_email', email: valor })
+      });
       const d = await r.json();
       if (d && d.existe) aviso.classList.remove('hidden');
     } catch (e) { /* checagem é só um aviso; falhar aqui não deve travar o formulário */ }
   });
 });
-// Chave de origem: não é segredo (fica visível no navegador), serve só para
-// descartar chamadas automatizadas triviais. A proteção real é o rate limit no n8n.
+
 const ORIGEM_CHAVE = 'rxsync-site-2026';
 const VERSAO = '2026-09-v1';
 
@@ -306,7 +279,7 @@ let forma = 'parcelado';
 let tipo  = 'pj';
 let etapa = 1;
 const INICIO = Date.now();
-let CLIENTE_ID = '';   // devolvido pelo n8n quando o lead é registrado
+let CLIENTE_ID = '';
 let LEAD_ENVIADO = false;
 
 const sel = (on) => on ? 'border-primary-900 bg-primary-900 text-white' : 'border-slate-200 text-slate-600 bg-white';
@@ -367,7 +340,6 @@ document.querySelectorAll('.btnTipo').forEach(b => b.onclick = () => {
   }
 });
 
-/* ---------- máscaras ---------- */
 const dig = v => (v || '').replace(/\D/g, '');
 function mascara(el, fn, max) {
   el.addEventListener('input', () => {
@@ -387,7 +359,6 @@ mascara(document.getElementById('cep'), d => d.replace(/(\d{5})(\d)/, '$1-$2'), 
 mascara(document.getElementById('cnpj'), d =>
   d.replace(/(\d{2})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2'), 14);
 
-/* ---------- validações ---------- */
 function cpfOk(v) {
   const c = dig(v);
   if (c.length !== 11 || /^(\d)\1{10}$/.test(c)) return false;
@@ -477,36 +448,37 @@ function mostrar(n) {
 }
 document.querySelectorAll('.proximo').forEach(b => b.onclick = () => {
   if (!validarEtapa(etapa)) return;
-  if (etapa === 1) registrarLead();   // grava o lead antes do aceite
+  if (etapa === 1) registrarLead();
   mostrar(etapa + 1);
 });
 
-// Registra o interessado assim que temos nome, clínica, e-mail e WhatsApp.
-// Se ele abandonar antes de aceitar os termos, ainda assim sabemos que existiu.
 async function registrarLead() {
   if (LEAD_ENVIADO) return;
   LEAD_ENVIADO = true;
   const v = id => (document.getElementById(id).value || '').trim();
   try {
-    // Usa a nova função dual
-    const r = await fetchDual({
-      _evento: 'lead',
-      status: 'Lead sem aceite',
-      produto: 'Clinica',
-      tipo_negocio: 'clínica médica',
-      representante_nome: v('nome'),
-      email: v('email'),
-      telefone: dig(v('whatsapp')),
-      plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
-      observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
-      _nome_fantasia: v('clinica'),
-      _ciclo: ciclo,
-      _origem: document.referrer || 'direto'
+    const r = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
+      body: JSON.stringify({
+        _evento: 'lead',
+        status: 'Lead sem aceite',
+        produto: 'Clinica',
+        tipo_negocio: 'clínica médica',
+        representante_nome: v('nome'),
+        email: v('email'),
+        telefone: dig(v('whatsapp')),
+        plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
+        observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
+        _nome_fantasia: v('clinica'),
+        _ciclo: ciclo,
+        _origem: document.referrer || 'direto'
+      })
     });
     const j = await r.json().catch(() => ({}));
     if (j && j.cliente_id) CLIENTE_ID = j.cliente_id;
   } catch (e) {
-    LEAD_ENVIADO = false;   // deixa tentar de novo se falhar
+    LEAD_ENVIADO = false;
   }
 }
 document.querySelectorAll('.voltar').forEach(b => b.onclick = () => mostrar(etapa - 1));
@@ -594,9 +566,12 @@ document.getElementById('form').addEventListener('submit', async ev => {
   };
 
   try {
-    // Usa a nova função dual
-    await fetchDual(dados);
-    
+    const r = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
+      body: JSON.stringify(dados)
+    });
+    if (!r.ok) throw new Error();
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
     document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
@@ -610,7 +585,6 @@ document.getElementById('form').addEventListener('submit', async ev => {
   }
 });
 
-/* consulta de CEP */
 const cepEl = document.getElementById('cep'), cepMsg = document.getElementById('cepMsg');
 function abrirEndereco() { document.getElementById('blocoEndereco').className = 'space-y-4'; }
 async function buscarCep() {
@@ -638,7 +612,6 @@ async function buscarCep() {
 cepEl.addEventListener('blur', buscarCep);
 cepEl.addEventListener('input', () => { if (dig(cepEl.value).length === 8) buscarCep(); });
 
-/* titular do CPF: reaproveita o nome da etapa 1 */
 document.getElementById('cpf').addEventListener('blur', () => {
   const t = document.getElementById('titular');
   if (!t.value) t.value = document.getElementById('nome').value.trim();
@@ -651,7 +624,6 @@ function enderecoCompleto() {
     .filter(s => s && s !== 'CEP ').join(', ');
 }
 
-/* consulta de CNPJ */
 const cnpjEl = document.getElementById('cnpj'), cnpjMsg = document.getElementById('cnpjMsg');
 cnpjEl.addEventListener('blur', async () => {
   if (!cnpjOk(cnpjEl.value)) return;
