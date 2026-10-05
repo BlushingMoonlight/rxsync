@@ -138,6 +138,13 @@
 
       <div class="px-6 sm:px-8 pb-6">
         <button id="salvar" class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-3 rounded-lg transition" disabled>Salvar tudo</button>
+        <div id="cardTeste" class="mt-4 border border-slate-200 rounded-xl p-4 bg-slate-50">
+          <div class="text-sm font-semibold text-slate-900">Testar minha assistente</div>
+          <p class="text-xs text-slate-500 mt-1 mb-3">Gera um link para conversar com a assistente com as informações acima, sem risco: as mensagens do teste não chegam a nenhum paciente.</p>
+          <button id="btnTeste" class="w-full border border-slate-300 hover:border-slate-500 text-slate-700 text-sm font-semibold py-2.5 rounded-lg transition">Salvar e gerar link de teste</button>
+          <div id="testeAviso" class="hidden mt-3 text-xs bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3"></div>
+          <div id="testeRes" class="hidden mt-3 text-sm text-slate-700"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -454,6 +461,57 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   }
   el("agNovo").addEventListener("click", function () { agForm(null); });
 
+
+  // ===== TESTE DA ASSISTENTE =====
+  var CONECTAR_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/conectar";
+  function chamarConectar(acao, extra) {
+    var body = { token: savedValues._token_conexao || "", acao: acao };
+    Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
+    return fetch(CONECTAR_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+  }
+  function salvarPendentes() {
+    var sujo = Object.keys(dirty).some(function (k) { return dirty[k]; });
+    if (!sujo) return Promise.resolve(true);
+    var dados = {};
+    CAMPOS.forEach(function (c) { dados[c.key] = el("campo_" + c.key).value; });
+    dados.horarios_estruturados = JSON.stringify(horariosAtuais());
+    dados.confirmacao_automatica = el("confirmacaoAutomatica").value;
+    return chamar("salvar", dados).then(function (resp) {
+      if (!resp.ok) return false;
+      Object.keys(dados).forEach(function (k) { savedValues[k] = dados[k]; marcarLimpo(k); });
+      return true;
+    });
+  }
+  function gerarTeste(confirmar) {
+    var b = el("btnTeste"), av = el("testeAviso"), res = el("testeRes");
+    if (!savedValues._token_conexao) { toast("Link de conexão indisponível. Fale com a RXSync."); return; }
+    b.disabled = true; b.textContent = "Salvando e gerando...";
+    av.classList.add("hidden"); res.classList.add("hidden");
+    salvarPendentes().then(function (ok) {
+      if (!ok) throw new Error("salvar");
+      return chamarConectar("testar", { confirmar: !!confirmar });
+    }).then(function (r) {
+      b.disabled = false; b.textContent = "Salvar e gerar link de teste";
+      if (r.ok && r.link) {
+        res.innerHTML = "";
+        res.appendChild(h$("div", "mb-2", r.mensagem || "Pronto! Também enviamos por e-mail."));
+        var a = h$("a", "inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 px-5 rounded-lg", "Abrir meu ambiente de teste");
+        a.href = r.link; a.target = "_blank"; a.rel = "noopener"; res.appendChild(a);
+        res.appendChild(h$("div", "text-xs text-slate-500 mt-3", "Enquanto o teste estiver ativo, o WhatsApp da clínica fica pausado. Para voltar a atender no WhatsApp, use o link \"Reconectar\" na aba Contato."));
+        res.classList.remove("hidden");
+      } else if (r.precisa_confirmar) {
+        av.innerHTML = "";
+        av.appendChild(h$("div", "font-semibold mb-1", "Atenção: seu WhatsApp está conectado"));
+        av.appendChild(h$("div", "mb-3", "Ao ativar o teste, a assistente para de responder no WhatsApp da clínica até você reconectar. Tem certeza?"));
+        var row = h$("div", "flex gap-2");
+        var sim = h$("button", "bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-2 rounded-lg", "Sim, ativar teste"); sim.onclick = function () { gerarTeste(true); };
+        var nao = h$("button", "border border-amber-300 text-amber-900 font-semibold px-3 py-2 rounded-lg", "Cancelar"); nao.onclick = function () { av.classList.add("hidden"); };
+        row.appendChild(sim); row.appendChild(nao); av.appendChild(row); av.classList.remove("hidden");
+      } else { toast(r.mensagem || "Não consegui gerar o teste."); }
+    }).catch(function () { b.disabled = false; b.textContent = "Salvar e gerar link de teste"; toast("Erro ao gerar o teste. Tenta de novo."); });
+  }
+  el("btnTeste").addEventListener("click", function () { gerarTeste(false); });
+
   chamar("abrir").then(function (resp) {
     el("carregando").classList.add("hidden");
     if (!resp.ok) { mostrarErro(resp.mensagem || "Não consegui abrir este link."); return; }
@@ -522,4 +580,4 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
 })();
 </script>
 </body>
-</html
+</htm
