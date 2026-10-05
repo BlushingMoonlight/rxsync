@@ -224,7 +224,36 @@
 </script>
 
 <script>
-const WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
+// --- ATUALIZAÇÃO: DUAL WEBHOOK ---
+const OLD_WEBHOOK = 'https://n8n.rxsync.com.br/webhook/cadastro';
+const NEW_WEBHOOK = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cadastro';
+
+// Função auxiliar para enviar para os dois ambientes simultaneamente
+function fetchDual(payload) {
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-rxsync-origem': ORIGEM_CHAVE
+        },
+        body: JSON.stringify(payload)
+    };
+
+    return Promise.allSettled([
+        fetch(OLD_WEBHOOK, requestOptions),
+        fetch(NEW_WEBHOOK, requestOptions)
+    ])
+    .then((results) => {
+        // Baseamos a resposta do site sempre no n8n de produção original
+        const resProducao = results[0];
+        if (resProducao.status === 'fulfilled' && resProducao.value.ok) {
+            return resProducao.value; // Retorna a response para ser lida (ex: .json())
+        } else {
+            throw new Error('Falha na comunicação com o servidor principal.');
+        }
+    });
+}
+// -----------------------------------
 
 document.addEventListener('DOMContentLoaded', function () {
   const emailEl = document.getElementById('email');
@@ -235,11 +264,8 @@ document.addEventListener('DOMContentLoaded', function () {
     aviso.classList.add('hidden');
     if (!valor || !valor.includes('@')) return;
     try {
-      const r = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
-        body: JSON.stringify({ acao: 'checar_email', email: valor })
-      });
+      // Usa a nova função dual
+      const r = await fetchDual({ acao: 'checar_email', email: valor });
       const d = await r.json();
       if (d && d.existe) aviso.classList.remove('hidden');
     } catch (e) { /* checagem é só um aviso; falhar aqui não deve travar o formulário */ }
@@ -462,27 +488,20 @@ async function registrarLead() {
   LEAD_ENVIADO = true;
   const v = id => (document.getElementById(id).value || '').trim();
   try {
-    const r = await fetch(WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
-      body: JSON.stringify({
-        _evento: 'lead',
-        status: 'Lead sem aceite',
-        // Classificação da linha. O 2/4 usa 'produto' para escolher o domínio
-        // do link de onboarding, e a IA de atendimento usa 'tipo_negocio'
-        // para achar o roteiro do nicho na aba "nichos".
-        // 'clínica médica' precisa do acento: é o valor exato daquela aba.
-        produto: 'Clinica',
-        tipo_negocio: 'clínica médica',
-        representante_nome: v('nome'),
-        email: v('email'),
-        telefone: dig(v('whatsapp')),
-        plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
-        observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
-        _nome_fantasia: v('clinica'),
-        _ciclo: ciclo,
-        _origem: document.referrer || 'direto'
-      })
+    // Usa a nova função dual
+    const r = await fetchDual({
+      _evento: 'lead',
+      status: 'Lead sem aceite',
+      produto: 'Clinica',
+      tipo_negocio: 'clínica médica',
+      representante_nome: v('nome'),
+      email: v('email'),
+      telefone: dig(v('whatsapp')),
+      plano: plano === 'gestao' ? 'Gestao' : 'Essencial',
+      observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
+      _nome_fantasia: v('clinica'),
+      _ciclo: ciclo,
+      _origem: document.referrer || 'direto'
     });
     const j = await r.json().catch(() => ({}));
     if (j && j.cliente_id) CLIENTE_ID = j.cliente_id;
@@ -528,10 +547,8 @@ document.getElementById('form').addEventListener('submit', async ev => {
   const v = id => (document.getElementById(id).value || '').trim();
   const P = PLANOS[plano];
 
-  // As chaves abaixo têm exatamente o nome das colunas da aba "cadastro" da planilha.
   const dados = {
     _evento: 'aceite',
-    // --- colunas da aba cadastro ---
     cliente_id: CLIENTE_ID,
     inbox_id: '',
     status: 'Aceite registrado',
@@ -547,7 +564,7 @@ document.getElementById('form').addEventListener('submit', async ev => {
     telefone: dig(v('whatsapp')),
     data_aceite: new Date().toISOString(),
     versao_termos: VERSAO,
-    ip_aceite: '',            // preenchido pelo n8n a partir do cabeçalho da requisição
+    ip_aceite: '',
     aceite_dpa: 'SIM',
     valor_mensal: ciclo === 'mensal' ? P.mensal : (forma === 'parcelado' ? P.anual12 : P.avista),
     valor_setup: ciclo === 'mensal' ? '999' : '0',
@@ -558,7 +575,6 @@ document.getElementById('form').addEventListener('submit', async ev => {
     aprovacao_conteudo: 'NAO', data_aprovacao: '',
     observacoes: 'Contratação pelo site. ' + descricaoPlano() + '.',
 
-    // --- campos extras, não vão para a planilha ---
     _tipo_pessoa: tipo,
     _ciclo: ciclo,
     _forma_pagamento: ciclo === 'anual' ? forma : 'mensal',
@@ -578,12 +594,9 @@ document.getElementById('form').addEventListener('submit', async ev => {
   };
 
   try {
-    const r = await fetch(WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
-      body: JSON.stringify(dados)
-    });
-    if (!r.ok) throw new Error();
+    // Usa a nova função dual
+    await fetchDual(dados);
+    
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
     document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
