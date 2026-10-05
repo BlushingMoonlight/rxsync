@@ -79,6 +79,14 @@
       <div class="flex overflow-x-auto border-b border-slate-200 px-4" id="tabBar"></div>
 
       <div class="px-6 sm:px-8 py-6">
+        <div class="tab-conteudo" data-tab="agenda">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div id="agChips" class="flex gap-1.5 overflow-x-auto"></div>
+            <button id="agNovo" class="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Novo</button>
+          </div>
+          <div id="agForm" class="hidden border border-slate-200 rounded-xl p-4 mb-4 bg-slate-50"></div>
+          <div id="agLista" class="space-y-3"><div class="text-sm text-slate-500 text-center py-8">Carregando agenda...</div></div>
+        </div>
         <div class="tab-conteudo" data-tab="contato">
           <div class="mb-5">
             <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Dados do contrato (só leitura)</h2>
@@ -140,7 +148,7 @@
 var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
 var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
-var TABS = [{"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
+var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
 var LIMITE_CATALOGO = 500;
 var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link final ficar em outro endereço
 
@@ -216,11 +224,13 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       document.querySelectorAll(".tab-btn").forEach(function (x) { x.classList.remove("ativa"); });
       document.querySelectorAll(".tab-conteudo").forEach(function (x) { x.classList.remove("ativa"); });
       b.classList.add("ativa");
+      el("salvar").parentElement.style.display = t.key === "agenda" ? "none" : "";
       document.querySelector(".tab-conteudo[data-tab='" + t.key + "']").classList.add("ativa");
     };
     tabBar.appendChild(b);
   });
   document.querySelector(".tab-conteudo[data-tab='" + TABS[0].key + "']").classList.add("ativa");
+  el("salvar").parentElement.style.display = "none";
 
   CAMPOS.forEach(function (c) {
     var destino = el("campos_" + c.tab);
@@ -348,11 +358,108 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     el("erro").textContent = msg;
   }
 
+
+  // ===== AGENDA =====
+  var agDados = [], agFiltro = "novos", agAbertoId = null;
+  var TZ = "America/Sao_Paulo";
+  function h$(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function fmt(iso) { return new Date(iso).toLocaleString("pt-BR", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); }
+  function paraInput(iso) { return new Date(iso).toLocaleString("sv-SE", { timeZone: TZ }).slice(0, 16).replace(" ", "T"); }
+  function deInput(v) { return v ? v + ":00-03:00" : ""; }
+  function duracaoMin() { var v = parseInt((el("campo_duracao_padrao_min") || {}).value, 10); return v > 0 ? v : 30; }
+  function somaMin(v, m) { var d = new Date(deInput(v)); d.setMinutes(d.getMinutes() + m); return paraInput(d.toISOString()); }
+  function zap(tel) { var n = String(tel || "").replace(/\D/g, ""); if (n.length <= 11) n = "55" + n; return "https://wa.me/" + n; }
+  function agChamar(acao, dados) { return chamar(acao, dados).then(function (r) { if (!r.ok) throw 0; return r.data; }); }
+  function agila(a) { return a.status !== "cancelado"; }
+  function agGrupos() {
+    var agora = Date.now(), g = { novos: [], confirmar: [], proximos: [], passados: [], cancelados: [] };
+    agDados.forEach(function (a) {
+      if (a.status === "cancelado") { g.cancelados.push(a); return; }
+      if (!a.visto) g.novos.push(a);
+      if (a.status === "pendente") g.confirmar.push(a);
+      if (new Date(a.fim).getTime() >= agora) g.proximos.push(a); else g.passados.push(a);
+    });
+    g.passados.reverse(); g.cancelados.reverse();
+    return g;
+  }
+  function agCarregar() {
+    agChamar("agenda_listar").then(function (rows) {
+      agDados = rows || [];
+      var g = agGrupos();
+      if (!g.novos.length && agFiltro === "novos") agFiltro = g.confirmar.length ? "confirmar" : "proximos";
+      agRender();
+    }).catch(function () { el("agLista").innerHTML = ""; el("agLista").appendChild(h$("div", "text-sm text-rose-600 text-center py-8", "Não consegui carregar a agenda. Recarregue a página.")); });
+  }
+  function agRender() {
+    var g = agGrupos(), chips = el("agChips"); chips.innerHTML = "";
+    [["novos", "Novos"], ["confirmar", "A confirmar"], ["proximos", "Próximos"], ["passados", "Passados"], ["cancelados", "Cancelados"]].forEach(function (c) {
+      var b = h$("button", "whitespace-nowrap text-xs font-semibold px-3 py-2 rounded-lg border " + (agFiltro === c[0] ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-300"), c[1] + " (" + g[c[0]].length + ")");
+      b.onclick = function () { agFiltro = c[0]; agRender(); };
+      chips.appendChild(b);
+    });
+    var lista = el("agLista"); lista.innerHTML = "";
+    var itens = g[agFiltro];
+    if (!itens.length) lista.appendChild(h$("div", "text-sm text-slate-500 text-center py-8", "Nada por aqui."));
+    itens.forEach(function (a) { lista.appendChild(agCard(a)); });
+    var tb = document.querySelectorAll(".tab-btn")[0];
+    if (tb) tb.textContent = "Agenda" + (g.novos.length ? " (" + g.novos.length + ")" : "");
+  }
+  function agBtn(txt, cls, fn) { var b = h$("button", "text-xs font-semibold px-3 py-2 rounded-lg border " + cls, txt); b.onclick = fn; return b; }
+  function agCard(a) {
+    var c = h$("div", "border rounded-xl p-4 bg-white " + (!a.visto && agila(a) ? "border-emerald-400 ring-1 ring-emerald-200" : "border-slate-200"));
+    var top = h$("div", "flex items-start justify-between gap-2");
+    var l = h$("div"); l.appendChild(h$("div", "font-semibold text-slate-900 text-sm", a.nome_paciente));
+    l.appendChild(h$("div", "text-xs text-slate-500 mt-0.5", fmt(a.inicio) + " – " + fmt(a.fim).slice(-5) + (a.servico ? " · " + a.servico : "")));
+    top.appendChild(l);
+    var tags = h$("div", "flex flex-wrap gap-1 justify-end");
+    if (!a.visto && agila(a)) tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800", "NOVO"));
+    if (a.status === "pendente") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800", "A CONFIRMAR"));
+    if (a.status === "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800", "CANCELADO"));
+    tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
+    top.appendChild(tags); c.appendChild(top);
+    if (a.briefing) { var bx = h$("div", "mt-3 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3"); bx.appendChild(h$("div", "font-semibold text-slate-500 mb-1", "Resumo da conversa")); bx.appendChild(h$("div", "", a.briefing)); c.appendChild(bx); }
+    if (a.observacoes) c.appendChild(h$("div", "mt-2 text-xs text-slate-600", "Obs.: " + a.observacoes));
+    var acoes = h$("div", "mt-3 flex flex-wrap gap-2");
+    var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(a.telefone_paciente); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa);
+    if (a.status === "pendente") acoes.appendChild(agBtn("Confirmar", "bg-emerald-600 text-white border-emerald-600", function () { agChamar("agenda_confirmar", { id: a.id }).then(function () { toast("Confirmado ✓"); agCarregar(); }).catch(function () { toast("Não consegui confirmar."); }); }));
+    if (agila(a)) {
+      if (!a.visto) acoes.appendChild(agBtn("Marcar como visto", "border-slate-300 text-slate-700", function () { agChamar("agenda_visto", { id: a.id }).then(agCarregar); }));
+      acoes.appendChild(agBtn("Editar", "border-slate-300 text-slate-700", function () { agForm(a); }));
+      acoes.appendChild(agBtn("Cancelar", "border-rose-200 text-rose-700", function () { if (confirm("Cancelar o horário de " + a.nome_paciente + "?")) agChamar("agenda_cancelar", { id: a.id }).then(function () { toast("Cancelado."); agCarregar(); }).catch(function () { toast("Não consegui cancelar."); }); }));
+    }
+    c.appendChild(acoes); return c;
+  }
+  function agForm(a) {
+    var f = el("agForm"); f.innerHTML = ""; f.classList.remove("hidden");
+    f.appendChild(h$("div", "font-semibold text-sm mb-3", a ? "Editar agendamento" : "Novo agendamento"));
+    var campos = {}, cls = "w-full border border-slate-300 rounded-lg p-2.5 text-sm mb-2";
+    [["nome", "Nome do paciente", "text", a && a.nome_paciente], ["tel", "Telefone com DDD", "tel", a && a.telefone_paciente], ["serv", "Serviço", "text", a && a.servico], ["ini", "Início", "datetime-local", a && paraInput(a.inicio)], ["fim", "Fim", "datetime-local", a && paraInput(a.fim)], ["obs", "Observações", "text", a && a.observacoes]].forEach(function (c) {
+      f.appendChild(h$("label", "block text-xs text-slate-500 mb-1", c[1]));
+      var i = h$("input", cls); i.type = c[2]; i.value = c[3] || ""; campos[c[0]] = i; f.appendChild(i);
+    });
+    campos.ini.addEventListener("change", function () { if (campos.ini.value) campos.fim.value = somaMin(campos.ini.value, duracaoMin()); });
+    var forca = h$("input"); forca.type = "checkbox"; var fl = h$("label", "flex items-center gap-2 text-xs text-slate-600 mb-3"); fl.appendChild(forca); fl.appendChild(h$("span", "", "Permitir encaixe (mesmo se o horário estiver ocupado)")); f.appendChild(fl);
+    var r = h$("div", "flex gap-2");
+    r.appendChild(agBtn("Salvar", "bg-emerald-600 text-white border-emerald-600", function () {
+      var d = { nome_paciente: campos.nome.value, telefone_paciente: campos.tel.value, servico: campos.serv.value, inicio: deInput(campos.ini.value), fim: deInput(campos.fim.value), observacoes: campos.obs.value, forcar: forca.checked };
+      if (a) d.id = a.id;
+      agChamar(a ? "agenda_editar" : "agenda_criar", d).then(function (res) {
+        if (res.ok) { f.classList.add("hidden"); toast("Salvo ✓"); agCarregar(); }
+        else toast(res.erro === "conflito" ? "Esse horário já está ocupado. Marque 'encaixe' para forçar." : "Confira nome, telefone e horários.");
+      }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
+    }));
+    r.appendChild(agBtn("Fechar", "border-slate-300 text-slate-700", function () { f.classList.add("hidden"); }));
+    f.appendChild(r);
+    f.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  el("agNovo").addEventListener("click", function () { agForm(null); });
+
   chamar("abrir").then(function (resp) {
     el("carregando").classList.add("hidden");
     if (!resp.ok) { mostrarErro(resp.mensagem || "Não consegui abrir este link."); return; }
     el("conteudo").classList.remove("hidden");
     el("btnSair").classList.remove("hidden");
+    agCarregar();
     if (window.lucide) lucide.createIcons();
 
     var roDiv = el("somenteLeitura");
@@ -415,4 +522,4 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
 })();
 </script>
 </body>
-</html>
+</html
