@@ -497,7 +497,7 @@ lucide.createIcons();
 /* =====================================================================
    CONTRATO COM O N8N — idêntico ao do site de salão.
 
-   POST https://n8n.rxsync.com.br/webhook/onboarding
+   POST https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/onboarding
    Cabeçalho: x-rxsync-origem: rxsync-site-2026
 
    Corpo, ao abrir:   { token, acao: 'abrir' }
@@ -523,7 +523,7 @@ const PERFIL = {
   gradePadrao: { dias: ['seg','ter','qua','qui','sex'], de: '08:00', ate: '18:00' }
 };
 
-const WEBHOOK      = 'https://n8n.rxsync.com.br/webhook/onboarding';
+const WEBHOOK      = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/onboarding';
 const ORIGEM_CHAVE = 'rxsync-site-2026';
 const TOTAL_ETAPAS = 6;
 
@@ -589,9 +589,8 @@ function alternarDia(id) {
   const on = $('ab_' + id).checked;
   $('de_' + id).disabled = !on;
   $('ate_' + id).disabled = !on;
-  if (!on) { $('de_' + id).value = ''; $('ate_' + id).value = ''; }
-  else if (!$('de_' + id).value) {
-    $('de_' + id).value = PERFIL.gradePadrao.de;
+  if (!on) { $('de_' + id).value = '';$('ate_' + id).value = ''; }
+  else if (!$('de_' + id).value) {$('de_' + id).value = PERFIL.gradePadrao.de;
     $('ate_' + id).value = PERFIL.gradePadrao.ate;
   }
   descreverHorario();
@@ -603,8 +602,8 @@ function descreverHorario() {
   const campo = $('horario_funcionamento');
   if (campo.dataset.editado === '1') return;
 
-  const abertos = DIAS.filter(([id]) => $('ab_' + id) && $('ab_' + id).checked)
-                      .map(([id, nome]) => ({ id, nome, de: $('de_' + id).value, ate: $('ate_' + id).value }))
+  const abertos = DIAS.filter(([id]) => $('ab_' + id) &&$('ab_' + id).checked)
+                      .map(([id, nome]) => ({ id, nome, de: $('de_' + id).value, ate:$('ate_' + id).value }))
                       .filter(d => d.de && d.ate);
   if (abertos.length === 0) { campo.value = ''; return; }
 
@@ -654,9 +653,9 @@ function coletar() {
 
   d.horarios = {};
   DIAS.forEach(([id]) => {
-    const on = $('ab_' + id) && $('ab_' + id).checked;
-    d.horarios[id] = on && $('de_' + id).value && $('ate_' + id).value
-      ? { abre: $('de_' + id).value, fecha: $('ate_' + id).value }
+    const on = $('ab_' + id) &&$('ab_' + id).checked;
+    d.horarios[id] = on && $('de_' + id).value &&$('ate_' + id).value
+      ? { abre: $('de_' + id).value, fecha:$('ate_' + id).value }
       : null;
   });
 
@@ -677,7 +676,7 @@ function lerRascunho() {
   try { d = JSON.parse(localStorage.getItem(CHAVE_RASCUNHO) || 'null'); } catch (e) {}
   if (!d) return false;
 
-  CAMPOS.forEach(c => { if ($(c) && d[c]) $(c).value = d[c]; });
+  CAMPOS.forEach(c => { if ($(c) && d[c])$(c).value = d[c]; });
   if (d.horario_funcionamento) $('horario_funcionamento').dataset.editado = '1';
 
   if (d.horarios) {
@@ -709,8 +708,7 @@ function limparErro(id) {
 function validar(n) {
   let ok = true, primeiro = null;
   for (const id of (OBRIGATORIOS[n] || [])) {
-    if (!$(id).value.trim()) {
-      $(id).classList.add('erro');
+    if (!$(id).value.trim()) {$(id).classList.add('erro');
       const m = document.querySelector(`.msg-erro[data-de="${id}"]`);
       if (m) m.classList.add('on');
       if (!primeiro) primeiro = id;
@@ -763,8 +761,7 @@ async function enviar() {
 
   enviando = true;
   $('btnEnviar').disabled = true;
-  $('btnEnviar').textContent = 'Enviando...';
-  $('erroForm').classList.remove('on');
+  $('btnEnviar').textContent = 'Enviando...';$('erroForm').classList.remove('on');
 
   try {
     const d = await chamar({ token: TOKEN, acao: 'salvar', dados: coletar() });
