@@ -196,20 +196,23 @@
 
       <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-5">
         <p class="text-xs text-slate-600 leading-relaxed"><strong class="text-primary-900">Sete dias para desistir.</strong> Você pode cancelar sem custo e sem justificativa em até 7 dias corridos, e devolvemos integralmente o que tiver sido pago.</p>
+        <p class="text-xs text-slate-600 leading-relaxed mt-2"><strong class="text-primary-900">Teste grátis.</strong> Se você escolher &ldquo;Começar 7 dias grátis&rdquo;, não paga nada agora. Os 7 dias contam a partir do dia em que a assistente entrar no ar. Você só paga se decidir continuar.</p>
       </div>
 
       <div id="erroAceite" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3 mb-4"></div>
-      <div class="flex gap-3">
-        <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-        <button type="submit" id="btnEnviar" class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-400 transition-colors shadow-lg">Concluir contratação</button>
+      <div class="flex flex-col gap-3">
+        <button type="submit" id="btnTeste" data-modalidade="teste" class="w-full bg-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-400 transition-colors shadow-lg">Começar 7 dias grátis</button>
+        <p class="text-xs text-slate-500 text-center -mt-1">Sem cartão e sem cobrança automática.</p>
+        <button type="submit" id="btnEnviar" data-modalidade="contratado" class="w-full bg-white text-primary-900 font-bold py-3.5 rounded-xl border-2 border-primary-900 hover:bg-slate-50 transition-colors">Contratar e pagar agora</button>
+        <button type="button" class="voltar w-full px-5 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
       </div>
     </section>
   </form>
 
   <section id="sucesso" class="hidden bg-white rounded-2xl border border-emerald-200 shadow-sm p-8 text-center">
     <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4 text-3xl">&check;</div>
-    <h2 class="text-xl font-extrabold text-primary-900 mb-2">Contratação registrada</h2>
-    <p class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">Enviamos a confirmação para o seu e-mail com a versão dos Termos que você aceitou. Em até um dia útil entramos em contato pelo WhatsApp para combinar a implantação e o pagamento.</p>
+    <h2 id="sucessoTitulo" class="text-xl font-extrabold text-primary-900 mb-2">Contratação registrada</h2>
+    <p id="sucessoTexto" class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">Enviamos a confirmação para o seu e-mail com a versão dos Termos que você aceitou. Em até um dia útil entramos em contato pelo WhatsApp para combinar a implantação e o pagamento.</p>
     <a href="/" class="inline-block mt-6 text-sm font-bold text-primary-700 underline">Voltar ao site</a>
   </section>
 </main>
@@ -504,8 +507,9 @@ function carregarTermos() {
   document.getElementById('linkTermos').href = url;
 }
 
-document.getElementById('form').addEventListener('submit', async ev => {
-  ev.preventDefault();
+document.getElementById('form').addEventListener('submit', async evt => {
+  // O parâmetro se chama evt para não esconder a função ev() de analytics, que era chamada depois do sucesso.
+  evt.preventDefault();
   const box = document.getElementById('erroAceite');
   if (!document.getElementById('aceiteTermos').checked || !document.getElementById('aceiteDpa').checked) {
     box.classList.remove('hidden');
@@ -513,14 +517,20 @@ document.getElementById('form').addEventListener('submit', async ev => {
     return;
   }
   box.classList.add('hidden');
-  const btn = document.getElementById('btnEnviar');
-  btn.disabled = true; btn.textContent = 'Registrando...';
+  // Qual botão foi apertado define a modalidade: teste de 7 dias ou contratação com pagamento.
+  const btn = evt.submitter || document.getElementById('btnEnviar');
+  const modalidade = btn.dataset && btn.dataset.modalidade === 'teste' ? 'teste' : 'contratado';
+  const botoes = Array.from(document.querySelectorAll('#btnTeste, #btnEnviar'));
+  const textos = botoes.map(b => b.textContent);
+  botoes.forEach(b => { b.disabled = true; });
+  btn.textContent = 'Registrando...';
 
   const v = id => (document.getElementById(id).value || '').trim();
   const P = PLANOS[plano];
 
   const dados = {
     _evento: 'aceite',
+    modalidade: modalidade,
     cliente_id: CLIENTE_ID,
     inbox_id: '',
     status: 'Aceite registrado',
@@ -576,10 +586,14 @@ document.getElementById('form').addEventListener('submit', async ev => {
     document.getElementById('progresso').classList.add('hidden');
     document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
     document.getElementById('sucesso').classList.remove('hidden');
-    ev('contratacao_registrada', { forma: ciclo === 'anual' ? forma : 'mensal' });
+    if (modalidade === 'teste') {
+      document.getElementById('sucessoTitulo').textContent = 'Teste grátis registrado';
+      document.getElementById('sucessoTexto').textContent = 'Enviamos a confirmação para o seu e-mail. Em poucos minutos você recebe o link para configurar a sua assistente. Os 7 dias só começam a contar quando ela entrar no ar. Sem cartão e sem cobrança automática.';
+    }
+    ev(modalidade === 'teste' ? 'teste_registrado' : 'contratacao_registrada', { forma: ciclo === 'anual' ? forma : 'mensal' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {
-    btn.disabled = false; btn.textContent = 'Concluir contratação';
+    botoes.forEach((b, i) => { b.disabled = false; b.textContent = textos[i]; });
     box.classList.remove('hidden');
     box.textContent = 'Não consegui registrar agora. Tente de novo em instantes ou fale com a gente pelo WhatsApp.';
   }
