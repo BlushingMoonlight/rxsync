@@ -253,10 +253,11 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
       <!-- ---------- ETAPA 3 ---------- -->
       <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="3">
         <h2 class="text-lg font-bold text-primary-900 mb-1">Horários</h2>
-        <p class="text-slate-500 text-sm mb-6">Marque os dias em que a clínica atende.</p>
+        <p class="text-slate-500 text-sm mb-6">Marque os dias em que a clínica atende. Se vocês param no almoço (ou em qualquer outro horário), clique em “+ Adicionar horário” para colocar a volta. Ex.: 8h às 12h e 14h às 18h.</p>
         <div class="space-y-4">
 
           <div id="grade" class="space-y-3"></div>
+          <p id="erroGrade" class="text-sm text-red-600 hidden"></p>
 
           <div class="pt-2">
             <label class="rotulo" for="horario_funcionamento">Como ela conta o horário para o paciente</label>
@@ -502,6 +503,8 @@ lucide.createIcons();
 
    Corpo, ao abrir:   { token, acao: 'abrir' }
    Corpo, ao salvar:  { token, acao: 'salvar', dados: { ...campos, horarios, faq } }
+   horarios: { seg: [ {abre:'08:00',fecha:'12:00'}, {abre:'14:00',fecha:'18:00'} ], ter: [...], sab: null, ... }
+   (cada dia é uma LISTA de faixas; a pausa é o intervalo entre elas; dia fechado = null)
 
    Resposta esperada:
    abrir  -> { ok: true, nome_exibicao, representante_nome, tipo_negocio, plano, expira }
@@ -564,65 +567,111 @@ function falhar(msg) {
 }
 
 /* ===================== GRADE DE HORÁRIOS ===================== */
+// Cada dia tem uma ou mais faixas (ex.: 08:00-12:00 e 14:00-18:00). A pausa é o intervalo entre elas.
+const hmin = v => { const [h, m] = String(v).split(':'); return Number(h) * 60 + Number(m); };
+
 function montarGrade() {
   $('grade').innerHTML = DIAS.map(([id, nome]) => `
-    <div class="flex items-center gap-3 flex-wrap">
-      <label class="flex items-center gap-2 w-28 shrink-0 cursor-pointer">
+    <div class="flex items-start gap-3 flex-wrap">
+      <label class="flex items-center gap-2 w-28 shrink-0 cursor-pointer pt-2">
         <input type="checkbox" id="ab_${id}" class="w-4 h-4 accent-emerald-600" onchange="alternarDia('${id}')">
         <span class="text-sm font-medium text-slate-600">${nome}</span>
       </label>
-      <input type="time" id="de_${id}" class="campo" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem" disabled>
-      <span class="text-xs text-slate-400">às</span>
-      <input type="time" id="ate_${id}" class="campo" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem" disabled>
+      <div id="bx_${id}" class="flex-1 min-w-0 space-y-2 hidden">
+        <div id="fx_${id}" class="space-y-2"></div>
+        <button type="button" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800" onclick="addFaixa('${id}')">+ Adicionar horário (ex.: depois do almoço)</button>
+      </div>
     </div>
   `).join('');
 
-  PERFIL.gradePadrao.dias.forEach(d => {
-    $('ab_' + d).checked = true;
-    $('de_' + d).value = PERFIL.gradePadrao.de;
-    $('ate_' + d).value = PERFIL.gradePadrao.ate;
-    alternarDia(d);
-  });
+  PERFIL.gradePadrao.dias.forEach(d => { $('ab_' + d).checked = true; alternarDia(d); });
+}
+
+function addFaixa(id, de = '', ate = '', removivel = null) {
+  const cont = $('fx_' + id);
+  if (removivel === null) removivel = cont.children.length > 0;
+  const row = document.createElement('div');
+  row.className = 'faixa flex items-center gap-2 flex-wrap';
+  row.innerHTML = `
+    <input type="time" class="campo fx-de" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem">
+    <span class="text-xs text-slate-400">às</span>
+    <input type="time" class="campo fx-ate" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem">
+    ${removivel ? '<button type="button" class="text-xs text-slate-400 hover:text-red-500" title="Remover este horário">remover</button>' : ''}`;
+  const [i1, i2] = row.querySelectorAll('input');
+  i1.value = de; i2.value = ate;
+  [i1, i2].forEach(x => x.addEventListener('change', () => { limparErroGrade(); descreverHorario(); salvarRascunho(); }));
+  const x = row.querySelector('button');
+  if (x) x.onclick = () => { row.remove(); limparErroGrade(); descreverHorario(); salvarRascunho(); };
+  cont.appendChild(row);
+}
+
+// Liga ou desliga o dia. Ao ligar sem faixas, coloca a faixa padrão.
+function aplicarDia(id, faixas) {
+  const on = !!(faixas && faixas.length);
+  $('ab_' + id).checked = on;
+  $('fx_' + id).innerHTML = '';
+  $('bx_' + id).classList.toggle('hidden', !on);
+  if (on) faixas.forEach((f, i) => addFaixa(id, f.abre, f.fecha, i > 0));
 }
 
 function alternarDia(id) {
   const on = $('ab_' + id).checked;
-  $('de_' + id).disabled = !on;
-  $('ate_' + id).disabled = !on;
-  if (!on) { $('de_' + id).value = '';$('ate_' + id).value = ''; }
-  else if (!$('de_' + id).value) {$('de_' + id).value = PERFIL.gradePadrao.de;
-    $('ate_' + id).value = PERFIL.gradePadrao.ate;
-  }
+  aplicarDia(id, on ? [{ abre: PERFIL.gradePadrao.de, fecha: PERFIL.gradePadrao.ate }] : []);
+  limparErroGrade();
   descreverHorario();
+  salvarRascunho();
 }
 
-// Escreve a frase de horário a partir da grade, agrupando dias seguidos
-// com a mesma faixa. O cliente pode reescrever por cima.
-function descreverHorario() {
-  const campo = $('horario_funcionamento');
-  if (campo.dataset.editado === '1') return;
+// Faixas completas de um dia, em ordem. Incompletas são ignoradas aqui e acusadas na validação.
+function faixasDia(id) {
+  return [...document.querySelectorAll(`#fx_${id} .faixa`)]
+    .map(r => { const [a, b] = r.querySelectorAll('input'); return { abre: a.value, fecha: b.value }; })
+    .filter(f => f.abre && f.fecha)
+    .sort((x, y) => hmin(x.abre) - hmin(y.abre));
+}
 
-  const abertos = DIAS.filter(([id]) => $('ab_' + id) &&$('ab_' + id).checked)
-                      .map(([id, nome]) => ({ id, nome, de: $('de_' + id).value, ate:$('ate_' + id).value }))
-                      .filter(d => d.de && d.ate);
-  if (abertos.length === 0) { campo.value = ''; return; }
+function limparErroGrade() { $('erroGrade').classList.add('hidden'); }
 
+// Devolve a mensagem de erro da grade, ou '' se estiver tudo certo.
+function validarGrade() {
+  for (const [id, nome] of DIAS) {
+    if (!$('ab_' + id).checked) continue;
+    const linhas = [...document.querySelectorAll(`#fx_${id} .faixa`)].map(r => { const [a, b] = r.querySelectorAll('input'); return { abre: a.value, fecha: b.value }; });
+    for (const f of linhas) {
+      if (!f.abre || !f.fecha) return `${nome}: preencha o início e o fim de cada horário, ou clique em “remover”.`;
+      if (hmin(f.fecha) <= hmin(f.abre)) return `${nome}: o fim precisa ser depois do início.`;
+    }
+    const ord = linhas.slice().sort((x, y) => hmin(x.abre) - hmin(y.abre));
+    for (let i = 1; i < ord.length; i++)
+      if (hmin(ord[i].abre) < hmin(ord[i - 1].fecha)) return `${nome}: os horários estão se sobrepondo.`;
+  }
+  return '';
+}
+
+// Monta a frase a partir dos dias abertos, agrupando dias SEGUIDOS com as mesmas faixas.
+// abertos: [{ idx, nome, fx: [{abre, fecha}] }] (idx = posição do dia na semana, segunda = 0)
+function fraseHorario(abertos) {
+  const hora = h => { const [hh, mm] = h.split(':'); return mm === '00' ? `${Number(hh)}h` : `${Number(hh)}h${mm}`; };
   const blocos = [];
   let atual = null;
   for (const d of abertos) {
-    const faixa = d.de + '-' + d.ate;
-    if (atual && atual.faixa === faixa) { atual.fim = d.nome; }
-    else { if (atual) blocos.push(atual); atual = { ini: d.nome, fim: d.nome, faixa, de: d.de, ate: d.ate }; }
+    const sig = d.fx.map(f => f.abre + '-' + f.fecha).join('|');
+    if (atual && atual.sig === sig && d.idx === atual.idxFim + 1) { atual.fim = d.nome; atual.idxFim = d.idx; }
+    else { if (atual) blocos.push(atual); atual = { ini: d.nome, fim: d.nome, idxFim: d.idx, sig, fx: d.fx }; }
   }
   if (atual) blocos.push(atual);
-
-  const hora = h => {
-    const [hh, mm] = h.split(':');
-    return mm === '00' ? `${Number(hh)}h` : `${Number(hh)}h${mm}`;
-  };
-  campo.value = blocos.map(b =>
-    (b.ini === b.fim ? b.ini : `${b.ini} a ${b.fim}`) + `, das ${hora(b.de)} às ${hora(b.ate)}`
+  return blocos.map(b =>
+    (b.ini === b.fim ? b.ini : `${b.ini} a ${b.fim}`) + ', ' + b.fx.map(f => `das ${hora(f.abre)} às ${hora(f.fecha)}`).join(' e ')
   ).join('. ');
+}
+
+// Escreve a frase de horário a partir da grade. O cliente pode reescrever por cima.
+function descreverHorario() {
+  const campo = $('horario_funcionamento');
+  if (campo.dataset.editado === '1') return;
+  const abertos = DIAS.map(([id, nome], idx) => ({ idx, nome, fx: $('ab_' + id).checked ? faixasDia(id) : [] }))
+                      .filter(d => d.fx.length);
+  campo.value = abertos.length ? fraseHorario(abertos) : '';
 }
 
 /* ===================== FAQ ===================== */
@@ -654,9 +703,8 @@ function coletar() {
   d.horarios = {};
   DIAS.forEach(([id]) => {
     const on = $('ab_' + id) &&$('ab_' + id).checked;
-    d.horarios[id] = on && $('de_' + id).value &&$('ate_' + id).value
-      ? { abre: $('de_' + id).value, fecha:$('ate_' + id).value }
-      : null;
+    const fx = on ? faixasDia(id) : [];
+    d.horarios[id] = fx.length ? fx : null;
   });
 
   d.faq = [...document.querySelectorAll('#listaFaq > div')].map(el => ({
@@ -682,11 +730,8 @@ function lerRascunho() {
   if (d.horarios) {
     DIAS.forEach(([id]) => {
       const f = d.horarios[id];
-      $('ab_' + id).checked = !!f;
-      $('de_' + id).value = f ? f.abre : '';
-      $('ate_' + id).value = f ? f.fecha : '';
-      $('de_' + id).disabled = !f;
-      $('ate_' + id).disabled = !f;
+      // aceita rascunho antigo (uma faixa { abre, fecha }) e o novo (lista de faixas)
+      aplicarDia(id, Array.isArray(f) ? f : (f && f.abre && f.fecha ? [f] : []));
     });
   }
   if (Array.isArray(d.faq)) {
@@ -716,6 +761,12 @@ function validar(n) {
     } else {
       limparErro(id);
     }
+  }
+  if (n === 3) {
+    const msg = validarGrade();
+    $('erroGrade').textContent = msg;
+    $('erroGrade').classList.toggle('hidden', !msg);
+    if (msg) { ok = false; $('grade').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   }
   if (primeiro) $(primeiro).focus();
   return ok;
