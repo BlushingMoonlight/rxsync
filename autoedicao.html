@@ -71,6 +71,7 @@
     <div id="erro" class="hidden text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-4 text-sm"></div>
 
     <div id="conteudo" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div id="bannerConta" class="hidden px-6 sm:px-8 py-4 text-sm border-b"></div>
       <div class="px-6 sm:px-8 pt-6">
         <h1 class="text-xl font-extrabold text-primary-900 tracking-tight mb-1">Editar minhas informações</h1>
         <p class="text-sm text-slate-500 mb-4">Cada campo salva sozinho assim que você sai dele.</p>
@@ -160,7 +161,7 @@
   <div id="toast"></div>
 
 <script>
-var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
+var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "lembrete_horarios", "label": "Lembretes de consulta (a IA avisa o paciente e pede confirmação)", "tipo": "multi", "tab": "agendamento", "opcoes": [["48", "48 horas antes"], ["24", "24 horas antes (véspera)"], ["M", "Na manhã do dia da consulta (8h)"], ["3", "3 horas antes"], ["2", "2 horas antes"], ["1", "1 hora antes"], ["nao", "Não enviar lembretes"]], "padrao": ["24", "2"]}, {"key": "followup_horas", "label": "Se o paciente parar de responder antes de agendar, retomar a conversa depois de", "tipo": "select", "tab": "agendamento", "opcoes": [["", "3 horas (padrão)"], ["1", "1 hora"], ["2", "2 horas"], ["4", "4 horas"], ["6", "6 horas"], ["12", "12 horas"], ["24", "24 horas"], ["nao", "Não retomar"]]}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
 var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
 var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
@@ -252,6 +253,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     var div = document.createElement("div");
     div.className = "campo mb-4";
     var input = (c.tipo === "textarea" || c.tipo === "textarea_limite") ? document.createElement("textarea") : (c.tipo === "select" ? document.createElement("select") : document.createElement("input"));
+    if (c.tipo === "multi") { input = document.createElement("input"); input.type = "hidden"; }
     if (c.tipo === "select") (c.opcoes || []).forEach(function (o) { var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; input.appendChild(op); });
     if (c.tipo === "text" || c.tipo === "tel" || c.tipo === "number") input.type = c.tipo;
     input.id = "campo_" + c.key;
@@ -262,6 +264,29 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       contagem.className = "text-xs text-right mt-1 text-slate-400";
       contagem.id = "contagem_" + c.key;
       div.appendChild(contagem);
+    }
+    if (c.tipo === "multi") {
+      var caixa = document.createElement("div"); caixa.className = "mt-2 space-y-2"; var cbs = [];
+      c.opcoes.forEach(function (o) {
+        var lab = document.createElement("label"); lab.className = "flex items-center gap-2 text-sm text-slate-700 cursor-pointer"; lab.style.display = "flex"; lab.style.alignItems = "center"; lab.style.gap = "8px"; lab.style.marginBottom = "0"; lab.style.fontSize = "0.875rem";
+        var cb = document.createElement("input"); cb.type = "checkbox"; cb.value = o[0]; cbs.push(cb); cb.style.width = "auto"; cb.style.flex = "none"; cb.style.margin = "0"; cb.style.padding = "0";
+        lab.appendChild(cb); lab.appendChild(document.createTextNode(o[1])); caixa.appendChild(lab);
+        cb.addEventListener("change", function () {
+          if (cb.checked && o[0] === "nao") cbs.forEach(function (x) { if (x !== cb) x.checked = false; });
+          if (cb.checked && o[0] !== "nao") cbs.forEach(function (x) { if (x.value === "nao") x.checked = false; });
+          var marcados = cbs.filter(function (x) { return x.checked; }).map(function (x) { return x.value; });
+          input.value = marcados.length ? marcados.join(",") : "nao";
+          if (input.value === "nao") cbs.forEach(function (x) { x.checked = x.value === "nao"; });
+          input.dispatchEvent(new Event("input"));
+          autosaveCampo(c.key, input.value);
+        });
+      });
+      input.sincronizar = function () {
+        var v = String(input.value || "").trim();
+        var sel = v ? v.split(",") : (c.padrao || []);
+        cbs.forEach(function (x) { x.checked = sel.indexOf(x.value) >= 0; });
+      };
+      div.appendChild(caixa); input.sincronizar();
     }
     destino.appendChild(div);
     marcarLimpo(c.key);
@@ -420,6 +445,7 @@ function partesTz(ms) {
     top.appendChild(l);
     var tags = h$("div", "flex flex-wrap gap-1 justify-end");
     if (!a.visto && agila(a)) tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800", "NOVO"));
+    if (a.presenca_confirmada && a.status !== "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800", "CONFIRMOU PRESENÇA"));
     if (a.status === "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800", "CANCELADO"));
     tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
     top.appendChild(tags); c.appendChild(top);
@@ -686,6 +712,27 @@ function partesTz(ms) {
       .catch(function () { b.disabled = false; toast("Erro de conexão. Tenta de novo."); });
   });
 
+  // Banner do teste grátis. Só aparece para quem está em teste; cliente normal não vê nada.
+  function mostrarBannerConta(conta) {
+    var b = el("bannerConta");
+    if (!conta || !conta.situacao) return;
+    var cta = " <a class='underline font-semibold' href='mailto:contato@rxsync.com.br?subject=Quero%20continuar%20com%20a%20RXSync'>Responda ao e-mail ou fale com a gente</a> para receber as instruções de pagamento.";
+    var cor = "bg-emerald-50 border-emerald-200 text-emerald-900", txt = "";
+    if (conta.situacao === "em_teste") {
+      var d = conta.dias_restantes;
+      var quando = d === 0 ? "termina hoje" : (d === 1 ? "termina amanhã" : "vai até " + conta.trial_fim_br);
+      txt = "<strong>Teste grátis: seu teste " + quando + ".</strong>" + (d !== null && d > 1 ? " Faltam " + d + " dias." : "") + " Se quiser continuar sem interrupção," + cta;
+      if (d !== null && d <= 2) cor = "bg-amber-50 border-amber-200 text-amber-900";
+    } else if (conta.situacao === "teste_aguardando") {
+      txt = "<strong>Teste grátis.</strong> Seus 7 dias só começam a contar quando a assistente entrar no ar, depois que você conectar o WhatsApp. Até lá você não gasta nenhum dia.";
+    } else if (conta.situacao === "teste_encerrado") {
+      cor = "bg-rose-50 border-rose-200 text-rose-900";
+      txt = "<strong>Seu teste terminou e a assistente está pausada.</strong> As mensagens continuam chegando para a sua equipe, sem a assistente respondendo. Suas informações estão guardadas por 15 dias." + cta;
+    } else { return; }
+    b.className = "px-6 sm:px-8 py-4 text-sm border-b " + cor;
+    b.innerHTML = txt;
+  }
+
   chamar("abrir").then(function (resp) {
     el("carregando").classList.add("hidden");
     if (!resp.ok) { mostrarErro(resp.mensagem || "Não consegui abrir este link."); return; }
@@ -707,12 +754,15 @@ function partesTz(ms) {
       var v = (resp.editaveis || {})[c.key] || "";
       if (c.key === "fuso_horario" && !v) v = "America/Sao_Paulo";
       el("campo_" + c.key).value = v;
+      if (c.tipo === "multi") el("campo_" + c.key).sincronizar();
       savedValues[c.key] = v;
     });
 
     aplicarFuso(savedValues.fuso_horario);
     savedValues._token_conexao = resp.token_conexao || "";
     atualizarLinkReconectar();
+
+    mostrarBannerConta(resp.conta);
 
     LIMITE_CATALOGO = resp.limite_catalogo || 500;
     var cc = el("contagem_catalogo_de_vendas");
