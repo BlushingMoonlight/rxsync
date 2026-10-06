@@ -825,6 +825,10 @@ a conversa esfriar.</p></li>
 e alteração dos parâmetros de operação, suspensão do Assistente Virtual e
 indicação de números excluídos do atendimento automatizado — incluso na
 Mensalidade.</p></li>
+<li><p>Agenda RXSync: agenda simples, integrada ao Painel de
+Configuração, na qual o Assistente Virtual consulta horários livres e grava
+agendamentos, e que a equipe do Cliente pode acompanhar e editar. O Cliente
+mantém nela a grade de horários e a disponibilidade atualizadas.</p></li>
 <li><p>Transcrição automática de áudios recebidos dos pacientes para
 texto na conversa.</p></li>
 <li><p>Campo de instruções adicionais para o Assistente Virtual, editável
@@ -836,18 +840,19 @@ no horário de suporte.</p></li>
 e 1 (uma) rodada de ajustes finos no primeiro mês.</p></li>
 <li><p>Franquia de 5.000 mensagens/mês.</p></li>
 </ul>
-<p><strong>2. Plano Essencial</strong> — inclui o item 1, sem integração
-com Sistema de Gestão. O Assistente Virtual informa, organiza e encaminha
-o atendimento; os agendamentos são efetivados pela equipe do Cliente ou
-pelo próprio paciente, na forma do item 5 deste Anexo. O campo de
-instruções adicionais tem limite de 500 (quinhentos) caracteres.</p>
+<p><strong>2. Plano Essencial</strong> — inclui o item 1, inclusive a
+Agenda RXSync, sem integração com Sistema de Gestão de terceiros. O
+Assistente Virtual informa, organiza o atendimento e agenda consultas na
+Agenda RXSync. O campo de instruções adicionais tem limite de 500
+(quinhentos) caracteres.</p>
 <p><strong>3. Plano Gestão Inteligente</strong> — inclui integralmente o
 item 1, acrescido de (o campo de instruções adicionais tem limite de
 2.000 (dois mil) caracteres neste plano):</p>
 <ul>
-<li><p>Integração via API com 1 (um) Sistema de Gestão indicado na
-contratação, para consulta de disponibilidade e gravação de
-agendamentos.</p></li>
+<li><p>Integração via API com 1 (um) Sistema de Gestão de terceiros que
+ofereça API aberta, indicado na contratação, para consulta de
+disponibilidade e gravação de agendamentos, como alternativa à Agenda
+RXSync.</p></li>
 <li><p>Cadência configurável de lembretes de confirmação.</p></li>
 <li><p>Atualização automática de status do agendamento no Sistema de
 Gestão, quando suportado pela API deste.</p></li>
@@ -879,9 +884,11 @@ recomposição a qualquer das Partes.</p>
 dos sistemas de prontuário do mercado não disponibiliza interface pública
 que permita gravar agendamentos a partir de aplicações externas,
 admitindo apenas leitura da agenda ou sincronização unidirecional com
-calendários. Nessas hipóteses, e em qualquer plano, a modalidade padrão
-de agendamento é o <strong>encaminhamento do endereço de agendamento
-online do próprio Cliente</strong>: o Assistente Virtual conduz o
+calendários. Nessas hipóteses, e em qualquer plano, o agendamento ocorre
+na Agenda RXSync (item 1). Se o Cliente preferir manter o seu Sistema de
+Gestão como agenda, aplica-se, a seu pedido, a modalidade de
+<strong>encaminhamento do endereço de agendamento online do próprio
+Cliente</strong>: o Assistente Virtual conduz o
 atendimento, verifica a disponibilidade a partir da agenda que lhe for
 dada em leitura e encaminha ao paciente o endereço para que este conclua
 a marcação no sistema do Cliente.</p>
