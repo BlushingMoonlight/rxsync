@@ -113,6 +113,9 @@
           <div id="resGrid" class="grid grid-cols-2 gap-3"><div class="text-sm text-slate-500 col-span-2 text-center py-8">Carregando resultados...</div></div>
           <div id="resUpsell" class="hidden mt-4 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4"></div>
         </div>
+        <div class="tab-conteudo" data-tab="assinatura">
+          <div id="assinConteudo"><div class="text-sm text-slate-500 text-center py-8">Carregando sua assinatura...</div></div>
+        </div>
         <div class="tab-conteudo" data-tab="contato">
           <div class="mb-5">
             <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Dados do contrato (só leitura)</h2>
@@ -124,7 +127,7 @@
               <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> Reconectar ou trocar este WhatsApp
             </a>
           </div>
-          <div class="mt-6 pt-5 border-t border-slate-100">
+          <div class="hidden mt-6 pt-5 border-t border-slate-100">
             <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Minha assinatura</h2>
             <div class="flex flex-col gap-2">
               <button id="btnMudarPlano" class="w-full border border-slate-300 hover:border-primary-900 text-slate-700 hover:text-primary-900 text-sm font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
@@ -176,7 +179,7 @@
 var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "link_privacidade", "label": "Link da política de privacidade da clínica (a assistente informa na primeira mensagem)", "tipo": "text", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "lembrete_horarios", "label": "Lembretes de consulta (a IA avisa o paciente e pede confirmação)", "tipo": "multi", "tab": "agendamento", "opcoes": [["48", "48 horas antes"], ["24", "24 horas antes (véspera)"], ["M", "Na manhã do dia da consulta (8h)"], ["3", "3 horas antes"], ["2", "2 horas antes"], ["1", "1 hora antes"], ["nao", "Não enviar lembretes"]], "padrao": ["24", "2"]}, {"key": "followup_horas", "label": "Se o paciente parar de responder antes de agendar, retomar a conversa depois de", "tipo": "select", "tab": "agendamento", "opcoes": [["", "3 horas (padrão)"], ["1", "1 hora"], ["2", "2 horas"], ["4", "4 horas"], ["6", "6 horas"], ["12", "12 horas"], ["24", "24 horas"], ["nao", "Não retomar"]]}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
 var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
-var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "resultados", "label": "Resultados"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
+var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "resultados", "label": "Resultados"}, {"key": "assinatura", "label": "Assinatura"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
 var LIMITE_CATALOGO = 500;
 var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link final ficar em outro endereço
 
@@ -252,8 +255,9 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       document.querySelectorAll(".tab-btn").forEach(function (x) { x.classList.remove("ativa"); });
       document.querySelectorAll(".tab-conteudo").forEach(function (x) { x.classList.remove("ativa"); });
       b.classList.add("ativa");
-      el("salvar").parentElement.style.display = (t.key === "agenda" || t.key === "resultados") ? "none" : "";
+      el("salvar").parentElement.style.display = (t.key === "agenda" || t.key === "resultados" || t.key === "assinatura") ? "none" : "";
       if (t.key === "resultados") resultadosCarregar();
+      if (t.key === "assinatura") assinCarregar();
       document.querySelector(".tab-conteudo[data-tab='" + t.key + "']").classList.add("ativa");
     };
     tabBar.appendChild(b);
@@ -464,6 +468,185 @@ function partesTz(ms) {
     });
   }
   el("resPeriodo").addEventListener("change", resultadosCarregar);
+  // ---------- Aba Assinatura ----------
+  window.irParaAba = function (key) {
+    var i = TABS.map(function (t) { return t.key; }).indexOf(key);
+    var btn = document.querySelectorAll("#tabBar .tab-btn")[i];
+    if (btn) { btn.click(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  };
+  var ASSIN_PRECOS = {
+    essencial: { nome: "Essencial", mensal: "299", parcelado: "269,10", avista: "2.990,00",
+      itens: ["Assistente no WhatsApp 24h", "Agenda RXSync", "Lembretes de consulta", "Retomada de conversas", "Resultados básicos", "Instruções extras até 500 caracteres"] },
+    gestao: { nome: "Gestão Inteligente", mensal: "599", parcelado: "539,10", avista: "5.990,00",
+      itens: ["Tudo do Essencial", "Lista de espera para vagas canceladas", "Indicadores completos", "Instruções extras até 2.000 caracteres", "Integração com sistema de gestão (em breve)"] }
+  };
+  var assinDados = null;
+  function assinSufixo(forma) { return forma === "avista" ? "/ano" : "/mês"; }
+  function assinForma(forma) { return forma === "avista" ? "anual à vista" : (forma === "parcelado" ? "anual em 12x" : "mensal"); }
+  function assinAcao(acao, dados, confirma, btn) {
+    if (confirma && !confirm(confirma)) return;
+    if (btn) btn.disabled = true;
+    chamar(acao, dados || {}).then(function (r) {
+      if (btn) btn.disabled = false;
+      toast((r && r.mensagem) || (r && r.ok ? "Pronto!" : "Não consegui concluir."));
+      if (r && r.ok && r.recarregar_assinatura) {
+        el("assinConteudo").innerHTML = '<div class="text-sm text-slate-500 text-center py-8">Gerando o seu pagamento... isso leva alguns segundos.</div>';
+        setTimeout(assinCarregar, 7000); setTimeout(function () { if (assinDados && !(assinDados.abertas || []).length) assinCarregar(); }, 20000);
+      } else if (r && r.ok) setTimeout(function () { location.reload(); }, 1600);
+    }).catch(function () { if (btn) btn.disabled = false; toast("Erro de conexão. Tente de novo."); });
+  }
+  function assinCarregar() {
+    var box = el("assinConteudo");
+    box.innerHTML = '<div class="text-sm text-slate-500 text-center py-8">Carregando sua assinatura...</div>';
+    chamar("assinatura_ver", {}).then(function (r) {
+      if (!r || !r.ok || !r.assinatura) throw 0;
+      assinDados = r.assinatura; assinRender();
+    }).catch(function () {
+      box.innerHTML = '<div class="text-sm text-slate-500 text-center py-8">Não consegui carregar a assinatura agora. Tente de novo em instantes.</div>';
+    });
+  }
+  function assinRender() {
+    var a = assinDados, box = el("assinConteudo");
+    box.innerHTML = "";
+    var SIT = {
+      em_dia: ["Em dia", "bg-emerald-100 text-emerald-800"], atrasada: ["Pagamento em atraso", "bg-amber-100 text-amber-800"],
+      suspensa: ["Suspensa por falta de pagamento", "bg-rose-100 text-rose-800"], teste: ["Teste grátis", "bg-sky-100 text-sky-800"],
+      teste_encerrado: ["Teste encerrado", "bg-slate-200 text-slate-700"], cancelada: ["Cancelada", "bg-slate-200 text-slate-700"]
+    };
+    var sit = SIT[a.situacao] || SIT.em_dia;
+
+    // resumo
+    var c1 = h$("div", "border border-slate-200 rounded-xl p-4 bg-white mb-3");
+    var topo = h$("div", "flex items-start justify-between gap-2");
+    var esq = h$("div");
+    esq.appendChild(h$("div", "text-xs text-slate-500", "Seu plano"));
+    esq.appendChild(h$("div", "text-lg font-bold text-slate-900", a.plano || "—"));
+    esq.appendChild(h$("div", "text-sm text-slate-600", "R$ " + (a.valor || "—") + assinSufixo(a.forma) + " · " + assinForma(a.forma)));
+    topo.appendChild(esq);
+    topo.appendChild(h$("span", "text-[11px] font-bold px-2 py-1 rounded-full whitespace-nowrap " + sit[1], sit[0]));
+    c1.appendChild(topo);
+    if (a.cancelar_em) c1.appendChild(h$("div", "mt-3 text-sm text-rose-700 font-semibold", "Cancelamento agendado para " + a.cancelar_em + ". Até lá tudo funciona normalmente."));
+    if (a.situacao === "teste" && a.trial_fim) c1.appendChild(h$("div", "mt-3 text-sm text-slate-600", "O teste grátis vai até " + a.trial_fim + ". Nada é cobrado sem você confirmar."));
+    if (a.situacao === "teste" && !a.trial_fim) c1.appendChild(h$("div", "mt-3 text-sm text-slate-600", "Os 7 dias grátis começam quando a assistente entrar no ar, depois que você conectar o WhatsApp."));
+    if (a.situacao === "teste_encerrado") c1.appendChild(h$("div", "mt-3 text-sm text-slate-600", "O teste terminou e a assistente está pausada. Pague abaixo para ela voltar ao ar."));
+    box.appendChild(c1);
+
+    // cobrança em aberto
+    var abertas = (a.abertas && a.abertas.length) ? a.abertas : (a.proxima ? [a.proxima] : []);
+    abertas.forEach(function (p) {
+      var venc = p.vencida;
+      var c2 = h$("div", "border rounded-xl p-4 mb-3 " + (venc ? "border-rose-300 bg-rose-50" : "border-emerald-200 bg-emerald-50"));
+      c2.appendChild(h$("div", "text-xs " + (venc ? "text-rose-700" : "text-emerald-800"), venc ? "Cobrança vencida" : "Cobrança em aberto"));
+      c2.appendChild(h$("div", "text-base font-bold text-slate-900 mt-0.5", "R$ " + p.valor + " · " + (venc ? "venceu em " : "vence em ") + p.vencimento));
+      if (p.descricao) c2.appendChild(h$("div", "text-xs text-slate-600", p.descricao));
+      if (p.link) {
+        var pay = h$("a", "block text-center mt-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl", "Pagar agora");
+        pay.href = p.link; pay.target = "_blank"; pay.rel = "noopener"; c2.appendChild(pay);
+        c2.appendChild(h$("div", "text-[11px] text-slate-500 mt-2 text-center", "Pix, boleto ou cartão, na página segura do Asaas."));
+      }
+      box.appendChild(c2);
+    });
+    if (!abertas.length && a.proximo_vencimento) {
+      box.appendChild(h$("div", "text-sm text-slate-600 mb-3 px-1", "Próxima cobrança: " + a.proximo_vencimento + ". O link chega por e-mail alguns dias antes."));
+    }
+
+    // teste: gerar o pagamento quando quiser
+    if ((a.situacao === "teste" || a.situacao === "teste_encerrado") && !abertas.length && !a.cobranca_gerada) {
+      var ct = h$("div", "border border-emerald-200 rounded-xl p-4 bg-emerald-50 mb-3");
+      ct.appendChild(h$("div", "text-sm font-semibold text-emerald-900", a.situacao === "teste" ? "Gostou? Garanta a continuidade agora" : "Quer reativar a assistente?"));
+      ct.appendChild(h$("div", "text-xs text-emerald-900/80 mt-1", "Geramos o pagamento do plano " + (a.plano || "") + " (R$ " + (a.valor || "—") + assinSufixo(a.forma) + (a.forma === "mensal" ? ", mais a taxa de implantação de R$ 999, uma única vez" : "") + "). " + (a.situacao === "teste" && a.trial_fim ? "O primeiro vencimento fica para o fim do teste, " + a.trial_fim + ", e a assistente segue sem interrupção." : "Assim que o pagamento for confirmado, a assistente volta ao ar.")));
+      var bt = h$("button", "mt-3 w-full text-sm font-bold py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white", "Quero continuar: gerar pagamento");
+      bt.onclick = function () { assinAcao("assinatura_pagar_teste", {}, "Gerar agora o pagamento para continuar com a RXSync depois do teste?", bt); };
+      ct.appendChild(bt);
+      box.appendChild(ct);
+    }
+
+    // histórico
+    if (a.historico && a.historico.length) {
+      var c3 = h$("div", "border border-slate-200 rounded-xl p-4 bg-white mb-3");
+      c3.appendChild(h$("div", "text-sm font-semibold text-slate-800 mb-2", "Histórico de cobranças"));
+      a.historico.forEach(function (x) {
+        var row = h$("div", "flex items-center justify-between gap-2 py-2 border-t border-slate-100 text-sm");
+        var l = h$("div");
+        l.appendChild(h$("div", "text-slate-800", x.vencimento + " · R$ " + x.valor));
+        l.appendChild(h$("div", "text-[11px] text-slate-500", (x.descricao ? x.descricao + " · " : "") + x.status + (x.pago_em ? " em " + x.pago_em : "")));
+        row.appendChild(l);
+        if (x.link) { var v = h$("a", "text-xs font-semibold text-primary-700 underline shrink-0", x.aberta ? "Pagar" : "Recibo"); v.href = x.link; v.target = "_blank"; v.rel = "noopener"; row.appendChild(v); }
+        c3.appendChild(row);
+      });
+      box.appendChild(c3);
+    } else if (a.asaas_ok === false) {
+      box.appendChild(h$("div", "text-xs text-slate-500 mb-3 px-1", "O histórico de cobranças aparece aqui depois da primeira cobrança."));
+    }
+
+    var encerrada = a.situacao === "cancelada" || a.situacao === "teste_encerrado";
+    // trocar de plano
+    if (!encerrada && ASSIN_PRECOS[a.plano_chave]) {
+      var c4 = h$("div", "border border-slate-200 rounded-xl p-4 bg-white mb-3");
+      c4.appendChild(h$("div", "text-sm font-semibold text-slate-800 mb-1", "Mudar de plano"));
+      c4.appendChild(h$("div", "text-xs text-slate-500 mb-3", "O novo valor vale a partir da próxima cobrança em aberto. Sem nova taxa de implantação."));
+      var grid = h$("div", "grid grid-cols-1 sm:grid-cols-2 gap-3");
+      ["essencial", "gestao"].forEach(function (k) {
+        var P = ASSIN_PRECOS[k], atual = k === a.plano_chave;
+        var card = h$("div", "border rounded-xl p-3 " + (atual ? "border-emerald-400 bg-emerald-50" : "border-slate-200"));
+        card.appendChild(h$("div", "font-bold text-slate-900", P.nome));
+        card.appendChild(h$("div", "text-sm text-slate-700", "R$ " + P[a.forma] + assinSufixo(a.forma)));
+        var ul = h$("ul", "mt-2 text-[11px] text-slate-600 space-y-0.5");
+        P.itens.forEach(function (i) { ul.appendChild(h$("li", "", "• " + i)); });
+        card.appendChild(ul);
+        if (atual) card.appendChild(h$("div", "mt-3 text-xs font-bold text-emerald-700", "Seu plano atual"));
+        else {
+          var bloqueado = a.cancelar_em || a.situacao === "suspensa" || (a.forma !== "mensal" && k === "essencial");
+          var b = h$("button", "mt-3 w-full text-xs font-semibold py-2 rounded-lg border " + (bloqueado ? "border-slate-200 text-slate-400" : "border-primary-900 text-primary-900 hover:bg-slate-50"), "Mudar para " + P.nome);
+          if (bloqueado) {
+            b.disabled = true;
+            card.appendChild(b);
+            card.appendChild(h$("div", "text-[11px] text-slate-500 mt-1", a.situacao === "suspensa" ? "Regularize o pagamento para mudar de plano." : (a.cancelar_em ? "Há um cancelamento agendado." : "No plano anual, a troca para um plano menor vale na renovação.")));
+          } else {
+            b.onclick = function () { assinAcao("assinatura_trocar_plano", { plano: k }, "Mudar para o plano " + P.nome + "? O valor passa a ser R$ " + P[a.forma] + assinSufixo(a.forma) + " a partir da próxima cobrança.", b); };
+            card.appendChild(b);
+          }
+        }
+        grid.appendChild(card);
+      });
+      c4.appendChild(grid);
+      box.appendChild(c4);
+    }
+
+    // pedido livre (ciclo, condições etc.)
+    if (!encerrada) {
+      var c5 = h$("div", "border border-slate-200 rounded-xl p-4 bg-white mb-3");
+      c5.appendChild(h$("div", "text-sm font-semibold text-slate-800 mb-1", "Pedir mudança de ciclo ou outro ajuste"));
+      c5.appendChild(h$("div", "text-xs text-slate-500 mb-2", "Por exemplo: passar de mensal para anual. A nossa equipe fala com você."));
+      var ta = h$("textarea", "w-full border border-slate-300 rounded-lg p-2 text-sm"); ta.rows = 2; ta.maxLength = 500;
+      c5.appendChild(ta);
+      var bp = h$("button", "mt-2 w-full text-xs font-semibold py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50", "Enviar pedido");
+      bp.onclick = function () { if (!ta.value.trim()) { toast("Escreva o que você precisa."); return; } assinAcao("assinatura_pedido", { texto: ta.value }, null, bp); };
+      c5.appendChild(bp);
+      box.appendChild(c5);
+    }
+
+    // cancelar / desistir
+    if (!encerrada) {
+      var c6 = h$("div", "border border-rose-200 rounded-xl p-4 bg-white");
+      if (a.cancelar_em) {
+        c6.appendChild(h$("div", "text-sm text-slate-700 mb-2", "Seu cancelamento está agendado para " + a.cancelar_em + "."));
+        var bd = h$("button", "w-full text-sm font-semibold py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white", "Desistir do cancelamento");
+        bd.onclick = function () { assinAcao("assinatura_desistir", {}, "Desistir do cancelamento e manter a assinatura?", bd); };
+        c6.appendChild(bd);
+      } else {
+        var teste = a.situacao === "teste";
+        var msg = teste ? "Encerrar o teste agora? A assistente é desligada na hora e nada será cobrado."
+          : (a.forma === "mensal" ? "Cancelar a assinatura? Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Você pode desistir até a data."
+            : "Seu plano é anual, com permanência. Vamos avisar a nossa equipe para combinar as condições do cancelamento com você. Continuar?");
+        var bc = h$("button", "w-full text-sm font-semibold py-2.5 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50", teste ? "Encerrar teste grátis" : "Cancelar assinatura");
+        bc.onclick = function () { assinAcao("assinatura_cancelar", {}, msg, bc); };
+        c6.appendChild(bc);
+      }
+      box.appendChild(c6);
+    }
+  }
+
   function agCarregar() {
     agChamar("agenda_listar").then(function (rows) {
       agDados = rows || [];
@@ -767,7 +950,7 @@ function partesTz(ms) {
   function mostrarBannerConta(conta) {
     var b = el("bannerConta");
     if (!conta || !conta.situacao) return;
-    var cta = " <a class='underline font-semibold' href='mailto:contato@rxsync.com.br?subject=Quero%20continuar%20com%20a%20RXSync'>Responda ao e-mail ou fale com a gente</a> para receber as instruções de pagamento.";
+    var cta = " <a class='underline font-semibold cursor-pointer' onclick='irParaAba(\"assinatura\")'>é só confirmar na aba Assinatura</a>.";
     var cor = "bg-emerald-50 border-emerald-200 text-emerald-900", txt = "";
     if (conta.situacao === "em_teste") {
       var d = conta.dias_restantes;
@@ -779,6 +962,9 @@ function partesTz(ms) {
     } else if (conta.situacao === "teste_encerrado") {
       cor = "bg-rose-50 border-rose-200 text-rose-900";
       txt = "<strong>Seu teste terminou e a assistente está pausada.</strong> As mensagens continuam chegando para a sua equipe, sem a assistente respondendo. Suas informações estão guardadas por 15 dias." + cta;
+    } else if (conta.situacao === "suspenso") {
+      cor = "bg-rose-50 border-rose-200 text-rose-900";
+      txt = "<strong>Assistente suspensa por falta de pagamento.</strong> As mensagens continuam chegando para a sua equipe, sem a assistente responder. <a class='underline font-semibold cursor-pointer' onclick='irParaAba(\"assinatura\")'>Pague na aba Assinatura</a> e ela volta ao ar sozinha.";
     } else { return; }
     b.className = "px-6 sm:px-8 py-4 text-sm border-b " + cor;
     b.innerHTML = txt;
