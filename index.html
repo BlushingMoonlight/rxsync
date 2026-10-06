@@ -282,7 +282,7 @@
               "name": "Posso testar antes de colocar a IA no WhatsApp da clínica?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Sim. Liberamos um número de teste para você e sua equipe conversarem com a IA como se fossem pacientes, e ajustamos o que for preciso antes de ela atender o WhatsApp oficial. Além disso, você tem sete dias para desistir sem custo."
+                "text": "Sim. Você pode começar com 7 dias grátis, sem cartão de crédito: faz o cadastro, configura a assistente e conecta o WhatsApp da clínica. Os 7 dias contam a partir do dia em que ela entra no ar. Antes de acabar, avisamos; se quiser continuar, enviamos as instruções de pagamento, e se não quiser, a assistente é pausada e nada é cobrado. Se preferir, também liberamos um número de teste para você e sua equipe conversarem com a IA como se fossem pacientes antes de ela atender o WhatsApp oficial."
               }
             },
             {
@@ -306,7 +306,7 @@
               "name": "Como funciona o contrato e o pagamento?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Você recebe um link para assinar os termos e o contrato, sem nenhum pagamento nessa etapa. Depois da assinatura, começa a implantação. No plano mensal, sem fidelidade, você paga a mensalidade mais a taxa única de implantação de R$ 999 (que não é parcelada). No plano anual não há taxa de implantação, e há permanência de 12 meses. Em ambos você tem sete dias para desistir sem custo."
+                "text": "Você aceita os termos e o contrato online, no cadastro, e escolhe como começar: o teste grátis de 7 dias, sem cartão e sem pagamento nessa etapa, ou a contratação direta. Quem testa e decide continuar recebe as instruções de pagamento no fim do teste. Depois do aceite, começa a implantação. No plano mensal, sem fidelidade, você paga a mensalidade mais a taxa única de implantação de R$ 999 (que não é parcelada). No plano anual não há taxa de implantação, e há permanência de 12 meses. Na contratação direta, você ainda tem sete dias para desistir sem custo."
               }
             },
             {
@@ -432,7 +432,10 @@
                 <p class="mt-4 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
                     Uma assistente virtual treinada com as regras da sua clínica tira dúvidas, passa valores e agenda direto no seu sistema — em português impecável, com a educação que a sua recepção teria se tivesse tempo.
                 </p>
-                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4 md:mb-16">
+                <div class="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-4 mb-4 md:mb-16">
+                    <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" onclick="trackCta('hero_teste_gratis')" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-xl text-white bg-emerald-500 hover:bg-emerald-400 shadow-xl transition-all hover:scale-105 text-center">
+                        Começar 7 dias grátis
+                    </a>
                     <a href="#precos" onclick="trackCta('hero_ver_planos')" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl text-primary-900 bg-white hover:bg-slate-100 shadow-xl transition-all hover:scale-105 text-center">
                         Ver planos e preços
                     </a>
@@ -874,7 +877,7 @@
                         </div>
                         <div class="mb-8 pb-8 border-b border-slate-100 flex flex-wrap gap-2">
                             <span class="inline-flex items-center gap-2 text-xs font-bold text-primary-700 bg-primary-50 border border-primary-100 rounded-full px-3 py-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Até 5.000 mensagens/mês</span>
-                            <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7 dias para desistir sem custo</span>
+                            <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7 dias grátis, sem cartão</span>
                         </div>
                         <ul class="space-y-4 mb-8 flex-1">
                             <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Triagem automatizada 24/7 (Nome, Convênio)</span></li>
@@ -885,8 +888,9 @@
                             <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-500 mr-3 shrink-0"></i><span class="text-slate-600 text-sm font-medium">Campo de instruções extras para a IA (até 500 caracteres)</span></li>
                         </ul>
                         <button onclick="irParaContratacao('essencial','Essencial')" class="w-full text-center px-4 py-3.5 border-2 border-primary-900 text-primary-900 font-bold rounded-xl hover:bg-primary-900 hover:text-white transition-colors">
-                            Selecionar Essencial
+                            Começar 7 dias grátis
                         </button>
+                        <p class="text-xs text-slate-500 text-center mt-3">Sem cartão de crédito. Se preferir, contrate direto na tela seguinte.</p>
                     </div>
 
                     <!-- Plano 2 -->
@@ -908,7 +912,7 @@
                             <p class="text-xs text-white/70 mt-1">Sem taxa de implantação &middot; permanência de 12 meses</p>
                         </div>
                         <div class="mb-8 pb-8 border-b border-primary-700/50 flex flex-wrap gap-2">
-                            <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-3 py-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7 dias para desistir sem custo</span>
+                            <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-3 py-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> 7 dias grátis, sem cartão</span>
                             <span class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1.5"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> Até 15.000 mensagens/mês</span>
                         </div>
                         <ul class="space-y-4 mb-8 flex-1">
@@ -920,8 +924,9 @@
                             <li class="flex items-start"><i data-lucide="check" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i><span class="text-white/90 text-sm font-medium">Campo de instruções extras para a IA (até 2.000 caracteres)</span></li>
                         </ul>
                         <button onclick="irParaContratacao('gestao','Gestão Inteligente')" class="w-full text-center px-4 py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 shadow-lg transition-colors">
-                            Selecionar Gestão
+                            Começar 7 dias grátis
                         </button>
+                        <p class="text-xs text-white/60 text-center mt-3">Sem cartão de crédito. Se preferir, contrate direto na tela seguinte.</p>
                     </div>
 
                     <!-- Plano 3 -->
@@ -1139,7 +1144,7 @@
                             </button>
                             <div class="faq-content bg-slate-50">
                                 <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                    Sim. Liberamos um número de teste para você e sua equipe conversarem com a IA como se fossem pacientes, e ajustamos o que for preciso antes de ela atender o WhatsApp oficial. Além disso, você tem sete dias para desistir sem custo.
+                                    Sim. Você pode começar com 7 dias grátis, sem cartão de crédito: faz o cadastro, configura a assistente e conecta o WhatsApp da clínica. Os 7 dias contam a partir do dia em que ela entra no ar. Antes de acabar, avisamos; se quiser continuar, enviamos as instruções de pagamento, e se não quiser, a assistente é pausada e nada é cobrado. Se preferir, também liberamos um número de teste para você e sua equipe conversarem com a IA como se fossem pacientes antes de ela atender o WhatsApp oficial.
                                 </div>
                             </div>
                         </div>
@@ -1176,7 +1181,7 @@
                             </button>
                             <div class="faq-content bg-slate-50">
                                 <div class="px-6 py-5 text-slate-600 text-sm border-t border-slate-100 leading-relaxed">
-                                    Você recebe um link para assinar os termos e o contrato, sem nenhum pagamento nessa etapa. Depois da assinatura, começa a implantação. No plano mensal, sem fidelidade, você paga a mensalidade mais a taxa única de implantação de R$ 999 (que não é parcelada). No plano anual não há taxa de implantação, e há permanência de 12 meses. Em ambos você tem sete dias para desistir sem custo.
+                                    Você aceita os termos e o contrato online, no cadastro, e escolhe como começar: o teste grátis de 7 dias, sem cartão e sem pagamento nessa etapa, ou a contratação direta. Quem testa e decide continuar recebe as instruções de pagamento no fim do teste. Depois do aceite, começa a implantação. No plano mensal, sem fidelidade, você paga a mensalidade mais a taxa única de implantação de R$ 999 (que não é parcelada). No plano anual não há taxa de implantação, e há permanência de 12 meses. Na contratação direta, você ainda tem sete dias para desistir sem custo.
                                 </div>
                             </div>
                         </div>
