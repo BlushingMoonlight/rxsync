@@ -830,7 +830,8 @@ agendamentos, e que a equipe do Cliente pode acompanhar e editar. O Cliente
 mantém nela a grade de horários e a disponibilidade atualizadas.</p></li>
 <li><p>Transcrição automática de áudios recebidos dos pacientes para
 texto na conversa.</p></li>
-<li><p>Retomada de conversa: quando o paciente interrompe a conversa antes de concluir o agendamento, o Assistente Virtual envia uma única mensagem de retomada, em horário comercial, desde que a equipe do Cliente não tenha assumido a conversa e o paciente não tenha pedido para ser deixado em paz.</p></li>
+<li><p>Retomada de conversa: quando o paciente interrompe a conversa antes de concluir o agendamento, o Assistente Virtual envia uma única mensagem de retomada, após o tempo escolhido pelo Cliente no Painel de Configuração (padrão: 3 horas) e em horário comercial, ou nenhuma, se o Cliente desativar a função, desde que a equipe do Cliente não tenha assumido a conversa e o paciente não tenha pedido para ser deixado em paz.</p></li>
+<li><p>Lembretes de consulta: envio automático, ao paciente que agendou pelo Assistente Virtual ou teve a consulta lançada pela equipe na Agenda RXSync, de lembretes nos horários antes da consulta escolhidos pelo Cliente no Painel de Configuração (padrão: 24 e 2 horas antes), em horário comercial, com pedido de confirmação de presença. O paciente pode confirmar, cancelar ou remarcar respondendo na própria conversa, e o cancelamento por ele solicitado é efetivado de imediato, sem necessidade de confirmação pela equipe do Cliente. A confirmação de presença é informativa e não gera obrigação para nenhuma das partes.</p></li>
 <li><p>Campo de instruções adicionais para o Assistente Virtual, editável
 pelo Cliente no Painel de Configuração, com limite de caracteres
 conforme o plano contratado (itens 2, 3 e 4 deste Anexo).</p></li>
@@ -853,11 +854,9 @@ item 1, acrescido de (o campo de instruções adicionais tem limite de
 ofereça API aberta, indicado na contratação, para consulta de
 disponibilidade e gravação de agendamentos, como alternativa à Agenda
 RXSync.</p></li>
-<li><p>Cadência configurável de lembretes de confirmação.</p></li>
 <li><p>Atualização automática de status do agendamento no Sistema de
 Gestão, quando suportado pela API deste.</p></li>
-<li><p>Acionamento de fila de espera para reposição de horários
-liberados.</p></li>
+<li><p>Acionamento de fila de espera para reposição de horários liberados: o Assistente Virtual registra pacientes interessados em horário indisponível e, quando uma consulta é cancelada, oferece a vaga a quem aguarda, uma pessoa por vez e por prazo de 1 (uma) hora, reservando-a a quem a aceitar.</p></li>
 <li><p><em>Follow-up</em> automático de orçamentos sem
 resposta.</p></li>
 <li><p>Pesquisa de satisfação (NPS) pós-consulta, com convite à
