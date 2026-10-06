@@ -80,12 +80,25 @@
 
       <div class="px-6 sm:px-8 py-6">
         <div class="tab-conteudo" data-tab="agenda">
+          <div id="calViews" class="flex gap-1 mb-3"></div>
           <div class="flex items-center justify-between gap-2 mb-3">
             <div id="agChips" class="flex gap-1.5 overflow-x-auto"></div>
             <button id="agNovo" class="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Novo</button>
           </div>
           <div id="agForm" class="hidden border border-slate-200 rounded-xl p-4 mb-4 bg-slate-50"></div>
           <div id="agLista" class="space-y-3"><div class="text-sm text-slate-500 text-center py-8">Carregando agenda...</div></div>
+          <div id="calWrap" class="hidden">
+            <div class="flex items-center justify-between mb-3 gap-2">
+              <div class="flex gap-1">
+                <button id="calPrev" type="button" class="text-sm font-bold px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700">‹</button>
+                <button id="calHoje" type="button" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700">Hoje</button>
+                <button id="calProx" type="button" class="text-sm font-bold px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700">›</button>
+              </div>
+              <div id="calTitulo" class="text-sm font-semibold text-slate-800 text-right capitalize"></div>
+            </div>
+            <div id="calBox"><div class="text-sm text-slate-500 text-center py-8">Carregando...</div></div>
+            <div id="calDetalhe" class="mt-4"></div>
+          </div>
         </div>
         <div class="tab-conteudo" data-tab="contato">
           <div class="mb-5">
@@ -117,15 +130,9 @@
         <div class="tab-conteudo" data-tab="agendamento">
           <div id="campos_agendamento"></div>
           <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wide mt-6 mb-2">Grade de horários de agendamento</h2>
-          <p class="text-xs text-slate-500 mb-3">Deixe em branco os dias em que não atende.</p>
-          <div id="gradeHorarios" class="space-y-2 mb-6"></div>
-          <div class="campo">
-            <label>Agendamento automático</label>
-            <select id="confirmacaoAutomatica">
-              <option value="SIM">Sim, a assistente marca sozinha na agenda</option>
-              <option value="NAO">Não, ela só conversa e não marca</option>
-            </select>
-          </div>
+          <p class="text-xs text-slate-500 mb-3">A assistente só oferece e marca horários dentro desta grade. Dia sem faixa = não atende. Você pode ter mais de uma faixa no mesmo dia (ex.: manhã e tarde).</p>
+          <div id="gradeHorarios" class="space-y-2 mb-3"></div>
+          <button id="gradeSalvar" type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 rounded-lg mb-6">Salvar grade de horários</button>
           <div class="mt-3">
             <button id="btnPedirAjudaAgendamento" class="w-full border border-slate-300 hover:border-primary-900 text-slate-700 hover:text-primary-900 text-sm font-semibold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
               <i data-lucide="life-buoy" class="w-4 h-4"></i> Preciso de ajuda para configurar isso
@@ -268,40 +275,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     });
   });
 
-  var gradeDiv = el("gradeHorarios");
-  function horariosAtuais() {
-    var g = {};
-    DIAS.forEach(function (d) {
-      var abre = el("abre_" + d.key).value, fecha = el("fecha_" + d.key).value;
-      g[d.key] = (abre && fecha) ? { abre: abre, fecha: fecha } : null;
-    });
-    return g;
-  }
-  function autosaveHorarios() {
-    var valor = JSON.stringify(horariosAtuais());
-    if (savedValues.horarios_estruturados === valor) return;
-    autosaveCampo("horarios_estruturados", valor);
-  }
-  DIAS.forEach(function (d) {
-    var row = document.createElement("div");
-    row.className = "flex items-center gap-2";
-    row.innerHTML =
-      '<span class="w-20 text-xs text-slate-600 shrink-0">' + d.label + '</span>' +
-      '<input type="time" id="abre_' + d.key + '" class="border border-slate-300 rounded-lg p-2 text-sm flex-1">' +
-      '<span class="text-xs text-slate-400">até</span>' +
-      '<input type="time" id="fecha_' + d.key + '" class="border border-slate-300 rounded-lg p-2 text-sm flex-1">';
-    gradeDiv.appendChild(row);
-    row.querySelectorAll("input").forEach(function (inp) { inp.addEventListener("blur", autosaveHorarios); });
-  });
-  marcarLimpo("horarios_estruturados");
 
-  el("confirmacaoAutomatica").addEventListener("change", function () {
-    var v = el("confirmacaoAutomatica").value;
-    chamar("salvar", { confirmacao_automatica: v }).then(function (resp) {
-      if (resp.ok) { savedValues.confirmacao_automatica = v; toast("Salvo ✓"); }
-      else { toast(resp.mensagem || "Não consegui salvar."); }
-    }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
-  });
 
   el("btnPedirAjudaAgendamento").addEventListener("click", function () {
     var btn = el("btnPedirAjudaAgendamento");
@@ -394,13 +368,14 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     agChamar("agenda_listar").then(function (rows) {
       agDados = rows || [];
       var g = agGrupos();
-      if (!g.novos.length && agFiltro === "novos") agFiltro = g.confirmar.length ? "confirmar" : "proximos";
+      if (!g.novos.length && agFiltro === "novos") agFiltro = "proximos";
       agRender();
+      if (calView !== "lista") calCarregar();
     }).catch(function () { el("agLista").innerHTML = ""; el("agLista").appendChild(h$("div", "text-sm text-rose-600 text-center py-8", "Não consegui carregar a agenda. Recarregue a página.")); });
   }
   function agRender() {
     var g = agGrupos(), chips = el("agChips"); chips.innerHTML = "";
-    [["novos", "Novos"], ["confirmar", "A confirmar"], ["proximos", "Próximos"], ["passados", "Passados"], ["cancelados", "Cancelados"]].forEach(function (c) {
+    [["novos", "Novos"], ["proximos", "Próximos"], ["passados", "Passados"], ["cancelados", "Cancelados"]].forEach(function (c) {
       var b = h$("button", "whitespace-nowrap text-xs font-semibold px-3 py-2 rounded-lg border " + (agFiltro === c[0] ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-300"), c[1] + " (" + g[c[0]].length + ")");
       b.onclick = function () { agFiltro = c[0]; agRender(); };
       chips.appendChild(b);
@@ -421,7 +396,6 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     top.appendChild(l);
     var tags = h$("div", "flex flex-wrap gap-1 justify-end");
     if (!a.visto && agila(a)) tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800", "NOVO"));
-    if (a.status === "pendente") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800", "A CONFIRMAR"));
     if (a.status === "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800", "CANCELADO"));
     tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
     top.appendChild(tags); c.appendChild(top);
@@ -429,7 +403,6 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (a.observacoes) c.appendChild(h$("div", "mt-2 text-xs text-slate-600", "Obs.: " + a.observacoes));
     var acoes = h$("div", "mt-3 flex flex-wrap gap-2");
     var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(a.telefone_paciente); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa);
-    if (a.status === "pendente") acoes.appendChild(agBtn("Confirmar", "bg-emerald-600 text-white border-emerald-600", function () { agChamar("agenda_confirmar", { id: a.id }).then(function () { toast("Confirmado ✓"); agCarregar(); }).catch(function () { toast("Não consegui confirmar."); }); }));
     if (agila(a)) {
       if (!a.visto) acoes.appendChild(agBtn("Marcar como visto", "border-slate-300 text-slate-700", function () { agChamar("agenda_visto", { id: a.id }).then(agCarregar); }));
       acoes.appendChild(agBtn("Editar", "border-slate-300 text-slate-700", function () { agForm(a); }));
@@ -445,15 +418,16 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       f.appendChild(h$("label", "block text-xs text-slate-500 mb-1", c[1]));
       var i = h$("input", cls); i.type = c[2]; i.value = c[3] || ""; campos[c[0]] = i; f.appendChild(i);
     });
+    if (!a && calView === "dia") { campos.ini.value = chave(calRef) + "T09:00"; campos.fim.value = somaMin(campos.ini.value, duracaoMin()); }
     campos.ini.addEventListener("change", function () { if (campos.ini.value) campos.fim.value = somaMin(campos.ini.value, duracaoMin()); });
-    var forca = h$("input"); forca.type = "checkbox"; var fl = h$("label", "flex items-center gap-2 text-xs text-slate-600 mb-3"); fl.appendChild(forca); fl.appendChild(h$("span", "", "Permitir encaixe (mesmo se o horário estiver ocupado)")); f.appendChild(fl);
+    var forca = h$("input"); forca.type = "checkbox"; var fl = h$("label", "flex items-center gap-2 text-xs text-slate-600 mb-3"); fl.appendChild(forca); fl.appendChild(h$("span", "", "Permitir encaixe (mesmo fora da grade ou com horário ocupado)")); f.appendChild(fl);
     var r = h$("div", "flex gap-2");
     r.appendChild(agBtn("Salvar", "bg-emerald-600 text-white border-emerald-600", function () {
       var d = { nome_paciente: campos.nome.value, telefone_paciente: campos.tel.value, servico: campos.serv.value, inicio: deInput(campos.ini.value), fim: deInput(campos.fim.value), observacoes: campos.obs.value, forcar: forca.checked };
       if (a) d.id = a.id;
       agChamar(a ? "agenda_editar" : "agenda_criar", d).then(function (res) {
         if (res.ok) { f.classList.add("hidden"); toast("Salvo ✓"); agCarregar(); }
-        else toast(res.erro === "conflito" ? "Esse horário já está ocupado. Marque 'encaixe' para forçar." : "Confira nome, telefone e horários.");
+        else toast(res.erro === "conflito" ? "Já existe um agendamento nesse horário. Marque 'encaixe' para forçar." : res.erro === "fora_da_grade" ? "Fora da sua grade de horários. Marque 'encaixe' para forçar." : "Confira nome, telefone e horários.");
       }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
     }));
     r.appendChild(agBtn("Fechar", "border-slate-300 text-slate-700", function () { f.classList.add("hidden"); }));
@@ -461,6 +435,179 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     f.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
   el("agNovo").addEventListener("click", function () { agForm(null); });
+
+  // ===== GRADE DE HORÁRIOS =====
+  var gradeDados = [];
+  var DIAS_SEM = [[1, "Segunda"], [2, "Terça"], [3, "Quarta"], [4, "Quinta"], [5, "Sexta"], [6, "Sábado"], [0, "Domingo"]];
+  function gradeCarregar() {
+    return agChamar("agenda_grade_listar").then(function (rows) { gradeDados = rows || []; gradeDesenhar(); if (calView !== "lista") calRender(); })
+      .catch(function () { el("gradeHorarios").innerHTML = ""; el("gradeHorarios").appendChild(h$("div", "text-sm text-rose-600", "Não consegui carregar a grade.")); });
+  }
+  function gradeDesenhar() {
+    var box = el("gradeHorarios"); box.innerHTML = "";
+    DIAS_SEM.forEach(function (d) {
+      var linha = h$("div", "border border-slate-200 rounded-lg p-2 bg-white"), topo = h$("div", "flex items-center justify-between mb-1");
+      topo.appendChild(h$("span", "text-xs font-semibold text-slate-700", d[1]));
+      var add = h$("button", "text-xs text-emerald-700 font-semibold", "+ faixa"); add.type = "button";
+      add.onclick = function () { gradeDados.push({ dia: d[0], inicio: "09:00", fim: "12:00" }); gradeDesenhar(); };
+      topo.appendChild(add); linha.appendChild(topo);
+      var tem = false;
+      gradeDados.forEach(function (g, idx) {
+        if (g.dia !== d[0]) return; tem = true;
+        var r = h$("div", "flex items-center gap-2 mb-1"), tcls = "border border-slate-300 rounded-lg p-2 text-sm flex-1 min-w-0";
+        var a = h$("input", tcls); a.type = "time"; a.value = g.inicio; a.onchange = function () { g.inicio = a.value; };
+        var b = h$("input", tcls); b.type = "time"; b.value = g.fim; b.onchange = function () { g.fim = b.value; };
+        var x = h$("button", "text-xs text-rose-600 shrink-0", "remover"); x.type = "button"; x.onclick = function () { gradeDados.splice(idx, 1); gradeDesenhar(); };
+        r.appendChild(a); r.appendChild(h$("span", "text-xs text-slate-400", "até")); r.appendChild(b); r.appendChild(x); linha.appendChild(r);
+      });
+      if (!tem) linha.appendChild(h$("div", "text-xs text-slate-400", "Não atende"));
+      box.appendChild(linha);
+    });
+  }
+  el("gradeSalvar").addEventListener("click", function () {
+    agChamar("agenda_grade_salvar", { grade: gradeDados }).then(function (res) {
+      if (res && res.ok) { toast("Grade salva ✓"); gradeCarregar(); } else toast("Confira os horários: o fim precisa ser depois do início e as faixas do mesmo dia não podem se sobrepor.");
+    }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
+  });
+
+  // ===== CALENDÁRIO: DIA / SEMANA / MÊS (Brasília = UTC-3 fixo; datas "locais" são lidas com getUTC*) =====
+  var calView = window.innerWidth < 640 ? "dia" : "semana", calDados = [], calReq = 0, PX = 48;
+  function fake(ms) { return new Date(ms - 3 * 3600000); }
+  function hojeLocal() { var d = fake(Date.now()); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
+  var calRef = hojeLocal();
+  function chave(d) { return d.toISOString().slice(0, 10); }
+  function somaDias(d, n) { return new Date(d.getTime() + n * 86400000); }
+  function iniSemana(d) { return somaDias(d, -((d.getUTCDay() + 6) % 7)); }
+  function minDia(iso) { var d = fake(new Date(iso).getTime()); return d.getUTCHours() * 60 + d.getUTCMinutes(); }
+  function chaveIso(iso) { return chave(fake(new Date(iso).getTime())); }
+  function dur(a) { return Math.max(15, Math.round((new Date(a.fim) - new Date(a.inicio)) / 60000)); }
+  function hm(v) { var p = String(v).split(":"); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); }
+  function hhmm(m) { var h = Math.floor(m / 60), mm = m % 60; return (h < 10 ? "0" : "") + h + ":" + (mm < 10 ? "0" : "") + mm; }
+  function fmtD(d, o) { o.timeZone = "UTC"; return d.toLocaleDateString("pt-BR", o); }
+  function calIntervalo() {
+    if (calView === "dia") return { ini: calRef, n: 1 };
+    if (calView === "semana") return { ini: iniSemana(calRef), n: 7 };
+    return { ini: iniSemana(new Date(Date.UTC(calRef.getUTCFullYear(), calRef.getUTCMonth(), 1))), n: 42 };
+  }
+  function calBarra() {
+    var b = el("calViews"); b.innerHTML = "";
+    [["lista", "Lista"], ["dia", "Dia"], ["semana", "Semana"], ["mes", "Mês"]].forEach(function (v) {
+      var x = h$("button", "flex-1 text-xs font-semibold px-3 py-2 rounded-lg border " + (calView === v[0] ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-600 border-slate-300"), v[1]);
+      x.type = "button";
+      x.onclick = function () { calView = v[0]; calMostrar(); if (v[0] === "lista") agRender(); else calCarregar(); };
+      b.appendChild(x);
+    });
+  }
+  function calMostrar() {
+    var lista = calView === "lista";
+    el("agChips").classList.toggle("hidden", !lista); el("agLista").classList.toggle("hidden", !lista); el("calWrap").classList.toggle("hidden", lista);
+    el("calDetalhe").innerHTML = ""; calBarra();
+  }
+  function calCarregar() {
+    if (calView === "lista") return;
+    var r = calIntervalo(), n = ++calReq;
+    el("calTitulo").textContent = calTitulo();
+    agChamar("agenda_listar", { de: chave(r.ini) + "T00:00:00-03:00", ate: chave(somaDias(r.ini, r.n)) + "T00:00:00-03:00" }).then(function (rows) {
+      if (n !== calReq) return;
+      calDados = (rows || []).filter(agila); calRender();
+    }).catch(function () { if (n !== calReq) return; el("calBox").innerHTML = ""; el("calBox").appendChild(h$("div", "text-sm text-rose-600 text-center py-8", "Não consegui carregar o calendário.")); });
+  }
+  function calTitulo() {
+    if (calView === "dia") return fmtD(calRef, { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+    if (calView === "semana") { var i = iniSemana(calRef), f = somaDias(i, 6); return fmtD(i, { day: "2-digit", month: "short" }) + " – " + fmtD(f, { day: "2-digit", month: "short", year: "numeric" }); }
+    return fmtD(calRef, { month: "long", year: "numeric" });
+  }
+  function calMover(dir) {
+    if (calView === "dia") calRef = somaDias(calRef, dir);
+    else if (calView === "semana") calRef = somaDias(calRef, 7 * dir);
+    else calRef = new Date(Date.UTC(calRef.getUTCFullYear(), calRef.getUTCMonth() + dir, 1));
+    el("calDetalhe").innerHTML = ""; calCarregar();
+  }
+  el("calPrev").addEventListener("click", function () { calMover(-1); });
+  el("calProx").addEventListener("click", function () { calMover(1); });
+  el("calHoje").addEventListener("click", function () { calRef = hojeLocal(); el("calDetalhe").innerHTML = ""; calCarregar(); });
+  function calRender() {
+    if (calView === "lista") return;
+    el("calTitulo").textContent = calTitulo();
+    var box = el("calBox"); box.innerHTML = "";
+    if (calView === "mes") box.appendChild(calMes());
+    else { var r = calIntervalo(), dias = []; for (var i = 0; i < r.n; i++) dias.push(somaDias(r.ini, i)); box.appendChild(calGrade(dias)); }
+  }
+  function calDetalhe(a) { var box = el("calDetalhe"); box.innerHTML = ""; box.appendChild(agCard(a)); box.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+  function lanes(lista) {
+    var out = [], cl = [], fimCl = 0;
+    function fechar() { var n = 0; cl.forEach(function (x) { n = Math.max(n, x.lane + 1); }); cl.forEach(function (x) { x.n = n; }); out = out.concat(cl); cl = []; }
+    lista.forEach(function (a) {
+      var s = minDia(a.inicio), e = s + dur(a);
+      if (cl.length && s >= fimCl) fechar();
+      var usados = {}; cl.forEach(function (x) { if (x.e > s) usados[x.lane] = true; });
+      var l = 0; while (usados[l]) l++;
+      cl.push({ a: a, lane: l, s: s, e: e }); fimCl = cl.length === 1 ? e : Math.max(fimCl, e);
+    });
+    if (cl.length) fechar(); return out;
+  }
+  function calGrade(dias) {
+    var ini = 8 * 60, fim = 18 * 60, achou = false, keys = dias.map(chave), hoje = chave(hojeLocal());
+    gradeDados.forEach(function (g) { var a = hm(g.inicio), b = hm(g.fim); if (!achou) { ini = a; fim = b; achou = true; } ini = Math.min(ini, a); fim = Math.max(fim, b); });
+    calDados.forEach(function (a) { if (keys.indexOf(chaveIso(a.inicio)) < 0) return; var s = minDia(a.inicio); ini = Math.min(ini, s); fim = Math.max(fim, Math.min(1440, s + dur(a))); });
+    ini = Math.floor(ini / 60) * 60; fim = Math.ceil(fim / 60) * 60; if (fim <= ini) fim = ini + 60;
+    var alt = (fim - ini) / 60 * PX;
+    var wrap = h$("div", "overflow-x-auto border border-slate-200 rounded-xl bg-white"), inner = h$("div"); inner.style.minWidth = dias.length > 1 ? "640px" : "0";
+    var head = h$("div", "flex border-b border-slate-200 bg-white"); head.appendChild(h$("div", "w-12 shrink-0"));
+    dias.forEach(function (d) {
+      var hd = h$("div", "flex-1 text-center text-xs font-semibold py-2 capitalize " + (chave(d) === hoje ? "text-emerald-700" : "text-slate-600"), fmtD(d, { weekday: "short", day: "2-digit" }));
+      if (dias.length > 1) { hd.style.cursor = "pointer"; hd.onclick = function () { calView = "dia"; calRef = d; calMostrar(); calCarregar(); }; }
+      head.appendChild(hd);
+    });
+    inner.appendChild(head);
+    var body = h$("div", "flex"), c0 = h$("div", "w-12 shrink-0 relative"); c0.style.height = alt + "px";
+    for (var m = ini; m < fim; m += 60) { var lb = h$("div", "absolute right-1 text-[10px] text-slate-400", hhmm(m)); lb.style.top = ((m - ini) / 60 * PX + 2) + "px"; c0.appendChild(lb); }
+    body.appendChild(c0);
+    dias.forEach(function (d) {
+      var col = h$("div", "flex-1 relative border-l border-slate-200 min-w-0 " + (gradeDados.length ? "bg-slate-100" : "bg-white")); col.style.height = alt + "px";
+      gradeDados.filter(function (g) { return g.dia === d.getUTCDay(); }).forEach(function (g) {
+        var b = h$("div", "absolute left-0 right-0 bg-white"); b.style.top = ((hm(g.inicio) - ini) / 60 * PX) + "px"; b.style.height = ((hm(g.fim) - hm(g.inicio)) / 60 * PX) + "px"; col.appendChild(b);
+      });
+      for (var m2 = ini; m2 < fim; m2 += 60) { var ln = h$("div", "absolute left-0 right-0 border-t border-slate-200 pointer-events-none"); ln.style.top = ((m2 - ini) / 60 * PX) + "px"; col.appendChild(ln); }
+      var lista = calDados.filter(function (a) { return chaveIso(a.inicio) === chave(d); }).sort(function (x, y) { return new Date(x.inicio) - new Date(y.inicio); });
+      lanes(lista).forEach(function (x) {
+        var a = x.a, b = h$("button", "absolute rounded-md text-left text-[11px] leading-tight px-1.5 py-1 overflow-hidden border " + (a.criado_por === "ia" ? "bg-emerald-100 border-emerald-300 text-emerald-900" : "bg-sky-100 border-sky-300 text-sky-900"));
+        b.type = "button"; b.style.top = ((Math.max(x.s, ini) - ini) / 60 * PX) + "px"; b.style.height = Math.max((Math.min(x.e, fim) - Math.max(x.s, ini)) / 60 * PX - 1, 18) + "px";
+        b.style.left = (x.lane / x.n * 100) + "%"; b.style.width = (100 / x.n - 1) + "%";
+        b.appendChild(h$("div", "font-semibold truncate", hhmm(x.s) + " " + a.nome_paciente));
+        if (a.servico) b.appendChild(h$("div", "truncate opacity-75", a.servico));
+        b.onclick = function () { calDetalhe(a); };
+        col.appendChild(b);
+      });
+      body.appendChild(col);
+    });
+    inner.appendChild(body); wrap.appendChild(inner); return wrap;
+  }
+  function calMes() {
+    var r = calIntervalo(), mes = calRef.getUTCMonth(), hoje = chave(hojeLocal()), estreito = window.innerWidth < 640;
+    var semanas = somaDias(r.ini, 35).getUTCMonth() === mes ? 6 : 5, porDia = {};
+    calDados.forEach(function (a) { var k = chaveIso(a.inicio); (porDia[k] = porDia[k] || []).push(a); });
+    var wrap = h$("div", "border border-slate-200 rounded-xl bg-white overflow-hidden"), cab = h$("div", "grid grid-cols-7 border-b border-slate-200 bg-slate-50");
+    ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].forEach(function (n) { cab.appendChild(h$("div", "text-center text-[11px] font-semibold text-slate-500 py-1.5", n)); });
+    wrap.appendChild(cab);
+    var grid = h$("div", "grid grid-cols-7");
+    for (var i = 0; i < semanas * 7; i++) {
+      (function (d) {
+        var k = chave(d), lista = (porDia[k] || []).sort(function (x, y) { return new Date(x.inicio) - new Date(y.inicio); });
+        var fora = d.getUTCMonth() !== mes, semGrade = gradeDados.length && !gradeDados.some(function (g) { return g.dia === d.getUTCDay(); });
+        var c = h$("button", "h-20 sm:h-24 border-b border-r border-slate-100 p-1 text-left align-top overflow-hidden " + (fora ? "bg-slate-50 text-slate-400" : semGrade ? "bg-slate-100 text-slate-500" : "bg-white text-slate-700")); c.type = "button";
+        c.appendChild(h$("div", "text-[11px] font-semibold mb-0.5 " + (k === hoje ? "inline-block bg-emerald-600 text-white rounded-full px-1.5" : ""), String(d.getUTCDate())));
+        if (estreito) { if (lista.length) c.appendChild(h$("div", "text-[10px] font-bold bg-emerald-100 text-emerald-800 rounded-full px-1.5 inline-block ml-1", String(lista.length))); }
+        else {
+          lista.slice(0, 3).forEach(function (a) { c.appendChild(h$("div", "text-[10px] truncate rounded px-1 mb-0.5 " + (a.criado_por === "ia" ? "bg-emerald-100 text-emerald-900" : "bg-sky-100 text-sky-900"), hhmm(minDia(a.inicio)) + " " + a.nome_paciente)); });
+          if (lista.length > 3) c.appendChild(h$("div", "text-[10px] text-slate-500", "+" + (lista.length - 3) + " mais"));
+        }
+        c.onclick = function () { calView = "dia"; calRef = d; calMostrar(); calCarregar(); };
+        grid.appendChild(c);
+      })(somaDias(r.ini, i));
+    }
+    wrap.appendChild(grid); return wrap;
+  }
 
 
   // ===== TESTE DA ASSISTENTE =====
@@ -475,8 +622,6 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (!sujo) return Promise.resolve(true);
     var dados = {};
     CAMPOS.forEach(function (c) { dados[c.key] = el("campo_" + c.key).value; });
-    dados.horarios_estruturados = JSON.stringify(horariosAtuais());
-    dados.confirmacao_automatica = el("confirmacaoAutomatica").value;
     return chamar("salvar", dados).then(function (resp) {
       if (!resp.ok) return false;
       Object.keys(dados).forEach(function (k) { savedValues[k] = dados[k]; marcarLimpo(k); });
@@ -523,7 +668,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (!resp.ok) { mostrarErro(resp.mensagem || "Não consegui abrir este link."); return; }
     el("conteudo").classList.remove("hidden");
     el("btnSair").classList.remove("hidden");
-    agCarregar();
+    calMostrar(); gradeCarregar(); agCarregar();
     if (window.lucide) lucide.createIcons();
 
     var roDiv = el("somenteLeitura");
@@ -548,17 +693,6 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     var cc = el("contagem_catalogo_de_vendas");
     if (cc) cc.textContent = (resp.editaveis.catalogo_de_vendas || "").length + " / " + LIMITE_CATALOGO + " caracteres";
 
-    var h = {};
-    try { h = JSON.parse((resp.editaveis || {}).horarios_estruturados || "{}"); } catch (e) { h = {}; }
-    DIAS.forEach(function (d) {
-      var f = h[d.key];
-      if (f && f.abre && f.fecha) { el("abre_" + d.key).value = f.abre; el("fecha_" + d.key).value = f.fecha; }
-    });
-    savedValues.horarios_estruturados = JSON.stringify(horariosAtuais());
-
-    var conf = (resp.editaveis || {}).confirmacao_automatica === "SIM" ? "SIM" : "NAO";
-    el("confirmacaoAutomatica").value = conf;
-    savedValues.confirmacao_automatica = conf;
 
   }).catch(function () {
     mostrarErro("Não consegui falar com o servidor. Tenta de novo em instantes.");
@@ -567,8 +701,6 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   el("salvar").addEventListener("click", function () {
     var dados = {};
     CAMPOS.forEach(function (c) { dados[c.key] = el("campo_" + c.key).value; });
-    dados.horarios_estruturados = JSON.stringify(horariosAtuais());
-    dados.confirmacao_automatica = el("confirmacaoAutomatica").value;
 
     var btn = el("salvar");
     btn.disabled = true; btn.textContent = "Salvando...";
