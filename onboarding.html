@@ -256,6 +256,12 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
         <p class="text-slate-500 text-sm mb-6">Marque os dias em que a clínica atende. Se vocês param no almoço (ou em qualquer outro horário), clique em “+ Adicionar horário” para colocar a volta. Ex.: 8h às 12h e 14h às 18h.</p>
         <div class="space-y-4">
 
+          <div>
+            <label class="rotulo" for="fuso_horario">Fuso horário da clínica</label>
+            <span class="ajuda">Os horários abaixo valem neste fuso.</span>
+            <select id="fuso_horario" class="campo"><option value="America/Sao_Paulo">Brasília (padrão) · UTC-3</option><option value="America/Cuiaba">Mato Grosso e Mato Grosso do Sul · UTC-4</option><option value="America/Manaus">Amazonas, Rondônia e Roraima · UTC-4</option><option value="America/Rio_Branco">Acre · UTC-5</option><option value="America/Noronha">Fernando de Noronha · UTC-2</option></select>
+          </div>
+
           <div id="grade" class="space-y-3"></div>
           <p id="erroGrade" class="text-sm text-red-600 hidden"></p>
 
@@ -540,7 +546,7 @@ let passo = 1, enviando = false;
 const CAMPOS = [
   'nome_exibicao','descricao_curta','endereco_atendimento','como_chegar','profissionais',
   'servicos','politica_precos','nao_oferecemos','formas_pagamento','convenios_parcerias',
-  'horario_funcionamento','horario_humano','mensagem_fora_horario','politica_agendamento',
+  'fuso_horario','horario_funcionamento','horario_humano','mensagem_fora_horario','politica_agendamento',
   'duracao_padrao_min','buffer_min','antecedencia_minima_h','janela_agendamento_dias',
   'saudacao','tom_de_voz','nunca_dizer','restricoes','gatilhos_escalonamento',
   'gatilhos_urgencia','resposta_urgencia',
