@@ -101,6 +101,18 @@
             <div id="calDetalhe" class="mt-4"></div>
           </div>
         </div>
+        <div class="tab-conteudo" data-tab="resultados">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <div class="text-sm font-semibold text-slate-800">Resultados da assistente</div>
+            <select id="resPeriodo" class="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white" style="width:auto">
+              <option value="7">Últimos 7 dias</option>
+              <option value="30" selected>Últimos 30 dias</option>
+              <option value="90">Últimos 90 dias</option>
+            </select>
+          </div>
+          <div id="resGrid" class="grid grid-cols-2 gap-3"><div class="text-sm text-slate-500 col-span-2 text-center py-8">Carregando resultados...</div></div>
+          <div id="resUpsell" class="hidden mt-4 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4"></div>
+        </div>
         <div class="tab-conteudo" data-tab="contato">
           <div class="mb-5">
             <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Dados do contrato (só leitura)</h2>
@@ -164,7 +176,7 @@
 var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "lembrete_horarios", "label": "Lembretes de consulta (a IA avisa o paciente e pede confirmação)", "tipo": "multi", "tab": "agendamento", "opcoes": [["48", "48 horas antes"], ["24", "24 horas antes (véspera)"], ["M", "Na manhã do dia da consulta (8h)"], ["3", "3 horas antes"], ["2", "2 horas antes"], ["1", "1 hora antes"], ["nao", "Não enviar lembretes"]], "padrao": ["24", "2"]}, {"key": "followup_horas", "label": "Se o paciente parar de responder antes de agendar, retomar a conversa depois de", "tipo": "select", "tab": "agendamento", "opcoes": [["", "3 horas (padrão)"], ["1", "1 hora"], ["2", "2 horas"], ["4", "4 horas"], ["6", "6 horas"], ["12", "12 horas"], ["24", "24 horas"], ["nao", "Não retomar"]]}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
 var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
-var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
+var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "resultados", "label": "Resultados"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
 var LIMITE_CATALOGO = 500;
 var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link final ficar em outro endereço
 
@@ -240,7 +252,8 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       document.querySelectorAll(".tab-btn").forEach(function (x) { x.classList.remove("ativa"); });
       document.querySelectorAll(".tab-conteudo").forEach(function (x) { x.classList.remove("ativa"); });
       b.classList.add("ativa");
-      el("salvar").parentElement.style.display = t.key === "agenda" ? "none" : "";
+      el("salvar").parentElement.style.display = (t.key === "agenda" || t.key === "resultados") ? "none" : "";
+      if (t.key === "resultados") resultadosCarregar();
       document.querySelector(".tab-conteudo[data-tab='" + t.key + "']").classList.add("ativa");
     };
     tabBar.appendChild(b);
@@ -413,6 +426,44 @@ function partesTz(ms) {
     g.passados.reverse(); g.cancelados.reverse();
     return g;
   }
+  function resFmtTempo(seg) {
+    if (seg == null) return "—";
+    if (seg < 90) return Math.round(seg) + " s";
+    if (seg < 5400) return Math.round(seg / 60) + " min";
+    return (Math.round(seg / 360) / 10).toString().replace(".", ",") + " h";
+  }
+  function resCard(rotulo, valor, dica) {
+    var c = h$("div", "border border-slate-200 rounded-xl p-4 bg-white");
+    c.appendChild(h$("div", "text-xs text-slate-500", rotulo));
+    c.appendChild(h$("div", "text-2xl font-bold text-slate-900 mt-1", valor));
+    if (dica) c.appendChild(h$("div", "text-[11px] text-slate-400 mt-1", dica));
+    return c;
+  }
+  function resultadosCarregar() {
+    var grid = el("resGrid"), up = el("resUpsell");
+    grid.innerHTML = '<div class="text-sm text-slate-500 col-span-2 text-center py-8">Carregando resultados...</div>';
+    up.classList.add("hidden");
+    agChamar("indicadores", { dias: parseInt(el("resPeriodo").value, 10) || 30 }).then(function (r) {
+      grid.innerHTML = "";
+      var n = function (v) { return v == null ? "—" : String(v).replace(".", ","); };
+      grid.appendChild(resCard("Conversas", n(r.conversas), r.conversas == null ? "indisponível no momento" : "pessoas que falaram com a assistente"));
+      grid.appendChild(resCard("Agendamentos feitos pela IA", n(r.agendadas_ia), "consultas marcadas sem sua equipe"));
+      if (r.completo) {
+        grid.appendChild(resCard("Taxa de agendamento", r.taxa_agendamento == null ? "—" : n(r.taxa_agendamento) + "%", "agendamentos da IA ÷ conversas"));
+        grid.appendChild(resCard("Tempo da 1ª resposta", resFmtTempo(r.tempo_resposta_seg), "média no período"));
+        grid.appendChild(resCard("Confirmaram presença", r.com_lembrete ? r.presenca_confirmada + " de " + r.com_lembrete : "—", "consultas que receberam lembrete"));
+        grid.appendChild(resCard("Consultas canceladas", n(r.canceladas), "de consultas do período"));
+        grid.appendChild(resCard("Entraram na lista de espera", n(r.fila_entradas), ""));
+        grid.appendChild(resCard("Vagas repostas", n(r.vagas_repostas), "horários cancelados que foram preenchidos"));
+      } else {
+        up.textContent = "No plano Gestão Inteligente você também acompanha a taxa de agendamento, o tempo de resposta, as confirmações de presença, os cancelamentos e as vagas repostas pela lista de espera.";
+        up.classList.remove("hidden");
+      }
+    }).catch(function () {
+      grid.innerHTML = '<div class="text-sm text-slate-500 col-span-2 text-center py-8">Não consegui carregar os resultados agora. Tente de novo em instantes.</div>';
+    });
+  }
+  el("resPeriodo").addEventListener("change", resultadosCarregar);
   function agCarregar() {
     agChamar("agenda_listar").then(function (rows) {
       agDados = rows || [];
