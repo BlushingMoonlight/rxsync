@@ -212,7 +212,20 @@
   <section id="sucesso" class="hidden bg-white rounded-2xl border border-emerald-200 shadow-sm p-8 text-center">
     <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4 text-3xl">&check;</div>
     <h2 id="sucessoTitulo" class="text-xl font-extrabold text-primary-900 mb-2">Contratação registrada</h2>
-    <p id="sucessoTexto" class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">Em instantes você recebe no seu e-mail o <strong>link de pagamento</strong> (Pix, boleto ou cartão), junto com a confirmação dos Termos que você aceitou. Assim que o pagamento for confirmado, enviamos o link para configurar a sua assistente. Não chegou em 15 minutos? Confira o spam ou fale com a gente pelo WhatsApp.</p>
+    <p id="sucessoTexto" class="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">Falta só o pagamento da primeira mensalidade. Assim que ele for confirmado, você recebe por e-mail o link para configurar a sua assistente.</p>
+    <div id="pagamentoBox" class="hidden mt-6 max-w-md mx-auto text-left border border-slate-200 rounded-xl p-5 bg-slate-50">
+      <div id="pagamentoCarregando" class="flex items-center gap-3 text-sm text-slate-600">
+        <span class="inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></span>
+        Gerando o seu link de pagamento...
+      </div>
+      <div id="pagamentoPronto" class="hidden">
+        <div class="text-xs text-slate-500">Primeira cobrança</div>
+        <div id="pagamentoResumo" class="text-base font-bold text-primary-900 mt-0.5"></div>
+        <a id="pagamentoLink" href="#" target="_blank" rel="noopener" class="block text-center mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl">Pagar agora</a>
+        <p class="text-xs text-slate-500 mt-3">Pix, boleto ou cartão, na página segura do Asaas. O mesmo link também foi para o seu e-mail. Assim que o pagamento for confirmado, você recebe um e-mail com o próximo passo.</p>
+      </div>
+      <p id="pagamentoDemorou" class="hidden text-sm text-slate-600">O link está demorando um pouco. Ele chega no seu e-mail em alguns minutos (confira também o spam).</p>
+    </div>
     <a href="/" class="inline-block mt-6 text-sm font-bold text-primary-700 underline">Voltar ao site</a>
   </section>
 </main>
@@ -250,6 +263,40 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 const ORIGEM_CHAVE = 'rxsync-site-2026';
+const LINK_PAGAMENTO = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/link-pagamento';
+
+// Depois da contratação paga: pergunta ao n8n (8/8) pelo link do Asaas até ele ficar pronto (~até 90 s).
+async function aguardarLink(clienteId, email) {
+  const box = document.getElementById('pagamentoBox');
+  box.classList.remove('hidden');
+  for (let i = 0; i < 30; i++) {
+    await new Promise(res => setTimeout(res, i === 0 ? 2500 : 3000));
+    try {
+      const r = await fetch(LINK_PAGAMENTO, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
+        body: JSON.stringify({ cliente_id: clienteId, email })
+      });
+      const j = await r.json().catch(() => ({}));
+      if (j && j.pronto && j.link) {
+        document.getElementById('pagamentoCarregando').classList.add('hidden');
+        document.getElementById('pagamentoResumo').textContent = j.resumo || 'RXSync';
+        document.getElementById('pagamentoLink').href = j.link;
+        document.getElementById('pagamentoPronto').classList.remove('hidden');
+        ev('link_pagamento_exibido', {});
+        return;
+      }
+      if (j && j.pago) {
+        document.getElementById('pagamentoCarregando').classList.add('hidden');
+        document.getElementById('pagamentoDemorou').textContent = 'Pagamento já confirmado. Confira o seu e-mail para o próximo passo.';
+        document.getElementById('pagamentoDemorou').classList.remove('hidden');
+        return;
+      }
+    } catch (e) { /* tenta de novo */ }
+  }
+  document.getElementById('pagamentoCarregando').classList.add('hidden');
+  document.getElementById('pagamentoDemorou').classList.remove('hidden');
+}
 const VERSAO = '2026-10-v1';
 
 const BASE = [
@@ -584,6 +631,8 @@ document.getElementById('form').addEventListener('submit', async evt => {
       body: JSON.stringify(dados)
     });
     if (!r.ok) throw new Error();
+    let clienteId = '';
+    try { clienteId = ((await r.json()) || {}).cliente_id || ''; } catch (_) {}
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
     document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
@@ -592,6 +641,7 @@ document.getElementById('form').addEventListener('submit', async evt => {
       document.getElementById('sucessoTitulo').textContent = 'Teste grátis registrado';
       document.getElementById('sucessoTexto').textContent = 'Enviamos a confirmação para o seu e-mail. Em poucos minutos você recebe o link para configurar a sua assistente. Os 7 dias só começam a contar quando ela entrar no ar. Sem cartão e sem cobrança automática.';
     }
+    if (modalidade !== 'teste' && clienteId) aguardarLink(clienteId, v('email'));
     ev(modalidade === 'teste' ? 'teste_registrado' : 'contratacao_registrada', { forma: ciclo === 'anual' ? forma : 'mensal' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (e) {
