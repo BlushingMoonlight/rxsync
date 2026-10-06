@@ -160,7 +160,7 @@
   <div id="toast"></div>
 
 <script>
-var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
+var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela vai atender", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp para nossos avisos", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
 var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor mensal"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
 var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
@@ -201,7 +201,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     el("salvar").disabled = !algumSujo;
   }
   function marcarSujo(key) { dirty[key] = true; atualizarBotao(); }
-  function marcarLimpo(key) { dirty[key] = false; atualizarBotao(); }
+  function marcarLimpo(key) { dirty[key] = false; atualizarBotao(); if (key === "fuso_horario") aplicarFuso(savedValues.fuso_horario); }
 
   function autosaveCampo(key, valor) {
     if (savedValues[key] === valor) return;
@@ -251,7 +251,8 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     var destino = el("campos_" + c.tab);
     var div = document.createElement("div");
     div.className = "campo mb-4";
-    var input = (c.tipo === "textarea" || c.tipo === "textarea_limite") ? document.createElement("textarea") : document.createElement("input");
+    var input = (c.tipo === "textarea" || c.tipo === "textarea_limite") ? document.createElement("textarea") : (c.tipo === "select" ? document.createElement("select") : document.createElement("input"));
+    if (c.tipo === "select") (c.opcoes || []).forEach(function (o) { var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; input.appendChild(op); });
     if (c.tipo === "text" || c.tipo === "tel" || c.tipo === "number") input.type = c.tipo;
     input.id = "campo_" + c.key;
     div.innerHTML = "<label>" + c.label + "</label>";
@@ -347,7 +348,30 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   function h$(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   function fmt(iso) { return new Date(iso).toLocaleString("pt-BR", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }); }
   function paraInput(iso) { return new Date(iso).toLocaleString("sv-SE", { timeZone: TZ }).slice(0, 16).replace(" ", "T"); }
-  function deInput(v) { return v ? v + ":00-03:00" : ""; }
+  // ---- fuso da clínica (vem do cadastro; padrão Brasília) ----
+function partesTz(ms) {
+    var o = {}, f = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    f.formatToParts(new Date(ms)).forEach(function (p) { o[p.type] = p.value; });
+    if (o.hour === "24") o.hour = "00";
+    return o;
+  }
+  // "relógio de parede" da clínica no instante ms, lido depois com getUTC*
+  function fake(ms) { var p = partesTz(ms); return new Date(Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second)); }
+  function offsetMin(ms) { return Math.round((fake(ms).getTime() - Math.floor(ms / 1000) * 1000) / 60000); }
+  function offStr(min) { var sg = min < 0 ? "-" : "+", a = Math.abs(min), h = Math.floor(a / 60), m = a % 60; return sg + (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m; }
+  // "AAAA-MM-DDTHH:MM" (hora da clínica) -> ISO 8601 com o deslocamento certo
+  function isoLocal(v) {
+    var p = v.split(/[-T:]/).map(Number), t0 = Date.UTC(p[0], p[1] - 1, p[2], p[3] || 0, p[4] || 0);
+    var off = offsetMin(t0), cand = t0 - off * 60000, off2 = offsetMin(cand);
+    if (off2 !== off) off = off2;
+    return v + ":00" + offStr(off);
+  }
+  function deInput(v) { return v ? isoLocal(v) : ""; }
+  function aplicarFuso(v) {
+    if (!v || v === TZ) return;
+    TZ = v;
+    if (typeof calRef !== "undefined") { calRef = hojeLocal(); try { agCarregar(); } catch (e) {} }
+  }
   function duracaoMin() { var v = parseInt((el("campo_duracao_padrao_min") || {}).value, 10); return v > 0 ? v : 30; }
   function somaMin(v, m) { var d = new Date(deInput(v)); d.setMinutes(d.getMinutes() + m); return paraInput(d.toISOString()); }
   function zap(tel) { var n = String(tel || "").replace(/\D/g, ""); if (n.length <= 11) n = "55" + n; return "https://wa.me/" + n; }
@@ -470,9 +494,8 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
   });
 
-  // ===== CALENDÁRIO: DIA / SEMANA / MÊS (Brasília = UTC-3 fixo; datas "locais" são lidas com getUTC*) =====
+  // ===== CALENDÁRIO: DIA / SEMANA / MÊS (no fuso da clínica; datas "locais" são lidas com getUTC*) =====
   var calView = window.innerWidth < 640 ? "dia" : "semana", calDados = [], calReq = 0, PX = 48;
-  function fake(ms) { return new Date(ms - 3 * 3600000); }
   function hojeLocal() { var d = fake(Date.now()); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
   var calRef = hojeLocal();
   function chave(d) { return d.toISOString().slice(0, 10); }
@@ -507,7 +530,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (calView === "lista") return;
     var r = calIntervalo(), n = ++calReq;
     el("calTitulo").textContent = calTitulo();
-    agChamar("agenda_listar", { de: chave(r.ini) + "T00:00:00-03:00", ate: chave(somaDias(r.ini, r.n)) + "T00:00:00-03:00" }).then(function (rows) {
+    agChamar("agenda_listar", { de: isoLocal(chave(r.ini) + "T00:00"), ate: isoLocal(chave(somaDias(r.ini, r.n)) + "T00:00") }).then(function (rows) {
       if (n !== calReq) return;
       calDados = (rows || []).filter(agila); calRender();
     }).catch(function () { if (n !== calReq) return; el("calBox").innerHTML = ""; el("calBox").appendChild(h$("div", "text-sm text-rose-600 text-center py-8", "Não consegui carregar o calendário.")); });
@@ -682,10 +705,12 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
 
     CAMPOS.forEach(function (c) {
       var v = (resp.editaveis || {})[c.key] || "";
+      if (c.key === "fuso_horario" && !v) v = "America/Sao_Paulo";
       el("campo_" + c.key).value = v;
       savedValues[c.key] = v;
     });
 
+    aplicarFuso(savedValues.fuso_horario);
     savedValues._token_conexao = resp.token_conexao || "";
     atualizarLinkReconectar();
 
