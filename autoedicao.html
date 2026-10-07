@@ -325,6 +325,7 @@
       </div>
 
       <div data-sub-pane="horarios" hidden>
+        <div id="gradeAvisoInteg" class="aviso verde hidden"></div>
         <p class="subtitulo" style="margin:0 0 14px">A assistente só oferece horários dentro destas faixas. Dia sem faixa é dia sem atendimento. Para folgas e imprevistos, bloqueie o horário na agenda.</p>
         <div class="bloco pad">
           <h2 class="sec">Dias e horários de atendimento</h2>
@@ -616,6 +617,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       el("agendaSeg").querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.sub === (temSub ? sub : ""))); });
       if (sub === "documentos") docCarregar();
       if (sub === "integracao") intCarregar();
+      if (sub === "horarios") gradeChecarInteg();
     }
     if (area === "hoje") hojeRender();
     if (area === "resultados" && !abertas.resultados) { abertas.resultados = true; resultadosCarregar(); }
@@ -1053,6 +1055,28 @@ function partesTz(ms) {
     opcoes.forEach(function (o) { var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; if (o[0] === valor) op.selected = true; s.appendChild(op); });
     return s;
   }
+  var DIAS_CURTOS = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
+  function intHorariosResumo(faixas) {
+    var porDia = {};
+    (faixas || []).forEach(function (f) { (porDia[f.dia] = porDia[f.dia] || []).push(f.inicio + "–" + f.fim); });
+    return [1, 2, 3, 4, 5, 6, 0].filter(function (d) { return porDia[d]; }).map(function (d) { return DIAS_CURTOS[d] + " " + porDia[d].join(", "); }).join("; ");
+  }
+  // Aba Horários: se os horários vêm da plataforma, avisa e trava a edição
+  function gradeChecarInteg() {
+    var av = el("gradeAvisoInteg"), bt = el("gradeSalvar"), box = el("gradeHorarios");
+    intChamar("status").then(function (r) {
+      var vem = r && r.conectado && r.importar_horarios !== false && r.horarios && r.horarios.length;
+      av.classList.toggle("hidden", !vem);
+      if (vem) {
+        av.textContent = "Estes horários vêm do " + (r.plataforma_nome || "Reservio") + " e se atualizam sozinhos. Para mudar, altere lá ou desligue essa opção em Agenda › Integração.";
+        bt.style.display = "none";
+        box.style.pointerEvents = "none"; box.style.opacity = ".6"; box.setAttribute("aria-disabled", "true");
+      } else {
+        bt.style.display = "";
+        box.style.pointerEvents = ""; box.style.opacity = ""; box.removeAttribute("aria-disabled");
+      }
+    }).catch(function () {});
+  }
   function intOcupado(btn, txt) { btn.disabled = true; btn.dataset.txt = btn.textContent; btn.textContent = txt; }
   function intRender(r, ultimo) {
     var box = el("intBox"); box.innerHTML = "";
@@ -1102,11 +1126,18 @@ function partesTz(ms) {
     var sServ = intCampo(cfg, "Serviço usado quando a assistente marca", intSelect([["", "Escolha"]].concat((r.servicos || []).map(function (x) { return [x.id, x.nome + (x.duracao_min ? " (" + x.duracao_min + " min)" : "")]; })), r.servico_id || ""));
     var sRec = intCampo(cfg, "Profissional", intSelect([["", "Todos os profissionais"]].concat((r.recursos || []).map(function (x) { return [x.id, x.nome]; })), r.recurso_id || ""),
       "As consultas desse profissional ocupam a agenda da RXSync, e é na agenda dele que a assistente marca.");
+    var lh = h$("label", "flex items-start gap-2 text-sm mb-2"); lh.style.cursor = "pointer";
+    var cbH = document.createElement("input"); cbH.type = "checkbox"; cbH.checked = r.importar_horarios !== false; cbH.style.marginTop = "3px";
+    lh.appendChild(cbH); lh.appendChild(h$("span", "", "Usar os dias e horários de atendimento do " + nomePlat));
+    cfg.appendChild(lh);
+    cfg.appendChild(h$("div", "text-xs text-slate-500 mb-3", r.importar_horarios !== false
+      ? (r.horarios && r.horarios.length ? "Horários vindos do " + nomePlat + ": " + intHorariosResumo(r.horarios) + ". Atualizam sozinhos a cada 30 minutos." : "Os horários são lidos do " + nomePlat + " quando você salvar.")
+      : "Desligado: a assistente usa os horários de Agenda › Horários."));
     var salvar = h$("button", "btn pri plena", "Salvar"); salvar.type = "button";
     salvar.onclick = function () {
       if (!sServ.value) { sServ.focus(); toast("Escolha o serviço."); return; }
       intOcupado(salvar, "Salvando…");
-      intChamar("configurar", { servico_id: sServ.value, recurso_id: sRec.value }).then(function (x) { intRender(x); }).catch(function () { toast("Não consegui salvar."); salvar.disabled = false; salvar.textContent = "Salvar"; });
+      intChamar("configurar", { servico_id: sServ.value, recurso_id: sRec.value, importar_horarios: cbH.checked }).then(function (x) { intRender(x); }).catch(function () { toast("Não consegui salvar."); salvar.disabled = false; salvar.textContent = "Salvar"; });
     };
     cfg.appendChild(salvar);
     box.appendChild(cfg);
@@ -1135,7 +1166,7 @@ function partesTz(ms) {
       "A cada 2 minutos, as consultas do " + nomePlat + " aparecem aqui e ocupam o horário, para a assistente não oferecer horário já tomado.",
       "Quando a assistente marca uma consulta, ela confere se o horário está livre no " + nomePlat + " e lança lá. Se alguém tiver ocupado o horário no meio tempo, você recebe um aviso no WhatsApp de alertas.",
       "O " + nomePlat + " não permite cancelar pela integração. Quando o paciente cancela pelo WhatsApp, avisamos no WhatsApp de alertas para você cancelar lá.",
-      "Mantenha os dias e horários de atendimento (Agenda › Horários) iguais aos do " + nomePlat + "."
+      r.importar_horarios !== false ? "Os dias e horários de atendimento vêm do " + nomePlat + ". Folgas e feriados de um dia específico ainda não: bloqueie esses horários na agenda da RXSync." : "Mantenha os dias e horários de atendimento (Agenda › Horários) iguais aos do " + nomePlat + "."
     ].forEach(function (t) { info.appendChild(h$("div", "mb-1", "• " + t)); });
     box.appendChild(info);
   }
