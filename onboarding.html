@@ -279,7 +279,8 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
           <div>
             <label class="rotulo" for="mensagem_fora_horario">O que ela diz fora do horário</label>
-            <textarea id="mensagem_fora_horario" class="campo" style="min-height:72px" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Posso já deixar seu horário marcado, e a equipe confirma assim que abrir."></textarea>
+            <span class="ajuda">Ela pode agendar a qualquer hora. Evite prometer que alguém vai confirmar depois: o horário que ela marca já está confirmado.</span>
+            <textarea id="mensagem_fora_horario" class="campo" style="min-height:72px" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Enquanto isso, posso ver os horários livres e já deixar sua consulta marcada."></textarea>
           </div>
 
         </div>
@@ -371,11 +372,15 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
             <div class="sm:col-span-2 pt-2"></div>
             <div>
               <label class="rotulo" for="resp_tecnico_nome">Responsável técnico</label>
+              <span class="ajuda">Profissional de saúde que aprova o conteúdo da assistente.</span>
               <input id="resp_tecnico_nome" class="campo" maxlength="120" placeholder="Dra. [nome do responsável técnico]">
+              <p class="msg-erro" data-de="resp_tecnico_nome">Informe o responsável técnico.</p>
             </div>
             <div>
               <label class="rotulo" for="resp_tecnico_conselho">Registro no conselho</label>
+              <span class="ajuda">Conselho, UF e número de inscrição.</span>
               <input id="resp_tecnico_conselho" class="campo" maxlength="60" placeholder="CRM/UF 00000">
+              <p class="msg-erro" data-de="resp_tecnico_conselho">Informe o registro no conselho.</p>
             </div>
           </div>
 
@@ -408,6 +413,13 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           <div>
             <label class="rotulo" for="saudacao">Primeira frase da conversa</label>
             <textarea id="saudacao" class="campo" style="min-height:72px" maxlength="400" placeholder="Oi! Aqui é a assistente da [nome da clínica]. Em que posso ajudar?"></textarea>
+          </div>
+
+          <div>
+            <label class="rotulo" for="link_privacidade">Link da política de privacidade da clínica</label>
+            <span class="ajuda">Opcional. A assistente informa esse link ao paciente na primeira mensagem, como pede a LGPD. Se a clínica ainda não tem, deixe em branco e preencha depois no painel.</span>
+            <input id="link_privacidade" class="campo" inputmode="url" maxlength="300" placeholder="https://suaclinica.com.br/privacidade">
+            <p class="msg-erro" data-de="link_privacidade">O link precisa começar com https:// e ser um endereço completo.</p>
           </div>
 
           <div>
@@ -458,6 +470,17 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           <i data-lucide="plus" class="w-4 h-4"></i> Adicionar pergunta
         </button>
 
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" id="declaracao_rt" class="mt-1 w-5 h-5 shrink-0 accent-emerald-600">
+            <span class="text-sm text-slate-700 leading-relaxed">
+              <strong class="text-primary-900">Aprovação do responsável técnico.</strong>
+              Declaro, como responsável técnico indicado neste formulário (ou em nome dele, com sua autorização), que revisei e aprovo o conteúdo informado aqui para uso pela assistente virtual, conforme a cláusula 9 dos Termos de Uso. A aprovação fica registrada com nome, registro no conselho, data e hora.
+            </span>
+          </label>
+          <p class="msg-erro" id="erroDeclaracao">Para enviar, o responsável técnico precisa aprovar o conteúdo.</p>
+        </div>
+
         <p id="erroForm" class="msg-erro mt-5"></p>
 
         <div class="flex gap-3 mt-6">
@@ -494,7 +517,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
 <footer class="max-w-3xl mx-auto px-5 pb-10">
   <p class="text-center text-xs text-slate-400">
-    RXSync — CNPJ 52.970.673/0001-78
+    RXSync Tecnologia e Automação em Saúde — CNPJ 52.970.673/0001-78
   </p>
 </footer>
 
@@ -502,7 +525,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 lucide.createIcons();
 
 /* =====================================================================
-   CONTRATO COM O N8N — idêntico ao do site de salão.
+   CONTRATO COM O N8N (workflow 3/5 - Onboarding - Receber).
 
    POST https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/onboarding
    Cabeçalho: x-rxsync-origem: rxsync-site-2026
@@ -517,18 +540,17 @@ lucide.createIcons();
    salvar -> { ok: true, link_conectar: 'https://.../conectar.html?t=...' }
    falha  -> { ok: false, mensagem: 'texto para mostrar ao cliente' }
 
-   Os 33 nomes de CAMPOS e o formato de 'horarios' e 'faq' são os mesmos
-   do salao.rxsync.com.br. O 3/4 - Onboarding - Receber não precisa saber
-   de qual site veio.
+   Os nomes de CAMPOS precisam bater com as colunas da aba cadastro.
+   declaracao_rt (true/false) é a aprovação do responsável técnico:
+   o 3/5 recusa o envio sem ela.
    ===================================================================== */
 
 /* =====================================================================
-   PERFIL — a única parte diferente entre clínica e salão.
-   Para unificar os dois arquivos no futuro, troque só este bloco.
+   PERFIL — grade de horários sugerida ao abrir o formulário.
    ===================================================================== */
 const PERFIL = {
   vertical:    'clinica',
-  // Terça a sábado é padrão de salão; clínica costuma ser segunda a sexta.
+  // Clínica costuma atender de segunda a sexta.
   gradePadrao: { dias: ['seg','ter','qua','qui','sex'], de: '08:00', ate: '18:00' }
 };
 
@@ -542,7 +564,7 @@ const CHAVE_RASCUNHO = 'rxsync_onb_' + TOKEN.slice(0, 8);
 const $ = id => document.getElementById(id);
 let passo = 1, enviando = false;
 
-/* ---------- campos simples: MESMA LISTA E MESMA ORDEM DO SALÃO ---------- */
+/* ---------- campos simples (mesmos nomes das colunas da planilha) ---------- */
 const CAMPOS = [
   'nome_exibicao','descricao_curta','endereco_atendimento','como_chegar','profissionais',
   'servicos','politica_precos','nao_oferecemos','formas_pagamento','convenios_parcerias',
@@ -551,7 +573,7 @@ const CAMPOS = [
   'saudacao','tom_de_voz','nunca_dizer','restricoes','gatilhos_escalonamento',
   'gatilhos_urgencia','resposta_urgencia',
   'numero_whatsapp','whatsapp_alerta','numero_reserva','telefone_urgencia',
-  'resp_tecnico_nome','resp_tecnico_conselho','sistema_gestao','usuarios_painel'
+  'resp_tecnico_nome','resp_tecnico_conselho','sistema_gestao','usuarios_painel','link_privacidade'
 ];
 
 const DIAS = [
@@ -718,6 +740,7 @@ function coletar() {
     resposta: el.querySelector('.faq-r').value.trim()
   })).filter(f => f.pergunta && f.resposta);
 
+  d.declaracao_rt = !!($('declaracao_rt') && $('declaracao_rt').checked);
   return d;
 }
 
@@ -748,7 +771,7 @@ function lerRascunho() {
 }
 
 /* ===================== NAVEGAÇÃO ===================== */
-const OBRIGATORIOS = { 1: ['nome_exibicao'], 2: ['servicos', 'politica_precos'], 5: ['numero_whatsapp'] };
+const OBRIGATORIOS = { 1: ['nome_exibicao'], 2: ['servicos', 'politica_precos'], 5: ['numero_whatsapp', 'resp_tecnico_nome', 'resp_tecnico_conselho'] };
 
 function limparErro(id) {
   $(id).classList.remove('erro');
@@ -808,10 +831,27 @@ async function chamar(corpo) {
 async function enviar() {
   if (enviando) return;
 
-  // Valida as três etapas obrigatórias e leva o cliente até a primeira que falhar.
+  // Valida as etapas obrigatórias e leva o cliente até a primeira que falhar.
   for (const n of [1, 2, 5]) {
     if (!validar(n)) { irPara(n); return; }
   }
+
+  // Link da política de privacidade: opcional, mas, se vier, precisa ser um endereço completo.
+  const lp = $('link_privacidade').value.trim();
+  if (lp && !/^https?:\/\/[^\s]+\.[^\s]+$/i.test(lp)) {
+    $('link_privacidade').classList.add('erro');
+    document.querySelector('.msg-erro[data-de="link_privacidade"]').classList.add('on');
+    $('link_privacidade').focus();
+    return;
+  }
+
+  // Aprovação do responsável técnico (cláusula 9.2 dos Termos): sem ela não há envio.
+  if (!$('declaracao_rt').checked) {
+    $('erroDeclaracao').classList.add('on');
+    $('declaracao_rt').focus();
+    return;
+  }
+  $('erroDeclaracao').classList.remove('on');
 
   // Armadilha de robô: se veio preenchida, finge que deu certo e não grava nada.
   if ($('empresa_site').value.trim() !== '') { mostrar('telaOk'); return; }
@@ -880,6 +920,7 @@ async function abrir() {
       el.addEventListener('change', salvarRascunho);
       el.addEventListener('input', () => { if (el.id) limparErro(el.id); });
     });
+    $('declaracao_rt').addEventListener('change', () => $('erroDeclaracao').classList.remove('on'));
 
     $('selo').classList.remove('hidden');
     mostrar('telaForm');
