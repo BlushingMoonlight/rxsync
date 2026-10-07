@@ -418,6 +418,75 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .rodape a:hover { color: #fff; text-decoration: underline; }
 .rodape-base { margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13.5px; color: #93a1b3; }
 
+/* Teste ao vivo (mini teste) */
+.mt-sec { background: linear-gradient(180deg, #eaf6f0 0%, #f4faf7 60%, #fff 100%); }
+.mt-card { background: #fff; border: 1px solid var(--line); border-radius: var(--r-xl); box-shadow: var(--sh-2); overflow: hidden; }
+.mt-form { display: grid; gap: 28px; padding: 24px; }
+@media (min-width: 900px) { .mt-form { grid-template-columns: .8fr 1.2fr; gap: 48px; padding: 40px; } }
+.mt-form-txt h3 { font-size: 22px; }
+.mt-passos { display: grid; gap: 14px; margin-top: 18px; }
+.mt-passos li { display: flex; gap: 12px; color: var(--ink-2); font-size: 15.5px; }
+.mt-passos li span { width: 26px; height: 26px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-ink); font-weight: 800; font-size: 13.5px; display: grid; place-items: center; flex-shrink: 0; }
+.mt-campos { display: grid; gap: 16px; align-content: start; }
+@media (min-width: 640px) { .mt-campos { grid-template-columns: 1fr 1fr; } .mt-largo { grid-column: 1 / -1; } }
+.campo small { display: block; color: var(--ink-3); font-size: 13px; margin-top: 6px; }
+.mt-campos .privac { margin-top: 0; }
+.mt-campos .erro-form { margin-top: 0; }
+
+.mt-teste { display: grid; }
+.mt-teste[hidden], .mt-form[hidden] { display: none; }
+@media (min-width: 1024px) { .mt-teste { grid-template-columns: 1fr 1fr; } }
+.mt-chat { display: flex; flex-direction: column; background: #efeae2; border-bottom: 1px solid var(--line); position: relative; min-width: 0; }
+@media (min-width: 1024px) { .mt-chat { border-bottom: 0; border-right: 1px solid var(--line); } }
+.mt-chat .wa-topo { padding: 12px 14px; }
+.mt-cont { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--brand-ink); background: var(--brand-soft); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.mt-cont.pouco { background: var(--amber-soft); color: var(--amber-ink); }
+.mt-msgs { height: 420px; overflow-y: auto; flex: none; }
+@media (max-width: 639px) { .mt-msgs { height: 360px; } }
+.mt-msgs .b { white-space: pre-wrap; word-wrap: break-word; }
+.mt-msgs .b-sis { align-self: center; background: #fff8d6; color: #5c4a00; font-size: 12.5px; max-width: 92%; text-align: center; border-radius: 8px; padding: 6px 10px; box-shadow: 0 1px .5px rgba(11,20,26,.13); }
+.mt-sug { display: flex; gap: 8px; padding: 0 10px 8px; overflow-x: auto; scrollbar-width: none; background: #efeae2; }
+.mt-sug::-webkit-scrollbar { display: none; }
+.mt-sug button { flex-shrink: 0; border: 1px solid #cfe9dc; background: #fff; color: var(--brand-ink); font-weight: 600; font-size: 13.5px; padding: 7px 12px; border-radius: 999px; min-height: 36px; }
+.mt-sug button:hover { background: var(--brand-soft); }
+.mt-input { border: 0; font: inherit; font-size: 16px; color: var(--ink); min-height: 40px; outline: none; }
+.mt-input:focus-visible { box-shadow: 0 0 0 3px rgba(5,150,105,.3); }
+.wa-env { border: 0; }
+.wa-env:disabled, .mt-input:disabled { opacity: .55; cursor: not-allowed; }
+.mt-fim { background: #fff; border-top: 1px solid var(--line); padding: 18px; display: grid; gap: 8px; text-align: center; }
+.mt-fim[hidden], .mt-chat .wa-barra[hidden], .mt-sug[hidden] { display: none; }
+.mt-fim strong { font-size: 17px; }
+.mt-fim p { color: var(--ink-2); font-size: 14.5px; }
+.mt-fim .btn { margin-top: 6px; }
+.mt-link { background: none; border: 0; color: var(--brand-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; padding: 6px; font-size: 14.5px; }
+
+.mt-agenda { padding: 18px; position: relative; min-width: 0; }
+@media (min-width: 640px) { .mt-agenda { padding: 24px; } }
+.mt-ag-topo strong { display: block; font-size: 17px; }
+.mt-ag-topo span { font-size: 13px; color: var(--ink-3); }
+.mt-dias { display: flex; gap: 6px; margin-top: 14px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.mt-dias::-webkit-scrollbar { display: none; }
+.mt-dias button { flex-shrink: 0; border: 1px solid var(--line-2); background: #fff; color: var(--ink-2); font-weight: 700; font-size: 13.5px; padding: 7px 12px; border-radius: 10px; min-height: 38px; position: relative; }
+.mt-dias button[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.mt-dias button.tem::after { content: ""; position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
+.mt-grade-wrap { margin-top: 12px; overflow-x: auto; }
+.mt-grade { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
+.mt-grade th { font-size: 12.5px; font-weight: 700; color: var(--ink-2); text-align: left; padding: 2px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-grade th.h { width: 48px; }
+.mt-grade td { height: 34px; border-radius: 7px; font-size: 12px; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mt-grade td.hora { color: var(--ink-3); font-weight: 600; padding: 0; }
+.mt-grade td.livre { background: #f3f7f5; border: 1px dashed #cfdcd6; }
+.mt-grade td.ocup { background: #e6eaee; color: #7a8794; }
+.mt-grade td.ia { background: var(--brand); color: #fff; font-weight: 700; animation: mtPop .6s ease; }
+@keyframes mtPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: none; } }
+.mt-leg { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 12.5px; color: var(--ink-3); }
+.mt-leg span { display: inline-flex; align-items: center; gap: 6px; }
+.mt-leg i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.l-livre { background: #f3f7f5; border: 1px dashed #cfdcd6; } .l-ocup { background: #e6eaee; } .l-ia { background: var(--brand); }
+.mt-toast { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--navy); color: #fff; border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 600; box-shadow: var(--sh-3); width: max-content; max-width: calc(100% - 32px); animation: mtPop .4s ease; }
+.mt-toast[hidden] { display: none; }
+.mt-toast .ic { color: #6ee7b7; }
+
 /* Barra fixa no celular */
 .barra-m { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 88px 10px 16px; background: rgba(255,255,255,.96); border-top: 1px solid var(--line); box-shadow: 0 -8px 24px -12px rgba(15,23,42,.2); transform: translateY(110%); transition: transform .25s; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
 .barra-m.vis { transform: none; }
@@ -616,7 +685,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           "name": "Posso testar antes de colocar no WhatsApp da clínica?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sim. Você pode começar com 7 dias grátis, sem cartão: a assistente atende o WhatsApp da clínica de verdade e você só paga se quiser continuar. No painel, também dá para abrir um teste e conversar com ela como se fosse um paciente, sem que nada chegue a ninguém."
+            "text": "Sim, de três formas. Aqui no site, no teste ao vivo, você escolhe a especialidade, informa o nome da clínica e de quem atende e conversa com ela na hora, com uma agenda de exemplo. Depois, pode começar com 7 dias grátis, sem cartão: a assistente atende o WhatsApp da clínica de verdade e você só paga se quiser continuar. E no painel dá para abrir um teste e conversar com ela como se fosse um paciente, sem que nada chegue a ninguém."
           }
         },
         {
@@ -713,6 +782,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
   <div class="wrap">
     <a href="/" class="marca" aria-label="RXSync, página inicial"><span class="marca-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>RXSync</a>
     <nav class="nav" aria-label="Navegação principal">
+      <a href="#teste-ao-vivo">Testar agora</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#recursos">Recursos</a>
       <a href="#seguranca">Segurança</a>
@@ -726,6 +796,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     </div>
   </div>
   <div class="menu-m" id="mobile-menu">
+    <a class="item" href="#teste-ao-vivo">Testar a assistente agora</a>
     <a class="item" href="#como-funciona">Como funciona</a>
     <a class="item" href="#recursos">Recursos</a>
     <a class="item" href="#seguranca">Segurança</a>
@@ -749,7 +820,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <p class="lead">A assistente da RXSync atende seus pacientes em segundos, a qualquer hora: tira dúvidas, passa valores e convênios, marca a consulta na agenda e manda os lembretes. Sua equipe assume a conversa quando quiser.</p>
       <div class="hero-ctas">
         <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" onclick="return iniciarTeste('gestao', 'hero', event)">Testar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-        <button type="button" class="btn btn-sec btn-lg" onclick="trackCta('hero_conversar'); abrirChat()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversar com a assistente</button>
+        <a href="#teste-ao-vivo" class="btn btn-sec btn-lg" onclick="trackCta('hero_testar_assistente')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Testar a assistente agora</a>
       </div>
       <div class="hero-micro">
         <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Sem cartão de crédito</span>
@@ -825,13 +896,99 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       </article>
     </div>
 
-    <div class="demo">
-      <div>
-        <div class="ao-vivo"><span class="pt" aria-hidden="true"></span>Ao vivo</div>
-        <h3>Converse agora com a nossa assistente.</h3>
-        <p>O chat no canto da tela não é gravação nem formulário: é a mesma tecnologia que vai atender a sua clínica. Pergunte sobre planos, implantação ou peça para marcar uma conversa com a gente.</p>
+  </div>
+</section>
+
+<!-- ===================== TESTE AO VIVO (mini teste) =====================
+     Conversa de verdade com a IA, com dados de exemplo da especialidade escolhida.
+     Backend: workflow n8n "11 - Mini teste do site" (/webhook/mini-teste-iniciar e /webhook/mini-teste-mensagem). -->
+<section class="sec mt-sec" id="teste-ao-vivo" aria-labelledby="titulo-mt">
+  <div class="wrap">
+    <div class="sec-head centro">
+      <span class="eyebrow"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.13-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.13a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.13 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.13a.5.5 0 0 1-.96 0z"/></svg>Teste grátis, aqui mesmo</span>
+      <h2 class="h2" id="titulo-mt">Converse com a assistente como se ela já fosse da sua clínica.</h2>
+      <p class="lead">Escolha a especialidade, diga o nome da clínica e de quem atende. A assistente fica pronta na hora para responder e marcar consultas numa agenda de exemplo. São 5 mensagens grátis.</p>
+    </div>
+
+    <div class="mt-card">
+      <!-- Etapa 1: dados da clínica -->
+      <form id="mtForm" class="mt-form" onsubmit="return mtIniciar(event)" novalidate>
+        <input type="text" id="mt_empresa_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+        <div class="mt-form-txt">
+          <h3>Monte sua clínica de teste</h3>
+          <ul class="mt-passos">
+            <li><span>1</span>Preencha os dados ao lado.</li>
+            <li><span>2</span>Converse como se fosse um paciente: pergunte valores, convênios ou peça para marcar.</li>
+            <li><span>3</span>Veja a consulta aparecer na agenda, como no painel da RXSync.</li>
+          </ul>
+        </div>
+        <div class="mt-campos">
+          <div class="campo"><label for="mt_especialidade">Especialidade</label>
+            <select id="mt_especialidade" required>
+              <option value="" selected>Selecione</option>
+              <option value="clinica_geral">Clínica geral</option>
+              <option value="cardiologia">Cardiologia</option>
+              <option value="dermatologia">Dermatologia</option>
+              <option value="endocrinologia">Endocrinologia</option>
+              <option value="estetica">Estética</option>
+              <option value="fisioterapia">Fisioterapia</option>
+              <option value="ginecologia">Ginecologia e obstetrícia</option>
+              <option value="nutricao">Nutrição</option>
+              <option value="odontologia">Odontologia</option>
+              <option value="oftalmologia">Oftalmologia</option>
+              <option value="ortopedia">Ortopedia</option>
+              <option value="pediatria">Pediatria</option>
+              <option value="psicologia">Psicologia</option>
+              <option value="psiquiatria">Psiquiatria</option>
+            </select></div>
+          <div class="campo"><label for="mt_clinica">Nome da clínica</label><input type="text" id="mt_clinica" maxlength="80" autocomplete="organization" placeholder="Ex.: Clínica Bem Estar"></div>
+          <div class="campo mt-largo"><label for="mt_profissionais">Quem atende</label><input type="text" id="mt_profissionais" maxlength="140" placeholder="Ex.: Dra. Ana Souza, Dr. Paulo Lima"><small>Até 3 nomes, separados por vírgula. Se for só você, coloque só o seu.</small></div>
+          <div class="campo mt-largo"><label for="mt_telefone">Seu WhatsApp</label><input type="tel" id="mt_telefone" autocomplete="tel" inputmode="tel" placeholder="(48) 99999-9999"></div>
+          <p id="mtErro" class="erro-form hidden mt-largo" role="alert"></p>
+          <button type="submit" id="mtBtn" class="btn btn-prim btn-lg btn-full mt-largo">Começar o teste <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+          <p class="privac mt-largo"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Usamos seu WhatsApp para falar com você sobre o teste. Valores, convênios e agenda são de exemplo. Veja a <a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</span></p>
+        </div>
+      </form>
+
+      <!-- Etapa 2: conversa + agenda -->
+      <div id="mtTeste" class="mt-teste" hidden>
+        <div class="mt-chat">
+          <div class="wa-topo">
+            <span class="wa-av" id="mtAv">CL</span>
+            <div><div class="wa-nome" id="mtNome">Clínica</div><div class="wa-sub" id="mtSub">assistente virtual</div></div>
+            <span class="mt-cont" id="mtCont" aria-live="polite">5 mensagens</span>
+          </div>
+          <div class="wa-corpo mt-msgs" id="mtMsgs" aria-live="polite">
+            <span class="wa-dia">Teste</span>
+          </div>
+          <div class="mt-sug" id="mtSug">
+            <button type="button" data-sug="Quero marcar uma consulta">Quero marcar uma consulta</button>
+            <button type="button" data-sug="Quanto custa a consulta?">Quanto custa a consulta?</button>
+            <button type="button" data-sug="Vocês atendem convênio?">Vocês atendem convênio?</button>
+          </div>
+          <form class="wa-barra" id="mtEnvio" onsubmit="return mtEnviar(event)">
+            <label for="mtTexto" class="sr">Sua mensagem</label>
+            <input type="text" id="mtTexto" class="wa-campo mt-input" maxlength="500" autocomplete="off" placeholder="Escreva como se fosse um paciente">
+            <button type="submit" class="wa-env" id="mtEnv" aria-label="Enviar"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
+          </form>
+          <div class="mt-fim" id="mtFim" hidden>
+            <strong>Gostou? Coloque a assistente no WhatsApp da sua clínica.</strong>
+            <p>Com os seus horários, valores e convênios, por 7 dias grátis e sem cartão.</p>
+            <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-full" onclick="return iniciarTeste('gestao', 'mini_teste', event)">Testar 7 dias grátis</a>
+            <button type="button" class="mt-link" onclick="scrollToForm('')">Prefiro falar com a equipe</button>
+          </div>
+        </div>
+
+        <div class="mt-agenda">
+          <div class="mt-ag-topo">
+            <div><strong>Agenda da clínica</strong><span>Exemplo, como no painel da RXSync</span></div>
+          </div>
+          <div class="mt-dias" id="mtDias" role="tablist" aria-label="Dias da agenda"></div>
+          <div class="mt-grade-wrap"><table class="mt-grade" id="mtGrade"></table></div>
+          <div class="mt-leg"><span><i class="l-livre"></i>Livre</span><span><i class="l-ocup"></i>Ocupado</span><span><i class="l-ia"></i>Marcado pela assistente</span></div>
+          <div class="mt-toast" id="mtToast" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg><span id="mtToastTxt">Consulta marcada</span></div>
+        </div>
       </div>
-      <button type="button" class="btn btn-prim btn-lg" onclick="trackCta('faixa_demo_ao_vivo'); abrirChat()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Abrir o chat</button>
     </div>
   </div>
 </section>
@@ -841,7 +998,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Como funciona</span>
-      <h2 class="h2" id="titulo-como">No ar em poucos dias, sem você precisar entender de IA.</h2>
+      <h2 class="h2" id="titulo-como">Sem burocracia e sem precisar entender de IA.</h2>
       <p class="lead">Você conta como a clínica funciona e a assistente sai configurada, com as regras de segurança prontas. Nossa equipe acompanha cada etapa.</p>
     </div>
     <ol class="passos" style="list-style:none;padding:0;margin:0">
@@ -1170,7 +1327,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-1">Posso testar antes de colocar no WhatsApp da clínica?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-1"><div><p>Sim. Você pode começar com 7 dias grátis, sem cartão: a assistente atende o WhatsApp da clínica de verdade e você só paga se quiser continuar. No painel, também dá para abrir um teste e conversar com ela como se fosse um paciente, sem que nada chegue a ninguém.</p></div></div>
+          <div class="faq-content" id="faq-r-2-1"><div><p>Sim, de três formas. Aqui no site, no teste ao vivo, você escolhe a especialidade, informa o nome da clínica e de quem atende e conversa com ela na hora, com uma agenda de exemplo. Depois, pode começar com 7 dias grátis, sem cartão: a assistente atende o WhatsApp da clínica de verdade e você só paga se quiser continuar. E no painel dá para abrir um teste e conversar com ela como se fosse um paciente, sem que nada chegue a ninguém.</p></div></div>
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-2">Como faço ajustes depois que ela estiver no ar?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1558,12 +1715,16 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         var barra = document.getElementById('barraM');
         var hero = document.querySelector('.hero-ctas');
         var final = document.getElementById('contato');
+        var mtSecao = document.getElementById('teste-ao-vivo');
         var travado = false;
         function atualizar() {
             topo.classList.toggle('rolou', window.scrollY > 8);
             var passouHero = hero.getBoundingClientRect().bottom < 0;
             var noFinal = final.getBoundingClientRect().top < window.innerHeight;
-            barra.classList.toggle('vis', passouHero && !noFinal);
+            // Some também no teste ao vivo, para não cobrir o campo de mensagem
+            var mtR = mtSecao ? mtSecao.getBoundingClientRect() : null;
+            var noTeste = mtR && mtR.top < window.innerHeight && mtR.bottom > 0;
+            barra.classList.toggle('vis', passouHero && !noFinal && !noTeste);
             travado = false;
         }
         window.addEventListener('scroll', function () {
@@ -1596,6 +1757,181 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
             });
         }, { passive: true });
     })();
+
+    // ===================== TESTE AO VIVO (mini teste) =====================
+    // Conversa de verdade com a IA, limitada a 5 mensagens. Backend: workflow n8n "11 - Mini teste do site".
+    var MT_API = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
+    var mt = { sessao: null, restantes: 5, agenda: null, profs: [], agendamento: null, dia: 'd1', enviando: false };
+
+    function mtPost(rota, dados) {
+        return fetch(MT_API + rota, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
+            body: JSON.stringify(dados)
+        }).then(function (r) { return r.json().catch(function () { return {}; }); });
+    }
+    function mtEl(id) { return document.getElementById(id); }
+    function mtErro(msg) { var e = mtEl('mtErro'); e.textContent = msg; e.classList.remove('hidden'); }
+
+    async function mtIniciar(ev) {
+        ev.preventDefault();
+        var v = function (id) { return (mtEl(id) || {}).value || ''; };
+        mtEl('mtErro').classList.add('hidden');
+        if (v('mt_empresa_site').trim()) return false;
+        var falta = [['mt_especialidade', 'a especialidade'], ['mt_clinica', 'o nome da clínica'], ['mt_profissionais', 'quem atende'], ['mt_telefone', 'seu WhatsApp']]
+            .filter(function (c) { return !v(c[0]).trim(); });
+        if (falta.length) { mtErro('Falta preencher ' + falta.map(function (c) { return c[1]; }).join(', ') + '.'); mtEl(falta[0][0]).focus(); return false; }
+        if (v('mt_telefone').replace(/\D/g, '').length < 10) { mtErro('Confira o WhatsApp: informe o DDD e o número.'); mtEl('mt_telefone').focus(); return false; }
+
+        var btn = mtEl('mtBtn'), txt = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = 'Preparando a sua assistente...';
+        try {
+            var d = await mtPost('mini-teste-iniciar', {
+                especialidade: v('mt_especialidade'), clinica: v('mt_clinica').trim(), profissionais: v('mt_profissionais').trim(),
+                telefone: v('mt_telefone'), empresa_site: v('mt_empresa_site'), pagina: location.href
+            });
+            if (!d.ok) throw new Error(d.mensagem || 'Não conseguimos começar o teste agora. Tente de novo em instantes.');
+            mt.sessao = d.sessao; mt.restantes = d.restantes; mt.agenda = d.agenda; mt.profs = d.profissionais || [];
+            evento('mini_teste_inicio', { 'especialidade': v('mt_especialidade') });
+            evento('generate_lead', { 'event_category': 'mini_teste', 'event_label': 'Mini_Teste_RXSync', 'especialidade': v('mt_especialidade'), 'currency': 'BRL', 'value': 299, 'transport_type': 'beacon' });
+            mtAbrir(d);
+        } catch (e) {
+            mtErro(e.message || 'Não conseguimos começar o teste agora. Tente de novo em instantes.');
+            btn.disabled = false; btn.innerHTML = txt;
+        }
+        return false;
+    }
+
+    function mtAbrir(d) {
+        var nome = d.clinica || 'Clínica';
+        mtEl('mtNome').textContent = nome;
+        mtEl('mtSub').textContent = 'assistente virtual · ' + (d.especialidade || '');
+        mtEl('mtAv').textContent = nome.replace(/^(cl[ií]nica|consult[óo]rio|centro)\s+(de\s+|do\s+|da\s+)?/i, '').split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0); }).join('').toUpperCase() || 'CL';
+        mtEl('mtForm').hidden = true;
+        mtEl('mtTeste').hidden = false;
+        mtContador();
+        mtDias();
+        mtSistema('Escreva como se fosse um paciente da ' + nome + '. Você tem 5 mensagens.');
+        document.querySelectorAll('#mtSug [data-sug]').forEach(function (b) {
+            b.addEventListener('click', function () { mtEl('mtTexto').value = b.dataset.sug; mtEnviar(); });
+        });
+        mtEl('teste-ao-vivo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(function () { mtEl('mtTexto').focus({ preventScroll: true }); }, 500);
+    }
+
+    function mtContador() {
+        var c = mtEl('mtCont');
+        c.textContent = mt.restantes === 1 ? '1 mensagem' : mt.restantes + ' mensagens';
+        c.classList.toggle('pouco', mt.restantes <= 2);
+    }
+
+    function mtBalao(texto, tipo) {
+        var box = mtEl('mtMsgs');
+        var b = document.createElement('div');
+        b.className = 'b ' + (tipo === 'eu' ? 'b-out' : tipo === 'sis' ? 'b-sis' : 'b-in');
+        b.textContent = texto;
+        if (tipo !== 'sis') {
+            var h = document.createElement('small');
+            h.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            b.appendChild(h);
+        }
+        box.appendChild(b);
+        box.scrollTop = box.scrollHeight;
+        return b;
+    }
+    function mtSistema(t) { return mtBalao(t, 'sis'); }
+
+    function mtDigitando(on) {
+        var box = mtEl('mtMsgs'), d = mtEl('mtDigit');
+        if (on && !d) { d = document.createElement('div'); d.id = 'mtDigit'; d.className = 'digitando'; d.style.display = 'flex'; d.innerHTML = '<i></i><i></i><i></i>'; box.appendChild(d); box.scrollTop = box.scrollHeight; }
+        if (!on && d) d.remove();
+    }
+
+    async function mtEnviar(ev) {
+        if (ev) ev.preventDefault();
+        var campo = mtEl('mtTexto');
+        var texto = campo.value.trim();
+        if (!texto || mt.enviando || !mt.sessao || mt.restantes <= 0) return false;
+        mt.enviando = true; campo.value = ''; mtEl('mtEnv').disabled = true;
+        mtEl('mtSug').hidden = true;
+        mtBalao(texto, 'eu');
+        mtDigitando(true);
+        try {
+            var d = await mtPost('mini-teste-mensagem', { sessao: mt.sessao, mensagem: texto });
+            mtDigitando(false);
+            if (!d.ok) {
+                if (d.limite) { mt.restantes = 0; mtFim(); }
+                else { mtSistema(d.mensagem || 'Não deu para enviar agora. Tente de novo.'); campo.value = texto; }
+                if (d.expirou) { mt.restantes = 0; mtEl('mtTexto').disabled = true; }
+            } else {
+                mtBalao(d.resposta, 'ia');
+                mt.restantes = typeof d.restantes === 'number' ? d.restantes : mt.restantes - 1;
+                evento('mini_teste_mensagem', { 'restantes': mt.restantes });
+                if (d.agendamento && d.novo_agendamento) mtMarcar(d.agendamento);
+                if (mt.restantes <= 0) { evento('mini_teste_limite', { 'agendou': !!mt.agendamento }); mtFim(); }
+            }
+        } catch (e) {
+            mtDigitando(false);
+            mtSistema('Sem conexão agora. Confira a internet e tente de novo.');
+            campo.value = texto;
+        }
+        mtContador();
+        mt.enviando = false;
+        if (mt.restantes > 0) { mtEl('mtEnv').disabled = false; campo.focus({ preventScroll: true }); }
+        return false;
+    }
+
+    function mtFim() {
+        mtEl('mtEnvio').hidden = true;
+        mtEl('mtSug').hidden = true;
+        mtEl('mtFim').hidden = false;
+        mtContador();
+    }
+
+    function mtDias() {
+        var box = mtEl('mtDias');
+        box.innerHTML = '';
+        (mt.agenda.dias || []).forEach(function (d) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.dia = d.id; b.textContent = d.rotulo;
+            b.addEventListener('click', function () { mt.dia = d.id; mtDias(); });
+            b.setAttribute('aria-selected', d.id === mt.dia ? 'true' : 'false');
+            if (mt.agendamento && mt.agendamento.dia === d.id) b.classList.add('tem');
+            box.appendChild(b);
+        });
+        mtGrade();
+    }
+
+    function mtGrade() {
+        var t = mtEl('mtGrade'), ag = mt.agenda, ocup = {};
+        (ag.ocupados || []).forEach(function (o) { ocup[o] = 1; });
+        var h = '<thead><tr><th class="h"></th>' + mt.profs.map(function (p) { return '<th title="' + mtEsc(p) + '">' + mtEsc(p) + '</th>'; }).join('') + '</tr></thead><tbody>';
+        (ag.horas || []).forEach(function (hr) {
+            h += '<tr><td class="hora">' + hr + '</td>';
+            mt.profs.forEach(function (p, i) {
+                var a = mt.agendamento;
+                if (a && a.dia === mt.dia && a.hora === hr && Number(a.prof) === i) h += '<td class="ia" title="' + mtEsc(a.paciente + ' · ' + a.servico) + '">' + mtEsc(a.paciente) + '</td>';
+                else if (ocup[mt.dia + '|' + hr + '|' + i]) h += '<td class="ocup">Ocupado</td>';
+                else h += '<td class="livre"><span class="sr">Livre</span></td>';
+            });
+            h += '</tr>';
+        });
+        t.innerHTML = h + '</tbody>';
+    }
+    function mtEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+    function mtMarcar(a) {
+        mt.agendamento = a;
+        mt.dia = a.dia;
+        mtDias();
+        evento('mini_teste_agendou', { 'especialidade': (mtEl('mt_especialidade') || {}).value || '' });
+        var toast = mtEl('mtToast');
+        mtEl('mtToastTxt').textContent = 'Consulta marcada: ' + a.rotulo_dia + ', ' + a.hora + ' · ' + a.paciente;
+        toast.hidden = false;
+        clearTimeout(mtMarcar._t);
+        mtMarcar._t = setTimeout(function () { toast.hidden = true; }, 5000);
+        mtSistema('📅 Consulta marcada na agenda' + (window.innerWidth < 1024 ? ', logo abaixo.' : ', ao lado.'));
+    }
     </script>
 
     <!-- Chatwoot - widget de atendimento RXSync -->
