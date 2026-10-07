@@ -46,7 +46,7 @@
   <header class="bg-primary-900 text-white">
     <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
       <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v1</span>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v2</span>
     </div>
   </header>
 
@@ -56,7 +56,7 @@
       <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para Serviços de Saúde</p>
 
       <div class="doc">
-        <p><strong>Versão 2026-10-v1</strong> · Vigente a partir de 6 de outubro de 2026</p>
+        <p><strong>Versão 2026-10-v2</strong> · Vigente a partir de 7 de outubro de 2026</p>
 
         <blockquote>
           <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros.</p>
@@ -112,6 +112,12 @@
                 <td>Nome do responsável, nome da clínica, e-mail, WhatsApp, sistema de gestão usado e plano de interesse</td>
                 <td>Responder ao pedido, entrar em contato e apresentar a Plataforma</td>
                 <td>Procedimentos preliminares a pedido do titular (art. 7º, V)</td>
+              </tr>
+              <tr>
+                <td><strong>Teste ao vivo da assistente</strong> (seção do site)</td>
+                <td>Especialidade, nome da clínica, nomes de quem atende, WhatsApp, mensagens trocadas no teste e consulta de exemplo marcada; página de origem e um código derivado do endereço IP, usado só para limitar abusos</td>
+                <td>Permitir o teste, entrar em contato com você sobre ele e apresentar a Plataforma</td>
+                <td>Procedimentos preliminares a pedido do titular (art. 7º, V) e legítimo interesse, para prevenir abuso (art. 7º, IX)</td>
               </tr>
               <tr>
                 <td><strong>Conversa no chat do site</strong></td>
@@ -196,11 +202,11 @@
             <thead><tr><th>Fornecedor</th><th>Para quê</th><th>Dados</th><th>Onde</th></tr></thead>
             <tbody>
               <tr><td>Hostinger International Ltd.</td><td>Hospedagem da Plataforma e das bases de dados (conversas, agendamentos, atendimento)</td><td>Todos os dados da Plataforma</td><td>Brasil (datacenter em São Paulo)</td></tr>
-              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente, transcrição de áudio e leitura de fotos e documentos enviados pelo paciente</td><td>Conteúdo da conversa e arquivos necessários para a resposta</td><td>Exterior</td></tr>
+              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente (inclusive no teste ao vivo do site), transcrição de áudio e leitura de fotos e documentos enviados pelo paciente</td><td>Conteúdo da conversa e arquivos necessários para a resposta</td><td>Exterior</td></tr>
               <tr><td>Meta Platforms, Inc. (WhatsApp)</td><td>Canal de mensagens com o paciente</td><td>Mensagens e número de telefone</td><td>Exterior</td></tr>
               <tr><td>Google LLC</td><td>Planilha de cadastro e base de conhecimento do cliente; análise de uso do site (Google Analytics)</td><td>Cadastro do cliente e conteúdo da base; dados de navegação</td><td>Exterior</td></tr>
               <tr><td>Resend, Inc.</td><td>Envio de e-mails operacionais aos clientes</td><td>Nome e e-mail do cliente e conteúdo do aviso</td><td>Exterior</td></tr>
-              <tr><td>Telegram</td><td>Avisos internos à equipe da RXSync sobre o andamento de clientes, pagamentos e falhas</td><td>Nome da clínica, identificador do cliente e informações do aviso; em caso de falha na entrega de um aviso de urgência ou de pedido de atendimento, nome, telefone e motivo informados pelo paciente</td><td>Exterior</td></tr>
+              <tr><td>Telegram</td><td>Avisos internos à equipe da RXSync sobre o andamento de clientes, pagamentos, falhas e testes feitos no site</td><td>Nome da clínica, identificador do cliente e informações do aviso; no teste ao vivo do site, os dados preenchidos e o resumo da conversa de teste; em caso de falha na entrega de um aviso de urgência ou de pedido de atendimento, nome, telefone e motivo informados pelo paciente</td><td>Exterior</td></tr>
               <tr><td>Asaas</td><td>Cobrança, recebimento e emissão de nota fiscal</td><td>Dados cadastrais e de cobrança do cliente</td><td>Brasil</td></tr>
               <tr><td>GitHub, Inc.</td><td>Hospedagem das páginas do site</td><td>Endereço IP e dados técnicos do acesso às páginas</td><td>Exterior</td></tr>
               <tr><td>Sistema de gestão da clínica, quando integrado</td><td>Agendamento e prontuário, conforme escolha da clínica</td><td>Dados de agendamento</td><td>Conforme contrato próprio da clínica</td></tr>
@@ -221,6 +227,7 @@
           <div class="tabela"><table>
             <thead><tr><th>Dado</th><th>Prazo</th></tr></thead>
             <tbody>
+              <tr><td>Teste ao vivo do site</td><td>Até <strong>90 dias</strong> do teste. Depois, apagamos automaticamente, se não houver contratação.</td></tr>
               <tr><td>Pedido de demonstração e conversas do chat do site</td><td>Pelo tempo necessário para responder e acompanhar o contato. Depois disso, apagamos ou anonimizamos, se não houver contratação.</td></tr>
               <tr><td>Cadastro, contratação, aceite e cobrança</td><td>Durante o contrato e, depois dele, pelo prazo necessário para cumprir obrigações legais e fiscais (em regra, 5 anos) e para exercer direitos em eventual disputa (prazos de prescrição aplicáveis). O registro do aceite dos Termos é mantido como prova.</td></tr>
               <tr><td>Teste grátis encerrado sem continuidade</td><td>Configuração e histórico mantidos por até <strong>15 dias corridos</strong> do término, para retomada ou exportação. Depois, são eliminados.</td></tr>
