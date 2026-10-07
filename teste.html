@@ -15,6 +15,10 @@
   .card { background: #fff; border: 1px solid #e0e7e4; border-radius: 16px; padding: 22px; margin-top: 20px; }
   h1 { margin: 0; font-size: 21px; line-height: 1.25; }
   p { margin: 10px 0 0; color: #445263; }
+  .abrir { margin-top: 18px; width: 100%; min-height: 56px; border: 0; border-radius: 12px; background: #059669; color: #fff; font: inherit; font-weight: 700; font-size: 17px; cursor: pointer; }
+  .abrir:disabled { background: #9fbfb2; cursor: wait; }
+  .status { margin-top: 10px; font-size: 14px; color: #66727f; text-align: center; }
+  .status.erro { color: #9f1239; }
   .rodape { margin-top: 16px; font-size: 14px; color: #66727f; text-align: center; }
   .rodape a { color: #065f46; font-weight: 700; }
 </style>
@@ -25,31 +29,45 @@
   <main class="wrap">
     <div class="card">
       <h1>Teste da sua assistente</h1>
-      <p>Toque em <strong>Conversar com a assistente</strong>, no canto da tela, e escreva como se fosse um paciente da sua clínica. Nada daqui chega ao WhatsApp de verdade.</p>
+      <p>Escreva como se fosse um paciente da sua clínica. Nada daqui chega ao WhatsApp de verdade.</p>
+      <button type="button" class="abrir" id="abrir" disabled>Carregando o chat...</button>
+      <p class="status" id="status" aria-live="polite"></p>
     </div>
     <p class="rodape">Precisa falar com a RXSync? <a href="https://rxsync.com.br/?suporte=1" target="_blank" rel="noopener">Fale com o suporte</a></p>
-    <p id="erro" class="rodape" hidden></p>
   </main>
 
 <script>
 (function (d, t) {
+  var btn = document.getElementById('abrir');
+  var status = document.getElementById('status');
+  function erro(msg) { btn.textContent = 'Chat indisponível'; status.textContent = msg; status.className = 'status erro'; }
+
   var token = new URLSearchParams(window.location.search).get('token');
-  if (!token) {
-    var e = document.getElementById('erro');
-    e.textContent = 'Link incompleto. Abra o teste de novo pelo painel.';
-    e.hidden = false;
-    return;
-  }
-  // Botão do chat com texto, para ficar claro onde tocar
-  window.chatwootSettings = { type: 'expanded_bubble', launcherTitle: 'Conversar com a assistente', position: 'right' };
+  if (!token) { erro('Link incompleto. Abra o teste de novo pelo painel.'); return; }
+
+  // O botão só funciona depois que o chat terminou de carregar (abrir antes deixa a janela em branco).
+  window.addEventListener('chatwoot:ready', function () {
+    clearTimeout(demora);
+    btn.disabled = false;
+    btn.textContent = 'Abrir a conversa';
+    status.textContent = '';
+  });
+  btn.addEventListener('click', function () {
+    if (window.$chatwoot) window.$chatwoot.toggle('open');
+  });
+  var demora = setTimeout(function () {
+    erro('O chat não carregou. Recarregue a página. Se continuar, avise o suporte.');
+  }, 15000);
 
   var BASE_URL = 'https://app.rxsync.com.br';
   var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
   g.src = BASE_URL + '/packs/js/sdk.js';
   g.async = true;
+  g.onerror = function () { clearTimeout(demora); erro('Não foi possível carregar o chat (app.rxsync.com.br). Confira a internet e recarregue.'); };
   s.parentNode.insertBefore(g, s);
   g.onload = function () {
-    window.chatwootSDK.run({ websiteToken: token, baseUrl: BASE_URL });
+    try { window.chatwootSDK.run({ websiteToken: token, baseUrl: BASE_URL }); }
+    catch (e) { clearTimeout(demora); erro('O chat não iniciou: ' + e.message); }
   };
 })(document, 'script');
 </script>
