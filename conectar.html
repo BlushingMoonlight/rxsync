@@ -163,5 +163,18 @@
   });
 })();
 </script>
+<!-- Chatwoot — widget de suporte da RXSync (CLI-000, inbox 1). É aqui que o cliente costuma travar. -->
+<script>
+(function (d, t) {
+  var BASE_URL = "https://app.rxsync.com.br";
+  var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+  g.src = BASE_URL + "/packs/js/sdk.js";
+  g.async = true;
+  s.parentNode.insertBefore(g, s);
+  g.onload = function () {
+    window.chatwootSDK.run({ websiteToken: 'umo8eLwQSe9QsAzdQAMKAQVu', baseUrl: BASE_URL });
+  };
+})(document, "script");
+</script>
 </body>
 </html>
