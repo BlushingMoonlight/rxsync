@@ -296,6 +296,7 @@
         <button role="tab" data-sub="" aria-selected="true">Consultas</button>
         <button role="tab" data-sub="horarios" aria-selected="false">Horários</button>
         <button role="tab" data-sub="documentos" aria-selected="false">Documentos</button>
+        <button role="tab" data-sub="integracao" aria-selected="false">Integração</button>
       </div>
 
       <div data-sub-pane="">
@@ -339,6 +340,11 @@
         <p class="subtitulo" style="margin:0 0 14px">Fotos e PDFs que os pacientes mandam no WhatsApp: pedido de exame, carteirinha, guia, documento. A assistente anota só os dados administrativos e não interpreta conteúdo clínico. Confira sempre no arquivo original.</p>
         <div id="docUpsell" class="aviso neutro hidden">A leitura de fotos e documentos faz parte do plano Gestão Inteligente. No seu plano, a assistente avisa o paciente que a equipe vai ver o arquivo. <button class="link" type="button" data-ir="conta/assinatura">Ver planos</button></div>
         <div id="docLista" class="space-y-3"><div class="vazio">Carregando…</div></div>
+      </div>
+
+      <div data-sub-pane="integracao" hidden>
+        <p class="subtitulo" style="margin:0 0 14px">Ligue a agenda da RXSync à agenda que a clínica já usa. As consultas marcadas lá aparecem aqui e ocupam o horário, e as que a assistente marca vão para lá.</p>
+        <div id="intBox"><div class="vazio">Carregando…</div></div>
       </div>
     </section>
 
@@ -609,6 +615,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (area === "agenda") {
       el("agendaSeg").querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.sub === (temSub ? sub : ""))); });
       if (sub === "documentos") docCarregar();
+      if (sub === "integracao") intCarregar();
     }
     if (area === "hoje") hojeRender();
     if (area === "resultados" && !abertas.resultados) { abertas.resultados = true; resultadosCarregar(); }
@@ -1014,6 +1021,124 @@ function partesTz(ms) {
   }
   el("chatEnviar").addEventListener("click", chatEnviar);
   el("chatTexto").addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatEnviar(); } });
+
+
+  // ---------- Aba Integração (agenda externa: Reservio) ----------
+  var INTEG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/integracao-agenda";
+  function intChamar(acao, dados) {
+    return fetch(INTEG_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(function (r) { return r.json(); });
+  }
+  function intCarregar() {
+    var box = el("intBox");
+    box.innerHTML = '<div class="vazio">Carregando…</div>';
+    intChamar("status").then(function (r) { intRender(r, null); }).catch(function () { box.innerHTML = '<div class="aviso rosa">Não consegui abrir a integração agora. Tente de novo em instantes.</div>'; });
+  }
+  function intHa(iso) {
+    if (!iso) return "ainda não aconteceu";
+    var min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if (min < 1) return "agora há pouco";
+    if (min < 60) return "há " + min + " min";
+    var hr = Math.round(min / 60); if (hr < 24) return "há " + hr + " h";
+    return fmt(iso);
+  }
+  function intCampo(box, rotulo, input, dica) {
+    box.appendChild(h$("label", "block text-xs text-slate-500 mb-1", rotulo));
+    input.className = "w-full border border-slate-300 rounded-lg p-2.5 text-sm mb-2";
+    box.appendChild(input);
+    if (dica) box.appendChild(h$("div", "text-xs text-slate-500 mb-3", dica));
+    return input;
+  }
+  function intSelect(opcoes, valor) {
+    var s = document.createElement("select");
+    opcoes.forEach(function (o) { var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; if (o[0] === valor) op.selected = true; s.appendChild(op); });
+    return s;
+  }
+  function intOcupado(btn, txt) { btn.disabled = true; btn.dataset.txt = btn.textContent; btn.textContent = txt; }
+  function intRender(r, ultimo) {
+    var box = el("intBox"); box.innerHTML = "";
+    r = r || {};
+    var nomePlat = r.plataforma_nome || "Reservio";
+    if (r.mensagem) box.appendChild(h$("div", "aviso " + (r.ok === false ? "rosa" : "verde"), r.mensagem));
+    if (!r.conectado) {
+      var b = h$("div", "bloco pad");
+      b.appendChild(h$("h2", "sec", "Conectar a agenda que você já usa"));
+      var plats = Object.keys(r.plataformas || { reservio: "Reservio" }).map(function (k) { return [k, (r.plataformas || {})[k] || "Reservio"]; });
+      var sPlat = intCampo(b, "Plataforma", intSelect(plats, (ultimo && ultimo.plataforma) || "reservio"), "Por enquanto, a integração funciona com o Reservio. Outras plataformas chegam em breve.");
+      var tok = document.createElement("input"); tok.type = "password"; tok.autocomplete = "off"; tok.spellcheck = false; tok.placeholder = "Cole aqui o token da API";
+      intCampo(b, "Token da API", tok, "No Reservio, a API faz parte do plano Pro: peça o token ao suporte do Reservio e cole aqui. Ele fica guardado com criptografia e não aparece de novo.");
+      if (ultimo && ultimo.token) tok.value = ultimo.token;
+      var neg = null;
+      if (r.escolher_negocio && r.escolher_negocio.length) {
+        neg = intCampo(b, "Negócio", intSelect(r.escolher_negocio.map(function (x) { return [x.id, x.nome || x.id]; }), ""), "Sua conta tem mais de um negócio. Escolha o desta clínica.");
+      } else if (r.pedir_negocio) {
+        neg = document.createElement("input"); neg.type = "text"; neg.placeholder = "Ex.: b04965e6-a9bb-591f-8f8a-1adcb2c8dc39";
+        intCampo(b, "ID do negócio", neg, "O suporte do " + nomePlat + " informa junto com o token.");
+      }
+      var bt = h$("button", "btn pri plena", "Conectar"); bt.type = "button";
+      bt.onclick = function () {
+        var dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg ? neg.value.trim() : "" };
+        if (!dados.token) { tok.focus(); toast("Cole o token da API."); return; }
+        intOcupado(bt, "Conectando…");
+        intChamar("conectar", dados).then(function (x) { intRender(x, x.ok ? null : dados); }).catch(function () { intRender({ ok: false, mensagem: "Não consegui conectar agora. Tente de novo em instantes.", plataformas: r.plataformas }, dados); });
+      };
+      b.appendChild(bt);
+      box.appendChild(b);
+      return;
+    }
+    var st = h$("div", "bloco pad");
+    var topo = h$("div", "flex items-start justify-between gap-2");
+    var esq = h$("div");
+    esq.appendChild(h$("div", "font-semibold text-slate-900 text-sm", nomePlat + (r.business_nome ? " · " + r.business_nome : "")));
+    esq.appendChild(h$("div", "text-xs text-slate-500 mt-0.5", "Última sincronização: " + intHa(r.ultima_sync)));
+    topo.appendChild(esq);
+    topo.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full " + (r.status === "erro" ? "bg-rose-100 text-rose-800" : "bg-emerald-100 text-emerald-800"), r.status === "erro" ? "COM PROBLEMA" : "CONECTADO"));
+    st.appendChild(topo);
+    if (r.status === "erro" && r.ultimo_erro) st.appendChild(h$("div", "aviso rosa", r.ultimo_erro));
+    box.appendChild(st);
+
+    var cfg = h$("div", "bloco pad");
+    cfg.appendChild(h$("h2", "sec", "Como a assistente usa o " + nomePlat));
+    if (!r.servico_id) cfg.appendChild(h$("div", "aviso ambar", "Escolha o serviço para a assistente começar a lançar no " + nomePlat + " as consultas que ela marca."));
+    var sServ = intCampo(cfg, "Serviço usado quando a assistente marca", intSelect([["", "Escolha"]].concat((r.servicos || []).map(function (x) { return [x.id, x.nome + (x.duracao_min ? " (" + x.duracao_min + " min)" : "")]; })), r.servico_id || ""));
+    var sRec = intCampo(cfg, "Profissional", intSelect([["", "Todos os profissionais"]].concat((r.recursos || []).map(function (x) { return [x.id, x.nome]; })), r.recurso_id || ""),
+      "As consultas desse profissional ocupam a agenda da RXSync, e é na agenda dele que a assistente marca.");
+    var salvar = h$("button", "btn pri plena", "Salvar"); salvar.type = "button";
+    salvar.onclick = function () {
+      if (!sServ.value) { sServ.focus(); toast("Escolha o serviço."); return; }
+      intOcupado(salvar, "Salvando…");
+      intChamar("configurar", { servico_id: sServ.value, recurso_id: sRec.value }).then(function (x) { intRender(x); }).catch(function () { toast("Não consegui salvar."); salvar.disabled = false; salvar.textContent = "Salvar"; });
+    };
+    cfg.appendChild(salvar);
+    box.appendChild(cfg);
+
+    var ac = h$("div", "mt-3 flex flex-wrap gap-2");
+    var bSync = agBtn("Sincronizar agora", "border-slate-300 text-slate-700", function () {
+      intOcupado(bSync, "Sincronizando…");
+      intChamar("sincronizar").then(function (x) { intRender(x); }).catch(function () { toast("Não consegui sincronizar."); intCarregar(); });
+    });
+    var bLista = agBtn("Atualizar lista de serviços", "border-slate-300 text-slate-700", function () {
+      intOcupado(bLista, "Atualizando…");
+      intChamar("atualizar_opcoes").then(function (x) { intRender(x); }).catch(function () { toast("Não consegui atualizar."); intCarregar(); });
+    });
+    var bSair = agBtn("Desconectar", "border-rose-200 text-rose-700", function () {
+      if (!confirm("Desconectar do " + nomePlat + "? As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de lançar consultas lá.")) return;
+      intOcupado(bSair, "Desconectando…");
+      intChamar("desconectar").then(function (x) { intRender(x); }).catch(function () { toast("Não consegui desconectar."); intCarregar(); });
+    });
+    ac.appendChild(bSync); ac.appendChild(bLista); ac.appendChild(bSair);
+    box.appendChild(ac);
+
+    var info = h$("div", "aviso neutro");
+    info.style.marginTop = "14px";
+    info.appendChild(h$("div", "font-semibold mb-1", "Como funciona"));
+    [
+      "A cada 2 minutos, as consultas do " + nomePlat + " aparecem aqui e ocupam o horário, para a assistente não oferecer horário já tomado.",
+      "Quando a assistente marca uma consulta, ela confere se o horário está livre no " + nomePlat + " e lança lá. Se alguém tiver ocupado o horário no meio tempo, você recebe um aviso no WhatsApp de alertas.",
+      "O " + nomePlat + " não permite cancelar pela integração. Quando o paciente cancela pelo WhatsApp, avisamos no WhatsApp de alertas para você cancelar lá.",
+      "Mantenha os dias e horários de atendimento (Agenda › Horários) iguais aos do " + nomePlat + "."
+    ].forEach(function (t) { info.appendChild(h$("div", "mb-1", "• " + t)); });
+    box.appendChild(info);
+  }
 
   // ---------- Aba Documentos ----------
   var DOC_TIPOS = { pedido_exame: "Pedido de exame", resultado_exame: "Resultado de exame", receita: "Receita", atestado_laudo: "Atestado ou laudo", carteirinha_convenio: "Carteirinha do convênio", documento_identidade: "Documento de identidade", comprovante_pagamento: "Comprovante de pagamento", guia_autorizacao: "Guia de autorização", outro: "Outro", ilegivel: "Não deu para ler" };
@@ -1470,16 +1595,22 @@ function partesTz(ms) {
     if (a.presenca_confirmada && a.status !== "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800", "CONFIRMOU PRESENÇA"));
     if (a.status === "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800", "CANCELADO"));
     if (a.servico === "BLOQUEIO") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-white", "⛔ BLOQUEIO"));
-    else tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
+    else tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.origem_externa ? String(a.origem_externa).toUpperCase() : a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
+    if (a.no_externo && !a.origem_externa && a.servico !== "BLOQUEIO") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800", "NO " + String(a.externo_plataforma || "").toUpperCase()));
     top.appendChild(tags); c.appendChild(top);
     if (a.briefing) { var bx = h$("div", "mt-3 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3"); bx.appendChild(h$("div", "font-semibold text-slate-500 mb-1", "Resumo da conversa")); bx.appendChild(h$("div", "", a.briefing)); c.appendChild(bx); }
     if (a.observacoes) c.appendChild(h$("div", "mt-2 text-xs text-slate-600", "Obs.: " + a.observacoes));
     var acoes = h$("div", "mt-3 flex flex-wrap gap-2");
     if (a.servico !== "BLOQUEIO") { var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(a.telefone_paciente); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa); }
+    if (agila(a) && a.origem_externa) {
+      c.appendChild(acoes);
+      c.appendChild(h$("div", "mt-2 text-xs text-slate-500", "Veio do " + (a.origem_externa === "reservio" ? "Reservio" : a.origem_externa) + ". Para alterar ou cancelar, use o " + (a.origem_externa === "reservio" ? "Reservio" : a.origem_externa) + ": a mudança aparece aqui em até 2 minutos."));
+      return c;
+    }
     if (agila(a)) {
       if (!a.visto) acoes.appendChild(agBtn("Marcar como visto", "border-slate-300 text-slate-700", function () { agChamar("agenda_visto", { id: a.id }).then(agCarregar); }));
       acoes.appendChild(agBtn("Editar", "border-slate-300 text-slate-700", function () { agForm(a); }));
-      acoes.appendChild(agBtn("Cancelar", "border-rose-200 text-rose-700", function () { if (confirm("Cancelar o horário de " + a.nome_paciente + "?")) agChamar("agenda_cancelar", { id: a.id }).then(function () { toast("Cancelado."); agCarregar(); }).catch(function () { toast("Não consegui cancelar."); }); }));
+      acoes.appendChild(agBtn("Cancelar", "border-rose-200 text-rose-700", function () { if (confirm("Cancelar o horário de " + a.nome_paciente + "?" + (a.no_externo ? "\n\nEssa consulta também está no " + (a.externo_plataforma === "reservio" ? "Reservio" : a.externo_plataforma) + ": cancele lá também." : ""))) agChamar("agenda_cancelar", { id: a.id }).then(function () { toast("Cancelado."); agCarregar(); }).catch(function () { toast("Não consegui cancelar."); }); }));
     } else {
       acoes.appendChild(agBtn("Excluir", "border-rose-200 text-rose-700", function () {
         var futuro = new Date(a.inicio).getTime() > Date.now();
