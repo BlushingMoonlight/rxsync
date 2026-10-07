@@ -221,7 +221,15 @@
   .ro-row .val { font-weight: 600; text-align: right; overflow-wrap: anywhere; }
 
   .cap1::first-letter { text-transform: uppercase; }
-  @media (max-width: 1023px) { body[data-area="assistente"] .fab, body[data-area="conta"] .fab { display: none; } }
+  /* nas telas de preencher, no celular, o botão fica só com o ícone para não tampar os campos */
+  @media (max-width: 1023px) { body[data-area="assistente"] .fab, body[data-area="conta"] .fab { width: 52px; height: 52px; padding: 0; justify-content: center; } body[data-area="assistente"] .fab-txt, body[data-area="conta"] .fab-txt { display: none; } }
+  .demo { background: #f6f8f7; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+  .demo .b { max-width: 85%; border-radius: 16px; padding: 8px 12px; font-size: 14px; line-height: 1.45; }
+  .demo .eu { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
+  .demo .ele { align-self: flex-start; background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .beneficios { margin: 0; padding: 0; list-style: none; }
+  .beneficios li { display: flex; gap: 10px; padding: 7px 0; font-size: 14.5px; }
+  .beneficios li::before { content: "✓"; color: var(--brand); font-weight: 800; }
   .boot { min-height: 100vh; display: grid; place-items: center; color: var(--ink-2); }
   .porta { max-width: 400px; margin: 12vh auto 0; padding: 0 16px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
@@ -446,19 +454,38 @@
 
   <nav class="tabbar" id="navBar" aria-label="Seções"></nav>
 
-  <button id="fabChat" class="fab" type="button" hidden><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 3v4M17 5h4M5 17v4M3 19h4"/></svg>Perguntar</button>
+  <button id="fabChat" class="fab" type="button" aria-label="Perguntar ao assistente de gestão"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 3v4M17 5h4M5 17v4M3 19h4"/></svg><span class="fab-txt">Perguntar</span></button>
   <div id="veuChat" class="veu" hidden></div>
   <div id="folhaChat" class="folha" role="dialog" aria-modal="true" aria-labelledby="folhaTitulo" hidden>
     <div class="folha-cab">
       <div><div class="t" id="folhaTitulo">Assistente de gestão</div><div class="s">Sobre a agenda, os resultados e os documentos</div></div>
       <button id="fecharChat" type="button" aria-label="Fechar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
+    <div id="chatUpsell" class="pad" style="overflow-y:auto;flex:1" hidden>
+      <span class="pill plano">Plano Gestão Inteligente</span>
+      <h2 class="titulo" style="font-size:22px;margin-top:10px">Seu assistente de gestão</h2>
+      <p class="subtitulo" style="font-size:14.5px">Pergunte sobre a clínica e peça mudanças por aqui ou pelo seu WhatsApp, sem abrir o painel.</p>
+      <div class="demo" aria-label="Exemplo de conversa">
+        <div class="b eu">Como está minha agenda amanhã?</div>
+        <div class="b ele"><strong>Amanhã, quinta</strong>, você tem 6 consultas. A primeira é às 8h e há um horário livre às 15h.</div>
+        <div class="b eu">Bloqueia sexta de manhã, vou a um congresso</div>
+        <div class="b ele">Vou bloquear sexta, das 8h às 12h. Há 2 consultas nesse período: quer que eu avise os pacientes? Confirma?</div>
+      </div>
+      <ul class="beneficios">
+        <li>Responde sobre agenda, resultados e documentos dos pacientes</li>
+        <li>Marca, remarca, bloqueia horários e muda a grade, sempre com a sua confirmação</li>
+        <li>Avisa os pacientes do dia quando você precisa atrasar ou remarcar</li>
+        <li>Manda o resumo da agenda no seu WhatsApp todo dia</li>
+      </ul>
+      <button class="btn pri plena" type="button" data-ir="conta/assinatura" style="margin-top:16px">Conhecer o plano Gestão Inteligente</button>
+      <p class="subtitulo" style="font-size:13px;text-align:center">Também traz leitura de documentos, pesquisa de satisfação e lista de espera.</p>
+    </div>
     <div id="chatDesligado" class="pad" hidden>
       <div class="aviso neutro" style="margin:0">O assistente está desligado. <button class="link" type="button" data-ir="conta/gestao">Ligar em Conta › Assistente de gestão</button></div>
     </div>
     <div id="chatMsgs"></div>
     <div id="chatSugestoes"></div>
-    <div class="chat-in">
+    <div class="chat-in" id="chatEntrada">
       <textarea id="chatTexto" rows="1" maxlength="2000" placeholder="Pergunte ou peça uma mudança"></textarea>
       <button id="chatEnviar" type="button" aria-label="Enviar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg></button>
     </div>
@@ -819,9 +846,10 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   // ===== Chat do assistente de gestão (folha que abre por cima de qualquer tela) =====
   function abrirChat() {
     el("veuChat").hidden = false; el("folhaChat").hidden = false;
-    var ligado = savedValues.assistente_dono_ativa === "SIM";
-    el("chatDesligado").hidden = ligado;
-    el("chatMsgs").hidden = !ligado; el("chatSugestoes").hidden = !ligado;
+    var ligado = !PLANO_ESSENCIAL && savedValues.assistente_dono_ativa === "SIM";
+    el("chatUpsell").hidden = !PLANO_ESSENCIAL;
+    el("chatDesligado").hidden = PLANO_ESSENCIAL || ligado;
+    el("chatMsgs").hidden = !ligado; el("chatSugestoes").hidden = !ligado; el("chatEntrada").hidden = PLANO_ESSENCIAL;
     el("chatTexto").disabled = !ligado; el("chatEnviar").disabled = !ligado;
     if (ligado) { chatIniciar(); setTimeout(function () { el("chatTexto").focus(); }, 80); }
   }
@@ -1799,7 +1827,6 @@ function partesTz(ms) {
       ["avaliacoesUpsell", "docUpsell", "assistUpsell"].forEach(function (k) { var x = el(k); if (x) x.classList.remove("hidden"); });
       CAMPOS.forEach(function (c) { if (!c.gestao) return; var x = el("campo_" + c.key); if (!x) return; x.disabled = true; if (x.desabilitar) x.desabilitar(); });
     } else {
-      el("fabChat").hidden = false;
       agChamar("agenda_documentos").then(function (rows) {
         var lim = Date.now() - 7 * 86400000;
         ESTADO.docs7 = (rows || []).filter(function (d) { return new Date(d.recebido_em).getTime() > lim; }).length;
