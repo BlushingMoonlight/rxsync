@@ -435,7 +435,8 @@ do link, o Cliente solicitará sua substituição a qualquer canal de
 suporte, que a RXSync executará em até 1 (um) dia útil.</p>
 <p><strong>7.9.</strong> Instituir e manter política de privacidade
 própria, colher a base legal adequada para o tratamento dos dados de
-seus pacientes e indicar Encarregado, na qualidade de controlador, inclusive para os lembretes de consulta, as mensagens de retomada de conversa e os avisos de vaga da lista de espera enviados pela Plataforma aos pacientes; a mensagem de retomada não é enviada ao paciente que tenha pedido para não receber mais mensagens.</p>
+seus pacientes e indicar Encarregado, na qualidade de controlador, inclusive para os lembretes de consulta, as mensagens de retomada de conversa, os avisos de vaga da lista de espera e as pesquisas de satisfação enviados pela Plataforma aos pacientes; a mensagem de retomada não é enviada ao paciente que tenha pedido para não receber mais mensagens.</p>
+<p><strong>7.10. Números autorizados.</strong> Quando usar o assistente de gestão, cadastrar no Painel de Configuração apenas números de WhatsApp de pessoas autorizadas a consultar e alterar a agenda e os dados da clínica, mantendo a lista atualizada e removendo imediatamente o número que trocar de titular, for perdido ou deixar de ser autorizado. O Cliente responde pelas consultas, alterações e recados aos pacientes feitos a partir desses números e do Painel, que o assistente só executa depois de confirmação expressa na conversa.</p>
 <h1 id="limites-de-atuação-da-inteligência-artificial">8. LIMITES DE
 ATUAÇÃO DA INTELIGÊNCIA ARTIFICIAL</h1>
 <p><strong>8.1.</strong> O Assistente Virtual atua exclusivamente como
@@ -466,6 +467,7 @@ da Mensalidade.</p>
 disciplinares praticadas pelo corpo clínico do Cliente, inclusive quando
 decorrentes de delegação, à Plataforma, de atividade que a norma reserva
 ao profissional de saúde.</p>
+<p><strong>8.6. Anexos enviados pelo paciente.</strong> Quando o plano contratado incluir a leitura de imagens e documentos, o Assistente Virtual os lê exclusivamente para fins administrativos (identificar o tipo do documento e extrair dados de identificação, convênio, profissional, datas e exames ou procedimentos solicitados), não interpreta conteúdo clínico, não transcreve resultados, valores, diagnósticos nem prescrições e não orienta o paciente com base neles. Os dados extraídos podem conter imprecisões e devem ser conferidos pelo Cliente no arquivo original antes de qualquer uso.</p>
 <h1 id="aprovação-de-conteúdo-pelo-responsável-técnico">9. APROVAÇÃO DE
 CONTEÚDO PELO RESPONSÁVEL TÉCNICO</h1>
 <p><strong>9.1.</strong> Todo o conteúdo que o Assistente Virtual
@@ -807,7 +809,7 @@ mantém nela a grade de horários e a disponibilidade atualizadas.</p></li>
 texto na conversa.</p></li>
 <li><p>Retomada de conversa: quando o paciente interrompe a conversa antes de concluir o agendamento, o Assistente Virtual envia uma única mensagem de retomada, após o tempo escolhido pelo Cliente no Painel de Configuração (padrão: 3 horas) e em horário comercial, ou nenhuma, se o Cliente desativar a função, desde que a equipe do Cliente não tenha assumido a conversa e o paciente não tenha pedido para ser deixado em paz.</p></li>
 <li><p>Lembretes de consulta: envio automático, para as consultas registradas na Agenda RXSync, ao paciente que agendou pelo Assistente Virtual ou que teve a consulta lançada pela equipe e já possui conversa com o Cliente no Canal de Mensageria, de lembretes nos horários antes da consulta escolhidos pelo Cliente no Painel de Configuração (padrão: 24 e 2 horas antes), em horário comercial, com pedido de confirmação de presença. O paciente pode confirmar, cancelar ou remarcar respondendo na própria conversa, e o cancelamento por ele solicitado é efetivado de imediato, sem necessidade de confirmação pela equipe do Cliente. A confirmação de presença é informativa e não gera obrigação para nenhuma das partes.</p></li>
-<li><p>Painel de resultados básico, na aba Resultados do Painel de Configuração: volume de conversas e de agendamentos feitos pelo Assistente Virtual no período escolhido.</p></li>
+<li><p>Painel de resultados, na aba Resultados do Painel de Configuração, com gráficos e comparação com o período anterior: volume de conversas, agendamentos feitos pelo Assistente Virtual e pela equipe, taxa de agendamento, tempo médio de primeira resposta, confirmações de presença e cancelamentos no período escolhido e, no Plano Gestão Inteligente, entradas na lista de espera e vagas repostas. Os indicadores dependem dos dados registrados na Plataforma e no Canal de Mensageria e têm caráter informativo.</p></li>
 <li><p>Campo de instruções adicionais para o Assistente Virtual, editável
 pelo Cliente no Painel de Configuração, com limite de caracteres
 conforme o plano contratado (itens 2, 3 e 4 deste Anexo).</p></li>
@@ -832,14 +834,11 @@ disponibilidade e gravação de agendamentos, como alternativa à Agenda
 RXSync.</p></li>
 <li><p><em>(em implantação)</em> Atualização automática de status do agendamento no Sistema de Gestão, quando suportado pela API deste.</p></li>
 <li><p>Acionamento de fila de espera para reposição de horários liberados: o Assistente Virtual registra pacientes interessados em horário indisponível e, quando uma consulta é cancelada, oferece a vaga a quem aguarda, uma pessoa por vez e por prazo de 1 (uma) hora, reservando-a a quem a aceitar.</p></li>
+<li><p>Recebimento de fotos e documentos em PDF enviados pelo paciente (até 8 MB): o Assistente Virtual identifica o tipo do documento, extrai dados administrativos, registra-os em nota interna na conversa e na aba Documentos do Painel de Configuração e usa-os apenas no atendimento administrativo, na forma da Cláusula 8.6. No Plano Essencial, o Assistente Virtual não abre anexos e informa ao paciente que a equipe do Cliente irá vê-los.</p></li>
+<li><p>Assistente de gestão para o Cliente, no Painel de Configuração e pelo Canal de Mensageria, a partir de até 3 (três) números autorizados (Cláusula 7.10): responde sobre agenda, grade de horários, resultados, documentos recebidos, lista de espera e pesquisas de satisfação; envia, se o Cliente ativar, resumo diário da agenda no horário escolhido; e, se o Cliente permitir, marca, remarca, cancela e bloqueia horários, altera a grade e as informações usadas pelo Assistente Virtual e envia recados operacionais a pacientes com consulta marcada, sempre após confirmação expressa. Limite de 60 (sessenta) perguntas por dia, que não integram a franquia de mensagens; os recados enviados a pacientes integram a franquia.</p></li>
 <li><p><em>(em implantação)</em> <em>Follow-up</em> automático de orçamentos sem
 resposta.</p></li>
-<li><p><em>(em implantação)</em> Pesquisa de satisfação (NPS) pós-consulta, com convite à
-avaliação pública encaminhado indistintamente a todos os respondentes e
-alerta interno imediato ao Cliente nas notas baixas.</p></li>
-<li><p>Painel de indicadores web, de acesso próprio do Cliente, com
-tempo médio de resposta, volume de atendimentos e taxa de agendamento, confirmações de presença, cancelamentos e vagas repostas pela lista de espera,
-atualizado ao menos diariamente.</p></li>
+<li><p>Pesquisa de satisfação pós-consulta, que o Cliente liga, desliga e configura no Painel de Configuração (prazo de envio após a consulta, nota mínima para o convite e endereço de avaliação pública): o Assistente Virtual pede ao paciente uma nota de 0 a 10, uma única vez por consulta, em horário comercial e nunca a quem pediu para não receber mensagens; envia o convite à avaliação pública aos que derem nota igual ou superior à escolhida pelo Cliente; e, nas notas de 0 a 6, pede desculpas, pergunta o que houve e avisa imediatamente o número de avisos cadastrado pelo Cliente. Cabe ao Cliente, que define o uso do convite, observar as políticas da plataforma de avaliações e as normas de publicidade do seu conselho profissional.</p></li>
 </ul>
 <p><strong>3.1. Itens em implantação.</strong> Os itens do Plano Gestão Inteligente marcados como “em implantação” ainda não estão disponíveis e serão liberados progressivamente, sem custo adicional e com comunicação por e-mail ou pelo Painel de Configuração (Cláusula 20.6). Enquanto um item não for liberado, ele não é exigível, e o Cliente do Plano Gestão Inteligente poderá migrar para o Plano Essencial a qualquer tempo, com efeito na Mensalidade seguinte, sem recomposição da Cláusula 18.4 e sem a perda da isenção da Taxa de Implantação na modalidade Anual.</p>
 <p><strong>4. Plano Enterprise</strong> — escopo definido em proposta
@@ -881,12 +880,12 @@ ACORDO DE TRATAMENTO DE DADOS PESSOAIS</h1>
 a RXSync é <strong>operadora</strong>, tratando dados pessoais
 exclusivamente conforme as instruções documentadas do controlador, que
 consistem nestes Termos e em suas solicitações escritas de suporte.</p>
-<p><strong>2. Objeto e finalidade.</strong> Operação de canal de atendimento automatizado e humano, triagem administrativa, agendamento, envio de lembretes e de mensagens de retomada de conversa, gestão de lista de espera, pesquisa de satisfação e geração de indicadores operacionais.</p>
+<p><strong>2. Objeto e finalidade.</strong> Operação de canal de atendimento automatizado e humano, triagem administrativa, agendamento, envio de lembretes e de mensagens de retomada de conversa, gestão de lista de espera, pesquisa de satisfação e geração de indicadores operacionais, leitura administrativa de documentos enviados por pacientes e assistente de gestão com resumo da agenda para a equipe do Cliente.</p>
 <p><strong>3. Categorias de titulares.</strong> Pacientes e potenciais
 pacientes do Cliente; colaboradores do Cliente autorizados a acessar o
-Painel de Configuração.</p>
+Painel de Configuração ou a usar o assistente de gestão.</p>
 <p><strong>4. Categorias de dados.</strong> Nome, telefone, e-mail, CPF,
-data de nascimento, convênio, conteúdo das mensagens trocadas, dados de
+data de nascimento, convênio, conteúdo das mensagens trocadas, imagens e documentos enviados pelo titular (como pedidos e resultados de exames, receitas, guias, carteirinhas de convênio e documentos de identificação) e os dados administrativos deles extraídos, dados de
 agendamento e, incidentalmente, <strong>dados pessoais sensíveis de
 saúde</strong> eventualmente informados pelo titular no curso da
 conversa.</p>
@@ -949,7 +948,7 @@ resposta:</p>
 </tr>
 <tr class="even">
 <td>OpenAI, L.L.C.</td>
-<td>Geração de respostas e transcrição de áudio</td>
+<td>Geração de respostas, transcrição de áudio e leitura de imagens e documentos enviados pelos pacientes</td>
 <td>Exterior</td>
 </tr>
 <tr class="odd">
