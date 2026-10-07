@@ -351,9 +351,10 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
           <div>
-            <label class="rotulo" for="whatsapp_alerta">WhatsApp para nossos avisos</label>
-            <span class="ajuda">Onde a gente avisa se algo sair do ar. Pode ser o seu pessoal.</span>
+            <label class="rotulo" for="whatsapp_alerta">WhatsApp que recebe os avisos de urgência</label>
+            <span class="ajuda">Quando um paciente tiver uma urgência ou pedir para falar com alguém, a assistente manda para este número o nome, o telefone e o motivo. <strong>Precisa ser um número DIFERENTE do WhatsApp que ela vai atender</strong> (por exemplo, o celular pessoal do médico ou da secretária): o aviso sai do WhatsApp da clínica, e mandado para ele mesmo ninguém veria.</span>
             <input id="whatsapp_alerta" class="campo" inputmode="tel" maxlength="20" placeholder="(00) 00000-0000">
+            <p class="msg-erro" data-de="whatsapp_alerta">Use um número diferente do WhatsApp que a assistente vai atender. Se ele for o mesmo, os avisos de urgência não chegam a ninguém.</p>
           </div>
 
           <div>
@@ -525,7 +526,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 lucide.createIcons();
 
 /* =====================================================================
-   CONTRATO COM O N8N (workflow 3/5 - Onboarding - Receber).
+   CONTRATO COM O N8N (workflow 3/9 - Onboarding - Receber).
 
    POST https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/onboarding
    Cabeçalho: x-rxsync-origem: rxsync-site-2026
@@ -542,7 +543,7 @@ lucide.createIcons();
 
    Os nomes de CAMPOS precisam bater com as colunas da aba cadastro.
    declaracao_rt (true/false) é a aprovação do responsável técnico:
-   o 3/5 recusa o envio sem ela.
+   o 3/9 recusa o envio sem ela.
    ===================================================================== */
 
 /* =====================================================================
@@ -791,6 +792,16 @@ function validar(n) {
       limparErro(id);
     }
   }
+  if (n === 5) {
+    const d8 = v => String(v || '').replace(/\D/g, '').slice(-8);
+    const al = d8($('whatsapp_alerta').value), at = d8($('numero_whatsapp').value);
+    if (al && at && al === at) {
+      $('whatsapp_alerta').classList.add('erro');
+      document.querySelector('.msg-erro[data-de="whatsapp_alerta"]').classList.add('on');
+      if (!primeiro) primeiro = 'whatsapp_alerta';
+      ok = false;
+    }
+  }
   if (n === 3) {
     const msg = validarGrade();
     $('erroGrade').textContent = msg;
@@ -936,8 +947,8 @@ abrir();
 </script>
 
 <!-- Chatwoot — widget da inbox de clínica (CLI-000, inbox 1).
-     O contratar.html não tem widget; o conectar.html tem. Mantive aqui
-     porque é um formulário de 10 minutos e a cliente pode travar no meio. -->
+     Também está no conectar.html. Aqui porque é um formulário de 10 minutos
+     e a cliente pode travar no meio. -->
 <script>
 (function (d, t) {
   var BASE_URL = "https://app.rxsync.com.br";
