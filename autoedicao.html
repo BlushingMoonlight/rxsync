@@ -84,7 +84,10 @@
           <div id="calViews" class="flex gap-1 mb-3"></div>
           <div class="flex items-center justify-between gap-2 mb-3">
             <div id="agChips" class="flex gap-1.5 overflow-x-auto"></div>
-            <button id="agNovo" class="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Novo</button>
+            <div class="flex gap-1.5 shrink-0">
+              <button id="agExportar" type="button" title="Baixar a agenda em .ics (Google Agenda, Outlook, iPhone)" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold px-3 py-2 rounded-lg">Exportar</button>
+              <button id="agNovo" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg">+ Novo</button>
+            </div>
           </div>
           <div id="agForm" class="hidden border border-slate-200 rounded-xl p-4 mb-4 bg-slate-50"></div>
           <div id="agLista" class="space-y-3"><div class="text-sm text-slate-500 text-center py-8">Carregando agenda...</div></div>
@@ -101,6 +104,31 @@
             <div id="calDetalhe" class="mt-4"></div>
           </div>
         </div>
+        <div class="tab-conteudo" data-tab="documentos">
+          <div class="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 leading-relaxed">
+            Fotos e PDFs que os pacientes mandam no WhatsApp (pedido de exame, carteirinha do convênio, guia, documento). A assistente lê <strong>só os dados administrativos</strong> para organizar o atendimento e <strong>não interpreta conteúdo clínico</strong>: em resultados, receitas e laudos ela registra só o tipo, o paciente, a data e quem assinou. Confira sempre no arquivo original.
+          </div>
+          <div id="docUpsell" class="hidden text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">A leitura de fotos e documentos faz parte do plano <strong>Gestão Inteligente</strong>. No Essencial, a assistente avisa o paciente que a equipe vai ver o arquivo. Você pode mudar de plano na aba Assinatura.</div>
+          <div id="docLista" class="space-y-3"><div class="text-sm text-slate-500 text-center py-8">Carregando...</div></div>
+        </div>
+        <div class="tab-conteudo" data-tab="assistente">
+          <div class="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 leading-relaxed">
+            <p class="font-semibold text-slate-800 mb-1">Seu assistente de gestão</p>
+            <p>Pergunte sobre a agenda, os resultados, os documentos e a lista de espera, aqui no painel ou pelo WhatsApp da clínica, a partir dos números cadastrados abaixo. Se você permitir, ele também marca, remarca, bloqueia horários ("dia 20 não vou atender"), muda a grade ("quarta não atendo mais de manhã") e manda recado aos pacientes do dia ("vou atrasar 30 minutos"), <strong>sempre mostrando o que vai fazer e pedindo sua confirmação</strong>.</p>
+            <p class="mt-2 text-xs text-slate-500">Quem escreve de um número cadastrado é tratado como dono da clínica, com acesso à agenda e aos dados dos pacientes. Cadastre só números de confiança e tire daqui o número que trocar de dono ou for perdido. Limite de 60 perguntas por dia.</p>
+          </div>
+          <div id="assistUpsell" class="hidden text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">O assistente de gestão faz parte do plano <strong>Gestão Inteligente</strong>. Você pode mudar de plano na aba Assinatura.</div>
+          <div id="campos_assistente"></div>
+          <div class="border border-slate-200 rounded-xl bg-white mt-2">
+            <div class="px-4 py-3 border-b border-slate-100 text-sm font-semibold text-slate-800">Conversar com o assistente</div>
+            <div id="chatMsgs" class="px-4 py-3 space-y-2 overflow-y-auto" style="max-height:420px;min-height:120px"></div>
+            <div id="chatSugestoes" class="px-4 pb-2 flex flex-wrap gap-1.5"></div>
+            <div class="flex gap-2 p-3 border-t border-slate-100">
+              <textarea id="chatTexto" rows="1" maxlength="2000" placeholder="Ex.: como está minha agenda amanhã?" class="flex-1 border border-slate-300 rounded-lg p-2.5 text-sm resize-none"></textarea>
+              <button id="chatEnviar" type="button" class="shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 rounded-lg">Enviar</button>
+            </div>
+          </div>
+        </div>
         <div class="tab-conteudo" data-tab="resultados">
           <div class="flex items-center justify-between gap-2 mb-4">
             <div class="text-sm font-semibold text-slate-800">Resultados da assistente</div>
@@ -110,8 +138,21 @@
               <option value="90">Últimos 90 dias</option>
             </select>
           </div>
-          <div id="resGrid" class="grid grid-cols-2 gap-3"><div class="text-sm text-slate-500 col-span-2 text-center py-8">Carregando resultados...</div></div>
-          <div id="resUpsell" class="hidden mt-4 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4"></div>
+          <div id="resHero" class="mb-4"></div>
+          <div id="resUso" class="mb-4"></div>
+          <div id="resGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"><div class="text-sm text-slate-500 col-span-2 sm:col-span-3 text-center py-8">Carregando resultados...</div></div>
+          <div id="resGraficos" class="hidden mt-5 space-y-4">
+            <div class="border border-slate-200 rounded-xl p-4 bg-white"><div class="text-sm font-semibold text-slate-800 mb-3">Agendamentos por dia</div><div class="relative h-56"><canvas id="grDias"></canvas></div></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="border border-slate-200 rounded-xl p-4 bg-white"><div class="text-sm font-semibold text-slate-800 mb-3">Quem marcou</div><div class="relative h-48"><canvas id="grOrigem"></canvas></div></div>
+              <div class="border border-slate-200 rounded-xl p-4 bg-white"><div class="text-sm font-semibold text-slate-800 mb-3">Presença nas consultas com lembrete</div><div class="relative h-48"><canvas id="grPresenca"></canvas></div></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="border border-slate-200 rounded-xl p-4 bg-white"><div class="text-sm font-semibold text-slate-800 mb-3">Dias mais procurados</div><div class="relative h-48"><canvas id="grSemana"></canvas></div></div>
+              <div class="border border-slate-200 rounded-xl p-4 bg-white"><div class="text-sm font-semibold text-slate-800 mb-3">Horários mais procurados</div><div class="relative h-48"><canvas id="grHora"></canvas></div></div>
+            </div>
+          </div>
+          <div id="resConquistas" class="hidden mt-5"></div>
         </div>
         <div class="tab-conteudo" data-tab="assinatura">
           <div id="assinConteudo"><div class="text-sm text-slate-500 text-center py-8">Carregando sua assinatura...</div></div>
@@ -131,6 +172,20 @@
         <div class="tab-conteudo" data-tab="negocio"><div id="campos_negocio"></div></div>
         <div class="tab-conteudo" data-tab="atendimento"><div id="campos_atendimento"></div></div>
         <div class="tab-conteudo" data-tab="urgencia"><div id="campos_urgencia"></div></div>
+        <div class="tab-conteudo" data-tab="avaliacoes">
+          <div class="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5 leading-relaxed">
+            <p class="font-semibold text-slate-800 mb-1">Como funciona</p>
+            <p>Depois da consulta, a assistente pergunta ao paciente, no WhatsApp, que nota de 0 a 10 ele dá para o atendimento.</p>
+            <ul class="list-disc ml-5 mt-2 space-y-1">
+              <li><strong>Nota alta:</strong> ela agradece e envia o link para avaliar a clínica no Google.</li>
+              <li><strong>Nota média:</strong> agradece e pergunta o que poderia ser melhor.</li>
+              <li><strong>Nota baixa (0 a 6):</strong> pede desculpas, pergunta o que houve e avisa na hora o WhatsApp de avisos da aba Urgência. A conversa fica marcada como urgente.</li>
+            </ul>
+            <p class="mt-2 text-xs text-slate-500">Vai uma vez por consulta, das 8h às 20h, e nunca para quem pediu para não receber mensagens. O link do Google fica no seu Perfil da Empresa, em "Pedir avaliações". O uso do convite deve respeitar as regras do Google para avaliações e as normas de publicidade do seu conselho profissional.</p>
+          </div>
+          <div id="avaliacoesUpsell" class="hidden text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">A pesquisa de satisfação faz parte do plano <strong>Gestão Inteligente</strong>. Você pode mudar de plano na aba Assinatura.</div>
+          <div id="campos_avaliacoes"></div>
+        </div>
         <div class="tab-conteudo" data-tab="agendamento">
           <div id="campos_agendamento"></div>
           <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wide mt-6 mb-2">Grade de horários de agendamento</h2>
@@ -164,10 +219,10 @@
   <div id="toast"></div>
 
 <script>
-var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "pausa_humano_horas", "label": "Quando alguém da equipe responde um paciente, a assistente fica em silêncio naquela conversa por", "tipo": "select", "tab": "atendimento", "opcoes": [["", "2 horas (padrão)"], ["1", "1 hora"], ["4", "4 horas"], ["8", "8 horas"], ["12", "12 horas"], ["24", "24 horas"], ["48", "48 horas"]]}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "link_privacidade", "label": "Link da política de privacidade da clínica (a assistente informa na primeira mensagem)", "tipo": "text", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp que recebe os avisos de urgência e de pedido de atendimento. Precisa ser DIFERENTE do WhatsApp que a assistente atende (ex.: celular do médico ou da secretária)", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "lembrete_horarios", "label": "Lembretes de consulta (a IA avisa o paciente e pede confirmação)", "tipo": "multi", "tab": "agendamento", "opcoes": [["48", "48 horas antes"], ["24", "24 horas antes (véspera)"], ["M", "Na manhã do dia da consulta (8h)"], ["3", "3 horas antes"], ["2", "2 horas antes"], ["1", "1 hora antes"], ["nao", "Não enviar lembretes"]], "padrao": ["24", "2"]}, {"key": "followup_horas", "label": "Se o paciente parar de responder antes de agendar, retomar a conversa depois de", "tipo": "select", "tab": "agendamento", "opcoes": [["", "3 horas (padrão)"], ["1", "1 hora"], ["2", "2 horas"], ["4", "4 horas"], ["6", "6 horas"], ["12", "12 horas"], ["24", "24 horas"], ["nao", "Não retomar"]]}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}];
+var CAMPOS = [{"key": "email", "label": "E-mail de contato", "tipo": "text", "tab": "contato"}, {"key": "telefone", "label": "Telefone", "tipo": "tel", "tab": "contato"}, {"key": "numero_reserva", "label": "Telefone da recepção", "tipo": "tel", "tab": "contato"}, {"key": "resp_tecnico_nome", "label": "Responsável técnico", "tipo": "text", "tab": "contato"}, {"key": "resp_tecnico_conselho", "label": "Registro no conselho", "tipo": "text", "tab": "contato"}, {"key": "sistema_gestao", "label": "Sistema que vocês usam hoje", "tipo": "text", "tab": "contato"}, {"key": "usuarios_painel", "label": "Quem mais atende neste WhatsApp", "tipo": "textarea", "tab": "contato"}, {"key": "nome_exibicao", "label": "Nome da clínica", "tipo": "text", "tab": "negocio"}, {"key": "descricao_curta", "label": "Em duas linhas, o que vocês fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "servicos", "label": "O que vocês atendem", "tipo": "textarea", "tab": "negocio"}, {"key": "nao_oferecemos", "label": "O que vocês NÃO fazem", "tipo": "textarea", "tab": "negocio"}, {"key": "profissionais", "label": "Quem atende", "tipo": "textarea", "tab": "negocio"}, {"key": "como_chegar", "label": "Como chegar, estacionamento, acessibilidade", "tipo": "textarea", "tab": "negocio"}, {"key": "endereco_atendimento", "label": "Endereço do atendimento", "tipo": "textarea", "tab": "negocio"}, {"key": "horario_funcionamento", "label": "Como ela conta o horário para o paciente", "tipo": "text", "tab": "atendimento"}, {"key": "horario_humano", "label": "Quando tem alguém da equipe disponível", "tipo": "text", "tab": "atendimento"}, {"key": "pausa_humano_horas", "label": "Quando alguém da equipe responde um paciente, a assistente fica em silêncio naquela conversa por", "tipo": "select", "tab": "atendimento", "opcoes": [["", "2 horas (padrão)"], ["1", "1 hora"], ["4", "4 horas"], ["8", "8 horas"], ["12", "12 horas"], ["24", "24 horas"], ["48", "48 horas"]]}, {"key": "formas_pagamento", "label": "Formas de pagamento", "tipo": "textarea", "tab": "atendimento"}, {"key": "convenios_parcerias", "label": "Convênios aceitos", "tipo": "textarea", "tab": "atendimento"}, {"key": "tom_de_voz", "label": "Como ela deve falar", "tipo": "textarea", "tab": "atendimento"}, {"key": "saudacao", "label": "Primeira frase da conversa", "tipo": "textarea", "tab": "atendimento"}, {"key": "link_privacidade", "label": "Link da política de privacidade da clínica (a assistente informa na primeira mensagem)", "tipo": "text", "tab": "atendimento"}, {"key": "restricoes", "label": "Limites do que ela pode responder", "tipo": "textarea", "tab": "atendimento"}, {"key": "nunca_dizer", "label": "Palavras e frases proibidas", "tipo": "textarea", "tab": "atendimento"}, {"key": "gatilhos_escalonamento", "label": "Quando ela deve chamar uma pessoa", "tipo": "textarea", "tab": "urgencia"}, {"key": "gatilhos_urgencia", "label": "O que é urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "resposta_urgencia", "label": "O que ela responde na urgência", "tipo": "textarea", "tab": "urgencia"}, {"key": "mensagem_fora_horario", "label": "O que ela diz fora do horário", "tipo": "textarea", "tab": "urgencia"}, {"key": "telefone_urgencia", "label": "Telefone para urgência", "tipo": "tel", "tab": "urgencia"}, {"key": "whatsapp_alerta", "label": "WhatsApp que recebe os avisos de urgência e de pedido de atendimento. Precisa ser DIFERENTE do WhatsApp que a assistente atende (ex.: celular do médico ou da secretária)", "tipo": "tel", "tab": "urgencia"}, {"key": "politica_agendamento", "label": "Regras de agendamento", "tipo": "textarea", "tab": "agendamento"}, {"key": "politica_precos", "label": "Preços", "tipo": "textarea", "tab": "agendamento"}, {"key": "fuso_horario", "label": "Fuso horário da clínica", "tipo": "select", "tab": "agendamento", "opcoes": [["America/Sao_Paulo", "Brasília (padrão) · UTC-3"], ["America/Cuiaba", "Mato Grosso e Mato Grosso do Sul · UTC-4"], ["America/Manaus", "Amazonas, Rondônia e Roraima · UTC-4"], ["America/Rio_Branco", "Acre · UTC-5"], ["America/Noronha", "Fernando de Noronha · UTC-2"]]}, {"key": "duracao_padrao_min", "label": "Duração da consulta (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "antecedencia_minima_h", "label": "Antecedência mínima (horas)", "tipo": "number", "tab": "agendamento"}, {"key": "janela_agendamento_dias", "label": "Até quantos dias à frente", "tipo": "number", "tab": "agendamento"}, {"key": "buffer_min", "label": "Intervalo entre consultas (minutos)", "tipo": "number", "tab": "agendamento"}, {"key": "lembrete_horarios", "label": "Lembretes de consulta (a IA avisa o paciente e pede confirmação)", "tipo": "multi", "tab": "agendamento", "opcoes": [["48", "48 horas antes"], ["24", "24 horas antes (véspera)"], ["M", "Na manhã do dia da consulta (8h)"], ["3", "3 horas antes"], ["2", "2 horas antes"], ["1", "1 hora antes"], ["nao", "Não enviar lembretes"]], "padrao": ["24", "2"]}, {"key": "followup_horas", "label": "Se o paciente parar de responder antes de agendar, retomar a conversa depois de", "tipo": "select", "tab": "agendamento", "opcoes": [["", "3 horas (padrão)"], ["1", "1 hora"], ["2", "2 horas"], ["4", "4 horas"], ["6", "6 horas"], ["12", "12 horas"], ["24", "24 horas"], ["nao", "Não retomar"]]}, {"key": "catalogo_de_vendas", "label": "Informações extras para a assistente saber", "tipo": "textarea_limite", "tab": "ia"}, {"key": "numeros_sem_ia", "label": "Números que a assistente NÃO deve responder", "tipo": "text", "tab": "ia"}, {"key": "pesquisa_ativa", "label": "Pesquisa de satisfação depois da consulta", "tipo": "select", "tab": "avaliacoes", "opcoes": [["", "Desligada"], ["SIM", "Ligada"]]}, {"key": "pesquisa_horas", "label": "Quando enviar (contando do fim da consulta)", "tipo": "select", "tab": "avaliacoes", "opcoes": [["", "3 horas depois (padrão)"], ["1", "1 hora depois"], ["2", "2 horas depois"], ["6", "6 horas depois"], ["12", "12 horas depois"], ["24", "No dia seguinte (24 horas depois)"]]}, {"key": "pesquisa_nota_minima", "label": "Quem recebe o convite para avaliar no Google", "tipo": "select", "tab": "avaliacoes", "opcoes": [["", "Quem der nota 9 ou 10 (padrão)"], ["10", "Só quem der nota 10"], ["8", "Quem der nota 8, 9 ou 10"]]}, {"key": "link_avaliacao_google", "label": "Link para avaliar a clínica no Google", "tipo": "text", "tab": "avaliacoes"}, {"key": "assistente_dono_ativa", "label": "Assistente de gestão", "tipo": "select", "tab": "assistente", "opcoes": [["", "Desligado"], ["SIM", "Ligado"]]}, {"key": "dono_whatsapp", "label": "WhatsApp de quem pode falar com o assistente (até 3 números, com DDD, separados por vírgula). Use números pessoais, não o da clínica.", "tipo": "text", "tab": "assistente"}, {"key": "dono_pode_editar", "label": "O assistente pode fazer alterações?", "tipo": "select", "tab": "assistente", "opcoes": [["", "Não: só responde perguntas"], ["SIM", "Sim: marca, remarca, bloqueia horários e muda a grade, sempre pedindo sua confirmação antes"]]}, {"key": "briefing_horario", "label": "Resumo da agenda no seu WhatsApp", "tipo": "select", "tab": "assistente", "opcoes": [["", "Não enviar"], ["6", "Às 6h, com a agenda do dia"], ["7", "Às 7h, com a agenda do dia"], ["8", "Às 8h, com a agenda do dia"], ["9", "Às 9h, com a agenda do dia"], ["10", "Às 10h, com a agenda do dia"], ["12", "Às 12h, com a agenda do dia"], ["18", "Às 18h, com a agenda de amanhã"], ["19", "Às 19h, com a agenda de amanhã"], ["20", "Às 20h, com a agenda de amanhã"], ["21", "Às 21h, com a agenda de amanhã"]]}, {"key": "briefing_dias", "label": "Em quais dias mandar o resumo", "tipo": "select", "tab": "assistente", "opcoes": [["", "Dias úteis (segunda a sexta)"], ["todos", "Todos os dias"], ["com_consulta", "Só quando houver consulta marcada"]]}];
 var READONLY = [{"key": "razao_social", "label": "Razão social"}, {"key": "cnpj", "label": "CNPJ"}, {"key": "representante_nome", "label": "Representante"}, {"key": "representante_cpf", "label": "CPF do representante"}, {"key": "endereco_faturamento", "label": "Endereço de faturamento"}, {"key": "plano", "label": "Plano"}, {"key": "valor_mensal", "label": "Valor"}, {"key": "numero_whatsapp", "label": "WhatsApp que ela atende (para trocar, use o link abaixo)"}];
 var DIAS = [{"key": "dom", "label": "Domingo"}, {"key": "seg", "label": "Segunda"}, {"key": "ter", "label": "Terça"}, {"key": "qua", "label": "Quarta"}, {"key": "qui", "label": "Quinta"}, {"key": "sex", "label": "Sexta"}, {"key": "sab", "label": "Sábado"}];
-var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "resultados", "label": "Resultados"}, {"key": "assinatura", "label": "Assinatura"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "ia", "label": "IA extra"}];
+var TABS = [{"key": "agenda", "label": "Agenda"}, {"key": "documentos", "label": "Documentos"}, {"key": "assistente", "label": "Assistente IA"}, {"key": "resultados", "label": "Resultados"}, {"key": "assinatura", "label": "Assinatura"}, {"key": "contato", "label": "Contato"}, {"key": "negocio", "label": "Negócio"}, {"key": "atendimento", "label": "Atendimento"}, {"key": "urgencia", "label": "Urgência"}, {"key": "agendamento", "label": "Agendamento"}, {"key": "avaliacoes", "label": "Avaliações"}, {"key": "ia", "label": "IA extra"}];
 var LIMITE_CATALOGO = 500;
 var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link final ficar em outro endereço
 
@@ -242,8 +297,10 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       document.querySelectorAll(".tab-btn").forEach(function (x) { x.classList.remove("ativa"); });
       document.querySelectorAll(".tab-conteudo").forEach(function (x) { x.classList.remove("ativa"); });
       b.classList.add("ativa");
-      el("salvar").parentElement.style.display = (t.key === "agenda" || t.key === "resultados" || t.key === "assinatura") ? "none" : "";
+      el("salvar").parentElement.style.display = (t.key === "agenda" || t.key === "documentos" || t.key === "resultados" || t.key === "assinatura") ? "none" : "";
       if (t.key === "resultados") resultadosCarregar();
+      if (t.key === "documentos") docCarregar();
+      if (t.key === "assistente") chatIniciar();
       if (t.key === "assinatura") assinCarregar();
       document.querySelector(".tab-conteudo[data-tab='" + t.key + "']").classList.add("ativa");
     };
@@ -404,28 +461,290 @@ function partesTz(ms) {
     if (dica) c.appendChild(h$("div", "text-[11px] text-slate-400 mt-1", dica));
     return c;
   }
+  // ---------- Aba Assistente IA (chat com o assistente de gestão) ----------
+  var ASSIST_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/assistente-dono";
+  var PLANO_ESSENCIAL = false, chatHist = [], chatOcupado = false, chatPronto = false;
+  var CHAT_SUGESTOES = ["Como está minha agenda hoje?", "Quem vem amanhã?", "Quantas consultas a IA marcou esta semana?", "Chegou algum documento de paciente?", "Bloqueia sexta à tarde", "Quarta não vou mais atender de manhã"];
+  function chatBolha(de, texto) {
+    var linha = h$("div", "flex " + (de === "dono" ? "justify-end" : "justify-start"));
+    var b = h$("div", "max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap " + (de === "dono" ? "bg-emerald-600 text-white rounded-br-sm" : "bg-slate-100 text-slate-800 rounded-bl-sm"));
+    // negrito do WhatsApp (*texto*) vira negrito na tela; o resto é texto puro
+    String(texto).split(/(\*[^*\n]+\*)/).forEach(function (p) {
+      if (/^\*[^*\n]+\*$/.test(p)) b.appendChild(h$("strong", "", p.slice(1, -1))); else if (p) b.appendChild(document.createTextNode(p));
+    });
+    b.style.whiteSpace = "pre-wrap";
+    linha.appendChild(b); el("chatMsgs").appendChild(linha);
+    el("chatMsgs").scrollTop = el("chatMsgs").scrollHeight;
+    return linha;
+  }
+  function chatIniciar() {
+    if (chatPronto) return; chatPronto = true;
+    chatBolha("assistente", "Oi! Sou o assistente de gestão da clínica. Pergunte sobre a agenda, os resultados ou os documentos dos pacientes." + (savedValues.dono_pode_editar === "SIM" ? " Também posso marcar, remarcar e bloquear horários: sempre mostro o que vou fazer e peço sua confirmação." : ""));
+    var box = el("chatSugestoes");
+    CHAT_SUGESTOES.forEach(function (t) {
+      var c = h$("button", "text-xs px-2.5 py-1.5 rounded-full border border-slate-300 text-slate-600 hover:bg-slate-50", t);
+      c.type = "button"; c.onclick = function () { el("chatTexto").value = t; chatEnviar(); };
+      box.appendChild(c);
+    });
+  }
+  function chatEnviar() {
+    var txt = el("chatTexto").value.trim();
+    if (!txt || chatOcupado) return;
+    if (PLANO_ESSENCIAL) { toast("O assistente faz parte do plano Gestão Inteligente."); return; }
+    if (savedValues.assistente_dono_ativa !== "SIM") { toast("Ligue o assistente de gestão acima para conversar."); return; }
+    chatOcupado = true; el("chatEnviar").disabled = true; el("chatTexto").value = "";
+    el("chatSugestoes").innerHTML = "";
+    chatBolha("dono", txt);
+    var espera = chatBolha("assistente", "digitando...");
+    var historico = chatHist.slice(-12);
+    chatHist.push({ de: "dono", texto: txt });
+    fetch(ASSIST_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify({ token: token, mensagem: txt, historico: historico }) })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        espera.remove();
+        var resp = (r && r.resposta) || "Não consegui responder agora. Tente de novo em instantes.";
+        chatBolha("assistente", resp); chatHist.push({ de: "assistente", texto: resp });
+        try { agCarregar(); gradeCarregar(); } catch (e) {}
+      })
+      .catch(function () { espera.remove(); chatBolha("assistente", "Erro de conexão. Tente de novo."); })
+      .then(function () { chatOcupado = false; el("chatEnviar").disabled = false; el("chatTexto").focus(); });
+  }
+  el("chatEnviar").addEventListener("click", chatEnviar);
+  el("chatTexto").addEventListener("keydown", function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); chatEnviar(); } });
+
+  // ---------- Aba Documentos ----------
+  var DOC_TIPOS = { pedido_exame: "Pedido de exame", resultado_exame: "Resultado de exame", receita: "Receita", atestado_laudo: "Atestado ou laudo", carteirinha_convenio: "Carteirinha do convênio", documento_identidade: "Documento de identidade", comprovante_pagamento: "Comprovante de pagamento", guia_autorizacao: "Guia de autorização", outro: "Outro", ilegivel: "Não deu para ler" };
+  var DOC_ROT = { nome_paciente: "Paciente", data_nascimento: "Nascimento", cpf: "CPF", data_documento: "Data do documento", convenio: "Convênio", plano_convenio: "Plano", numero_carteirinha: "Carteirinha", validade: "Validade", profissional: "Profissional", registro_profissional: "Registro", procedimentos_solicitados: "Solicitado", numero_guia: "Guia", valor_pago: "Valor" };
+  function docCarregar() {
+    var box = el("docLista");
+    box.innerHTML = '<div class="text-sm text-slate-500 text-center py-8">Carregando...</div>';
+    agChamar("agenda_documentos").then(function (rows) {
+      box.innerHTML = "";
+      if (!rows || !rows.length) { box.appendChild(h$("div", "text-sm text-slate-500 text-center py-8", "Nenhum documento recebido ainda.")); return; }
+      rows.forEach(function (x) {
+        var c = h$("div", "border border-slate-200 rounded-xl p-4 bg-white");
+        var topo = h$("div", "flex items-start justify-between gap-2");
+        var esq = h$("div");
+        esq.appendChild(h$("div", "font-semibold text-slate-900 text-sm", (x.dados && x.dados.nome_paciente) || x.nome_contato || "Paciente"));
+        esq.appendChild(h$("div", "text-xs text-slate-500 mt-0.5", fmt(x.recebido_em) + (x.telefone ? " · " + x.telefone : "")));
+        topo.appendChild(esq);
+        topo.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 whitespace-nowrap", (DOC_TIPOS[x.tipo] || "Documento").toUpperCase()));
+        c.appendChild(topo);
+        if (x.resumo) c.appendChild(h$("div", "mt-2 text-xs text-slate-700", x.resumo));
+        var dl = h$("div", "mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1");
+        Object.keys(DOC_ROT).forEach(function (k) {
+          var v = x.dados && x.dados[k];
+          if (!v || (Array.isArray(v) && !v.length)) return;
+          var linha = h$("div", "text-xs text-slate-600");
+          linha.appendChild(h$("span", "text-slate-400", DOC_ROT[k] + ": "));
+          linha.appendChild(document.createTextNode(Array.isArray(v) ? v.join(", ") : v));
+          dl.appendChild(linha);
+        });
+        c.appendChild(dl);
+        var acoes = h$("div", "mt-3 flex flex-wrap gap-2");
+        if (x.arquivo_url) { var ab = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "Abrir arquivo"); ab.href = x.arquivo_url; ab.target = "_blank"; ab.rel = "noopener"; acoes.appendChild(ab); }
+        if (x.telefone) { var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(x.telefone); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa); }
+        acoes.appendChild(agBtn("Excluir", "border-rose-200 text-rose-700", function () {
+          if (!confirm("Excluir este registro? O arquivo original continua na conversa do WhatsApp.")) return;
+          agChamar("agenda_documento_excluir", { id: x.id }).then(function () { toast("Excluído."); docCarregar(); }).catch(function () { toast("Não consegui excluir."); });
+        }));
+        c.appendChild(acoes);
+        box.appendChild(c);
+      });
+    }).catch(function () { box.innerHTML = ""; box.appendChild(h$("div", "text-sm text-slate-500 text-center py-8", "Não consegui carregar os documentos agora. Tente de novo em instantes.")); });
+  }
+
+  // ---------- Aba Resultados: números, comparação com o período anterior, gráficos e conquistas ----------
+  var resGraficos = [];
+  var chartPromessa = null;
+  function carregarChart() {
+    if (window.Chart) return Promise.resolve();
+    if (!chartPromessa) chartPromessa = new Promise(function (ok, falha) {
+      var sc = document.createElement("script");
+      sc.src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js";
+      sc.onload = ok; sc.onerror = function () { chartPromessa = null; falha(); };
+      document.head.appendChild(sc);
+    });
+    return chartPromessa;
+  }
+  function resNum(v) { return v == null ? "—" : Number(v).toLocaleString("pt-BR"); }
+  // variação contra o período anterior; menorMelhor inverte a cor (tempo de resposta, cancelamentos)
+  function resDelta(atual, anterior, menorMelhor) {
+    if (atual == null || anterior == null) return null;
+    if (anterior === 0) return atual > 0 ? { txt: "novo", bom: !menorMelhor } : null;
+    var p = Math.round(((atual - anterior) / anterior) * 100);
+    if (p === 0) return { txt: "= igual", bom: null };
+    return { txt: (p > 0 ? "▲ " : "▼ ") + Math.abs(p) + "%", bom: menorMelhor ? p < 0 : p > 0 };
+  }
+  function resCardDelta(rotulo, valor, dica, dl) {
+    var c = resCard(rotulo, valor, dica);
+    if (dl) {
+      var cor = dl.bom === null ? "bg-slate-100 text-slate-600" : (dl.bom ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800");
+      var chip = h$("div", "inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full " + cor, dl.txt);
+      chip.title = "comparado com o período anterior, do mesmo tamanho";
+      c.appendChild(chip);
+    }
+    return c;
+  }
+  var RES_NIVEIS = [[0, "Começando", "🌱"], [10, "Bronze", "🥉"], [50, "Prata", "🥈"], [150, "Ouro", "🥇"], [500, "Platina", "💎"], [1000, "Diamante", "🏆"]];
+  function resHero(t) {
+    var box = el("resHero"); box.innerHTML = "";
+    var total = t.ia || 0, nivel = RES_NIVEIS[0], prox = null;
+    RES_NIVEIS.forEach(function (n, i) { if (total >= n[0]) { nivel = n; prox = RES_NIVEIS[i + 1] || null; } });
+    var horas = Math.round((total * 5) / 60);
+    var c = h$("div", "rounded-2xl p-5 text-white bg-gradient-to-br from-primary-900 via-primary-800 to-emerald-700 shadow-sm");
+    var topo = h$("div", "flex items-start justify-between gap-3");
+    var esq = h$("div");
+    esq.appendChild(h$("div", "text-xs text-white/70", "Desde o início, a assistente marcou"));
+    esq.appendChild(h$("div", "text-3xl font-extrabold tracking-tight mt-0.5", resNum(total) + (total === 1 ? " consulta" : " consultas")));
+    esq.appendChild(h$("div", "text-xs text-white/80 mt-1", "≈ " + resNum(horas) + " h de recepção poupadas" + (t.desde ? " · desde " + t.desde.split("-").reverse().join("/") : "")));
+    topo.appendChild(esq);
+    var selo = h$("div", "text-center shrink-0 bg-white/10 border border-white/20 rounded-xl px-3 py-2");
+    selo.appendChild(h$("div", "text-2xl leading-none", nivel[2]));
+    selo.appendChild(h$("div", "text-[11px] font-bold mt-1", "Nível " + nivel[1]));
+    topo.appendChild(selo);
+    c.appendChild(topo);
+    if (prox) {
+      var pct = Math.min(100, Math.round(((total - nivel[0]) / (prox[0] - nivel[0])) * 100));
+      var barra = h$("div", "mt-4 h-2 rounded-full bg-white/15 overflow-hidden");
+      var enche = h$("div", "h-full rounded-full bg-emerald-400"); enche.style.width = pct + "%";
+      barra.appendChild(enche); c.appendChild(barra);
+      c.appendChild(h$("div", "text-[11px] text-white/80 mt-1.5", "Faltam " + resNum(prox[0] - total) + " para o nível " + prox[1] + " " + prox[2]));
+    } else c.appendChild(h$("div", "text-[11px] text-white/80 mt-3", "Nível máximo. Parabéns!"));
+    c.appendChild(h$("div", "text-[10px] text-white/50 mt-2", "Horas poupadas: estimativa de 5 minutos de recepção por consulta marcada pela assistente."));
+    box.appendChild(c);
+  }
+  function resUso(u) {
+    var box = el("resUso"); box.innerHTML = "";
+    if (!u) return;
+    var fr = u.franquia || 5000, pct = Math.round((u.mes / fr) * 100);
+    var cor = pct >= 100 ? "bg-rose-500" : (pct >= 80 ? "bg-amber-500" : "bg-emerald-500");
+    var c = h$("div", "border border-slate-200 rounded-xl p-4 bg-white");
+    var topo = h$("div", "flex items-end justify-between gap-2");
+    var esq = h$("div");
+    esq.appendChild(h$("div", "text-sm font-semibold text-slate-800", "Mensagens neste mês"));
+    esq.appendChild(h$("div", "text-xs text-slate-500", resNum(u.mes) + " de " + resNum(fr) + " da franquia do plano"));
+    topo.appendChild(esq);
+    topo.appendChild(h$("div", "text-xl font-extrabold " + (pct >= 100 ? "text-rose-600" : (pct >= 80 ? "text-amber-600" : "text-slate-900")), pct + "%"));
+    c.appendChild(topo);
+    var barra = h$("div", "mt-3 h-2.5 rounded-full bg-slate-100 overflow-hidden"), enche = h$("div", "h-full rounded-full " + cor);
+    enche.style.width = Math.min(100, pct) + "%"; barra.appendChild(enche); c.appendChild(barra);
+    var g = h$("div", "grid grid-cols-3 gap-2 mt-3 text-center");
+    [["Hoje", u.hoje], ["Neste ano", u.ano], ["Desde o início", u.total]].forEach(function (x) {
+      var b = h$("div", "bg-slate-50 rounded-lg py-2");
+      b.appendChild(h$("div", "text-sm font-bold text-slate-900", resNum(x[1])));
+      b.appendChild(h$("div", "text-[10px] text-slate-500", x[0]));
+      g.appendChild(b);
+    });
+    c.appendChild(g);
+    var nota = "Conta as mensagens trocadas entre a assistente e os pacientes: as que ela recebe e as que envia, incluindo lembretes e avisos de vaga.";
+    if (pct >= 100) nota = (u.limitada ? "A franquia do mês acabou e a assistente está pausada até o próximo mês. Fale com a gente para ampliar. " : "Você passou da franquia do mês. Vamos falar com você para ajustar o plano, sem cobrança surpresa. ") + nota;
+    else if (pct >= 80) nota = "Você já usou mais de 80% da franquia do mês. " + nota;
+    c.appendChild(h$("div", "text-[11px] mt-3 " + (pct >= 80 ? "text-amber-700" : "text-slate-400"), nota));
+    if (u.dono_hoje) c.appendChild(h$("div", "text-[11px] text-slate-500 mt-2", "Assistente de gestão: " + resNum(u.dono_hoje) + " de " + resNum(u.dono_limite || 60) + " perguntas hoje (não entram na franquia)."));
+    if (u.desde) c.appendChild(h$("div", "text-[10px] text-slate-400 mt-1", "Contagem desde " + u.desde.split("-").reverse().join("/") + ". O mês vira no dia 1º."));
+    box.appendChild(c);
+  }
+  function resConquistas(r) {
+    var t = r.totais || {}, a = r.atual || r, box = el("resConquistas"); box.innerHTML = "";
+    var taxaPres = a.com_lembrete ? a.presenca_confirmada / a.com_lembrete : 0;
+    var lista = [
+      ["🎯", "Primeira consulta marcada pela IA", t.ia, 1],
+      ["🔟", "10 consultas marcadas pela IA", t.ia, 10],
+      ["💯", "100 consultas marcadas pela IA", t.ia, 100],
+      ["🚀", "1.000 consultas marcadas pela IA", t.ia, 1000],
+      ["✅", "50 presenças confirmadas pelos pacientes", t.presenca, 50],
+      ["⚡", "Resposta relâmpago: 1ª resposta em até 1 minuto no período", null, null, a.tempo_resposta_seg != null && a.tempo_resposta_seg <= 60],
+      ["📈", "Agenda que converte: 30% ou mais das conversas viram consulta no período", null, null, a.taxa_agendamento != null && a.taxa_agendamento >= 30],
+      ["🙌", "Presença em alta: 80% ou mais confirmaram no período (mín. 5 lembretes)", null, null, a.com_lembrete >= 5 && taxaPres >= 0.8]
+    ];
+    if (r.tem_fila) lista.push(["♻️", "Primeira vaga reposta pela lista de espera", t.vagas, 1], ["🧲", "10 vagas repostas pela lista de espera", t.vagas, 10]);
+    var feitas = 0;
+    var grid = h$("div", "grid grid-cols-1 sm:grid-cols-2 gap-2");
+    lista.forEach(function (x) {
+      var ok = x[4] != null ? x[4] : (x[2] || 0) >= x[3];
+      if (ok) feitas++;
+      var c = h$("div", "flex items-center gap-3 border rounded-xl p-3 " + (ok ? "border-emerald-300 bg-emerald-50" : "border-slate-200 bg-white"));
+      var ic = h$("div", "text-2xl w-9 text-center shrink-0" + (ok ? "" : " grayscale opacity-40"), x[0]);
+      c.appendChild(ic);
+      var tx = h$("div", "min-w-0 flex-1");
+      tx.appendChild(h$("div", "text-xs font-semibold " + (ok ? "text-emerald-900" : "text-slate-600"), x[1]));
+      if (!ok && x[3]) {
+        var pct = Math.min(100, Math.round(((x[2] || 0) / x[3]) * 100));
+        var b = h$("div", "mt-1.5 h-1.5 rounded-full bg-slate-100 overflow-hidden"), f = h$("div", "h-full bg-emerald-400 rounded-full"); f.style.width = pct + "%"; b.appendChild(f); tx.appendChild(b);
+        tx.appendChild(h$("div", "text-[10px] text-slate-400 mt-0.5", resNum(x[2] || 0) + " de " + resNum(x[3])));
+      } else if (ok) tx.appendChild(h$("div", "text-[10px] font-bold text-emerald-700 mt-0.5", "Conquistada"));
+      c.appendChild(tx); grid.appendChild(c);
+    });
+    var cab = h$("div", "flex items-center justify-between mb-2");
+    cab.appendChild(h$("div", "text-sm font-semibold text-slate-800", "Conquistas"));
+    cab.appendChild(h$("div", "text-xs font-bold text-emerald-700", feitas + " de " + lista.length));
+    box.appendChild(cab); box.appendChild(grid);
+    box.classList.remove("hidden");
+  }
+  function resDesenharGraficos(r) {
+    var wrap = el("resGraficos");
+    if (!r.serie) { wrap.classList.add("hidden"); return; }
+    carregarChart().then(function () {
+      resGraficos.forEach(function (g) { g.destroy(); }); resGraficos = [];
+      wrap.classList.remove("hidden");
+      var VERDE = "#10b981", AZUL = "#1e3a8a", CINZA = "#cbd5e1", ROSA = "#f43f5e";
+      var base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+      var eixos = { x: { grid: { display: false }, ticks: { color: "#64748b", font: { size: 10 } } }, y: { beginAtZero: true, ticks: { precision: 0, color: "#64748b", font: { size: 10 } }, grid: { color: "#f1f5f9" } } };
+      var rot = r.serie.map(function (s) { var p = s.dia.split("-"); return p[2] + "/" + p[1]; });
+      resGraficos.push(new Chart(el("grDias"), { type: "bar",
+        data: { labels: rot, datasets: [{ label: "Pela IA", data: r.serie.map(function (s) { return s.ia; }), backgroundColor: VERDE, borderRadius: 4, stack: "a" }, { label: "Pela equipe", data: r.serie.map(function (s) { return s.manual; }), backgroundColor: AZUL, borderRadius: 4, stack: "a" }] },
+        options: Object.assign({}, base, { plugins: { legend: { display: true, position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: Object.assign({ stacked: true }, eixos.x), y: Object.assign({ stacked: true }, eixos.y) } }) }));
+      var a = r.atual || r;
+      var vazio = function (arr) { return !arr.some(function (v) { return v > 0; }); };
+      var rosca = function (id, rotulos, dados, cores) {
+        var cfg = vazio(dados) ? { labels: ["Sem dados no período"], datasets: [{ data: [1], backgroundColor: ["#f1f5f9"] }] } : { labels: rotulos, datasets: [{ data: dados, backgroundColor: cores, borderWidth: 0 }] };
+        resGraficos.push(new Chart(el(id), { type: "doughnut", data: cfg, options: Object.assign({}, base, { cutout: "62%", plugins: { legend: { display: true, position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } }, tooltip: { enabled: !vazio(dados) } } }) }));
+      };
+      rosca("grOrigem", ["Pela IA", "Pela equipe"], [a.agendadas_ia || 0, a.agendadas_manual || 0], [VERDE, AZUL]);
+      rosca("grPresenca", ["Confirmaram", "Não confirmaram"], [a.presenca_confirmada || 0, Math.max(0, (a.com_lembrete || 0) - (a.presenca_confirmada || 0))], [VERDE, CINZA]);
+      var ordem = [1, 2, 3, 4, 5, 6, 0], NOMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+      var sem = ordem.map(function (i) { return (r.semana || [])[i] || 0; }), maxS = Math.max.apply(null, sem);
+      resGraficos.push(new Chart(el("grSemana"), { type: "bar", data: { labels: ordem.map(function (i) { return NOMES[i]; }), datasets: [{ data: sem, backgroundColor: sem.map(function (v) { return v && v === maxS ? VERDE : "#a7f3d0"; }), borderRadius: 4 }] }, options: Object.assign({}, base, { scales: eixos }) }));
+      var hrs = (r.hora || []), ini = 24, fim = -1;
+      hrs.forEach(function (v, i) { if (v > 0) { ini = Math.min(ini, i); fim = Math.max(fim, i); } });
+      if (fim < 0) { ini = 8; fim = 18; }
+      var faixa = []; for (var h = ini; h <= fim; h++) faixa.push(h);
+      var hv = faixa.map(function (h) { return hrs[h] || 0; }), maxH = Math.max.apply(null, hv);
+      resGraficos.push(new Chart(el("grHora"), { type: "bar", data: { labels: faixa.map(function (h) { return (h < 10 ? "0" : "") + h + "h"; }), datasets: [{ data: hv, backgroundColor: hv.map(function (v) { return v && v === maxH ? AZUL : "#bfdbfe"; }), borderRadius: 4 }] }, options: Object.assign({}, base, { scales: eixos }) }));
+    }).catch(function () { wrap.classList.add("hidden"); });
+  }
   function resultadosCarregar() {
-    var grid = el("resGrid"), up = el("resUpsell");
-    grid.innerHTML = '<div class="text-sm text-slate-500 col-span-2 text-center py-8">Carregando resultados...</div>';
-    up.classList.add("hidden");
+    var grid = el("resGrid");
+    grid.innerHTML = '<div class="text-sm text-slate-500 col-span-2 sm:col-span-3 text-center py-8">Carregando resultados...</div>';
     agChamar("indicadores", { dias: parseInt(el("resPeriodo").value, 10) || 30 }).then(function (r) {
       grid.innerHTML = "";
-      var n = function (v) { return v == null ? "—" : String(v).replace(".", ","); };
-      grid.appendChild(resCard("Conversas", n(r.conversas), r.conversas == null ? "indisponível no momento" : "pessoas que falaram com a assistente"));
-      grid.appendChild(resCard("Agendamentos feitos pela IA", n(r.agendadas_ia), "consultas marcadas sem sua equipe"));
-      if (r.completo) {
-        grid.appendChild(resCard("Taxa de agendamento", r.taxa_agendamento == null ? "—" : n(r.taxa_agendamento) + "%", "agendamentos da IA ÷ conversas"));
-        grid.appendChild(resCard("Tempo da 1ª resposta", resFmtTempo(r.tempo_resposta_seg), "média no período"));
-        grid.appendChild(resCard("Confirmaram presença", r.com_lembrete ? r.presenca_confirmada + " de " + r.com_lembrete : "—", "consultas que receberam lembrete"));
-        grid.appendChild(resCard("Consultas canceladas", n(r.canceladas), "de consultas do período"));
-        grid.appendChild(resCard("Entraram na lista de espera", n(r.fila_entradas), ""));
-        grid.appendChild(resCard("Vagas repostas", n(r.vagas_repostas), "horários cancelados que foram preenchidos"));
-      } else {
-        up.textContent = "No plano Gestão Inteligente você também acompanha a taxa de agendamento, o tempo de resposta, as confirmações de presença, os cancelamentos e as vagas repostas pela lista de espera.";
-        up.classList.remove("hidden");
+      var a = r.atual || r, p = r.anterior || null, ant = function (k) { return p ? p[k] : null; };
+      var pct = function (x, y) { return y ? Math.round((x / y) * 100) : null; };
+      if (r.totais) resHero(r.totais); else el("resHero").innerHTML = "";
+      resUso(r.uso);
+      grid.appendChild(resCardDelta("Conversas", resNum(a.conversas), a.conversas == null ? "indisponível no momento" : "pessoas que falaram com a assistente", resDelta(a.conversas, ant("conversas"))));
+      grid.appendChild(resCardDelta("Marcadas pela IA", resNum(a.agendadas_ia), "consultas sem trabalho da equipe", resDelta(a.agendadas_ia, ant("agendadas_ia"))));
+      grid.appendChild(resCardDelta("Marcadas pela equipe", resNum(a.agendadas_manual), "lançadas no painel", resDelta(a.agendadas_manual, ant("agendadas_manual"))));
+      grid.appendChild(resCardDelta("Taxa de agendamento", a.taxa_agendamento == null ? "—" : String(a.taxa_agendamento).replace(".", ",") + "%", "consultas da IA ÷ conversas", resDelta(a.taxa_agendamento, ant("taxa_agendamento"))));
+      grid.appendChild(resCardDelta("Tempo da 1ª resposta", resFmtTempo(a.tempo_resposta_seg), "média no período", resDelta(a.tempo_resposta_seg, ant("tempo_resposta_seg"), true)));
+      grid.appendChild(resCardDelta("Confirmaram presença", a.com_lembrete ? a.presenca_confirmada + " de " + a.com_lembrete : "—", "consultas que receberam lembrete", resDelta(pct(a.presenca_confirmada, a.com_lembrete), p ? pct(p.presenca_confirmada, p.com_lembrete) : null)));
+      grid.appendChild(resCardDelta("Cancelamentos", resNum(a.canceladas), "consultas canceladas no período", resDelta(a.canceladas, ant("canceladas"), true)));
+      if (r.tem_fila !== false && a.fila_entradas != null) {
+        grid.appendChild(resCardDelta("Entraram na lista de espera", resNum(a.fila_entradas), "", resDelta(a.fila_entradas, ant("fila_entradas"))));
+        grid.appendChild(resCardDelta("Vagas repostas", resNum(a.vagas_repostas), "cancelamentos preenchidos pela lista", resDelta(a.vagas_repostas, ant("vagas_repostas"))));
       }
+      if (r.pesquisa && r.pesquisa.enviadas) {
+        var ps = r.pesquisa;
+        grid.appendChild(resCard("Nota média dos pacientes", ps.media == null ? "—" : String(ps.media).replace(".", ",") + " / 10", ps.respondidas + " de " + ps.enviadas + " responderam à pesquisa"));
+        grid.appendChild(resCard("NPS", ps.nps == null ? "—" : String(ps.nps), "% de notas 9-10 menos % de notas 0-6"));
+        grid.appendChild(resCard("Notas baixas (0 a 6)", resNum(ps.detratores), "a equipe foi avisada na hora"));
+      }
+      if (p) grid.appendChild(h$("div", "col-span-2 sm:col-span-3 text-[11px] text-slate-400 -mt-1", "As setas comparam com o período anterior, do mesmo tamanho."));
+      resDesenharGraficos(r);
+      if (r.totais) resConquistas(r); else el("resConquistas").classList.add("hidden");
     }).catch(function () {
-      grid.innerHTML = '<div class="text-sm text-slate-500 col-span-2 text-center py-8">Não consegui carregar os resultados agora. Tente de novo em instantes.</div>';
+      grid.innerHTML = '<div class="text-sm text-slate-500 col-span-2 sm:col-span-3 text-center py-8">Não consegui carregar os resultados agora. Tente de novo em instantes.</div>';
     });
   }
   el("resPeriodo").addEventListener("change", resultadosCarregar);
@@ -437,9 +756,9 @@ function partesTz(ms) {
   };
   var ASSIN_PRECOS = {
     essencial: { nome: "Essencial", mensal: "299", parcelado: "269,10", avista: "2.990,00",
-      itens: ["Assistente no WhatsApp 24h", "Agenda RXSync", "Lembretes de consulta", "Retomada de conversas", "Resultados básicos", "Instruções extras até 500 caracteres"] },
+      itens: ["Assistente no WhatsApp 24h", "Agenda RXSync", "Lembretes de consulta", "Retomada de conversas", "Resultados completos com gráficos", "Instruções extras até 500 caracteres"] },
     gestao: { nome: "Gestão Inteligente", mensal: "599", parcelado: "539,10", avista: "5.990,00",
-      itens: ["Tudo do Essencial", "Lista de espera para vagas canceladas", "Indicadores completos", "Instruções extras até 2.000 caracteres", "Integração com sistema de gestão (em breve)"] }
+      itens: ["Tudo do Essencial", "Lista de espera para vagas canceladas", "Instruções extras até 2.000 caracteres", "Integração com sistema de gestão (em breve)"] }
   };
   var assinDados = null;
   function assinSufixo(forma) { return forma === "avista" ? "/ano" : "/mês"; }
@@ -627,6 +946,15 @@ function partesTz(ms) {
     var lista = el("agLista"); lista.innerHTML = "";
     var itens = g[agFiltro];
     if (!itens.length) lista.appendChild(h$("div", "text-sm text-slate-500 text-center py-8", "Nada por aqui."));
+    if (agFiltro === "cancelados" && itens.length) {
+      var tudo = agBtn("Excluir todos os cancelados (" + itens.length + ")", "w-full border-rose-200 text-rose-700 bg-white hover:bg-rose-50", function () {
+        if (!confirm("Excluir de vez as " + itens.length + " consultas canceladas? Não dá para desfazer.")) return;
+        tudo.disabled = true;
+        agChamar("agenda_excluir_cancelados").then(function (r) { toast((r && r.n ? r.n : 0) + " excluída(s)."); agCarregar(); })
+          .catch(function () { tudo.disabled = false; toast("Não consegui excluir. Tente de novo."); });
+      });
+      lista.appendChild(tudo);
+    }
     itens.forEach(function (a) { lista.appendChild(agCard(a)); });
     var tb = document.querySelectorAll(".tab-btn")[0];
     if (tb) tb.textContent = "Agenda" + (g.novos.length ? " (" + g.novos.length + ")" : "");
@@ -642,16 +970,26 @@ function partesTz(ms) {
     if (!a.visto && agila(a)) tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800", "NOVO"));
     if (a.presenca_confirmada && a.status !== "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800", "CONFIRMOU PRESENÇA"));
     if (a.status === "cancelado") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800", "CANCELADO"));
-    tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
+    if (a.servico === "BLOQUEIO") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-white", "⛔ BLOQUEIO"));
+    else tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600", a.criado_por === "ia" ? "MARCADO PELA IA" : "MANUAL"));
     top.appendChild(tags); c.appendChild(top);
     if (a.briefing) { var bx = h$("div", "mt-3 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3"); bx.appendChild(h$("div", "font-semibold text-slate-500 mb-1", "Resumo da conversa")); bx.appendChild(h$("div", "", a.briefing)); c.appendChild(bx); }
     if (a.observacoes) c.appendChild(h$("div", "mt-2 text-xs text-slate-600", "Obs.: " + a.observacoes));
     var acoes = h$("div", "mt-3 flex flex-wrap gap-2");
-    var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(a.telefone_paciente); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa);
+    if (a.servico !== "BLOQUEIO") { var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(a.telefone_paciente); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa); }
     if (agila(a)) {
       if (!a.visto) acoes.appendChild(agBtn("Marcar como visto", "border-slate-300 text-slate-700", function () { agChamar("agenda_visto", { id: a.id }).then(agCarregar); }));
       acoes.appendChild(agBtn("Editar", "border-slate-300 text-slate-700", function () { agForm(a); }));
       acoes.appendChild(agBtn("Cancelar", "border-rose-200 text-rose-700", function () { if (confirm("Cancelar o horário de " + a.nome_paciente + "?")) agChamar("agenda_cancelar", { id: a.id }).then(function () { toast("Cancelado."); agCarregar(); }).catch(function () { toast("Não consegui cancelar."); }); }));
+    } else {
+      acoes.appendChild(agBtn("Excluir", "border-rose-200 text-rose-700", function () {
+        var futuro = new Date(a.inicio).getTime() > Date.now();
+        if (!confirm("Excluir de vez o horário cancelado de " + a.nome_paciente + "? Não dá para desfazer." + (futuro ? "\n\nO horário continua livre na agenda. Se você usa a lista de espera e ela ainda não ofereceu essa vaga, deixa de oferecer." : ""))) return;
+        agChamar("agenda_excluir", { id: a.id }).then(function (r) {
+          toast(r && r.ok ? "Excluído." : "Não encontrei esse horário cancelado.");
+          el("calDetalhe").innerHTML = ""; agCarregar();
+        }).catch(function () { toast("Não consegui excluir."); });
+      }));
     }
     c.appendChild(acoes); return c;
   }
@@ -680,6 +1018,48 @@ function partesTz(ms) {
     f.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
   el("agNovo").addEventListener("click", function () { agForm(null); });
+
+  // ---- Exportar a agenda em .ics (padrão aceito por Google Agenda, Outlook e iPhone) ----
+  function icsTxt(v) { return String(v == null ? "" : v).replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;"); }
+  function icsHora(iso) { return new Date(iso).toISOString().replace(/\.\d{3}Z$/, "Z").replace(/[-:]/g, ""); }
+  function icsDobra(linha) {
+    // linhas de no máximo 75 bytes; a continuação começa com espaço (RFC 5545)
+    var enc = new TextEncoder(), out = "", atual = "", n = 0, lim = 75;
+    for (var ch of linha) {
+      var b = enc.encode(ch).length;
+      if (n + b > lim) { out += atual + "\r\n "; atual = ""; n = 1; lim = 75; }
+      atual += ch; n += b;
+    }
+    return out + atual;
+  }
+  function agExportar() {
+    var bt = el("agExportar"); bt.disabled = true; bt.textContent = "Gerando...";
+    var agora = Date.now(), semMs = function (d) { return new Date(d).toISOString().replace(/\.\d{3}Z$/, "Z"); };
+    agChamar("agenda_listar", { de: semMs(agora - 365 * 86400000), ate: semMs(agora + 730 * 86400000) }).then(function (rows) {
+      var ativos = (rows || []).filter(agila);
+      if (!ativos.length) { toast("Não há consultas para exportar."); return; }
+      var carimbo = icsHora(new Date().toISOString());
+      var L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RXSync//Agenda//PT-BR", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:" + icsTxt("Agenda " + (savedValues.nome_exibicao || "RXSync")), "X-WR-TIMEZONE:" + TZ];
+      ativos.forEach(function (a) {
+        var desc = ["Telefone: " + (a.telefone_paciente || "-")];
+        if (a.servico) desc.push("Serviço: " + a.servico);
+        if (a.observacoes) desc.push("Obs.: " + a.observacoes);
+        desc.push(a.criado_por === "ia" ? "Marcado pela assistente RXSync" : "Lançado pela equipe");
+        L.push("BEGIN:VEVENT", "UID:rxsync-" + a.id + "@rxsync.com.br", "DTSTAMP:" + carimbo, "DTSTART:" + icsHora(a.inicio), "DTEND:" + icsHora(a.fim),
+          "SUMMARY:" + icsTxt(a.nome_paciente + (a.servico ? " · " + a.servico : "")), "DESCRIPTION:" + icsTxt(desc.join("\n")), "STATUS:CONFIRMED", "END:VEVENT");
+      });
+      L.push("END:VCALENDAR");
+      var blob = new Blob([L.map(icsDobra).join("\r\n") + "\r\n"], { type: "text/calendar;charset=utf-8" });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "agenda-rxsync-" + new Date().toLocaleDateString("sv-SE", { timeZone: TZ }) + ".ics";
+      document.body.appendChild(link); link.click();
+      setTimeout(function () { URL.revokeObjectURL(link.href); link.remove(); }, 1500);
+      toast(ativos.length + " consulta(s) exportada(s). Abra o arquivo no Google Agenda, Outlook ou iPhone.");
+    }).catch(function () { toast("Não consegui exportar agora. Tente de novo."); })
+      .then(function () { bt.disabled = false; bt.textContent = "Exportar"; });
+  }
+  el("agExportar").addEventListener("click", agExportar);
 
   // ===== GRADE DE HORÁRIOS =====
   var gradeDados = [];
@@ -961,6 +1341,16 @@ function partesTz(ms) {
     atualizarLinkReconectar();
 
     mostrarBannerConta(resp.conta);
+
+    // Pesquisa de satisfação: só do Gestão Inteligente para cima.
+    if (/^essencial/i.test(String((resp.somenteLeitura || {}).plano || ""))) {
+      el("avaliacoesUpsell").classList.remove("hidden");
+      el("docUpsell").classList.remove("hidden");
+      el("assistUpsell").classList.remove("hidden");
+      ["assistente_dono_ativa", "dono_whatsapp", "dono_pode_editar", "briefing_horario", "briefing_dias"].forEach(function (k) { var x = el("campo_" + k); if (x) { x.disabled = true; x.classList.add("opacity-50"); } });
+      PLANO_ESSENCIAL = true;
+      ["pesquisa_ativa", "pesquisa_horas", "pesquisa_nota_minima", "link_avaliacao_google"].forEach(function (k) { var x = el("campo_" + k); if (x) { x.disabled = true; x.classList.add("opacity-50"); } });
+    }
 
     LIMITE_CATALOGO = resp.limite_catalogo || 500;
     var cc = el("contagem_catalogo_de_vendas");
