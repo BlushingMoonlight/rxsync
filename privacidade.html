@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>Política de Privacidade — RXSync</title>
+<meta name="description" content="Como a RXSync trata dados pessoais: quem somos, quais dados coletamos, para quê, com quem compartilhamos, por quanto tempo guardamos e como exercer seus direitos pela LGPD.">
+<link rel="canonical" href="https://rxsync.com.br/privacidade.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      fontFamily: { sans: ['Inter', 'sans-serif'] },
+      colors: {
+        primary: { 50: '#f0f5f9', 100: '#e0ebf4', 200: '#cbdcec', 300: '#a3b8cf', 400: '#60a5fa', 500: '#3b82f6', 600: '#1d4ed8', 700: '#1e40af', 800: '#1e3a8a', 900: '#0f172a', 950: '#080c17' },
+        emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
+      }
+    } }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 1.5rem; }
+  .doc h2 { font-size:1.2rem; font-weight:800; color:#0f172a; margin:2.25rem 0 .75rem; padding-bottom:.5rem; border-bottom:1px solid #e2e8f0; }
+  .doc h3 { font-size:1rem; font-weight:700; color:#0f172a; margin:1.25rem 0 .4rem; }
+  .doc p { margin:.7rem 0; line-height:1.75; color:#334155; }
+  .doc strong { color:#0f172a; }
+  .doc a { color:#1d4ed8; text-decoration:underline; }
+  .doc ul { margin:.7rem 0 .7rem 1.25rem; list-style:disc; }
+  .doc li { margin:.35rem 0; line-height:1.7; color:#334155; }
+  .doc blockquote { border-left:4px solid #10b981; background:#ecfdf5; padding:1rem 1.25rem; margin:1.25rem 0; border-radius:.5rem; }
+  .doc blockquote p { margin:0; color:#065f46; }
+  .tabela { overflow-x:auto; margin:1rem 0; }
+  .doc table { width:100%; min-width:36rem; border-collapse:collapse; font-size:.875rem; }
+  .doc th { background:#f1f5f9; text-align:left; font-weight:700; color:#0f172a; }
+  .doc th, .doc td { border:1px solid #e2e8f0; padding:.55rem .75rem; vertical-align:top; color:#334155; }
+  .sumario a { text-decoration:none; }
+  .sumario a:hover { color:#047857; }
+</style>
+</head>
+<body class="bg-slate-50 font-sans antialiased">
+  <header class="bg-primary-900 text-white">
+    <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
+      <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v1</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-5 py-10">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-10">
+      <h1 class="text-2xl md:text-3xl font-extrabold text-primary-900 leading-tight">Política de Privacidade</h1>
+      <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para Serviços de Saúde</p>
+
+      <div class="doc">
+        <p><strong>Versão 2026-10-v1</strong> · Vigente a partir de 6 de outubro de 2026</p>
+
+        <blockquote>
+          <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros.</p>
+        </blockquote>
+
+        <nav class="sumario bg-slate-50 border border-slate-200 rounded-xl p-4 my-6" aria-label="Sumário">
+          <p class="!mt-0 !mb-2 font-bold text-primary-900 text-sm">Sumário</p>
+          <ol class="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm list-decimal ml-5 text-slate-600">
+            <li><a href="#quem-somos">Quem somos e como falar conosco</a></li>
+            <li><a href="#papeis">Em que papel tratamos os dados</a></li>
+            <li><a href="#dados-rxsync">Dados que tratamos como controladora</a></li>
+            <li><a href="#dados-pacientes">Dados de pacientes (como operadora)</a></li>
+            <li><a href="#ia">Assistente virtual e inteligência artificial</a></li>
+            <li><a href="#compartilhamento">Com quem compartilhamos</a></li>
+            <li><a href="#internacional">Transferência internacional</a></li>
+            <li><a href="#retencao">Por quanto tempo guardamos</a></li>
+            <li><a href="#cookies">Cookies e tecnologias do site</a></li>
+            <li><a href="#seguranca">Segurança</a></li>
+            <li><a href="#direitos">Seus direitos</a></li>
+            <li><a href="#criancas">Crianças e adolescentes</a></li>
+            <li><a href="#alteracoes">Alterações desta política</a></li>
+          </ol>
+        </nav>
+
+        <section id="quem-somos">
+          <h2>1. Quem somos e como falar conosco</h2>
+          <p><strong>52.970.673 LUAN DUARTE CAVALHEIRO</strong>, inscrita no CNPJ sob o nº 52.970.673/0001-78, com sede em Florianópolis/SC, que opera sob o nome fantasia <strong>RXSync Tecnologia e Automação em Saúde</strong> (“RXSync”, “nós”).</p>
+          <p><strong>Canal para assuntos de privacidade e proteção de dados:</strong> <a href="mailto:contato@rxsync.com.br?subject=Privacidade%20e%20dados%20pessoais">contato@rxsync.com.br</a> (use “Privacidade” no assunto). O responsável por esse canal é o fundador da RXSync, <strong>Luan Duarte Cavalheiro</strong>, que atua como encarregado pelo tratamento de dados pessoais, nos termos do art. 41 da Lei nº 13.709/2018 (LGPD).</p>
+          <p>Esta Política vale para o site <strong>rxsync.com.br</strong>, para as páginas de contratação, implantação, conexão e configuração da Plataforma, e para o atendimento que a RXSync presta às clínicas. Os <a href="/termos/2026-10-v1.html">Termos de Uso</a> e o Acordo de Tratamento de Dados Pessoais (Anexo II dos Termos) regulam a relação com as clínicas clientes e prevalecem, quanto aos dados de pacientes, sobre o que está resumido aqui.</p>
+        </section>
+
+        <section id="papeis">
+          <h2>2. Em que papel tratamos os dados</h2>
+          <p>A LGPD distingue quem decide sobre os dados (<strong>controlador</strong>) de quem os trata por conta de outro (<strong>operador</strong>). A RXSync atua nos dois papéis, em situações diferentes:</p>
+          <div class="tabela"><table>
+            <thead><tr><th>Quem</th><th>Dados</th><th>Papel da RXSync</th></tr></thead>
+            <tbody>
+              <tr><td>Visitantes do site e quem pede uma demonstração</td><td>Dados de navegação e dados do formulário</td><td><strong>Controladora</strong></td></tr>
+              <tr><td>Clínicas e profissionais que contratam ou testam a RXSync, seus representantes, responsáveis técnicos e usuários do painel</td><td>Cadastro, contratação, cobrança, configuração e uso da Plataforma</td><td><strong>Controladora</strong></td></tr>
+              <tr><td>Pacientes e potenciais pacientes das clínicas</td><td>Mensagens, dados de contato e de agendamento</td><td><strong>Operadora</strong> (a clínica é a controladora)</td></tr>
+            </tbody>
+          </table></div>
+        </section>
+
+        <section id="dados-rxsync">
+          <h2>3. Dados que tratamos como controladora</h2>
+          <p>Tratamos apenas o necessário para cada finalidade. A tabela mostra o que coletamos, para quê e com qual base legal (art. 7º da LGPD).</p>
+          <div class="tabela"><table>
+            <thead><tr><th>Situação</th><th>Dados</th><th>Finalidade</th><th>Base legal</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Pedido de demonstração</strong> (formulário do site)</td>
+                <td>Nome do responsável, nome da clínica, e-mail, WhatsApp, sistema de gestão usado e plano de interesse</td>
+                <td>Responder ao pedido, entrar em contato e apresentar a Plataforma</td>
+                <td>Procedimentos preliminares a pedido do titular (art. 7º, V)</td>
+              </tr>
+              <tr>
+                <td><strong>Conversa no chat do site</strong></td>
+                <td>Mensagens enviadas e dados que você informar no chat</td>
+                <td>Atender sua dúvida sobre a RXSync</td>
+                <td>Procedimentos preliminares a pedido do titular (art. 7º, V)</td>
+              </tr>
+              <tr>
+                <td><strong>Contratação e teste grátis</strong></td>
+                <td>Nome, e-mail, WhatsApp, CNPJ ou CPF, razão social, endereço, representante, plano e modalidade escolhidos; registro do aceite dos Termos (data, hora, endereço IP, versão)</td>
+                <td>Identificar o contratante, firmar e executar o contrato, comprovar o aceite, impedir mais de um teste grátis por cliente</td>
+                <td>Execução de contrato e procedimentos preliminares (art. 7º, V); exercício regular de direitos (art. 7º, VI); legítimo interesse na prevenção a fraude e abuso (art. 7º, IX)</td>
+              </tr>
+              <tr>
+                <td><strong>Implantação</strong> (onboarding)</td>
+                <td>Dados da clínica, horários, serviços e preços, nome e número de registro no conselho do responsável técnico, número de aviso da equipe, usuários do painel, aprovação do responsável técnico (nome, registro, data e hora)</td>
+                <td>Configurar a assistente, comprovar a aprovação do conteúdo pelo responsável técnico, prestar suporte</td>
+                <td>Execução de contrato (art. 7º, V); exercício regular de direitos (art. 7º, VI)</td>
+              </tr>
+              <tr>
+                <td><strong>Cobrança e nota fiscal</strong></td>
+                <td>Nome ou razão social, CPF ou CNPJ, e-mail, endereço, telefone, valores e situação dos pagamentos. Não recebemos nem guardamos dados de cartão: o pagamento é feito no ambiente do Asaas</td>
+                <td>Cobrar, conciliar pagamentos, emitir nota fiscal, cumprir obrigações fiscais</td>
+                <td>Execução de contrato (art. 7º, V); obrigação legal e regulatória (art. 7º, II)</td>
+              </tr>
+              <tr>
+                <td><strong>Uso da Plataforma e suporte</strong></td>
+                <td>Registros de acesso ao painel, ações realizadas, solicitações de suporte, avisos operacionais (conexão do WhatsApp, fim de teste, pagamentos)</td>
+                <td>Operar, proteger e dar suporte à Plataforma; avisar sobre o serviço</td>
+                <td>Execução de contrato (art. 7º, V); legítimo interesse na segurança e na melhoria do serviço (art. 7º, IX)</td>
+              </tr>
+              <tr>
+                <td><strong>Navegação no site</strong></td>
+                <td>Páginas visitadas, cliques em botões, rolagem, tipo de aparelho e navegador, origem do acesso, localização aproximada e identificador de cookie</td>
+                <td>Entender como o site é usado e melhorar o conteúdo e a contratação</td>
+                <td>Legítimo interesse (art. 7º, IX). Veja a <a href="#cookies">seção 9</a>, inclusive como recusar</td>
+              </tr>
+            </tbody>
+          </table></div>
+          <p>Não vendemos dados pessoais e não os usamos para publicidade de terceiros. Usamos o e-mail e o WhatsApp informados por você para falar sobre o seu pedido, a sua contratação e o serviço (avisos de implantação, de fim de teste, de cobrança e de alterações importantes). Não enviamos boletim promocional sem que você peça.</p>
+          <p>Não coletamos de propósito dados pessoais sensíveis dos contratantes. O número de registro do responsável técnico em conselho profissional é coletado como prova da aprovação do conteúdo, e não para tratar informação de saúde.</p>
+        </section>
+
+        <section id="dados-pacientes">
+          <h2>4. Dados de pacientes (RXSync como operadora)</h2>
+          <p>Quando um paciente conversa pelo WhatsApp de uma clínica que usa a RXSync, <strong>quem decide sobre esses dados é a clínica</strong>, que é a controladora e responde pela base legal, pela política de privacidade dirigida aos seus pacientes e pelo atendimento aos direitos deles. A RXSync trata esses dados <strong>somente</strong> conforme as instruções da clínica, previstas nos Termos de Uso.</p>
+          <h3>4.1. O que a Plataforma trata</h3>
+          <ul>
+            <li>Nome, telefone, e-mail, CPF, data de nascimento e convênio, quando a clínica os solicita no atendimento;</li>
+            <li>Conteúdo das mensagens, incluindo áudios (transcritos para texto) e os dados que o paciente decidir informar;</li>
+            <li>Dados de agendamento, lista de espera, lembretes e pesquisa de satisfação;</li>
+            <li>Dados pessoais sensíveis de saúde, <strong>apenas se o próprio paciente os informar</strong> na conversa. A assistente é configurada para não pedir nem interpretar informação clínica.</li>
+          </ul>
+          <h3>4.2. Para que a RXSync os usa</h3>
+          <p>Atendimento automatizado e humano, triagem administrativa, agendamento, lembretes de consulta, mensagens de retomada de conversa, avisos de vaga da lista de espera, pesquisa de satisfação e indicadores operacionais da própria clínica. A mensagem de retomada não é enviada a quem pediu para não receber mais mensagens.</p>
+          <h3>4.3. O que a RXSync não faz</h3>
+          <ul>
+            <li>Não usa dados de pacientes para finalidade própria, nem os comercializa;</li>
+            <li>Não os usa para treinar modelos de linguagem de terceiros;</li>
+            <li>Não dá orientação clínica, diagnóstico ou prescrição por meio da assistente.</li>
+          </ul>
+          <h3>4.4. Se você é paciente</h3>
+          <p>Para saber como seus dados são tratados e para exercer seus direitos, <strong>fale primeiro com a clínica</strong>: ela é a controladora e informou, na primeira mensagem, o endereço da sua política de privacidade quando o cadastrou na Plataforma. Se você escrever para a RXSync, <strong>encaminharemos o pedido à clínica</strong> e a auxiliaremos a atendê-lo no prazo previsto no contrato.</p>
+        </section>
+
+        <section id="ia">
+          <h2>5. Assistente virtual e inteligência artificial</h2>
+          <ul>
+            <li>A assistente <strong>se identifica como virtual</strong>, e não como pessoa, na primeira interação;</li>
+            <li>As respostas são geradas por modelo de linguagem de provedor externo (veja as seções <a href="#compartilhamento">6</a> e <a href="#internacional">7</a>), que recebe apenas o conteúdo necessário para gerar a resposta;</li>
+            <li>A assistente atua só no atendimento administrativo. Diante de urgência, de assunto fora do seu limite ou de pedido do paciente para falar com uma pessoa, <strong>passa a conversa para a equipe humana</strong> da clínica;</li>
+            <li>O conteúdo que a assistente usa (horários, serviços, preços, orientações) é <strong>aprovado pelo responsável técnico</strong> da clínica antes de entrar no ar.</li>
+          </ul>
+          <p>A assistente não toma decisões com efeitos jurídicos ou semelhantes sobre o paciente. Se, ainda assim, você quiser a revisão de uma decisão tomada com base em tratamento automatizado (art. 20 da LGPD), basta pedir à clínica ou a nós, e a revisão será feita por uma pessoa.</p>
+        </section>
+
+        <section id="compartilhamento">
+          <h2>6. Com quem compartilhamos</h2>
+          <p>Compartilhamos dados pessoais apenas com quem é necessário para operar o serviço, na medida do necessário, e exigimos de cada um deles proteção compatível com esta Política. Esses fornecedores atuam como <strong>suboperadores</strong> (quando tratam dados de pacientes) ou como prestadores da RXSync (nos demais casos):</p>
+          <div class="tabela"><table>
+            <thead><tr><th>Fornecedor</th><th>Para quê</th><th>Dados</th><th>Onde</th></tr></thead>
+            <tbody>
+              <tr><td>Hostinger International Ltd.</td><td>Hospedagem da Plataforma e das bases de dados (conversas, agendamentos, atendimento)</td><td>Todos os dados da Plataforma</td><td>Brasil (datacenter em São Paulo)</td></tr>
+              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente e transcrição de áudio</td><td>Conteúdo da conversa necessário para a resposta</td><td>Exterior</td></tr>
+              <tr><td>Meta Platforms, Inc. (WhatsApp)</td><td>Canal de mensagens com o paciente</td><td>Mensagens e número de telefone</td><td>Exterior</td></tr>
+              <tr><td>Google LLC</td><td>Planilha de cadastro e base de conhecimento do cliente; análise de uso do site (Google Analytics)</td><td>Cadastro do cliente e conteúdo da base; dados de navegação</td><td>Exterior</td></tr>
+              <tr><td>Resend, Inc.</td><td>Envio de e-mails operacionais aos clientes</td><td>Nome e e-mail do cliente e conteúdo do aviso</td><td>Exterior</td></tr>
+              <tr><td>Telegram</td><td>Avisos internos à equipe da RXSync sobre o andamento de clientes, pagamentos e falhas</td><td>Nome da clínica, identificador do cliente e informações do aviso; em caso de falha na entrega de um aviso de urgência ou de pedido de atendimento, nome, telefone e motivo informados pelo paciente</td><td>Exterior</td></tr>
+              <tr><td>Asaas</td><td>Cobrança, recebimento e emissão de nota fiscal</td><td>Dados cadastrais e de cobrança do cliente</td><td>Brasil</td></tr>
+              <tr><td>GitHub, Inc.</td><td>Hospedagem das páginas do site</td><td>Endereço IP e dados técnicos do acesso às páginas</td><td>Exterior</td></tr>
+              <tr><td>Sistema de gestão da clínica, quando integrado</td><td>Agendamento e prontuário, conforme escolha da clínica</td><td>Dados de agendamento</td><td>Conforme contrato próprio da clínica</td></tr>
+            </tbody>
+          </table></div>
+          <p>A RXSync também mantém seu próprio ambiente de atendimento (Chatwoot) e de automação (n8n), instalados na infraestrutura contratada junto ao provedor de hospedagem acima.</p>
+          <p>Além desses fornecedores, compartilhamos dados quando a lei, uma ordem judicial ou uma autoridade competente exigir, para defender direitos da RXSync em processo judicial, administrativo ou arbitral, ou, em caso de reorganização societária, com quem vier a suceder a RXSync, mantidas as garantias desta Política.</p>
+          <p>A lista oficial de suboperadores para fins do contrato é a do Anexo II dos Termos de Uso. Alterações nela são comunicadas aos clientes com 30 dias de antecedência.</p>
+        </section>
+
+        <section id="internacional">
+          <h2>7. Transferência internacional de dados</h2>
+          <p>Alguns dos fornecedores acima (em especial o provedor do modelo de linguagem, o canal de mensagens, a ferramenta de planilhas, o envio de e-mail, a mensageria interna, a análise de uso do site e a hospedagem das páginas) têm infraestrutura no exterior. Por isso, parte dos dados pode ser transferida para fora do Brasil, com fundamento no art. 33 da LGPD e, quando aplicável, nas cláusulas-padrão contratuais aprovadas pela Resolução CD/ANPD nº 19/2024, limitada ao conteúdo estritamente necessário para cada finalidade.</p>
+        </section>
+
+        <section id="retencao">
+          <h2>8. Por quanto tempo guardamos</h2>
+          <div class="tabela"><table>
+            <thead><tr><th>Dado</th><th>Prazo</th></tr></thead>
+            <tbody>
+              <tr><td>Pedido de demonstração e conversas do chat do site</td><td>Pelo tempo necessário para responder e acompanhar o contato. Depois disso, apagamos ou anonimizamos, se não houver contratação.</td></tr>
+              <tr><td>Cadastro, contratação, aceite e cobrança</td><td>Durante o contrato e, depois dele, pelo prazo necessário para cumprir obrigações legais e fiscais (em regra, 5 anos) e para exercer direitos em eventual disputa (prazos de prescrição aplicáveis). O registro do aceite dos Termos é mantido como prova.</td></tr>
+              <tr><td>Teste grátis encerrado sem continuidade</td><td>Configuração e histórico mantidos por até <strong>15 dias corridos</strong> do término, para retomada ou exportação. Depois, são eliminados.</td></tr>
+              <tr><td>Cadastro iniciado, mas WhatsApp nunca conectado</td><td>Se a conexão não ocorrer em até <strong>30 dias corridos</strong> do aceite, a configuração preenchida pode ser eliminada, mantido o registro do aceite.</td></tr>
+              <tr><td>Contrato encerrado</td><td>Disponibilização dos dados (CSV ou JSON) por <strong>15 dias corridos</strong> do encerramento e, depois, eliminação segura e irreversível, com declaração de expurgo se solicitada. Ressalva: retenção mínima exigida por lei.</td></tr>
+              <tr><td>Dados de contexto da conversa em bases transitórias</td><td>Expurgados automaticamente após a resolução do atendimento.</td></tr>
+              <tr><td>Cópias de segurança (backup)</td><td>Rotativas, com retenção mínima de 7 dias; os dados eliminados saem dos backups no ciclo de renovação.</td></tr>
+              <tr><td>Registros de acesso (logs)</td><td>Pelo prazo mínimo exigido pelo Marco Civil da Internet (Lei nº 12.965/2014) e pelo tempo necessário à segurança da Plataforma.</td></tr>
+              <tr><td>Dados de navegação (Google Analytics)</td><td>Conforme a configuração de retenção da ferramenta, em regra de poucos meses.</td></tr>
+            </tbody>
+          </table></div>
+          <p>Os dados de pacientes pertencem à clínica (controladora). Ao fim do contrato, são exportados e eliminados conforme a tabela acima e a Cláusula 19 dos Termos de Uso.</p>
+        </section>
+
+        <section id="cookies">
+          <h2>9. Cookies e tecnologias do site</h2>
+          <p>O site usa:</p>
+          <ul>
+            <li><strong>Google Analytics 4</strong> (medição de audiência): grava cookies próprios (como <em>_ga</em>) e envia ao Google dados de navegação — páginas, cliques em botões e planos, profundidade de rolagem, aparelho, navegador, origem do acesso e localização aproximada. Nas páginas com link pessoal de cadastro, o endereço enviado ao Google é reescrito <strong>sem o código de acesso</strong> do link;</li>
+            <li><strong>Chat de atendimento (Chatwoot)</strong>: guarda no seu navegador um identificador para manter a sua conversa aberta enquanto você navega. É necessário para o chat funcionar;</li>
+            <li><strong>Fontes e bibliotecas de terceiros</strong> (Google Fonts, Tailwind CSS e Lucide), carregadas de servidores externos, que por isso recebem o seu endereço IP e dados técnicos do navegador.</li>
+          </ul>
+          <p><strong>Como recusar a medição de audiência:</strong> você pode bloquear cookies nas configurações do navegador, usar o modo anônimo ou instalar o <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">complemento de desativação do Google Analytics</a>. O site continua funcionando normalmente sem o Analytics.</p>
+          <p>Não usamos cookies para publicidade nem para criar perfis de comportamento para terceiros.</p>
+        </section>
+
+        <section id="seguranca">
+          <h2>10. Segurança</h2>
+          <p>Adotamos medidas técnicas e administrativas para proteger os dados contra acesso não autorizado, perda e uso indevido, entre elas: criptografia em trânsito (TLS) nas conexões externas; cópias de segurança criptografadas fora do ambiente de produção; bases de dados sem exposição à rede pública; separação lógica entre clientes; controle de acesso individualizado e de menor privilégio; registros de acesso; ambiente de produção separado do de testes; e termo de confidencialidade para quem trabalha com os dados.</p>
+          <p>Nenhum sistema é totalmente invulnerável. Se ocorrer um incidente de segurança que possa causar risco ou dano relevante, a RXSync (i) notifica a clínica controladora <strong>em até 24 horas</strong> da confirmação, nos casos de dados de pacientes, e (ii) comunica a ANPD e os titulares afetados nos prazos da Resolução CD/ANPD nº 15/2024, quando a RXSync for a controladora dos dados.</p>
+          <p>Cuide também da sua parte: o acesso ao painel de configuração e à página de conexão é feito por link pessoal; <strong>não o compartilhe</strong> com quem não deva acessar a conta.</p>
+        </section>
+
+        <section id="direitos">
+          <h2>11. Seus direitos</h2>
+          <p>Como titular, você pode pedir à RXSync, em relação aos dados de que somos controladora:</p>
+          <ul>
+            <li>confirmação de que tratamos seus dados e acesso a eles;</li>
+            <li>correção de dados incompletos, inexatos ou desatualizados;</li>
+            <li>anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade com a LGPD;</li>
+            <li>portabilidade dos dados, nos termos da regulamentação;</li>
+            <li>eliminação dos dados tratados com base em consentimento, quando houver;</li>
+            <li>informação sobre as entidades com as quais compartilhamos seus dados;</li>
+            <li>informação sobre a possibilidade de não fornecer consentimento e suas consequências, e revogação do consentimento, quando for a base legal;</li>
+            <li>oposição a tratamento feito com base em legítimo interesse ou outra hipótese que dispense consentimento, se houver descumprimento da lei;</li>
+            <li>revisão de decisões tomadas unicamente com base em tratamento automatizado.</li>
+          </ul>
+          <p><strong>Como pedir:</strong> escreva para <a href="mailto:contato@rxsync.com.br?subject=Privacidade%20e%20dados%20pessoais">contato@rxsync.com.br</a>, com o assunto “Privacidade”, informando seu nome e e-mail ou telefone usados no cadastro. Para sua segurança, podemos pedir uma confirmação de identidade antes de entregar ou alterar dados. Respondemos em até <strong>15 dias</strong>, como prevê o art. 19, II, da LGPD.</p>
+          <p><strong>Alguns pedidos têm limites legais.</strong> Por exemplo, não podemos eliminar dados que a lei nos obriga a guardar (como os fiscais) nem os que precisamos manter para nos defendermos em processo; nesses casos, explicamos o motivo e a duração da guarda.</p>
+          <p><strong>Pacientes:</strong> o pedido deve ser dirigido à clínica; veja a <a href="#dados-pacientes">seção 4.4</a>.</p>
+          <p>Se entender que o tratamento de seus dados viola a LGPD, você também pode reclamar à <strong>Autoridade Nacional de Proteção de Dados (ANPD)</strong>, em <a href="https://www.gov.br/anpd" target="_blank" rel="noopener">gov.br/anpd</a>, sem prejuízo de procurar os órgãos de defesa do consumidor ou o Poder Judiciário.</p>
+        </section>
+
+        <section id="criancas">
+          <h2>12. Crianças e adolescentes</h2>
+          <p>O site e a contratação da RXSync são dirigidos a profissionais e empresas de saúde, e não a menores de 18 anos. Pacientes menores de idade podem ser atendidos pela clínica por meio da Plataforma, caso em que a clínica, como controladora, é a responsável por observar o art. 14 da LGPD (tratamento no melhor interesse da criança e do adolescente, com o consentimento específico de ao menos um dos pais ou do responsável legal, quando exigido).</p>
+        </section>
+
+        <section id="alteracoes">
+          <h2>13. Alterações desta política</h2>
+          <p>Podemos atualizar esta Política para refletir mudanças no serviço, nos fornecedores ou na lei. A versão vigente é sempre a publicada nesta página, com o número da versão e a data de início de vigência no topo. Mudanças relevantes que afetem clientes serão comunicadas ao e-mail cadastrado, com a antecedência prevista nos Termos de Uso. O uso do site e do serviço depois da vigência da nova versão não afeta os direitos que você tem pela lei.</p>
+          <p>Dúvidas sobre esta Política? Escreva para <a href="mailto:contato@rxsync.com.br?subject=Privacidade%20e%20dados%20pessoais">contato@rxsync.com.br</a>.</p>
+        </section>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-slate-400 mt-6">
+      &copy; 2026 RXSync Tecnologia e Automação em Saúde · CNPJ 52.970.673/0001-78 · Florianópolis/SC
+      <br><a href="/" class="underline">Voltar ao site</a> · <a href="/termos/2026-10-v1.html" class="underline">Termos de Uso</a>
+    </p>
+  </main>
+</body>
+</html>
