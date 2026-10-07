@@ -139,7 +139,7 @@
               </tr>
               <tr>
                 <td><strong>Uso da Plataforma e suporte</strong></td>
-                <td>Registros de acesso ao painel, ações realizadas, solicitações de suporte, avisos operacionais (conexão do WhatsApp, fim de teste, pagamentos)</td>
+                <td>Registros de acesso ao painel, ações realizadas, solicitações de suporte, avisos operacionais (conexão do WhatsApp, fim de teste, pagamentos); no plano Gestão Inteligente, os números autorizados a usar o assistente de gestão e as conversas com ele</td>
                 <td>Operar, proteger e dar suporte à Plataforma; avisar sobre o serviço</td>
                 <td>Execução de contrato (art. 7º, V); legítimo interesse na segurança e na melhoria do serviço (art. 7º, IX)</td>
               </tr>
@@ -162,16 +162,17 @@
           <ul>
             <li>Nome, telefone, e-mail, CPF, data de nascimento e convênio, quando a clínica os solicita no atendimento;</li>
             <li>Conteúdo das mensagens, incluindo áudios (transcritos para texto) e os dados que o paciente decidir informar;</li>
+            <li>No plano Gestão Inteligente, fotos e documentos em PDF que o paciente enviar (como pedido de exame, guia, carteirinha do convênio ou documento de identidade), dos quais a assistente extrai apenas dados administrativos para a equipe da clínica;</li>
             <li>Dados de agendamento, lista de espera, lembretes e pesquisa de satisfação;</li>
             <li>Dados pessoais sensíveis de saúde, <strong>apenas se o próprio paciente os informar</strong> na conversa. A assistente é configurada para não pedir nem interpretar informação clínica.</li>
           </ul>
           <h3>4.2. Para que a RXSync os usa</h3>
-          <p>Atendimento automatizado e humano, triagem administrativa, agendamento, lembretes de consulta, mensagens de retomada de conversa, avisos de vaga da lista de espera, pesquisa de satisfação e indicadores operacionais da própria clínica. A mensagem de retomada não é enviada a quem pediu para não receber mais mensagens.</p>
+          <p>Atendimento automatizado e humano, triagem administrativa, agendamento, lembretes de consulta, mensagens de retomada de conversa, avisos de vaga da lista de espera, pesquisa de satisfação, indicadores operacionais, e o assistente de gestão e o resumo diário da agenda enviados à equipe da clínica da própria clínica. A mensagem de retomada não é enviada a quem pediu para não receber mais mensagens.</p>
           <h3>4.3. O que a RXSync não faz</h3>
           <ul>
             <li>Não usa dados de pacientes para finalidade própria, nem os comercializa;</li>
             <li>Não os usa para treinar modelos de linguagem de terceiros;</li>
-            <li>Não dá orientação clínica, diagnóstico ou prescrição por meio da assistente.</li>
+            <li>Não dá orientação clínica, diagnóstico ou prescrição por meio da assistente, nem interpreta o conteúdo clínico de exames, receitas ou laudos enviados pelo paciente.</li>
           </ul>
           <h3>4.4. Se você é paciente</h3>
           <p>Para saber como seus dados são tratados e para exercer seus direitos, <strong>fale primeiro com a clínica</strong>: ela é a controladora e informou, na primeira mensagem, o endereço da sua política de privacidade quando o cadastrou na Plataforma. Se você escrever para a RXSync, <strong>encaminharemos o pedido à clínica</strong> e a auxiliaremos a atendê-lo no prazo previsto no contrato.</p>
@@ -195,7 +196,7 @@
             <thead><tr><th>Fornecedor</th><th>Para quê</th><th>Dados</th><th>Onde</th></tr></thead>
             <tbody>
               <tr><td>Hostinger International Ltd.</td><td>Hospedagem da Plataforma e das bases de dados (conversas, agendamentos, atendimento)</td><td>Todos os dados da Plataforma</td><td>Brasil (datacenter em São Paulo)</td></tr>
-              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente e transcrição de áudio</td><td>Conteúdo da conversa necessário para a resposta</td><td>Exterior</td></tr>
+              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente, transcrição de áudio e leitura de fotos e documentos enviados pelo paciente</td><td>Conteúdo da conversa e arquivos necessários para a resposta</td><td>Exterior</td></tr>
               <tr><td>Meta Platforms, Inc. (WhatsApp)</td><td>Canal de mensagens com o paciente</td><td>Mensagens e número de telefone</td><td>Exterior</td></tr>
               <tr><td>Google LLC</td><td>Planilha de cadastro e base de conhecimento do cliente; análise de uso do site (Google Analytics)</td><td>Cadastro do cliente e conteúdo da base; dados de navegação</td><td>Exterior</td></tr>
               <tr><td>Resend, Inc.</td><td>Envio de e-mails operacionais aos clientes</td><td>Nome e e-mail do cliente e conteúdo do aviso</td><td>Exterior</td></tr>
@@ -225,6 +226,7 @@
               <tr><td>Teste grátis encerrado sem continuidade</td><td>Configuração e histórico mantidos por até <strong>15 dias corridos</strong> do término, para retomada ou exportação. Depois, são eliminados.</td></tr>
               <tr><td>Cadastro iniciado, mas WhatsApp nunca conectado</td><td>Se a conexão não ocorrer em até <strong>30 dias corridos</strong> do aceite, a configuração preenchida pode ser eliminada, mantido o registro do aceite.</td></tr>
               <tr><td>Contrato encerrado</td><td>Disponibilização dos dados (CSV ou JSON) por <strong>15 dias corridos</strong> do encerramento e, depois, eliminação segura e irreversível, com declaração de expurgo se solicitada. Ressalva: retenção mínima exigida por lei.</td></tr>
+              <tr><td>Registro dos documentos lidos pela assistente (dados administrativos)</td><td>Enquanto durar o contrato, podendo a clínica excluí-los a qualquer momento no painel; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Dados de contexto da conversa em bases transitórias</td><td>Expurgados automaticamente após a resolução do atendimento.</td></tr>
               <tr><td>Cópias de segurança (backup)</td><td>Rotativas, com retenção mínima de 7 dias; os dados eliminados saem dos backups no ciclo de renovação.</td></tr>
               <tr><td>Registros de acesso (logs)</td><td>Pelo prazo mínimo exigido pelo Marco Civil da Internet (Lei nº 12.965/2014) e pelo tempo necessário à segurança da Plataforma.</td></tr>
