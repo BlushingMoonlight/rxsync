@@ -6,112 +6,42 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Teste da sua assistente | RXSync</title>
 <link rel="icon" type="image/png" href="/assets/favicon-rxsync.png.PNG">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #f2f5f4; --ink: #0f172a; --ink-2: #445263; --ink-3: #66727f; --line: #e0e7e4; --brand: #059669; --brand-ink: #065f46; --brand-soft: #e6f5ee; --amber-soft: #fef3c7; --amber-ink: #92400e; }
-  * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Figtree', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+  body { margin: 0; min-height: 100vh; background: #f2f5f4; color: #0f172a; font-family: -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
   header { background: #0f172a; color: #fff; padding-top: env(safe-area-inset-top); }
-  .wrap { max-width: 620px; margin: 0 auto; padding: 0 16px; }
-  .topo { display: flex; align-items: center; gap: 10px; height: 60px; }
-  .marca { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #0f172a, #0b5c48 55%, #059669); display: grid; place-items: center; border: 1px solid rgba(255,255,255,.15); }
-  .marca svg { width: 20px; height: 20px; }
-  .topo b { font-size: 17px; letter-spacing: -.01em; }
-  .topo span { display: block; font-size: 12.5px; color: #a3b0c0; }
-  .card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 24px; margin-top: 20px; }
-  h1 { margin: 0; font-size: 24px; line-height: 1.2; letter-spacing: -.02em; }
-  .sub { color: var(--ink-2); margin: 8px 0 0; }
-  .papel { display: flex; gap: 12px; margin-top: 20px; padding: 14px 16px; border-radius: 14px; background: var(--brand-soft); color: var(--brand-ink); }
-  .papel svg { width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px; }
-  .papel p { margin: 0; font-size: 15px; }
-  ol { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
-  ol li { display: flex; gap: 12px; color: var(--ink-2); font-size: 15.5px; }
-  ol li span { width: 26px; height: 26px; border-radius: 50%; background: #0f172a; color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; flex-shrink: 0; }
-  .ex { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .ex span { border: 1px solid #cfe9dc; background: #fff; color: var(--brand-ink); font-weight: 600; font-size: 14px; padding: 7px 12px; border-radius: 999px; }
-  .abrir { margin-top: 20px; width: 100%; min-height: 52px; border: 0; border-radius: 12px; background: var(--brand); color: #fff; font: inherit; font-weight: 700; font-size: 16.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
-  .abrir:hover { background: #047857; }
-  .abrir svg { width: 20px; height: 20px; }
-  .ajuda { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 20px 24px; margin-top: 14px; }
-  .ajuda h2 { margin: 0; font-size: 17px; letter-spacing: -.01em; display: flex; gap: 8px; align-items: center; }
-  .ajuda h2 svg { width: 18px; height: 18px; color: var(--amber-ink); }
-  .ajuda p { margin: 6px 0 0; color: var(--ink-2); font-size: 15px; }
-  .ajuda a.btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 44px; padding: 0 16px; border-radius: 10px; border: 1px solid #cfd9d5; color: var(--ink); font-weight: 700; text-decoration: none; font-size: 15px; }
-  .ajuda a.btn:hover { border-color: var(--ink); }
-  .nota { margin-top: 14px; font-size: 13.5px; color: var(--ink-3); text-align: center; }
-  .erro { margin-top: 20px; padding: 14px 16px; border-radius: 12px; background: #fff1f2; color: #9f1239; font-size: 15px; }
-  :focus-visible { outline: 3px solid #34d399; outline-offset: 2px; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+  .topo { display: flex; align-items: center; gap: 10px; height: 56px; font-weight: 800; font-size: 17px; }
+  .marca { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #0f172a, #0b5c48 55%, #059669); display: grid; place-items: center; border: 1px solid rgba(255,255,255,.15); }
+  .card { background: #fff; border: 1px solid #e0e7e4; border-radius: 16px; padding: 22px; margin-top: 20px; }
+  h1 { margin: 0; font-size: 21px; line-height: 1.25; }
+  p { margin: 10px 0 0; color: #445263; }
+  .rodape { margin-top: 16px; font-size: 14px; color: #66727f; text-align: center; }
+  .rodape a { color: #065f46; font-weight: 700; }
 </style>
 </head>
 <body>
-  <header>
-    <div class="wrap topo">
-      <span class="marca" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
-      <div><b>RXSync</b><span>Teste da sua assistente</span></div>
-    </div>
-  </header>
+  <header><div class="wrap topo"><span class="marca" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>RXSync</div></header>
 
   <main class="wrap">
-    <section class="card" aria-labelledby="titulo">
-      <h1 id="titulo">Converse com a sua assistente como se fosse um paciente</h1>
-      <p class="sub">O chat no canto da tela é a assistente da <strong>sua clínica</strong>, com as informações que você cadastrou. Nada daqui chega ao WhatsApp de verdade nem a pacientes.</p>
-
-      <div class="papel">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
-        <p><strong>Aqui, você é o paciente.</strong> Escreva o que um paciente escreveria. Ela vai responder como responderia no WhatsApp da clínica.</p>
-      </div>
-
-      <ol>
-        <li><span>1</span>Abra o chat e mande uma mensagem.</li>
-        <li><span>2</span>Pergunte valores, convênios, horários, ou peça para marcar uma consulta.</li>
-        <li><span>3</span>Se algo estiver errado, ajuste no painel. Ela já responde com a informação nova.</li>
-      </ol>
-
-      <div class="ex" aria-label="Ideias para testar">
-        <span>“Quero marcar uma consulta”</span>
-        <span>“Quanto custa a consulta?”</span>
-        <span>“Vocês atendem convênio?”</span>
-      </div>
-
-      <button type="button" class="abrir" id="abrir">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-        Abrir o chat da assistente
-      </button>
-      <div id="erro" class="erro" role="alert" hidden></div>
-    </section>
-
-    <section class="ajuda" aria-labelledby="titulo-ajuda">
-      <h2 id="titulo-ajuda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Precisa de ajuda da RXSync?</h2>
-      <p>Não escreva no chat desta página: ele é a sua assistente, não o nosso suporte. Fale com a nossa equipe por aqui:</p>
-      <a class="btn" href="https://rxsync.com.br/?suporte=1" target="_blank" rel="noopener">Falar com o suporte da RXSync</a>
-      <p class="nota">Ou escreva para <a href="mailto:contato@rxsync.com.br">contato@rxsync.com.br</a>.</p>
-    </section>
+    <div class="card">
+      <h1>Teste da sua assistente</h1>
+      <p>Toque em <strong>Conversar com a assistente</strong>, no canto da tela, e escreva como se fosse um paciente da sua clínica. Nada daqui chega ao WhatsApp de verdade.</p>
+    </div>
+    <p class="rodape">Precisa falar com a RXSync? <a href="https://rxsync.com.br/?suporte=1" target="_blank" rel="noopener">Fale com o suporte</a></p>
+    <p id="erro" class="rodape" hidden></p>
   </main>
 
 <script>
 (function (d, t) {
-  var params = new URLSearchParams(window.location.search);
-  var token = params.get('token');
-  var erro = document.getElementById('erro');
-  var abrir = document.getElementById('abrir');
+  var token = new URLSearchParams(window.location.search).get('token');
   if (!token) {
-    erro.textContent = 'Link incompleto: falta o código do teste. Abra o teste de novo pelo painel, em Assistente.';
-    erro.hidden = false; abrir.disabled = true;
+    var e = document.getElementById('erro');
+    e.textContent = 'Link incompleto. Abra o teste de novo pelo painel.';
+    e.hidden = false;
     return;
   }
-
-  function abrirChat() {
-    if (window.$chatwoot && typeof window.$chatwoot.toggle === 'function') {
-      window.$chatwoot.toggle('open');
-    } else {
-      erro.textContent = 'O chat ainda está carregando. Espere alguns segundos e tente de novo.';
-      erro.hidden = false;
-      setTimeout(function () { erro.hidden = true; }, 4000);
-    }
-  }
-  abrir.addEventListener('click', function () { abrirChat(); });
+  // Botão do chat com texto, para ficar claro onde tocar
+  window.chatwootSettings = { type: 'expanded_bubble', launcherTitle: 'Conversar com a assistente', position: 'right' };
 
   var BASE_URL = 'https://app.rxsync.com.br';
   var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
