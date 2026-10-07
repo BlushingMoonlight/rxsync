@@ -1264,9 +1264,8 @@
                     <p class="text-slate-200 font-medium text-lg">Preencha o formulário e nossa equipe entrará em contato para agendar uma demonstração exclusiva com a sua estrutura de atendimento.</p>
                 </div>
 
-                <form action="https://formspree.io/f/xkjwrgjk" method="POST" class="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-8 md:p-10 mb-8" onsubmit="trackFormSubmit()">
-                    <input type="hidden" name="_subject" value="Novo lead pelo site RXSync">
-                    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
+                <form id="formDemo" class="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-8 md:p-10 mb-8" onsubmit="return enviarFormDemo(event)">
+                    <input type="text" id="empresa_site" name="empresa_site" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
@@ -1315,7 +1314,8 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-1 flex justify-center items-center gap-2">
+                    <p id="erroFormDemo" class="hidden text-sm text-red-600 text-center mb-4"></p>
+                    <button type="submit" id="btnFormDemo" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-1 flex justify-center items-center gap-2">
                         Agendar Demonstração <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
                     <p class="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
@@ -1518,6 +1518,41 @@
                 });
             }
             return true;
+        }
+
+        // Formulário de demonstração: vai para o n8n (workflow "Email e formulário no Telegram"), que avisa no Telegram.
+        async function enviarFormDemo(ev) {
+            ev.preventDefault();
+            const form = document.getElementById('formDemo');
+            const btn = document.getElementById('btnFormDemo');
+            const erro = document.getElementById('erroFormDemo');
+            const v = id => (document.getElementById(id) || {}).value || '';
+            erro.classList.add('hidden');
+            if (v('empresa_site').trim()) return false;   // robô: não envia
+            btn.disabled = true;
+            const textoBtn = btn.innerHTML;
+            btn.innerHTML = 'Enviando...';
+            try {
+                const r = await fetch('https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/formulario-site', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
+                    body: JSON.stringify({ nome: v('nome'), clinica: v('clinica'), email: v('email'), telefone: v('telefone'),
+                        software_gestao: v('software'), plano_interesse: v('plano'), pagina: location.href })
+                });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok || d.ok === false) throw new Error(d.mensagem || 'falha');
+                trackFormSubmit();
+                form.innerHTML = '<div class="text-center py-6"><div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4"><i data-lucide="check" class="w-7 h-7 text-emerald-600"></i></div>'
+                    + '<h3 class="text-xl font-bold text-primary-900 mb-2">Recebemos seu pedido!</h3>'
+                    + '<p class="text-slate-600">Nossa equipe vai falar com você pelo WhatsApp informado para agendar a demonstração.</p></div>';
+                if (window.lucide) lucide.createIcons();
+            } catch (e) {
+                erro.textContent = 'Não conseguimos enviar agora. Tente de novo em instantes ou escreva para contato@rxsync.com.br.';
+                erro.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = textoBtn;
+            }
+            return false;
         }
 
         // Rastreia a profundidade de leitura da página (qualidade do tráfego)
