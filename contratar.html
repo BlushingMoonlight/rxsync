@@ -266,11 +266,11 @@ const ORIGEM_CHAVE = 'rxsync-site-2026';
 const LINK_PAGAMENTO = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/link-pagamento';
 const COBRAR_AGORA = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cobrar-agora';
 
-// Depois da contratação paga: pergunta ao n8n (8/8) pelo link do Asaas até ele ficar pronto (~até 90 s).
+// Depois da contratação paga: pergunta ao n8n (8/9) pelo link do Asaas até ele ficar pronto (~até 90 s).
 async function aguardarLink(clienteId, email) {
   const box = document.getElementById('pagamentoBox');
   box.classList.remove('hidden');
-  // Pede ao 8/8 para criar a cobrança agora (se falhar, o 8/8 cria sozinho em até 15 minutos e manda por e-mail).
+  // Pede ao 8/9 para criar a cobrança agora (se falhar, o 8/9 cria sozinho em até 15 minutos e manda por e-mail).
   try {
     await fetch(COBRAR_AGORA, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cliente_id: clienteId }) });
   } catch (e) { /* segue esperando o link */ }
