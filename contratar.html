@@ -184,6 +184,7 @@
 
       <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-10-v1"></iframe></div>
       <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-10-v1</strong> · <a id="linkTermos" href="/termos/2026-10-v1.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
+      <p class="text-xs text-slate-500 mb-5 -mt-3">Os dados deste cadastro são tratados pela RXSync conforme a <a href="/privacidade.html" target="_blank" rel="noopener" class="text-primary-600 underline">Política de Privacidade</a>.</p>
 
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteTermos" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
@@ -319,7 +320,7 @@ const BASE = [
   'A assistente entende os áudios do paciente',
   'Retomada de conversa: se o paciente some antes de agendar, a IA manda um lembrete',
   'Lembretes de consulta nos horários que você escolher, com confirmação e cancelamento pelo WhatsApp',
-  'Painel de resultados: conversas e agendamentos feitos pela IA',
+  'Painel de resultados completo, com gráficos: conversas, agendamentos, confirmações, cancelamentos e tempo de resposta',
   'Profissional da RXSync dedicado, acessível por WhatsApp',
   'Treinamento da equipe e ajustes no primeiro mês',
   'Até 5.000 mensagens por mês'
@@ -331,9 +332,10 @@ const PLANOS = {
     features: BASE.concat([
       'Integração com a agenda do seu sistema de gestão, se ele tiver API aberta (em breve)',
       'Fila de espera para reposição de horários liberados',
+      'A assistente lê fotos e PDFs do paciente (pedido de exame, carteirinha, guia) e organiza os dados para a equipe, sem interpretar conteúdo clínico',
+      'Assistente de gestão no painel e no seu WhatsApp: pergunte sobre a agenda, bloqueie horários, mude a grade e receba o resumo do dia',
       'Follow-up de orçamentos sem resposta (em breve)',
-      'Pesquisa de satisfação após a consulta (em breve)',
-      'Indicadores completos: taxa de agendamento, tempo de resposta, confirmações, cancelamentos e vagas repostas'
+      'Pesquisa de satisfação após a consulta, com convite para avaliar a clínica no Google'
     ]) }
 };
 
