@@ -1527,6 +1527,14 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         setTimeout(function () { var n = document.getElementById('nome'); if (n) n.focus({ preventScroll: true }); }, 600);
     }
 
+    // Link de suporte (rxsync.com.br/?suporte=1, usado na página de teste do cliente): abre o chat da RXSync sozinho
+    window.addEventListener('chatwoot:ready', function () {
+        if (/[?&]suporte=1\b/.test(location.search) && window.$chatwoot) {
+            evento('abrir_suporte', { 'event_category': 'suporte' });
+            window.$chatwoot.toggle('open');
+        }
+    });
+
     // Abre o widget do Chatwoot
     function abrirChat() {
         evento('abrir_chat_demo');
