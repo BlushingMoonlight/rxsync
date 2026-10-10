@@ -2067,7 +2067,8 @@ function partesTz(ms) {
       var v = (resp.somenteLeitura || {})[c.key] || "";
       var row = document.createElement("div");
       row.className = "ro-row";
-      row.innerHTML = "<span class='lbl'>" + c.label + "</span><span class='val'>" + (v || "—") + "</span>";
+      row.appendChild(h$("span", "lbl", c.label));
+      row.appendChild(h$("span", "val", v || "—"));
       roDiv.appendChild(row);
     });
 
