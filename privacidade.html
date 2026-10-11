@@ -46,7 +46,7 @@
   <header class="bg-primary-900 text-white">
     <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
       <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v3</span>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v4</span>
     </div>
   </header>
 
@@ -56,7 +56,7 @@
       <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para Serviços de Saúde</p>
 
       <div class="doc">
-        <p><strong>Versão 2026-10-v3</strong> · Vigente a partir de 11 de outubro de 2026</p>
+        <p><strong>Versão 2026-10-v4</strong> · Vigente a partir de 11 de outubro de 2026</p>
 
         <blockquote>
           <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros.</p>
@@ -170,10 +170,11 @@
             <li>Conteúdo das mensagens, incluindo áudios (transcritos para texto) e os dados que o paciente decidir informar;</li>
             <li>No plano Gestão Inteligente, fotos e documentos em PDF que o paciente enviar (como pedido de exame, guia, carteirinha do convênio ou documento de identidade), dos quais a assistente extrai apenas dados administrativos para a equipe da clínica;</li>
             <li>Dados de agendamento, lista de espera, lembretes e pesquisa de satisfação;</li>
+            <li>No plano Gestão Inteligente, quando a clínica liga a função “Perguntas antes de agendar”, as respostas do paciente às perguntas que a própria clínica cadastrou, guardadas no agendamento e no resumo do paciente para a equipe da clínica;</li>
             <li>Dados pessoais sensíveis de saúde, <strong>apenas se o próprio paciente os informar</strong> na conversa. A assistente é configurada para não pedir nem interpretar informação clínica.</li>
           </ul>
           <h3>4.2. Para que a RXSync os usa</h3>
-          <p>Atendimento automatizado e humano, triagem administrativa, agendamento, lembretes de consulta, mensagens de retomada de conversa, avisos de vaga da lista de espera, pesquisa de satisfação, indicadores operacionais, e o assistente de gestão e o resumo diário da agenda enviados à equipe da clínica da própria clínica. A mensagem de retomada não é enviada a quem pediu para não receber mais mensagens.</p>
+          <p>Atendimento automatizado e humano, triagem administrativa, agendamento, perguntas antes do agendamento definidas pela clínica (pré-consulta), lembretes de consulta, mensagens de retomada de conversa, avisos de vaga da lista de espera, pesquisa de satisfação, indicadores operacionais, e o assistente de gestão e o resumo diário da agenda enviados à equipe da clínica da própria clínica. A mensagem de retomada não é enviada a quem pediu para não receber mais mensagens.</p>
           <h3>4.3. O que a RXSync não faz</h3>
           <ul>
             <li>Não usa dados de pacientes para finalidade própria, nem os comercializa;</li>
@@ -204,7 +205,7 @@
               <tr><td>Hostinger International Ltd.</td><td>Hospedagem da Plataforma e das bases de dados (conversas, agendamentos, atendimento)</td><td>Todos os dados da Plataforma</td><td>Brasil (datacenter em São Paulo)</td></tr>
               <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente (inclusive no teste ao vivo do site), transcrição de áudio e leitura de fotos e documentos enviados pelo paciente</td><td>Conteúdo da conversa e arquivos necessários para a resposta</td><td>Exterior</td></tr>
               <tr><td>Meta Platforms, Inc. (WhatsApp)</td><td>Canal de mensagens com o paciente</td><td>Mensagens e número de telefone</td><td>Exterior</td></tr>
-              <tr><td>Google LLC</td><td>Planilha de cadastro e base de conhecimento do cliente; análise de uso do site (Google Analytics)</td><td>Cadastro do cliente e conteúdo da base; dados de navegação</td><td>Exterior</td></tr>
+              <tr><td>Google LLC</td><td>Análise de uso do site (Google Analytics)</td><td>Dados de navegação</td><td>Exterior</td></tr>
               <tr><td>Resend, Inc.</td><td>Envio de e-mails operacionais aos clientes</td><td>Nome e e-mail do cliente e conteúdo do aviso</td><td>Exterior</td></tr>
               <tr><td>Telegram</td><td>Avisos internos à equipe da RXSync sobre o andamento de clientes, pagamentos, falhas e testes feitos no site</td><td>Nome da clínica, identificador do cliente e informações do aviso; no teste ao vivo do site, os dados preenchidos e o resumo da conversa de teste; em caso de falha na entrega de um aviso de urgência ou de pedido de atendimento, nome, telefone e motivo informados pelo paciente</td><td>Exterior</td></tr>
               <tr><td>Asaas</td><td>Cobrança, recebimento e emissão de nota fiscal</td><td>Dados cadastrais e de cobrança do cliente</td><td>Brasil</td></tr>
@@ -219,7 +220,7 @@
 
         <section id="internacional">
           <h2>7. Transferência internacional de dados</h2>
-          <p>Alguns dos fornecedores acima (em especial o provedor do modelo de linguagem, o canal de mensagens, a ferramenta de planilhas, o envio de e-mail, a mensageria interna, a análise de uso do site e a hospedagem das páginas) têm infraestrutura no exterior. Por isso, parte dos dados pode ser transferida para fora do Brasil, com fundamento no art. 33 da LGPD e, quando aplicável, nas cláusulas-padrão contratuais aprovadas pela Resolução CD/ANPD nº 19/2024, limitada ao conteúdo estritamente necessário para cada finalidade.</p>
+          <p>Alguns dos fornecedores acima (em especial o provedor do modelo de linguagem, o canal de mensagens, o envio de e-mail, a mensageria interna, a análise de uso do site e a hospedagem das páginas) têm infraestrutura no exterior. Por isso, parte dos dados pode ser transferida para fora do Brasil, com fundamento no art. 33 da LGPD e, quando aplicável, nas cláusulas-padrão contratuais aprovadas pela Resolução CD/ANPD nº 19/2024, limitada ao conteúdo estritamente necessário para cada finalidade.</p>
         </section>
 
         <section id="retencao">
@@ -233,7 +234,8 @@
               <tr><td>Teste grátis encerrado sem continuidade</td><td>Configuração e histórico mantidos por até <strong>15 dias corridos</strong> do término, para retomada ou exportação. Depois, são eliminados.</td></tr>
               <tr><td>Cadastro iniciado, mas WhatsApp nunca conectado</td><td>Se a conexão não ocorrer em até <strong>30 dias corridos</strong> do aceite, a configuração preenchida pode ser eliminada, mantido o registro do aceite.</td></tr>
               <tr><td>Contrato encerrado</td><td>Disponibilização dos dados (CSV ou JSON) por <strong>15 dias corridos</strong> do encerramento e, depois, eliminação segura e irreversível, com declaração de expurgo se solicitada. Ressalva: retenção mínima exigida por lei.</td></tr>
-              <tr><td>Respostas do paciente às perguntas antes do agendamento (pré-consulta), quando a clínica usa essa função</td><td>Apagadas automaticamente <strong>90 dias</strong> depois da consulta.</td></tr>
+              <tr><td>Respostas do paciente às perguntas antes do agendamento (pré-consulta), guardadas no agendamento e no resumo do paciente, quando a clínica usa essa função</td><td>Apagadas automaticamente <strong>90 dias</strong> depois da consulta. O que o paciente escreveu na própria conversa segue o prazo das conversas (linha abaixo).</td></tr>
+              <tr><td>Conversas do WhatsApp com pacientes (histórico do atendimento)</td><td>Enquanto durar o contrato, sob decisão da clínica; eliminadas com os demais dados da clínica ao fim do contrato. As cópias que a equipe da clínica recebe no próprio WhatsApp ficam com ela.</td></tr>
               <tr><td>Registro dos documentos lidos pela assistente (dados administrativos)</td><td>Enquanto durar o contrato, podendo a clínica excluí-los a qualquer momento no painel; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Dados de contexto da conversa em bases transitórias</td><td>Expurgados automaticamente após a resolução do atendimento.</td></tr>
               <tr><td>Cópias de segurança (backup)</td><td>Rotativas, com retenção mínima de 7 dias; os dados eliminados saem dos backups no ciclo de renovação.</td></tr>
@@ -293,6 +295,7 @@
           <p>Podemos atualizar esta Política para refletir mudanças no serviço, nos fornecedores ou na lei. A versão vigente é sempre a publicada nesta página, com o número da versão e a data de início de vigência no topo. Mudanças relevantes que afetem clientes serão comunicadas ao e-mail cadastrado, com a antecedência prevista nos Termos de Uso. O uso do site e do serviço depois da vigência da nova versão não afeta os direitos que você tem pela lei.</p>
           <p><strong>Histórico de versões</strong></p>
           <ul>
+            <li><strong>2026-10-v4</strong>, vigente a partir de 11 de outubro de 2026: as respostas da pré-consulta entram nos dados de pacientes (seção 4); a seção 8 diz onde elas ficam guardadas e ganha o prazo das conversas do WhatsApp com pacientes; o Google deixa de guardar o cadastro e a base de conhecimento, e fica só a análise de uso do site (seções 6 e 7).</li>
             <li><strong>2026-10-v3</strong>, vigente a partir de 11 de outubro de 2026: o encarregado pelo tratamento de dados pessoais passa a ser Jean Duarte Cavalheiro (seção 1) e entra o prazo de guarda das respostas da pré-consulta, apagadas 90 dias depois da consulta (seção 8).</li>
             <li><strong>2026-10-v2</strong>, vigente a partir de 7 de outubro de 2026: versão anterior.</li>
           </ul>
