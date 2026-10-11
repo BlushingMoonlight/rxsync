@@ -1780,7 +1780,7 @@ function partesTz(ms) {
       var i = h$("input", cls); i.type = c[2]; i.value = c[3] || ""; campos[c[0]] = i; f.appendChild(i);
     });
     if (!a && calView === "dia") { campos.ini.value = chave(calRef) + "T09:00"; campos.fim.value = somaMin(campos.ini.value, duracaoMin()); }
-    campos.ini.addEventListener("change", function () { if (campos.ini.value) campos.fim.value = somaMin(campos.ini.value, duracaoMin()); });
+    campos.ini.addEventListener("change", function () { if (campos.ini.value) campos.fim.value = somaMin(campos.ini.value, tipoDur() || duracaoMin()); });
     // Médico (Gestão): só aparece se há médico ativo ou se a consulta já tem médico. Sem médico = vale para todos.
     // No modo médicos a consulta exige médico; "Sem médico" só vale para bloqueio (Serviço = BLOQUEIO).
     var medSel = null;
@@ -1796,6 +1796,30 @@ function partesTz(ms) {
       f.appendChild(medSel);
       if (MODO_MED) f.appendChild(h$("div", "text-xs text-slate-500 -mt-1 mb-2", "Para bloquear um horário de todos os médicos, escreva BLOQUEIO em Serviço e escolha \"Sem médico\"."));
     }
+    // Tipo de consulta (item 24): aparece quando o médico escolhido tem tipos. Escolher o tipo preenche o fim pela
+    // duração dele (o servidor confere e calcula de novo). No modo médicos, médico com tipos exige o tipo.
+    var tipoSel = null, tipoLbl = null;
+    function tipoDur() { var o = tipoSel && !tipoSel.classList.contains("hidden") ? tipoSel.options[tipoSel.selectedIndex] : null; return o && o.value ? parseInt(o.getAttribute("data-dur"), 10) || 0 : 0; }
+    if (medSel) {
+      tipoLbl = h$("label", "block text-xs text-slate-500 mb-1", "Tipo de consulta"); tipoSel = h$("select", cls);
+      var tipoAntigo = a && a.tipo_consulta_id ? String(a.tipo_consulta_id) : "";
+      var tipoMontar = function (manter) {
+        var m = medDados.filter(function (x) { return String(x.id) === medSel.value; })[0];
+        var lista = ((m && m.tipos) || []).filter(function (t) { return t.ativo || String(t.id) === tipoAntigo; });
+        tipoSel.innerHTML = "";
+        var o0 = h$("option", "", "Escolha o tipo"); o0.value = ""; tipoSel.appendChild(o0);
+        lista.forEach(function (t) { var o = h$("option", "", t.nome + " · " + t.duracao_min + " min" + (t.ativo ? "" : " (removido)")); o.value = String(t.id); o.setAttribute("data-dur", String(t.duracao_min)); o.setAttribute("data-nome", t.nome); tipoSel.appendChild(o); });
+        tipoSel.value = manter && lista.some(function (t) { return String(t.id) === manter; }) ? manter : "";
+        tipoLbl.classList.toggle("hidden", !lista.length); tipoSel.classList.toggle("hidden", !lista.length);
+      };
+      f.appendChild(tipoLbl); f.appendChild(tipoSel); tipoMontar(tipoAntigo);
+      medSel.addEventListener("change", function () { tipoMontar(""); });
+      tipoSel.addEventListener("change", function () {
+        var o = tipoSel.options[tipoSel.selectedIndex];
+        if (tipoDur() && campos.ini.value) campos.fim.value = somaMin(campos.ini.value, tipoDur());
+        if (o && o.value && !campos.serv.value.trim()) campos.serv.value = o.getAttribute("data-nome");
+      });
+    }
     var forca = h$("input"); forca.type = "checkbox"; var fl = h$("label", "flex items-center gap-2 text-xs text-slate-600 mb-3"); fl.appendChild(forca); fl.appendChild(h$("span", "", "Permitir encaixe (mesmo fora da grade ou com horário ocupado)")); f.appendChild(fl);
     var r = h$("div", "flex gap-2");
     r.appendChild(agBtn("Salvar", "bg-emerald-600 text-white border-emerald-600", function () {
@@ -1803,10 +1827,12 @@ function partesTz(ms) {
       if (a) d.id = a.id;
       if (String(d.servico || "").trim().toUpperCase() === "BLOQUEIO") d.servico = "BLOQUEIO";
       if (medSel) d.medico_id = medSel.value;
+      if (tipoSel) d.tipo_consulta_id = tipoSel.classList.contains("hidden") ? "" : tipoSel.value;
       if (MODO_MED && medSel && !medSel.value && d.servico !== "BLOQUEIO") { toast("Escolha o médico da consulta. \"Sem médico\" só vale para bloqueio."); medSel.focus(); return; }
+      if (MODO_MED && tipoSel && !tipoSel.classList.contains("hidden") && !tipoSel.value && d.servico !== "BLOQUEIO") { toast("Escolha o tipo de consulta."); tipoSel.focus(); return; }
       agChamar(a ? "agenda_editar" : "agenda_criar", d).then(function (res) {
         if (res.ok) { f.classList.add("hidden"); toast("Salvo ✓"); agCarregar(); if (medSel) medCarregar(); }
-        else toast(res.erro === "conflito" ? "Já existe um agendamento nesse horário. Marque 'encaixe' para forçar." : res.erro === "fora_da_grade" ? "Fora da sua grade de horários. Marque 'encaixe' para forçar." : res.erro === "medico" ? "Esse médico foi removido. Escolha outro médico ou 'Sem médico'." : res.erro === "plano" ? (res.mensagem || "Recurso do plano Gestão Inteligente.") : "Confira nome, telefone e horários.");
+        else toast(res.erro === "conflito" ? "Já existe um agendamento nesse horário. Marque 'encaixe' para forçar." : res.erro === "fora_da_grade" ? "Fora da sua grade de horários. Marque 'encaixe' para forçar." : res.erro === "medico" ? "Esse médico foi removido. Escolha outro médico ou 'Sem médico'." : res.erro === "tipo_obrigatorio" ? "Escolha o tipo de consulta." : res.erro === "tipo" ? "Esse tipo de consulta não vale para este médico. Escolha outro tipo." : res.erro === "plano" ? (res.mensagem || "Recurso do plano Gestão Inteligente.") : "Confira nome, telefone e horários.");
       }).catch(function () { toast("Erro ao salvar. Tenta de novo."); });
     }));
     r.appendChild(agBtn("Fechar", "border-slate-300 text-slate-700", function () { f.classList.add("hidden"); }));
@@ -1996,7 +2022,7 @@ function partesTz(ms) {
     w.appendChild(lf);
     // Tipos de consulta (item 23).
     var tp = h$("div"); tp.appendChild(h$("div", "text-sm font-semibold text-slate-800 mb-1", "Tipos de consulta"));
-    tp.appendChild(h$("div", "aviso neutro", "A duração e o prazo de retorno passam a ser usados pela assistente numa próxima etapa. Hoje ela usa a duração padrão de consulta da clínica (" + duracaoMin() + " min)."));
+    tp.appendChild(h$("div", "aviso neutro", "A assistente confirma o tipo com o paciente e usa a duração dele para oferecer os horários. Os horários começam de " + duracaoMin() + " em " + duracaoMin() + " minutos (a duração padrão de consulta da clínica). Com tipos cadastrados, toda consulta deste médico precisa de um tipo."));
     var lista = h$("div", "space-y-1 mt-2");
     (m.tipos || []).forEach(function (t) {
       var r = h$("div", "flex items-center justify-between gap-2 text-sm border border-slate-200 rounded-lg px-2.5 py-2 " + (t.ativo ? "" : "opacity-60"));
