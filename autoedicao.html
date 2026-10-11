@@ -344,6 +344,14 @@
             <button id="medNovoBtn" type="button" class="btn pri" style="height:44px;min-height:0;padding:0 16px;font-size:14px">Adicionar</button>
           </div>
         </div>
+        <div class="bloco pad hidden" id="preBox" style="margin-top:14px">
+          <div class="flex items-center justify-between gap-2"><h2 class="sec">Perguntas antes de agendar</h2><span id="preEstado" class="pill"></span></div>
+          <p class="subtitulo" style="margin:0 0 12px;font-size:14px">Perguntas que a assistente faz ao paciente antes de marcar a consulta. As gerais valem para toda consulta; as de um tipo de consulta, só para aquele tipo. Até 10 perguntas ativas por grupo, com até 300 caracteres cada. As respostas (até 500 caracteres cada) aparecem na consulta e são apagadas 90 dias depois dela.</p>
+          <div id="preAviso" class="aviso neutro hidden"></div>
+          <div id="preLista" class="space-y-3"><div class="vazio">Carregando…</div></div>
+          <div id="preForm"></div>
+          <button id="preNovoBtn" type="button" class="btn sec plena" style="margin-top:12px">+ Pergunta</button>
+        </div>
         <div class="bloco pad" id="ferBox" style="margin-top:14px"><h2 class="sec">Feriados</h2><div class="vazio">Carregando…</div></div>
         <div class="bloco" style="margin-top:14px"><div id="campos_horarios"></div></div>
         <button id="btnPedirAjudaAgendamento" type="button" class="btn sec plena" style="margin-top:14px">Pedir ajuda para configurar</button>
@@ -1747,6 +1755,12 @@ function partesTz(ms) {
     if (a.no_externo && !a.origem_externa && a.servico !== "BLOQUEIO") tags.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800", "NO " + String(a.externo_plataforma || "").toUpperCase()));
     top.appendChild(tags); c.appendChild(top);
     if (a.briefing) { var bx = h$("div", "mt-3 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3"); bx.appendChild(h$("div", "font-semibold text-slate-500 mb-1", "Resumo da conversa")); bx.appendChild(h$("div", "", a.briefing)); c.appendChild(bx); }
+    if (Array.isArray(a.preconsulta) && a.preconsulta.length) {
+      var px = h$("div", "mt-2 text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-3");
+      px.appendChild(h$("div", "font-semibold text-slate-500 mb-1", "Respostas antes da consulta"));
+      a.preconsulta.forEach(function (q) { var l = h$("div", "mt-1 break-words"); l.appendChild(h$("span", "font-semibold", (q.pergunta || "") + " ")); l.appendChild(document.createTextNode(q.resposta || "")); px.appendChild(l); });
+      c.appendChild(px);
+    }
     if (a.observacoes) c.appendChild(h$("div", "mt-2 text-xs text-slate-600", "Obs.: " + a.observacoes));
     var acoes = h$("div", "mt-3 flex flex-wrap gap-2");
     if (a.servico !== "BLOQUEIO") { var wa = h$("a", "text-xs font-semibold px-3 py-2 rounded-lg border border-slate-300 text-slate-700", "WhatsApp"); wa.href = zap(a.telefone_paciente); wa.target = "_blank"; wa.rel = "noopener"; acoes.appendChild(wa); }
@@ -2079,6 +2093,115 @@ function partesTz(ms) {
     medAcao("agenda_medico_salvar", { nome: n }, function () { i.value = ""; toast("Médico adicionado ✓"); });
   });
 
+  // ===== PERGUNTAS ANTES DE AGENDAR (Projeto 1, Lote 4, item 28). Só no Gestão Inteligente: no Essencial o bloco
+  // fica escondido e o servidor (workflow 24) recusa as ações. A função entra desligada.
+  var preDados = { perguntas: [], ligado: false, limite_por_tipo: 10, limite_texto: 300 }, preEditando = null;
+  function preErro(r) {
+    var e = r && r.erro;
+    toast(r && r.mensagem ? r.mensagem
+      : e === "texto" ? "Escreva a pergunta (até " + preDados.limite_texto + " caracteres)."
+      : e === "tipo" ? "Esse tipo de consulta não está disponível. Escolha outro."
+      : e === "limite" ? "Esse grupo já tem " + preDados.limite_por_tipo + " perguntas ativas. Remova uma antes."
+      : e === "nao_encontrada" ? "Pergunta não encontrada. Recarregue a página."
+      : "Não consegui salvar. Confira os dados e tente de novo.");
+  }
+  function preCarregar() {
+    return agChamar("agenda_preconsulta_listar").then(function (r) {
+      if (!r || !r.ok) { preFalha(r && r.mensagem); return; }
+      preDados = r; preDesenhar();
+    }).catch(function () { preFalha(); });
+  }
+  function preFalha(msg) { var box = el("preLista"); box.innerHTML = ""; box.appendChild(h$("div", "text-sm text-rose-600", msg || "Não consegui carregar as perguntas.")); }
+  function preAcao(acao, dados, ok) {
+    return agChamar(acao, dados).then(function (r) { if (r && r.ok) { if (ok) ok(r); preCarregar(); } else preErro(r); return r; })
+      .catch(function () { toast("Erro ao salvar. Tenta de novo."); });
+  }
+  // Tipos de consulta que podem receber pergunta: os ativos de médicos ativos (do bloco Médicos).
+  function preTipos() {
+    var l = [];
+    (medDados || []).forEach(function (m) { if (!m.ativo) return; (m.tipos || []).forEach(function (t) { if (t.ativo) l.push({ id: t.id, nome: m.nome + " · " + t.nome }); }); });
+    return l;
+  }
+  function preGrupoNome(p) { return p.tipo_consulta_id ? (p.medico_nome ? p.medico_nome + " · " : "") + (p.tipo_nome || "Tipo de consulta") : "Gerais (todas as consultas)"; }
+  function preDesenhar() {
+    var est = el("preEstado"); est.className = "pill" + (preDados.ligado ? " ok" : ""); est.textContent = preDados.ligado ? "Ligada" : "Desligada";
+    var av = el("preAviso");
+    av.textContent = preDados.ligado ? "" : "A função está desligada: por enquanto, a assistente não faz estas perguntas. Você já pode cadastrá-las.";
+    av.classList.toggle("hidden", !!preDados.ligado);
+    var box = el("preLista"); box.innerHTML = "";
+    var ps = preDados.perguntas || [];
+    if (!ps.length) { box.appendChild(h$("div", "text-sm text-slate-500", "Nenhuma pergunta cadastrada.")); return; }
+    var grupos = [], porChave = {};
+    ps.forEach(function (p) {
+      var k = p.tipo_consulta_id ? String(p.tipo_consulta_id) : "";
+      if (!porChave[k]) { porChave[k] = { nome: preGrupoNome(p), itens: [] }; grupos.push(porChave[k]); }
+      porChave[k].itens.push(p);
+    });
+    grupos.forEach(function (g) {
+      var ativas = g.itens.filter(function (p) { return p.ativo; }).length;
+      var c = h$("div", "border border-slate-200 rounded-xl p-3 bg-white");
+      var topo = h$("div", "flex items-center justify-between gap-2 mb-2");
+      topo.appendChild(h$("div", "font-semibold text-sm text-slate-900 min-w-0", g.nome));
+      topo.appendChild(h$("span", "text-xs text-slate-500 shrink-0", ativas + " de " + preDados.limite_por_tipo));
+      c.appendChild(topo);
+      g.itens.forEach(function (p) {
+        var r = h$("div", "border border-slate-200 rounded-lg px-2.5 py-2 mt-1 " + (p.ativo ? "" : "opacity-60"));
+        r.appendChild(h$("div", "text-sm text-slate-800 break-words", p.texto));
+        var info = h$("div", "flex flex-wrap items-center gap-1.5 mt-1");
+        info.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full " + (p.obrigatoria ? "bg-amber-100 text-amber-800" : "bg-slate-100 text-slate-600"), p.obrigatoria ? "OBRIGATÓRIA" : "OPCIONAL"));
+        info.appendChild(h$("span", "text-xs text-slate-500", "Ordem " + p.ordem));
+        if (!p.ativo) info.appendChild(h$("span", "text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700", "REMOVIDA"));
+        r.appendChild(info);
+        var bt = h$("div", "flex flex-wrap gap-2 mt-2");
+        if (p.ativo) {
+          bt.appendChild(agBtn("Editar", "border-slate-300 text-slate-700", function () { preFormAbrir(p); }));
+          bt.appendChild(agBtn("Remover", "border-rose-200 text-rose-700", function () {
+            if (!confirm("Remover esta pergunta? As respostas que já existem continuam na consulta.")) return;
+            preAcao("agenda_pergunta_ativo", { id: p.id, ativo: false }, function () { toast("Pergunta removida."); });
+          }));
+        } else bt.appendChild(agBtn("Reativar", "border-slate-300 text-slate-700", function () { preAcao("agenda_pergunta_ativo", { id: p.id, ativo: true }, function () { toast("Pergunta reativada ✓"); }); }));
+        r.appendChild(bt); c.appendChild(r);
+      });
+      box.appendChild(c);
+    });
+  }
+  function preFormAbrir(p) {
+    preEditando = p || null;
+    var box = el("preForm"); box.innerHTML = "";
+    var f = h$("div", "border border-slate-200 rounded-lg p-3 mt-3 bg-slate-50"), cls = "w-full border border-slate-300 rounded-lg p-2 text-sm mb-2";
+    f.appendChild(h$("div", "text-sm font-semibold text-slate-800 mb-2", p ? "Editar pergunta" : "Nova pergunta"));
+    f.appendChild(h$("label", "block text-xs text-slate-500 mb-1", "Pergunta (até " + preDados.limite_texto + " caracteres)"));
+    var tx = h$("textarea", cls); tx.maxLength = preDados.limite_texto; tx.rows = 3; tx.value = p ? p.texto : ""; f.appendChild(tx);
+    var cont = h$("div", "text-xs text-slate-400 -mt-1 mb-2 text-right"); f.appendChild(cont);
+    var conta = function () { cont.textContent = tx.value.length + " / " + preDados.limite_texto; }; tx.oninput = conta; conta();
+    f.appendChild(h$("label", "block text-xs text-slate-500 mb-1", "Vale para"));
+    var sel = h$("select", cls + " bg-white");
+    var op0 = h$("option", "", "Todas as consultas (pergunta geral)"); op0.value = ""; sel.appendChild(op0);
+    var tipos = preTipos();
+    if (p && p.tipo_consulta_id && !tipos.some(function (t) { return String(t.id) === String(p.tipo_consulta_id); }))
+      tipos.unshift({ id: p.tipo_consulta_id, nome: preGrupoNome(p) + " (removido)" });
+    tipos.forEach(function (t) { var o = h$("option", "", t.nome); o.value = String(t.id); sel.appendChild(o); });
+    sel.value = p && p.tipo_consulta_id ? String(p.tipo_consulta_id) : "";
+    f.appendChild(sel);
+    if (!preTipos().length) f.appendChild(h$("div", "text-xs text-slate-500 -mt-1 mb-2", "Para perguntas de um tipo de consulta, cadastre os tipos em cada médico, no bloco Médicos."));
+    var lo = h$("label", "flex items-start gap-2 text-sm text-slate-700 mb-2"), cb = h$("input", "mt-1"); cb.type = "checkbox"; cb.checked = !!(p && p.obrigatoria);
+    lo.appendChild(cb); lo.appendChild(h$("span", "", "Obrigatória: a consulta só é marcada com esta resposta.")); f.appendChild(lo);
+    f.appendChild(h$("label", "block text-xs text-slate-500 mb-1", "Ordem (de 0 a 99; a menor é perguntada primeiro)"));
+    var od = h$("input", cls); od.type = "number"; od.min = "0"; od.max = "99"; od.inputMode = "numeric"; od.value = p ? p.ordem : "0"; f.appendChild(od);
+    var r = h$("div", "flex gap-2");
+    r.appendChild(agBtn("Salvar", "bg-emerald-600 text-white border-emerald-600", function () {
+      var texto = tx.value.trim(), ordem = od.value.trim() === "" ? 0 : Number(od.value);
+      if (!texto) { toast("Escreva a pergunta."); return; }
+      if (!(Number.isInteger(ordem) && ordem >= 0 && ordem <= 99)) { toast("A ordem vai de 0 a 99."); return; }
+      var d = { texto: texto, tipo_consulta_id: sel.value, obrigatoria: cb.checked, ordem: ordem };
+      if (preEditando) d.id = preEditando.id;
+      preAcao("agenda_pergunta_salvar", d, function () { box.innerHTML = ""; preEditando = null; toast("Pergunta salva ✓"); });
+    }));
+    r.appendChild(agBtn("Fechar", "border-slate-300 text-slate-700", function () { box.innerHTML = ""; preEditando = null; }));
+    f.appendChild(r); box.appendChild(f); tx.focus();
+  }
+  el("preNovoBtn").addEventListener("click", function () { preFormAbrir(null); });
+
   // ===== CALENDÁRIO: DIA / SEMANA / MÊS (no fuso da clínica; datas "locais" são lidas com getUTC*) =====
   var calView = window.innerWidth < 640 ? "dia" : "semana", calDados = [], calReq = 0, PX = 48;
   function hojeLocal() { var d = fake(Date.now()); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
@@ -2317,6 +2440,7 @@ function partesTz(ms) {
       CAMPOS.forEach(function (c) { if (!c.gestao) return; var x = el("campo_" + c.key); if (!x) return; x.disabled = true; if (x.desabilitar) x.desabilitar(); });
     } else {
       el("medBox").classList.remove("hidden"); medCarregar();
+      el("preBox").classList.remove("hidden"); preCarregar();
       agChamar("agenda_documentos").then(function (rows) {
         var lim = Date.now() - 7 * 86400000;
         ESTADO.docs7 = (rows || []).filter(function (d) { return new Date(d.recebido_em).getTime() > lim; }).length;
