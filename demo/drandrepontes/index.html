@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR" data-estilo="clean-claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f4f1ea">
+<title>AG Melhor Versão · prévia para a Clínica Evoluir</title>
+<link rel="stylesheet" href="comum/ds.css">
+<style>
+  .entrada { max-width: 1180px; margin: 0 auto; padding: 72px 24px 56px; display: grid; gap: 28px; }
+  .apresenta { display: grid; justify-items: center; text-align: center; gap: 14px; }
+  .apresenta h1 { font-size: clamp(28px, 4vw, 40px); }
+  .apresenta p { max-width: 620px; }
+  .cartoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  @media (max-width: 900px) { .cartoes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .cartoes { grid-template-columns: 1fr; } }
+  .opcao { display: grid; gap: 12px; padding: 12px; text-decoration: none; color: inherit; transition: transform .2s ease; }
+  .opcao:active { transform: scale(.985); }
+  .previa { position: relative; height: 300px; border-radius: calc(var(--raio) - 6px); overflow: hidden; background: var(--fundo-2); border: 1px solid var(--linha); }
+  .previa iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: transparent; }
+  .opcao .rodape { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 4px; }
+  .opcao h2 { font-size: 17px; }
+  .opcao .abrir { font-size: 13px; font-weight: 650; color: var(--primaria); display: inline-flex; align-items: center; gap: 4px; }
+  .opcao .abrir .ic { width: 16px; height: 16px; }
+  .nota { text-align: center; font-size: 12.5px; }
+</style>
+<script src="comum/comum.js"></script>
+</head>
+<body>
+<main class="entrada">
+  <header class="apresenta entra">
+    <div id="logo"></div>
+    <h1>App e painel da Clínica Evoluir</h1>
+    <p class="mudo">Prévia visual para o Dr. André Pontes Gonçalves. Escolha o app do paciente ou o painel da clínica, em um dos três estilos. Em qualquer tela, o botão no canto de cima troca o estilo sem sair da tela.</p>
+  </header>
+  <section class="cartoes entra" id="cartoes">
+    <a class="cartao opcao" href="app/clean/" data-previa="app/?e=clean-claro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">App do paciente</span><h2>Clean</h2></div><span class="abrir">Abrir</span></div></a>
+    <a class="cartao opcao" href="app/couro/" data-previa="app/?e=couro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">App do paciente</span><h2>Couro</h2></div><span class="abrir">Abrir</span></div></a>
+    <a class="cartao opcao" href="app/cyber/" data-previa="app/?e=cyber"><div class="previa"></div><div class="rodape"><div><span class="rotulo">App do paciente</span><h2>Cyber</h2></div><span class="abrir">Abrir</span></div></a>
+    <a class="cartao opcao" href="painel/clean/" data-previa="painel/?e=clean-claro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">Painel da clínica</span><h2>Clean</h2></div><span class="abrir">Abrir</span></div></a>
+    <a class="cartao opcao" href="painel/couro/" data-previa="painel/?e=couro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">Painel da clínica</span><h2>Couro</h2></div><span class="abrir">Abrir</span></div></a>
+    <a class="cartao opcao" href="painel/cyber/" data-previa="painel/?e=cyber"><div class="previa"></div><div class="rodape"><div><span class="rotulo">Painel da clínica</span><h2>Cyber</h2></div><span class="abrir">Abrir</span></div></a>
+  </section>
+  <p class="nota fraco">Todos os dados são de exemplo. A IA é simulada: não diagnostica, não prescreve, e o app não calcula dose.</p>
+</main>
+<script>
+  // Cada cartão mostra a tela de verdade, reduzida (o app em tamanho de celular, o painel em tamanho de computador).
+  document.getElementById('logo').innerHTML = AG.logo({ tamanho: 84 });
+  document.querySelectorAll('.opcao').forEach(function (a) {
+    a.querySelector('.abrir').insertAdjacentHTML('beforeend', AG.ic('seta'));
+    var app = a.dataset.previa.indexOf('app/') === 0;
+    var w = app ? 390 : 1280, h = app ? 844 : 800;
+    var caixa = a.querySelector('.previa');
+    var f = document.createElement('iframe');
+    f.src = a.dataset.previa; f.loading = 'lazy'; f.tabIndex = -1; f.title = 'Prévia'; f.setAttribute('aria-hidden', 'true');
+    f.width = w; f.height = h; f.style.width = w + 'px'; f.style.height = h + 'px';
+    caixa.appendChild(f);
+    function ajustar() {
+      var cw = caixa.clientWidth, ch = caixa.clientHeight, s = cw / w;
+      if (app) { s = Math.min(cw / w, 0.62); f.style.left = ((cw - w * s) / 2) + 'px'; }
+      else { var alto = Math.ceil(ch / s); f.height = alto; f.style.height = alto + 'px'; }
+      f.style.transform = 'scale(' + s + ')';
+    }
+    ajustar(); window.addEventListener('resize', ajustar);
+  });
+</script>
+</body>
+</html>
