@@ -2,10 +2,9 @@
    Dados: dados.js (gerado a partir do escopo oficial) e telas.js ("ver na tela").
    Marcações (caixa, incluir · dúvida · tirar, anotações) ficam só neste aparelho (localStorage).
    Começa com todos os itens em "incluir"; "Limpar marcações" volta a esse padrão.
-   Preços: Projeto 1 aparece riscado, como desconto (não entra na soma). Projetos 2 e 3 somam por lote:
-   lote com algum item tirado mantém o preço e fica "a recalcular" (sem desconto automático); lote com todos
-   os itens tirados sai da soma; lote "preço a definir" fica fora da soma; a versão completa do app (A9 a A11)
-   é um bloco único. Itens em dúvida contam na soma, com aviso. Preços e total ficam ocultos até a senha. */
+   Sem preços: a página mostra os itens, os lotes (código novo e o antigo ao lado) e o prazo em semanas por subprojeto
+   (Projeto 1, ERP, CRM, CDX e App). Lote com algum item tirado fica "a recalcular" e continua no prazo; lote com
+   todos os itens tirados sai do prazo. Itens obrigatórios (lotes obrigatórios e o 172) não têm "Tirar". */
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, TELAS = window.TELAS_ITEM || {};
@@ -23,16 +22,19 @@
   var $ = function (id) { return document.getElementById(id); };
   document.getElementById('logo').innerHTML = A.logo({ tamanho: 54, texto: false });
   $('versao').textContent = 'Clínica Evoluir · escopo versão ' + D.versao + ' (' + D.atualizado + ') · ' + D.itens.length + ' itens';
-  $('f-projeto').innerHTML = '<option value="">Todos os projetos</option>' + Object.keys(D.projetos).map(function (p) { return '<option value="' + p + '">' + D.projetos[p] + '</option>'; }).join('');
+  // Filtro por projeto e subprojeto (Projeto 2: ERP, CRM e CDX).
+  $('f-projeto').innerHTML = '<option value="">Todos os projetos</option>' + window.CALCULO.ORDEM_SUB.map(function (k) {
+    var sp = D.subprojetos[k]; return '<option value="' + k + '">' + esc(k === 'P1' ? D.projetos[1] : 'Projeto ' + sp.projeto + ' · ' + sp.nome) + '</option>';
+  }).join('');
   function opcoesLote() {
     var p = $('f-projeto').value;
-    $('f-lote').innerHTML = '<option value="">Todos os lotes</option>' + D.lotes.filter(function (l) { return !p || String(l.projeto) === p; }).map(function (l) { return '<option value="' + l.id + '">' + esc(l.nome) + '</option>'; }).join('');
+    $('f-lote').innerHTML = '<option value="">Todos os lotes</option>' + D.lotes.filter(function (l) { return !p || l.sub === p; }).map(function (l) { return '<option value="' + l.id + '">' + esc(l.nome) + '</option>'; }).join('');
   }
   opcoesLote();
 
   function passa(i) {
     var b = $('busca').value.trim().toLowerCase(), p = $('f-projeto').value, l = $('f-lote').value, st = $('f-situacao').value;
-    if (p && String(LOTE[i.lote].projeto) !== p) return false;
+    if (p && LOTE[i.lote].sub !== p) return false;
     if (l && i.lote !== l) return false;
     if (b && !(String(i.n) === b || (i.n + ' ' + i.nome + ' ' + i.desc).toLowerCase().indexOf(b) >= 0)) return false;
     if (st === 'marcado' && !M.marcados[i.n]) return false;
@@ -42,72 +44,51 @@
     return true;
   }
   function loteParcial(id) {
-    var l = D.itens.filter(function (i) { return i.lote === id && !i.fora; }), t = l.filter(function (i) { return M.status[i.n] === 'tirar'; }).length;
-    return t === 0 ? '' : t === l.length ? 'lote retirado · fora da soma' : 'a recalcular (' + t + ' de ' + l.length + ' itens retirados)';
+    var l = D.itens.filter(function (i) { return i.lote === id; }), t = l.filter(function (i) { return M.status[i.n] === 'tirar'; }).length;
+    return t === 0 ? '' : t === l.length ? 'lote retirado · fora do prazo' : 'a recalcular (' + t + ' de ' + l.length + ' itens retirados)';
   }
 
-  // ---------- preços (a conta fica no calculo.js, usada também pelo orçamento em PDF) ----------
-  var C = window.CALCULO, P1 = C.P1, MENSAL = C.MENSAL, BLOCO_VC = C.BLOCO_VC, VC_VALOR = C.VC_VALOR, reais = C.reais;
+  // ---------- itens e prazo (a conta fica no calculo.js, usada também pelo resumo em PDF) ----------
+  var C = window.CALCULO, semanas = C.semanas;
   function conta() { return C.conta(M); }
-  function precoChip(l) {
-    if (l.projeto === 1) return '<span class="preco">no plano do Projeto 1</span>';
-    if (l.proposta) return '<span class="preco proposta">Proposta · preço a definir</span>';
-    if (!A.precoVisivel()) return '<span class="preco oculto">preço oculto</span>';
-    if (BLOCO_VC.indexOf(l.id) >= 0) return '<span class="preco">versão completa · bloco de ' + reais(VC_VALOR) + '</span>';
-    return '<span class="preco">' + esc(l.preco) + '</span>';
+  function chipsLote(l) {
+    if (l.projeto === 1) return '<span class="preco">no plano · obrigatório</span>';
+    return '<span class="preco">' + semanas(l.semanas) + '</span>' + (l.obrigatorio ? '<span class="preco">obrigatório</span>' : '') +
+      (l.proposta ? '<span class="preco proposta">proposta</span>' : '') + (l.terceiros ? '<span class="preco proposta">terceiros</span>' : '');
+  }
+  function linhaSub(s) {
+    return s.incluidos + ' de ' + s.total + ' itens · ' + (s.sub === 'P1' ? 'ativação na semana 1, em paralelo' : s.semanas ? semanas(s.semanas) + (s.semanas !== s.semanasCheias ? ' (de ' + semanas(s.semanasCheias) + ')' : '') : 'fora do prazo');
   }
   function totalHTML() {
-    if (!A.precoVisivel()) return '<section class="cartao total-escopo"><h2>Total</h2><p class="mudo">Preços ocultos para a apresentação.</p><button type="button" class="botao" data-preco="mostrar">Mostrar preços</button></section>';
-    var c = conta(), mens = [];
-    if (c.ativo[2]) mens.push(['Projeto 2 · Gestão interna', reais(MENSAL[2]) + ' + IA por consumo']);
-    if (c.ativo[3]) mens.push(['Projeto 3 · App', reais(MENSAL[3].porPaciente) + ' por paciente ativo + IA por consumo']);
-    var mensal = [c.ativo[2] ? reais(MENSAL[2]) : '', c.ativo[3] ? reais(MENSAL[3].porPaciente) + ' por paciente ativo' : ''].filter(Boolean).join(' + ');
-    return '<section class="cartao total-escopo"><div class="total-cab"><h2>Total</h2><button type="button" class="mini-botao" data-preco="ocultar">Ocultar preços</button></div>' +
+    var c = conta();
+    return '<section class="cartao total-escopo"><div class="total-cab"><h2>Itens e prazo</h2></div>' +
       '<div class="total-grade">' +
-        '<div><span class="rotulo">Implantação</span><div class="total-valor num">' + reais(c.imp) + '</div><small class="fraco">Projetos 2 e 3, lotes com preço</small></div>' +
-        '<div><span class="rotulo">Mensalidade</span><div class="total-valor num">' + (mensal || '—') + '</div><small class="fraco">' + (mens.length ? 'por mês + IA por consumo' : 'nenhum projeto incluído') + '</small></div>' +
+        '<div><span class="rotulo">Itens incluídos</span><div class="total-valor num">' + c.incluidos + ' de ' + D.itens.length + '</div><small class="fraco">' + c.tirados + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +
+        '<div><span class="rotulo">Prazo</span><div class="total-valor num">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</div><small class="fraco">' + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div>' +
       '</div>' +
-      (mens.length ? '<ul class="total-lista">' + mens.map(function (m) { return '<li><b>' + m[0] + ':</b> ' + m[1] + '</li>'; }).join('') + '</ul>' : '') +
+      '<ul class="total-lista">' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') + '</ul>' +
       '<ul class="total-lista">' +
-        '<li class="desconto"><b>Projeto 1 · Gestão Inteligente:</b> <s>' + reais(P1.implantacao) + ' de implantação</s> · <s>' + reais(P1.mensal) + ' por mês</s> <span class="selo-desconto">desconto</span></li>' +
-        (c.recalc.length ? '<li><b>A recalcular (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '. O preço continua o mesmo até ser recalculado.</li>' : '') +
-        (c.duvidas ? '<li><b>' + c.duvidas + ' item(ns) em dúvida</b> entram na soma.</li>' : '') +
-        (c.semPreco.length ? '<li><b>Fora da soma (preço a definir):</b> ' + c.semPreco.map(esc).join(', ') + '.</li>' : '') +
+        '<li><b>Etapas:</b> ' + c.etapas.map(function (e) { return 'etapa ' + e.etapa + ' · ' + esc(e.nome) + ' (' + e.prazo + ')'; }).join('; ') + '.</li>' +
+        (c.recalc.length ? '<li><b>A recalcular (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '. O lote continua inteiro no prazo.</li>' : '') +
+        (c.duvidas ? '<li><b>' + c.duvidas + ' item(ns) em dúvida</b> contam como incluídos.</li>' : '') +
+        '<li>Os valores ficam na proposta da RXSync, à parte.</li>' +
       '</ul></section>';
   }
-  function pedirSenha() {
-    var f = document.createElement('div'); f.className = 'folha-fundo';
-    f.innerHTML = '<form class="folha"><h2 style="font-size:20px">Mostrar preços</h2><p class="mudo" style="font-size:13.5px">Digite a senha. Os preços ficam visíveis só neste aparelho.</p>' +
-      '<input class="campo" type="password" name="s" autocomplete="off" aria-label="Senha dos preços">' +
-      '<div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="botao botao-claro" data-fechar>Cancelar</button><button type="submit" class="botao">Mostrar</button></div></form>';
-    document.body.appendChild(f);
-    f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
-    f.querySelector('form').addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      if (!A.liberarPrecos(String(new FormData(ev.target).get('s') || ''))) { A.log('senha-precos-errada', {}); avisoCurto('Senha incorreta.'); return; }
-      A.log('precos-liberados', {});
-      f.remove(); desenhar(); botaoPrecos(); avisoCurto('Preços visíveis neste aparelho.');
-    });
-    f.querySelector('input').focus();
-  }
-  function botaoPrecos() { $('precos').textContent = A.precoVisivel() ? 'Ocultar preços' : 'Mostrar preços'; }
-  document.addEventListener('click', function (ev) {
-    var b = ev.target.closest('[data-preco]'); if (!b) return;
-    if (b.dataset.preco === 'mostrar') pedirSenha();
-    else { A.ocultarPrecos(); A.log('precos-ocultos', {}); desenhar(); botaoPrecos(); }
-  });
 
   // ---------- desenho ----------
   function itemHTML(i) {
     var st = M.status[i.n] || '', nota = M.notas[i.n] || '', tela = TELAS[String(i.n)];
+    var opcoes = i.obrigatorio ? ['incluir', 'duvida'] : ['incluir', 'duvida', 'tirar']; // obrigatório não tem "Tirar"
     return '<div class="item-esc' + (st ? ' st-' + st : '') + '" id="item-' + i.n + '" data-n="' + i.n + '">' +
       '<input type="checkbox" aria-label="Marcar o item ' + i.n + '"' + (M.marcados[i.n] ? ' checked' : '') + ' data-acao="marcar">' +
       '<div class="cab-item"><span class="num-item">' + i.n + '</span><span class="nome-item">' + esc(i.nome) + '</span><span class="selos">' +
         (i.sempre ? '<span class="item" title="Sempre ligado">🔒 sempre ligado</span>' : '') + (i.consumo ? '<span class="item" title="IA por consumo">💲 IA por consumo</span>' : '') +
-        (i.juridico ? A.juridico('depende do parecer jurídico') : '') + (i.fora ? '<span class="item item-juridico">fora do Projeto 1</span>' : '') +
+        (i.obrigatorio ? '<span class="item" title="Obrigatório: não pode ser tirado">obrigatório</span>' : '') +
+        (i.terceiros ? '<span class="item" title="Depende de certificado, plataforma externa ou aprovação de loja">terceiros</span>' : '') +
+        (i.juridico ? A.juridico('depende do parecer jurídico') : '') +
         (LOTE[i.lote].proposta ? '<span class="item item-proposta">proposta</span>' : '') + '</span></div>' +
       '<div class="desc">' + esc(i.desc) + '</div>' +
-      '<div class="ferramentas"><span class="rapida" role="group" aria-label="Marcação rápida">' + ['incluir', 'duvida', 'tirar'].map(function (k) {
+      '<div class="ferramentas"><span class="rapida" role="group" aria-label="Marcação rápida">' + opcoes.map(function (k) {
           return '<button type="button" data-acao="status" data-st="' + k + '" aria-pressed="' + (st === k) + '">' + ST_NOME[k] + '</button>';
         }).join('') + '</span>' +
         '<button type="button" class="mini-botao' + (nota.trim() ? ' tem-nota' : '') + '" data-acao="nota">' + (nota.trim() ? 'Anotação ✓' : 'Anotar') + '</button>' +
@@ -116,17 +97,21 @@
       '</div>';
   }
   function desenhar() {
-    var h = '', proj = 0, total = 0;
+    var h = '', proj = 0, sub = '', total = 0, c = conta();
     D.lotes.forEach(function (l) {
       var its = D.itens.filter(function (i) { return i.lote === l.id && passa(i); }); if (!its.length) return;
       total += its.length;
       if (l.projeto !== proj) {
         proj = l.projeto;
-        h += '<h2 class="titulo-projeto">' + D.projetos[proj] + '</h2>' + (proj === 1 && A.precoVisivel() ? '<p class="preco-projeto"><s>' + reais(P1.implantacao) + ' de implantação · ' + reais(P1.mensal) + ' por mês</s> <span class="selo-desconto">desconto</span> Marque à vontade: o preço do Projeto 1 não muda.</p>' : '');
+        h += '<h2 class="titulo-projeto">' + esc(D.projetos[proj]) + '</h2>';
+      }
+      if (l.sub !== sub) {
+        sub = l.sub; var sp = D.subprojetos[sub] || {};
+        h += '<p class="titulo-sub"><b>' + esc(sub === 'P1' ? sp.desc : sp.nome) + '</b> · ' + linhaSub(c.subs[sub]) + '</p>';
       }
       var parc = l.projeto === 1 ? '' : loteParcial(l.id);
-      h += '<section class="cartao lote"><div class="lote-cab"><h3>' + esc(l.nome) + '</h3><div style="display:flex;gap:6px;flex-wrap:wrap">' +
-        precoChip(l) + (parc ? '<span class="recalcular">' + parc + '</span>' : '') + '</div></div>' +
+      h += '<section class="cartao lote"><div class="lote-cab"><h3>' + esc(l.nome) + (l.antigo ? ' <small class="fraco">antes ' + esc(l.antigo) + '</small>' : '') + '</h3><div style="display:flex;gap:6px;flex-wrap:wrap">' +
+        chipsLote(l) + (parc ? '<span class="recalcular">' + parc + '</span>' : '') + '</div></div>' +
         (l.nota ? '<p class="lote-nota">' + esc(l.nota) + '</p>' : '') + its.map(itemHTML).join('') + '</section>';
     });
     $('lista').innerHTML = h || '<div class="cartao vazio mudo">Nenhum item com esses filtros.</div>';
@@ -146,15 +131,15 @@
   // ---------- resumo da reunião ----------
   function linha(i) {
     var l = LOTE[i.lote], nota = (M.notas[i.n] || '').trim();
-    return '- ' + i.n + ' · ' + i.nome + ' (' + l.nome.replace(/^Lote /, 'lote ') + (A.precoVisivel() ? ' · ' + A.precoLote(l) : '') + ')' + (nota ? '\n  Anotação: ' + nota.replace(/\n+/g, ' ') : '');
+    return '- ' + i.n + ' · ' + i.nome + ' (lote ' + l.nome + ')' + (nota ? '\n  Anotação: ' + nota.replace(/\n+/g, ' ') : '');
   }
   function resumo() {
     var grupo = function (t, f) { var l = D.itens.filter(f); return t + ' (' + l.length + ')\n' + (l.length ? l.map(linha).join('\n') : '- nenhum') + '\n'; };
-    var rec = D.lotes.map(function (l) { var p = l.projeto === 1 ? '' : loteParcial(l.id); return p ? '- ' + l.nome + (A.precoVisivel() ? ' (' + l.preco + ')' : '') + ': ' + p : ''; }).filter(Boolean);
-    var c = conta(), tot = A.precoVisivel() ? 'TOTAL\n- Implantação: ' + reais(c.imp) + ' (Projetos 2 e 3)\n' +
-      (c.ativo[2] ? '- Mensalidade do Projeto 2: ' + reais(MENSAL[2]) + ' + IA por consumo\n' : '') + (c.ativo[3] ? '- Mensalidade do Projeto 3: ' + reais(MENSAL[3].porPaciente) + ' por paciente ativo + IA por consumo\n' : '') +
-      '- Projeto 1: desconto (' + reais(P1.implantacao) + ' de implantação e ' + reais(P1.mensal) + ' por mês riscados)\n' + (c.duvidas ? '- ' + c.duvidas + ' item(ns) em dúvida entram na soma\n' : '') +
-      (c.semPreco.length ? '- Fora da soma (preço a definir): ' + c.semPreco.join(', ') + '\n' : '') + '\n' : '';
+    var rec = D.lotes.map(function (l) { var p = l.projeto === 1 ? '' : loteParcial(l.id); return p ? '- ' + l.nome + ': ' + p : ''; }).filter(Boolean);
+    var c = conta(), tot = 'ITENS E PRAZO\n- Itens incluídos: ' + c.incluidos + ' de ' + D.itens.length + ' (' + c.tirados + ' tirados, ' + c.duvidas + ' em dúvida)\n' +
+      c.ordem.map(function (k) { var s = c.subs[k]; return '- ' + s.nome + ': ' + linhaSub(s) + '\n'; }).join('') +
+      '- Prazo: ' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + (c.semanasTotal !== c.semanasCheias ? ' (de ' + semanas(c.semanasCheias) + ' com tudo incluído)' : '') + '\n' +
+      c.etapas.map(function (e) { return '- Etapa ' + e.etapa + ' · ' + e.nome + ': ' + e.prazo + '\n'; }).join('') + '\n';
     return 'Reunião com o Dr. André · Clínica Evoluir\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n\n' +
       grupo('INCLUIR', function (i) { return M.status[i.n] === 'incluir'; }) + '\n' +
       grupo('DÚVIDAS', function (i) { return M.status[i.n] === 'duvida'; }) + '\n' +
@@ -162,7 +147,7 @@
       grupo('MARCADOS SEM DECISÃO', function (i) { return M.marcados[i.n] && !M.status[i.n]; }) + '\n' +
       grupo('ANOTAÇÕES EM ITENS SEM DECISÃO', function (i) { return (M.notas[i.n] || '').trim() && !M.status[i.n] && !M.marcados[i.n]; }) + '\n' +
       'LOTES A RECALCULAR (' + rec.length + ')\n' + (rec.length ? rec.join('\n') : '- nenhum') + '\n\n' + tot +
-      (A.precoVisivel() ? 'Preços: como na proposta; itens em proposta com preço a definir. Nenhum valor foi recalculado.' : 'Preços ocultos neste aparelho.');
+      'Valores: na proposta da RXSync, à parte. Nenhum valor foi recalculado.';
   }
   function avisoCurto(m) { var v = document.querySelector('.aviso-curto'); if (v) v.remove(); v = document.createElement('div'); v.className = 'aviso-curto'; v.textContent = m; document.body.appendChild(v); setTimeout(function () { v.remove(); }, 2600); }
   function mostrarResumo(texto, copiou) {
@@ -197,7 +182,8 @@
     var b = $('salvar'), c = conta();
     var corpo = JSON.stringify({ tipo: 'escopo', usuario: A.usuario(), aparelho: A.aparelho(), sessao: A.sessao(), versao: D.versao,
       marcacoes: { status: M.status, marcados: M.marcados }, anotacoes: M.notas, desligados: desligados(),
-      total: { implantacao: c.imp, recalcular: c.recalc, sem_preco: c.semPreco, duvidas: c.duvidas, projeto2: c.ativo[2], projeto3: c.ativo[3] } });
+      total: { itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, recalcular: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
+        subprojetos: c.ordem.reduce(function (o, k) { var x = c.subs[k]; o[k] = { itens: x.incluidos, de: x.total, tirados: x.tirados, semanas: x.semanas }; return o; }, {}) } });
     b.disabled = true; b.textContent = 'Enviando…';
     function fim(ok) {
       b.disabled = false; b.textContent = 'Salvar e enviar à RXSync';
@@ -217,6 +203,7 @@
   $('lista').addEventListener('click', function (ev) {
     var el = ev.target.closest('[data-acao]'); if (!el) return;
     var n = +el.closest('.item-esc').dataset.n, a = el.dataset.acao;
+    if (a === 'status' && el.dataset.st === 'tirar' && (D.itens.filter(function (i) { return i.n === n; })[0] || {}).obrigatorio) return;
     if (a === 'status') { var de = M.status[n] || ''; M.status[n] = M.status[n] === el.dataset.st ? '' : el.dataset.st; if (!M.status[n]) delete M.status[n]; A.log('escopo-marcacao', { item: n, de: de, para: M.status[n] || '' }); salvar(); desenhar(); }
     if (a === 'nota') { notaAberta[n] = !notaAberta[n]; desenhar(); var t = document.querySelector('.item-esc[data-n="' + n + '"] textarea'); if (t) t.focus(); }
   });
@@ -236,8 +223,6 @@
   });
   ['busca', 'f-lote', 'f-situacao'].forEach(function (id) { $(id).addEventListener('input', desenhar); });
   $('f-projeto').addEventListener('input', function () { opcoesLote(); desenhar(); });
-  $('precos').addEventListener('click', function () { if (A.precoVisivel()) { A.ocultarPrecos(); desenhar(); botaoPrecos(); } else pedirSenha(); });
-  botaoPrecos();
   desenhar();
 
   // escopo/#item-N (vindo do "Ver no escopo"): limpa os filtros, rola até o item e destaca.

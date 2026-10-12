@@ -84,7 +84,8 @@
       Object.keys(no).forEach(function (n) { if (no[n] !== noA[n]) mud.push('anotação no item ' + esc(n) + ': "' + esc(String(no[n]).slice(0, 200)) + '"'); });
       var t = s.total || {};
       return '<details class="versao"' + (i === esc0.length - 1 ? ' open' : '') + '><summary><b>Versão ' + (i + 1) + '</b> · ' + dh(s.quando) + ' · escopo v' + esc(s.versao) + ' · ' + (s.desligados || []).length + ' itens tirados' +
-        (t.implantacao != null ? ' · implantação R$ ' + Number(t.implantacao).toLocaleString('pt-BR') : '') + '</summary>' +
+        (t.semanas != null ? ' · prazo ' + esc(String(t.semanas).replace('.', ',')) + ' semanas' : '') +
+        (t.itens_incluidos != null ? ' · ' + esc(t.itens_incluidos) + ' itens incluídos' : '') + '</summary>' +
         (ant ? (mud.length ? '<ul>' + mud.map(function (m) { return '<li>' + m + '</li>'; }).join('') + '</ul>' : '<p class="mudo">Nada mudou em relação à versão anterior.</p>') : '<p class="mudo">Primeira versão. Itens tirados: ' + ((s.desligados || []).map(esc).join(', ') || 'nenhum') + '.</p>') + '</details>';
     }).join('') : '<p class="mudo">Nenhum escopo salvo.</p>');
     // Questionário
@@ -99,7 +100,7 @@
     var perg = meus.filter(function (e) { return e[8] === 'pergunta'; }).reverse();
     h += bloco('Perguntas nos chats', tabela(['Quando', 'Chat', 'Pergunta'], perg.map(function (e) { return [dh(e[1]), esc(det(e).chat || ''), esc(det(e).texto || '')]; })));
     // Mudanças no escopo (eventos)
-    var mudEsc = meus.filter(function (e) { return /^escopo-|^precos-|^senha-|^resumo-|^orcamento-/.test(e[8]); }).reverse();
+    var mudEsc = meus.filter(function (e) { return /^escopo-|^resumo-|^precos-|^senha-|^orcamento-/.test(e[8]); }).reverse();
     h += bloco('Mudanças no escopo', tabela(['Quando', 'O quê', 'Detalhe'], mudEsc.slice(0, 200).map(function (e) { return [dh(e[1]), esc(e[8]), resumoDetalhe(e)]; })));
     // Linha do tempo de cada sessão
     h += bloco('Linha do tempo de cada sessão', lista.length ? lista.map(function (s, i) {

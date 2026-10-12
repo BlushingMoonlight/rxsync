@@ -1,4 +1,4 @@
-/* Orçamento: página de leitura na tela e A4 limpo na impressão. */
+/* Resumo do escopo: página de leitura na tela e A4 limpo na impressão. Sem preços. */
 .orcamento { background: var(--fundo); }
 .barra-imprimir { max-width: 860px; margin: 56px auto 0; padding: 0 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .barra-imprimir p { width: 100%; font-size: 12.5px; margin: 0; }
@@ -10,6 +10,9 @@
 .indice { text-align: left; margin: 12px 0 0; padding-left: 22px; display: grid; gap: 4px; }
 .indice a { color: var(--texto); }
 .nota-capa { font-size: 12.5px; max-width: 460px; }
+.capa > * { max-width: 100%; min-width: 0; overflow-wrap: anywhere; }
+.prazos td { overflow-wrap: anywhere; }
+#doc > *, .secao > * { min-width: 0; overflow-wrap: anywhere; }
 .secao { background: var(--superficie); border: var(--cartao-borda); border-radius: var(--raio); padding: 22px; display: grid; gap: 10px; }
 .secao h2 { font-size: 20px; display: flex; gap: 10px; align-items: baseline; }
 .secao h2 .num { color: var(--primaria); font-family: var(--fonte-num); }
@@ -27,8 +30,10 @@
 .grafico .r { font-size: 13px; fill: var(--texto-2); }
 .grafico .v { font-size: 13px; font-weight: 700; fill: var(--texto); }
 .grafico .b { fill: var(--primaria); }
+.grafico .b.p0 { fill: var(--texto-3); }
+.grafico .b.p2 { fill: var(--c2, var(--primaria)); }
 .grafico .b.p3 { fill: var(--c3, var(--primaria)); }
-.grafico .b.recalc { fill: var(--alerta); }
+.grafico .b.p4 { fill: var(--c4, var(--primaria)); }
 .prazos { width: 100%; border-collapse: collapse; }
 .prazos th, .prazos td { text-align: left; padding: 8px; border-bottom: 1px solid var(--linha); }
 .rodape { text-align: center; font-size: 12px; }
@@ -40,6 +45,6 @@
   .capa, .secao { border: 0; box-shadow: none; background: #fff; padding: 0; }
   .capa { min-height: 240mm; align-content: center; break-after: page; }
   .secao { break-inside: avoid-page; padding-top: 6mm; }
-  .grafico .b { fill: #2f6b4f; } .grafico .b.p3 { fill: #3d7ea6; } .grafico .b.recalc { fill: #b7791f; }
+  .grafico .b { fill: #2f6b4f; } .grafico .b.p0 { fill: #8a8a8a; } .grafico .b.p2 { fill: #6b4f8f; } .grafico .b.p3 { fill: #3d7ea6; } .grafico .b.p4 { fill: #b7791f; }
   .grafico .r, .grafico .v { fill: #111; }
 }
