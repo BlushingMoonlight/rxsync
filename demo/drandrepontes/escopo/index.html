@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR" data-estilo="clean-claro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f4f1ea">
+<title>Escopo do projeto · Clínica Evoluir (prévia)</title>
+<link rel="stylesheet" href="../comum/ds.css">
+<link rel="stylesheet" href="escopo.css">
+<script src="../comum/comum.js"></script>
+</head>
+<body>
+<main class="pagina">
+  <header class="topo-escopo">
+    <a class="voltar-home" href="../" data-leva-estilo>‹ Início</a>
+    <div class="linha-titulo"><div id="logo"></div><div><h1>Escopo do projeto</h1><p class="mudo" id="versao"></p></div></div>
+    <p class="mudo dica-topo">Marque o que foi conversado, escolha <b>incluir</b>, <b>dúvida</b> ou <b>tirar</b> e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião".</p>
+  </header>
+
+  <section class="painel-fixo" aria-label="Contador e ações">
+    <div class="contador" id="contador"></div>
+    <div class="acoes-topo">
+      <button class="botao" type="button" id="copiar">Copiar resumo da reunião</button>
+      <button class="botao botao-claro" type="button" id="limpar">Limpar marcações</button>
+    </div>
+  </section>
+
+  <section class="filtros" aria-label="Busca e filtros">
+    <input class="campo" id="busca" type="search" placeholder="Buscar por número, nome ou descrição" autocomplete="off">
+    <select class="campo" id="f-projeto"></select>
+    <select class="campo" id="f-lote"></select>
+    <select class="campo" id="f-situacao">
+      <option value="">Todas as situações</option>
+      <option value="marcado">Marcados</option>
+      <option value="incluir">Incluir</option>
+      <option value="duvida">Dúvida</option>
+      <option value="tirar">Tirar</option>
+      <option value="nota">Com anotação</option>
+      <option value="sem">Ainda sem marcação</option>
+    </select>
+  </section>
+
+  <div id="lista" class="lista-escopo"></div>
+  <p class="nota-rodape fraco">Preço por lote como na proposta. Itens em proposta: preço a definir. Um lote com item retirado fica "a recalcular" (sem cálculo automático).</p>
+</main>
+<script src="dados.js"></script>
+<script src="telas.js"></script>
+<script src="escopo.js"></script>
+</body>
+</html>

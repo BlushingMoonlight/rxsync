@@ -1,0 +1,63 @@
+/* Escopo interativo da reunião (prévia). Usa os tokens do comum/ds.css. */
+.pagina { max-width: 1000px; margin: 0 auto; padding: 60px 16px 48px; display: grid; gap: 16px; }
+.voltar-home { font-size: 13.5px; font-weight: 600; color: var(--primaria); text-decoration: none; }
+.linha-titulo { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+.linha-titulo h1 { font-size: clamp(24px, 3.4vw, 32px); }
+.dica-topo { font-size: 13.5px; margin-top: 8px; max-width: 720px; }
+
+.painel-fixo { position: sticky; top: 52px; z-index: 20; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border-radius: var(--raio); background: var(--vidro); border: 1px solid var(--linha); box-shadow: var(--sombra);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
+.contador { display: flex; flex-wrap: wrap; gap: 6px; }
+.contador span { font-size: 12.5px; font-weight: 650; padding: 5px 10px; border-radius: 999px; background: var(--superficie-2); border: 1px solid var(--linha); }
+.contador b { font-family: var(--fonte-num); margin-right: 3px; }
+[data-estilo="cyber"] .contador span { border-radius: 2px; font-family: var(--fonte-mono); }
+.acoes-topo { display: flex; gap: 8px; flex-wrap: wrap; }
+.acoes-topo .botao { height: 38px; font-size: 13px; }
+
+.filtros { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; }
+@media (max-width: 760px) { .filtros { grid-template-columns: 1fr 1fr; } .filtros #busca { grid-column: span 2; } }
+
+.lista-escopo { display: grid; gap: 14px; }
+.titulo-projeto { font-size: 18px; margin: 10px 2px 0; }
+.lote { padding: 0; overflow: hidden; }
+.lote-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid var(--linha); }
+.lote-cab h3 { font-size: 15px; }
+.lote-cab .preco { font-size: 12.5px; font-weight: 650; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--primaria) 10%, transparent); color: var(--primaria); white-space: nowrap; }
+.lote-cab .preco.proposta { background: color-mix(in srgb, var(--info) 12%, transparent); color: var(--info); }
+.lote-cab .recalcular { font-size: 12px; font-weight: 650; padding: 4px 10px; border-radius: 999px; color: var(--alerta); background: color-mix(in srgb, var(--alerta) 12%, transparent); }
+[data-estilo="cyber"] .lote-cab .preco, [data-estilo="cyber"] .lote-cab .recalcular { border-radius: 2px; font-family: var(--fonte-mono); }
+.lote-nota { padding: 8px 16px 0; font-size: 12.5px; color: var(--texto-2); font-style: italic; }
+
+.item-esc { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; padding: 12px 16px; border-top: 1px solid var(--linha); }
+.item-esc:first-of-type { border-top: 0; }
+.item-esc.st-incluir { box-shadow: inset 3px 0 0 var(--ok); }
+.item-esc.st-duvida { box-shadow: inset 3px 0 0 var(--alerta); }
+.item-esc.st-tirar { box-shadow: inset 3px 0 0 var(--perigo); }
+.item-esc.st-tirar .nome-item { text-decoration: line-through; color: var(--texto-3); }
+.item-esc input[type=checkbox] { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--primaria); }
+.item-esc .cab-item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.item-esc .num-item { font-family: var(--fonte-num); font-weight: 700; color: var(--primaria); min-width: 30px; }
+.item-esc .nome-item { font-weight: 650; }
+.item-esc .desc { grid-column: 2; font-size: 13.5px; color: var(--texto-2); }
+.item-esc .ferramentas { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.rapida { display: inline-flex; border-radius: 999px; border: 1px solid var(--linha); overflow: hidden; }
+.rapida button { padding: 6px 12px; font-size: 12.5px; font-weight: 650; color: var(--texto-2); background: var(--superficie); }
+.rapida button + button { border-left: 1px solid var(--linha); }
+.rapida button[aria-pressed="true"][data-st="incluir"] { background: var(--ok); color: #fff; }
+.rapida button[aria-pressed="true"][data-st="duvida"] { background: var(--alerta); color: #fff; }
+.rapida button[aria-pressed="true"][data-st="tirar"] { background: var(--perigo); color: #fff; }
+[data-estilo="cyber"] .rapida { border-radius: 2px; }
+.mini-botao { padding: 6px 11px; font-size: 12.5px; font-weight: 600; border-radius: 999px; border: 1px solid var(--linha); background: var(--superficie-2); color: var(--texto-2); text-decoration: none; }
+[data-estilo="cyber"] .mini-botao { border-radius: 2px; }
+.mini-botao.tem-nota { border-color: var(--primaria); color: var(--primaria); }
+.item-esc textarea { grid-column: 2; margin-top: 6px; height: 70px; font-size: 14px; }
+.selos { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.vazio { text-align: center; padding: 30px; }
+.nota-rodape { font-size: 12px; text-align: center; }
+.folha-fundo { position: fixed; inset: 0; z-index: 80; background: rgba(10, 20, 16, .35); display: grid; place-items: center; padding: 16px; }
+.folha { width: min(620px, 100%); max-height: 90vh; overflow-y: auto; background: var(--superficie); border-radius: var(--raio-g); box-shadow: var(--sombra-g); padding: 20px; display: grid; gap: 12px; border: var(--cartao-borda); }
+.folha textarea { height: 50vh; font-family: var(--fonte-mono, ui-monospace, monospace); font-size: 12.5px; }
+.aviso-curto { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 95; max-width: min(520px, calc(100% - 32px)); padding: 12px 16px; border-radius: 14px; background: var(--texto); color: var(--fundo); font-size: 13.5px; font-weight: 600; box-shadow: var(--sombra-g); }
+@media (max-width: 760px) { .painel-fixo { position: static; } .acoes-topo { width: 100%; } .acoes-topo .botao { flex: 1; } }
+[data-estilo="couro"] .acoes-topo .botao-claro { background: var(--superficie-2); color: var(--texto); box-shadow: inset 0 0 0 1px rgba(182,148,87,.4); }
