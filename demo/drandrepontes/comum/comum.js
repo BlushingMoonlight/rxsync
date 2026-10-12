@@ -139,6 +139,43 @@
   function juridico(t) { return '<span class="item item-juridico">' + (t || 'Versão completa · depende do parecer jurídico') + '</span>'; }
   function proposta() { return '<span class="item item-proposta">proposta</span>'; }
 
+
+  // ---------- Balão de chat flutuante (app e painel) ----------
+  // AG.balao({ dentro, titulo, sub, itens, saudacao, sugestoes, responder(texto) -> [resposta, nota] })
+  // O texto digitado é sempre escapado antes de aparecer. As respostas são prontas (simuladas).
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+  function balao(o) {
+    var dentro = o.dentro || document.body, msgs = [['ela', o.saudacao, '']];
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'balao-botao'; b.setAttribute('aria-label', 'Abrir o chat: ' + o.titulo);
+    b.innerHTML = ic('ia');
+    var pnl = document.createElement('section');
+    pnl.className = 'balao-painel'; pnl.setAttribute('aria-label', o.titulo);
+    dentro.appendChild(b); dentro.appendChild(pnl);
+    function desenhar() {
+      pnl.innerHTML = '<header class="balao-cab"><span class="ic-bolha" style="--cor:var(--primaria);width:36px;height:36px;border-radius:12px">' + ic('ia') + '</span>' +
+        '<div style="flex:1;min-width:0"><b>' + o.titulo + '</b><div class="fraco" style="font-size:11.5px">' + (o.sub || '') + '</div></div>' +
+        '<button type="button" class="balao-fechar" aria-label="Fechar">✕</button></header>' +
+        '<div class="itens" style="padding:0 14px 8px">' + (o.itens || '') + '</div>' +
+        '<div class="balao-msgs chat">' + msgs.map(function (m) { return '<div class="msg ' + m[0] + '">' + m[1] + (m[2] ? '<small>' + m[2] + '</small>' : '') + '</div>'; }).join('') + '</div>' +
+        '<div class="opcoes balao-sug">' + (o.sugestoes || []).map(function (t) { return '<button type="button" data-sug="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>' +
+        '<form class="digitar balao-form"><input class="campo" placeholder="Escreva aqui" autocomplete="off" aria-label="Mensagem"><button class="botao" type="submit" aria-label="Enviar">' + ic('enviar') + '</button></form>';
+      var l = pnl.querySelector('.balao-msgs'); l.scrollTop = l.scrollHeight;
+    }
+    function enviar(t) {
+      t = String(t || '').trim(); if (!t) return;
+      msgs.push(['eu', esc(t), '']); desenhar();
+      setTimeout(function () { var r = o.responder(t); msgs.push(['ela', r[0], r[1] || '']); desenhar(); var c = pnl.querySelector('input'); if (c) c.focus(); }, 600);
+    }
+    b.addEventListener('click', function () { var abre = !pnl.classList.contains('aberto'); pnl.classList.toggle('aberto', abre); b.classList.toggle('aberto', abre); if (abre) { desenhar(); } });
+    pnl.addEventListener('click', function (ev) {
+      if (ev.target.closest('.balao-fechar')) { pnl.classList.remove('aberto'); b.classList.remove('aberto'); return; }
+      var s = ev.target.closest('[data-sug]'); if (s) enviar(s.textContent);
+    });
+    pnl.addEventListener('submit', function (ev) { ev.preventDefault(); var c = pnl.querySelector('input'); enviar(c.value); });
+    return { enviar: enviar };
+  }
+
   // ---------- Selo e botão de troca ----------
   function montarSelo() {
     if (document.querySelector('.selo-previa') || html.dataset.semSelo !== undefined) return;
@@ -171,7 +208,12 @@
       var l = new URL(a.getAttribute('href'), location.href); l.searchParams.set('e', id); a.href = l.pathname + l.search + l.hash;
     });
   }
+  // Links marcados com data-leva-estilo levam o estilo atual, mesmo os criados depois pelo JS.
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest && ev.target.closest('a[data-leva-estilo]'); if (!a) return;
+    var l = new URL(a.getAttribute('href'), location.href); l.searchParams.set('e', html.dataset.estilo); a.href = l.pathname + l.search + l.hash;
+  }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { ESTILOS: ESTILOS, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();

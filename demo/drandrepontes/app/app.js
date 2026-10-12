@@ -108,7 +108,7 @@
           '<div class="saudacao"><div class="mudo" style="font-size:13px">Terça, 13 de outubro</div><h1>Olá, ' + PACIENTE.nome + '</h1></div>' +
           '<a class="sino sem-sublinhado" href="#avisos" aria-label="Avisos">' + A.ic('sino') + '<i></i></a>' +
         '</header>' +
-        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="chip"><span class="ponto" style="background:var(--ok)"></span>' + PACIENTE.fase + '</span>' + A.novo('fase do acompanhamento') + '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="chip"><span class="ponto" style="background:var(--ok)"></span>' + PACIENTE.fase + '</span>' + A.item(155) + '</div>' +
 
         '<div><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="rotulo">Sua semana</span>' + A.item(101) + '</div>' +
         '<div class="semana">' + dias.map(function (d) {
@@ -126,12 +126,12 @@
           mini({ href: 'alimentacao', ic: 'fogo', cor: 'var(--c2)', valor: br(E.kcal), unidade: ' / 1.600 kcal', nome: 'Calorias', p: E.kcal / 1600 }) +
           mini({ href: 'alimentacao', ic: 'proteina', cor: 'var(--c1)', valor: E.prot, unidade: ' / 110 g', nome: 'Proteínas', p: E.prot / 110 }) +
           mini({ href: 'agua', ic: 'agua', cor: 'var(--c3)', valor: br(E.agua / 1000, 1), unidade: ' / 2,5 L', nome: 'Água', p: E.agua / 2500 }) +
-          mini({ href: 'sono', ic: 'sono', cor: 'var(--c4)', valor: '7h10', unidade: '', nome: 'Sono', p: .9, selo: A.novo('Apple Saúde') }) +
-          mini({ href: 'atividade', ic: 'atividade', cor: 'var(--c5)', valor: '6.420', unidade: ' passos', nome: 'Atividade', p: .64, selo: A.novo('Apple Saúde') }) +
+          mini({ href: 'sono', ic: 'sono', cor: 'var(--c4)', valor: '7h10', unidade: '', nome: 'Sono', p: .9, selo: A.item(162) }) +
+          mini({ href: 'atividade', ic: 'atividade', cor: 'var(--c5)', valor: '6.420', unidade: ' passos', nome: 'Atividade', p: .64, selo: A.item(162) }) +
           mini({ href: 'humor', ic: 'humor', cor: 'var(--c6)', valor: E.humor == null ? '—' : ['Mal', 'Baixo', 'Ok', 'Bem', 'Ótimo'][E.humor], unidade: '', nome: 'Humor', p: E.humor == null ? 0 : (E.humor + 1) / 5 }) +
         '</div>' +
 
-        cartao('<div class="cartao-titulo"><h3>Registrar</h3><span class="itens">' + A.novo('itens do Dr. André') + '</span></div>' +
+        cartao('<div class="cartao-titulo"><h3>Registrar</h3><span class="itens">' + A.item([150, 151, 152, 153, 154]) + '</span></div>' +
           '<div class="blocos">' + reg.map(function (r) { return '<a class="bloco" href="#' + r[0] + '">' + A.bolha(r[1], r[2]) + r[3] + '</a>'; }).join('') + '</div>') +
 
         cartao('<div class="cartao-titulo"><div class="linha-ic">' + A.bolha('ia', 'var(--primaria)') + '<div class="meio"><h3>Assistente da clínica</h3><div class="fraco" style="font-size:12px">IA · não substitui a equipe</div></div></div></div>' +
@@ -139,7 +139,7 @@
           '<div class="acoes" style="margin-top:10px"><a class="botao sem-sublinhado" href="#alimentacao">' + A.ic('camera') + 'Foto do prato</a><a class="botao botao-claro sem-sublinhado" href="#ia">Conversar</a></div>' +
           '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">' +
             '<div class="canal" role="group" aria-label="Canal da assistente"><button type="button" class="ativo" data-acao="canal">App</button><button type="button" data-acao="canal">WhatsApp</button></div>' +
-            '<div class="itens">' + A.item(144) + A.novo('IA ativa') + A.juridico('depende do parecer jurídico') + '</div></div>') +
+            '<div class="itens">' + A.item([144, 163, 164]) + A.juridico('depende do parecer jurídico') + '</div></div>') +
 
         cartao('<a class="linha-ic sem-sublinhado" href="#picadinha" style="color:inherit">' + A.bolha('seringa', 'var(--c1)') +
           '<div class="meio"><span class="rotulo">Próxima picadinha</span><h3>Quinta, 15/10 · 08:00</h3>' +
@@ -210,7 +210,7 @@
         cartao('<div class="cartao-titulo"><h3>Lembrete de água</h3>' + A.item(132) + '</div><div class="linha-ic"><div class="meio mudo" style="font-size:13.5px">A cada 2 horas, das 8h às 20h</div><span class="chave on"></span></div>') + ficha();
     },
     sono: function () {
-      return sub('sono', 'Sono', A.item(115) + A.novo('Apple Saúde / Google')) +
+      return sub('sono', 'Sono', A.item(115) + A.item(162)) +
         cartao('<span class="rotulo">Última noite</span><div class="num" style="font-size:40px;font-weight:700;margin:4px 0">7h10</div><p class="mudo">23:40 → 06:50 · veio do Apple Saúde</p>') +
         cartao('<div class="cartao-titulo"><h3>Como você dormiu?</h3></div>' + escala(5, ['😣', '😕', '😐', '🙂', '😴'], 3, 'marca', 'rosto')) +
         cartao('<div class="cartao-titulo"><h3>Horas por noite</h3></div>' + grafico('sono', [6.5, 7, 6.2, 7.4, 6.8, 7.5, 7.2], ['qua', 'qui', 'sex', 'sáb', 'dom', 'seg', 'ter'], 'h', 1)) + ficha();
@@ -223,19 +223,19 @@
         botaoSalvar() + '<p class="fraco" style="font-size:12px;text-align:center">Se a nota pedir atenção, a Maria Clara (psicóloga) é avisada.</p>' + ficha();
     },
     atividade: function () {
-      return sub('atividade', 'Atividade física', A.item(116) + A.novo('Apple Saúde / Google')) +
+      return sub('atividade', 'Atividade física', A.item(116) + A.item(162)) +
         cartao('<div class="cartao-titulo"><h3>Passos de hoje</h3><span class="chip" style="padding:4px 8px">' + A.ic('link') + 'Apple Saúde</span></div><div class="num" style="font-size:40px;font-weight:700">6.420</div><div class="barra" style="--cor:var(--c5);margin-top:8px"><i style="width:64%"></i></div><p class="fraco" style="font-size:12px;margin-top:6px">Meta: 10.000 passos</p>') +
         cartao('<div class="cartao-titulo"><h3>Registrar exercício</h3></div>' + opcoes(['Caminhada', 'Musculação', 'Corrida', 'Bicicleta', 'Pilates', 'Outro'], 'marca', [1]) +
           '<div style="margin-top:12px"><span class="rotulo">Duração</span>' + opcoes(['20 min', '30 min', '45 min', '1 h'], 'marca', [2]) + '</div>') + botaoSalvar() + ficha();
     },
     fome: function () {
-      return sub('fome', 'Fome e saciedade', A.novo()) +
+      return sub('fome', 'Fome e saciedade', A.item(150)) +
         cartao('<div class="cartao-titulo"><h3>Fome antes de comer</h3></div>' + escala(6, ['0', '2', '4', '6', '8', '10'], 3, 'marca') + '<div style="display:flex;justify-content:space-between;margin-top:6px" class="fraco"><small>sem fome</small><small>muita fome</small></div>') +
         cartao('<div class="cartao-titulo"><h3>Saciedade depois</h3></div>' + escala(6, ['0', '2', '4', '6', '8', '10'], 4, 'marca') + '<div style="display:flex;justify-content:space-between;margin-top:6px" class="fraco"><small>ainda com fome</small><small>muito cheia</small></div>') +
         cartao('<div class="cartao-titulo"><h3>Qual refeição?</h3></div>' + opcoes(['Café', 'Lanche', 'Almoço', 'Lanche da tarde', 'Jantar', 'Beliscou'], 'marca', [2])) + botaoSalvar() + ficha();
     },
     intestino: function () {
-      return sub('intestino', 'Intestino', A.novo()) +
+      return sub('intestino', 'Intestino', A.item(151)) +
         cartao('<div class="cartao-titulo"><h3>Hoje</h3></div>' + opcoes(['Não evacuei', '1 vez', '2 vezes', '3 ou mais'], 'marca', [1])) +
         cartao('<div class="cartao-titulo"><h3>Como estava?</h3><span class="fraco" style="font-size:12px">escala de 1 a 7</span></div>' +
           escala(7, ['1', '2', '3', '4', '5', '6', '7'], 3, 'marca') + '<div style="display:flex;justify-content:space-between;margin-top:6px" class="fraco"><small>muito duro</small><small>líquido</small></div>') +
@@ -243,14 +243,14 @@
         '<p class="fraco" style="font-size:12px;text-align:center">Mais de 3 dias sem evacuar ou sangue avisam a enfermagem.</p>' + ficha();
     },
     substancias: function () {
-      return sub('substancias', 'Álcool, tabaco e outras', A.novo()) +
+      return sub('substancias', 'Álcool, tabaco e outras', A.item(152)) +
         cartao('<div class="cartao-titulo"><h3>' + 'Álcool hoje' + '</h3>' + A.ic('copo', 'fraco') + '</div>' + opcoes(['Nada', '1 dose', '2 doses', '3 ou mais'], 'marca', [0])) +
         cartao('<div class="cartao-titulo"><h3>Tabaco ou cigarro eletrônico</h3>' + A.ic('cigarro', 'fraco') + '</div>' + opcoes(['Não uso', 'Menos de 5', '5 a 10', 'Mais de 10'], 'marca', [0])) +
         cartao('<div class="cartao-titulo"><h3>Outras substâncias</h3>' + A.ic('cadeado', 'fraco') + '</div><textarea class="campo" placeholder="Só a equipe que cuida de você vê"></textarea>') +
         botaoSalvar() + '<p class="fraco" style="font-size:12px;text-align:center">Sem julgamento: ajuda a equipe a cuidar melhor de você.</p>' + ficha();
     },
     medicamentos: function () {
-      return sub('medicamentos', 'Remédios e vitaminas', A.novo()) +
+      return sub('medicamentos', 'Remédios e vitaminas', A.item(153)) +
         cartao('<div class="cartao-titulo"><h3>Uso diário</h3><span class="fraco" style="font-size:12px">cadastrado pela clínica</span></div>' +
           '<div class="lista-menu" style="padding:0">' +
           tomar('Remédio de uso diário (exemplo)', '1 comprimido · café da manhã', true) + tomar('Vitamina D (exemplo)', '1 cápsula · almoço', false) + tomar('Ômega 3 (exemplo)', '1 cápsula · jantar', false) + '</div>') +
@@ -269,7 +269,7 @@
     ciclo: function () {
       var d = '';
       for (var i = 1; i <= 28; i++) d += '<span style="display:grid;place-items:center;height:30px;border-radius:9px;font-size:12px;font-weight:600;' + (i <= 5 ? 'background:color-mix(in srgb,var(--c6) 22%,transparent);color:var(--c6)' : (i >= 12 && i <= 16 ? 'background:color-mix(in srgb,var(--c3) 16%,transparent)' : 'background:var(--superficie-2)')) + (i === 9 ? ';outline:2px solid var(--primaria)' : '') + '">' + i + '</span>';
-      return sub('ciclo', 'Ciclo menstrual', A.novo()) +
+      return sub('ciclo', 'Ciclo menstrual', A.item(154)) +
         cartao('<span class="rotulo">Dia 9 do ciclo</span><h2 style="font-size:22px;margin:4px 0">Próxima menstruação em ~19 dias</h2><p class="mudo" style="font-size:13px">Estimativa a partir dos seus registros. Não é método contraceptivo.</p>') +
         cartao('<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">' + d + '</div>' +
           '<div style="display:flex;gap:14px;margin-top:10px;font-size:12px" class="mudo"><span><span class="ponto" style="background:var(--c6)"></span> menstruação</span><span><span class="ponto" style="background:var(--c3)"></span> período fértil estimado</span></div>') +
@@ -286,7 +286,7 @@
     // ===== IA, avisos, consultas, comunidade =====
     ia: function () {
       if (!E.chat) E.chat = [['ela', 'Oi, Marina! Sou a assistente da Clínica Evoluir. Respondo com base nas orientações do Dr. André e da equipe. Não faço diagnóstico nem mudo seu tratamento. Como posso ajudar?']];
-      return sub('ia', 'Assistente da clínica', A.item([143, 144]) + A.novo('IA ativa') + A.juridico()) +
+      return sub('ia', 'Assistente da clínica', A.item([143, 144]) + A.item([163, 164]) + A.juridico()) +
         '<div class="canal" role="group" style="justify-self:start"><button type="button" class="ativo" data-acao="canal">No app</button><button type="button" data-acao="canal">No WhatsApp</button></div>' +
         '<div class="chat" id="chat">' + E.chat.map(function (m) { return '<div class="msg ' + m[0] + '">' + m[1] + (m[2] ? '<small>' + m[2] + '</small>' : '') + '</div>'; }).join('') + '</div>' +
         '<div class="opcoes">' + ['Posso comer pão à noite?', 'Estou enjoada', 'Posso aumentar a dose?', 'Esqueci a picadinha'].map(function (t) { return '<button type="button" data-acao="perguntar" data-v="' + t + '">' + t + '</button>'; }).join('') + '</div>' +
@@ -302,7 +302,7 @@
     },
     consultas: function () {
       var slots = ['Ter, 20/10 · 09:30', 'Qua, 21/10 · 14:00', 'Qui, 22/10 · 10:30', 'Sex, 23/10 · 08:30'];
-      return sub('consultas', 'Minhas consultas', A.item(130) + A.novo('marcar e remarcar no app')) +
+      return sub('consultas', 'Minhas consultas', A.item(130) + A.item(158)) +
         cartao('<span class="rotulo">Próxima</span><h2 style="font-size:21px;margin:4px 0">' + E.consulta + '</h2><p class="mudo">Retorno com o Dr. André · presencial · Clínica Evoluir</p>' +
           '<div class="acoes" style="margin-top:12px"><button class="botao" type="button" data-acao="aviso" data-msg="Presença confirmada. Até lá!">Confirmar presença</button><button class="botao botao-claro" type="button" data-acao="remarcar">Remarcar</button></div>' +
           '<div id="slots" class="' + (E.slot === 'abrir' ? '' : 'oculto') + '" style="margin-top:12px"><span class="rotulo">Horários livres do Dr. André</span>' +
@@ -376,7 +376,7 @@
 
     // ===== Equipe =====
     equipe: function () {
-      return '<header class="cab" style="padding-right:40px"><h1 style="font-size:24px">Equipe</h1></header><div class="cab-itens">' + A.novo('contatos e redes') + '</div>' +
+      return '<header class="cab" style="padding-right:40px"><h1 style="font-size:24px">Equipe</h1></header><div class="cab-itens">' + A.item(156) + '</div>' +
         '<div class="lista-menu cartao" style="padding:4px 16px">' +
           linMenu('chat', 'chat', 'var(--primaria)', 'Falar com a equipe', 'a resposta chega citada, sem alteração', A.item(60)) +
           linMenu('ia', 'ia', 'var(--c4)', 'Assistente da clínica (IA)', 'dúvidas do dia a dia', A.item(143)) +
@@ -391,7 +391,7 @@
     chat: function () {
       if (!E.chatEquipe) E.chatEquipe = [['eu', 'Thaís, tive um pouco de enjoo ontem depois da aplicação. É normal?', 'seg 09:40'],
         ['ela', '<blockquote>Thaís, tive um pouco de enjoo ontem depois da aplicação. É normal?</blockquote>"Oi Marina! Pode acontecer nos primeiros dias. Coma devagar, em porções menores, e me avise se piorar ou se vomitar."<small>Thaís · enfermagem · enviado pela clínica, sem alteração</small>', 'seg 10:22']];
-      return sub('chat', 'Equipe da clínica', A.item([58, 59, 60]) + A.novo('chat com a equipe')) +
+      return sub('chat', 'Equipe da clínica', A.item([58, 59, 60]) + A.item(157)) +
         '<p class="fraco" style="font-size:12px">A IA encaminha para a pessoa certa. A resposta chega citada, entre aspas e sem alteração.</p>' +
         '<div class="chat">' + E.chatEquipe.map(function (m) { return '<div class="msg ' + m[0] + '">' + m[1] + (m[0] === 'eu' && m[2] ? '<small>' + m[2] + '</small>' : '') + '</div>'; }).join('') + '</div>' +
         '<div class="digitar"><input class="campo" id="msg-equipe" placeholder="Escreva para a equipe" autocomplete="off"><button class="botao" type="button" data-acao="enviar-equipe" aria-label="Enviar">' + A.ic('enviar') + '</button></div>';
@@ -399,7 +399,7 @@
     revistas: function () {
       var r = [['Nutrição', 'Proteína no café da manhã: por que ajuda na saciedade', 'Felipe · 4 min', 'var(--c2)'], ['Psicologia', 'Fome emocional: como perceber e o que fazer', 'Maria Clara · 6 min', 'var(--c6)'],
         ['Medicina', 'O que esperar nas primeiras semanas de tratamento', 'Dr. André · 5 min', 'var(--c1)'], ['Receita', 'Omelete de forno com legumes', 'Felipe · vídeo 3 min', 'var(--c5)']];
-      return sub('revistas', 'Revistas e conteúdo', A.item(133) + A.novo('revistas')) +
+      return sub('revistas', 'Revistas e conteúdo', A.item(133)) +
         '<div class="opcoes">' + ['Todas', 'Nutrição', 'Psicologia', 'Medicina', 'Receitas', 'Vídeos'].map(function (t, i) { return '<button type="button" data-acao="marca" class="' + (i ? '' : 'sel') + '">' + t + '</button>'; }).join('') + '</div>' +
         r.map(function (x) {
           return cartao('<div style="height:96px;border-radius:12px;margin:-4px -4px 12px;background:linear-gradient(135deg,color-mix(in srgb,' + x[3] + ' 30%,transparent),color-mix(in srgb,' + x[3] + ' 8%,transparent));display:grid;place-items:center">' + A.bolha('revista', x[3]) + '</div>' +
@@ -415,15 +415,15 @@
           '<p class="fraco" style="font-size:12px;margin-top:10px">' + A.ic('escudo') + ' Tudo sincronizado. O app funciona sem internet e envia quando o sinal volta ' + A.item(100) + '</p>') +
         grupo('Saúde', [
           ['corpo', 'perfil', 'var(--c1)', 'Perfil corporal', 'altura, biotipo, objetivo', A.item(96)],
-          ['metas', 'trofeu', 'var(--c2)', 'Metas e hábitos da equipe', 'o que a clínica pediu para você', A.item(112) + A.novo()],
+          ['metas', 'trofeu', 'var(--c2)', 'Metas e hábitos da equipe', 'o que a clínica pediu para você', A.item(112) + A.item(161)],
           ['conquistas', 'trofeu', 'var(--c5)', 'Conquistas e sequência', '9 dias seguidos', A.item([137, 138])],
           ['documentos', 'documento', 'var(--c3)', 'Relatórios e exames', '', A.item([121, 136])],
           ['fotos', 'camera', 'var(--c4)', 'Fotos de progresso', 'privadas', A.item(122)]]) +
         grupo('App', [
-          ['lembretes', 'relogio', 'var(--c3)', 'Lembretes', 'água, remédios, picadinha, registros', A.item(132) + A.novo()],
-          ['integracoes', 'link', 'var(--c1)', 'Apple Saúde, Google e balança', 'passos, sono e peso', A.novo() + A.item(119)],
+          ['lembretes', 'relogio', 'var(--c3)', 'Lembretes', 'água, remédios, picadinha, registros', A.item(132) + A.item(160)],
+          ['integracoes', 'link', 'var(--c1)', 'Apple Saúde, Google e balança', 'passos, sono e peso', A.item(162) + A.item(119)],
           ['acessibilidade', 'letra', 'var(--c4)', 'Letra grande e modo escuro', '', A.item(105)],
-          ['pagamentos', 'cartao', 'var(--c5)', 'Pagamentos', 'Pix e cartão', A.novo()]]) +
+          ['pagamentos', 'cartao', 'var(--c5)', 'Pagamentos', 'Pix e cartão', A.item(159)]]) +
         grupo('Privacidade e conta', [
           ['dados', 'cadeado', 'var(--c6)', 'Meus dados (LGPD)', 'baixar ou pedir exclusão', A.item(98)],
           ['consentimento', 'escudo', 'var(--c1)', 'Termo de uso e aviso de IA', 'aceito em 01/09/2026', A.item(97)],
@@ -437,23 +437,23 @@
         cartao('<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campoNum('Altura (cm)', '165') + campoNum('Peso inicial (kg)', '84,0') + campoNum('Cintura inicial (cm)', '94') + campoNum('Idade', '41') + '</div>') +
         cartao('<div class="cartao-titulo"><h3>Biotipo</h3></div>' + opcoes(['Ectomorfo', 'Mesomorfo', 'Endomorfo'], 'marca', [2])) +
         cartao('<div class="cartao-titulo"><h3>Objetivo</h3></div>' + opcoes(['Perder peso', 'Ganhar massa', 'Manter', 'Saúde em geral'], 'marca', [0])) +
-        cartao('<div class="cartao-titulo"><h3>Fase do acompanhamento</h3>' + A.novo() + '</div>' + opcoes(['1 · Início', '2 · Perda de peso', '3 · Desmame', '4 · Manutenção'], 'marca', [1]) +
+        cartao('<div class="cartao-titulo"><h3>Fase do acompanhamento</h3>' + A.item(155) + '</div>' + opcoes(['1 · Início', '2 · Perda de peso', '3 · Desmame', '4 · Manutenção'], 'marca', [1]) +
           '<p class="fraco" style="font-size:12px;margin-top:8px">Definida pelo Dr. André. Muda o que o app pede e lembra.</p>') + botaoSalvar('Salvar');
     },
     metas: function () {
-      return sub('metas', 'Metas e hábitos', A.item(112) + A.novo('hábitos prescritos')) +
+      return sub('metas', 'Metas e hábitos', A.item(112) + A.item(161)) +
         cartao('<div class="cartao-titulo"><h3>Metas do dia</h3>' + A.item(112) + '</div>' + meta('Calorias', E.kcal, 1600, 'kcal', 'var(--c2)') + '<div style="height:10px"></div>' + meta('Proteína', E.prot, 110, 'g', 'var(--c1)') + '<div style="height:10px"></div>' + meta('Água', E.agua, 2500, 'ml', 'var(--c3)')) +
         cartao('<div class="cartao-titulo"><h3>Hábitos pedidos pela equipe</h3></div><div class="lista-menu" style="padding:0">' +
           habito('Caminhar 30 min, 5 vezes por semana', 'Dr. André', true) + habito('Proteína em todas as refeições', 'Felipe', true) + habito('Respirar 5 min antes de dormir', 'Maria Clara', false) + habito('Dormir antes das 23h30', 'Dr. André', false) + '</div>');
     },
     lembretes: function () {
       var l = [['Água', 'a cada 2 h, das 8h às 20h', 1], ['Remédios', 'na hora de cada um', 1], ['Picadinha', 'quinta 07:00 e 08:00', 1], ['Registrar refeições', '12:30 e 20:00', 1], ['Humor', '21:00', 0], ['Consulta', '1 dia antes', 1]];
-      return sub('lembretes', 'Lembretes', A.item(132) + A.novo()) + cartao('<div class="lista-menu" style="padding:0">' + l.map(function (x) {
+      return sub('lembretes', 'Lembretes', A.item(132) + A.item(160)) + cartao('<div class="lista-menu" style="padding:0">' + l.map(function (x) {
         return '<div class="lin-menu">' + A.bolha('relogio', 'var(--c3)') + '<span class="meio"><b>' + x[0] + '</b><small>' + x[1] + '</small></span><button type="button" class="chave' + (x[2] ? ' on' : '') + '" data-acao="chave" aria-label="Ligar ou desligar"></button></div>';
       }).join('') + '</div>');
     },
     integracoes: function () {
-      return sub('integracoes', 'Apple Saúde, Google e balança', A.novo() + A.item(119)) +
+      return sub('integracoes', 'Apple Saúde, Google e balança', A.item(162) + A.item(119)) +
         cartao('<div class="lista-menu" style="padding:0">' +
           '<div class="lin-menu">' + A.bolha('atividade', 'var(--c6)') + '<span class="meio"><b>Apple Saúde</b><small>passos e sono · ligado</small></span><button type="button" class="chave on" data-acao="chave"></button></div>' +
           '<div class="lin-menu">' + A.bolha('globo', 'var(--c3)') + '<span class="meio"><b>Google (Health Connect)</b><small>para Android</small></span><button type="button" class="chave" data-acao="chave"></button></div>' +
@@ -469,7 +469,7 @@
         cartao('<span class="rotulo">Exemplo</span><p style="margin-top:6px">Olá, Marina! Este é o tamanho do texto com a opção escolhida.</p>');
     },
     pagamentos: function () {
-      return sub('pagamentos', 'Pagamentos', A.novo() + A.item(87)) +
+      return sub('pagamentos', 'Pagamentos', A.item(159) + A.item(87)) +
         cartao('<span class="rotulo">Em aberto</span><h2 style="font-size:24px;margin:4px 0" class="num">R$ 650,00</h2><p class="mudo">Programa trimestral · parcela 2 de 3 · vence 20/10 (valores de exemplo)</p>' +
           '<div class="acoes" style="margin-top:12px"><button class="botao" type="button" data-acao="aviso" data-msg="Pix copia e cola copiado (exemplo).">Pagar com Pix</button><button class="botao botao-claro" type="button" data-acao="aviso" data-msg="Abre o pagamento com cartão (exemplo).">' + A.ic('cartao') + 'Cartão</button></div>', 'cartao-destaque') +
         cartao('<div class="cartao-titulo"><h3>Pagos</h3></div><table class="tabela"><tr><td>Parcela 1 de 3 · Pix</td><td>R$ 650,00</td></tr><tr><td>Consulta inicial · cartão</td><td>R$ 450,00</td></tr></table>') +
@@ -633,6 +633,11 @@
     document.getElementById('abas').innerHTML = ABAS.map(function (a) {
       return '<a class="aba" href="#' + a.id + '" data-tela="' + a.id + '">' + A.ic(a.ic) + a.nome + '</a>';
     }).join('');
+    // Balão da assistente em todas as telas (itens 143 e 163): mesmas respostas prontas e mesmas regras do #ia.
+    A.balao({ dentro: document.querySelector('.aparelho'), titulo: 'Assistente da clínica', sub: 'IA · não substitui a equipe',
+      itens: A.item([143, 163]) + A.juridico('depende do parecer jurídico'),
+      saudacao: 'Oi, Marina! Respondo com base nas orientações do Dr. André e da equipe. Não faço diagnóstico, não prescrevo e não falo de dose.',
+      sugestoes: ['Posso comer pão à noite?', 'Estou enjoada', 'Posso aumentar a dose?'], responder: respostaIA });
     window.addEventListener('hashchange', function () { render(false); });
     document.addEventListener('estilo', function () { if ((location.hash || '').slice(1) === 'acessibilidade') render(true); });
     render(false);

@@ -8,62 +8,73 @@
 <title>AG Melhor Versão · prévia para a Clínica Evoluir</title>
 <link rel="stylesheet" href="comum/ds.css">
 <style>
-  .entrada { max-width: 1180px; margin: 0 auto; padding: 72px 24px 56px; display: grid; gap: 28px; }
-  .apresenta { display: grid; justify-items: center; text-align: center; gap: 14px; }
-  .apresenta h1 { font-size: clamp(28px, 4vw, 40px); }
-  .apresenta p { max-width: 620px; }
-  .cartoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-  @media (max-width: 900px) { .cartoes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 560px) { .cartoes { grid-template-columns: 1fr; } }
-  .opcao { display: grid; gap: 12px; padding: 12px; text-decoration: none; color: inherit; transition: transform .2s ease; }
-  .opcao:active { transform: scale(.985); }
-  .previa { position: relative; height: 300px; border-radius: calc(var(--raio) - 6px); overflow: hidden; background: var(--fundo-2); border: 1px solid var(--linha); }
-  .previa iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: transparent; }
-  .opcao .rodape { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 4px; }
-  .opcao h2 { font-size: 17px; }
-  .opcao .abrir { font-size: 13px; font-weight: 650; color: var(--primaria); display: inline-flex; align-items: center; gap: 4px; }
-  .opcao .abrir .ic { width: 16px; height: 16px; }
-  .nota { text-align: center; font-size: 12.5px; }
+  .home { max-width: 1040px; margin: 0 auto; min-height: 100vh; padding: 72px 20px 40px; display: grid; gap: 28px; align-content: center; }
+  .cartao-visita { display: grid; justify-items: center; text-align: center; gap: 10px; }
+  .cartao-visita h1 { font-size: clamp(26px, 4vw, 36px); }
+  .cartao-visita p { max-width: 520px; }
+  .portas { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .portas { grid-template-columns: 1fr; } }
+  .porta { display: flex; flex-direction: column; gap: 14px; padding: 14px; }
+  .porta .previa { position: relative; flex: 1; min-height: 320px; border-radius: calc(var(--raio) - 6px); overflow: hidden; background: var(--fundo-2); border: 1px solid var(--linha); display: block; }
+  .porta iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; pointer-events: none; }
+  .porta .rodape { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px; flex-wrap: wrap; }
+  .porta h2 { font-size: 20px; }
+  .porta .botao { text-decoration: none; }
+  .quem-lista { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 4px 4px; }
+  .quem-lista a { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: var(--superficie-2); border: 1px solid var(--linha); text-decoration: none; color: var(--texto); font-size: 13px; font-weight: 600; }
+  .quem-lista a:active { transform: scale(.97); }
+  .quem-lista .ini { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; }
+  [data-estilo="cyber"] .quem-lista a, [data-estilo="cyber"] .quem-lista .ini { border-radius: 3px; }
+  .rodape-home { text-align: center; font-size: 12px; }
 </style>
 <script src="comum/comum.js"></script>
 </head>
 <body>
-<main class="entrada">
-  <header class="apresenta entra">
+<main class="home">
+  <header class="cartao-visita entra">
     <div id="logo"></div>
-    <h1>App e painel da Clínica Evoluir</h1>
-    <p class="mudo">Prévia visual para o Dr. André Pontes Gonçalves. Escolha o app do paciente ou o painel da clínica, em um dos três estilos. Em qualquer tela, o botão no canto de cima troca o estilo sem sair da tela.</p>
+    <h1>AG Melhor Versão</h1>
+    <p class="mudo">Clínica Evoluir · Dr. André Pontes Gonçalves</p>
   </header>
-  <section class="cartoes entra" id="cartoes">
-    <a class="cartao opcao" href="app/clean/" data-previa="app/?e=clean-claro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">App do paciente</span><h2>Clean</h2></div><span class="abrir">Abrir</span></div></a>
-    <a class="cartao opcao" href="app/couro/" data-previa="app/?e=couro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">App do paciente</span><h2>Couro</h2></div><span class="abrir">Abrir</span></div></a>
-    <a class="cartao opcao" href="app/cyber/" data-previa="app/?e=cyber"><div class="previa"></div><div class="rodape"><div><span class="rotulo">App do paciente</span><h2>Cyber</h2></div><span class="abrir">Abrir</span></div></a>
-    <a class="cartao opcao" href="painel/clean/" data-previa="painel/?e=clean-claro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">Painel da clínica</span><h2>Clean</h2></div><span class="abrir">Abrir</span></div></a>
-    <a class="cartao opcao" href="painel/couro/" data-previa="painel/?e=couro"><div class="previa"></div><div class="rodape"><div><span class="rotulo">Painel da clínica</span><h2>Couro</h2></div><span class="abrir">Abrir</span></div></a>
-    <a class="cartao opcao" href="painel/cyber/" data-previa="painel/?e=cyber"><div class="previa"></div><div class="rodape"><div><span class="rotulo">Painel da clínica</span><h2>Cyber</h2></div><span class="abrir">Abrir</span></div></a>
+
+  <section class="portas entra">
+    <article class="cartao porta">
+      <a class="previa" href="app/" data-leva-estilo data-previa="app/" aria-label="Abrir o app do paciente"></a>
+      <div class="rodape"><div><span class="rotulo">Para o paciente</span><h2>App do paciente</h2></div><a class="botao" href="app/" data-leva-estilo>Abrir o app</a></div>
+    </article>
+    <article class="cartao porta">
+      <a class="previa" href="painel/" data-leva-estilo data-previa="painel/" aria-label="Abrir o painel da clínica"></a>
+      <div class="rodape"><div><span class="rotulo">Para a equipe</span><h2>Painel da clínica</h2></div><a class="botao" href="painel/?quem=andre" data-leva-estilo>Abrir o painel</a></div>
+      <div><span class="rotulo" style="display:block;padding:0 4px 8px">Entrar como</span><div class="quem-lista" id="quem"></div></div>
+    </article>
   </section>
-  <p class="nota fraco">Todos os dados são de exemplo. A IA é simulada: não diagnostica, não prescreve, e o app não calcula dose.</p>
+
+  <p class="rodape-home fraco">Prévia com dados de exemplo. A IA é simulada: não diagnostica, não prescreve e o app não calcula dose. O estilo muda pelo botão do canto.</p>
 </main>
 <script>
-  // Cada cartão mostra a tela de verdade, reduzida (o app em tamanho de celular, o painel em tamanho de computador).
-  document.getElementById('logo').innerHTML = AG.logo({ tamanho: 84 });
-  document.querySelectorAll('.opcao').forEach(function (a) {
-    a.querySelector('.abrir').insertAdjacentHTML('beforeend', AG.ic('seta'));
-    var app = a.dataset.previa.indexOf('app/') === 0;
-    var w = app ? 390 : 1280, h = app ? 844 : 800;
-    var caixa = a.querySelector('.previa');
-    var f = document.createElement('iframe');
-    f.src = a.dataset.previa; f.loading = 'lazy'; f.tabIndex = -1; f.title = 'Prévia'; f.setAttribute('aria-hidden', 'true');
-    f.width = w; f.height = h; f.style.width = w + 'px'; f.style.height = h + 'px';
-    caixa.appendChild(f);
-    function ajustar() {
-      var cw = caixa.clientWidth, ch = caixa.clientHeight, s = cw / w;
-      if (app) { s = Math.min(cw / w, 0.62); f.style.left = ((cw - w * s) / 2) + 'px'; }
-      else { var alto = Math.ceil(ch / s); f.height = alto; f.style.height = alto + 'px'; }
-      f.style.transform = 'scale(' + s + ')';
-    }
-    ajustar(); window.addEventListener('resize', ajustar);
-  });
+  document.getElementById('logo').innerHTML = AG.logo({ tamanho: 92 });
+  // Entrar como (item 169): o painel abre na tela de cada pessoa, com o menu do que é dela.
+  var EQUIPE = [['andre', 'Dr. André', 'AG', 'var(--c1)'], ['emanuele', 'Emanuele', 'EM', 'var(--c5)'], ['felipe', 'Felipe', 'FE', 'var(--c2)'], ['mariaclara', 'Maria Clara', 'MC', 'var(--c6)'],
+    ['eduarda', 'Eduarda', 'ED', 'var(--c4)'], ['thais', 'Thaís', 'TH', 'var(--c3)'], ['elenice', 'Elenice', 'EL', 'var(--c1)']];
+  document.getElementById('quem').innerHTML = EQUIPE.map(function (p) {
+    return '<a href="painel/?quem=' + p[0] + '" data-leva-estilo><span class="ini" style="background:' + p[3] + '">' + p[2] + '</span>' + p[1] + '</a>';
+  }).join('');
+  // Prévias: a tela de verdade, reduzida, no estilo atual da página.
+  var caixas = [].slice.call(document.querySelectorAll('.previa'));
+  function previas() {
+    caixas.forEach(function (c) {
+      var app = c.dataset.previa === 'app/', w = app ? 390 : 1280, h = app ? 844 : 800;
+      var f = c.querySelector('iframe');
+      if (!f) { f = document.createElement('iframe'); f.tabIndex = -1; f.title = 'Prévia'; f.setAttribute('aria-hidden', 'true'); f.loading = 'lazy'; c.appendChild(f); }
+      var src = c.dataset.previa + '?e=' + AG.estilo() + (app ? '' : '&quem=andre');
+      if (f.getAttribute('src') !== src) f.setAttribute('src', src);
+      var cw = c.clientWidth, ch = c.clientHeight, s;
+      if (app) { s = Math.min(ch / h * 1.35, cw / w, .62); f.style.left = ((cw - w * s) / 2) + 'px'; }
+      else { s = cw / w; h = Math.ceil(ch / s); }
+      f.width = w; f.height = h; f.style.width = w + 'px'; f.style.height = h + 'px'; f.style.transform = 'scale(' + s + ')';
+    });
+  }
+  previas(); window.addEventListener('resize', previas); document.addEventListener('estilo', previas);
 </script>
 </body>
 </html>

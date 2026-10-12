@@ -186,3 +186,11 @@ select.campo { appearance: none; -webkit-appearance: none; background-image: lin
 [data-estilo="cyber"] .aviso-curto { border-radius: 3px; background: var(--primaria); color: #fff; }
 .coluna, .ficha-cartao { min-width: 0; }
 .ficha-cartao .status, .tabela-larga .status { white-space: normal; line-height: 1.3; }
+.menu .quem { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: var(--superficie-2); border: 1px solid var(--linha); }
+.menu .quem b { display: block; font-size: 14px; }
+.menu .quem small { display: block; font-size: 11.5px; color: var(--texto-3); }
+.menu .quem a { display: inline; padding: 0; color: var(--primaria); text-decoration: underline; font-size: 11.5px; }
+[data-estilo="couro"] .menu .quem { background: rgba(255,255,255,.05); border-color: rgba(196,164,102,.3); }
+[data-estilo="couro"] .menu .quem small { color: rgba(239,227,198,.6); }
+[data-estilo="couro"] .menu .quem a { color: #e2c88f; }
+@media (max-width: 1023px) { .balao-painel { bottom: 84px; } }
