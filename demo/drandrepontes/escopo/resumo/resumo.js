@@ -28,7 +28,7 @@
       if (!inc.length) return '';
       var s = C.situacao([l.id], M);
       var marcas = [V && V.lotes[l.id] ? valor(V.lotes[l.id].atual, V.lotes[l.id].cheio) : '', l.antigo ? 'antes ' + l.antigo : '', l.projeto === 1 ? 'no plano' : semanas(l.semanas), l.obrigatorio ? 'obrigatório' : '', l.proposta ? 'proposta' : '', l.terceiros ? 'terceiros' : ''].filter(Boolean).join(' · ');
-      return '<div class="lote"><div class="lote-cab"><b>' + esc(l.nome) + '</b><span>' + esc(marcas) + (s.parcial ? ' · <em>a recalcular</em>' : '') + '</span></div>' +
+      return '<div class="lote"><div class="lote-cab"><b>' + esc(l.nome) + '</b><span>' + esc(marcas) + (s.parcial ? ' · <em>' + s.tirados + ' de ' + s.total + ' itens tirados</em>' : '') + '</span></div>' +
         '<p class="fraco">' + inc.length + ' de ' + tot + ' itens: ' + inc.map(function (i) { return i.n + ' ' + esc(i.nome) + (P && P.itens[i.n] ? ' (' + reais(P.itens[i.n]) + ')' : ''); }).join(' · ') + '</p></div>';
     }).join('');
   }
