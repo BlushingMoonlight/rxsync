@@ -65,6 +65,8 @@
   }
   function botaoSalvar(texto, msg) { return '<button class="botao botao-cheio" type="button" data-acao="aviso" data-msg="' + (msg || 'Registrado. Obrigada!') + '">' + (texto || 'Salvar registro') + '</button>'; }
   function avatar(p, t) { return '<span class="avatar" style="background:' + p.cor + (t ? ';width:' + t + 'px;height:' + t + 'px' : '') + '">' + p.ini + '</span>'; }
+  // Texto digitado pela pessoa: escapado antes de entrar no HTML.
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function br(n, d) { return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
 
   // Gráfico de linha de uma série só (o título diz o que é; sem legenda). Toque num ponto para ler o valor.
@@ -563,7 +565,7 @@
   }
   function perguntar(t) {
     if (!t) return;
-    E.chat.push(['eu', t]);
+    E.chat.push(['eu', esc(t)]);
     render(true);
     setTimeout(function () { var r = respostaIA(t); E.chat.push(['ela', r[0], r[1]]); render(true); rolarFim(); }, 700);
     rolarFim();
@@ -603,7 +605,7 @@
     if (a === 'perguntar-campo') { var c = document.getElementById('pergunta'); perguntar(c.value.trim()); return; }
     if (a === 'enviar-equipe') {
       var m = document.getElementById('msg-equipe'), t = m.value.trim(); if (!t) return;
-      E.chatEquipe.push(['eu', t.replace(/</g, '&lt;'), 'agora']); render(true); rolarFim(); avisoCurto('Enviado. A IA encaminhou para a pessoa certa da equipe.'); return;
+      E.chatEquipe.push(['eu', esc(t), 'agora']); render(true); rolarFim(); avisoCurto('Enviado. A IA encaminhou para a pessoa certa da equipe.'); return;
     }
   });
   document.addEventListener('keydown', function (ev) {
