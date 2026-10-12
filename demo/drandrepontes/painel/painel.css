@@ -10,7 +10,8 @@ body.painel { min-height: 100vh; }
   background-image: var(--textura), linear-gradient(180deg, #1d3b2c 0%, #152c21 100%);
   background-blend-mode: overlay, normal; color: #efe3c6; border-right: 1px solid rgba(196,164,102,.35);
 }
-[data-estilo="cyber"] .menu { background: rgba(5, 10, 11, .92); }
+[data-estilo="cyber"] .menu { background: #fbfcfc; }
+[data-estilo="cyber"] .menu .grupo > span { font-family: var(--fonte-mono); }
 .menu .marca { display: flex; align-items: center; gap: 12px; padding: 0 8px; }
 .menu .marca b { display: block; font-family: var(--fonte-titulo); font-size: 15px; }
 .menu .marca small { color: var(--texto-3); font-size: 11.5px; }
@@ -28,12 +29,12 @@ body.painel { min-height: 100vh; }
 [data-estilo="couro"] .menu a:hover { background: rgba(255,255,255,.05); }
 [data-estilo="couro"] .menu a.ativo { background: rgba(196,164,102,.16); color: #e2c88f; box-shadow: inset 0 0 0 1px rgba(196,164,102,.35); }
 [data-estilo="cyber"] .menu a { border-radius: 2px; font-size: 12.5px; }
-[data-estilo="cyber"] .menu a.ativo { background: rgba(94,234,212,.08); box-shadow: inset 2px 0 0 var(--primaria); }
+[data-estilo="cyber"] .menu a.ativo { background: rgba(15,118,110,.08); box-shadow: inset 2px 0 0 var(--primaria); }
 
 .principal { min-width: 0; padding: 28px 32px 48px; display: grid; gap: 18px; align-content: start; }
 .cabeca { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-right: 44px; }
 .cabeca h1 { font-size: 30px; }
-[data-estilo="cyber"] .cabeca h1 { font-size: 22px; letter-spacing: .12em; }
+[data-estilo="cyber"] .cabeca h1 { font-size: 26px; }
 .cabeca .direita { display: flex; align-items: center; gap: 10px; }
 .busca { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; min-width: 240px; border-radius: 999px; background: var(--superficie); border: 1px solid var(--linha); color: var(--texto-3); font-size: 13.5px; }
 [data-estilo="cyber"] .busca { border-radius: 2px; }
@@ -55,7 +56,7 @@ body.painel { min-height: 100vh; }
 .lista .lin { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--linha); }
 .lista .lin:first-child { border-top: 0; }
 .lista .hora { width: 52px; font-weight: 700; font-size: 14px; }
-[data-estilo="cyber"] .lista .hora { color: var(--primaria); font-weight: 500; }
+[data-estilo="cyber"] .lista .hora { color: var(--primaria); font-weight: 500; font-family: var(--fonte-mono); }
 .lista .meio { flex: 1; min-width: 0; }
 .lista .meio b { font-weight: 650; }
 .lista .meio .fraco { font-size: 12.5px; }
