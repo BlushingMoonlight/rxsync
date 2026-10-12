@@ -261,7 +261,9 @@
   // ---------- Itens tirados no escopo: aparecem apagados na demonstração (com "fora do projeto") ----------
   function tirados() {
     var D = window.ESCOPO, o = {}; if (!D) return o;
-    try { var m = JSON.parse(localStorage.getItem(chaveEscopo()) || 'null'); if (m && m.status) Object.keys(m.status).forEach(function (n) { if (m.status[n] === 'tirar') o[n] = 1; }); } catch (e) { /* sem armazenamento */ }
+    // Item obrigatório nunca fica "tirado", mesmo com uma marcação antiga salva no aparelho.
+    var obrig = {}; D.itens.forEach(function (i) { if (i.obrigatorio) obrig[i.n] = 1; });
+    try { var m = JSON.parse(localStorage.getItem(chaveEscopo()) || 'null'); if (m && m.status) Object.keys(m.status).forEach(function (n) { if (m.status[n] === 'tirar' && !obrig[n]) o[n] = 1; }); } catch (e) { /* sem armazenamento */ }
     return o;
   }
   function marcarDesligados(raiz, t) {

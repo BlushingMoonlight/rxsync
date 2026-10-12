@@ -300,7 +300,7 @@
         ['Financeiro', 'Paula Freitas', 'P-DEMO3', 'Segunda via do boleto', 'Emanuele', '35 min', 'st-in', 'aberto'], ['Médico', 'Renata Costa', 'P-DEM12', 'Perdi 2,4 kg em uma semana, é normal?', 'Dr. André', '1 h', 'st-al', 'aguardando'],
         ['Nutrição', 'Sofia Martins', 'P-DEM11', 'Plano para quem trabalha à noite', 'Felipe', '—', 'st-ok', 'respondido']];
       return cab('Casos por área', 'O que a IA não resolve vai para a pessoa certa, com o nome e o ID do paciente.', A.item([57, 58, 59, 60, 61, 62])) +
-        '<div class="casos" style="grid-template-columns:repeat(4,1fr)">' + caso('Nutrição', 2, '1 respondido') + caso('Enfermagem', 1, '1 atrasado', 'var(--perigo)') + caso('Financeiro', 1, 'Emanuele') + caso('Médico', 1, 'Dr. André') + '</div>' +
+        '<div class="casos" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">' + caso('Nutrição', 2, '1 respondido') + caso('Enfermagem', 1, '1 atrasado', 'var(--perigo)') + caso('Financeiro', 1, 'Emanuele') + caso('Médico', 1, 'Dr. André') + '</div>' +
         cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Área ' + A.item(57) + '</th><th>Paciente ' + A.item(59) + '</th><th>Pergunta</th><th>Com ' + A.item(58) + '</th><th>Tempo</th><th>Situação ' + A.item(61) + '</th></tr>' +
           c.map(function (x) { return '<tr><td>' + x[0] + '</td><td><b>' + x[1] + '</b> <span class="idp">' + x[2] + '</span></td><td class="mudo">"' + x[3] + '"</td><td>' + x[4] + '</td><td class="num">' + x[5] + '</td><td><span class="status ' + x[6] + '">' + x[7] + '</span></td></tr>'; }).join('') + '</table></div>') +
         cartao(titulo('Como a resposta chega ao paciente', A.item(60)) +
