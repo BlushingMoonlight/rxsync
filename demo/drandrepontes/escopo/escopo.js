@@ -46,7 +46,7 @@
   // ---------- desenho ----------
   function itemHTML(i) {
     var st = M.status[i.n] || '', nota = M.notas[i.n] || '', tela = TELAS[String(i.n)];
-    return '<div class="item-esc' + (st ? ' st-' + st : '') + '" data-n="' + i.n + '">' +
+    return '<div class="item-esc' + (st ? ' st-' + st : '') + '" id="item-' + i.n + '" data-n="' + i.n + '">' +
       '<input type="checkbox" aria-label="Marcar o item ' + i.n + '"' + (M.marcados[i.n] ? ' checked' : '') + ' data-acao="marcar">' +
       '<div class="cab-item"><span class="num-item">' + i.n + '</span><span class="nome-item">' + esc(i.nome) + '</span><span class="selos">' +
         (i.sempre ? '<span class="item" title="Sempre ligado">🔒 sempre ligado</span>' : '') + (i.consumo ? '<span class="item" title="IA por consumo">💲 IA por consumo</span>' : '') +
@@ -145,4 +145,15 @@
   ['busca', 'f-lote', 'f-situacao'].forEach(function (id) { $(id).addEventListener('input', desenhar); });
   $('f-projeto').addEventListener('input', function () { opcoesLote(); desenhar(); });
   desenhar();
+
+  // escopo/#item-N (vindo do "Ver no escopo"): limpa os filtros, rola até o item e destaca.
+  function irParaItem() {
+    var m = (location.hash || '').match(/^#item-(\d+)$/); if (!m) return;
+    $('busca').value = ''; $('f-projeto').value = ''; opcoesLote(); $('f-lote').value = ''; $('f-situacao').value = ''; desenhar();
+    var el = document.getElementById('item-' + m[1]); if (!el) return;
+    el.classList.remove('destaque'); void el.offsetWidth; el.classList.add('destaque');
+    el.scrollIntoView({ block: 'center' });
+  }
+  window.addEventListener('hashchange', irParaItem);
+  irParaItem();
 })();

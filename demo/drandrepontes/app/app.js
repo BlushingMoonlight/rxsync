@@ -178,7 +178,7 @@
         cartao('<div class="cartao-titulo"><h3>Diário de hoje</h3><a href="#plano" class="item" style="text-decoration:none">ver plano · item 113</a></div>' +
           '<table class="tabela"><tr><td>Café · ovos mexidos, pão integral</td><td>380 kcal</td></tr><tr><td>Lanche · iogurte natural</td><td>110 kcal</td></tr>' +
           '<tr><td>Almoço · <span class="fraco">ainda não registrado</span></td><td>—</td></tr><tr><td>Jantar</td><td>—</td></tr></table>' +
-          '<p class="fraco" style="font-size:12px;margin-top:8px">A foto do prato usa IA cobrada por uso ' + A.item(107) + '. O resultado sempre passa pela sua confirmação.</p>') + ficha();
+          '<p class="fraco" style="font-size:12px;margin-top:8px">A foto do prato é lida pela IA ' + A.item(107) + '. O resultado sempre passa pela sua confirmação.</p>') + ficha();
     },
     alimento: function () {
       var g = E.porcao, f = g / 170;

@@ -131,13 +131,58 @@
 
   // ---------- Marcadores de item do escopo ----------
   // item(107) · item([124, 125]) · novo() · juridico() · proposta()
+  // Marcadores clicáveis: tocar abre um balão curto com o significado e o item do escopo ("Ver no escopo").
   function item(n) {
     var l = [].concat(n);
-    return '<span class="item" title="Item do escopo">item ' + l.join(' · ') + '</span>';
+    return '<span class="item" role="button" tabindex="0" data-itens="' + l.join(',') + '" title="Item do escopo">item ' + l.join(' · ') + '</span>';
   }
-  function novo(t) { return '<span class="item item-novo" title="Fora do escopo atual: ganha número depois da reunião">novo' + (t ? ' · ' + t : '') + '</span>'; }
-  function juridico(t) { return '<span class="item item-juridico">' + (t || 'Versão completa · depende do parecer jurídico') + '</span>'; }
-  function proposta() { return '<span class="item item-proposta">proposta</span>'; }
+  function novo(t) { return '<span class="item item-novo" role="button" tabindex="0" data-marca="novo">novo' + (t ? ' · ' + t : '') + '</span>'; }
+  function juridico(t) { return '<span class="item item-juridico" role="button" tabindex="0" data-marca="juridico">' + (t || 'Versão completa · depende do parecer jurídico') + '</span>'; }
+  function proposta() { return '<span class="item item-proposta" role="button" tabindex="0" data-marca="proposta">proposta</span>'; }
+  function sempre() { return '<span class="item item-sempre" role="button" tabindex="0" data-marca="sempre">🔒 sempre ligado</span>'; }
+
+  var MARCAS = {
+    item: 'Número do item no escopo do projeto. Cada função da proposta tem um número fixo, para conferir na reunião.',
+    novo: 'Item que ainda não tinha número no escopo e entra como proposta.',
+    proposta: 'Item em proposta: entrou depois da proposta original, com preço a definir e conteúdo a combinar com a equipe.',
+    juridico: 'Só entra no ar depois do parecer do advogado e da classificação de risco (Resolução CFM 2.454/2026). A IA nunca diagnostica, nunca prescreve e nunca fala de dose.',
+    sempre: 'Sempre ligado: por segurança, exigência legal ou estrutura do sistema, não tem botão de desligar.'
+  };
+  function textoItem(n) {
+    var D = window.ESCOPO; if (!D) return '<p>Item ' + n + ' do escopo.</p>';
+    var i = D.itens.filter(function (x) { return x.n === n; })[0]; if (!i) return '<p>Item ' + n + ' do escopo.</p>';
+    var l = D.lotes.filter(function (x) { return x.id === i.lote; })[0] || {};
+    var noApp = html.dataset.contexto === 'app'; // no app, nada de preço nem de custo de IA (a IA é cobrada só da clínica)
+    return '<div class="explica-item"><b>' + n + ' · ' + esc(i.nome) + '</b><p>' + esc(i.desc) + '</p><small>' + esc(l.nome || '') +
+      (noApp ? '' : ' · ' + esc(l.preco || '')) + (i.sempre ? ' · 🔒 sempre ligado' : '') + (!noApp && i.consumo ? ' · 💲 IA cobrada da clínica pelo uso' : '') + '</small></div>';
+  }
+  function fecharExplica() { var e = document.querySelector('.explica-fundo'); if (e) e.remove(); }
+  function abrirExplica(el) {
+    fecharExplica();
+    var nums = (el.dataset.itens || '').split(',').filter(Boolean).map(Number), marca = el.dataset.marca || (nums.length ? 'item' : '');
+    if (!marca && el.classList.contains('item-juridico')) marca = 'juridico';
+    var f = document.createElement('div'); f.className = 'explica-fundo';
+    var escopo = (html.dataset.raiz || '../') + 'escopo/';
+    f.innerHTML = '<div class="explica" role="dialog" aria-label="O que significa">' +
+      '<div class="explica-cab"><span class="rotulo">O que significa</span><button type="button" class="explica-fechar" aria-label="Fechar">✕</button></div>' +
+      '<p>' + MARCAS[marca || 'item'] + '</p>' + nums.map(textoItem).join('') +
+      '<div class="explica-acoes">' + nums.map(function (n) {
+        return '<a class="botao" href="' + escopo + '#item-' + n + '" target="_blank" rel="noopener" data-leva-estilo>Ver no escopo' + (nums.length > 1 ? ' · ' + n : '') + '</a>';
+      }).join('') + (nums.length ? '' : '<a class="botao botao-claro" href="' + escopo + '" target="_blank" rel="noopener" data-leva-estilo>Abrir o escopo</a>') + '</div></div>';
+    document.body.appendChild(f);
+    f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.closest('.explica-fechar')) fecharExplica(); });
+  }
+  // Pega o toque antes dos outros cliques (o marcador pode estar dentro de um cartão que é link).
+  document.addEventListener('click', function (ev) {
+    var el = ev.target.closest && ev.target.closest('.item[data-itens], .item[data-marca], .item-juridico');
+    if (!el || el.closest('.explica')) return;
+    ev.preventDefault(); ev.stopPropagation(); abrirExplica(el);
+  }, true);
+  window.addEventListener('hashchange', fecharExplica);
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') fecharExplica();
+    if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('.item[data-itens], .item[data-marca]')) { ev.preventDefault(); abrirExplica(ev.target); }
+  });
 
 
   // ---------- Balão de chat flutuante (app e painel) ----------
@@ -199,8 +244,15 @@
     });
     document.addEventListener('click', function (ev) { if (!d.contains(ev.target)) d.classList.remove('aberta'); });
   }
+  // "‹ Demo": volta para a home da demonstração (só nas páginas que dizem onde ela fica, em data-voltar).
+  function montarVoltar() {
+    if (!html.dataset.voltar || document.querySelector('.volta-demo')) return;
+    var a = document.createElement('a'); a.className = 'volta-demo'; a.href = html.dataset.voltar; a.setAttribute('data-leva-estilo', '');
+    a.setAttribute('aria-label', 'Voltar para o início da demonstração'); a.textContent = '‹ Demo';
+    document.body.appendChild(a);
+  }
   function iniciar() {
-    montarSelo(); montarTroca();
+    montarSelo(); montarTroca(); montarVoltar();
     aplicarEstilo(html.dataset.estilo, false);
     // links internos já saem com o estilo atual
     var id = html.dataset.estilo;
@@ -215,5 +267,5 @@
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();
