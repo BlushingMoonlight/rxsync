@@ -6,11 +6,14 @@
   'use strict';
   var A = window.AG;
 
-  // ---------- menu: Base, CRM e ERP separados, mais Atendimento RXSync, App, Central do médico e Profissionais ----------
+  // ---------- menu: Centrais, Base, CRM e ERP separados, mais Atendimento RXSync, App e Profissionais ----------
   var MENU = [
     { grupo: 'Hoje', itens: [
       { id: 'dia', nome: 'Visão do dia', ic: 'inicio' },
       { id: 'medico', nome: 'Visão do médico', ic: 'estetoscopio' }] },
+    { grupo: 'Centrais', itens: [
+      { id: 'central-paciente', nome: 'Central do paciente', ic: 'pacientes' },
+      { id: 'central', nome: 'Central do médico', ic: 'estetoscopio' }] },
     { grupo: 'Atendimento RXSync', itens: [
       { id: 'atendimento', nome: 'Conversas da IA', ic: 'whatsapp' },
       { id: 'agenda-ia', nome: 'Agenda da IA e pré-consulta', ic: 'calendario' },
@@ -29,8 +32,6 @@
       { id: 'config', nome: 'Configurações', ic: 'engrenagem' }] },
     { grupo: 'App do paciente', itens: [
       { id: 'app', nome: 'Prescrições e conteúdo', ic: 'seringa' }] },
-    { grupo: 'Central do médico', itens: [
-      { id: 'central', nome: 'Consulta e assistente', ic: 'estetoscopio' }] },
     { grupo: 'Profissionais', itens: [
       { id: 'profissionais', nome: 'Painel de cada um', ic: 'perfil' }] },
     { grupo: 'Base', itens: [
@@ -84,7 +85,7 @@
       { id: 12, dia: 4, slot: 14, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' }
     ],
     proxId: 13, selEvento: null, filtroProf: '', selCartao: null, paciente: 'P-DEMO7', abaFicha: 'resumo',
-    gravando: false, transcrita: false, pdf: false, chatEquipe: null, profAberto: 'andre'
+    chatEquipe: null, profAberto: 'andre'
   };
   var FUNIL = ['Novo contato', 'Agendado', 'Em tratamento', 'Retorno vencido', 'Inativo'];
 
@@ -117,8 +118,9 @@
       var hoje = E.eventos.filter(function (e) { return e.dia === 1; }).sort(function (a, b) { return a.slot - b.slot; });
       return '' +
         '<div class="cabeca"><div><div class="mudo" style="font-size:13px">Terça, 13 de outubro</div><h1>Visão do dia</h1></div>' +
-          '<div class="direita"><a class="busca" href="#pacientes" style="text-decoration:none">' + A.ic('pacientes') + 'Buscar paciente, telefone ou ID</a>' +
+          '<div class="direita"><a class="busca" href="#central-paciente" style="text-decoration:none">' + A.ic('pacientes') + 'Buscar paciente, telefone ou ID</a>' +
           '<div class="eu"><span class="avatar">AG</span></div></div></div>' +
+        (PAINEL.quadroCentral ? PAINEL.quadroCentral() : '') +
         '<div class="kpis">' +
           kpi('Consultas hoje', hoje.length, '2 encaixes', 'sobe') + kpi('Faltas na semana', '3', '−2 vs. semana passada', 'sobe') +
           kpi('Ativos no app', '186', '+9 este mês', 'sobe') + kpi('Adesão média', '78%', 'registros na semana', '') + kpi('Perda média', '−6,4 kg', 'em 90 dias', 'sobe') +
@@ -253,7 +255,7 @@
     // ===== CRM =====
     pacientes: function () {
       return cab('Pacientes', 'Todos que já falaram com a clínica. Um ID por paciente, do WhatsApp ao app.', A.item([67, 68, 69, 14])) +
-        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><div class="busca" style="flex:1">' + A.ic('pacientes') + 'Buscar por nome, telefone ou ID</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><a class="busca" href="#central-paciente" style="flex:1;text-decoration:none">' + A.ic('pacientes') + 'Buscar por nome, telefone ou ID</a>' +
         '<div class="abas-tela">' + ['Todos', 'Novo contato', 'Agendado', 'Em tratamento', 'Inativo'].map(function (t, i) { return '<button type="button" data-acao="aba" class="' + (i ? '' : 'ativo') + '">' + t + '</button>'; }).join('') + '</div></div>' +
         '<div style="text-align:right">' + A.item(69) + '</div>' +
         cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Paciente</th><th>Idade</th><th>Status ' + A.item(68) + '</th><th>Profissional</th><th>Último contato</th><th>Pagamento</th></tr>' +
@@ -434,31 +436,7 @@
         '</div>';
     },
 
-    // ===== Central do médico (novo) =====
-    central: function () {
-      var p = pac('P-DEMO9');
-      var falas = [['Dr. André', 'Larissa, o que te trouxe aqui hoje?'], ['Paciente', 'Quero perder uns 12 quilos. Já tentei várias dietas e sempre volto a ganhar.'], ['Dr. André', 'Usa algum remédio todos os dias?'], ['Paciente', 'Só o anticoncepcional.'], ['Dr. André', 'Vamos começar pelos exames e um plano com o Felipe.']];
-      return cab('Central do médico', 'Consulta de hoje com pré-consulta, transcrição, arquivos e assistente. Tudo ligado ao ID do paciente.', A.item([165, 166, 167]) + A.item(71)) +
-        cartao('<div class="linha-ic">' + '<span class="pessoa" style="background:var(--c3);width:46px;height:46px">LM</span><div class="meio"><h3 style="font-size:18px">' + p.nome + '</h3><div class="fraco" style="font-size:12.5px">' + p.id + ' · primeira consulta · 09:00</div></div><a class="botao botao-claro" href="#ficha" data-acao="abrir-ficha" data-v="' + p.id + '" style="text-decoration:none">Abrir ficha</a></div>') +
-        '<div class="grade">' +
-          cartao(titulo('Pré-consulta', A.item([71, 30])) + lista([['Objetivo', 'Perder 12 kg'], ['Cirurgias', 'Nenhuma'], ['Remédios diários', 'Anticoncepcional'], ['Peso informado', '84 kg']].map(function (x) { return lin('', '<span class="rotulo">' + x[0] + '</span><div>' + x[1] + '</div>'); })), 's4') +
-          cartao(titulo('Transcrição da consulta', A.item(165) + '<span class="item">ligada ao ' + p.id + '</span>') +
-            (E.gravando ? '<div class="gravando"><i></i>Gravando · 04:12</div>' : '') +
-            (E.transcrita || E.gravando ? '<div class="transcricao" style="margin-top:8px">' + falas.map(function (f) { return '<p><b>' + f[0] + ':</b> ' + f[1] + '</p>'; }).join('') + '</div>' : '<p class="mudo" style="font-size:13.5px">Com o aceite da paciente, o áudio vira texto e vai para a ficha dela.</p>') +
-            '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="botao" type="button" data-acao="gravar">' + (E.gravando ? 'Parar e transcrever' : 'Começar a gravar') + '</button>' +
-            (E.transcrita ? '<button class="botao botao-claro" type="button" data-acao="aviso" data-msg="Resumo da consulta salvo na ficha como rascunho, para o Dr. André revisar.">Salvar resumo na ficha</button>' : '') + '</div>' +
-            (E.transcrita ? '<div class="alerta-lin" style="--cor:var(--info);margin-top:12px">' + A.bolha('ia', 'var(--info)') + '<div><b>Resumo (rascunho para revisão)</b><p class="mudo" style="font-size:13px">Primeira consulta. Objetivo: −12 kg. Histórico de efeito sanfona. Usa anticoncepcional. Plano: exames e encaminhamento à nutrição. <span class="fraco">(simulado)</span></p></div></div>' : ''), 's8') +
-          cartao(titulo('Arquivo com síntese da IA', A.item(166) + A.item(66)) +
-            '<p class="mudo" style="font-size:13.5px">Envie um PDF ou foto (exame, laudo, relatório de outro profissional). A IA resume o que está escrito; a interpretação é do médico.</p>' +
-            '<button class="botao botao-claro" type="button" style="margin-top:10px" data-acao="pdf">' + A.ic('documento') + 'Enviar arquivo (exemplo)</button>' +
-            (E.pdf ? '<div class="alerta-lin" style="--cor:var(--info);margin-top:12px">' + A.bolha('documento', 'var(--info)') + '<div><b>hemograma_larissa.pdf · síntese</b><p class="mudo" style="font-size:13px">Exame de 05/10. 18 itens. Valores fora da referência do laboratório: ferritina (baixa) e vitamina D (baixa). Os demais dentro da referência. <span class="fraco">(simulado; confira no documento)</span></p></div></div>' : ''), 's6') +
-          cartao(titulo('Assistente clínico', A.item(167) + A.juridico('depende do parecer jurídico')) +
-            '<p class="mudo" style="font-size:13.5px">Organiza a informação para o médico decidir. Não diagnostica e não prescreve.</p>' + lista([
-              lin(A.bolha('ia', 'var(--c4)'), 'Pré-consulta sem informação de pressão arterial: medir hoje.'),
-              lin(A.bolha('ia', 'var(--c4)'), 'Exame com ferritina e vitamina D abaixo da referência do laboratório.'),
-              lin(A.bolha('ia', 'var(--c4)'), 'Protocolo da clínica para primeira consulta: pedir bioimpedância e marcar nutrição.')]), 's6') +
-        '</div>';
-    },
+    // Central do paciente e Central do médico: no centrais.js.
 
     // ===== Profissionais (novo · proposta) =====
     profissionais: function () {
@@ -504,7 +482,7 @@
   var PROF = {
     andre: { resumo: 'Consultas do dia com pré-consulta, alertas clínicos, evolução de cada paciente e pendências.', blocos: [
       ['Consultas de hoje', 'agenda do Dr. André com o resumo pré-consulta de cada um', '6', 71], ['Alertas clínicos', 'sintoma forte, perda rápida de peso, retorno vencido', '3', 135],
-      ['Receitas e laudos pendentes', 'documentos para assinar', '2', 0], ['Adesão da carteira', 'média de registros no app dos seus pacientes', '78%', 134], ['Transcrições a revisar', 'rascunhos da central do médico', '1', 0]] },
+      ['Receitas e laudos pendentes', 'documentos para assinar', '2', 0], ['Adesão da carteira', 'média de registros no app dos seus pacientes', '78%', 134], ['Fichas a assinar', 'rascunhos da Central do médico', '1', 165]] },
     emanuele: { resumo: 'Faturamento, contas a receber, inadimplência, consumo de IA e estoque em valor.', blocos: [
       ['Recebido no mês', 'Pix, cartão e boleto', 'R$ 48.250', 87], ['A receber em 7 dias', '9 cobranças com lembrete agendado', 'R$ 5.850', 88],
       ['Em atraso', 'pacientes com pagamento em aberto', '2', 89], ['Consumo de IA', 'do teto mensal', '53%', 146], ['Estoque em valor', 'frascos e materiais', 'R$ 3.120', 91]] },
@@ -539,12 +517,12 @@
   // O Dr. André vê tudo. Cada outra pessoa vê o próprio painel e o que é da função dela.
   var QUEM = (function () { var q = new URLSearchParams(location.search).get('quem'); return Object.prototype.hasOwnProperty.call(EQUIPE, q) ? q : 'andre'; })();
   var MENU_FUNCAO = {
-    emanuele: ['financeiro', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
-    felipe: ['pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
-    mariaclara: ['pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
-    eduarda: ['agenda', 'ficha', 'financeiro', 'app', 'casos'],
-    thais: ['medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
-    elenice: ['agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
+    emanuele: ['central-paciente', 'financeiro', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
+    felipe: ['central-paciente', 'pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
+    mariaclara: ['central-paciente', 'pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
+    eduarda: ['central-paciente', 'agenda', 'ficha', 'financeiro', 'app', 'casos'],
+    thais: ['central-paciente', 'medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
+    elenice: ['central-paciente', 'agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
   };
   function telaInicial() { return QUEM === 'andre' ? 'dia' : 'prof-' + QUEM; }
 
@@ -702,8 +680,6 @@
     if (a === 'nova') { janelaMarcar(1, 10); return; }
     if (a === 'melhor') { avisoCurto('Sugestão da IA (simulada): quarta, 14/10, às 08:30, colado na consulta das 09:00 (empilhamento).'); var x = document.querySelector('.vaga[data-dia="2"][data-slot="1"]'); if (x) x.classList.add('destino'); return; }
     if (a === 'cancelar-sel') { E.selEvento = null; render(true); return; }
-    if (a === 'gravar') { if (E.gravando) { E.gravando = false; E.transcrita = true; } else { E.gravando = true; } render(true); return; }
-    if (a === 'pdf') { E.pdf = true; render(true); return; }
     if (a === 'pergunta-ia') { perguntaIA(v); return; }
     if (a === 'pergunta-ia-campo') { var c = document.getElementById('pergunta-ia'); perguntaIA(c.value.trim()); return; }
     if (a === 'enviar-caixa') { var m = document.getElementById('msg-caixa'), t = m.value.trim(); if (!t) return; E.chatEquipe.push(['eq', '"' + esc(t) + '"', 'agora']); render(true); avisoCurto('Enviado pela clínica, entre aspas e sem alteração.'); return; }
@@ -724,7 +700,7 @@
     var el = document.getElementById('tela'), y = window.scrollY;
     el.innerHTML = TELAS[id] ? TELAS[id]() : emBreve(id);
     el.className = 'principal' + (manter ? '' : ' entra');
-    var menuId = id.indexOf('prof-') === 0 && id !== 'prof-' + QUEM ? 'profissionais' : id;
+    var menuId = id.indexOf('prof-') === 0 && id !== 'prof-' + QUEM ? 'profissionais' : id.indexOf('central-') === 0 && id !== 'central-paciente' ? 'central' : id;
     document.querySelectorAll('.menu a').forEach(function (a) { a.classList.toggle('ativo', a.dataset.tela === menuId); });
     document.querySelector('.casca').classList.remove('menu-aberto');
     ligarArrastar(id);
