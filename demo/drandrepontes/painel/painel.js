@@ -23,7 +23,13 @@
       { id: 'pacientes', nome: 'Pacientes', ic: 'pacientes' },
       { id: 'funil', nome: 'Funil', ic: 'funil' },
       { id: 'casos', nome: 'Casos por área', ic: 'equipe' },
-      { id: 'conversas', nome: 'Caixa de conversas', ic: 'chat' }] },
+      { id: 'conversas', nome: 'Caixa de conversas', ic: 'chat' },
+      { id: 'crm-tarefas', nome: 'Tarefas e retornos', ic: 'relogio' },
+      { id: 'crm-origens', nome: 'Origem dos contatos', ic: 'link' },
+      { id: 'crm-segmentos', nome: 'Etiquetas e segmentos', ic: 'equipe' },
+      { id: 'crm-modelos', nome: 'Modelos de mensagem', ic: 'documento' },
+      { id: 'crm-campanhas', nome: 'Campanhas', ic: 'whatsapp' },
+      { id: 'crm-indicacoes', nome: 'Indicações', ic: 'trofeu' }] },
     { grupo: 'ERP', itens: [
       { id: 'agenda', nome: 'Agenda', ic: 'calendario' },
       { id: 'ficha', nome: 'Ficha e balança', ic: 'documento' },
@@ -258,9 +264,9 @@
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><a class="busca" href="#central-paciente" style="flex:1;text-decoration:none">' + A.ic('pacientes') + 'Buscar por nome, telefone ou ID</a>' +
         '<div class="abas-tela">' + ['Todos', 'Novo contato', 'Agendado', 'Em tratamento', 'Inativo'].map(function (t, i) { return '<button type="button" data-acao="aba" class="' + (i ? '' : 'ativo') + '">' + t + '</button>'; }).join('') + '</div></div>' +
         '<div style="text-align:right">' + A.item(69) + '</div>' +
-        cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Paciente</th><th>Idade</th><th>Status ' + A.item(68) + '</th><th>Profissional</th><th>Último contato</th><th>Pagamento</th></tr>' +
+        cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Paciente</th><th>Idade</th><th>Status ' + A.item(68) + '</th><th>Origem ' + A.item(180) + '</th><th>Profissional</th><th>Último contato</th><th>Pagamento</th></tr>' +
           PACIENTES.map(function (p) {
-            return '<tr class="clicavel" data-acao="abrir-ficha" data-v="' + p.id + '"><td><b>' + p.nome + '</b> <span class="idp">' + p.id + '</span></td><td>' + p.idade + '</td><td>' + st(p.status) + '</td><td>' + p.prof + '</td><td class="num">' + p.ultimo + '</td><td>' + (p.id === 'P-DEMO3' ? '<span class="status st-pe">em aberto</span> ' + A.item(89) : '<span class="fraco">em dia</span>') + '</td></tr>';
+            return '<tr class="clicavel" data-acao="abrir-ficha" data-v="' + p.id + '"><td><b>' + p.nome + '</b> <span class="idp">' + p.id + '</span></td><td>' + p.idade + '</td><td>' + st(p.status) + '</td><td>' + (PAINEL.crm ? PAINEL.crm.origem(p.id) : '—') + '</td><td>' + p.prof + '</td><td class="num">' + p.ultimo + '</td><td>' + (p.id === 'P-DEMO3' ? '<span class="status st-pe">em aberto</span> ' + A.item(89) : '<span class="fraco">em dia</span>') + '</td></tr>';
           }).join('') + '</table></div>') + '<p class="nota">Lista de contatos com a data do último contato ' + A.item(67) + '. Toque para abrir a ficha.</p>';
     },
     funil: function () {
@@ -289,7 +295,7 @@
     },
     conversas: function () {
       if (!E.chatEquipe) E.chatEquipe = [['ela', 'Oi, tudo bem? Queria saber se posso remarcar minha aplicação de quinta.', '09:58'], ['ia', 'Claro, Marina! Tenho quinta 10:30 ou sexta 08:00. Qual prefere?', '09:58']];
-      return cab('Caixa de conversas', 'Todas as conversas da clínica dentro do painel. A equipe assume no lugar da IA e devolve quando terminar.', A.item([84, 85, 86])) +
+      return cab('Caixa de conversas', 'Todas as conversas da clínica dentro do painel. A equipe assume no lugar da IA e devolve quando terminar.', A.item([84, 85, 86, 185])) +
         '<div class="duas">' +
           cartao(titulo('Conversas', A.item(84)) + lista([
             lin('<span class="pessoa" style="background:var(--c1)">ML</span>', '<b>Marina Lopes</b> <span class="idp">P-DEMO7</span><div class="fraco" style="font-size:12px">remarcar aplicação · IA atendendo</div>', '<span class="status st-in">IA</span>'),
@@ -300,6 +306,7 @@
               return '<div class="msg ' + (m[0] === 'ela' ? 'ela' : 'eu') + '">' + m[1] + '<small>' + (m[0] === 'ia' ? 'IA' : m[0] === 'eq' ? 'Equipe' : 'Paciente') + ' · ' + m[2] + '</small></div>';
             }).join('') + '</div>' +
             '<div class="acoes" style="margin:12px 0;display:flex;gap:8px;flex-wrap:wrap"><button class="botao" type="button" data-acao="aviso" data-msg="Você assumiu a conversa. A IA fica em pausa.">Assumir</button><button class="botao botao-claro" type="button" data-acao="aviso" data-msg="Conversa devolvida para a IA.">Devolver à IA</button></div>' +
+            (PAINEL.crm ? '<div style="margin-bottom:8px">' + PAINEL.crm.seletorModelo('P-DEMO7', 'msg-caixa') + '</div>' : '') +
             '<div class="digitar"><input class="campo" id="msg-caixa" placeholder="Responder como equipe" autocomplete="off"><button class="botao" type="button" data-acao="enviar-caixa" aria-label="Enviar">' + A.ic('enviar') + '</button></div>' +
             '<p class="nota" style="margin-top:8px">A conversa fica na ficha do paciente ' + A.item(86) + '.</p>') +
         '</div>';
@@ -517,12 +524,12 @@
   // O Dr. André vê tudo. Cada outra pessoa vê o próprio painel e o que é da função dela.
   var QUEM = (function () { var q = new URLSearchParams(location.search).get('quem'); return Object.prototype.hasOwnProperty.call(EQUIPE, q) ? q : 'andre'; })();
   var MENU_FUNCAO = {
-    emanuele: ['central-paciente', 'financeiro', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
-    felipe: ['central-paciente', 'pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
-    mariaclara: ['central-paciente', 'pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
-    eduarda: ['central-paciente', 'agenda', 'ficha', 'financeiro', 'app', 'casos'],
-    thais: ['central-paciente', 'medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
-    elenice: ['central-paciente', 'agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
+    emanuele: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-campanhas', 'crm-indicacoes', 'financeiro', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
+    felipe: ['central-paciente', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
+    mariaclara: ['central-paciente', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
+    eduarda: ['central-paciente', 'crm-tarefas', 'agenda', 'ficha', 'financeiro', 'app', 'casos'],
+    thais: ['central-paciente', 'crm-tarefas', 'medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
+    elenice: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-modelos', 'crm-campanhas', 'crm-indicacoes', 'agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
   };
   function telaInicial() { return QUEM === 'andre' ? 'dia' : 'prof-' + QUEM; }
 
@@ -735,7 +742,7 @@
   }
   // Peças comuns para o funcoes.js (telas de cada profissional, carregado depois deste arquivo).
   var PAINEL = window.PAINEL = {
-    A: A, TELAS: TELAS, PROF: PROF, E: E, QUEM: QUEM, EQUIPE: EQUIPE, PACIENTES: PACIENTES, HORAS: HORAS, DIAS: DIAS, meuMenu: {},
+    A: A, TELAS: TELAS, PROF: PROF, E: E, FUNIL: FUNIL, QUEM: QUEM, EQUIPE: EQUIPE, PACIENTES: PACIENTES, HORAS: HORAS, DIAS: DIAS, meuMenu: {},
     cartao: cartao, titulo: titulo, cab: cab, kpi: kpi, lista: lista, lin: lin, pessoa: pessoa, chave: chave, funcao: funcao, st: st, pac: pac, esc: esc,
     avisoCurto: function (m) { avisoCurto(m); }, render: function (m) { render(m); }
   };
