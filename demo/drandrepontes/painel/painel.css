@@ -194,3 +194,4 @@ select.campo { appearance: none; -webkit-appearance: none; background-image: lin
 [data-estilo="couro"] .menu .quem small { color: rgba(239,227,198,.6); }
 [data-estilo="couro"] .menu .quem a { color: #e2c88f; }
 @media (max-width: 1023px) { .balao-painel { bottom: 84px; } }
+.kpi .valor { font-size: clamp(22px, 2.3vw, 34px); }
