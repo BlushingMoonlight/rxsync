@@ -346,7 +346,8 @@
             [['13/10', '1.240', '82 g', '1,6 L', '7h10', '—', '—'], ['12/10', '1.580', '104 g', '2,4 L', '6h50', 'Bem', '—'], ['11/10', '1.420', '96 g', '2,1 L', '7h30', 'Ok', '—'], ['10/10', '1.690', '88 g', '1,8 L', '6h20', 'Bem', '—'], ['09/10', '1.350', '110 g', '2,6 L', '7h40', 'Ótimo', 'enjoo leve']].map(function (r) { return '<tr><td class="num">' + r.join('</td><td class="num">') + '</td></tr>'; }).join('') + '</table></div>');
         },
         consultas: function () {
-          return cartao(titulo('Consultas', A.item([16, 130])) + '<div class="lista">' + lin('<span class="num">20/10</span>', '<b>Retorno · Dr. André</b>', '<span class="status st-in">marcada</span>') + lin('<span class="num">22/09</span>', 'Retorno · Dr. André', '<span class="status st-ok">realizada</span>') + lin('<span class="num">15/09</span>', 'Nutrição · Felipe', '<span class="status st-ok">realizada</span>') + lin('<span class="num">01/09</span>', 'Primeira consulta · Dr. André', '<span class="status st-ok">realizada</span>') + '</div><p class="nota" style="margin-top:8px">Inclusive as importadas do Reservio, todas ligadas ao ID ' + A.item(16) + '.</p>');
+          return cartao(titulo('Consultas', A.item([16, 130])) + '<div class="lista">' + lin('<span class="num">20/10</span>', '<b>Retorno · Dr. André</b>', '<span class="status st-in">marcada</span>') +
+(['P-DEMO3', 'P-DEM12'].indexOf(p.id) >= 0 ? lin('<span class="num">11/10</span>', 'Psicologia · Maria Clara' + (QUEM === 'mariaclara' ? '<div class="mudo" style="font-size:12.5px">Anotações no <a href="#mc-prontuario">prontuário de psicologia</a> (só você vê).</div>' : '<div class="fraco" style="font-size:12.5px">' + A.ic('cadeado') + ' Sessão realizada · conteúdo restrito à psicóloga</div>'), A.item(172)) : '') + lin('<span class="num">22/09</span>', 'Retorno · Dr. André', '<span class="status st-ok">realizada</span>') + lin('<span class="num">15/09</span>', 'Nutrição · Felipe', '<span class="status st-ok">realizada</span>') + lin('<span class="num">01/09</span>', 'Primeira consulta · Dr. André', '<span class="status st-ok">realizada</span>') + '</div><p class="nota" style="margin-top:8px">Inclusive as importadas do Reservio, todas ligadas ao ID ' + A.item(16) + '.</p>');
         },
         exames: function () {
           return cartao(titulo('Exames e anexos', A.item([64, 136])) + '<div class="lista">' + lin(A.bolha('documento', 'var(--c3)'), '<b>Hemograma · 05/10</b><div class="fraco" style="font-size:12px">enviado pela paciente no app ' + A.item(136) + '</div>') + lin(A.bolha('documento', 'var(--c3)'), '<b>Pedido de exame · 28/08</b><div class="fraco" style="font-size:12px">lido pela IA no WhatsApp ' + A.item(3) + '</div>') + '</div>');
@@ -735,7 +736,9 @@
       '<div class="marca">' + A.logo({ tamanho: 46, texto: false }) + '<div><b>Clínica Evoluir</b><small>Dr. André Pontes Gonçalves</small></div></div>' +
       '<div class="quem">' + pessoa(EQUIPE[QUEM]) + '<div style="flex:1;min-width:0"><span class="rotulo">Entrou como</span><b>' + EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André') + '</b>' +
         '<small>' + (QUEM === 'andre' ? 'vê tudo' : EQUIPE[QUEM].papel) + ' · <a href="../" data-leva-estilo>trocar</a></small></div>' + A.item(169) + '</div>' +
-      (QUEM === 'andre' ? '' : '<nav class="grupo"><span>Meu painel</span><a href="#prof-' + QUEM + '" data-tela="prof-' + QUEM + '">' + A.ic('inicio') + 'Meu dia</a></nav>') +
+      (QUEM === 'andre' ? '' : '<nav class="grupo"><span>Meu painel</span>' + (PAINEL.meuMenu[QUEM] || [['prof-' + QUEM, 'Meu dia', 'inicio']]).map(function (i) {
+        return '<a href="#' + i[0] + '" data-tela="' + i[0] + '">' + A.ic(i[2]) + i[1] + '</a>';
+      }).join('') + '</nav>') +
       MENU.map(function (g) {
         var itens = QUEM === 'andre' ? g.itens : g.itens.filter(function (i) { return MENU_FUNCAO[QUEM].indexOf(i.id) >= 0; });
         if (!itens.length) return '';
@@ -754,5 +757,11 @@
     window.addEventListener('hashchange', function () { E.selEvento = null; E.selCartao = null; render(false); });
     render(false);
   }
+  // Peças comuns para o funcoes.js (telas de cada profissional, carregado depois deste arquivo).
+  var PAINEL = window.PAINEL = {
+    A: A, TELAS: TELAS, PROF: PROF, E: E, QUEM: QUEM, EQUIPE: EQUIPE, PACIENTES: PACIENTES, HORAS: HORAS, DIAS: DIAS, meuMenu: {},
+    cartao: cartao, titulo: titulo, cab: cab, kpi: kpi, lista: lista, lin: lin, pessoa: pessoa, chave: chave, funcao: funcao, st: st, pac: pac, esc: esc,
+    avisoCurto: function (m) { avisoCurto(m); }, render: function (m) { render(m); }
+  };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar();
 })();
