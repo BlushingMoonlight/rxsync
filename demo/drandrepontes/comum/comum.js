@@ -148,13 +148,23 @@
     juridico: 'Só entra no ar depois do parecer do advogado e da classificação de risco (Resolução CFM 2.454/2026). A IA nunca diagnostica, nunca prescreve e nunca fala de dose.',
     sempre: 'Sempre ligado: por segurança, exigência legal ou estrutura do sistema, não tem botão de desligar.'
   };
+  // Preços da proposta: escondidos até digitar a senha no escopo (só para não aparecerem na apresentação).
+  // Liberados ficam só neste aparelho. A senha está no código público: não é proteção de dados.
+  var CHAVE_PRECOS = 'ag-precos-liberados';
+  function precosLiberados() { try { return localStorage.getItem(CHAVE_PRECOS) === '1'; } catch (e) { return false; } }
+  function liberarPrecos(senha) { if (senha !== 'admin') return false; try { localStorage.setItem(CHAVE_PRECOS, '1'); } catch (e) { /* sem armazenamento: vale só agora */ } liberadoAgora = true; return true; }
+  function ocultarPrecos() { liberadoAgora = false; try { localStorage.removeItem(CHAVE_PRECOS); } catch (e) { /* idem */ } }
+  var liberadoAgora = false;
+  function precoVisivel() { return liberadoAgora || precosLiberados(); }
+  // Preço de um lote para mostrar (Projeto 1 virou desconto: sem cobrança à parte).
+  function precoLote(l) { return l.projeto === 1 ? 'Projeto 1 · desconto (sem cobrança à parte)' : l.preco; }
   function textoItem(n) {
     var D = window.ESCOPO; if (!D) return '<p>Item ' + n + ' do escopo.</p>';
     var i = D.itens.filter(function (x) { return x.n === n; })[0]; if (!i) return '<p>Item ' + n + ' do escopo.</p>';
     var l = D.lotes.filter(function (x) { return x.id === i.lote; })[0] || {};
     var noApp = html.dataset.contexto === 'app'; // no app, nada de preço nem de custo de IA (a IA é cobrada só da clínica)
     return '<div class="explica-item"><b>' + n + ' · ' + esc(i.nome) + '</b><p>' + esc(i.desc) + '</p><small>' + esc(l.nome || '') +
-      (noApp ? '' : ' · ' + esc(l.preco || '')) + (i.sempre ? ' · 🔒 sempre ligado' : '') + (!noApp && i.consumo ? ' · 💲 IA cobrada da clínica pelo uso' : '') + '</small></div>';
+      (noApp || !precoVisivel() ? '' : ' · ' + esc(precoLote(l) || '')) + (i.sempre ? ' · 🔒 sempre ligado' : '') + (!noApp && i.consumo ? ' · 💲 IA cobrada da clínica pelo uso' : '') + '</small></div>';
   }
   function fecharExplica() { var e = document.querySelector('.explica-fundo'); if (e) e.remove(); }
   function abrirExplica(el) {
@@ -267,5 +277,5 @@
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, precoVisivel: precoVisivel, liberarPrecos: liberarPrecos, ocultarPrecos: ocultarPrecos, precoLote: precoLote, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();
