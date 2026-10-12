@@ -22,9 +22,8 @@
     <div class="contador" id="contador"></div>
     <div class="acoes-topo">
       <button class="botao" type="button" id="salvar">Salvar e enviar à RXSync</button>
-      <a class="botao botao-claro" id="pdf" href="orcamento/" data-leva-estilo style="text-decoration:none">Baixar orçamento em PDF</a>
+      <a class="botao botao-claro" id="pdf" href="resumo/" data-leva-estilo style="text-decoration:none">Resumo do escopo em PDF</a>
       <button class="botao botao-claro" type="button" id="copiar">Copiar resumo da reunião</button>
-      <button class="botao botao-claro" type="button" id="precos">Mostrar preços</button>
       <button class="botao botao-claro" type="button" id="limpar">Limpar marcações</button>
     </div>
     <p class="fraco salvo-linha" id="salvo" aria-live="polite"></p>
@@ -47,7 +46,7 @@
 
   <div id="lista" class="lista-escopo"></div>
   <div id="total"></div>
-  <p class="nota-rodape fraco">Tudo começa em "incluir". Projeto 1: preço fixo (entra como desconto). Projetos 2 e 3: preço por lote; um lote com item retirado mantém o preço e fica "a recalcular" (sem desconto automático); lote sem nenhum item sai da soma; itens em proposta têm preço a definir e ficam fora da soma.</p>
+  <p class="nota-rodape fraco">Tudo começa em "incluir". Os lotes têm código novo, com o antigo ao lado. Itens obrigatórios (todo o Projeto 1, ERP-1, CDX-1, APP-1, APP-9 e o item 172) não podem ser tirados. Um lote com item tirado continua inteiro e fica "a recalcular"; lote sem nenhum item sai do prazo. Os valores ficam na proposta da RXSync, à parte.</p>
 </main>
 <script src="dados.js"></script>
 <script src="telas.js"></script>

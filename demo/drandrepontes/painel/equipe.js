@@ -1,4 +1,4 @@
-/* Comunicação interna e equipe do paciente (lote C5, itens 202 a 209; proposta, preço a definir).
+/* Comunicação interna e equipe do paciente (lote CRM-5, itens 202 a 209; proposta).
    Canais da equipe, mensagens diretas, menção com @, delegar tarefa pela conversa (vira tarefa do 182), conversa ligada
    ao ID do paciente (aparece na linha do tempo da Central do paciente, 191), equipe de cada paciente, avisos para quem
    cuida dele e o painel "Meus pacientes". Dados de exemplo; tudo só na memória. Texto digitado é sempre escapado.

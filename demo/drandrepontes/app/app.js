@@ -153,7 +153,7 @@
           '<div class="mudo" style="font-size:12.5px">Retorno com o Dr. André · presencial</div></div>' + A.ic('seta', 'fraco') + '</a>' +
           '<div style="margin-top:10px">' + A.item(130) + '</div>') +
 
-        cartao('<div class="cartao-titulo"><h3>Comunidade</h3><div class="itens">' + A.item([139, 140]) + '<span class="item">versão completa</span></div></div>' +
+        cartao('<div class="cartao-titulo"><h3>Comunidade</h3><div class="itens">' + A.item([139, 140]) + '</div></div>' +
           '<div style="display:grid;gap:12px">' +
           '<div class="linha-ic"><span class="avatar" style="background:var(--c1)">LS</span><div class="meio"><b>Lu S.</b> <span class="mudo">completou 14 dias seguidos registrando</span></div></div>' +
           '<div class="linha-ic"><span class="avatar" style="background:var(--c2)">RP</span><div class="meio"><b>Rafa P.</b> <span class="mudo">entrou no desafio "10 mil passos"</span></div></div>' +
@@ -314,7 +314,7 @@
         cartao('<div class="cartao-titulo"><h3>Anteriores</h3></div><table class="tabela"><tr><td>Retorno · Dr. André</td><td>{d:-21}</td></tr><tr><td>Nutrição · Felipe</td><td>{d:-28}</td></tr><tr><td>Primeira consulta · Dr. André</td><td>{d:-42}</td></tr></table>');
     },
     comunidade: function () {
-      return sub('comunidade', 'Comunidade', A.item([139, 140]) + '<span class="item">versão completa</span>') +
+      return sub('comunidade', 'Comunidade', A.item([139, 140])) +
         cartao('<div class="cartao-titulo"><h3>Desafio do grupo: 10 mil passos</h3>' + A.item(140) + '</div><table class="tabela"><tr><td>1 · Rafa P.</td><td>61.200</td></tr><tr><td>2 · Lu S.</td><td>58.900</td></tr><tr><td>3 · Você</td><td>44.940</td></tr><tr><td>4 · Bia N.</td><td>39.010</td></tr></table>') +
         ['Lu S. completou 14 dias seguidos registrando', 'Rafa P. bateu a meta de proteína a semana toda', 'Bia N. ganhou o selo "Hidratada"'].map(function (t, i) {
           return cartao('<div class="linha-ic"><span class="avatar" style="background:var(--c' + (i + 1) + ')">' + t.slice(0, 1) + t.split(' ')[1].slice(0, 1) + '</span><div class="meio">' + t + '<div class="fraco" style="font-size:12px">❤ ' + (12 - i * 3) + ' · 💬 ' + (4 - i) + '</div></div></div>');
@@ -322,7 +322,7 @@
     },
     conquistas: function () {
       var s = [['Primeira semana', 1], ['Hidratada', 1], ['7 dias seguidos', 1], ['Proteína em dia', 0], ['30 dias', 0], ['−5 kg', 1]];
-      return sub('conquistas', 'Metas e conquistas', A.item([137, 138]) + '<span class="item">versão completa</span>') +
+      return sub('conquistas', 'Metas e conquistas', A.item([137, 138])) +
         cartao('<div style="display:flex;align-items:center;gap:16px">' + A.anel({ tamanho: 86, espessura: 8, valor: 9 / 14, cor: 'var(--c2)', centro: '<div class="num" style="font-size:22px;font-weight:700">9</div>' }) +
           '<div><span class="rotulo">Sequência</span><h3>9 dias seguidos registrando</h3><p class="mudo" style="font-size:13px">Recorde: 14 dias</p></div></div>') +
         cartao('<div class="cartao-titulo"><h3>Metas da semana</h3>' + A.item(137) + '</div>' + meta('Registrar o almoço', 4, 7, 'dias', 'var(--c1)') + '<div style="height:10px"></div>' + meta('Caminhar 30 min', 3, 5, 'vezes', 'var(--c5)')) +

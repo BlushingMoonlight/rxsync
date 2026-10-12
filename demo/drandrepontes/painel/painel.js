@@ -6,14 +6,15 @@
   'use strict';
   var A = window.AG;
 
-  // ---------- menu: Centrais, Base, CRM e ERP separados, mais Atendimento RXSync, App e Profissionais ----------
+  // ---------- menu: CDX (Consultório Digital), Equipe, CRM, ERP e Base separados, mais Atendimento RXSync, App e Profissionais ----------
   var MENU = [
     { grupo: 'Hoje', itens: [
       { id: 'dia', nome: 'Visão do dia', ic: 'inicio' },
       { id: 'medico', nome: 'Visão do médico', ic: 'estetoscopio' }] },
-    { grupo: 'Centrais', itens: [
+    { grupo: 'CDX · Consultório Digital', itens: [
       { id: 'central-paciente', nome: 'Central do paciente', ic: 'pacientes' },
-      { id: 'central', nome: 'Central do médico', ic: 'estetoscopio' }] },
+      { id: 'central', nome: 'Central do médico', ic: 'estetoscopio' },
+      { id: 'ficha', nome: 'Ficha e balança', ic: 'documento' }] },
     { grupo: 'Equipe', itens: [
       { id: 'equipe-chat', nome: 'Comunicação', ic: 'chat' },
       { id: 'equipe-paciente', nome: 'Equipe do paciente', ic: 'equipe' },
@@ -36,7 +37,6 @@
       { id: 'crm-indicacoes', nome: 'Indicações', ic: 'trofeu' }] },
     { grupo: 'ERP', itens: [
       { id: 'agenda', nome: 'Agenda', ic: 'calendario' },
-      { id: 'ficha', nome: 'Ficha e balança', ic: 'documento' },
       { id: 'financeiro', nome: 'Financeiro', ic: 'moeda' },
       { id: 'estoque', nome: 'Estoque', ic: 'pilula' },
       { id: 'ia-equipe', nome: 'IA da equipe e manual', ic: 'ia' },
@@ -231,7 +231,7 @@
             '<tr><td rowspan="2"><b>Dr. André</b></td><td>Primeira consulta</td><td>60 min</td><td>30 dias</td></tr><tr><td>Retorno</td><td>30 min</td><td>45 dias</td></tr>' +
             '<tr><td><b>Felipe</b></td><td>Nutrição</td><td>45 min</td><td>30 dias</td></tr><tr><td><b>Maria Clara</b></td><td>Psicologia</td><td>50 min</td><td>7 dias</td></tr></table></div>' +
             '<p class="nota" style="margin-top:8px">Cada um tem a própria grade ' + A.item(25) + '; a IA entende qual consulta o paciente precisa e confirma antes de marcar ' + A.item(24) + '.</p>' +
-            '<p class="nota riscado" style="margin-top:6px">Reservio por médico</p><p class="nota">' + A.item(27) + ' fora do Projeto 1 (escopo versão 3, 11/10/2026): fica para quando um cliente pedir.</p>', 's6') +
+            '<p class="nota riscado" style="margin-top:6px">Reservio por médico</p><p class="nota"><span class="item">fora do escopo</span> Não existe na plataforma; se for criado, volta ao Projeto 1.</p>', 's6') +
           cartao(titulo('Pré-consulta', A.item([28, 29, 30])) +
             '<div class="lista">' + ['Qual é o seu objetivo com o tratamento?', 'Já fez alguma cirurgia?', 'Usa algum remédio todos os dias?', 'Qual é o seu peso hoje (aproximado)?'].map(function (q, i) { return lin('<span class="num fraco">' + (i + 1) + '</span>', q, i < 2 ? '<span class="status st-in">obrigatória</span>' : ''); }).join('') + '</div>' +
             '<p class="nota" style="margin-top:8px">Perguntas por tipo de consulta ' + A.item(28) + '; a IA pergunta antes de confirmar ' + A.item(29) + '; as respostas vão para a ficha e o briefing ' + A.item(30) + '.</p>', 's6') +
@@ -434,7 +434,7 @@
           cartao(titulo('Liga e desliga de tudo', A.item(54)) + '<div class="funcoes">' +
             funcao('IA marca consultas', 'por clínica e por médico', A.item(4), true) + funcao('IA encaminha para a equipe', '', A.item(58), true) +
             funcao('Responder sobre preços', '', A.item(2), true) + funcao('Picadinha no app', 'liga junto a instrução conferida', A.item([124, 125]), true) +
-            funcao('Foto do prato (IA por consumo)', '', A.item(107), true) + funcao('Comunidade', 'versão completa', A.item(139), false) +
+            funcao('Foto do prato (IA por consumo)', '', A.item(107), true) + funcao('Comunidade', 'gamificação e comunidade', A.item(139), false) +
             funcao('Assistente de saúde do paciente', 'depende do parecer jurídico', A.item([143, 144]), false) + funcao('Registro de acessos', '', A.item(45), true, true) + '</div>', 's6') +
           '<div class="s6 pilha">' +
             cartao(titulo('Setores e equipe', A.item(53)) + lista(Object.keys(EQUIPE).map(function (k) { var p = EQUIPE[k]; return lin(pessoa(p), '<b>' + p.nome + '</b><div class="fraco" style="font-size:12px">' + p.papel + ' · WhatsApp cadastrado</div>'); }))) +

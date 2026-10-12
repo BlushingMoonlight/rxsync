@@ -1,4 +1,4 @@
-/* Painel de cada profissional (itens 168 e 169, e lote R8 · Rotinas por função, 171 a 179).
+/* Painel de cada profissional (itens 168 e 169, lote ERP-7; rotinas da operação, ERP-6, e rotinas clínicas, CDX-3: 171 a 179).
    Proposta baseada na rotina de cada função numa clínica de emagrecimento com acompanhamento multiprofissional.
    Dados de exemplo fictícios; as ações funcionam só na memória (recarregar volta ao começo).
    Regras fixas: o sistema não calcula dose (só mostra o que foi prescrito e conferido); a IA não diagnostica

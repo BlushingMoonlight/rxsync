@@ -202,34 +202,26 @@
   }
 
   // ---------- Marcadores de item do escopo ----------
-  // item(107) · item([124, 125]) · novo() · juridico() · proposta()
+  // item(107) · item([124, 125]) · novo() · juridico() · proposta() · sempre()
   // Marcadores clicáveis: tocar abre um balão curto com o significado e o item do escopo ("Ver no escopo").
   function item(n) {
     var l = [].concat(n);
     return '<span class="item" role="button" tabindex="0" data-itens="' + l.join(',') + '" title="Item do escopo">item ' + l.join(' · ') + '</span>';
   }
   function novo(t) { return '<span class="item item-novo" role="button" tabindex="0" data-marca="novo">novo' + (t ? ' · ' + t : '') + '</span>'; }
-  function juridico(t) { return '<span class="item item-juridico" role="button" tabindex="0" data-marca="juridico">' + (t || 'Versão completa · depende do parecer jurídico') + '</span>'; }
+  function juridico(t) { return '<span class="item item-juridico" role="button" tabindex="0" data-marca="juridico">' + (t || 'depende do parecer jurídico') + '</span>'; }
   function proposta() { return '<span class="item item-proposta" role="button" tabindex="0" data-marca="proposta">proposta</span>'; }
   function sempre() { return '<span class="item item-sempre" role="button" tabindex="0" data-marca="sempre">🔒 sempre ligado</span>'; }
 
   var MARCAS = {
     item: 'Número do item no escopo do projeto. Cada função da proposta tem um número fixo, para conferir na reunião.',
     novo: 'Item que ainda não tinha número no escopo e entra como proposta.',
-    proposta: 'Item em proposta: entrou depois da proposta original, com preço a definir e conteúdo a combinar com a equipe.',
+    proposta: 'Item em proposta: sugestão da RXSync além do pedido original, com conteúdo a combinar com a equipe.',
     juridico: 'Só entra no ar depois do parecer do advogado e da classificação de risco (Resolução CFM 2.454/2026). A IA nunca diagnostica, nunca prescreve e nunca fala de dose.',
     sempre: 'Sempre ligado: por segurança, exigência legal ou estrutura do sistema, não tem botão de desligar.'
   };
-  // Preços da proposta: escondidos até digitar a senha no escopo (só para não aparecerem na apresentação).
-  // Liberados ficam só neste aparelho. A senha está no código público: não é proteção de dados.
-  var CHAVE_PRECOS = 'ag-precos-liberados';
-  function precosLiberados() { try { return localStorage.getItem(CHAVE_PRECOS) === '1'; } catch (e) { return false; } }
-  function liberarPrecos(senha) { if (senha !== 'admin') return false; try { localStorage.setItem(CHAVE_PRECOS, '1'); } catch (e) { /* sem armazenamento: vale só agora */ } liberadoAgora = true; return true; }
-  function ocultarPrecos() { liberadoAgora = false; try { localStorage.removeItem(CHAVE_PRECOS); } catch (e) { /* idem */ } }
-  var liberadoAgora = false;
-  function precoVisivel() { return liberadoAgora || precosLiberados(); }
-  // Preço de um lote para mostrar (Projeto 1 virou desconto: sem cobrança à parte).
-  function precoLote(l) { return l.projeto === 1 ? 'Projeto 1 · desconto (sem cobrança à parte)' : l.preco; }
+  // Nenhum preço aparece na demonstração: os balões mostram o lote, o subprojeto e as marcas, sem valores.
+  function nomeSub(l) { var D = window.ESCOPO, s = D && D.subprojetos && D.subprojetos[l.sub]; return s ? s.nome.replace(/^[A-Z]+ · /, '') : ''; }
   // ---------- Itens tirados no escopo: aparecem apagados na demonstração (com "fora do projeto") ----------
   function tirados() {
     var D = window.ESCOPO, o = {}; if (!D) return o;
@@ -252,10 +244,11 @@
     var D = window.ESCOPO; if (!D) return '<p>Item ' + n + ' do escopo.</p>';
     var i = D.itens.filter(function (x) { return x.n === n; })[0]; if (!i) return '<p>Item ' + n + ' do escopo.</p>';
     var l = D.lotes.filter(function (x) { return x.id === i.lote; })[0] || {};
-    var noApp = html.dataset.contexto === 'app'; // no app, nada de preço nem de custo de IA (a IA é cobrada só da clínica)
+    var noApp = html.dataset.contexto === 'app'; // no app, nada de custo de IA (a IA é cobrada só da clínica)
     return '<div class="explica-item"><b>' + n + ' · ' + esc(i.nome) + '</b><p>' + esc(i.desc) + '</p>' +
-      (tirados()[n] ? '<p class="aviso-fora">Tirado no escopo: aparece apagado nesta demonstração. Para religar, toque em "Ver no escopo" e marque "Incluir".</p>' : '') + '<small>' + esc(l.nome || '') +
-      (noApp || !precoVisivel() ? '' : ' · ' + esc(precoLote(l) || '')) + (i.sempre ? ' · 🔒 sempre ligado' : '') + (!noApp && i.consumo ? ' · 💲 IA cobrada da clínica pelo uso' : '') + '</small></div>';
+      (tirados()[n] ? '<p class="aviso-fora">Tirado no escopo: aparece apagado nesta demonstração. Para religar, toque em "Ver no escopo" e marque "Incluir".</p>' : '') + '<small>' + esc(l.nome || '') + (nomeSub(l) && l.sub !== 'P1' ? ' · ' + esc(nomeSub(l)) : '') +
+      (i.obrigatorio ? ' · obrigatório' : '') + (l.proposta ? ' · proposta' : '') + (i.terceiros ? ' · depende de terceiros' : '') +
+      (i.sempre ? ' · 🔒 sempre ligado' : '') + (!noApp && i.consumo ? ' · 💲 IA cobrada da clínica pelo uso' : '') + '</small></div>';
   }
   function fecharExplica() { var e = document.querySelector('.explica-fundo'); if (e) e.remove(); }
   function abrirExplica(el) {
@@ -471,5 +464,5 @@
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { datas: DATAS, log: log, enviarLog: enviarLog, usuario: usuario, USUARIOS: USUARIOS, escolherUsuario: escolherUsuario, trocarUsuario: trocarUsuario, destinoVolta: destinoVolta, raiz: RAIZ, pagina: PAGINA, aparelho: function () { return codigo('localStorage', 'ag-aparelho'); }, sessao: function () { return codigo('sessionStorage', 'ag-sessao'); }, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, precoVisivel: precoVisivel, liberarPrecos: liberarPrecos, ocultarPrecos: ocultarPrecos, precoLote: precoLote, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { datas: DATAS, log: log, enviarLog: enviarLog, usuario: usuario, USUARIOS: USUARIOS, escolherUsuario: escolherUsuario, trocarUsuario: trocarUsuario, destinoVolta: destinoVolta, raiz: RAIZ, pagina: PAGINA, aparelho: function () { return codigo('localStorage', 'ag-aparelho'); }, sessao: function () { return codigo('sessionStorage', 'ag-sessao'); }, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, nomeSub: nomeSub, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();

@@ -20,6 +20,9 @@
 
 .lista-escopo { display: grid; gap: 14px; }
 .titulo-projeto { font-size: 18px; margin: 10px 2px 0; }
+.titulo-sub { margin: 2px 2px 0; font-size: 13.5px; color: var(--texto-2); }
+.titulo-sub b { color: var(--texto); }
+.lote-cab h3 small { font-weight: 500; font-size: 12px; }
 .lote { padding: 0; overflow: hidden; }
 .lote-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 1px solid var(--linha); }
 .lote-cab h3 { font-size: 15px; }
@@ -64,10 +67,6 @@
 @keyframes destaca { 0%, 60% { background: color-mix(in srgb, var(--acento) 26%, transparent); } 100% { background: transparent; } }
 .item-esc.destaque { animation: destaca 2.6s ease both; outline: 2px solid var(--acento); outline-offset: -2px; }
 .item-esc { scroll-margin-top: 140px; }
-.lote-cab .preco.oculto { background: var(--superficie-2); color: var(--texto-3); font-style: italic; }
-.preco-projeto { margin: -4px 2px 4px; font-size: 13.5px; color: var(--texto-2); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-.selo-desconto { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
-[data-estilo="cyber"] .selo-desconto { border-radius: 2px; font-family: var(--fonte-mono); }
 .total-escopo { display: grid; gap: 12px; border: 2px solid color-mix(in srgb, var(--primaria) 45%, transparent); }
 .total-escopo h2 { font-size: 20px; }
 .total-cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -75,7 +74,6 @@
 @media (max-width: 560px) { .total-grade { grid-template-columns: 1fr; } }
 .total-valor { font-size: clamp(24px, 4vw, 32px); font-weight: 750; line-height: 1.15; margin: 4px 0 2px; }
 .total-lista { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; color: var(--texto-2); }
-.total-lista .desconto s { color: var(--texto-3); }
 .salvo-linha { width: 100%; font-size: 12.5px; margin: 0; }
 .salvo-linha:empty { display: none; }
 .acoes-topo .botao[disabled] { opacity: .6; }
