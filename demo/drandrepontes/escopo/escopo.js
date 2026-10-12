@@ -1,10 +1,12 @@
 /* Escopo interativo para a reunião com o Dr. André (prévia).
    Dados: dados.js (gerado a partir do escopo oficial) e telas.js ("ver na tela").
    Marcações (caixa, incluir · dúvida · tirar, anotações) ficam só neste aparelho (localStorage).
-   Começa com todos os itens em "incluir"; "Limpar marcações" volta a esse padrão.
-   Sem preços: a página mostra os itens, os lotes (código novo e o antigo ao lado) e o prazo em semanas por subprojeto
-   (Projeto 1, ERP, CRM, CDX e App). Lote com algum item tirado fica "a recalcular" e continua no prazo; lote com
-   todos os itens tirados sai do prazo. Itens obrigatórios (lotes obrigatórios e o 172) não têm "Tirar". */
+   Começa com todas as caixinhas marcadas e todos os itens em "incluir"; "Limpar marcações" volta a esse padrão.
+   A página mostra os itens, os lotes (código novo e o antigo ao lado) e o prazo em semanas por subprojeto
+   (Projeto 1, ERP, CRM, CDX e App). Lote com todos os itens tirados sai do prazo. Itens obrigatórios
+   (lotes obrigatórios e o 172) não têm "Tirar".
+   Preços: só para o Admin com os preços abertos (arquivo cifrado). Aí cada item mostra o seu preço, e cada lote e
+   subprojeto mostra o valor atual (sem o que foi tirado) e o cheio; o total recalcula na hora. */
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, TELAS = window.TELAS_ITEM || {};
@@ -45,23 +47,39 @@
   }
   function loteParcial(id) {
     var l = D.itens.filter(function (i) { return i.lote === id; }), t = l.filter(function (i) { return M.status[i.n] === 'tirar'; }).length;
-    return t === 0 ? '' : t === l.length ? 'lote retirado · fora do prazo' : 'a recalcular (' + t + ' de ' + l.length + ' itens retirados)';
+    return t === 0 ? '' : t === l.length ? 'lote retirado · fora do prazo' : t + ' de ' + l.length + ' itens tirados';
   }
 
   // ---------- itens e prazo (a conta fica no calculo.js, usada também pelo resumo em PDF) ----------
-  var C = window.CALCULO, semanas = C.semanas;
+  var C = window.CALCULO, semanas = C.semanas, reais = A.reais, V = null; // V: valores (só com os preços abertos)
   function conta() { return C.conta(M); }
+  function valor(atual, cheio) { return atual === cheio ? reais(cheio) : reais(atual) + ' de ' + reais(cheio); }
   function chipsLote(l) {
     if (l.projeto === 1) return '<span class="preco">no plano · obrigatório</span>';
-    return '<span class="preco">' + semanas(l.semanas) + '</span>' + (l.obrigatorio ? '<span class="preco">obrigatório</span>' : '') +
+    return (V && V.lotes[l.id] ? '<span class="preco">' + valor(V.lotes[l.id].atual, V.lotes[l.id].cheio) + '</span>' : '') +
+      '<span class="preco">' + semanas(l.semanas) + '</span>' + (l.obrigatorio ? '<span class="preco">obrigatório</span>' : '') +
       (l.proposta ? '<span class="preco proposta">proposta</span>' : '') + (l.terceiros ? '<span class="preco proposta">terceiros</span>' : '');
   }
   function linhaSub(s) {
-    return s.incluidos + ' de ' + s.total + ' itens · ' + (s.sub === 'P1' ? 'ativação na semana 1, em paralelo' : s.semanas ? semanas(s.semanas) + (s.semanas !== s.semanasCheias ? ' (de ' + semanas(s.semanasCheias) + ')' : '') : 'fora do prazo');
+    var v = V && (s.sub === 'P1' ? { p1: V.p1 } : V.subs[s.sub]);
+    return s.incluidos + ' de ' + s.total + ' itens · ' + (s.sub === 'P1' ? 'ativação na semana 1, em paralelo' : s.semanas ? semanas(s.semanas) + (s.semanas !== s.semanasCheias ? ' (de ' + semanas(s.semanasCheias) + ')' : '') : 'fora do prazo') +
+      (!v ? '' : s.sub === 'P1' ? ' · ' + reais(V.p1.implantacao) + ' + ' + reais(V.p1.mensal) + ' por mês (fora do desconto)' : ' · ' + valor(v.atual, v.cheio) + ' · ' + (v.mensal ? reais(v.mensal) + ' por mês' : 'sem mensalidade'));
+  }
+  function valoresHTML() {
+    if (!V) return '';
+    return '<div class="total-grade">' +
+        '<div><span class="rotulo">Implantação · Projetos 2 e 3</span><div class="total-valor num">' + reais(V.comDesconto) + '</div><small class="fraco">' + reais(V.implantacao) + (V.implantacao !== V.cheio ? ' (de ' + reais(V.cheio) + ' com tudo)' : '') + ' − ' + Math.round(V.desconto * 100) + '% de desconto pelo valor</small></div>' +
+        '<div><span class="rotulo">Mensalidade</span><div class="total-valor num">' + reais(V.mensal) + '</div><small class="fraco">Projetos 2 e 3 + IA por consumo</small></div>' +
+      '</div>' +
+      '<ul class="total-lista">' +
+        '<li><b>À vista em dinheiro ou cripto:</b> ' + reais(V.avista) + '</li>' +
+        '<li><b>Projeto 1 · Plano Gestão Inteligente RXSync:</b> ' + reais(V.p1.implantacao) + ' + ' + reais(V.p1.mensal) + ' por mês, fora do desconto</li>' +
+        '<li><b>Com o Projeto 1:</b> ' + reais(V.comP1) + ' com desconto · ' + reais(V.avistaComP1) + ' à vista em dinheiro ou cripto · ' + reais(V.mensalComP1) + ' por mês + IA por consumo</li>' +
+      '</ul>';
   }
   function totalHTML() {
     var c = conta();
-    return '<section class="cartao total-escopo"><div class="total-cab"><h2>Itens e prazo</h2></div>' +
+    return '<section class="cartao total-escopo"><div class="total-cab"><h2>' + (V ? 'Valores, itens e prazo' : 'Itens e prazo') + '</h2></div>' + valoresHTML() +
       '<div class="total-grade">' +
         '<div><span class="rotulo">Itens incluídos</span><div class="total-valor num">' + c.incluidos + ' de ' + D.itens.length + '</div><small class="fraco">' + c.tirados + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +
         '<div><span class="rotulo">Prazo</span><div class="total-valor num">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</div><small class="fraco">' + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div>' +
@@ -69,9 +87,9 @@
       '<ul class="total-lista">' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') + '</ul>' +
       '<ul class="total-lista">' +
         '<li><b>Etapas:</b> ' + c.etapas.map(function (e) { return 'etapa ' + e.etapa + ' · ' + esc(e.nome) + ' (' + e.prazo + ')'; }).join('; ') + '.</li>' +
-        (c.recalc.length ? '<li><b>A recalcular (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '. O lote continua inteiro no prazo.</li>' : '') +
+        (c.recalc.length ? '<li><b>Lotes com itens tirados (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '.' + (V ? ' O preço dos itens tirados já foi descontado.' : '') + ' O lote continua no prazo.</li>' : '') +
         (c.duvidas ? '<li><b>' + c.duvidas + ' item(ns) em dúvida</b> contam como incluídos.</li>' : '') +
-        '<li>Os valores ficam na proposta da RXSync, à parte.</li>' +
+        (V ? '' : '<li>Os valores ficam na proposta da RXSync, à parte.</li>') +
       '</ul></section>';
   }
 
@@ -79,6 +97,7 @@
   function itemHTML(i) {
     var st = M.status[i.n] || '', nota = M.notas[i.n] || '', tela = TELAS[String(i.n)];
     var opcoes = i.obrigatorio ? ['incluir', 'duvida'] : ['incluir', 'duvida', 'tirar']; // obrigatório não tem "Tirar"
+    var P = V && A.precos(), pr = P && P.itens[i.n];
     return '<div class="item-esc' + (st ? ' st-' + st : '') + '" id="item-' + i.n + '" data-n="' + i.n + '">' +
       '<input type="checkbox" aria-label="Marcar o item ' + i.n + '"' + (M.marcados[i.n] ? ' checked' : '') + ' data-acao="marcar">' +
       '<div class="cab-item"><span class="num-item">' + i.n + '</span><span class="nome-item">' + esc(i.nome) + '</span><span class="selos">' +
@@ -86,7 +105,8 @@
         (i.obrigatorio ? '<span class="item" title="Obrigatório: não pode ser tirado">obrigatório</span>' : '') +
         (i.terceiros ? '<span class="item" title="Depende de certificado, plataforma externa ou aprovação de loja">terceiros</span>' : '') +
         (i.juridico ? A.juridico('depende do parecer jurídico') : '') +
-        (LOTE[i.lote].proposta ? '<span class="item item-proposta">proposta</span>' : '') + '</span></div>' +
+        (LOTE[i.lote].proposta ? '<span class="item item-proposta">proposta</span>' : '') + '</span>' +
+        (pr ? '<span class="preco-item' + (st === 'tirar' ? ' tirado' : '') + '">' + reais(pr) + '</span>' : '') + '</div>' +
       '<div class="desc">' + esc(i.desc) + '</div>' +
       '<div class="ferramentas"><span class="rapida" role="group" aria-label="Marcação rápida">' + opcoes.map(function (k) {
           return '<button type="button" data-acao="status" data-st="' + k + '" aria-pressed="' + (st === k) + '">' + ST_NOME[k] + '</button>';
@@ -97,7 +117,7 @@
       '</div>';
   }
   function desenhar() {
-    var h = '', proj = 0, sub = '', total = 0, c = conta();
+    var h = '', proj = 0, sub = '', total = 0, c = conta(); V = c.valores || null; botaoPrecos();
     D.lotes.forEach(function (l) {
       var its = D.itens.filter(function (i) { return i.lote === l.id && passa(i); }); if (!its.length) return;
       total += its.length;
@@ -146,8 +166,12 @@
       grupo('TIRAR', function (i) { return M.status[i.n] === 'tirar'; }) + '\n' +
       grupo('MARCADOS SEM DECISÃO', function (i) { return M.marcados[i.n] && !M.status[i.n]; }) + '\n' +
       grupo('ANOTAÇÕES EM ITENS SEM DECISÃO', function (i) { return (M.notas[i.n] || '').trim() && !M.status[i.n] && !M.marcados[i.n]; }) + '\n' +
-      'LOTES A RECALCULAR (' + rec.length + ')\n' + (rec.length ? rec.join('\n') : '- nenhum') + '\n\n' + tot +
-      'Valores: na proposta da RXSync, à parte. Nenhum valor foi recalculado.';
+      'LOTES COM ITENS TIRADOS (' + rec.length + ')\n' + (rec.length ? rec.join('\n') : '- nenhum') + '\n\n' + tot +
+      (V ? 'VALORES (preço de cada item; o que foi tirado já está descontado)\n- Implantação dos Projetos 2 e 3: ' + reais(V.implantacao) + (V.implantacao !== V.cheio ? ' (de ' + reais(V.cheio) + ' com tudo)' : '') + '\n' +
+        '- Desconto pelo valor: ' + Math.round(V.desconto * 100) + '% · com desconto: ' + reais(V.comDesconto) + '\n- À vista em dinheiro ou cripto: ' + reais(V.avista) + '\n' +
+        '- Mensalidade: ' + reais(V.mensal) + ' + IA por consumo\n- Projeto 1: ' + reais(V.p1.implantacao) + ' + ' + reais(V.p1.mensal) + ' por mês (fora do desconto)\n' +
+        '- Com o Projeto 1: ' + reais(V.comP1) + ' com desconto · ' + reais(V.avistaComP1) + ' à vista · ' + reais(V.mensalComP1) + ' por mês'
+        : 'Valores: na proposta da RXSync, à parte.');
   }
   function avisoCurto(m) { var v = document.querySelector('.aviso-curto'); if (v) v.remove(); v = document.createElement('div'); v.className = 'aviso-curto'; v.textContent = m; document.body.appendChild(v); setTimeout(function () { v.remove(); }, 2600); }
   function mostrarResumo(texto, copiou) {
@@ -178,12 +202,44 @@
   function desligados() { return D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; }).map(function (i) { return i.n; }); }
   function ultimoEnvio() { try { return localStorage.getItem(CHAVE + '-enviado') || ''; } catch (e) { return ''; } }
   function mostrarEnvio() { var u = ultimoEnvio(); $('salvo').textContent = u ? 'Salvo e enviado em ' + u : ''; }
+  // Os valores só vão no total quando quem salva é o Admin com os preços abertos.
+  function totalEnviado(c) {
+    var t = { itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, lotes_com_itens_tirados: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
+      subprojetos: c.ordem.reduce(function (o, k) { var x = c.subs[k]; o[k] = { itens: x.incluidos, de: x.total, tirados: x.tirados, semanas: x.semanas }; return o; }, {}) };
+    var v = A.usuario() === 'admin' && c.valores;
+    if (v) t.valores = { implantacao: v.implantacao, cheio: v.cheio, desconto: v.desconto, com_desconto: v.comDesconto, a_vista: v.avista, mensal: v.mensal,
+      com_p1: v.comP1, a_vista_com_p1: v.avistaComP1, mensal_com_p1: v.mensalComP1,
+      subprojetos: Object.keys(v.subs).reduce(function (o, k) { o[k] = v.subs[k]; return o; }, {}) };
+    return t;
+  }
+  // Admin numa aba sem os preços abertos (ex.: veio de "Ver no escopo"): pode abrir aqui com a senha.
+  function botaoPrecos() {
+    var b = $('precos'); if (!b) return;
+    b.hidden = !(A.usuario() === 'admin' && !A.precos());
+  }
+  function pedirSenha() {
+    var f = document.createElement('div'); f.className = 'folha-fundo';
+    f.innerHTML = '<form class="folha"><h2 style="font-size:20px">Abrir preços</h2><p class="mudo" style="font-size:13.5px">Digite a senha do Admin. Os preços ficam abertos só nesta aba.</p>' +
+      '<input class="campo" type="password" name="s" autocomplete="off" aria-label="Senha do Admin"><div class="erro" aria-live="polite" style="font-size:13px"></div>' +
+      '<div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="botao botao-claro" data-fechar>Cancelar</button><button type="submit" class="botao">Abrir</button></div></form>';
+    document.body.appendChild(f);
+    f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
+    f.querySelector('form').addEventListener('submit', function (ev) {
+      ev.preventDefault(); var erro = f.querySelector('.erro'), bt = f.querySelector('[type=submit]'); bt.disabled = true; erro.textContent = 'Conferindo…';
+      A.abrirPrecos(String(new FormData(ev.target).get('s') || '')).then(function (ok) {
+        bt.disabled = false;
+        if (!ok) { erro.textContent = 'Senha incorreta.'; A.log('senha-admin-errada', {}); return; }
+        A.log('precos-abertos', {}); f.remove(); desenhar(); avisoCurto('Preços abertos nesta aba.');
+      });
+    });
+    f.querySelector('input').focus();
+  }
+  $('precos').addEventListener('click', pedirSenha);
   $('salvar').addEventListener('click', function () {
     var b = $('salvar'), c = conta();
     var corpo = JSON.stringify({ tipo: 'escopo', usuario: A.usuario(), aparelho: A.aparelho(), sessao: A.sessao(), versao: D.versao,
       marcacoes: { status: M.status, marcados: M.marcados }, anotacoes: M.notas, desligados: desligados(),
-      total: { itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, recalcular: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
-        subprojetos: c.ordem.reduce(function (o, k) { var x = c.subs[k]; o[k] = { itens: x.incluidos, de: x.total, tirados: x.tirados, semanas: x.semanas }; return o; }, {}) } });
+      total: totalEnviado(c) });
     b.disabled = true; b.textContent = 'Enviando…';
     function fim(ok) {
       b.disabled = false; b.textContent = 'Salvar e enviar à RXSync';

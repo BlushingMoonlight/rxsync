@@ -15,7 +15,7 @@
   <header class="topo-escopo">
     <a class="voltar-home" href="../" data-leva-estilo>‹ Início</a>
     <div class="linha-titulo"><div id="logo"></div><div><h1>Escopo do projeto</h1><p class="mudo" id="versao"></p></div></div>
-    <p class="mudo dica-topo">Tudo começa em <b>incluir</b>. Marque o que foi conversado, mude para <b>dúvida</b> ou <b>tirar</b> e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião".</p>
+    <p class="mudo dica-topo">Tudo começa marcado e em <b>incluir</b>. Mude para <b>dúvida</b> ou <b>tirar</b>, desmarque o que ainda não foi conversado e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião".</p>
   </header>
 
   <section class="painel-fixo" aria-label="Contador e ações">
@@ -25,6 +25,7 @@
       <a class="botao botao-claro" id="pdf" href="resumo/" data-leva-estilo style="text-decoration:none">Resumo do escopo em PDF</a>
       <button class="botao botao-claro" type="button" id="copiar">Copiar resumo da reunião</button>
       <button class="botao botao-claro" type="button" id="limpar">Limpar marcações</button>
+      <button class="botao botao-claro" type="button" id="precos" hidden>Abrir preços</button>
     </div>
     <p class="fraco salvo-linha" id="salvo" aria-live="polite"></p>
   </section>
@@ -46,7 +47,7 @@
 
   <div id="lista" class="lista-escopo"></div>
   <div id="total"></div>
-  <p class="nota-rodape fraco">Tudo começa em "incluir". Os lotes têm código novo, com o antigo ao lado. Itens obrigatórios (todo o Projeto 1, ERP-1, CDX-1, APP-1, APP-9 e o item 172) não podem ser tirados. Um lote com item tirado continua inteiro e fica "a recalcular"; lote sem nenhum item sai do prazo. Os valores ficam na proposta da RXSync, à parte.</p>
+  <p class="nota-rodape fraco">Tudo começa marcado e em "incluir". Os lotes têm código novo, com o antigo ao lado. Itens obrigatórios (todo o Projeto 1, ERP-1, CDX-1, APP-1, APP-9 e o item 172) não podem ser tirados. Lote sem nenhum item sai do prazo.</p>
 </main>
 <script src="dados.js"></script>
 <script src="telas.js"></script>

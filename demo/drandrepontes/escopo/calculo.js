@@ -1,16 +1,19 @@
-/* Conta do escopo (usada pela página do escopo e pelo resumo em PDF). Dados: dados.js.
-   Sem preços: a demonstração mostra só itens, lotes e semanas. Os valores ficam na proposta, à parte.
+/* Conta do escopo (usada pela página do escopo e pelo resumo em PDF). Dados: dados.js (sem preço).
    Por subprojeto (Projeto 1, ERP, CRM, CDX e App): itens incluídos, tirados e em dúvida, e o prazo em semanas.
-   Lote com algum item tirado continua inteiro no prazo ("a recalcular"); lote com todos os itens tirados sai do prazo.
+   Lote com algum item tirado continua no prazo; lote com todos os itens tirados sai do prazo.
    Itens obrigatórios (lotes obrigatórios e o 172) não podem ser tirados. Itens em dúvida contam como incluídos.
+   Valores: SÓ quando o Admin abriu os preços (AG.precos(), arquivo cifrado). Nenhum valor está escrito neste código.
+   Tirar um item desconta o preço dele do lote, do subprojeto e do total, na hora; a mensalidade do subprojeto só conta
+   se algum item dele estiver incluído; desconto por faixa e à vista recalculados; Projeto 1 à parte, fora do desconto.
    As marcações ficam só no aparelho (localStorage), na chave da versão do escopo. */
 (function () {
   'use strict';
   var D = window.ESCOPO;
-  var CHAVE = 'ag-escopo-reuniao-v' + D.versao + '-padrao-incluir';
+  var CHAVE = window.AG.chaveEscopo();
   var ITEM = {}; D.itens.forEach(function (i) { ITEM[i.n] = i; });
   var ORDEM_SUB = ['P1', 'ERP', 'CRM', 'CDX', 'APP'];
-  function padrao() { var st = {}; D.itens.forEach(function (i) { st[i.n] = 'incluir'; }); return { marcados: {}, status: st, notas: {} }; }
+  // Padrão: todas as caixinhas marcadas e todos os itens em "incluir".
+  function padrao() { var st = {}, mc = {}; D.itens.forEach(function (i) { st[i.n] = 'incluir'; mc[i.n] = true; }); return { marcados: mc, status: st, notas: {} }; }
   function ler() {
     var s = null;
     try { s = JSON.parse(localStorage.getItem(CHAVE) || 'null'); } catch (e) { /* sem armazenamento */ }
@@ -41,7 +44,36 @@
     });
     ORDEM_SUB.forEach(function (k) { var s = subs[k]; s.ativo = s.incluidos > 0; s.semanas = Math.round(s.semanas * 10) / 10; s.semanasCheias = Math.round(s.semanasCheias * 10) / 10; });
     var c = cronograma(subs);
-    return { subs: subs, ordem: ORDEM_SUB, recalc: recalc, duvidas: duvidas, tirados: tirados, incluidos: D.itens.length - tirados, etapas: c.etapas, semanasTotal: c.total, semanasCheias: c.cheias };
+    var r = { subs: subs, ordem: ORDEM_SUB, recalc: recalc, duvidas: duvidas, tirados: tirados, incluidos: D.itens.length - tirados, etapas: c.etapas, semanasTotal: c.total, semanasCheias: c.cheias };
+    var P = window.AG.precos(); if (P) r.valores = valores(M, P, subs);
+    return r;
+  }
+  // ---------- valores (só com os preços abertos) ----------
+  function centavos(v) { return Math.round(v * 100) / 100; }
+  function faixa(P, imp) { for (var k = 0; k < P.faixas.length; k++) { var f = P.faixas[k]; if (f.ate === null || imp <= f.ate) return f.desconto; } return 0; }
+  // Implantação, desconto, à vista e mensalidade de um conjunto de valores (Projetos 2 e 3), com o Projeto 1 à parte.
+  function fechar(P, imp, cheio, mensal) {
+    var d = faixa(P, imp), comDesconto = centavos(imp * (1 - d)), avista = Math.round(comDesconto * P.avista);
+    return { implantacao: imp, cheio: cheio, desconto: d, comDesconto: comDesconto, avista: avista, mensal: mensal,
+      p1: P.p1, comP1: centavos(comDesconto + P.p1.implantacao), avistaComP1: avista + P.p1.implantacao, mensalComP1: mensal + P.p1.mensal };
+  }
+  function valores(M, P, subs) {
+    var lotes = {}, imp = 0, cheio = 0, mensal = 0, porSub = {};
+    D.lotes.forEach(function (l) {
+      if (l.projeto === 1) return;
+      var atual = 0; D.itens.forEach(function (i) { if (i.lote === l.id && M.status[i.n] !== 'tirar') atual += P.itens[i.n] || 0; });
+      lotes[l.id] = { atual: atual, cheio: P.lotes[l.id] };
+      var s = porSub[l.sub] = porSub[l.sub] || { atual: 0, cheio: 0, mensal: 0 }; s.atual += atual; s.cheio += P.lotes[l.id];
+    });
+    Object.keys(porSub).forEach(function (k) { var s = porSub[k]; s.mensal = subs[k] && subs[k].ativo ? P.mensal[k] : 0; imp += s.atual; cheio += s.cheio; mensal += s.mensal; });
+    var r = fechar(P, imp, cheio, mensal); r.lotes = lotes; r.subs = porSub; return r;
+  }
+  // Pacote com subprojetos inteiros (para conferir a tabela de pacotes).
+  function pacote(P, lista) {
+    var imp = 0, mensal = 0;
+    D.lotes.forEach(function (l) { if (lista.indexOf(l.sub) >= 0) imp += P.lotes[l.id]; });
+    lista.forEach(function (k) { mensal += P.mensal[k]; });
+    return fechar(P, imp, imp, mensal);
   }
   // Etapas em sequência (cada uma entrega um subprojeto inteiro); o Projeto 1 é ativado na semana 1, em paralelo.
   // Subprojeto sem nenhum lote incluído sai do cronograma, e as etapas seguintes sobem.
@@ -58,5 +90,5 @@
     });
     return { etapas: etapas, total: fim, cheias: Math.round(cheias * 10) / 10 };
   }
-  window.CALCULO = { CHAVE: CHAVE, ORDEM_SUB: ORDEM_SUB, padrao: padrao, ler: ler, semanas: semanas, num: num, situacao: situacao, conta: conta };
+  window.CALCULO = { CHAVE: CHAVE, ORDEM_SUB: ORDEM_SUB, padrao: padrao, ler: ler, semanas: semanas, num: num, situacao: situacao, conta: conta, pacote: pacote, reais: window.AG.reais };
 })();
