@@ -85,7 +85,8 @@
       var t = s.total || {};
       return '<details class="versao"' + (i === esc0.length - 1 ? ' open' : '') + '><summary><b>Versão ' + (i + 1) + '</b> · ' + dh(s.quando) + ' · escopo v' + esc(s.versao) + ' · ' + (s.desligados || []).length + ' itens tirados' +
         (t.semanas != null ? ' · prazo ' + esc(String(t.semanas).replace('.', ',')) + ' semanas' : '') +
-        (t.itens_incluidos != null ? ' · ' + esc(t.itens_incluidos) + ' itens incluídos' : '') + '</summary>' +
+        (t.itens_incluidos != null ? ' · ' + esc(t.itens_incluidos) + ' itens incluídos' : '') +
+        (t.valores && isFinite(t.valores.com_desconto) ? ' · ' + esc(A.reais(+t.valores.com_desconto)) + ' com desconto (Admin)' : '') + '</summary>' +
         (ant ? (mud.length ? '<ul>' + mud.map(function (m) { return '<li>' + m + '</li>'; }).join('') + '</ul>' : '<p class="mudo">Nada mudou em relação à versão anterior.</p>') : '<p class="mudo">Primeira versão. Itens tirados: ' + ((s.desligados || []).map(esc).join(', ') || 'nenhum') + '.</p>') + '</details>';
     }).join('') : '<p class="mudo">Nenhum escopo salvo.</p>');
     // Questionário

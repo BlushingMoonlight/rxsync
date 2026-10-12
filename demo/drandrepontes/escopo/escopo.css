@@ -13,7 +13,8 @@
 .contador b { font-family: var(--fonte-num); margin-right: 3px; }
 [data-estilo="cyber"] .contador span { border-radius: 2px; font-family: var(--fonte-mono); }
 .acoes-topo { display: flex; gap: 8px; flex-wrap: wrap; }
-.acoes-topo .botao { height: 38px; font-size: 13px; }
+.acoes-topo .botao { min-height: 38px; height: auto; font-size: 13px; line-height: 1.2; padding-top: 6px; padding-bottom: 6px; }
+.acoes-topo [hidden] { display: none !important; }
 
 .filtros { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; }
 @media (max-width: 760px) { .filtros { grid-template-columns: 1fr 1fr; } .filtros #busca { grid-column: span 2; } }
@@ -77,3 +78,6 @@
 .salvo-linha { width: 100%; font-size: 12.5px; margin: 0; }
 .salvo-linha:empty { display: none; }
 .acoes-topo .botao[disabled] { opacity: .6; }
+/* Preço do item: só aparece para o Admin com os preços abertos. */
+.preco-item { margin-left: auto; font-size: 12.5px; font-weight: 700; white-space: nowrap; color: var(--primaria); }
+.preco-item.tirado { text-decoration: line-through; color: var(--texto-3); }

@@ -1,10 +1,12 @@
 /* Resumo do escopo para imprimir ou salvar em PDF, montado a partir das marcações do escopo neste aparelho.
    Capa com a logo, a data real e o índice; subprojetos e lotes incluídos; itens tirados; prazos por etapa com o
-   gráfico de semanas. Sem preços: os valores ficam na proposta da RXSync, à parte. */
+   gráfico de semanas. Valores só para o Admin com os preços abertos (arquivo cifrado): implantação, desconto, à vista,
+   mensalidade, Projeto 1 à parte, valor de cada lote e de cada item, e o gráfico de implantação por subprojeto. */
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, C = window.CALCULO, M = C.ler(), esc = A.esc, DT = A.datas, semanas = C.semanas, num = C.num;
-  var c = C.conta(M), agora = DT.agora();
+  var c = C.conta(M), agora = DT.agora(), V = c.valores || null, P = V && A.precos(), reais = A.reais;
+  function valor(atual, cheio) { return atual === cheio ? reais(cheio) : reais(atual) + ' de ' + reais(cheio); }
   var tirados = D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; });
   function itensLote(id) { return D.itens.filter(function (i) { return i.lote === id; }); }
   function incluidos(id) { return itensLote(id).filter(function (i) { return M.status[i.n] !== 'tirar'; }); }
@@ -25,12 +27,35 @@
       var inc = incluidos(l.id), tot = itensLote(l.id).length;
       if (!inc.length) return '';
       var s = C.situacao([l.id], M);
-      var marcas = [l.antigo ? 'antes ' + l.antigo : '', l.projeto === 1 ? 'no plano' : semanas(l.semanas), l.obrigatorio ? 'obrigatório' : '', l.proposta ? 'proposta' : '', l.terceiros ? 'terceiros' : ''].filter(Boolean).join(' · ');
+      var marcas = [V && V.lotes[l.id] ? valor(V.lotes[l.id].atual, V.lotes[l.id].cheio) : '', l.antigo ? 'antes ' + l.antigo : '', l.projeto === 1 ? 'no plano' : semanas(l.semanas), l.obrigatorio ? 'obrigatório' : '', l.proposta ? 'proposta' : '', l.terceiros ? 'terceiros' : ''].filter(Boolean).join(' · ');
       return '<div class="lote"><div class="lote-cab"><b>' + esc(l.nome) + '</b><span>' + esc(marcas) + (s.parcial ? ' · <em>a recalcular</em>' : '') + '</span></div>' +
-        '<p class="fraco">' + inc.length + ' de ' + tot + ' itens: ' + inc.map(function (i) { return i.n + ' ' + esc(i.nome); }).join(' · ') + '</p></div>';
+        '<p class="fraco">' + inc.length + ' de ' + tot + ' itens: ' + inc.map(function (i) { return i.n + ' ' + esc(i.nome) + (P && P.itens[i.n] ? ' (' + reais(P.itens[i.n]) + ')' : ''); }).join(' · ') + '</p></div>';
     }).join('');
   }
-  function linhaSub(s) { return s.incluidos + ' de ' + s.total + ' itens · ' + (s.sub === 'P1' ? 'ativação na semana 1, em paralelo' : s.semanas ? semanas(s.semanas) : 'fora do prazo'); }
+  function linhaSub(s) {
+    var v = V && V.subs[s.sub];
+    return s.incluidos + ' de ' + s.total + ' itens · ' + (s.sub === 'P1' ? 'ativação na semana 1, em paralelo' : s.semanas ? semanas(s.semanas) : 'fora do prazo') +
+      (!V ? '' : s.sub === 'P1' ? ' · ' + reais(V.p1.implantacao) + ' + ' + reais(V.p1.mensal) + ' por mês' : v ? ' · ' + valor(v.atual, v.cheio) + (v.mensal ? ' + ' + reais(v.mensal) + ' por mês' : '') : '');
+  }
+  // Barras horizontais em SVG (sem biblioteca): implantação por subprojeto.
+  function barras(lista) {
+    var max = Math.max.apply(null, lista.map(function (x) { return x[1]; })) || 1, h = 34, W = 640, rot = 150;
+    return '<svg class="grafico" viewBox="0 0 ' + W + ' ' + (lista.length * h + 8) + '" role="img" aria-label="Implantação por subprojeto">' + lista.map(function (x, k) {
+      var w = Math.max(2, (x[1] / max) * (W - rot - 130)), y = k * h + 4;
+      return '<text x="0" y="' + (y + 20) + '" class="r">' + esc(x[0]) + '</text><rect x="' + rot + '" y="' + (y + 6) + '" width="' + w.toFixed(1) + '" height="20" rx="4" class="b p' + (k + 1) + '"/>' +
+        '<text x="' + (rot + w + 8).toFixed(1) + '" y="' + (y + 20) + '" class="v">' + esc(reais(x[1])) + '</text>';
+    }).join('') + '</svg>';
+  }
+  function valoresHTML() {
+    if (!V) return '';
+    return '<h3>Valores</h3><div class="resumo"><div><span class="rotulo">Implantação · Projetos 2 e 3</span><b class="grande">' + reais(V.comDesconto) + '</b><small>' + reais(V.implantacao) + ' − ' + Math.round(V.desconto * 100) + '% de desconto pelo valor</small></div>' +
+      '<div><span class="rotulo">Mensalidade</span><b class="grande">' + reais(V.mensal) + '</b><small>Projetos 2 e 3 + IA por consumo</small></div></div>' +
+      '<ul><li><b>À vista em dinheiro ou cripto:</b> ' + reais(V.avista) + '</li>' +
+      '<li><b>Projeto 1:</b> ' + reais(V.p1.implantacao) + ' + ' + reais(V.p1.mensal) + ' por mês, fora do desconto</li>' +
+      '<li><b>Com o Projeto 1:</b> ' + reais(V.comP1) + ' com desconto · ' + reais(V.avistaComP1) + ' à vista · ' + reais(V.mensalComP1) + ' por mês + IA por consumo</li>' +
+      (V.implantacao !== V.cheio ? '<li>Com tudo incluído, a implantação seria ' + reais(V.cheio) + '. O preço de cada item tirado já foi descontado.</li>' : '') + '</ul>' +
+      '<h3>Implantação por subprojeto</h3>' + barras(['ERP', 'CRM', 'CDX', 'APP'].filter(function (k) { return V.subs[k] && V.subs[k].atual; }).map(function (k) { return [c.subs[k].nome.replace(/ · .*$/, ''), V.subs[k].atual]; }));
+  }
   var dataExt = DT.cap(DT.extenso(agora)) + ' de ' + agora.getFullYear();
   var SECOES = c.ordem.map(function (k) { var sp = D.subprojetos[k]; return [k, k === 'P1' ? D.projetos[1] : 'Projeto ' + sp.projeto + ' · ' + sp.nome]; });
   var indice = ['Resumo'].concat(SECOES.map(function (x) { return x[1]; }), ['Itens tirados', 'Prazos por etapa']);
@@ -39,13 +64,13 @@
     '<h1>Resumo do escopo</h1><p class="sub">Clínica Evoluir · Dr. André Pontes Gonçalves</p>' +
     '<p class="data">' + dataExt + ' · escopo versão ' + esc(D.versao) + '</p>' +
     '<ol class="indice">' + indice.map(function (t, i) { return '<li><a href="#s' + (i + 1) + '">' + esc(t) + '</a></li>'; }).join('') + '</ol>' +
-    '<p class="fraco nota-capa">Montado a partir das marcações feitas no escopo deste aparelho. Os valores ficam na proposta da RXSync, à parte.</p></section>';
+    '<p class="fraco nota-capa">Montado a partir das marcações feitas no escopo deste aparelho.' + (V ? '' : ' Os valores ficam na proposta da RXSync, à parte.') + '</p></section>';
 
   h += secao(1, 'Resumo',
     '<div class="resumo"><div><span class="rotulo">Itens incluídos</span><b class="grande">' + c.incluidos + ' de ' + D.itens.length + '</b><small>' + tirados.length + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +
     '<div><span class="rotulo">Prazo</span><b class="grande">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</b><small>' + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div></div>' +
     '<ul>' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') +
-    (c.recalc.length ? '<li><b>A recalcular:</b> ' + c.recalc.map(esc).join(', ') + ' (o lote continua inteiro no prazo)</li>' : '') + '</ul>');
+    (c.recalc.length ? '<li><b>Lotes com itens tirados:</b> ' + c.recalc.map(esc).join(', ') + ' (continuam no prazo' + (V ? '; o preço dos itens tirados já foi descontado' : '') + ')</li>' : '') + '</ul>' + valoresHTML());
   SECOES.forEach(function (x, n) {
     var sp = D.subprojetos[x[0]], s = c.subs[x[0]];
     h += secao(n + 2, x[1], '<p>' + esc(sp.desc) + ' <b>' + linhaSub(s) + '.</b></p>' + (lotesDoSub(x[0]) || '<p class="mudo">Nenhum lote incluído.</p>'));
@@ -61,6 +86,6 @@
     '<p class="fraco">Prazos que não dependem da RXSync (certificado, plataformas externas, lojas e pareceres jurídicos) podem deslocar as etapas ligadas a eles.</p>');
   h += '<p class="rodape fraco">Gerado em ' + DT.dma(agora) + ' às ' + DT.hm(agora) + '. Escopo sujeito a confirmação.</p>';
   document.getElementById('doc').innerHTML = h;
-  A.log('resumo-pdf-aberto', { tirados: tirados.length, semanas: c.semanasTotal });
+  A.log('resumo-pdf-aberto', { tirados: tirados.length, semanas: c.semanasTotal, precos: !!V });
   document.getElementById('imprimir').addEventListener('click', function () { A.log('resumo-pdf-imprimir', {}); A.enviarLog(true); window.print(); });
 })();

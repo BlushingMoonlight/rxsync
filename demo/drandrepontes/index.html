@@ -62,7 +62,8 @@
   </section>
 
   <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap"><a class="botao botao-claro" href="escopo/" data-leva-estilo style="text-decoration:none">Escopo do projeto</a>
-    <a class="botao" id="link-questionario" href="questionario/" data-leva-estilo style="text-decoration:none" hidden>Responder o questionário</a></div>
+    <a class="botao botao-claro" href="escopo/resumo/" data-leva-estilo style="text-decoration:none">Resumo do escopo em PDF</a>
+    <a class="botao" href="questionario/" data-leva-estilo style="text-decoration:none">Responder o questionário</a></div>
 
   <p class="usuario-linha fraco" id="usuario-linha"></p>
   <p class="rodape-home fraco">Prévia com dados de exemplo. A IA é simulada: não diagnostica, não prescreve e o app não calcula dose. O estilo muda pelo botão do canto.</p>
@@ -92,11 +93,11 @@
   }
   previas(); window.addEventListener('resize', previas); document.addEventListener('estilo', previas);
 
-  // Quem está usando (Datalog): Admin (Jean), Dr. André ou Convidado. A senha só identifica quem usa; fica guardado no aparelho.
+  // Quem está usando (Datalog): Admin (Jean), Dr. André ou Convidado. Fica guardado no aparelho. A senha do Admin é conferida
+  // abrindo o arquivo de preços cifrado (não está no código); as do Dr. André e do Convidado só identificam quem usa.
   function mostrarUsuario() {
     var u = AG.usuario();
     document.getElementById('usuario-linha').innerHTML = u ? 'Usando como ' + AG.USUARIOS[u][0] + ' · <button type="button" id="trocar-usuario">trocar usuário</button>' : '';
-    document.getElementById('link-questionario').hidden = !(u === 'andre' || u === 'convidado');
   }
   function escolha() {
     var f = document.createElement('div'); f.className = 'escolha-fundo';
@@ -113,10 +114,16 @@
     });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      if (!AG.escolherUsuario(escolhido, form.senha.value)) { form.querySelector('.erro').textContent = 'Senha incorreta.'; form.senha.select(); return; }
-      var volta = AG.destinoVolta();
-      if (volta) { AG.enviarLog(true); location.replace(volta); return; }
-      f.remove(); mostrarUsuario();
+      var botao = form.querySelector('button'), erro = form.querySelector('.erro');
+      if (!escolhido) return;
+      botao.disabled = true; erro.textContent = escolhido === 'admin' ? 'Conferindo…' : '';
+      AG.entrar(escolhido, form.senha.value).then(function (ok) {
+        botao.disabled = false;
+        if (!ok) { erro.textContent = 'Senha incorreta.'; form.senha.select(); return; }
+        var volta = AG.destinoVolta();
+        if (volta) { AG.enviarLog(true); location.replace(volta); return; }
+        f.remove(); mostrarUsuario();
+      });
     });
   }
   document.addEventListener('click', function (ev) {
