@@ -15,13 +15,14 @@
   <header class="topo-escopo">
     <a class="voltar-home" href="../" data-leva-estilo>‹ Início</a>
     <div class="linha-titulo"><div id="logo"></div><div><h1>Escopo do projeto</h1><p class="mudo" id="versao"></p></div></div>
-    <p class="mudo dica-topo">Marque o que foi conversado, escolha <b>incluir</b>, <b>dúvida</b> ou <b>tirar</b> e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião".</p>
+    <p class="mudo dica-topo">Tudo começa em <b>incluir</b>. Marque o que foi conversado, mude para <b>dúvida</b> ou <b>tirar</b> e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião".</p>
   </header>
 
   <section class="painel-fixo" aria-label="Contador e ações">
     <div class="contador" id="contador"></div>
     <div class="acoes-topo">
       <button class="botao" type="button" id="copiar">Copiar resumo da reunião</button>
+      <button class="botao botao-claro" type="button" id="precos">Mostrar preços</button>
       <button class="botao botao-claro" type="button" id="limpar">Limpar marcações</button>
     </div>
   </section>
@@ -42,7 +43,8 @@
   </section>
 
   <div id="lista" class="lista-escopo"></div>
-  <p class="nota-rodape fraco">Preço por lote como na proposta. Itens em proposta: preço a definir. Um lote com item retirado fica "a recalcular" (sem cálculo automático).</p>
+  <div id="total"></div>
+  <p class="nota-rodape fraco">Tudo começa em "incluir". Projeto 1: preço fixo (entra como desconto). Projetos 2 e 3: preço por lote; um lote com item retirado mantém o preço e fica "a recalcular" (sem desconto automático); lote sem nenhum item sai da soma; itens em proposta têm preço a definir e ficam fora da soma.</p>
 </main>
 <script src="dados.js"></script>
 <script src="telas.js"></script>
