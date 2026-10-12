@@ -261,7 +261,107 @@
     a.setAttribute('aria-label', 'Voltar para o início da demonstração'); a.textContent = '‹ Demo';
     document.body.appendChild(a);
   }
+  // ---------- datas reais (hoje, semana, feriados) ----------
+  // Os dados de exemplo são relativos a hoje. Nos textos, marcas {formato:deslocamento} viram a data real:
+  //   {d:-3} 10/10 · {a:+30} 12/11/2026 · {ws:+1} qua · {Ws:+1} Qua · {wl:+1} quarta · {Wl:+1} Quarta
+  //   {x:0} terça, 13 de outubro · {X:0} Terça, 13 de outubro · {r:-3} há 3 dias · {R:0} Hoje
+  //   {h:-45} hora de 45 minutos atrás · {m:0} outubro · {M:-1} Setembro · {y:0} 2026
+  //   "u" conta dias úteis (sem fim de semana e feriado): {Ws:u+2} = dia da semana do 2º dia útil depois de hoje.
+  //   "p" é a próxima ocorrência de um dia da semana: {d:p4} = data da próxima quinta.
+  var MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  var SEM_LONGO = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  var SEM_CURTO = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+  function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function dois(n) { return (n < 10 ? '0' : '') + n; }
+  function agora() { return new Date(); }
+  function meiaNoite(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function hoje() { return meiaNoite(agora()); }
+  function somaDias(d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); return x; }
+  function diasEntre(a, b) { return Math.round((meiaNoite(b) - meiaNoite(a)) / 864e5); }
+  // Páscoa (algoritmo de Meeus) para a Sexta-feira Santa.
+  function pascoa(ano) {
+    var a = ano % 19, b = Math.floor(ano / 100), c = ano % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+    var h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    var mes = Math.floor((h + l - 7 * m + 114) / 31), dia = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(ano, mes - 1, dia);
+  }
+  var cacheFeriados = {};
+  // Feriados nacionais (Lei 662/1949 e seguintes, incluindo 20/11 desde 2024).
+  function feriados(ano) {
+    if (cacheFeriados[ano]) return cacheFeriados[ano];
+    var l = [[1, 1, 'Confraternização Universal'], [4, 21, 'Tiradentes'], [5, 1, 'Dia do Trabalho'], [9, 7, 'Independência'], [10, 12, 'Nossa Senhora Aparecida'],
+      [11, 2, 'Finados'], [11, 15, 'Proclamação da República'], [11, 20, 'Consciência Negra'], [12, 25, 'Natal']].map(function (x) { return { data: new Date(ano, x[0] - 1, x[1]), nome: x[2] }; });
+    l.push({ data: somaDias(pascoa(ano), -2), nome: 'Sexta-feira Santa' });
+    return (cacheFeriados[ano] = l.sort(function (a, b) { return a.data - b.data; }));
+  }
+  function feriado(d) { var f = feriados(d.getFullYear()).filter(function (x) { return diasEntre(x.data, d) === 0; })[0]; return f ? f.nome : ''; }
+  function util(d) { var w = d.getDay(); return w > 0 && w < 6 && !feriado(d); }
+  function somaUteis(d, n) { var x = meiaNoite(d), passo = n < 0 ? -1 : 1, k = Math.abs(n); while (k > 0) { x = somaDias(x, passo); if (util(x)) k--; } return x; }
+  function proximoFeriado(d) {
+    d = meiaNoite(d || agora());
+    var l = feriados(d.getFullYear()).concat(feriados(d.getFullYear() + 1)).filter(function (x) { return x.data >= d; });
+    return l[0];
+  }
+  // Semana mostrada na agenda: a do dia de referência (hoje, se for dia útil; senão, o próximo dia útil).
+  function semana() {
+    var h = hoje(), ref = util(h) ? h : somaUteis(h, 1), seg = somaDias(ref, 1 - ref.getDay());
+    var dias = [0, 1, 2, 3, 4].map(function (i) { return somaDias(seg, i); });
+    return { dias: dias, ref: ref.getDay() - 1, hoje: dias.map(Number).indexOf(+h), refData: ref };
+  }
+  function dm(d) { return dois(d.getDate()) + '/' + dois(d.getMonth() + 1); }
+  function dma(d) { return dm(d) + '/' + d.getFullYear(); }
+  function hm(d) { return dois(d.getHours()) + ':' + dois(d.getMinutes()); }
+  function extenso(d) { return SEM_LONGO[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
+  function relativo(n) { return n === 0 ? 'hoje' : n === -1 ? 'ontem' : n === 1 ? 'amanhã' : n < 0 ? 'há ' + -n + ' dias' : 'daqui a ' + n + ' dias'; }
+  // Deslocamento: número de dias (+2), "u" + dias úteis (u+2) ou "p" + dia da semana (p4 = próxima quinta, a partir de amanhã).
+  function dataDe(off) {
+    var c = off.charAt(0);
+    if (c === 'u') return somaUteis(hoje(), +off.slice(1));
+    if (c === 'p') { var x = somaDias(hoje(), 1); while (x.getDay() !== +off.slice(1)) x = somaDias(x, 1); return x; }
+    return somaDias(hoje(), +off);
+  }
+  var FORMATOS = {
+    d: function (o) { return dm(dataDe(o)); }, a: function (o) { return dma(dataDe(o)); },
+    ws: function (o) { return SEM_CURTO[dataDe(o).getDay()]; }, Ws: function (o) { return cap(SEM_CURTO[dataDe(o).getDay()]); },
+    wl: function (o) { return SEM_LONGO[dataDe(o).getDay()]; }, Wl: function (o) { return cap(SEM_LONGO[dataDe(o).getDay()]); },
+    x: function (o) { return extenso(dataDe(o)); }, X: function (o) { return cap(extenso(dataDe(o))); },
+    r: function (o) { return relativo(diasEntre(hoje(), dataDe(o))); }, R: function (o) { return cap(relativo(diasEntre(hoje(), dataDe(o)))); },
+    h: function (o) { return hm(new Date(agora().getTime() + (+o) * 6e4)); },
+    m: function (o) { var x = agora(); return MESES[(x.getMonth() + (+o) % 12 + 12) % 12]; }, M: function (o) { return cap(FORMATOS.m(o)); },
+    y: function (o) { return String(agora().getFullYear() + (+o)); }
+  };
+  var MARCA = /\{(d|a|ws|Ws|wl|Wl|x|X|r|R|h|m|M|y):([up]?[+-]?\d+)\}/g;
+  function trocar(t) { return String(t).indexOf('{') < 0 ? t : String(t).replace(MARCA, function (s, f, o) { return FORMATOS[f](o); }); }
+  // Troca as marcas em tudo o que aparece na página (telas, janelas, avisos e balões), antes de desenhar.
+  // O value de <option> fica como está: é chave de dado, não texto.
+  var ATRIBUTOS = ['value', 'title', 'placeholder', 'aria-label', 'data-v', 'data-msg'];
+  function trocarEm(no) {
+    if (no.nodeType === 3) { if (no.nodeValue.indexOf('{') >= 0) { var n = trocar(no.nodeValue); if (n !== no.nodeValue) no.nodeValue = n; } return; }
+    if (no.nodeType !== 1) return;
+    var w = document.createTreeWalker(no, 5, null), x = no;
+    while (x) {
+      if (x.nodeType === 3) { if (x.nodeValue.indexOf('{') >= 0) { var v = trocar(x.nodeValue); if (v !== x.nodeValue) x.nodeValue = v; } }
+      else ATRIBUTOS.forEach(function (a) { if (a === 'value' && x.tagName === 'OPTION') return; var at = x.getAttribute(a); if (at && at.indexOf('{') >= 0) { var t = trocar(at); if (t !== at) x.setAttribute(a, t); } });
+      x = w.nextNode();
+    }
+  }
+  new MutationObserver(function (lista) {
+    lista.forEach(function (m) {
+      if (m.type === 'childList') m.addedNodes.forEach(trocarEm);
+      else if (m.type === 'characterData') trocarEm(m.target);
+      else if (m.type === 'attributes' && !(m.attributeName === 'value' && m.target.tagName === 'OPTION')) { var v = m.target.getAttribute(m.attributeName); if (v && v.indexOf('{') >= 0) { var t = trocar(v); if (t !== v) m.target.setAttribute(m.attributeName, t); } }
+    });
+  }).observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATRIBUTOS });
+  var DATAS = {
+    agora: agora, hoje: hoje, somaDias: somaDias, somaUteis: somaUteis, diasEntre: diasEntre, util: util, feriado: feriado, feriados: feriados, proximoFeriado: proximoFeriado,
+    semana: semana, dm: dm, dma: dma, hm: hm, extenso: extenso, relativo: relativo, cap: cap, trocar: trocar,
+    semCurto: function (d) { return SEM_CURTO[d.getDay()]; }, semLongo: function (d) { return SEM_LONGO[d.getDay()]; }, mes: function (d) { return MESES[d.getMonth()]; },
+    // "há N min" a partir de agora, em HH:MM
+    horaAntes: function (min) { return hm(new Date(agora().getTime() - min * 6e4)); }
+  };
+
   function iniciar() {
+    trocarEm(document.body);
     montarSelo(); montarTroca(); montarVoltar();
     aplicarEstilo(html.dataset.estilo, false);
     // links internos já saem com o estilo atual
@@ -277,5 +377,5 @@
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, precoVisivel: precoVisivel, liberarPrecos: liberarPrecos, ocultarPrecos: ocultarPrecos, precoLote: precoLote, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { datas: DATAS, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, precoVisivel: precoVisivel, liberarPrecos: liberarPrecos, ocultarPrecos: ocultarPrecos, precoLote: precoLote, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();

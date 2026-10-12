@@ -23,9 +23,9 @@
     return f;
   }
   function numero(t) { var v = parseFloat(String(t).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : NaN; }
-  function linhaTempo(id, tipo, texto, det) { if (P.linhaPaciente && id) P.linhaPaciente(id).unshift(['13/10', 'agora', tipo, texto, det || curto(QUEM)]); }
+  function linhaTempo(id, tipo, texto, det) { if (P.linhaPaciente && id) P.linhaPaciente(id).unshift(['{d:0}', 'agora', tipo, texto, det || curto(QUEM)]); }
   function abas(lista, atual) { return '<div class="abas-tela abas-area">' + lista.map(function (a) { return '<a href="#' + a[0] + '" class="' + (a[0] === atual ? 'ativo' : '') + '">' + a[1] + '</a>'; }).join('') + '</div>'; }
-  var DATAS = ['12/10', '13/10', '14/10', '15/10', '16/10'];
+  var DT = A.datas, DATAS = P.SEM.dias.map(DT.dm);
   var DIAS_SEM = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   var PROFS = ['Dr. André', 'Felipe', 'Maria Clara', 'Enfermagem'];
 
@@ -46,12 +46,27 @@
     if (/^Bioimp/.test(t)) l = l.concat(['bal']);
     return l;
   }
+  // Bloqueios de exemplo em volta do dia de referência, sem cair em cima das consultas de exemplo:
+  // férias do Felipe nos dois últimos dias livres da semana e congresso do Dr. André numa tarde livre.
+  function livreDe(prof, d, h1, h2) { return !P.FERIADO[d] && d !== P.REF && !E.eventos.some(function (e) { return e.prof === prof && e.dia === d && e.slot >= h1 && e.slot < h2; }); }
+  function bloqueiosDeExemplo() {
+    var l = [], de = -1, ate = -1, d;
+    for (d = 3; d >= 0 && de < 0; d--) if (livreDe('Felipe', d, 0, 20) && livreDe('Felipe', d + 1, 0, 20)) { de = d; ate = d + 1; }
+    for (d = 4; d >= 0 && de < 0; d--) if (livreDe('Felipe', d, 0, 20)) { de = d; ate = d; }
+    if (de >= 0) l.push({ id: 1, prof: 'Felipe', de: de, ate: ate, h1: 0, h2: 20, motivo: 'Férias' });
+    var a = [P.diaDe(1), P.diaDe(2), P.diaDe(3)].filter(function (x) { return livreDe('Dr. André', x, 16, 20); })[0];
+    if (a != null) l.push({ id: 2, prof: 'Dr. André', de: a, ate: a, h1: 16, h2: 20, motivo: 'Congresso' });
+    return l;
+  }
+  // Próximas 4 datas de uma série semanal (dow: 1 = segunda ... 5 = sexta), a partir de amanhã.
+  function proximasDe(dow, passo) { var x = DT.somaDias(DT.hoje(), 1); while (x.getDay() !== dow) x = DT.somaDias(x, 1); return [0, 1, 2, 3].map(function (i) { return DT.dm(DT.somaDias(x, i * passo)); }); }
+  function diasFelipe() { var b = AG.bloqueios.filter(function (x) { return x.prof === 'Felipe'; })[0]; if (!b) return ''; var t = []; for (var d = b.de; d <= b.ate; d++) t.push(DT.semLongo(P.SEM.dias[d])); return t.join(' e na '); }
   var AG = {
     reservas: [{ id: 1, dia: 3, slot: 16, rec: 'c2', motivo: 'Reunião de equipe' }, { id: 2, dia: 2, slot: 0, rec: 'bal', motivo: 'Calibração da balança' }],
-    proxReserva: 3, diaSalas: 1,
-    bloqueios: [{ id: 1, prof: 'Felipe', de: 3, ate: 4, h1: 0, h2: 20, motivo: 'Férias' }, { id: 2, prof: 'Dr. André', de: 2, ate: 2, h1: 16, h2: 20, motivo: 'Congresso' }],
+    proxReserva: 3, diaSalas: P.REF,
+    bloqueios: bloqueiosDeExemplo(),
     proxBloq: 3,
-    series: [{ id: 1, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem', dow: 4, slot: 0, passo: 7, vezes: 12, criada: '15/09', proximas: ['15/10', '22/10', '29/10', '05/11'] }],
+    series: [{ id: 1, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem', dow: 4, slot: 0, passo: 7, vezes: 12, criada: '{d:-28}', proximas: proximasDe(4, 7) }],
     proxSerie: 2,
     rec: { pac: 'Carlos Menezes', tipo: 'Aplicação na clínica', prof: 'Enfermagem', dow: 3, slot: 13, passo: 7, vezes: 8 }
   };
@@ -120,21 +135,20 @@
         })) : '<p class="mudo">Nenhum bloqueio.</p>') +
           '<div style="margin-top:12px">' + botao(A.ic('mais') + 'Novo bloqueio', 'bloq-novo') + '</div>', 's7') +
         cartao(titulo('Como a IA responde', A.item([189, 4])) +
-          '<div class="msg ela previa"><blockquote>Tem horário com o Felipe na quinta?</blockquote>"O Felipe está de férias na quinta e na sexta. Posso marcar na quarta, 14/10, às 10:00, ou com ele na semana que vem."<small>IA da clínica · simulado</small></div>' +
+          '<div class="msg ela previa"><blockquote>Tem horário com o Felipe na ' + (diasFelipe().split(' e ')[0] || 'quinta') + '?</blockquote>"' + (diasFelipe() ? 'O Felipe está de férias na ' + diasFelipe() + '.' : 'O Felipe não atende nesse dia.') + ' Posso marcar na ' + P.nomeDia(P.diaDe(1)).toLowerCase() + ', às 10:00, ou com ele na semana que vem."<small>IA da clínica · simulado</small></div>' +
           '<p class="nota" style="margin-top:8px">O horário bloqueado some das opções que a IA oferece e aparece riscado na agenda.</p>', 's5') +
       '</div>';
   };
 
-  // Datas reais (2026) para as séries; feriados pulados com sugestão do dia seguinte.
-  var FERIADOS = { '12/10': 'Nossa Senhora Aparecida', '02/11': 'Finados', '15/11': 'Proclamação da República', '20/11': 'Consciência Negra', '25/12': 'Natal' };
-  function dd(dt) { return ('0' + dt.getDate()).slice(-2) + '/' + ('0' + (dt.getMonth() + 1)).slice(-2); }
+  // Datas reais para as séries, a partir da segunda-feira da semana mostrada; feriados nacionais pulados com sugestão do próximo dia útil.
+  var dd = DT.dm;
   function datasSerie(r) {
-    var dt = new Date(2026, 9, 12); while (dt.getDay() !== r.dow) dt.setDate(dt.getDate() + 1);
+    var dt = new Date(P.SEM.dias[0]); while (dt.getDay() !== r.dow) dt.setDate(dt.getDate() + 1);
     var out = [];
     for (var i = 0; i < r.vezes; i++) {
       var x = new Date(dt); x.setDate(dt.getDate() + i * r.passo);
       var s = dd(x), idx = DATAS.indexOf(s), st = 'livre', obs = '';
-      if (FERIADOS[s]) { var y = new Date(x); do { y.setDate(y.getDate() + 1); } while (y.getDay() === 0 || y.getDay() === 6); st = 'feriado'; obs = FERIADOS[s] + ' · sugerir ' + DIAS_SEM[y.getDay()] + ' ' + dd(y); }
+      if (DT.feriado(x)) { var y = DT.somaUteis(x, 1); st = 'feriado'; obs = DT.feriado(x) + ' · sugerir ' + DIAS_SEM[y.getDay()] + ' ' + dd(y); }
       else if (idx >= 0) { var c = P.conflito(idx, r.slot, { id: 0, pac: r.pac, tipo: r.tipo, prof: r.prof }); if (c) { st = 'ocupado'; obs = c; } }
       out.push({ data: DIAS_SEM[x.getDay()] + ' ' + s, s: s, idx: idx, st: st, obs: obs });
     }
@@ -183,14 +197,14 @@
       { id: 'sem', nome: 'Programa semestral', parcelas: 6, parcela: 600, inclui: { 'Retorno': 6, 'Nutrição': 6, 'Aplicação na clínica': 24, 'Bioimpedância': 6 } },
       { id: 'psi', nome: 'Pacote de psicologia', parcelas: 1, parcela: 650, inclui: { 'Psicologia': 4 } }],
     contratos: [
-      { id: 1, pac: 'P-DEMO7', plano: 'tri', inicio: '01/09', pagas: 1, uso: { 'Retorno': 2, 'Nutrição': 1, 'Aplicação na clínica': 7, 'Bioimpedância': 2 } },
-      { id: 2, pac: 'P-DEMO5', plano: 'sem', inicio: '15/07', pagas: 3, uso: { 'Retorno': 3, 'Nutrição': 2, 'Aplicação na clínica': 11, 'Bioimpedância': 3 } },
-      { id: 3, pac: 'P-DEMO2', plano: 'tri', inicio: '01/07', pagas: 3, uso: { 'Retorno': 3, 'Nutrição': 3, 'Aplicação na clínica': 12, 'Bioimpedância': 3 } },
-      { id: 4, pac: 'P-DEMO3', plano: 'psi', inicio: '01/10', pagas: 0, uso: { 'Psicologia': 1 } }],
+      { id: 1, pac: 'P-DEMO7', plano: 'tri', inicio: '{d:-42}', pagas: 1, uso: { 'Retorno': 2, 'Nutrição': 1, 'Aplicação na clínica': 7, 'Bioimpedância': 2 } },
+      { id: 2, pac: 'P-DEMO5', plano: 'sem', inicio: '{d:-90}', pagas: 3, uso: { 'Retorno': 3, 'Nutrição': 2, 'Aplicação na clínica': 11, 'Bioimpedância': 3 } },
+      { id: 3, pac: 'P-DEMO2', plano: 'tri', inicio: '{d:-104}', pagas: 3, uso: { 'Retorno': 3, 'Nutrição': 3, 'Aplicação na clínica': 12, 'Bioimpedância': 3 } },
+      { id: 4, pac: 'P-DEMO3', plano: 'psi', inicio: '{d:-12}', pagas: 0, uso: { 'Psicologia': 1 } }],
     proxContrato: 5, proxReceber: 100, proxRecibo: 1043,
-    caixa: { aberto: true, por: 'Elenice', hora: '07:45', inicial: 200, movs: [
-      { hora: '08:35', pac: 'P-DEMO2', desc: 'Retorno', forma: 'Pix', valor: 300, recibo: 1041 },
-      { hora: '08:52', pac: 'P-DEMO5', desc: 'Bioimpedância (fora do plano)', forma: 'Cartão de débito', valor: 90, recibo: 1042 }], fechamento: null }
+    caixa: { aberto: true, por: 'Elenice', hora: '{h:-95}', inicial: 200, movs: [
+      { hora: '{h:-45}', pac: 'P-DEMO2', desc: 'Retorno', forma: 'Pix', valor: 300, recibo: 1041 },
+      { hora: '{h:-28}', pac: 'P-DEMO5', desc: 'Bioimpedância (fora do plano)', forma: 'Cartão de débito', valor: 90, recibo: 1042 }], fechamento: null }
   };
   var FORMAS = ['Dinheiro', 'Pix', 'Cartão de débito', 'Cartão de crédito'];
   function preco(tipo) { var p = FIN.precos.filter(function (x) { return tipo.indexOf(x.tipo) === 0; })[0]; return p ? p.valor : 0; }
@@ -219,11 +233,11 @@
     var caixaHoje = FIN.caixa.movs.reduce(function (s, m) { return s + m.valor; }, 0);
     return cab('Financeiro', 'Preços, planos, cobranças, recibos, caixa, contas a pagar, repasses e relatórios. Valores de exemplo.', A.item([87, 196, 197, 198, 199, 200, 178, 179])) + P.abasFin('financeiro') +
       '<div class="kpis">' + kpi('Recebido no mês', reais(F.recebidoMes), 'Pix, cartão e dinheiro', 'sobe') + kpi('A receber', reais(somaR(function (r) { return r.st === 'aberto'; })), 'em aberto', '') +
-        kpi('Em atraso', reais(somaR(function (r) { return r.st === 'atraso'; })), atraso.length + ' cobrança(s)', atraso.length ? 'desce' : 'sobe') + kpi('Saldo previsto', reais(entradas() - saidas()), 'outubro', entradas() >= saidas() ? 'sobe' : 'desce') +
+        kpi('Em atraso', reais(somaR(function (r) { return r.st === 'atraso'; })), atraso.length + ' cobrança(s)', atraso.length ? 'desce' : 'sobe') + kpi('Saldo previsto', reais(entradas() - saidas()), '{m:0}', entradas() >= saidas() ? 'sobe' : 'desce') +
         kpi('Caixa de hoje', reais(caixaHoje), FIN.caixa.aberto ? 'aberto por ' + FIN.caixa.por : 'fechado', '') + '</div>' +
       '<div class="grade">' +
         cartao(titulo('Pede atenção', A.item([89, 197, 91])) + (atencao(atraso, alem) || '<p class="mudo">Nada pendente.</p>'), 's6') +
-        cartao(titulo('Resultado de outubro', A.item(200)) + barras([['Entradas', entradas(), ''], ['Saídas', saidas(), 'opacity:.55']]) +
+        cartao(titulo('Resultado de {m:0}', A.item(200)) + barras([['Entradas', entradas(), ''], ['Saídas', saidas(), 'opacity:.55']]) +
           '<p style="margin-top:10px">Resultado previsto: <b class="num">' + reais(entradas() - saidas()) + '</b></p><p class="nota">Entradas = recebido + a receber. Saídas = despesas do mês. <a href="#fin-relatorios">Relatórios</a></p>', 's6') +
       '</div>';
   };
@@ -277,8 +291,8 @@
   P.reciboBtn = function (r) { return '<span class="status st-ok">pago · ' + esc(r.forma || 'Pix') + '</span> ' + peq('Recibo', 'recibo', 'r:' + r.id, true); };
   function reciboDe(v) {
     var x = v.split(':');
-    if (x[0] === 'r') { var r = F.receber.filter(function (y) { return String(y.id) === x[1]; })[0]; if (!r.recibo) r.recibo = FIN.proxRecibo++; return { n: r.recibo, pac: r.pac, desc: r.desc, valor: r.valor, forma: r.forma || 'Pix', data: r.pagoEm || '13/10' }; }
-    var m = FIN.caixa.movs[+x[1]]; return { n: m.recibo, pac: m.pac, desc: m.desc, valor: m.valor, forma: m.forma, data: '13/10' };
+    if (x[0] === 'r') { var r = F.receber.filter(function (y) { return String(y.id) === x[1]; })[0]; if (!r.recibo) r.recibo = FIN.proxRecibo++; return { n: r.recibo, pac: r.pac, desc: r.desc, valor: r.valor, forma: r.forma || 'Pix', data: r.pagoEm || '{d:0}' }; }
+    var m = FIN.caixa.movs[+x[1]]; return { n: m.recibo, pac: m.pac, desc: m.desc, valor: m.valor, forma: m.forma, data: '{d:0}' };
   }
   function mostrarRecibo(v) {
     var r = reciboDe(v), p = P.pac(r.pac);
@@ -294,7 +308,7 @@
     var c = FIN.caixa, por = {};
     FORMAS.forEach(function (f) { por[f] = 0; }); c.movs.forEach(function (m) { por[m.forma] += m.valor; });
     var total = c.movs.reduce(function (s, m) { return s + m.valor; }, 0), gaveta = c.inicial + por.Dinheiro;
-    return cab('Caixa do dia', 'Abertura e fechamento do caixa da recepção, com as formas de pagamento. Terça, 13/10.', A.item([199, 198])) + (QUEM === 'elenice' ? '' : P.abasFin('fin-caixa')) +
+    return cab('Caixa do dia', 'Abertura e fechamento do caixa da recepção, com as formas de pagamento. {Wl:0}, {d:0}.', A.item([199, 198])) + (QUEM === 'elenice' ? '' : P.abasFin('fin-caixa')) +
       '<div class="kpis">' + kpi('Situação', c.aberto ? 'Aberto' : 'Fechado', c.aberto ? 'por ' + c.por + ' às ' + c.hora : 'às ' + c.fechamento.hora, c.aberto ? 'sobe' : '') +
         FORMAS.map(function (f) { return kpi(f, reais(por[f]), c.movs.filter(function (m) { return m.forma === f; }).length + ' pagamento(s)', ''); }).join('') + '</div>' +
       '<div class="grade">' +
@@ -317,11 +331,11 @@
   T['fin-relatorios'] = function () {
     var porProf = {}; PROCED.forEach(function (x) { porProf[x[1]] = (porProf[x[1]] || 0) + x[3]; });
     var prod = PROCED.reduce(function (s, x) { return s + x[3]; }, 0);
-    return cab('Relatórios e resultado do mês', 'Produção por profissional e por procedimento, e o resultado simples de outubro. Valores de exemplo.', A.item([200, 179])) + P.abasFin('fin-relatorios') +
+    return cab('Relatórios e resultado do mês', 'Produção por profissional e por procedimento, e o resultado simples de {m:0}. Valores de exemplo.', A.item([200, 179])) + P.abasFin('fin-relatorios') +
       '<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + kpi('Produção do mês', reais(prod), 'o que foi atendido', '') + kpi('Entradas − saídas', reais(entradas() - saidas()), 'resultado previsto', entradas() >= saidas() ? 'sobe' : 'desce') + kpi('Ticket médio', reais(Math.round(prod / PROCED.reduce(function (s, x) { return s + x[2]; }, 0))), 'por atendimento', '') + '</div>' +
       '<div class="grade">' +
         cartao(titulo('Por profissional', A.item([200, 179])) + barras(Object.keys(porProf).map(function (k) { return [k, porProf[k], '']; })), 's6') +
-        cartao(titulo('Resultado de outubro', A.item(200)) + barras([['Entradas', entradas(), ''], ['Saídas', saidas(), 'opacity:.55']]) +
+        cartao(titulo('Resultado de {m:0}', A.item(200)) + barras([['Entradas', entradas(), ''], ['Saídas', saidas(), 'opacity:.55']]) +
           '<p style="margin-top:10px">Resultado: <b class="num">' + reais(entradas() - saidas()) + '</b></p><p class="nota">Entradas = recebido + a receber; saídas = despesas do mês ' + A.item(178) + '.</p>', 's6') +
         cartao(titulo('Por procedimento', A.item(200)) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Procedimento</th><th>Profissional</th><th>Atendimentos</th><th>Produção</th></tr>' +
           PROCED.map(function (x) { return '<tr><td><b>' + x[0] + '</b></td><td>' + x[1] + '</td><td class="num">' + x[2] + '</td><td class="num">' + reais(x[3]) + '</td></tr>'; }).join('') + '</table></div>' +
@@ -333,13 +347,13 @@
   var EST = {
     materiais: [{ nome: 'Seringa de insulina', qtd: 38, min: 20 }, { nome: 'Agulha para caneta', qtd: 14, min: 20 }, { nome: 'Algodão (bola)', qtd: 220, min: 100 }, { nome: 'Álcool 70% (sachê)', qtd: 90, min: 50 }, { nome: 'Curativo redondo', qtd: 60, min: 30 }],
     kit: [['Seringa de insulina', 1], ['Agulha para caneta', 1], ['Algodão (bola)', 2], ['Álcool 70% (sachê)', 1], ['Curativo redondo', 1]],
-    movs: [['13/10 08:15', 'saída', '1 frasco (lote L2309A) + kit de aplicação', 'Aplicação de Beatriz Nogueira · Eduarda'], ['01/10 10:00', 'entrada', '20 frascos (lote L2309A)', 'Compra do fornecedor'], ['01/10 10:05', 'entrada', '200 seringas, 100 agulhas', 'Compra do fornecedor']]
+    movs: [['{d:0} {h:-65}', 'saída', '1 frasco (lote L2309A) + kit de aplicação', 'Aplicação de Beatriz Nogueira · Eduarda'], ['{d:-12} 10:00', 'entrada', '20 frascos (lote L2309A)', 'Compra do fornecedor'], ['{d:-12} 10:05', 'entrada', '200 seringas, 100 agulhas', 'Compra do fornecedor']]
   };
   function material(n) { return EST.materiais.filter(function (m) { return m.nome === n; })[0]; }
   // Item 201: cada aplicação registrada tira do estoque o frasco e o kit; e conta no plano do paciente (197).
   P.aoAplicar = function (pac, lote) {
     EST.kit.forEach(function (k) { var m = material(k[0]); if (m) m.qtd = Math.max(0, m.qtd - k[1]); });
-    EST.movs.unshift(['13/10 ' + new Date().toTimeString().slice(0, 5), 'saída', '1 frasco (lote ' + esc(lote) + ') + kit de aplicação', 'Aplicação de ' + nome(pac) + ' · ' + curto(QUEM === 'andre' ? 'eduarda' : QUEM)]);
+    EST.movs.unshift(['{d:0} ' + new Date().toTimeString().slice(0, 5), 'saída', '1 frasco (lote ' + esc(lote) + ') + kit de aplicação', 'Aplicação de ' + nome(pac) + ' · ' + curto(QUEM === 'andre' ? 'eduarda' : QUEM)]);
     var extra = ' Baixa automática do kit.';
     var c = contratoCom(pac, 'Aplicação na clínica');
     if (c) { c.uso['Aplicação na clínica'] = (c.uso['Aplicação na clínica'] || 0) + 1; extra += ' Plano: ' + c.uso['Aplicação na clínica'] + ' de ' + plano(c.plano).inclui['Aplicação na clínica'] + ' aplicações.'; }
@@ -411,7 +425,7 @@
     'serie-marcar': function () {
       var r = AG.rec, datas = datasSerie(r), livres = datas.filter(function (x) { return x.st === 'livre'; });
       livres.forEach(function (x) { if (x.idx >= 0) E.eventos.push({ id: E.proxId++, dia: x.idx, slot: r.slot, pac: r.pac, tipo: r.tipo, prof: r.prof }); });
-      AG.series.push({ id: AG.proxSerie++, pac: r.pac, tipo: r.tipo, prof: r.prof, dow: r.dow, slot: r.slot, passo: r.passo, vezes: livres.length, criada: '13/10', proximas: livres.slice(0, 4).map(function (x) { return x.s; }) });
+      AG.series.push({ id: AG.proxSerie++, pac: r.pac, tipo: r.tipo, prof: r.prof, dow: r.dow, slot: r.slot, passo: r.passo, vezes: livres.length, criada: '{d:0}', proximas: livres.slice(0, 4).map(function (x) { return x.s; }) });
       var p = pacNome(r.pac); linhaTempo(p && p.id, 'consulta', 'Série marcada: ' + r.tipo + ', ' + livres.length + ' datas', r.prof);
       P.render(true); P.avisoCurto(livres.length + ' consultas marcadas. As desta semana já estão na agenda.');
     },
@@ -426,8 +440,8 @@
         campo('Plano', '<select class="campo" name="pl">' + opcoes(FIN.planos.map(function (p) { return [p.id, p.nome + ' · ' + p.parcelas + 'x ' + reais(p.parcela)]; })) + '</select>'), function (d) {
         var pl = plano(d.get('pl')), pac = d.get('pac'), uso = {};
         Object.keys(pl.inclui).forEach(function (k) { uso[k] = 0; });
-        FIN.contratos.unshift({ id: FIN.proxContrato++, pac: pac, plano: pl.id, inicio: '13/10', pagas: 0, uso: uso });
-        var meses = ['13/10', '13/11', '13/12', '13/01', '13/02', '13/03'];
+        FIN.contratos.unshift({ id: FIN.proxContrato++, pac: pac, plano: pl.id, inicio: '{d:0}', pagas: 0, uso: uso });
+        var meses = [0, 1, 2, 3, 4, 5].map(function (i) { var h = DT.hoje(); return DT.dm(new Date(h.getFullYear(), h.getMonth() + i, Math.min(h.getDate(), 28))); });
         for (var i = 0; i < pl.parcelas; i++) F.receber.push({ id: FIN.proxReceber++, pac: pac, desc: pl.nome + ' · parcela ' + (i + 1) + '/' + pl.parcelas, valor: pl.parcela, venc: meses[i], st: 'aberto' });
         linhaTempo(pac, 'pagamento', pl.nome + ' contratado · ' + pl.parcelas + 'x ' + reais(pl.parcela));
         P.render(true); P.avisoCurto(pl.nome + ' vendido. ' + pl.parcelas + ' parcela(s) entraram em "A receber".');
@@ -447,7 +461,7 @@
         campo('Forma de pagamento', '<select class="campo" name="forma">' + opcoes(FORMAS, 'Pix') + '</select>'), function (d) {
         var o = String(d.get('o')).split(':'), forma = d.get('forma'), mov;
         if (o[0] === 'r') {
-          var r = F.receber.filter(function (y) { return String(y.id) === o[1]; })[0]; r.st = 'pago'; r.forma = forma; r.pagoEm = '13/10'; r.recibo = FIN.proxRecibo++;
+          var r = F.receber.filter(function (y) { return String(y.id) === o[1]; })[0]; r.st = 'pago'; r.forma = forma; r.pagoEm = '{d:0}'; r.recibo = FIN.proxRecibo++;
           F.recebidoMes += r.valor; mov = { pac: r.pac, desc: r.desc, valor: r.valor, recibo: r.recibo };
           var c = FIN.contratos.filter(function (k) { return k.pac === r.pac && r.desc.indexOf(plano(k.plano).nome) === 0; })[0]; if (c) c.pagas = Math.min(plano(c.plano).parcelas, c.pagas + 1);
         } else {
@@ -470,13 +484,13 @@
     'csv': function () {
       var l = [['Procedimento', 'Profissional', 'Atendimentos', 'Produção (R$)']].concat(PROCED.map(function (x) { return [x[0], x[1], x[2], x[3]]; }));
       var csv = '﻿' + l.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(';'); }).join('\n');
-      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'relatorio-outubro-exemplo.csv';
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'relatorio-' + DT.mes(DT.hoje()) + '-exemplo.csv';
       document.body.appendChild(a); a.click(); a.remove(); P.avisoCurto('Planilha baixada (dados de exemplo).');
     },
     'material-entrada': function () {
       folha('Entrada de material', campo('Material', '<select class="campo" name="m">' + opcoes(EST.materiais.map(function (m) { return m.nome; })) + '</select>') + campo('Quantidade', '<input class="campo" name="q" inputmode="numeric" value="100">'), function (d) {
         var q = parseInt(d.get('q'), 10), m = material(d.get('m')); if (!(q > 0) || !m) return false;
-        m.qtd += q; EST.movs.unshift(['13/10 ' + new Date().toTimeString().slice(0, 5), 'entrada', q + ' ' + esc(m.nome.toLowerCase()), 'Entrada manual · ' + curto(QUEM)]); P.render(true);
+        m.qtd += q; EST.movs.unshift(['{d:0} ' + new Date().toTimeString().slice(0, 5), 'entrada', q + ' ' + esc(m.nome.toLowerCase()), 'Entrada manual · ' + curto(QUEM)]); P.render(true);
       }, 'Registrar');
     },
     'aviso': function (v) { P.avisoCurto(v); }

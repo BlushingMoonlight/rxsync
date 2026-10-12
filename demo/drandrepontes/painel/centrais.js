@@ -19,16 +19,16 @@
   function foneBonito(d) { return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7); }
   // Estado do app: [conectado?, texto do último acesso, dias sem abrir]
   var APP = {
-    'P-DEMO7': [1, 'hoje, 07:58', 0], 'P-DEMO5': [1, 'hoje, 07:40', 0], 'P-DEMO9': [0, 'convite enviado ontem; ainda não entrou', 0], 'P-DEMO4': [1, '08/10, 21:14', 5],
-    'P-DEMO2': [1, 'ontem, 21:10', 1], 'P-DEMO3': [1, 'hoje, 06:55', 0], 'P-DEMO6': [0, 'sem app (novo contato)', 0], 'P-DEMO8': [1, '02/09, 10:02', 41],
-    'P-DEMO1': [0, 'desconectou em 15/03', 0], 'P-DEM10': [0, 'sem app (novo contato)', 0], 'P-DEM11': [0, 'convite enviado em 06/10; ainda não entrou', 0], 'P-DEM12': [1, 'ontem, 22:30', 1]
+    'P-DEMO7': [1, 'hoje, {h:-82}', 0], 'P-DEMO5': [1, 'hoje, {h:-100}', 0], 'P-DEMO9': [0, 'convite enviado ontem; ainda não entrou', 0], 'P-DEMO4': [1, '{d:-5}, 21:14', 5],
+    'P-DEMO2': [1, 'ontem, 21:10', 1], 'P-DEMO3': [1, 'hoje, {h:-145}', 0], 'P-DEMO6': [0, 'sem app (novo contato)', 0], 'P-DEMO8': [1, '{d:-41}, 10:02', 41],
+    'P-DEMO1': [0, 'desconectou em {d:-212}', 0], 'P-DEM10': [0, 'sem app (novo contato)', 0], 'P-DEM11': [0, 'convite enviado em {d:-7}; ainda não entrou', 0], 'P-DEM12': [1, 'ontem, 22:30', 1]
   };
   var TIPOS = {
     consulta: ['Consultas', 'estetoscopio', 'var(--c1)'], app: ['Registros do app', 'evolucao', 'var(--c2)'], balanca: ['Balança', 'balanca', 'var(--c3)'],
     exame: ['Exames', 'documento', 'var(--c4)'], conversa: ['Conversas', 'chat', 'var(--c5)'], pagamento: ['Pagamentos', 'moeda', 'var(--c6)'], aplicacao: ['Aplicações', 'seringa', 'var(--info)'],
     interacao: ['Ligações e orçamentos', 'telefone', 'var(--c2)']
   };
-  var PSICO = { 'P-DEMO3': '11/10', 'P-DEM12': '13/10' };
+  var PSICO = { 'P-DEMO3': '{d:-2}', 'P-DEM12': '{d:0}' };
 
   // Linha do tempo: [data, hora, tipo, texto, detalhe], da mais nova para a mais antiga. Montada uma vez por paciente.
   var LINHA = {};
@@ -36,40 +36,40 @@
     if (LINHA[id]) return LINHA[id];
     var p = P.pac(id), l;
     if (id === 'P-DEMO7') l = [
-      ['13/10', '09:58', 'conversa', 'Pediu pelo WhatsApp para remarcar a aplicação', 'respondida pela IA · item 1'],
-      ['13/10', '07:58', 'app', 'Café da manhã registrado: 320 kcal, 22 g de proteína; 400 mL de água', 'registro do app'],
-      ['13/10', '07:30', 'balanca', 'Bioimpedância: 78,6 kg · 35,4% de gordura', 'entrou sozinha pela balança'],
-      ['12/10', '22:10', 'app', 'Humor "bem" · sono 6h50 · 2,4 L de água', 'registro do app'],
-      ['09/10', '13:20', 'app', 'Sintoma: enjoo leve', 'sem alerta (leve)'],
-      ['09/10', '08:15', 'aplicacao', 'Aplicação registrada · abdômen, lado esquerdo', 'instrução conferida pela enfermagem'],
-      ['05/10', '19:02', 'exame', 'Hemograma enviado pelo app', 'anexado ao ID'],
-      ['01/10', '10:11', 'pagamento', 'Mensalidade de outubro paga · Pix · R$ 650', 'baixa automática'],
-      ['22/09', '10:00', 'consulta', 'Retorno com o Dr. André', 'ficha v4 assinada'],
-      ['22/09', '09:45', 'balanca', 'Bioimpedância: 80,2 kg · 36,9% de gordura', ''],
-      ['15/09', '14:00', 'consulta', 'Nutrição com o Felipe', 'plano alimentar enviado ao app'],
-      ['01/09', '09:00', 'consulta', 'Primeira consulta com o Dr. André', 'ficha v3'],
-      ['30/08', '11:00', 'interacao', 'Ligação: confirmou a primeira consulta', 'Elenice'],
-      ['28/08', '18:40', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID P-DEMO7 criado pela IA']];
+      ['{d:0}', '{h:-3}', 'conversa', 'Pediu pelo WhatsApp para remarcar a aplicação', 'respondida pela IA · item 1'],
+      ['{d:0}', '{h:-82}', 'app', 'Café da manhã registrado: 320 kcal, 22 g de proteína; 400 mL de água', 'registro do app'],
+      ['{d:0}', '{h:-110}', 'balanca', 'Bioimpedância: 78,6 kg · 35,4% de gordura', 'entrou sozinha pela balança'],
+      ['{d:-1}', '22:10', 'app', 'Humor "bem" · sono 6h50 · 2,4 L de água', 'registro do app'],
+      ['{d:-4}', '13:20', 'app', 'Sintoma: enjoo leve', 'sem alerta (leve)'],
+      ['{d:-4}', '08:15', 'aplicacao', 'Aplicação registrada · abdômen, lado esquerdo', 'instrução conferida pela enfermagem'],
+      ['{d:-8}', '19:02', 'exame', 'Hemograma enviado pelo app', 'anexado ao ID'],
+      ['{d:-12}', '10:11', 'pagamento', 'Mensalidade de {m:0} paga · Pix · R$ 650', 'baixa automática'],
+      ['{d:-21}', '10:00', 'consulta', 'Retorno com o Dr. André', 'ficha v4 assinada'],
+      ['{d:-21}', '09:45', 'balanca', 'Bioimpedância: 80,2 kg · 36,9% de gordura', ''],
+      ['{d:-28}', '14:00', 'consulta', 'Nutrição com o Felipe', 'plano alimentar enviado ao app'],
+      ['{d:-42}', '09:00', 'consulta', 'Primeira consulta com o Dr. André', 'ficha v3'],
+      ['{d:-44}', '11:00', 'interacao', 'Ligação: confirmou a primeira consulta', 'Elenice'],
+      ['{d:-46}', '18:40', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID P-DEMO7 criado pela IA']];
     else if (p.status === 'Novo contato') l = [
-      ['13/10', '08:12', 'conversa', 'Perguntou o preço da primeira consulta', 'respondida pela IA com os preços cadastrados'],
-      ['13/10', '08:10', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID ' + id + ' criado pela IA']];
+      ['{d:0}', '{h:-68}', 'conversa', 'Perguntou o preço da primeira consulta', 'respondida pela IA com os preços cadastrados'],
+      ['{d:0}', '{h:-70}', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID ' + id + ' criado pela IA']];
     else if (p.status === 'Agendado') l = [
-      ['12/10', '17:30', 'conversa', 'Respondeu a pré-consulta', 'resumo pronto para o médico'],
-      ['11/10', '10:05', 'pagamento', 'Sinal da primeira consulta pago · cartão', ''],
-      ['10/10', '16:22', 'consulta', 'Primeira consulta marcada pela IA', p.prof],
-      ['10/10', '16:15', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID ' + id + ' criado pela IA']];
+      ['{d:-1}', '17:30', 'conversa', 'Respondeu a pré-consulta', 'resumo pronto para o médico'],
+      ['{d:-2}', '10:05', 'pagamento', 'Sinal da primeira consulta pago · cartão', ''],
+      ['{d:-3}', '16:22', 'consulta', 'Primeira consulta marcada pela IA', p.prof],
+      ['{d:-3}', '16:15', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID ' + id + ' criado pela IA']];
     else {
       l = [
         [p.ultimo, '10:00', 'consulta', 'Consulta com ' + p.prof, p.status === 'Retorno vencido' ? 'retorno vencido' : 'realizada'],
         [p.ultimo, '09:40', 'balanca', 'Bioimpedância: ' + p.peso + ' kg', 'variação ' + p.var],
-        ['01/10', '09:30', 'pagamento', id === 'P-DEMO3' ? 'Mensalidade de outubro em aberto · venceu 05/10' : 'Mensalidade de outubro paga · Pix', id === 'P-DEMO3' ? 'lembrete enviado' : 'baixa automática'],
-        ['28/09', '08:00', 'aplicacao', 'Aplicação registrada no app', 'instrução conferida pela enfermagem'],
-        ['15/08', '11:00', 'exame', 'Exames de rotina anexados', 'enviados pelo app']];
-      if (APP[id][0] && APP[id][2] < 3) l.unshift([APP[id][1].split(',')[0].replace('hoje', '13/10').replace('ontem', '12/10'), (APP[id][1].split(', ')[1] || '08:00'), 'app', 'Registros do dia: refeições, água e humor', 'registro do app']);
-      if (id === 'P-DEMO5') l.unshift(['13/10', '07:42', 'app', 'Sintoma: náusea forte, 2 dias depois da aplicação', 'enfermagem avisada às 07:42']);
-      if (id === 'P-DEM12') l.unshift(['12/10', '20:05', 'balanca', 'Peso no app: 90,7 kg (−2,4 kg em 7 dias)', 'alerta para o médico']);
+        ['{d:-12}', '09:30', 'pagamento', id === 'P-DEMO3' ? 'Mensalidade de {m:0} em aberto · venceu {d:-8}' : 'Mensalidade de {m:0} paga · Pix', id === 'P-DEMO3' ? 'lembrete enviado' : 'baixa automática'],
+        ['{d:-15}', '08:00', 'aplicacao', 'Aplicação registrada no app', 'instrução conferida pela enfermagem'],
+        ['{d:-59}', '11:00', 'exame', 'Exames de rotina anexados', 'enviados pelo app']];
+      if (APP[id][0] && APP[id][2] < 3) l.unshift([APP[id][1].split(',')[0].replace('hoje', '{d:0}').replace('ontem', '{d:-1}'), (APP[id][1].split(', ')[1] || '08:00'), 'app', 'Registros do dia: refeições, água e humor', 'registro do app']);
+      if (id === 'P-DEMO5') l.unshift(['{d:0}', '{h:-98}', 'app', 'Sintoma: náusea forte, 2 dias depois da aplicação', 'enfermagem avisada às {h:-98}']);
+      if (id === 'P-DEM12') l.unshift(['{d:-1}', '20:05', 'balanca', 'Peso no app: 90,7 kg (−2,4 kg em 7 dias)', 'alerta para o médico']);
     }
-    if (id === 'P-DEMO6') l.unshift(['13/10', '08:30', 'interacao', 'Orçamento do acompanhamento de 3 meses enviado', 'Emanuele']);
+    if (id === 'P-DEMO6') l.unshift(['{d:0}', '{h:-50}', 'interacao', 'Orçamento do acompanhamento de 3 meses enviado', 'Emanuele']);
     if (PSICO[id]) l.splice(1, 0, [PSICO[id], '11:00', 'consulta', 'Psicologia com a Maria Clara', 'psicologia']);
     return (LINHA[id] = l);
   }
@@ -78,7 +78,7 @@
     if (p.alerta) a.push([p.alerta, 'var(--perigo)']);
     if (APP[id][0] && APP[id][2] >= 3) a.push(['Não abre o app há ' + APP[id][2] + ' dias', 'var(--alerta)']);
     if (!APP[id][0] && /convite/.test(APP[id][1])) a.push(['Ainda não entrou no app', 'var(--info)']);
-    if (id === 'P-DEMO3') a.push(['Pagamento de outubro em aberto', 'var(--alerta)']);
+    if (id === 'P-DEMO3') a.push(['Pagamento de {m:0} em aberto', 'var(--alerta)']);
     return a;
   }
 
@@ -88,13 +88,14 @@
     { nome: 'Colesterol LDL', un: 'mg/dL', min: 0, max: 130 }, { nome: 'Triglicerídeos', un: 'mg/dL', min: 0, max: 150 },
     { nome: 'TSH', un: 'mUI/L', min: 0.4, max: 4 }, { nome: 'Ferritina', un: 'ng/mL', min: 15, max: 150 }, { nome: 'Vitamina D', un: 'ng/mL', min: 20, max: 60 }];
   var HIST = {
-    'P-DEMO9': [['12/03/2026', [104, 5.9, 142, 188, 2.1, 22, 18]]],
-    'P-DEMO7': [['01/09/2025', [112, 6.1, 151, 210, 2.6, 48, 24]], ['15/03/2026', [101, 5.8, 138, 172, 2.4, 52, 27]]]
+    'P-DEMO9': [['{a:-215}', [104, 5.9, 142, 188, 2.1, 22, 18]]],
+    'P-DEMO7': [['{a:-407}', [112, 6.1, 151, 210, 2.6, 48, 24]], ['{a:-212}', [101, 5.8, 138, 172, 2.4, 52, 27]]]
   };
-  // O arquivo novo (exemplo) que a IA lê: "exame_05-10.pdf".
+  // O arquivo novo (exemplo) que a IA lê: "exame_dd-mm.pdf" (data do exame: 8 dias atrás).
+  function arquivoExame() { return 'exame_' + A.datas.dm(A.datas.somaDias(A.datas.hoje(), -8)).replace('/', '-'); }
   var NOVO = { 'P-DEMO9': [99, 5.7, 135, 160, 2.3, 12, 16], 'P-DEMO7': [94, 5.5, 126, 141, 2.2, 55, 31] };
   function hist(id) {
-    if (!HIST[id]) { var b = 90 + id.charCodeAt(id.length - 1) % 15; HIST[id] = [['20/04/2026', [b + 6, 5.6, 128, 150, 2.0, 60, 25]]]; }
+    if (!HIST[id]) { var b = 90 + id.charCodeAt(id.length - 1) % 15; HIST[id] = [['{a:-176}', [b + 6, 5.6, 128, 150, 2.0, 60, 25]]]; }
     return HIST[id];
   }
   function novoDe(id) { if (!NOVO[id]) { var h = hist(id)[0][1]; NOVO[id] = h.map(function (v, i) { return i === 1 || i === 4 ? Math.round((v - .1) * 10) / 10 : Math.round(v * .95); }); } return NOVO[id]; }
@@ -164,7 +165,7 @@
   // ---------- Central do médico ----------
   var ABAS = [['central', 'Consulta'], ['central-exames', 'Exames'], ['central-documentos', 'Documentos'], ['central-receita', 'Receita'], ['central-assistente', 'Pré-consulta e assistente']];
   function cabMedico(aba, sub, itens) {
-    var c = C.cons, p = P.pac(c.pac), hoje = P.E.eventos.filter(function (e) { return e.pac === p.nome && e.dia === 1; })[0];
+    var c = C.cons, p = P.pac(c.pac), hoje = P.E.eventos.filter(function (e) { return e.pac === p.nome && e.dia === P.REF; })[0];
     return cab('Central do médico', sub, itens) +
       '<div class="abas-tela">' + ABAS.map(function (a) { return '<a href="#' + a[0] + '" class="' + (a[0] === aba ? 'ativo' : '') + '">' + a[1] + '</a>'; }).join('') + '</div>' +
       cartao('<div class="linha-ic"><span class="pessoa" style="background:var(--c3);width:46px;height:46px">' + iniciais(p.id) + '</span><div class="meio"><h3 style="font-size:18px">' + p.nome + '</h3>' +
@@ -226,7 +227,7 @@
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' + botao(A.ic('cadeado') + 'Assinar e salvar na ficha', 'cons-assinar', '', false, c.revisei ? '' : ' disabled') + botao('Descartar rascunho', 'cons-descartar', '', true) + '</div>' +
       '<p class="nota" style="margin-top:8px">Assinatura com certificado ICP-Brasil ' + A.item(194) + ': depende de certificado digital e integração externa. Aqui, simulada.</p>');
     else corpo = cartao(titulo('Ficha assinada', '<span class="status st-ok">assinada</span>' + A.item([194, 65])) +
-      '<p class="mudo" style="font-size:13.5px">Salva na ficha de ' + p.nome + ' como versão nova (v' + c.versao + '), assinada pelo Dr. André em 13/10. A versão anterior continua guardada.</p>' +
+      '<p class="mudo" style="font-size:13.5px">Salva na ficha de ' + p.nome + ' como versão nova (v' + c.versao + '), assinada pelo Dr. André em {d:0}. A versão anterior continua guardada.</p>' +
       lista([['Anamnese', c.campos.anamnese], ['Evolução', c.campos.evolucao], ['Conduta', c.campos.conduta]].map(function (x) { return lin('', '<span class="rotulo">' + x[0] + '</span><div style="margin-top:2px">' + quebra(x[1]) + '</div>'); })) +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><a class="botao" href="#central-documentos" style="text-decoration:none">' + A.ic('documento') + 'Documentos da consulta</a><a class="botao botao-claro" href="#central-receita" style="text-decoration:none">Receita</a>' + botao('Nova consulta', 'cons-nova', '', true) + '</div>');
     var apoio = c.etapa === 'gravando' || c.etapa === 'rascunho'
@@ -259,12 +260,12 @@
     var envio = cartao(titulo('Enviar PDF ou foto do exame', A.item([192, 166])) +
       '<p class="mudo" style="font-size:13.5px">A IA lê o arquivo e passa os valores para uma tabela. Você confere com o documento antes de anexar ao ID ' + id + '.</p>' +
       (x.etapa === 'inicio' ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' + botao(A.ic('documento') + 'Enviar PDF (exemplo)', 'ex-ler', 'pdf') + botao(A.ic('camera') + 'Tirar foto do exame (exemplo)', 'ex-ler', 'foto', true) + '</div>' : '') +
-      (x.etapa === 'lendo' ? '<div class="gravando" style="color:var(--info);margin-top:12px"><i style="background:var(--info)"></i>A IA está lendo exame_05-10.' + (x.tipo === 'foto' ? 'jpg' : 'pdf') + '…</div>' : '') +
+      (x.etapa === 'lendo' ? '<div class="gravando" style="color:var(--info);margin-top:12px"><i style="background:var(--info)"></i>A IA está lendo ' + arquivoExame() + '.' + (x.tipo === 'foto' ? 'jpg' : 'pdf') + '…</div>' : '') +
       (x.etapa === 'conferir' ? '<div class="rolar-x" style="margin-top:12px"><table class="tabela-larga"><tr><th>Exame</th><th>Valor lido</th><th>Unidade</th><th>Referência do laudo</th></tr>' +
         EXAMES.map(function (e, i) { return '<tr><td>' + e.nome + '</td><td class="num"><b>' + num(nv[i]) + '</b></td><td>' + e.un + '</td><td class="num">' + (e.min ? num(e.min) + ' a ' : 'até ') + num(e.max) + (fora(e, nv[i]) ? ' <span class="status st-al">fora da faixa do laudo</span>' : '') + '</td></tr>'; }).join('') + '</table></div>' +
-        '<p class="nota" style="margin-top:6px">Lido de exame_05-10.' + (x.tipo === 'foto' ? 'jpg' : 'pdf') + ' · data do exame: 05/10/2026 · confira com o documento.</p>' +
+        '<p class="nota" style="margin-top:6px">Lido de ' + arquivoExame() + '.' + (x.tipo === 'foto' ? 'jpg' : 'pdf') + ' · data do exame: {a:-8} · confira com o documento.</p>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + botao('Conferi · anexar ao ' + id, 'ex-anexar') + botao('Descartar', 'ex-descartar', '', true) + '</div>' : '') +
-      (x.etapa === 'anexado' ? '<div class="alerta-lin" style="--cor:var(--ok);margin-top:12px">' + A.bolha('documento', 'var(--ok)') + '<div><b>Exame de 05/10/2026 anexado ao ' + id + '</b><div class="fraco" style="font-size:12.5px">aparece na tabela, no gráfico e na linha do tempo do paciente</div></div></div>' : ''));
+      (x.etapa === 'anexado' ? '<div class="alerta-lin" style="--cor:var(--ok);margin-top:12px">' + A.bolha('documento', 'var(--ok)') + '<div><b>Exame de {a:-8} anexado ao ' + id + '</b><div class="fraco" style="font-size:12.5px">aparece na tabela, no gráfico e na linha do tempo do paciente</div></div></div>' : ''));
     corpo = cartao(titulo('Exames de ' + nome(id), A.item(192)) +
       '<div class="rolar-x"><table class="tabela-larga"><tr><th>Exame</th>' + h.map(function (d) { return '<th class="num">' + d[0] + '</th>'; }).join('') + '<th>Unidade</th></tr>' +
       EXAMES.map(function (e, i) { return '<tr class="clicavel" data-c="ex-sel" data-v="' + i + '"' + (i === x.sel ? ' style="background:var(--superficie-2)"' : '') + '><td><b>' + e.nome + '</b></td>' + h.map(function (d) { return '<td class="num">' + num(d[1][i]) + (fora(e, d[1][i]) ? ' <span class="ponto" style="background:var(--alerta)" title="fora da faixa do laudo"></span>' : '') + '</td>'; }).join('') + '<td>' + e.un + '</td></tr>'; }).join('') + '</table></div>' +
@@ -282,9 +283,9 @@
   // Documentos (193) com assinatura (194).
   var MODELOS = { pedido: 'Pedido de exame', atestado: 'Atestado de comparecimento', orientacoes: 'Orientações' };
   function textoModelo(m, id) {
-    var p = P.pac(id), cabec = 'Clínica Evoluir · Dr. André Pontes Gonçalves · CRM 000000 (exemplo)\nPaciente: ' + p.nome + ' · ' + p.id + ' · ' + p.idade + ' anos\nData: 13/10/2026\n\n';
+    var p = P.pac(id), cabec = 'Clínica Evoluir · Dr. André Pontes Gonçalves · CRM 000000 (exemplo)\nPaciente: ' + p.nome + ' · ' + p.id + ' · ' + p.idade + ' anos\nData: {a:0}\n\n';
     if (m === 'pedido') return cabec + 'Solicito os exames abaixo (modelo da clínica para ' + (p.status === 'Agendado' ? 'primeira consulta' : 'acompanhamento') + '):\n- Hemograma completo\n- Glicemia de jejum\n- Hemoglobina glicada\n- Colesterol total e frações\n- Triglicerídeos\n- TSH\n- Ferritina\n- Vitamina D\n\nJejum conforme orientação do laboratório.';
-    if (m === 'atestado') return cabec + 'Atesto, para os devidos fins, que ' + p.nome + ' esteve em consulta nesta clínica em 13/10/2026, das 09:00 às 10:00.';
+    if (m === 'atestado') return cabec + 'Atesto, para os devidos fins, que ' + p.nome + ' esteve em consulta nesta clínica em {a:0}, das 09:00 às 10:00.';
     return cabec + 'Orientações combinadas na consulta:\n- Registrar as refeições, a água e o humor no app todos os dias.\n- Fazer os exames pedidos e enviar o resultado pelo app.\n- Consulta de nutrição com o Felipe na próxima semana.\n- Em caso de sintoma forte, avisar pelo app ou pelo WhatsApp da clínica.';
   }
   T['central-documentos'] = function () {
@@ -297,7 +298,7 @@
           return lin(A.bolha('documento', m === d.modelo ? 'var(--primaria)' : 'var(--c4)'), '<b>' + MODELOS[m] + '</b>' + (d.assinado[m + ':' + id] ? '<div class="fraco" style="font-size:12px">assinado</div>' : ''), botao(m === d.modelo ? 'Aberto' : 'Abrir', 'doc-modelo', m, m !== d.modelo));
         }).join('') + '</div><p class="nota" style="margin-top:8px">A clínica cadastra os próprios modelos. Os dados do paciente entram sozinhos pelo ID.</p>', 's4') +
         cartao(titulo(MODELOS[d.modelo], (ass ? '<span class="status st-ok">assinado</span>' : '<span class="selo-rascunho">RASCUNHO</span>') + A.item([193, 194])) +
-          (ass ? '<div class="documento">' + quebra(d.texto[k]) + '<p class="fraco" style="margin-top:12px">Assinado digitalmente por Dr. André Pontes Gonçalves em 13/10/2026 (simulado).</p></div>' +
+          (ass ? '<div class="documento">' + quebra(d.texto[k]) + '<p class="fraco" style="margin-top:12px">Assinado digitalmente por Dr. André Pontes Gonçalves em {a:0} (simulado).</p></div>' +
             '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' + botao(A.ic('download') + 'Gerar PDF', 'aviso', 'PDF de exemplo gerado com a marca da clínica.') + botao(A.ic('chat') + 'Enviar pelo app', 'aviso', 'Documento enviado ao app de ' + nome(id) + ' (simulado).', true) + botao(A.ic('whatsapp') + 'Enviar pelo WhatsApp', 'aviso', 'Documento enviado pelo WhatsApp (simulado).', true) + '</div>'
           : '<textarea class="campo campo-doc" data-c-campo="doc">' + esc(d.texto[k]) + '</textarea>' +
             '<label class="confirma"><input type="checkbox" data-c-mudar="doc-revisei"' + (d.revisei ? ' checked' : '') + '> Revisei o documento</label>' +
@@ -333,7 +334,7 @@
         cartao(titulo('Pré-consulta', A.item([71, 30])) + '<p style="font-size:14px">' + preConsulta(id) + '</p>', 's6') +
         cartao(titulo('Arquivo com síntese da IA', A.item(166)) +
           '<p class="mudo" style="font-size:13.5px">Laudo ou relatório de outro profissional: a IA resume o que está escrito; a interpretação é do médico.</p>' +
-          (C.sintese ? '<div class="alerta-lin" style="--cor:var(--info);margin-top:10px">' + A.bolha('documento', 'var(--info)') + '<div><b>relatorio_nutricao.pdf · síntese</b><p class="mudo" style="font-size:13px">Relatório de 02/10 de outro serviço. Descreve plano de 1.500 kcal seguido por 3 meses e perda de 3 kg no período. <span class="fraco">(simulado; confira no documento)</span></p></div></div>'
+          (C.sintese ? '<div class="alerta-lin" style="--cor:var(--info);margin-top:10px">' + A.bolha('documento', 'var(--info)') + '<div><b>relatorio_nutricao.pdf · síntese</b><p class="mudo" style="font-size:13px">Relatório de {d:-11} de outro serviço. Descreve plano de 1.500 kcal seguido por 3 meses e perda de 3 kg no período. <span class="fraco">(simulado; confira no documento)</span></p></div></div>'
             : '<div style="margin-top:10px">' + botao(A.ic('documento') + 'Enviar arquivo (exemplo)', 'sintese', '', true) + '</div>'), 's6') +
         cartao(titulo('Assistente clínico', A.item(167) + A.juridico('depende do parecer jurídico')) +
           '<p class="mudo" style="font-size:13.5px">Organiza a informação para o médico decidir. Não diagnostica e não prescreve.</p>' + lista([
@@ -346,13 +347,13 @@
   // ---------- quadro da Visão do dia (Dr. André) ----------
   P.linhaPaciente = linha;
   P.quadroCentral = function () {
-    var prox = P.E.eventos.filter(function (e) { return e.prof === 'Dr. André' && e.dia >= 1; }).sort(function (a, b) { return a.dia - b.dia || a.slot - b.slot; }).slice(0, 4);
+    var prox = P.E.eventos.filter(function (e) { return e.prof === 'Dr. André' && e.dia >= P.REF; }).sort(function (a, b) { return a.dia - b.dia || a.slot - b.slot; }).slice(0, 4);
     return cartao('<div class="quadro-cab"><div><span class="rotulo">Central do paciente</span><h2 style="font-size:20px">Encontre qualquer paciente</h2></div><div class="itens">' + A.item([191, 165]) + '</div></div>' +
       '<div class="quadro-corpo"><div>' + caixaBusca('res-home', '') + '<p class="nota" style="margin-top:6px">Por nome, ID ou telefone. Abre a linha do tempo completa.</p></div>' +
       '<div><span class="rotulo">Próximos pacientes</span><div class="lista">' + prox.map(function (e) {
         var p = P.PACIENTES.filter(function (x) { return x.nome === e.pac; })[0];
-        return '<div class="lin"><span class="hora num">' + P.HORAS[e.slot] + '</span><div class="meio"><button type="button" class="link-pac" data-c="abrir-pac" data-v="' + p.id + '"><b>' + p.nome + '</b></button> <span class="idp">' + p.id + '</span><div class="fraco">' + (e.dia === 1 ? 'hoje' : P.DIAS[e.dia]) + ' · ' + e.tipo + '</div></div>' +
-          botao(A.ic('estetoscopio') + 'Iniciar consulta', 'iniciar', p.id, e.dia !== 1, ' style="height:34px;padding:0 12px;font-size:12.5px"') + '</div>';
+        return '<div class="lin"><span class="hora num">' + P.HORAS[e.slot] + '</span><div class="meio"><button type="button" class="link-pac" data-c="abrir-pac" data-v="' + p.id + '"><b>' + p.nome + '</b></button> <span class="idp">' + p.id + '</span><div class="fraco">' + (e.dia === P.REF ? P.rotuloRef() : P.DIAS[e.dia]) + ' · ' + e.tipo + '</div></div>' +
+          botao(A.ic('estetoscopio') + 'Iniciar consulta', 'iniciar', p.id, e.dia !== P.REF, ' style="height:34px;padding:0 12px;font-size:12.5px"') + '</div>';
       }).join('') + '</div></div></div>', 'quadro-central');
   };
 
@@ -371,7 +372,7 @@
     f.querySelector('form').addEventListener('submit', function (ev) {
       ev.preventDefault(); var d = new FormData(ev.target), t = String(d.get('t') || '').trim(); if (!t) return;
       var canal = d.get('canal') === 'app' ? 'pelo app' : 'pelo WhatsApp', quem = P.EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André');
-      linha(id).unshift(['13/10', 'agora', 'conversa', 'Mensagem ' + canal + ': "' + esc(t.slice(0, 400)) + '"', 'enviada por ' + quem]);
+      linha(id).unshift(['{d:0}', 'agora', 'conversa', 'Mensagem ' + canal + ': "' + esc(t.slice(0, 400)) + '"', 'enviada por ' + quem]);
       f.remove(); C.filtro = ''; P.render(true); P.avisoCurto('Enviada ' + canal + ', entre aspas e sem alteração.');
     });
     f.querySelector('textarea').focus();
@@ -387,7 +388,7 @@
     f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
     f.querySelector('form').addEventListener('submit', function (ev) {
       ev.preventDefault(); var d = new FormData(ev.target), t = String(d.get('t') || '').trim(); if (!t) return;
-      linha(id).unshift(['13/10', 'agora', 'interacao', esc(d.get('tipo')) + ': ' + esc(t.slice(0, 300)), P.EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André')]);
+      linha(id).unshift(['{d:0}', 'agora', 'interacao', esc(d.get('tipo')) + ': ' + esc(t.slice(0, 300)), P.EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André')]);
       f.remove(); C.filtro = ''; P.render(true); P.avisoCurto('Interação registrada na linha do tempo.');
     });
     f.querySelector('textarea').focus();
@@ -404,7 +405,7 @@
     'iniciar': iniciar,
     'cons-iniciar': function () { iniciar(C.cons.pac); },
     'cons-aceitou': function () {
-      var c = C.cons; c.etapa = 'gravando'; linha(c.pac).unshift(['13/10', 'agora', 'consulta', 'Aceite para gravar a consulta registrado', 'Dr. André']);
+      var c = C.cons; c.etapa = 'gravando'; linha(c.pac).unshift(['{d:0}', 'agora', 'consulta', 'Aceite para gravar a consulta registrado', 'Dr. André']);
       parar(); timer = setInterval(tique, 1400); P.render(true);
     },
     'cons-sem': function () { var c = C.cons; c.etapa = 'rascunho'; c.campos = { anamnese: '', evolucao: '', conduta: '' }; P.render(true); },
@@ -415,7 +416,7 @@
     },
     'cons-assinar': function () {
       var c = C.cons; if (!c.revisei) return; c.etapa = 'assinada'; c.versao = 5;
-      linha(c.pac).unshift(['13/10', 'agora', 'consulta', 'Consulta com o Dr. André · ficha assinada', 'nova versão da ficha (v5)']);
+      linha(c.pac).unshift(['{d:0}', 'agora', 'consulta', 'Consulta com o Dr. André · ficha assinada', 'nova versão da ficha (v5)']);
       P.render(true); P.avisoCurto('Ficha assinada e salva. A versão anterior continua guardada.');
     },
     'cons-descartar': function () { C.cons.etapa = 'pronto'; C.cons.campos = null; C.cons.revisei = false; P.render(true); },
@@ -426,27 +427,27 @@
     },
     'ex-anexar': function () {
       var id = C.cons.pac, h = hist(id);
-      if (h[h.length - 1][0] !== '05/10/2026') h.push(['05/10/2026', novoDe(id).slice()]);
-      linha(id).unshift(['13/10', 'agora', 'exame', 'Exame de 05/10 lido pela IA e anexado', 'valores conferidos pelo Dr. André']);
+      if (h[h.length - 1][0] !== '{a:-8}') h.push(['{a:-8}', novoDe(id).slice()]);
+      linha(id).unshift(['{d:0}', 'agora', 'exame', 'Exame de {d:-8} lido pela IA e anexado', 'valores conferidos pelo Dr. André']);
       C.ex.etapa = 'anexado'; P.render(true); P.avisoCurto('Anexado ao ' + id + '. O gráfico já mostra o ponto novo.');
     },
     'ex-descartar': function () { C.ex.etapa = 'inicio'; P.render(true); },
     'ex-sel': function (v) { C.ex.sel = +v; P.render(true); },
     'ex-nota': function () {
       var id = C.cons.pac, t = String(C.ex.nota[id] || '').trim(); if (!t) { P.avisoCurto('Escreva a interpretação antes de salvar.'); return; }
-      linha(id).unshift(['13/10', 'agora', 'exame', 'Interpretação do Dr. André salva na ficha', '"' + esc(t.slice(0, 160)) + (t.length > 160 ? '…' : '') + '"']);
+      linha(id).unshift(['{d:0}', 'agora', 'exame', 'Interpretação do Dr. André salva na ficha', '"' + esc(t.slice(0, 160)) + (t.length > 160 ? '…' : '') + '"']);
       P.avisoCurto('Interpretação salva na ficha de ' + nome(id) + '.');
     },
     'doc-modelo': function (v) { C.doc.modelo = v; C.doc.revisei = false; P.render(true); },
     'doc-refazer': function () { delete C.doc.texto[C.doc.modelo + ':' + C.cons.pac]; C.doc.revisei = false; P.render(true); },
     'doc-assinar': function () {
       var d = C.doc, id = C.cons.pac; if (!d.revisei) return; d.assinado[d.modelo + ':' + id] = true; d.revisei = false;
-      linha(id).unshift(['13/10', 'agora', 'exame', MODELOS[d.modelo] + ' assinado', 'Dr. André']);
+      linha(id).unshift(['{d:0}', 'agora', 'exame', MODELOS[d.modelo] + ' assinado', 'Dr. André']);
       P.render(true); P.avisoCurto(MODELOS[d.modelo] + ' assinado (simulado).');
     },
     'rec-emitir': function () {
       var r = C.rec; if (!String(r.texto).trim()) { P.avisoCurto('Escreva a receita antes de assinar.'); return; }
-      r.emitida = C.cons.pac; linha(r.emitida).unshift(['13/10', 'agora', 'consulta', 'Receita emitida e assinada pelo Dr. André', 'chega ao app depois da conferência da enfermagem']);
+      r.emitida = C.cons.pac; linha(r.emitida).unshift(['{d:0}', 'agora', 'consulta', 'Receita emitida e assinada pelo Dr. André', 'chega ao app depois da conferência da enfermagem']);
       P.render(true);
     },
     'rec-nova': function () { C.rec = { texto: '', emitida: null }; P.render(true); },

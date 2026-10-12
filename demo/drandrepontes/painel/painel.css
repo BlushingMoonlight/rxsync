@@ -291,3 +291,4 @@ button.mini { font-size: 12px; font-weight: 600; color: var(--primaria); text-de
 @media (max-width: 560px) { .uso { grid-template-columns: 110px 1fr 40px; } }
 .campo-preco { width: 120px; text-align: right; }
 [data-estilo="cyber"] .reserva, [data-estilo="cyber"] .chip-bloq { border-radius: 2px; }
+.agenda-semana .cab-dia.hoje { color: var(--primaria); box-shadow: inset 0 -3px 0 var(--primaria); }

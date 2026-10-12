@@ -48,54 +48,61 @@
       { nome: '1.800 kcal · treino à tarde', ref: [[0, 1, 8], [9, 2], [7, 4, 5, 6], [12, 13], [11, 7]] }],
     planoPac: 'P-DEMO4', plano: null, meta: 1600, metaProt: 110, enviado: {},
     nutri: ['P-DEMO4', 'P-DEM11', 'P-DEMO7', 'P-DEMO2', 'P-DEMO1', 'P-DEM12'],
-    adesao: { 'P-DEMO4': [21, 62, '08/10'], 'P-DEM11': [80, 91, 'hoje'], 'P-DEMO7': [82, 75, 'hoje'], 'P-DEMO2': [91, 96, 'hoje'], 'P-DEMO1': [0, 0, '15/03'], 'P-DEM12': [58, 70, 'ontem'] },
-    evolucoesNutri: [['P-DEM11', '06/10', 'Primeira consulta de nutrição. Trabalha à noite; plano com jantar leve.']],
+    adesao: { 'P-DEMO4': [21, 62, '{d:-5}'], 'P-DEM11': [80, 91, 'hoje'], 'P-DEMO7': [82, 75, 'hoje'], 'P-DEMO2': [91, 96, 'hoje'], 'P-DEMO1': [0, 0, '{d:-212}'], 'P-DEM12': [58, 70, 'ontem'] },
+    evolucoesNutri: [['P-DEM11', '{d:-7}', 'Primeira consulta de nutrição. Trabalha à noite; plano com jantar leve.']],
     // Maria Clara · psicologia
     humor: { 'P-DEMO3': [1, 1, 0, 1, 2, 1, 1], 'P-DEM12': [2, 1, 1, 1, 2, 1, 1], 'P-DEMO7': [3, 3, 2, 3, 4, 3, 3], 'P-DEMO5': [2, 2, 3, 2, 2, 3, 2], 'P-DEMO2': [4, 3, 4, 4, 3, 4, 4] },
-    sessoes: [{ id: 1, hora: '11:00', pac: 'P-DEMO3', tipo: 'presencial', st: 'agendada' }, { id: 2, hora: '16:00', pac: 'P-DEM11', tipo: 'on-line', st: 'agendada' }, { id: 3, hora: '08:00', pac: 'P-DEM12', tipo: 'presencial', st: 'realizada' }],
-    prontuario: { 'P-DEMO3': [['04/10', 'Relata comer à noite quando ansiosa. Combinado registro de fome no app.']], 'P-DEM12': [['13/10', 'Sessão de acolhimento; objetivos do acompanhamento definidos.']] },
+    sessoes: [{ id: 1, hora: '11:00', pac: 'P-DEMO3', tipo: 'presencial', st: 'agendada' }, { id: 2, hora: '16:00', pac: 'P-DEM11', tipo: 'on-line', st: 'agendada' }, { id: 3, hora: '{h:-80}', pac: 'P-DEM12', tipo: 'presencial', st: 'realizada' }],
+    prontuario: { 'P-DEMO3': [['{d:-9}', 'Relata comer à noite quando ansiosa. Combinado registro de fome no app.']], 'P-DEM12': [['{d:0}', 'Sessão de acolhimento; objetivos do acompanhamento definidos.']] },
     escalas: ['Escala de humor', 'Escala de ansiedade', 'Escala de compulsão alimentar'],
-    respostas: [['P-DEMO3', 'Escala de compulsão alimentar', '05/10', 21, 'acima do ponto de corte definido pela clínica'], ['P-DEMO3', 'Escala de humor', '05/10', 12, 'dentro do esperado'], ['P-DEM12', 'Escala de ansiedade', '10/10', 9, 'dentro do esperado'], ['P-DEMO7', 'Escala de humor', '01/10', 6, 'dentro do esperado']],
+    respostas: [['P-DEMO3', 'Escala de compulsão alimentar', '{d:-8}', 21, 'acima do ponto de corte definido pela clínica'], ['P-DEMO3', 'Escala de humor', '{d:-8}', 12, 'dentro do esperado'], ['P-DEM12', 'Escala de ansiedade', '{d:-3}', 9, 'dentro do esperado'], ['P-DEMO7', 'Escala de humor', '{d:-12}', 6, 'dentro do esperado']],
     enviadas: [['P-DEM11', 'Escala de compulsão alimentar', 'enviada hoje']],
     // Thaís e Eduarda · enfermagem
     prescricoes: [{ id: 1, pac: 'P-DEMO9', med: 'Medicação semanal (exemplo)', un: '5', ml: '0,05', freq: 'semanal · quinta, 08:00', st: 'pendente', marcas: [0, 0, 0] },
       { id: 2, pac: 'P-DEM12', med: 'Medicação semanal (exemplo)', un: '10', ml: '0,10', freq: 'semanal · segunda, 07:00', st: 'pendente', marcas: [0, 0, 0] },
-      { id: 3, pac: 'P-DEMO7', med: 'Medicação semanal (exemplo)', un: '10', ml: '0,10', freq: 'semanal · quinta, 08:00', st: 'conferida', por: 'Thaís · 08/10', marcas: [1, 1, 1] }],
-    alertas: [{ id: 1, pac: 'P-DEMO5', txt: 'Náusea forte 2 dias depois da aplicação', quando: 'hoje 07:42', st: 'aberto' },
+      { id: 3, pac: 'P-DEMO7', med: 'Medicação semanal (exemplo)', un: '10', ml: '0,10', freq: 'semanal · quinta, 08:00', st: 'conferida', por: 'Thaís · {d:-5}', marcas: [1, 1, 1] }],
+    alertas: [{ id: 1, pac: 'P-DEMO5', txt: 'Náusea forte 2 dias depois da aplicação', quando: 'hoje {h:-98}', st: 'aberto' },
       { id: 2, pac: 'P-DEM12', txt: 'Perda de 2,4 kg em 7 dias', quando: 'ontem 18:10', st: 'aberto' },
-      { id: 3, pac: 'P-DEMO7', txt: 'Enjoo leve depois da aplicação', quando: '01/10', st: 'resolvido', nota: 'Orientada a comer em porções menores.' }],
-    sinais: [['P-DEMO5', '13/10 08:35', '132/86', 78, 104, 'Eduarda'], ['P-DEMO7', '08/10 10:40', '118/76', 72, 92, 'Thaís']],
+      { id: 3, pac: 'P-DEMO7', txt: 'Enjoo leve depois da aplicação', quando: '{d:-12}', st: 'resolvido', nota: 'Orientada a comer em porções menores.' }],
+    sinais: [['P-DEMO5', '{d:0} {h:-45}', '132/86', 78, 104, 'Eduarda'], ['P-DEMO7', '{d:-5} 10:40', '118/76', 72, 92, 'Thaís']],
     locais: ['Abdômen, lado esquerdo', 'Abdômen, lado direito', 'Abdômen inferior esquerdo', 'Abdômen inferior direito', 'Coxa esquerda', 'Coxa direita', 'Braço esquerdo', 'Braço direito'],
     rodizio: { 'P-DEMO7': ['Abdômen, lado esquerdo', 'Abdômen, lado direito', 'Coxa esquerda'], 'P-DEMO5': ['Abdômen, lado direito', 'Abdômen, lado direito', 'Coxa direita'], 'P-DEMO2': ['Coxa direita', 'Coxa esquerda', 'Abdômen, lado esquerdo'] },
-    lotes: [{ lote: 'L2309A', val: '05/11/2026', dias: 23, qtd: 3 }, { lote: 'L2310B', val: '20/02/2027', dias: 130, qtd: 1 }],
-    aplicacoes: [{ id: 1, hora: '08:15', pac: 'P-DEMO2', st: 'feita', local: 'Coxa direita', lote: 'L2309A' }, { id: 2, hora: '10:30', pac: 'P-DEMO7', st: 'agendada' }, { id: 3, hora: '14:00', pac: 'P-DEMO5', st: 'agendada' }],
-    bio: [{ id: 1, hora: '08:30', pac: 'P-DEMO5', st: 'importada', v: '101,2 kg · 39,8% gordura' }, { id: 2, hora: '09:00', pac: 'P-DEMO9', st: 'agendada' }, { id: 3, hora: '15:30', pac: 'P-DEM11', st: 'agendada' }],
+    lotes: [{ lote: 'L2309A', val: '{a:+23}', dias: 23, qtd: 3 }, { lote: 'L2310B', val: '{a:+130}', dias: 130, qtd: 1 }],
+    aplicacoes: [{ id: 1, hora: '{h:-65}', pac: 'P-DEMO2', st: 'feita', local: 'Coxa direita', lote: 'L2309A' }, { id: 2, hora: '10:30', pac: 'P-DEMO7', st: 'agendada' }, { id: 3, hora: '14:00', pac: 'P-DEMO5', st: 'agendada' }],
+    bio: [{ id: 1, hora: '{h:-50}', pac: 'P-DEMO5', st: 'importada', v: '101,2 kg · 39,8% gordura' }, { id: 2, hora: '09:00', pac: 'P-DEMO9', st: 'agendada' }, { id: 3, hora: '15:30', pac: 'P-DEM11', st: 'agendada' }],
     // Emanuele · financeiro
-    receber: [{ id: 1, pac: 'P-DEMO7', desc: 'Programa · parcela 2/3', valor: 650, venc: '20/10', st: 'aberto' }, { id: 2, pac: 'P-DEMO3', desc: 'Psicologia · outubro', valor: 650, venc: '05/10', st: 'atraso' },
-      { id: 3, pac: 'P-DEMO8', desc: 'Retorno', valor: 650, venc: '28/09', st: 'atraso' }, { id: 4, pac: 'P-DEMO2', desc: 'Programa · parcela 3/3', valor: 650, venc: '10/10', st: 'pago' },
-      { id: 5, pac: 'P-DEM11', desc: 'Primeira consulta de nutrição', valor: 380, venc: '17/10', st: 'aberto' }, { id: 6, pac: 'P-DEMO9', desc: 'Primeira consulta', valor: 450, venc: '13/10', st: 'aberto' }],
+    receber: [{ id: 1, pac: 'P-DEMO7', desc: 'Programa · parcela 2/3', valor: 650, venc: '{d:+7}', st: 'aberto' }, { id: 2, pac: 'P-DEMO3', desc: 'Psicologia · {m:0}', valor: 650, venc: '{d:-8}', st: 'atraso' },
+      { id: 3, pac: 'P-DEMO8', desc: 'Retorno', valor: 650, venc: '{d:-15}', st: 'atraso' }, { id: 4, pac: 'P-DEMO2', desc: 'Programa · parcela 3/3', valor: 650, venc: '{d:-3}', st: 'pago' },
+      { id: 5, pac: 'P-DEM11', desc: 'Primeira consulta de nutrição', valor: 380, venc: '{d:+4}', st: 'aberto' }, { id: 6, pac: 'P-DEMO9', desc: 'Primeira consulta', valor: 450, venc: '{d:0}', st: 'aberto' }],
     recebidoMes: 48250,
-    pagar: [{ id: 1, desc: 'Aluguel', cat: 'Estrutura', valor: 8500, venc: '15/10', st: 'aberto' }, { id: 2, desc: 'Medicação (fornecedor)', cat: 'Medicação', valor: 12400, venc: '20/10', st: 'aberto' },
-      { id: 3, desc: 'Energia', cat: 'Estrutura', valor: 1150, venc: '18/10', st: 'aberto' }, { id: 4, desc: 'Material de enfermagem', cat: 'Materiais', valor: 900, venc: '12/10', st: 'pago' },
-      { id: 5, desc: 'Equipe (folha)', cat: 'Pessoal', valor: 28000, venc: '05/11', st: 'aberto' }],
+    pagar: [{ id: 1, desc: 'Aluguel', cat: 'Estrutura', valor: 8500, venc: '{d:+2}', st: 'aberto' }, { id: 2, desc: 'Medicação (fornecedor)', cat: 'Medicação', valor: 12400, venc: '{d:+7}', st: 'aberto' },
+      { id: 3, desc: 'Energia', cat: 'Estrutura', valor: 1150, venc: '{d:+5}', st: 'aberto' }, { id: 4, desc: 'Material de enfermagem', cat: 'Materiais', valor: 900, venc: '{d:-1}', st: 'pago' },
+      { id: 5, desc: 'Equipe (folha)', cat: 'Pessoal', valor: 28000, venc: '{d:+23}', st: 'aberto' }],
     proxPagar: 6,
     repasse: [{ prof: 'Dr. André', atend: 64, prod: 38400, regra: 1, st: 'aberto' }, { prof: 'Felipe', atend: 52, prod: 19760, regra: .5, st: 'aberto' },
       { prof: 'Maria Clara', atend: 36, prod: 23400, regra: .6, st: 'aberto' }, { prof: 'Enfermagem', atend: 118, prod: 11800, regra: .3, st: 'aberto' }],
     // Elenice · recepção
-    agora: '09:20',
     chegada: {}, // preenchido abaixo, pela agenda de hoje
-    confirmar: [{ id: 1, pac: 'P-DEMO4', hora: 'qua 10:00', prof: 'Felipe', st: 'pendente' }, { id: 2, pac: 'P-DEM11', hora: 'qua 09:30', prof: 'Felipe', st: 'pendente' },
-      { id: 3, pac: 'P-DEMO8', hora: 'qui 12:00', prof: 'Dr. André', st: 'pendente' }, { id: 4, pac: 'P-DEM12', hora: 'qua 14:00', prof: 'Dr. André', st: 'confirmada' }],
+    confirmar: [{ id: 1, pac: 'P-DEMO4', hora: '{ws:u+1} 10:00', prof: 'Felipe', st: 'pendente' }, { id: 2, pac: 'P-DEM11', hora: '{ws:u+1} 09:30', prof: 'Felipe', st: 'pendente' },
+      { id: 3, pac: 'P-DEMO8', hora: '{ws:u+2} 12:00', prof: 'Dr. André', st: 'pendente' }, { id: 4, pac: 'P-DEM12', hora: '{ws:u+1} 14:00', prof: 'Dr. André', st: 'confirmada' }],
     fila: [{ id: 1, pac: 'P-DEM10', pref: 'manhãs', prof: 'Dr. André' }, { id: 2, pac: 'P-DEMO6', pref: 'qualquer horário', prof: 'Dr. André' }, { id: 3, pac: 'P-DEMO1', pref: 'sexta', prof: 'Felipe' }],
-    aniversarios: [{ pac: 'P-DEMO2', data: 'hoje', idade: 30, st: '' }, { pac: 'P-DEMO5', data: 'quinta, 15/10', idade: 53, st: '' }, { pac: 'P-DEM12', data: 'sábado, 17/10', idade: 51, st: '' }],
-    boasVindas: [{ pac: 'P-DEMO9', hora: 'hoje 09:00', st: '' }, { pac: 'P-DEMO6', hora: 'sex 09:00', st: '' }]
+    aniversarios: [{ pac: 'P-DEMO2', data: 'hoje', idade: 30, st: '' }, { pac: 'P-DEMO5', data: '{wl:+2}, {d:+2}', idade: 53, st: '' }, { pac: 'P-DEM12', data: '{wl:+4}, {d:+4}', idade: 51, st: '' }],
+    boasVindas: [{ pac: 'P-DEMO9', hora: 'hoje 09:00', st: '' }, { pac: 'P-DEMO6', hora: '{ws:u+3} 09:00', st: '' }]
   };
   F.plano = F.modelos[0].ref.map(function (r) { return r.slice(); });
-  // recepção de hoje: a partir da agenda (terça, 13/10)
-  P.E.eventos.filter(function (e) { return e.dia === 1; }).forEach(function (e) {
-    F.chegada[e.id] = e.slot === 0 ? { st: 'finalizado', hora: '07:52' } : e.slot === 1 ? { st: 'atendimento', hora: '08:24' } : e.slot === 2 ? { st: 'chegou', hora: '08:58' } : { st: 'aguardando' };
-  });
-  function minutos(h) { var a = F.agora.split(':'), b = h.split(':'); return (a[0] * 60 + +a[1]) - (b[0] * 60 + +b[1]); }
+  // recepção de hoje: a partir da agenda ({wl:0}, {d:0})
+  // A recepção segue a hora real: cada consulta começa uns 25 minutos depois do horário marcado (agenda atrasada de exemplo).
+  var DT = A.datas;
+  function agoraHM() { return DT.hm(DT.agora()); }
+  function hmDe(min) { return DT.hm(new Date(2000, 0, 1, 0, min)); }
+  (function () {
+    var n = P.SEM.hoje === P.REF ? DT.agora().getHours() * 60 + DT.agora().getMinutes() : -1;
+    P.E.eventos.filter(function (e) { return e.dia === P.REF; }).forEach(function (e) {
+      var s0 = 8 * 60 + e.slot * 30;
+      F.chegada[e.id] = n < 0 ? { st: 'aguardando' } : n >= s0 + 65 ? { st: 'finalizado', hora: hmDe(s0 - 8) } : n >= s0 + 25 ? { st: 'atendimento', hora: hmDe(s0 - 6) } : n >= s0 - 25 ? { st: 'chegou', hora: hmDe(Math.min(s0 - 2, n)) } : { st: 'aguardando' };
+    });
+  })();
+  function minutos(h) { var a = agoraHM().split(':'), b = h.split(':'); return (a[0] * 60 + +a[1]) - (b[0] * 60 + +b[1]); }
 
   function totais() {
     var k = 0, p = 0; F.plano.forEach(function (r) { r.forEach(function (i) { k += F.alimentos[i][1]; p += F.alimentos[i][2]; }); }); return [k, p];
@@ -191,7 +198,7 @@
       cartao(titulo('Nota sinalizada', A.item(117)) + lin(A.bolha('alerta', 'var(--alerta)'), '<b>Paula Freitas</b> · ontem 22:14<div class="mudo" style="font-size:13px">"Dia difícil, comi demais de novo." (nota do app)</div>', botao('Mandar mensagem', 'msg-pac', 'P-DEMO3', true)));
   };
   T['mc-sessoes'] = function () {
-    return cab('Sessões', 'Hoje, terça, 13/10. Ao marcar como realizada, registre a evolução: ela vai para o prontuário com sigilo.', A.item([50, 172])) +
+    return cab('Sessões', 'Hoje, {wl:0}, {d:0}. Ao marcar como realizada, registre a evolução: ela vai para o prontuário com sigilo.', A.item([50, 172])) +
       cartao(lista(F.sessoes.map(function (s) {
         return lin('<span class="hora num">' + s.hora + '</span>', '<b>' + nome(s.pac) + '</b> <span class="idp">' + s.pac + '</span><div class="fraco" style="font-size:12px">' + s.tipo + '</div>',
           s.st === 'realizada' ? '<span class="status st-ok">realizada</span>' : (QUEM === 'mariaclara' ? botao('Marcar realizada', 'sessao-feita', s.id) : '<span class="status st-in">agendada</span>'));
@@ -317,8 +324,8 @@
   T['prof-emanuele'] = function () {
     var atraso = F.receber.filter(function (r) { return r.st === 'atraso'; });
     return cabProf('emanuele', 'cobranças, contas a pagar, fluxo de caixa, repasses e consumo de IA.', A.item([87, 178, 179, 146])) +
-      '<div class="kpis">' + kpi('Recebido no mês', reais(F.recebidoMes), '+12% vs. setembro', 'sobe') + kpi('A receber', reais(soma(F.receber, function (r) { return r.st === 'aberto'; })), 'em aberto', '') +
-        kpi('Em atraso', reais(soma(atraso, function () { return true; })), atraso.length + ' pacientes', atraso.length ? 'desce' : 'sobe') + kpi('A pagar', reais(soma(F.pagar, function (p) { return p.st === 'aberto'; })), 'até 05/11', '') + kpi('Consumo de IA', '53%', 'do teto', '') + '</div>' +
+      '<div class="kpis">' + kpi('Recebido no mês', reais(F.recebidoMes), '+12% vs. {m:-1}', 'sobe') + kpi('A receber', reais(soma(F.receber, function (r) { return r.st === 'aberto'; })), 'em aberto', '') +
+        kpi('Em atraso', reais(soma(atraso, function () { return true; })), atraso.length + ' pacientes', atraso.length ? 'desce' : 'sobe') + kpi('A pagar', reais(soma(F.pagar, function (p) { return p.st === 'aberto'; })), 'até {d:+23}', '') + kpi('Consumo de IA', '53%', 'do teto', '') + '</div>' +
       atalhos([['emanuele-receber', 'moeda', 'var(--c1)', 'Contas a receber', 'cobrar, lembrar e dar baixa', A.item([87, 88, 89])],
         ['emanuele-pagar', 'cartao', 'var(--c5)', 'Contas a pagar e caixa', 'despesas e saldo previsto', A.item(178)],
         ['emanuele-repasse', 'equipe', 'var(--c3)', 'Repasse por profissional', 'produção e repasse do mês', A.item(179)],
@@ -339,12 +346,12 @@
   T['emanuele-pagar'] = function () {
     var entra = F.recebidoMes + soma(F.receber, function (r) { return r.st !== 'pago'; }), sai = soma(F.pagar, function () { return true; }), max = Math.max(entra, sai);
     return cab('Contas a pagar e fluxo de caixa', 'Amplia o ERP: além de cobrar os pacientes, as despesas da clínica e o saldo previsto do mês. Valores de exemplo.', A.item(178)) + (P.abasFin ? P.abasFin('emanuele-pagar') : '') +
-      '<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + kpi('Entradas do mês', reais(entra), 'recebido + a receber', 'sobe') + kpi('Saídas do mês', reais(sai), 'pagas + a pagar', '') + kpi('Saldo previsto', reais(entra - sai), 'outubro', entra - sai >= 0 ? 'sobe' : 'desce') + '</div>' +
+      '<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + kpi('Entradas do mês', reais(entra), 'recebido + a receber', 'sobe') + kpi('Saídas do mês', reais(sai), 'pagas + a pagar', '') + kpi('Saldo previsto', reais(entra - sai), '{m:0}', entra - sai >= 0 ? 'sobe' : 'desce') + '</div>' +
       '<div class="grade">' +
         cartao(titulo('Despesas', A.item(178)) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Despesa</th><th>Categoria</th><th>Valor</th><th>Vence</th><th></th></tr>' +
           F.pagar.map(function (p) { return '<tr><td><b>' + esc(p.desc) + '</b></td><td>' + esc(p.cat) + '</td><td class="num">' + reais(p.valor) + '</td><td class="num">' + esc(p.venc) + '</td><td>' + (p.st === 'pago' ? '<span class="status st-ok">paga</span>' : botao('Paga', 'pagar', p.id)) + '</td></tr>'; }).join('') +
           '</table></div><div style="margin-top:12px">' + botao('Nova despesa', 'despesa-nova', '') + '</div>', 's7') +
-        cartao(titulo('Fluxo de caixa de outubro', A.item(178)) + '<div class="barras">' +
+        cartao(titulo('Fluxo de caixa de {m:0}', A.item(178)) + '<div class="barras">' +
           '<div class="lin"><span>Entradas</span><span class="trilho"><i style="width:' + Math.round(entra / max * 100) + '%"></i></span><span class="val">' + reais(entra) + '</span></div>' +
           '<div class="lin"><span>Saídas</span><span class="trilho"><i style="width:' + Math.round(sai / max * 100) + '%;opacity:.55"></i></span><span class="val">' + reais(sai) + '</span></div></div>' +
           '<p class="nota" style="margin-top:10px">Entradas = recebido no mês + cobranças em aberto. Saídas = despesas pagas + a pagar.</p>', 's5') +
@@ -355,17 +362,17 @@
       cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Profissional</th><th>Atendimentos</th><th>Produção</th><th>Regra</th><th>Repasse</th><th></th></tr>' +
         F.repasse.map(function (r, i) {
           return '<tr><td><b>' + r.prof + '</b></td><td class="num">' + r.atend + '</td><td class="num">' + reais(r.prod) + '</td><td>' + (r.regra === 1 ? 'sócio · sem repasse' : Math.round(r.regra * 100) + '% da produção') + '</td><td class="num">' + (r.regra === 1 ? '—' : reais(r.prod * r.regra)) + '</td><td>' +
-            (r.regra === 1 ? '' : r.st === 'fechado' ? '<span class="status st-ok">fechado</span>' : botao('Fechar outubro', 'repasse', i)) + '</td></tr>';
+            (r.regra === 1 ? '' : r.st === 'fechado' ? '<span class="status st-ok">fechado</span>' : botao('Fechar {m:0}', 'repasse', i)) + '</td></tr>';
         }).join('') + '</table></div>');
   };
 
   // ======================= ELENICE · CONCIERGE =======================
-  function hojeEventos() { return P.E.eventos.filter(function (e) { return e.dia === 1; }).sort(function (a, b) { return a.slot - b.slot; }); }
+  function hojeEventos() { return P.E.eventos.filter(function (e) { return e.dia === P.REF; }).sort(function (a, b) { return a.slot - b.slot; }); }
   T['prof-elenice'] = function () {
     var ev = hojeEventos(), esperando = ev.filter(function (e) { return (F.chegada[e.id] || {}).st === 'chegou'; });
     return cabProf('elenice', 'recepção, confirmações, encaixes, aniversários e boas-vindas.', A.item([176, 6, 7, 177])) +
-      '<div class="kpis">' + kpi('Agora', F.agora, 'terça, 13/10', '') + kpi('Esperando', esperando.length, esperando.length ? 'há ' + minutos(F.chegada[esperando[0].id].hora) + ' min' : 'ninguém', esperando.length ? 'desce' : 'sobe') +
-        kpi('Sem confirmar', F.confirmar.filter(function (c) { return c.st === 'pendente'; }).length, 'amanhã e quinta', '') + kpi('Fila de espera', F.fila.length, 'para encaixes', '') + kpi('Aniversários', F.aniversarios.length, 'na semana', '') + '</div>' +
+      '<div class="kpis">' + kpi('Agora', agoraHM(), '{wl:0}, {d:0}', '') + kpi('Esperando', esperando.length, esperando.length ? 'há ' + minutos(F.chegada[esperando[0].id].hora) + ' min' : 'ninguém', esperando.length ? 'desce' : 'sobe') +
+        kpi('Sem confirmar', F.confirmar.filter(function (c) { return c.st === 'pendente'; }).length, '{wl:u+1} e {wl:u+2}', '') + kpi('Fila de espera', F.fila.length, 'para encaixes', '') + kpi('Aniversários', F.aniversarios.length, 'na semana', '') + '</div>' +
       atalhos([['ele-recepcao', 'pacientes', 'var(--c1)', 'Recepção', 'chegadas e tempo de espera', A.item(176)],
         ['ele-confirmar', 'whatsapp', 'var(--c3)', 'Confirmações', 'quem ainda não confirmou', A.item([6, 51])],
         ['ele-encaixe', 'calendario', 'var(--c5)', 'Encaixes e fila', 'horários livres e fila de espera', A.item([7, 51])],
@@ -375,7 +382,7 @@
   };
   T['ele-recepcao'] = function () {
     var ST = { aguardando: ['st-in', 'a caminho'], chegou: ['st-al', 'esperando'], atendimento: ['st-ok', 'em atendimento'], finalizado: ['st-ok', 'finalizado'] };
-    return cab('Recepção', 'Agora: ' + F.agora + '. Marque a chegada, chame para o atendimento e finalize. O tempo de espera conta a partir da chegada.', A.item(176)) +
+    return cab('Recepção', 'Agora: ' + agoraHM() + '. Marque a chegada, chame para o atendimento e finalize. O tempo de espera conta a partir da chegada.', A.item(176)) +
       cartao(lista(hojeEventos().map(function (e) {
         var c = F.chegada[e.id] || { st: 'aguardando' }, p = P.PACIENTES.filter(function (x) { return x.nome === e.pac; })[0] || { id: '' };
         var espera = c.st === 'chegou' ? ' · <b style="color:' + (minutos(c.hora) > 15 ? 'var(--perigo)' : 'inherit') + '">esperando há ' + minutos(c.hora) + ' min</b>' : '';
@@ -384,7 +391,7 @@
       })));
   };
   T['ele-confirmar'] = function () {
-    return cab('Confirmações', 'Consultas de amanhã e quinta. A mensagem sai pelo WhatsApp da clínica.', A.item([6, 51])) +
+    return cab('Confirmações', 'Consultas de {wl:u+1} e {wl:u+2}. A mensagem sai pelo WhatsApp da clínica.', A.item([6, 51])) +
       cartao(lista(F.confirmar.map(function (c) {
         return lin('<span class="hora num">' + c.hora + '</span>', '<b>' + nome(c.pac) + '</b> <span class="idp">' + c.pac + '</span><div class="fraco" style="font-size:12px">' + c.prof + '</div>',
           c.st === 'confirmada' ? '<span class="status st-ok">confirmada</span>' : botao('Mandar mensagem', 'confirmar-msg', c.id, true) + ' ' + botao('Confirmou', 'confirmou', c.id) + ' <a class="botao botao-claro" href="#agenda" style="height:34px;padding:0 12px;font-size:12.5px;text-decoration:none">Remarcar</a>');
@@ -392,12 +399,13 @@
   };
   T['ele-encaixe'] = function () {
     var livres = [];
-    for (var s = 8; s < 18; s++) if (!P.E.eventos.some(function (e) { return e.dia === 2 && e.slot === s; })) livres.push(s);
-    return cab('Encaixes e fila de espera', 'Horários livres de quarta, 14/10, à tarde. Ao encaixar, a consulta entra na agenda.', A.item([7, 51])) +
+    var dE = P.diaDe(1);
+    for (var s = 8; s < 18; s++) if (!P.E.eventos.some(function (e) { return e.dia === dE && e.slot === s; })) livres.push(s);
+    return cab('Encaixes e fila de espera', 'Horários livres de ' + P.nomeDia(dE).toLowerCase() + ', à tarde. Ao encaixar, a consulta entra na agenda.', A.item([7, 51])) +
       '<div class="duas">' + cartao(titulo('Fila de espera', A.item(7)) + lista(F.fila.map(function (f) {
           return lin('', '<b>' + nome(f.pac) + '</b> <span class="idp">' + f.pac + '</span><div class="fraco" style="font-size:12px">prefere ' + f.pref + ' · ' + f.prof + '</div>', botao('Encaixar', 'encaixar', f.id));
         })) + (F.fila.length ? '' : '<p class="mudo">Fila vazia.</p>')) +
-        cartao(titulo('Livres na quarta à tarde') + '<div class="opcoes">' + livres.map(function (s) { return '<span class="chip">' + P.HORAS[s] + '</span>'; }).join('') + '</div><a class="botao botao-claro" href="#agenda" style="margin-top:12px;text-decoration:none">Abrir a agenda</a>') + '</div>';
+        cartao(titulo('Livres ' + P.nomeDia(P.diaDe(1)).split(',')[0].toLowerCase() + ' à tarde') + '<div class="opcoes">' + livres.map(function (s) { return '<span class="chip">' + P.HORAS[s] + '</span>'; }).join('') + '</div><a class="botao botao-claro" href="#agenda" style="margin-top:12px;text-decoration:none">Abrir a agenda</a>') + '</div>';
   };
   T['ele-aniversarios'] = function () {
     return cab('Aniversários e boas-vindas', 'Para cumprimentar os aniversariantes e receber quem vem pela primeira vez.', A.item(177)) +
@@ -426,7 +434,7 @@
     },
     'plano-tirar': function (v) { var x = v.split(':'); F.plano[+x[0]].splice(+x[1], 1); },
     'plano-por': function (v, el) { var s = document.querySelector('select[data-ref="' + v + '"]'); if (s && s.value !== '') F.plano[+v].push(+s.value); else return P.avisoCurto('Escolha um alimento.'); },
-    'plano-enviar': function () { F.enviado[F.planoPac] = 'hoje ' + F.agora; P.avisoCurto('Plano enviado ao app de ' + nome(F.planoPac) + '. Ele vê ao lado do diário.'); },
+    'plano-enviar': function () { F.enviado[F.planoPac] = 'hoje ' + agoraHM(); P.avisoCurto('Plano enviado ao app de ' + nome(F.planoPac) + '. Ele vê ao lado do diário.'); },
     'plano-modelo-salvar': function () {
       folha('Salvar como modelo', campo('Nome do modelo', '<input class="campo" name="n" value="Meu modelo ' + (F.modelos.length + 1) + '">'), function (d) {
         F.modelos.push({ nome: String(d.get('n') || 'Modelo').slice(0, 60), ref: F.plano.map(function (r) { return r.slice(); }) }); P.avisoCurto('Modelo salvo.'); P.render(true);
@@ -438,14 +446,14 @@
       var s = achar(F.sessoes, v);
       folha('Sessão de ' + nome(s.pac), '<p class="nota">' + A.ic('cadeado') + ' A evolução fica no prontuário de psicologia e só a psicóloga lê ' + A.item(172) + '.</p>' + campo('Evolução da sessão', '<textarea class="campo" name="t" placeholder="Anotações da sessão"></textarea>'), function (d) {
         s.st = 'realizada'; var t = String(d.get('t') || '').trim();
-        if (t) (F.prontuario[s.pac] = F.prontuario[s.pac] || []).push(['13/10', esc(t)]);
+        if (t) (F.prontuario[s.pac] = F.prontuario[s.pac] || []).push(['{d:0}', esc(t)]);
         P.avisoCurto('Sessão realizada. A equipe vê só "sessão realizada".'); P.render(true);
       }, 'Marcar realizada');
     },
     'pront-nova': function (v) {
-      folha('Anotação · ' + nome(v), campo('Texto', '<textarea class="campo" name="t"></textarea>'), function (d) { var t = String(d.get('t') || '').trim(); if (!t) return false; F.prontuario[v].push(['13/10', esc(t)]); P.render(true); });
+      folha('Anotação · ' + nome(v), campo('Texto', '<textarea class="campo" name="t"></textarea>'), function (d) { var t = String(d.get('t') || '').trim(); if (!t) return false; F.prontuario[v].push(['{d:0}', esc(t)]); P.render(true); });
     },
-    'conferir': function (v) { var p = achar(F.prescricoes, v); p.st = 'conferida'; p.por = 'Thaís · 13/10'; P.avisoCurto('Conferida. A instrução aparece no app de ' + nome(p.pac) + '.'); },
+    'conferir': function (v) { var p = achar(F.prescricoes, v); p.st = 'conferida'; p.por = 'Thaís · {d:0}'; P.avisoCurto('Conferida. A instrução aparece no app de ' + nome(p.pac) + '.'); },
     'devolver': function (v) {
       var p = achar(F.prescricoes, v);
       folha('Devolver ao Dr. André', campo('O que não confere', '<textarea class="campo" name="t" placeholder="Ex.: unidades diferentes da receita"></textarea>'), function () { p.st = 'devolvida'; P.avisoCurto('Devolvida ao Dr. André. Não aparece no app até ser corrigida.'); P.render(true); }, 'Devolver');
@@ -471,37 +479,37 @@
     },
     'bio': function (v) { var b = achar(F.bio, v); b.st = 'importada'; b.v = b.pac === 'P-DEMO9' ? '84,0 kg · 38,1% gordura' : '72,5 kg · 33,0% gordura'; P.avisoCurto('Medidas importadas da balança para a ficha.'); },
     'lote-novo': function () {
-      folha('Entrada de frascos', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Lote', '<input class="campo" name="lote" value="L2311C">') + campo('Validade', '<input class="campo" name="val" value="30/04/2027">') + '</div>' + campo('Frascos', '<input class="campo" name="qtd" inputmode="numeric" value="10">'),
+      folha('Entrada de frascos', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Lote', '<input class="campo" name="lote" value="L2311C">') + campo('Validade', '<input class="campo" name="val" value="{a:+199}">') + '</div>' + campo('Frascos', '<input class="campo" name="qtd" inputmode="numeric" value="10">'),
         function (d) { var q = parseInt(d.get('qtd'), 10); if (!(q > 0)) return false; F.lotes.push({ lote: String(d.get('lote')).slice(0, 20), val: String(d.get('val')).slice(0, 12), dias: 200, qtd: q }); P.avisoCurto('Entrada registrada: ' + q + ' frascos.'); P.render(true); });
     },
     'cobrar': function (v) { P.avisoCurto('Link de Pix e cartão enviado a ' + nome(achar(F.receber, v).pac) + ' pelo WhatsApp (simulado).'); },
     'lembrar': function (v) { P.avisoCurto('Lembrete de pagamento enviado a ' + nome(achar(F.receber, v).pac) + ' (simulado).'); },
-    'recebido': function (v) { var r = achar(F.receber, v); r.st = 'pago'; r.forma = r.forma || 'Pix'; r.pagoEm = '13/10'; F.recebidoMes += r.valor; P.avisoCurto('Baixa feita: ' + reais(r.valor) + ' de ' + nome(r.pac) + '.'); },
+    'recebido': function (v) { var r = achar(F.receber, v); r.st = 'pago'; r.forma = r.forma || 'Pix'; r.pagoEm = '{d:0}'; F.recebidoMes += r.valor; P.avisoCurto('Baixa feita: ' + reais(r.valor) + ' de ' + nome(r.pac) + '.'); },
     'pagar': function (v) { achar(F.pagar, v).st = 'pago'; },
     'despesa-nova': function () {
-      folha('Nova despesa', campo('Despesa', '<input class="campo" name="desc" placeholder="Ex.: manutenção do ar">') + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Valor (R$)', '<input class="campo" name="valor" inputmode="decimal" value="500">') + campo('Vence', '<input class="campo" name="venc" value="25/10">') + '</div>' +
+      folha('Nova despesa', campo('Despesa', '<input class="campo" name="desc" placeholder="Ex.: manutenção do ar">') + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Valor (R$)', '<input class="campo" name="valor" inputmode="decimal" value="500">') + campo('Vence', '<input class="campo" name="venc" value="{d:+12}">') + '</div>' +
         campo('Categoria', '<select class="campo" name="cat"><option>Estrutura</option><option>Medicação</option><option>Materiais</option><option>Pessoal</option><option>Outros</option></select>'),
         function (d) { var v = parseFloat(String(d.get('valor')).replace('.', '').replace(',', '.')); var desc = String(d.get('desc') || '').trim(); if (!desc || !(v > 0)) return false;
           F.pagar.push({ id: F.proxPagar++, desc: desc.slice(0, 60), cat: d.get('cat'), valor: v, venc: String(d.get('venc')).slice(0, 10), st: 'aberto' }); P.avisoCurto('Despesa incluída no fluxo de caixa.'); P.render(true); });
     },
-    'repasse': function (v) { F.repasse[+v].st = 'fechado'; P.avisoCurto('Repasse de outubro fechado para ' + F.repasse[+v].prof + '.'); },
-    'chegou': function (v) { F.chegada[v] = { st: 'chegou', hora: F.agora }; P.avisoCurto('Chegada registrada às ' + F.agora + '.'); },
+    'repasse': function (v) { F.repasse[+v].st = 'fechado'; P.avisoCurto('Repasse de {m:0} fechado para ' + F.repasse[+v].prof + '.'); },
+    'chegou': function (v) { F.chegada[v] = { st: 'chegou', hora: agoraHM() }; P.avisoCurto('Chegada registrada às ' + agoraHM() + '.'); },
     'chamar': function (v) { F.chegada[v].st = 'atendimento'; },
     'finalizar': function (v) { F.chegada[v].st = 'finalizado'; },
     'confirmar-msg': function (v) { P.avisoCurto('Mensagem de confirmação enviada a ' + nome(achar(F.confirmar, v).pac) + ' (simulado).'); },
     'confirmou': function (v) { achar(F.confirmar, v).st = 'confirmada'; },
     'encaixar': function (v) {
       var f = achar(F.fila, v), livres = [];
-      var quemAtende = f.prof === 'Felipe' ? 'Felipe' : 'Dr. André';
+      var quemAtende = f.prof === 'Felipe' ? 'Felipe' : 'Dr. André', dE = P.diaDe(1);
       for (var s = 8; s < 18; s++) {
-        var teste = { id: 0, dia: 2, slot: s, pac: nome(f.pac), tipo: 'Retorno · 30 min', prof: quemAtende };
-        if (P.conflito ? !P.conflito(2, s, teste) : !P.E.eventos.some(function (e) { return e.dia === 2 && e.slot === s; })) livres.push(s);
+        var teste = { id: 0, dia: dE, slot: s, pac: nome(f.pac), tipo: 'Retorno · 30 min', prof: quemAtende };
+        if (P.conflito ? !P.conflito(dE, s, teste) : !P.E.eventos.some(function (e) { return e.dia === dE && e.slot === s; })) livres.push(s);
       }
-      folha('Encaixar ' + nome(f.pac), campo('Horário (quarta, 14/10)', '<select class="campo" name="slot">' + livres.map(function (s) { return '<option value="' + s + '">' + P.HORAS[s] + '</option>'; }).join('') + '</select>'), function (d) {
+      folha('Encaixar ' + nome(f.pac), campo('Horário (' + P.nomeDia(dE).toLowerCase() + ')', '<select class="campo" name="slot">' + livres.map(function (s) { return '<option value="' + s + '">' + P.HORAS[s] + '</option>'; }).join('') + '</select>'), function (d) {
         var s = +d.get('slot');
-        P.E.eventos.push({ id: P.E.proxId++, dia: 2, slot: s, pac: nome(f.pac), tipo: 'Retorno · 30 min', prof: f.prof === 'Felipe' ? 'Felipe' : 'Dr. André' });
+        P.E.eventos.push({ id: P.E.proxId++, dia: dE, slot: s, pac: nome(f.pac), tipo: 'Retorno · 30 min', prof: f.prof === 'Felipe' ? 'Felipe' : 'Dr. André' });
         F.fila = F.fila.filter(function (x) { return x !== f; });
-        P.avisoCurto(nome(f.pac) + ' encaixada na quarta às ' + P.HORAS[s] + '. Já está na agenda.'); P.render(true);
+        P.avisoCurto(nome(f.pac) + ' encaixada ' + P.nomeDia(dE).split(',')[0].toLowerCase() + ' às ' + P.HORAS[s] + '. Já está na agenda.'); P.render(true);
       }, 'Encaixar');
     },
     'parabens': function (v) { F.aniversarios[+v].st = 'ok'; P.avisoCurto('Mensagem de parabéns enviada (simulado).'); },
@@ -522,9 +530,9 @@
   document.addEventListener('submit', function (ev) {
     var f = ev.target.closest('[data-f-form]'); if (!f) return; ev.preventDefault();
     var d = new FormData(f), tipo = f.dataset.fForm;
-    if (tipo === 'nutri-evolucao') { var t = String(d.get('texto') || '').trim() || 'Consulta registrada.'; F.evolucoesNutri.unshift([d.get('pac'), '13/10', 'Peso ' + esc(d.get('peso')) + ' kg · cintura ' + esc(d.get('cintura')) + ' cm. ' + esc(t)]); P.avisoCurto('Evolução salva na ficha (nova versão).'); }
+    if (tipo === 'nutri-evolucao') { var t = String(d.get('texto') || '').trim() || 'Consulta registrada.'; F.evolucoesNutri.unshift([d.get('pac'), '{d:0}', 'Peso ' + esc(d.get('peso')) + ' kg · cintura ' + esc(d.get('cintura')) + ' cm. ' + esc(t)]); P.avisoCurto('Evolução salva na ficha (nova versão).'); }
     if (tipo === 'enviar-escala') { F.enviadas.unshift([d.get('pac'), d.get('escala'), 'enviada agora']); P.avisoCurto('Questionário enviado ao app de ' + nome(d.get('pac')) + '.'); }
-    if (tipo === 'sinais') { F.sinais.unshift([d.get('pac'), '13/10 ' + F.agora, String(d.get('pa')).slice(0, 9), String(d.get('fc')).slice(0, 4), String(d.get('gl')).slice(0, 4), P.EQUIPE[QUEM === 'eduarda' ? 'eduarda' : 'thais'].nome]); P.avisoCurto('Sinais vitais salvos na ficha.'); }
+    if (tipo === 'sinais') { F.sinais.unshift([d.get('pac'), '{d:0} ' + agoraHM(), String(d.get('pa')).slice(0, 9), String(d.get('fc')).slice(0, 4), String(d.get('gl')).slice(0, 4), P.EQUIPE[QUEM === 'eduarda' ? 'eduarda' : 'thais'].nome]); P.avisoCurto('Sinais vitais salvos na ficha.'); }
     P.render(true);
   });
 })();

@@ -22,9 +22,10 @@
     f.querySelector('form').addEventListener('submit', function (ev) { ev.preventDefault(); if (aoSalvar(new FormData(ev.target)) !== false) f.remove(); });
     var c = f.querySelector('input,textarea,select'); if (c) c.focus();
   }
-  function linhaTempo(id, tipo, texto, det) { if (P.linhaPaciente) P.linhaPaciente(id).unshift(['13/10', 'agora', tipo, texto, det || curto(QUEM)]); }
-  function dia(d) { var x = d.split('/'); return +x[1] * 100 + +x[0]; }
-  var HOJE = dia('13/10');
+  function linhaTempo(id, tipo, texto, det) { if (P.linhaPaciente) P.linhaPaciente(id).unshift(['{d:0}', 'agora', tipo, texto, det || curto(QUEM)]); }
+  // Prazos em dias a partir de hoje (0 = hoje, −3 = venceu há 3 dias).
+  var DT = A.datas;
+  function dataPrazo(n) { return DT.dm(DT.somaDias(DT.hoje(), n)); }
   var IDS = P.PACIENTES.map(function (p) { return p.id; });
 
   // ---------- dados de exemplo ----------
@@ -34,29 +35,29 @@
   var ORIGEM = { 'P-DEMO7': 'Instagram', 'P-DEMO5': 'Indicação', 'P-DEMO9': 'Instagram', 'P-DEMO4': 'Google', 'P-DEMO2': 'Indicação', 'P-DEMO3': 'Site',
     'P-DEMO6': 'Instagram', 'P-DEMO8': 'Google', 'P-DEMO1': 'Google', 'P-DEM10': 'Indicação', 'P-DEM11': 'Site', 'P-DEM12': 'Google' };
   var ETIQ = { 'P-DEMO7': ['Aplicação semanal', 'App ativo', 'Indicou alguém'], 'P-DEMO5': ['Aplicação semanal'], 'P-DEMO9': ['Primeira consulta'], 'P-DEMO4': ['Sumiu do app'],
-    'P-DEMO2': ['Manutenção', 'Indicou alguém', 'App ativo'], 'P-DEMO3': ['Aniversário em outubro'], 'P-DEMO6': ['Orçamento enviado'], 'P-DEMO8': ['Manutenção', 'Sumiu do app'],
-    'P-DEMO1': ['Sumiu do app', 'Indicou alguém'], 'P-DEM10': ['Orçamento enviado'], 'P-DEM11': ['Primeira consulta', 'Aniversário em outubro'], 'P-DEM12': ['Aplicação semanal', 'App ativo'] };
-  var SAIU = { 'P-DEMO1': '02/06' };   // responderam SAIR: não recebem campanhas
+    'P-DEMO2': ['Manutenção', 'Indicou alguém', 'App ativo'], 'P-DEMO3': ['Aniversário no mês'], 'P-DEMO6': ['Orçamento enviado'], 'P-DEMO8': ['Manutenção', 'Sumiu do app'],
+    'P-DEMO1': ['Sumiu do app', 'Indicou alguém'], 'P-DEM10': ['Orçamento enviado'], 'P-DEM11': ['Primeira consulta', 'Aniversário no mês'], 'P-DEM12': ['Aplicação semanal', 'App ativo'] };
+  var SAIU = { 'P-DEMO1': '{d:-133}' };   // responderam SAIR: não recebem campanhas
   var VIROU = ['Agendado', 'Em tratamento', 'Retorno vencido', 'Inativo'];
   var BASE_FUNIL = P.FUNIL.slice();     // etapas que a agenda e o app usam: não somem nem mudam de nome nesta demonstração
 
   var R = {
     origemSel: '', funilEditar: false,
     tarefas: [
-      { id: 1, t: 'Ligar para confirmar a primeira consulta', tipo: 'Ligar', pac: 'P-DEMO9', resp: 'elenice', prazo: '13/10', st: 'aberta' },
-      { id: 2, t: 'Mandar orçamento do acompanhamento de 3 meses', tipo: 'Mandar orçamento', pac: 'P-DEM10', resp: 'emanuele', prazo: '13/10', st: 'aberta' },
-      { id: 3, t: 'Lembrar o retorno vencido', tipo: 'Lembrar retorno', pac: 'P-DEMO8', resp: 'elenice', prazo: '10/10', st: 'aberta' },
-      { id: 4, t: 'Conferir os exames enviados pelo app', tipo: 'Outro', pac: 'P-DEMO7', resp: 'andre', prazo: '14/10', st: 'aberta' },
-      { id: 5, t: 'Ligar para saber como está a náusea', tipo: 'Ligar', pac: 'P-DEMO5', resp: 'thais', prazo: '13/10', st: 'aberta' },
-      { id: 6, t: 'Enviar plano para quem trabalha à noite', tipo: 'Outro', pac: 'P-DEM11', resp: 'felipe', prazo: '15/10', st: 'aberta' },
-      { id: 7, t: 'Reenviar o convite do app', tipo: 'Ligar', pac: 'P-DEM11', resp: 'elenice', prazo: '12/10', st: 'aberta' },
-      { id: 8, t: 'Retomar o orçamento sem resposta', tipo: 'Mandar orçamento', pac: 'P-DEMO6', resp: 'emanuele', prazo: '16/10', st: 'aberta' },
-      { id: 9, t: 'Agradecer a indicação do Lucas', tipo: 'Ligar', pac: 'P-DEMO2', resp: 'elenice', prazo: '11/10', st: 'feita' }],
+      { id: 1, t: 'Ligar para confirmar a primeira consulta', tipo: 'Ligar', pac: 'P-DEMO9', resp: 'elenice', prazo: 0, st: 'aberta' },
+      { id: 2, t: 'Mandar orçamento do acompanhamento de 3 meses', tipo: 'Mandar orçamento', pac: 'P-DEM10', resp: 'emanuele', prazo: 0, st: 'aberta' },
+      { id: 3, t: 'Lembrar o retorno vencido', tipo: 'Lembrar retorno', pac: 'P-DEMO8', resp: 'elenice', prazo: -3, st: 'aberta' },
+      { id: 4, t: 'Conferir os exames enviados pelo app', tipo: 'Outro', pac: 'P-DEMO7', resp: 'andre', prazo: 1, st: 'aberta' },
+      { id: 5, t: 'Ligar para saber como está a náusea', tipo: 'Ligar', pac: 'P-DEMO5', resp: 'thais', prazo: 0, st: 'aberta' },
+      { id: 6, t: 'Enviar plano para quem trabalha à noite', tipo: 'Outro', pac: 'P-DEM11', resp: 'felipe', prazo: 2, st: 'aberta' },
+      { id: 7, t: 'Reenviar o convite do app', tipo: 'Ligar', pac: 'P-DEM11', resp: 'elenice', prazo: -1, st: 'aberta' },
+      { id: 8, t: 'Retomar o orçamento sem resposta', tipo: 'Mandar orçamento', pac: 'P-DEMO6', resp: 'emanuele', prazo: 3, st: 'aberta' },
+      { id: 9, t: 'Agradecer a indicação do Lucas', tipo: 'Ligar', pac: 'P-DEMO2', resp: 'elenice', prazo: -2, st: 'feita' }],
     proxTarefa: 10, filtroTarefa: QUEM === 'andre' ? 'todas' : 'minhas',
     segmentos: [
       { nome: 'Sumiram do app', etiqueta: 'Sumiu do app', etapa: '', origem: '' },
       { nome: 'Orçamentos sem resposta', etiqueta: 'Orçamento enviado', etapa: 'Novo contato', origem: '' },
-      { nome: 'Aniversariantes de outubro', etiqueta: 'Aniversário em outubro', etapa: '', origem: '' },
+      { nome: 'Aniversariantes de {m:0}', etiqueta: 'Aniversário no mês', etapa: '', origem: '' },
       { nome: 'Vieram do Instagram', etiqueta: '', etapa: '', origem: 'Instagram' }],
     filtro: { etiqueta: '', etapa: '', origem: '' }, etiqPac: 'P-DEMO7',
     modelos: [
@@ -68,12 +69,12 @@
       { nome: 'Agradecer indicação', t: '{nome}, muito obrigado pela indicação! Seu benefício já está separado aqui na clínica.' }],
     modeloSel: 0, modeloPac: 'P-DEMO8',
     camp: { seg: 0, modelo: 3, entendi: false },
-    campanhas: [{ nome: 'Convite para voltar · Sumiram do app', data: '01/10', enviados: 24, responderam: 7, sairam: 1, st: 'concluída' }],
+    campanhas: [{ nome: 'Convite para voltar · Sumiram do app', data: '{d:-12}', enviados: 24, responderam: 7, sairam: 1, st: 'concluída' }],
     beneficio: '1 bioimpedância grátis para quem indicou, depois que o indicado faz a primeira consulta.',
     indicacoes: [
-      { id: 1, de: 'P-DEMO1', para: 'P-DEMO2', data: '20/03', st: 'beneficio' },
-      { id: 2, de: 'P-DEMO7', para: 'P-DEMO5', data: '02/09', st: 'paciente' },
-      { id: 3, de: 'P-DEMO2', para: 'P-DEM10', data: '09/10', st: 'contato' }],
+      { id: 1, de: 'P-DEMO1', para: 'P-DEMO2', data: '{d:-207}', st: 'beneficio' },
+      { id: 2, de: 'P-DEMO7', para: 'P-DEMO5', data: '{d:-41}', st: 'paciente' },
+      { id: 3, de: 'P-DEMO2', para: 'P-DEM10', data: '{d:-4}', st: 'contato' }],
     proxInd: 4
   };
   var ST_IND = { contato: ['Indicado em contato', 'st-in'], paciente: ['Virou paciente', 'st-al'], beneficio: ['Benefício entregue', 'st-ok'] };
@@ -115,7 +116,7 @@
     var tot = linhas.reduce(function (a, l) { return [a[0] + l.cont, a[1] + l.pacs]; }, [0, 0]);
     var max = Math.max.apply(null, linhas.map(function (l) { return l.cont; }));
     var lst = P.PACIENTES.filter(function (p) { return !R.origemSel || ORIGEM[p.id] === R.origemSel; });
-    return cab('Origem dos contatos', 'De onde cada contato veio e quantos viraram pacientes. Outubro, dados de exemplo.', A.item(180)) +
+    return cab('Origem dos contatos', 'De onde cada contato veio e quantos viraram pacientes. {M:0}, dados de exemplo.', A.item(180)) +
       '<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + kpi('Contatos no mês', tot[0], 'todas as origens', '') + kpi('Viraram pacientes', tot[1], 'marcaram consulta', 'sobe') + kpi('Conversão', Math.round(tot[1] / tot[0] * 100) + '%', 'contato → paciente', '') + '</div>' +
       '<div class="grade">' +
         cartao(titulo('Por origem', A.item(180)) + '<div class="barras-origem">' + linhas.map(function (l) {
@@ -157,23 +158,23 @@
   // ---------- 182 · Tarefas e retornos com prazo ----------
   T['crm-tarefas'] = function () {
     var f = R.filtroTarefa, todas = R.tarefas;
-    function atrasada(t) { return t.st === 'aberta' && dia(t.prazo) < HOJE; }
+    function atrasada(t) { return t.st === 'aberta' && t.prazo < 0; }
     var l = todas.filter(function (t) {
       if (f === 'minhas') return t.resp === QUEM && t.st === 'aberta';
       if (f === 'atrasadas') return atrasada(t);
       if (f === 'feitas') return t.st === 'feita';
       return t.st === 'aberta';
-    }).sort(function (a, b) { return dia(a.prazo) - dia(b.prazo); });
+    }).sort(function (a, b) { return a.prazo - b.prazo; });
     var abas = [['minhas', 'Minhas (' + todas.filter(function (t) { return t.resp === QUEM && t.st === 'aberta'; }).length + ')'], ['todas', 'Todas abertas (' + todas.filter(function (t) { return t.st === 'aberta'; }).length + ')'],
       ['atrasadas', 'Atrasadas (' + todas.filter(atrasada).length + ')'], ['feitas', 'Feitas']];
     return cab('Tarefas e retornos', 'Ligar, mandar orçamento, lembrar retorno: cada tarefa tem responsável e prazo.', A.item(182)) +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between"><div class="abas-tela">' + abas.map(function (a) { return '<button type="button" data-r="tarefa-filtro" data-v="' + a[0] + '" class="' + (f === a[0] ? 'ativo' : '') + '">' + a[1] + '</button>'; }).join('') + '</div>' +
         botao(A.ic('mais') + 'Nova tarefa', 'tarefa-nova') + '</div>' +
       cartao(l.length ? lista(l.map(function (t) {
-        var atr = atrasada(t), hoje = t.st === 'aberta' && dia(t.prazo) === HOJE;
+        var atr = atrasada(t), hoje = t.st === 'aberta' && t.prazo === 0;
         return lin(t.st === 'feita' ? A.bolha('trofeu', 'var(--ok)') : A.bolha(t.tipo === 'Ligar' ? 'telefone' : t.tipo === 'Mandar orçamento' ? 'moeda' : t.tipo === 'Lembrar retorno' ? 'calendario' : 'documento', atr ? 'var(--perigo)' : 'var(--c4)'),
           '<b>' + t.t + '</b><div class="fraco"><button type="button" class="link-pac" data-r="abrir-pac" data-v="' + t.pac + '">' + nome(t.pac) + '</button> <span class="idp">' + t.pac + '</span> · ' + curto(t.resp) + '</div>',
-          '<div class="tarefa-acoes"><span class="status ' + (t.st === 'feita' ? 'st-ok">feita' : atr ? 'st-pe">atrasada · ' + t.prazo : hoje ? 'st-al">hoje' : 'st-in">até ' + t.prazo) + '</span>' + (t.st === 'aberta' ? ' ' + peq('Concluir', 'tarefa-feita', t.id) : '') + '</div>');
+          '<div class="tarefa-acoes"><span class="status ' + (t.st === 'feita' ? 'st-ok">feita' : atr ? 'st-pe">atrasada · ' + dataPrazo(t.prazo) : hoje ? 'st-al">hoje' : 'st-in">até ' + dataPrazo(t.prazo)) + '</span>' + (t.st === 'aberta' ? ' ' + peq('Concluir', 'tarefa-feita', t.id) : '') + '</div>');
       })) : '<p class="mudo">Nenhuma tarefa aqui.</p>', 'tarefas') +
       '<p class="nota">Tarefa atrasada aparece em vermelho para quem é responsável e para o Dr. André. Ao concluir, ela entra na linha do tempo do paciente ' + A.item(183) + '.</p>';
   };
@@ -299,14 +300,14 @@
     },
     'tarefa-filtro': function (v) { R.filtroTarefa = v; P.render(true); },
     'tarefa-nova': function () {
-      var datas = ['13/10', '14/10', '15/10', '16/10', '19/10', '20/10'];
+      var datas = [0, 1, 2, 3, 6, 7].map(function (n) { return [n, (n ? '' : 'hoje · ') + dataPrazo(n)]; });
       folha('Nova tarefa', campo('O que fazer', '<input class="campo" name="t" placeholder="Ex.: Ligar para saber se recebeu o orçamento" maxlength="80">') +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Tipo', '<select class="campo" name="tipo">' + opcoes(['Ligar', 'Mandar orçamento', 'Lembrar retorno', 'Outro']) + '</select>') + campo('Prazo', '<select class="campo" name="prazo">' + opcoes(datas, '14/10') + '</select>') + '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Tipo', '<select class="campo" name="tipo">' + opcoes(['Ligar', 'Mandar orçamento', 'Lembrar retorno', 'Outro']) + '</select>') + campo('Prazo', '<select class="campo" name="prazo">' + opcoes(datas, 1) + '</select>') + '</div>' +
         campo('Paciente', '<select class="campo" name="pac">' + opcoes(IDS.map(function (id) { return [id, nome(id) + ' · ' + id]; })) + '</select>') +
         campo('Responsável', '<select class="campo" name="resp">' + opcoes(Object.keys(P.EQUIPE).map(function (k) { return [k, curto(k) + ' · ' + P.EQUIPE[k].papel]; }), QUEM) + '</select>'), function (d) {
         var t = String(d.get('t') || '').trim(); if (!t) return false;
-        R.tarefas.push({ id: R.proxTarefa++, t: esc(t.slice(0, 80)), tipo: d.get('tipo'), pac: d.get('pac'), resp: d.get('resp'), prazo: d.get('prazo'), st: 'aberta' });
-        P.render(true); P.avisoCurto('Tarefa criada para ' + curto(d.get('resp')) + ', até ' + d.get('prazo') + '.');
+        R.tarefas.push({ id: R.proxTarefa++, t: esc(t.slice(0, 80)), tipo: d.get('tipo'), pac: d.get('pac'), resp: d.get('resp'), prazo: +d.get('prazo'), st: 'aberta' });
+        P.render(true); P.avisoCurto('Tarefa criada para ' + curto(d.get('resp')) + ', até ' + dataPrazo(+d.get('prazo')) + '.');
       }, 'Criar');
     },
     'tarefa-feita': function (v) {
@@ -336,7 +337,7 @@
     'camp-enviar': function () {
       var c = R.camp, s = R.segmentos[c.seg], m = R.modelos[c.modelo], rec = noSegmento(s).filter(function (p) { return !SAIU[p.id]; });
       if (!c.entendi || !rec.length) return;
-      R.campanhas.unshift({ nome: m.nome + ' · ' + s.nome, data: '13/10', enviados: rec.length, responderam: 0, sairam: 0, st: rec.length > 30 ? 'enviando · 30 por dia' : 'enviando' });
+      R.campanhas.unshift({ nome: m.nome + ' · ' + s.nome, data: '{d:0}', enviados: rec.length, responderam: 0, sairam: 0, st: rec.length > 30 ? 'enviando · 30 por dia' : 'enviando' });
       rec.forEach(function (p) { linhaTempo(p.id, 'conversa', 'Campanha "' + esc(m.nome) + '" enviada pelo WhatsApp', 'com a opção SAIR'); });
       c.entendi = false; P.render(true); P.avisoCurto('Campanha enviada a ' + rec.length + ' contato(s), aos poucos (simulado).');
     },
@@ -347,7 +348,7 @@
         campo('Contato indicado', '<select class="campo" name="para">' + opcoes(podem.map(function (id) { return [id, nome(id) + ' · ' + P.pac(id).status]; })) + '</select>'), function (d) {
         var de = d.get('de'), para = d.get('para'); if (de === para) { P.avisoCurto('Quem indicou e o indicado precisam ser pessoas diferentes.'); return false; }
         var p = P.pac(para);
-        R.indicacoes.push({ id: R.proxInd++, de: de, para: para, data: '13/10', st: VIROU.indexOf(p.status) >= 0 ? 'paciente' : 'contato' });
+        R.indicacoes.push({ id: R.proxInd++, de: de, para: para, data: '{d:0}', st: VIROU.indexOf(p.status) >= 0 ? 'paciente' : 'contato' });
         ORIGEM[para] = 'Indicação'; linhaTempo(de, 'interacao', 'Indicou ' + nome(para)); P.render(true); P.avisoCurto('Indicação registrada. A origem de ' + primeiro(para) + ' agora é "Indicação".');
       }, 'Registrar');
     },

@@ -48,18 +48,18 @@
 
   // ---------- dados de exemplo ----------
   var PACIENTES = [
-    { id: 'P-DEMO7', nome: 'Marina Lopes', idade: 41, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '13/10', peso: '78,6', var: '−5,4 kg', adesao: 82, alerta: '' },
-    { id: 'P-DEMO5', nome: 'Carlos Menezes', idade: 52, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '13/10', peso: '101,2', var: '−7,9 kg', adesao: 64, alerta: 'Náusea forte depois da aplicação' },
+    { id: 'P-DEMO7', nome: 'Marina Lopes', idade: 41, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:0}', peso: '78,6', var: '−5,4 kg', adesao: 82, alerta: '' },
+    { id: 'P-DEMO5', nome: 'Carlos Menezes', idade: 52, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:0}', peso: '101,2', var: '−7,9 kg', adesao: 64, alerta: 'Náusea forte depois da aplicação' },
     { id: 'P-DEMO9', nome: 'Larissa Moreira', idade: 36, fase: 'Início', status: 'Agendado', prof: 'Dr. André', ultimo: '—', peso: '84,0', var: '—', adesao: 0, alerta: '' },
-    { id: 'P-DEMO4', nome: 'Rodrigo Alves', idade: 47, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Felipe', ultimo: '08/10', peso: '93,4', var: '−3,1 kg', adesao: 21, alerta: '5 dias sem registrar' },
-    { id: 'P-DEMO2', nome: 'Beatriz Nogueira', idade: 29, fase: 'Manutenção', status: 'Em tratamento', prof: 'Dr. André', ultimo: '12/10', peso: '61,8', var: '−9,2 kg', adesao: 91, alerta: '' },
-    { id: 'P-DEMO3', nome: 'Paula Freitas', idade: 44, fase: 'Desmame', status: 'Em tratamento', prof: 'Maria Clara', ultimo: '11/10', peso: '70,3', var: '−11,5 kg', adesao: 74, alerta: 'Humor baixo 3 dias seguidos' },
+    { id: 'P-DEMO4', nome: 'Rodrigo Alves', idade: 47, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Felipe', ultimo: '{d:-5}', peso: '93,4', var: '−3,1 kg', adesao: 21, alerta: '5 dias sem registrar' },
+    { id: 'P-DEMO2', nome: 'Beatriz Nogueira', idade: 29, fase: 'Manutenção', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:-1}', peso: '61,8', var: '−9,2 kg', adesao: 91, alerta: '' },
+    { id: 'P-DEMO3', nome: 'Paula Freitas', idade: 44, fase: 'Desmame', status: 'Em tratamento', prof: 'Maria Clara', ultimo: '{d:-2}', peso: '70,3', var: '−11,5 kg', adesao: 74, alerta: 'Humor baixo 3 dias seguidos' },
     { id: 'P-DEMO6', nome: 'Juliana Prado', idade: 38, fase: '—', status: 'Novo contato', prof: '—', ultimo: '—', peso: '—', var: '—', adesao: 0, alerta: '' },
-    { id: 'P-DEMO8', nome: 'Fernando Lima', idade: 55, fase: 'Manutenção', status: 'Retorno vencido', prof: 'Dr. André', ultimo: '02/08', peso: '88,0', var: '−6,0 kg', adesao: 12, alerta: 'Retorno vencido há 12 dias' },
-    { id: 'P-DEMO1', nome: 'Ana Ribeiro', idade: 33, fase: 'Manutenção', status: 'Inativo', prof: 'Felipe', ultimo: '15/03', peso: '66,1', var: '−4,2 kg', adesao: 0, alerta: '' },
+    { id: 'P-DEMO8', nome: 'Fernando Lima', idade: 55, fase: 'Manutenção', status: 'Retorno vencido', prof: 'Dr. André', ultimo: '{d:-72}', peso: '88,0', var: '−6,0 kg', adesao: 12, alerta: 'Retorno vencido há 12 dias' },
+    { id: 'P-DEMO1', nome: 'Ana Ribeiro', idade: 33, fase: 'Manutenção', status: 'Inativo', prof: 'Felipe', ultimo: '{d:-212}', peso: '66,1', var: '−4,2 kg', adesao: 0, alerta: '' },
     { id: 'P-DEM10', nome: 'Lucas Teixeira', idade: 41, fase: '—', status: 'Novo contato', prof: '—', ultimo: '—', peso: '—', var: '—', adesao: 0, alerta: '' },
     { id: 'P-DEM11', nome: 'Sofia Martins', idade: 27, fase: 'Início', status: 'Agendado', prof: 'Felipe', ultimo: '—', peso: '72,5', var: '—', adesao: 0, alerta: '' },
-    { id: 'P-DEM12', nome: 'Renata Costa', idade: 50, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '10/10', peso: '90,7', var: '−2,8 kg', adesao: 58, alerta: 'Perda de 2,4 kg em 7 dias' }
+    { id: 'P-DEM12', nome: 'Renata Costa', idade: 50, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:-3}', peso: '90,7', var: '−2,8 kg', adesao: 58, alerta: 'Perda de 2,4 kg em 7 dias' }
   ];
   var EQUIPE = {
     andre: { nome: 'Dr. André Pontes Gonçalves', papel: 'Médico', ini: 'AG', cor: 'var(--c1)' },
@@ -72,24 +72,33 @@
   };
   var PROFS = [['Dr. André', 'var(--c1)'], ['Felipe', 'var(--c2)'], ['Maria Clara', 'var(--c6)'], ['Enfermagem', 'var(--c3)']];
   var TIPOS = ['Primeira consulta · 60 min', 'Retorno · 30 min', 'Nutrição', 'Psicologia', 'Aplicação na clínica', 'Bioimpedância'];
-  var DIAS = ['Seg 12/10', 'Ter 13/10', 'Qua 14/10', 'Qui 15/10', 'Sex 16/10'];
+  // Semana real: segunda a sexta da semana atual (no fim de semana, a próxima), com os feriados nacionais do ano.
+  // REF é o dia de referência: hoje, se for dia útil; senão, o próximo dia útil. Os exemplos da agenda ficam em volta dele.
+  var DT = A.datas, SEM = DT.semana(), REF = SEM.ref;
+  var DIAS = SEM.dias.map(function (d) { return DT.cap(DT.semCurto(d)) + ' ' + DT.dm(d); });
+  var FERIADO = SEM.dias.map(function (d) { return DT.feriado(d); });
+  function nomeDia(d) { return DT.cap(DT.semLongo(SEM.dias[d])) + ', ' + DT.dm(SEM.dias[d]); }
+  function msgFeriado(d) { return nomeDia(d) + ', é feriado (' + FERIADO[d] + '): horário bloqueado.'; }
+  // Dia da semana de um exemplo que fica k dias úteis depois do dia de referência (gira dentro da semana e pula feriados).
+  function diaDe(k) { var t = ((REF + k) % 5 + 5) % 5, n = 0; while ((FERIADO[t] || (t === REF && k !== 0)) && n < 6) { t = (t + 1) % 5; n++; } return t; }
+  function rotuloRef() { return SEM.hoje === REF ? 'hoje' : DT.extenso(SEM.dias[REF]); }
   var HORAS = []; for (var h = 8; h < 18; h++) { HORAS.push((h < 10 ? '0' : '') + h + ':00'); HORAS.push((h < 10 ? '0' : '') + h + ':30'); }
 
   // Estado da demonstração (só na memória: recarregar volta ao começo).
   var E = {
     eventos: [
-      { id: 1, dia: 1, slot: 0, pac: 'Beatriz Nogueira', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
-      { id: 2, dia: 1, slot: 1, pac: 'Carlos Menezes', tipo: 'Bioimpedância', prof: 'Enfermagem' },
-      { id: 3, dia: 1, slot: 2, pac: 'Larissa Moreira', tipo: 'Primeira consulta · 60 min', prof: 'Dr. André' },
-      { id: 4, dia: 1, slot: 4, pac: 'Rodrigo Alves', tipo: 'Nutrição', prof: 'Felipe' },
-      { id: 5, dia: 1, slot: 5, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
-      { id: 6, dia: 1, slot: 6, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' },
-      { id: 7, dia: 2, slot: 3, pac: 'Sofia Martins', tipo: 'Nutrição', prof: 'Felipe' },
-      { id: 8, dia: 2, slot: 12, pac: 'Renata Costa', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
-      { id: 9, dia: 3, slot: 0, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
-      { id: 10, dia: 3, slot: 8, pac: 'Fernando Lima', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
-      { id: 11, dia: 4, slot: 2, pac: 'Juliana Prado', tipo: 'Primeira consulta · 60 min', prof: 'Dr. André' },
-      { id: 12, dia: 4, slot: 14, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' }
+      { id: 1, dia: diaDe(0), slot: 0, pac: 'Beatriz Nogueira', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
+      { id: 2, dia: diaDe(0), slot: 1, pac: 'Carlos Menezes', tipo: 'Bioimpedância', prof: 'Enfermagem' },
+      { id: 3, dia: diaDe(0), slot: 2, pac: 'Larissa Moreira', tipo: 'Primeira consulta · 60 min', prof: 'Dr. André' },
+      { id: 4, dia: diaDe(0), slot: 4, pac: 'Rodrigo Alves', tipo: 'Nutrição', prof: 'Felipe' },
+      { id: 5, dia: diaDe(0), slot: 5, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
+      { id: 6, dia: diaDe(0), slot: 6, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' },
+      { id: 7, dia: diaDe(1), slot: 3, pac: 'Sofia Martins', tipo: 'Nutrição', prof: 'Felipe' },
+      { id: 8, dia: diaDe(1), slot: 12, pac: 'Renata Costa', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
+      { id: 9, dia: diaDe(2), slot: 0, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
+      { id: 10, dia: diaDe(2), slot: 8, pac: 'Fernando Lima', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
+      { id: 11, dia: diaDe(3), slot: 2, pac: 'Juliana Prado', tipo: 'Primeira consulta · 60 min', prof: 'Dr. André' },
+      { id: 12, dia: diaDe(3), slot: 14, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' }
     ],
     proxId: 13, selEvento: null, filtroProf: '', selCartao: null, paciente: 'P-DEMO7', abaFicha: 'resumo',
     chatEquipe: null, profAberto: 'andre'
@@ -122,24 +131,24 @@
   var TELAS = {
     // ===== Hoje =====
     dia: function () {
-      var hoje = E.eventos.filter(function (e) { return e.dia === 1; }).sort(function (a, b) { return a.slot - b.slot; });
+      var hoje = E.eventos.filter(function (e) { return e.dia === REF; }).sort(function (a, b) { return a.slot - b.slot; });
       return '' +
-        '<div class="cabeca"><div><div class="mudo" style="font-size:13px">Terça, 13 de outubro</div><h1>Visão do dia</h1></div>' +
+        '<div class="cabeca"><div><div class="mudo" style="font-size:13px">{X:0}</div><h1>Visão do dia</h1></div>' +
           '<div class="direita"><a class="busca" href="#central-paciente" style="text-decoration:none">' + A.ic('pacientes') + 'Buscar paciente, telefone ou ID</a>' +
           '<div class="eu"><span class="avatar">AG</span></div></div></div>' +
         (PAINEL.quadroCentral ? PAINEL.quadroCentral() : '') +
         '<div class="kpis">' +
-          kpi('Consultas hoje', hoje.length, '2 encaixes', 'sobe') + kpi('Faltas na semana', '3', '−2 vs. semana passada', 'sobe') +
+          kpi(SEM.hoje === REF ? 'Consultas hoje' : 'Consultas ' + DT.semLongo(SEM.dias[REF]), hoje.length, '2 encaixes', 'sobe') + kpi('Faltas na semana', '3', '−2 vs. semana passada', 'sobe') +
           kpi('Ativos no app', '186', '+9 este mês', 'sobe') + kpi('Adesão média', '78%', 'registros na semana', '') + kpi('Perda média', '−6,4 kg', 'em 90 dias', 'sobe') +
         '</div><div style="display:flex;justify-content:flex-end;margin-top:-8px">' + A.item(56) + '</div>' +
         '<div class="grade">' +
-          cartao(titulo('Agenda de hoje', A.item([50, 51]) + ' <a class="item" href="#agenda" style="text-decoration:none">abrir agenda</a>') +
+          cartao(titulo('Agenda de ' + rotuloRef(), A.item([50, 51]) + ' <a class="item" href="#agenda" style="text-decoration:none">abrir agenda</a>') +
             lista(hoje.map(function (e) {
               var p = pacPorNome(e.pac) || { id: '', nome: e.pac };
               return '<div class="lin"><span class="hora num">' + HORAS[e.slot] + '</span><div class="meio">' + linkPac(p) + '<div class="fraco">' + e.tipo + ' · ' + e.prof + '</div></div>' + (p.alerta ? '<span class="status st-al">alerta</span>' : '<span class="status st-ok">Confirmada</span>') + '</div>';
             })), 's7') +
           cartao(titulo('Alertas', A.item([129, 135])) +
-            '<div class="alerta-lin" style="--cor:var(--perigo)">' + A.bolha('alerta', 'var(--perigo)') + '<div><b>Carlos M. relatou náusea forte</b><div class="fraco" style="font-size:12.5px">2 dias depois da aplicação · enfermagem avisada às 07:42</div></div></div>' +
+            '<div class="alerta-lin" style="--cor:var(--perigo)">' + A.bolha('alerta', 'var(--perigo)') + '<div><b>Carlos M. relatou náusea forte</b><div class="fraco" style="font-size:12.5px">2 dias depois da aplicação · enfermagem avisada às {h:-98}</div></div></div>' +
             '<div class="alerta-lin" style="--cor:var(--alerta)">' + A.bolha('evolucao', 'var(--alerta)') + '<div><b>Rodrigo A. parou de registrar</b><div class="fraco" style="font-size:12.5px">5 dias sem registro no app</div></div></div>' +
             '<div class="alerta-lin" style="--cor:var(--info)">' + A.bolha('seringa', 'var(--info)') + '<div><b>Estoque: 4 frascos</b> ' + A.item(91) + '<div class="fraco" style="font-size:12.5px">abaixo do mínimo de 6</div></div></div>' +
             '<a class="botao botao-claro" href="#medico" style="margin-top:12px;width:100%;text-decoration:none">Visão do médico</a>', 's5') +
@@ -205,7 +214,7 @@
             funcao('Agendamento direto', 'respeita antecedência e intervalos; nunca marca dois no mesmo horário', A.item(4), true) +
             funcao('Lembretes de consulta', 'mensagem automática antes da consulta', A.item(6), true) +
             funcao('Fila de espera', 'vaga cancelada é oferecida a quem está na lista · 3 aguardando', A.item(7), true) +
-            funcao('Feriados por cidade', 'segunda, 12/10, bloqueada (feriado nacional)', A.item(8), true) +
+            funcao('Feriados por cidade', 'próximo: ' + DT.proximoFeriado().nome + ', ' + DT.semLongo(DT.proximoFeriado().data) + ', ' + DT.dm(DT.proximoFeriado().data) + ' (bloqueado)', A.item(8), true) +
             funcao('Integração com o Reservio', 'desligada nesta clínica', A.item(9), false) + '</div>', 's6') +
           cartao(titulo('Empilhamento', A.item([18, 19, 20, 21, 26])) + '<div class="funcoes">' +
             funcao('Agrupar pacientes', 'liga e desliga no calendário', A.item(18), true) +
@@ -244,9 +253,9 @@
       return cab('Ligação com o painel', 'Como o painel da Clínica Evoluir conversa com o atendimento da RXSync. O painel nunca acessa o banco da RXSync, só esta ligação.', A.item([31, 32, 33, 34, 35, 36])) +
         '<div class="grade">' +
           cartao(titulo('Avisos de eventos', A.item(31)) + lista([
-            lin('<span class="num fraco">09:12</span>', '<b>agendou</b> · Lucas Teixeira · quinta 10:30', '<span class="status st-ok">recebido</span>'),
-            lin('<span class="num fraco">08:47</span>', '<b>encaminhado</b> · Carlos Menezes · enfermagem', '<span class="status st-ok">recebido</span>'),
-            lin('<span class="num fraco">08:05</span>', '<b>remarcou</b> · Fernando Lima', '<span class="status st-ok">recebido</span>')]) +
+            lin('<span class="num fraco">{h:-8}</span>', '<b>agendou</b> · Lucas Teixeira · {wl:u+2} 10:30', '<span class="status st-ok">recebido</span>'),
+            lin('<span class="num fraco">{h:-33}</span>', '<b>encaminhado</b> · Carlos Menezes · enfermagem', '<span class="status st-ok">recebido</span>'),
+            lin('<span class="num fraco">{h:-75}</span>', '<b>remarcou</b> · Fernando Lima', '<span class="status st-ok">recebido</span>')]) +
             '<p class="nota" style="margin-top:8px">Cada aviso vem assinado; o painel confere a assinatura.</p>', 's6') +
           cartao(titulo('O que o painel usa', A.item([32, 33, 34, 35, 36])) + '<div class="funcoes">' +
             funcao('Envio de mensagens', 'o painel pede e a RXSync envia pelo WhatsApp da clínica', A.item(32), true) +
@@ -295,7 +304,7 @@
           '<p class="nota" style="margin-top:8px">A IA identifica a área ' + A.item(57) + ' (usa IA por consumo). Sem resposta no prazo, o caso sobe até o dono ' + A.item(61) + '.</p>');
     },
     conversas: function () {
-      if (!E.chatEquipe) E.chatEquipe = [['ela', 'Oi, tudo bem? Queria saber se posso remarcar minha aplicação de quinta.', '09:58'], ['ia', 'Claro, Marina! Tenho quinta 10:30 ou sexta 08:00. Qual prefere?', '09:58']];
+      if (!E.chatEquipe) E.chatEquipe = [['ela', 'Oi, tudo bem? Queria saber se posso remarcar minha aplicação de quinta.', '{h:-3}'], ['ia', 'Claro, Marina! Tenho quinta 10:30 ou sexta 08:00. Qual prefere?', '{h:-3}']];
       return cab('Caixa de conversas', 'Todas as conversas da clínica dentro do painel. A equipe assume no lugar da IA e devolve quando terminar.', A.item([84, 85, 86, 185])) +
         '<div class="duas">' +
           cartao(titulo('Conversas', A.item(84)) + lista([
@@ -316,20 +325,20 @@
     // ===== ERP =====
     agenda: function () {
       var evs = E.eventos.filter(function (e) { return !E.filtroProf || e.prof === E.filtroProf; });
-      var cel = '<div></div>' + DIAS.map(function (d, i) { return '<div class="cab-dia">' + d + (i === 0 ? ' <span class="status st-pe" style="font-size:10px">feriado</span>' : '') + (PAINEL.chipDia ? PAINEL.chipDia(i, E.filtroProf) : '') + '</div>'; }).join('');
+      var cel = '<div></div>' + DIAS.map(function (d, i) { return '<div class="cab-dia' + (i === SEM.hoje ? ' hoje' : '') + '">' + d + (FERIADO[i] ? ' <span class="status st-pe" style="font-size:10px" title="' + esc(FERIADO[i]) + '">feriado</span>' : '') + (PAINEL.chipDia ? PAINEL.chipDia(i, E.filtroProf) : '') + '</div>'; }).join('');
       HORAS.forEach(function (hh, s) {
         cel += '<div class="hora">' + hh + '</div>';
         for (var d = 0; d < 5; d++) {
           var aqui = evs.filter(function (e) { return e.dia === d && e.slot === s; }), n = aqui.length;
-          var marca = d > 0 && PAINEL.marcaVaga ? PAINEL.marcaVaga(d, s, E.filtroProf) : null;
-          cel += '<div class="vaga' + (d === 0 ? ' bloq' : '') + (marca ? ' ' + marca.cls : '') + '" data-dia="' + d + '" data-slot="' + s + '"' + (marca ? ' title="' + esc(marca.titulo) + '"' : '') + '>' + (marca ? marca.html : '') +
+          var marca = !FERIADO[d] && PAINEL.marcaVaga ? PAINEL.marcaVaga(d, s, E.filtroProf) : null;
+          cel += '<div class="vaga' + (FERIADO[d] ? ' bloq' : '') + (marca ? ' ' + marca.cls : '') + '" data-dia="' + d + '" data-slot="' + s + '"' + (marca ? ' title="' + esc(marca.titulo) + '"' : '') + '>' + (marca ? marca.html : '') +
             aqui.map(function (ev, i) {
               var lado = n > 1 ? ';left:calc(3px + ' + i + ' * (100% - 6px) / ' + n + ');right:auto;width:calc((100% - 6px) / ' + n + ' - 2px)' : '';
               return '<div class="evento' + (E.selEvento === ev.id ? ' sel' : '') + (n > 1 ? ' estreito' : '') + '" data-evento="' + ev.id + '" style="--cor:' + corProf(ev.prof) + lado + '"><b>' + esc(ev.pac) + '</b><span>' + ev.tipo.split(' · ')[0] + ' · ' + ev.prof + '</span></div>';
             }).join('') + '</div>';
         }
       });
-      return cab('Agenda', 'Semana de 12 a 16 de outubro. Toque num horário livre para marcar; arraste uma consulta (ou toque nela e depois no horário novo) para mover.', A.item([50, 51, 52, 79, 8, 188, 189])) +
+      return cab('Agenda', 'Semana de ' + DT.dm(SEM.dias[0]) + ' a ' + DT.dm(SEM.dias[4]) + '. Toque num horário livre para marcar; arraste uma consulta (ou toque nela e depois no horário novo) para mover.', A.item([50, 51, 52, 79, 8, 188, 189])) +
         (PAINEL.abasAgenda ? PAINEL.abasAgenda('agenda') : '') +
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between">' +
           '<div class="abas-tela"><button type="button" data-acao="filtro" data-v="" class="' + (E.filtroProf ? '' : 'ativo') + '">Todos</button>' + PROFS.map(function (p) { return '<button type="button" data-acao="filtro" data-v="' + p[0] + '" class="' + (E.filtroProf === p[0] ? 'ativo' : '') + '"><span class="ponto" style="background:' + p[1] + ';margin-right:6px"></span>' + p[0] + '</button>'; }).join('') + '</div>' +
@@ -337,7 +346,7 @@
         '</div>' +
         (E.selEvento ? '<div class="dica">' + A.ic('seta') + 'Toque no horário novo para mover ' + E.eventos.filter(function (e) { return e.id === E.selEvento; })[0].pac + ' · <button type="button" data-acao="cancelar-sel" style="text-decoration:underline">cancelar</button></div>' : '') +
         '<div class="rolar-x"><div class="agenda-semana" id="agenda-semana">' + cel + '</div></div>' +
-        '<p class="nota">Visão por semana e por médico ' + A.item(50) + '. A secretária marca, remarca e cancela na mesma agenda que a IA usa ' + A.item(51) + '. Segunda, 12/10, bloqueada pelo feriado ' + A.item(8) + '.</p>';
+        '<p class="nota">Visão por semana e por médico ' + A.item(50) + '. A secretária marca, remarca e cancela na mesma agenda que a IA usa ' + A.item(51) + '. ' + (FERIADO.some(Boolean) ? FERIADO.map(function (f, i) { return f ? nomeDia(i) + ' (' + f + ')' : ''; }).filter(Boolean).join(', ') + ': bloqueado pelo feriado ' : 'Feriados nacionais ficam bloqueados (próximo: ' + DT.proximoFeriado().nome + ', ' + DT.dm(DT.proximoFeriado().data) + ') ') + A.item(8) + '.</p>';
     },
     ficha: function () {
       var p = pac(E.paciente), aba = E.abaFicha;
@@ -345,34 +354,34 @@
       var corpo = {
         resumo: function () {
           return '<div class="grade">' +
-            cartao(titulo('Antes da consulta', A.item(71) + A.item(66)) + '<p style="font-size:14px">Desde a última consulta (22/09): <b>−1,6 kg</b>, adesão de ' + p.adesao + '%, 3 aplicações registradas, 1 enjoo leve (01/10), humor estável. Água abaixo da meta em 4 dias. <span class="fraco">(resumo simulado)</span></p>', 's8') +
+            cartao(titulo('Antes da consulta', A.item(71) + A.item(66)) + '<p style="font-size:14px">Desde a última consulta ({d:-21}): <b>−1,6 kg</b>, adesão de ' + p.adesao + '%, 3 aplicações registradas, 1 enjoo leve ({d:-12}), humor estável. Água abaixo da meta em 4 dias. <span class="fraco">(resumo simulado)</span></p>', 's8') +
             cartao(titulo('Situação', A.item([68, 89])) + '<div style="display:grid;gap:8px">' + st(p.status) + '<span class="chip">' + p.fase + '</span><span class="fraco" style="font-size:12.5px">Pagamento em dia</span></div>', 's4') +
             '</div>';
         },
         ficha: function () {
           return '<div class="grade">' + cartao(titulo('Campos da ficha', A.item([63, 64])) +
-            '<div class="lista">' + [['Anamnese', 'Busca perda de peso; histórico de efeito sanfona; sem cirurgias.'], ['Histórico', 'Hipotireoidismo controlado (exemplo).'], ['Evolução', '22/09: boa adaptação; enjoo leve na 2ª semana.'], ['Conduta', 'Mantém o plano; retorno em 4 semanas.']].map(function (x) { return lin('', '<span class="rotulo">' + x[0] + '</span><div style="margin-top:2px">' + x[1] + '</div>'); }).join('') + '</div>' +
+            '<div class="lista">' + [['Anamnese', 'Busca perda de peso; histórico de efeito sanfona; sem cirurgias.'], ['Histórico', 'Hipotireoidismo controlado (exemplo).'], ['Evolução', '{d:-21}: boa adaptação; enjoo leve na 2ª semana.'], ['Conduta', 'Mantém o plano; retorno em 4 semanas.']].map(function (x) { return lin('', '<span class="rotulo">' + x[0] + '</span><div style="margin-top:2px">' + x[1] + '</div>'); }).join('') + '</div>' +
             '<p class="nota" style="margin-top:8px">O médico escolhe quais campos usa ' + A.item(64) + '. A ficha nasce sozinha pelo ID no primeiro contato ' + A.item(63) + '.</p>', 's8') +
-            cartao(titulo('Versões', A.item(65)) + '<div class="lista">' + lin('', '<b>v4</b> · 22/09 · Dr. André') + lin('', '<b>v3</b> · 01/09 · Dr. André') + lin('', '<b>v2</b> · 01/09 · Elenice') + lin('', '<b>v1</b> · 28/08 · criada pela IA') + '</div><p class="nota" style="margin-top:8px">Nada é apagado.</p>', 's4') +
+            cartao(titulo('Versões', A.item(65)) + '<div class="lista">' + lin('', '<b>v4</b> · {d:-21} · Dr. André') + lin('', '<b>v3</b> · {d:-42} · Dr. André') + lin('', '<b>v2</b> · {d:-42} · Elenice') + lin('', '<b>v1</b> · {d:-46} · criada pela IA') + '</div><p class="nota" style="margin-top:8px">Nada é apagado.</p>', 's4') +
             cartao(titulo('Importação do histórico', A.item(70)) + '<p class="mudo" style="font-size:13.5px">Os dados do prontuário atual podem ser trazidos para cá, se a clínica quiser.</p>', 's12') + '</div>';
         },
         app: function () {
           return cartao(titulo('Registros do app (últimos 7 dias)', A.item(134)) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Dia</th><th>Calorias</th><th>Proteína</th><th>Água</th><th>Sono</th><th>Humor</th><th>Sintomas</th></tr>' +
-            [['13/10', '1.240', '82 g', '1,6 L', '7h10', '—', '—'], ['12/10', '1.580', '104 g', '2,4 L', '6h50', 'Bem', '—'], ['11/10', '1.420', '96 g', '2,1 L', '7h30', 'Ok', '—'], ['10/10', '1.690', '88 g', '1,8 L', '6h20', 'Bem', '—'], ['09/10', '1.350', '110 g', '2,6 L', '7h40', 'Ótimo', 'enjoo leve']].map(function (r) { return '<tr><td class="num">' + r.join('</td><td class="num">') + '</td></tr>'; }).join('') + '</table></div>');
+            [['{d:0}', '1.240', '82 g', '1,6 L', '7h10', '—', '—'], ['{d:-1}', '1.580', '104 g', '2,4 L', '6h50', 'Bem', '—'], ['{d:-2}', '1.420', '96 g', '2,1 L', '7h30', 'Ok', '—'], ['{d:-3}', '1.690', '88 g', '1,8 L', '6h20', 'Bem', '—'], ['{d:-4}', '1.350', '110 g', '2,6 L', '7h40', 'Ótimo', 'enjoo leve']].map(function (r) { return '<tr><td class="num">' + r.join('</td><td class="num">') + '</td></tr>'; }).join('') + '</table></div>');
         },
         consultas: function () {
-          return cartao(titulo('Consultas', A.item([16, 130])) + '<div class="lista">' + lin('<span class="num">20/10</span>', '<b>Retorno · Dr. André</b>', '<span class="status st-in">marcada</span>') +
-(['P-DEMO3', 'P-DEM12'].indexOf(p.id) >= 0 ? lin('<span class="num">11/10</span>', 'Psicologia · Maria Clara' + (QUEM === 'mariaclara' ? '<div class="mudo" style="font-size:12.5px">Anotações no <a href="#mc-prontuario">prontuário de psicologia</a> (só você vê).</div>' : '<div class="fraco" style="font-size:12.5px">' + A.ic('cadeado') + ' Sessão realizada · conteúdo restrito à psicóloga</div>'), A.item(172)) : '') + lin('<span class="num">22/09</span>', 'Retorno · Dr. André', '<span class="status st-ok">realizada</span>') + lin('<span class="num">15/09</span>', 'Nutrição · Felipe', '<span class="status st-ok">realizada</span>') + lin('<span class="num">01/09</span>', 'Primeira consulta · Dr. André', '<span class="status st-ok">realizada</span>') + '</div><p class="nota" style="margin-top:8px">Inclusive as importadas do Reservio, todas ligadas ao ID ' + A.item(16) + '.</p>');
+          return cartao(titulo('Consultas', A.item([16, 130])) + '<div class="lista">' + lin('<span class="num">{d:+7}</span>', '<b>Retorno · Dr. André</b>', '<span class="status st-in">marcada</span>') +
+(['P-DEMO3', 'P-DEM12'].indexOf(p.id) >= 0 ? lin('<span class="num">{d:-2}</span>', 'Psicologia · Maria Clara' + (QUEM === 'mariaclara' ? '<div class="mudo" style="font-size:12.5px">Anotações no <a href="#mc-prontuario">prontuário de psicologia</a> (só você vê).</div>' : '<div class="fraco" style="font-size:12.5px">' + A.ic('cadeado') + ' Sessão realizada · conteúdo restrito à psicóloga</div>'), A.item(172)) : '') + lin('<span class="num">{d:-21}</span>', 'Retorno · Dr. André', '<span class="status st-ok">realizada</span>') + lin('<span class="num">{d:-28}</span>', 'Nutrição · Felipe', '<span class="status st-ok">realizada</span>') + lin('<span class="num">{d:-42}</span>', 'Primeira consulta · Dr. André', '<span class="status st-ok">realizada</span>') + '</div><p class="nota" style="margin-top:8px">Inclusive as importadas do Reservio, todas ligadas ao ID ' + A.item(16) + '.</p>');
         },
         exames: function () {
-          return cartao(titulo('Exames e anexos', A.item([64, 136])) + '<div class="lista">' + lin(A.bolha('documento', 'var(--c3)'), '<b>Hemograma · 05/10</b><div class="fraco" style="font-size:12px">enviado pela paciente no app ' + A.item(136) + '</div>') + lin(A.bolha('documento', 'var(--c3)'), '<b>Pedido de exame · 28/08</b><div class="fraco" style="font-size:12px">lido pela IA no WhatsApp ' + A.item(3) + '</div>') + '</div>');
+          return cartao(titulo('Exames e anexos', A.item([64, 136])) + '<div class="lista">' + lin(A.bolha('documento', 'var(--c3)'), '<b>Hemograma · {d:-8}</b><div class="fraco" style="font-size:12px">enviado pela paciente no app ' + A.item(136) + '</div>') + lin(A.bolha('documento', 'var(--c3)'), '<b>Pedido de exame · {d:-46}</b><div class="fraco" style="font-size:12px">lido pela IA no WhatsApp ' + A.item(3) + '</div>') + '</div>');
         },
         conversas: function () {
-          return cartao(titulo('Conversas', A.item([86, 66])) + '<div class="lista">' + lin('<span class="num">09:58</span>', 'Pediu para remarcar a aplicação · IA') + lin('<span class="num">seg</span>', 'Enjoo depois da aplicação · <b>Thaís</b> respondeu (citado)') + lin('<span class="num">22/09</span>', 'Pré-consulta respondida') + '</div>');
+          return cartao(titulo('Conversas', A.item([86, 66])) + '<div class="lista">' + lin('<span class="num">{h:-3}</span>', 'Pediu para remarcar a aplicação · IA') + lin('<span class="num">{ws:-1}</span>', 'Enjoo depois da aplicação · <b>Thaís</b> respondeu (citado)') + lin('<span class="num">{d:-21}</span>', 'Pré-consulta respondida') + '</div>');
         },
         balanca: function () {
           return '<div class="grade">' + cartao(titulo('Balança Anovator', A.item([72, 73])) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Data</th><th>Peso</th><th>Gordura</th><th>Músculo</th><th>Água</th><th>Visceral</th></tr>' +
-            [['13/10', '78,6', '35,4%', '27,3', '48,1%', '9'], ['22/09', '80,2', '36,9%', '27,1', '47,6%', '10'], ['01/09', '84,0', '38,2%', '26,8', '47,0%', '11']].map(function (r) { return '<tr><td class="num">' + r.join('</td><td class="num">') + '</td></tr>'; }).join('') + '</table></div>' +
+            [['{d:0}', '78,6', '35,4%', '27,3', '48,1%', '9'], ['{d:-21}', '80,2', '36,9%', '27,1', '47,6%', '10'], ['{d:-42}', '84,0', '38,2%', '26,8', '47,0%', '11']].map(function (r) { return '<tr><td class="num">' + r.join('</td><td class="num">') + '</td></tr>'; }).join('') + '</table></div>' +
             '<p class="nota" style="margin-top:8px">Entra sem digitação ' + A.item(72) + '. Gráfico da evolução ' + A.item(73) + ': peso de 84,0 para 78,6 kg.</p>', 's12') + '</div>';
         },
         pdf: function () {
@@ -387,27 +396,27 @@
     },
     financeiro: function () {
       return cab('Financeiro e estoque', 'Cobranças, lembretes, inadimplência, aplicações na clínica e frascos. Valores de exemplo.', A.item([87, 88, 89, 90, 91])) +
-        '<div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + kpi('Recebido no mês', 'R$ 48.250', '+12% vs. setembro', 'sobe') + kpi('A receber', 'R$ 9.100', '14 cobranças', '') + kpi('Em atraso', 'R$ 1.300', '2 pacientes', 'desce') + kpi('Frascos', '4', 'mínimo 6', 'desce') + '</div>' +
+        '<div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + kpi('Recebido no mês', 'R$ 48.250', '+12% vs. {m:-1}', 'sobe') + kpi('A receber', 'R$ 9.100', '14 cobranças', '') + kpi('Em atraso', 'R$ 1.300', '2 pacientes', 'desce') + kpi('Frascos', '4', 'mínimo 6', 'desce') + '</div>' +
         '<div class="grade">' +
           cartao(titulo('Cobranças', A.item([87, 88])) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Paciente</th><th>O quê</th><th>Valor</th><th>Vence</th><th>Situação</th></tr>' +
-            '<tr><td><b>Marina Lopes</b></td><td>Programa · 2/3</td><td class="num">R$ 650</td><td class="num">20/10</td><td><span class="status st-in">lembrete enviado</span></td></tr>' +
-            '<tr><td><b>Paula Freitas</b></td><td>Psicologia</td><td class="num">R$ 650</td><td class="num">05/10</td><td><span class="status st-pe">em atraso</span></td></tr>' +
-            '<tr><td><b>Fernando Lima</b></td><td>Retorno</td><td class="num">R$ 650</td><td class="num">28/09</td><td><span class="status st-pe">em atraso</span></td></tr>' +
-            '<tr><td><b>Beatriz Nogueira</b></td><td>Programa · 3/3</td><td class="num">R$ 650</td><td class="num">10/10</td><td><span class="status st-ok">pago · Pix</span></td></tr></table></div>' +
+            '<tr><td><b>Marina Lopes</b></td><td>Programa · 2/3</td><td class="num">R$ 650</td><td class="num">{d:+7}</td><td><span class="status st-in">lembrete enviado</span></td></tr>' +
+            '<tr><td><b>Paula Freitas</b></td><td>Psicologia</td><td class="num">R$ 650</td><td class="num">{d:-8}</td><td><span class="status st-pe">em atraso</span></td></tr>' +
+            '<tr><td><b>Fernando Lima</b></td><td>Retorno</td><td class="num">R$ 650</td><td class="num">{d:-15}</td><td><span class="status st-pe">em atraso</span></td></tr>' +
+            '<tr><td><b>Beatriz Nogueira</b></td><td>Programa · 3/3</td><td class="num">R$ 650</td><td class="num">{d:-3}</td><td><span class="status st-ok">pago · Pix</span></td></tr></table></div>' +
             '<p class="nota" style="margin-top:8px">Link de Pix ou cartão pelo WhatsApp ' + A.item(87) + '; aviso antes e depois do vencimento ' + A.item(88) + '; quem está em aberto aparece também no CRM ' + A.item(89) + '.</p>', 's7') +
           cartao(titulo('Aplicações e estoque', A.item([90, 91])) + lista([
-            lin('<span class="num">10:30</span>', '<b>Marina Lopes</b> · aplicação na clínica · Thaís', '<span class="status st-ok">registrada</span>'),
-            lin('<span class="num">08:30</span>', '<b>Carlos Menezes</b> · complexo vitamínico · Eduarda', '<span class="status st-ok">registrada</span>')]) +
-            '<div class="alerta-lin" style="--cor:var(--alerta);margin-top:10px">' + A.bolha('alerta', 'var(--alerta)') + '<div><b>Estoque baixo: 4 frascos</b><div class="fraco" style="font-size:12.5px">entrada: 20 em 01/10 · saída: 16</div></div></div>', 's5') +
+            lin('<span class="num">{h:-20}</span>', '<b>Marina Lopes</b> · aplicação na clínica · Thaís', '<span class="status st-ok">registrada</span>'),
+            lin('<span class="num">{h:-50}</span>', '<b>Carlos Menezes</b> · complexo vitamínico · Eduarda', '<span class="status st-ok">registrada</span>')]) +
+            '<div class="alerta-lin" style="--cor:var(--alerta);margin-top:10px">' + A.bolha('alerta', 'var(--alerta)') + '<div><b>Estoque baixo: 4 frascos</b><div class="fraco" style="font-size:12.5px">entrada: 20 em {d:-12} · saída: 16</div></div></div>', 's5') +
         '</div>';
     },
     'ia-equipe': function () {
-      if (!E.chatIA) E.chatIA = [['eu', 'Quem faltou esta semana?'], ['ela', 'Duas faltas: Fernando Lima (P-DEMO8) na segunda e Rodrigo Alves (P-DEMO4) na quarta. Quer que eu ofereça horários para eles?']];
+      if (!E.chatIA) E.chatIA = [['eu', 'Quem faltou nos últimos dias?'], ['ela', 'Duas faltas: Fernando Lima (P-DEMO8) {r:-1} e Rodrigo Alves (P-DEMO4) {r:-4}. Quer que eu ofereça horários para eles?']];
       return cab('IA da equipe e manual', 'Uma IA para a equipe dentro do painel: pergunta, ação por pedido e ajuda de uso. Respostas simuladas.', A.item([77, 78, 79, 80, 81, 82, 83, 149])) +
         '<div class="duas">' +
           cartao(titulo('Chat da equipe', A.item([77, 78, 80])) +
             '<div class="chat" id="chat-ia">' + E.chatIA.map(function (m) { return '<div class="msg ' + m[0] + '">' + m[1] + '</div>'; }).join('') + '</div>' +
-            '<div class="opcoes" style="margin:12px 0">' + ['Marca a Maria na quinta às 10h', 'Qual o melhor horário para a Sofia?', 'Como faço para gerar o PDF da ficha?'].map(function (t) { return '<button type="button" data-acao="pergunta-ia" data-v="' + t + '">' + t + '</button>'; }).join('') + '</div>' +
+            '<div class="opcoes" style="margin:12px 0">' + ['Marca a Maria {wl:u+2} às 10h', 'Qual o melhor horário para a Sofia?', 'Como faço para gerar o PDF da ficha?'].map(function (t) { return '<button type="button" data-acao="pergunta-ia" data-v="' + t + '">' + t + '</button>'; }).join('') + '</div>' +
             '<div class="digitar"><input class="campo" id="pergunta-ia" placeholder="Pergunte à IA da equipe" autocomplete="off"><button class="botao" type="button" data-acao="pergunta-ia-campo" aria-label="Enviar">' + A.ic('enviar') + '</button></div>') +
           '<div class="pilha">' +
             cartao(titulo('Manual de uso', A.item([81, 82])) + lista(['Como marcar e mover consultas', 'Como ler a Visão do médico', 'Como montar o plano alimentar', 'Como cadastrar a prescrição da picadinha'].map(function (t) { return lin(A.bolha('revista', 'var(--c2)'), t, A.ic('seta', 'fraco')); })) + '<p class="nota" style="margin-top:8px">Sempre atualizado a cada versão. Dúvidas de uso são respondidas pelo chat ' + A.item(82) + '.</p>') +
@@ -465,15 +474,15 @@
     consumo: function () {
       var f = [['Foto do prato (app)', 1840000, 61.2, 107], ['Resumo pré-consulta', 920000, 38.4, 71], ['Transcrição de consulta', 610000, 34.9, 165], ['Chat da equipe', 540000, 27.1, 77], ['Identificação do assunto', 410000, 18.6, 57], ['Síntese de arquivos', 300000, 16.3, 166], ['Dicas do assistente (app)', 220000, 15.9, 144]];
       var max = 61.2, tot = f.reduce(function (s, x) { return s + x[2]; }, 0);
-      var meses = [['jun', 96], ['jul', 128], ['ago', 154], ['set', 188], ['out*', 212.4]];
+      var meses = [96, 128, 154, 188, 212.4].map(function (v, i) { var d = new Date(DT.hoje().getFullYear(), DT.hoje().getMonth() - 4 + i, 1); return [DT.mes(d).slice(0, 3) + (i === 4 ? '*' : ''), v]; });
       return cab('Consumo de IA', 'Medido por função, por profissional e por paciente. Cobrado pós-pago com a mensalidade. Valores de exemplo.', A.item([145, 146, 147, 148])) +
-        '<div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + kpi('Gasto em outubro', 'R$ ' + tot.toFixed(2).replace('.', ','), 'até dia 13', '') + kpi('Teto do mês', 'R$ 400', 'avisos em 80% e 100%', '') + kpi('Tokens no mês', '4,84 mi', 'entrada + saída', '') + kpi('Previsão', 'R$ 489', 'acima do teto', 'desce') + '</div>' +
+        '<div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + kpi('Gasto em {m:0}', 'R$ ' + tot.toFixed(2).replace('.', ','), 'até ' + DT.dm(DT.hoje()), '') + kpi('Teto do mês', 'R$ 400', 'avisos em 80% e 100%', '') + kpi('Tokens no mês', '4,84 mi', 'entrada + saída', '') + kpi('Previsão', 'R$ 489', 'acima do teto', 'desce') + '</div>' +
         '<div class="grade">' +
-          cartao(titulo('Custo por função em outubro', A.item([145, 146])) + '<div class="barras">' + f.map(function (x) {
+          cartao(titulo('Custo por função em {m:0}', A.item([145, 146])) + '<div class="barras">' + f.map(function (x) {
             return '<div class="lin"><span>' + x[0] + (x[3] ? ' ' + A.item(x[3]) : '') + '</span><span class="trilho"><i style="width:' + Math.round(x[2] / max * 100) + '%"></i></span><span class="val">R$ ' + x[2].toFixed(2).replace('.', ',') + '</span></div>';
           }).join('') + '</div>', 's7') +
           cartao(titulo('Tokens por função', A.item(145)) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Função</th><th>Tokens</th></tr>' + f.map(function (x) { return '<tr><td>' + x[0] + '</td><td class="num">' + x[1].toLocaleString('pt-BR') + '</td></tr>'; }).join('') + '</table></div>', 's5') +
-          cartao(titulo('Por mês', A.item(146)) + '<div class="barras">' + meses.map(function (m) { return '<div class="lin"><span>' + m[0] + '</span><span class="trilho"><i style="width:' + Math.round(m[1] / 400 * 100) + '%;' + (m[0] === 'out*' ? '' : 'opacity:.55') + '"></i></span><span class="val">R$ ' + m[1].toFixed(2).replace('.', ',') + '</span></div>'; }).join('') + '</div><p class="nota" style="margin-top:8px">* outubro até o dia 13. A barra cheia é o teto de R$ 400.</p>', 's6') +
+          cartao(titulo('Por mês', A.item(146)) + '<div class="barras">' + meses.map(function (m) { return '<div class="lin"><span>' + m[0] + '</span><span class="trilho"><i style="width:' + Math.round(m[1] / 400 * 100) + '%;' + (/\*$/.test(m[0]) ? '' : 'opacity:.55') + '"></i></span><span class="val">R$ ' + m[1].toFixed(2).replace('.', ',') + '</span></div>'; }).join('') + '</div><p class="nota" style="margin-top:8px">* {m:0} até hoje. A barra cheia é o teto de R$ 400.</p>', 's6') +
           cartao(titulo('Teto e avisos', A.item([147, 148])) + '<div class="funcoes">' + funcao('Avisar em 80% do teto', 'para Emanuele e Dr. André', A.item(147), true) + funcao('Avisar em 100%', '', A.item(147), true) + funcao('Ao atingir o teto, pausar as funções de IA cobradas à parte', 'desligado = continuam e entram na próxima fatura', A.item(147), false) + '</div>' +
             '<p class="nota" style="margin-top:8px">O consumo do mês é somado e cobrado junto da mensalidade, com o detalhe por função ' + A.item(148) + '.</p>', 's6') +
         '</div>';
@@ -485,7 +494,7 @@
         '<div class="grade">' +
           cartao('<div class="funcoes">' + l.map(function (x) { return funcao(x[1], x[2], A.item(x[0]), true, true); }).join('') + '</div>', 's6') +
           '<div class="s6 pilha">' +
-            cartao(titulo('Registro de acessos (hoje)', A.item(45)) + lista([lin('<span class="num">09:14</span>', '<b>Dr. André</b> abriu a ficha de Larissa Moreira'), lin('<span class="num">08:52</span>', '<b>Thaís</b> registrou aplicação de Marina Lopes'), lin('<span class="num">08:31</span>', '<b>Elenice</b> remarcou Fernando Lima'), lin('<span class="num">08:02</span>', '<b>Emanuele</b> exportou o financeiro de setembro')])) +
+            cartao(titulo('Registro de acessos (hoje)', A.item(45)) + lista([lin('<span class="num">{h:-6}</span>', '<b>Dr. André</b> abriu a ficha de Larissa Moreira'), lin('<span class="num">{h:-28}</span>', '<b>Thaís</b> registrou aplicação de Marina Lopes'), lin('<span class="num">{h:-49}</span>', '<b>Elenice</b> remarcou Fernando Lima'), lin('<span class="num">{h:-78}</span>', '<b>Emanuele</b> exportou o financeiro de {m:-1}')])) +
             cartao(titulo('Exportar tudo', A.item(49)) + '<button class="botao" type="button" data-acao="aviso" data-msg="Exportação de exemplo iniciada: o arquivo chega no e-mail do responsável.">' + A.ic('download') + 'Baixar todos os dados</button>') +
           '</div></div>';
     }
@@ -546,9 +555,9 @@
       [/aten|alerta|hoje/, 'Três pacientes pedem atenção: Carlos Menezes (náusea forte depois da aplicação), Renata Costa (−2,4 kg em 7 dias) e Rodrigo Alves (5 dias sem registrar).'],
       [/larissa|pré|pre-/, 'Larissa Moreira (P-DEMO9), primeira consulta às 09:00: objetivo −12 kg, sem cirurgias, usa anticoncepcional, peso informado 84 kg.']] },
     emanuele: { sug: ['Quem está em atraso?', 'Quanto recebemos no mês?', 'Como está o consumo de IA?'], r: [
-      [/atras|aberto|devend/, 'Dois pacientes em atraso: Paula Freitas (R$ 650, venceu 05/10) e Fernando Lima (R$ 650, venceu 28/09). Quer que eu mande o lembrete de pagamento (item 88)?'],
-      [/receb|fatur|mês|mes/, 'Recebido em outubro até hoje: R$ 48.250 (+12% em relação a setembro). A receber nos próximos 7 dias: R$ 5.850.'],
-      [/consumo|ia|token/, 'Consumo de IA em outubro: R$ 212,40, 53% do teto de R$ 400. Previsão para o mês: R$ 489, acima do teto (item 147).']] },
+      [/atras|aberto|devend/, 'Dois pacientes em atraso: Paula Freitas (R$ 650, venceu {d:-8}) e Fernando Lima (R$ 650, venceu {d:-15}). Quer que eu mande o lembrete de pagamento (item 88)?'],
+      [/receb|fatur|mês|mes/, 'Recebido em {m:0} até hoje: R$ 48.250 (+12% em relação a {m:-1}). A receber nos próximos 7 dias: R$ 5.850.'],
+      [/consumo|ia|token/, 'Consumo de IA em {m:0}: R$ 212,40, 53% do teto de R$ 400. Previsão para o mês: R$ 489, acima do teto (item 147).']] },
     felipe: { sug: ['Quem não registrou o almoço?', 'Adesão dos meus pacientes', 'Rascunho de plano de 1.600 kcal'], r: [
       [/almo|registr/, 'Hoje, 11 dos seus 42 pacientes ainda não registraram o almoço. Os 3 há mais tempo sem registro: Rodrigo Alves, Ana Ribeiro e Sofia Martins.'],
       [/ades|meta|prote/, 'Na semana, seus pacientes cumpriram em média 84% da meta de proteína e registraram em 73% dos dias.'],
@@ -560,9 +569,9 @@
     eduarda: { sug: ['Aplicações de hoje', 'Bioimpedâncias marcadas', 'Como está o estoque?'], r: [
       [/aplic/, 'Aplicações de hoje na clínica: 10:30 Marina Lopes e 14:00 Carlos Menezes. Instruções já conferidas pela Thaís.'],
       [/bio|balan/, 'Bioimpedâncias de hoje: 08:30 Carlos Menezes e 09:00 Larissa Moreira (primeira consulta). Os dados entram sozinhos na ficha (item 72).'],
-      [/estoq|frasc/, 'Estoque: 4 frascos, abaixo do mínimo de 6. Entrada de 20 em 01/10, saída de 16 (item 91).']] },
+      [/estoq|frasc/, 'Estoque: 4 frascos, abaixo do mínimo de 6. Entrada de 20 em {d:-12}, saída de 16 (item 91).']] },
     thais: { sug: ['Alertas de sintomas de hoje', 'Prescrições a conferir', 'Posso aumentar a dose do Carlos?'], r: [
-      [/alert|sintom/, 'Dois alertas: Carlos Menezes relatou náusea forte 2 dias depois da aplicação (07:42) e Renata Costa perdeu 2,4 kg em 7 dias.'],
+      [/alert|sintom/, 'Dois alertas: Carlos Menezes relatou náusea forte 2 dias depois da aplicação ({h:-98}) e Renata Costa perdeu 2,4 kg em 7 dias.'],
       [/confer|prescri/, 'Uma prescrição nova para conferir: Larissa Moreira, cadastrada pelo Dr. André às 09:40. Ela só aparece no app depois da sua conferência (item 125).']] },
     elenice: { sug: ['Quem não confirmou?', 'Tem encaixe hoje à tarde?', 'Quem está na fila de espera?'], r: [
       [/confirm/, 'Sem confirmar para amanhã: Rodrigo Alves (10:00), Sofia Martins (14:00) e Fernando Lima (16:30). Quer que eu mande a mensagem de confirmação?'],
@@ -581,8 +590,8 @@
   // ---------- respostas simuladas da IA da equipe ----------
   function respostaEquipe(t) {
     t = t.toLowerCase();
-    if (/marca|agend/.test(t)) return 'Pronto (simulado): marquei Maria na quinta, 15/10, às 10:00, com o Dr. André. Mando a confirmação pelo WhatsApp?';
-    if (/melhor hor/.test(t)) return 'Para a Sofia, o melhor é quarta, 14/10, às 09:00: fica colado na consulta das 08:30 e respeita o tipo "Nutrição". ';
+    if (/marca|agend/.test(t)) return 'Pronto (simulado): marquei Maria na {wl:u+2}, {d:u+2}, às 10:00, com o Dr. André. Mando a confirmação pelo WhatsApp?';
+    if (/melhor hor/.test(t)) return 'Para a Sofia, o melhor é {wl:u+1}, {d:u+1}, às 09:00: fica colado na consulta das 08:30 e respeita o tipo "Nutrição". ';
     if (/pdf|ficha/.test(t)) return 'Abra a ficha do paciente › aba "PDF da ficha" › escolha as partes › "Gerar PDF". Quer que eu abra para você?';
     return 'Anotei. Posso responder sobre pacientes, agenda e setores, ou fazer uma ação por você.';
   }
@@ -622,7 +631,7 @@
   }
   function moverEvento(id, dia, slot) {
     var ev = E.eventos.filter(function (e) { return e.id === id; })[0];
-    if (dia === 0) { avisoCurto('Segunda, 12/10, é feriado: horário bloqueado.'); return; }
+    if (FERIADO[dia]) { avisoCurto(msgFeriado(dia)); return; }
     var c = conflito(dia, slot, ev); if (c) { avisoCurto(c); return; }
     ev.dia = dia; ev.slot = slot; E.selEvento = null; render(true);
     avisoCurto(ev.pac + ' movida para ' + DIAS[dia] + ' às ' + HORAS[slot] + '. O paciente recebe o aviso (simulado).');
@@ -647,7 +656,7 @@
   // ---------- janela para marcar consulta ----------
   function janelaMarcar(dia, slot) {
     var f = document.createElement('div'); f.className = 'folha-fundo';
-    var opDia = DIAS.map(function (d, i) { return i ? '<option value="' + i + '"' + (i === dia ? ' selected' : '') + '>' + d + '</option>' : ''; }).join('');
+    var opDia = DIAS.map(function (d, i) { return FERIADO[i] ? '' : '<option value="' + i + '"' + (i === dia ? ' selected' : '') + '>' + d + '</option>'; }).join('');
     var opHora = HORAS.map(function (h, i) { return '<option value="' + i + '"' + (i === slot ? ' selected' : '') + '>' + h + '</option>'; }).join('');
     f.innerHTML = '<form class="folha"><h2 style="font-size:20px">Marcar consulta</h2>' +
       '<label><span class="rotulo">Paciente</span><select class="campo" name="pac">' + PACIENTES.map(function (p) { return '<option>' + p.nome + '</option>'; }).join('') + '</select></label>' +
@@ -683,7 +692,7 @@
     if (vaga && !ev.target.closest('.evento')) {
       var d = Number(vaga.dataset.dia), s = Number(vaga.dataset.slot);
       if (E.selEvento) { moverEvento(E.selEvento, d, s); return; }
-      if (d === 0) { avisoCurto('Segunda, 12/10, é feriado: horário bloqueado.'); return; }
+      if (FERIADO[d]) { avisoCurto(msgFeriado(d)); return; }
       janelaMarcar(d, s); return;
     }
     var col = ev.target.closest('.coluna');
@@ -697,8 +706,8 @@
     if (a === 'abrir-ficha') { ev.preventDefault(); E.paciente = v; E.abaFicha = 'resumo'; if (location.hash === '#ficha') render(false); else location.hash = '#ficha'; return; }
     if (a === 'aba-ficha') { E.abaFicha = v; render(true); return; }
     if (a === 'filtro') { E.filtroProf = v; E.selEvento = null; render(true); return; }
-    if (a === 'nova') { janelaMarcar(1, 10); return; }
-    if (a === 'melhor') { avisoCurto('Sugestão da IA (simulada): quarta, 14/10, às 08:30, colado na consulta das 09:00 (empilhamento).'); var x = document.querySelector('.vaga[data-dia="2"][data-slot="1"]'); if (x) x.classList.add('destino'); return; }
+    if (a === 'nova') { janelaMarcar(REF, 10); return; }
+    if (a === 'melhor') { avisoCurto('Sugestão da IA (simulada): ' + nomeDia(diaDe(1)).toLowerCase() + ', às 08:30, colado na consulta das 09:00 (empilhamento).'); var x = document.querySelector('.vaga[data-dia="' + diaDe(1) + '"][data-slot="1"]'); if (x) x.classList.add('destino'); return; }
     if (a === 'cancelar-sel') { E.selEvento = null; render(true); return; }
     if (a === 'pergunta-ia') { perguntaIA(v); return; }
     if (a === 'pergunta-ia-campo') { var c = document.getElementById('pergunta-ia'); perguntaIA(c.value.trim()); return; }
@@ -756,7 +765,7 @@
   }
   // Peças comuns para o funcoes.js (telas de cada profissional, carregado depois deste arquivo).
   var PAINEL = window.PAINEL = {
-    A: A, TELAS: TELAS, PROF: PROF, E: E, FUNIL: FUNIL, QUEM: QUEM, EQUIPE: EQUIPE, PACIENTES: PACIENTES, HORAS: HORAS, DIAS: DIAS, meuMenu: {},
+    A: A, TELAS: TELAS, PROF: PROF, E: E, FUNIL: FUNIL, DT: DT, SEM: SEM, REF: REF, FERIADO: FERIADO, diaDe: diaDe, nomeDia: nomeDia, rotuloRef: rotuloRef, QUEM: QUEM, EQUIPE: EQUIPE, PACIENTES: PACIENTES, HORAS: HORAS, DIAS: DIAS, meuMenu: {},
     cartao: cartao, titulo: titulo, cab: cab, kpi: kpi, lista: lista, lin: lin, pessoa: pessoa, chave: chave, funcao: funcao, st: st, pac: pac, esc: esc,
     avisoCurto: function (m) { avisoCurto(m); }, render: function (m) { render(m); }
   };

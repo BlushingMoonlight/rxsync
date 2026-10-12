@@ -16,7 +16,7 @@
   ];
   // Estado da demonstração (só na memória: recarregar volta ao começo).
   var E = { kcal: 1240, prot: 82, agua: 1600, humor: null, letra: false, porcao: 170, local: null, slot: null,
-            consulta: 'Terça, 20/10 · 09:30', chat: null, chatEquipe: null, check: [false, false, false] };
+            consulta: '{Wl:u+5}, {d:u+5} · 09:30', chat: null, chatEquipe: null, check: [false, false, false] };
 
   var ABAS = [
     { id: 'inicio', nome: 'Início', ic: 'inicio' },
@@ -96,7 +96,9 @@
   var TELAS = {
     // ===== Início =====
     inicio: function () {
-      var dias = [['seg', 12, 1], ['ter', 13, 0, 1], ['qua', 14], ['qui', 15], ['sex', 16], ['sáb', 17], ['dom', 18]];
+      // Semana real (segunda a domingo), com hoje marcado e os dias anteriores registrados.
+      var DT = A.datas, h = DT.hoje(), seg = DT.somaDias(h, -((h.getDay() + 6) % 7));
+      var dias = [0, 1, 2, 3, 4, 5, 6].map(function (i) { var d = DT.somaDias(seg, i), k = DT.diasEntre(h, d); return [DT.semCurto(d), d.getDate(), k < 0 ? 1 : 0, k === 0 ? 1 : 0]; });
       var reg = [
         ['alimentacao', 'prato', 'var(--c2)', 'Alimentação'], ['agua', 'agua', 'var(--c3)', 'Água'], ['humor', 'humor', 'var(--c6)', 'Humor'],
         ['sono', 'sono', 'var(--c4)', 'Sono'], ['atividade', 'atividade', 'var(--c5)', 'Atividade'], ['fome', 'fome', 'var(--c2)', 'Fome e saciedade'],
@@ -105,7 +107,7 @@
       ];
       return '' +
         '<header class="topo topo-couro com-textura">' + A.logo({ tamanho: 40, texto: false }) +
-          '<div class="saudacao"><div class="mudo" style="font-size:13px">Terça, 13 de outubro</div><h1>Olá, ' + PACIENTE.nome + '</h1></div>' +
+          '<div class="saudacao"><div class="mudo" style="font-size:13px">{X:0}</div><h1>Olá, ' + PACIENTE.nome + '</h1></div>' +
           '<a class="sino sem-sublinhado" href="#avisos" aria-label="Avisos">' + A.ic('sino') + '<i></i></a>' +
         '</header>' +
         '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="chip"><span class="ponto" style="background:var(--ok)"></span>' + PACIENTE.fase + '</span>' + A.item(155) + '</div>' +
@@ -142,7 +144,7 @@
             '<div class="itens">' + A.item([144, 163, 164]) + A.juridico('depende do parecer jurídico') + '</div></div>') +
 
         cartao('<a class="linha-ic sem-sublinhado" href="#picadinha" style="color:inherit">' + A.bolha('seringa', 'var(--c1)') +
-          '<div class="meio"><span class="rotulo">Próxima picadinha</span><h3>Quinta, 15/10 · 08:00</h3>' +
+          '<div class="meio"><span class="rotulo">Próxima picadinha</span><h3>{Wl:p4}, {d:p4} · 08:00</h3>' +
           '<div class="mudo" style="font-size:12.5px">Instrução conferida pela clínica. O app não calcula dose.</div></div>' + A.ic('seta', 'fraco') + '</a>' +
           '<div style="margin-top:10px">' + A.item([124, 125, 126]) + '</div>') +
 
@@ -197,7 +199,7 @@
         ['Lanche', '1 fruta + 10 castanhas', 'Troca: 1 iogurte natural'], ['Almoço', 'Salada à vontade + 120 g de frango + 4 col. de arroz + 1 concha de feijão', 'Troca: peixe ou carne magra'],
         ['Lanche da tarde', 'Iogurte natural + 1 col. de chia', 'Troca: 1 fruta + queijo branco'], ['Jantar', 'Omelete de 2 ovos com legumes', 'Troca: sopa de legumes com frango']];
       return sub('plano', 'Plano alimentar', A.item(113)) +
-        '<div class="chip" style="justify-self:start">' + A.ic('documento') + 'Montado pelo Felipe · válido até 10/11</div>' +
+        '<div class="chip" style="justify-self:start">' + A.ic('documento') + 'Montado pelo Felipe · válido até {d:+28}</div>' +
         ref.map(function (r) { return cartao('<span class="rotulo">' + r[0] + '</span><h3 style="font-size:15px;margin:6px 0 4px">' + r[1] + '</h3><p class="mudo" style="font-size:13px">' + r[2] + '</p>'); }).join('');
     },
 
@@ -213,7 +215,7 @@
       return sub('sono', 'Sono', A.item(115) + A.item(162)) +
         cartao('<span class="rotulo">Última noite</span><div class="num" style="font-size:40px;font-weight:700;margin:4px 0">7h10</div><p class="mudo">23:40 → 06:50 · veio do Apple Saúde</p>') +
         cartao('<div class="cartao-titulo"><h3>Como você dormiu?</h3></div>' + escala(5, ['😣', '😕', '😐', '🙂', '😴'], 3, 'marca', 'rosto')) +
-        cartao('<div class="cartao-titulo"><h3>Horas por noite</h3></div>' + grafico('sono', [6.5, 7, 6.2, 7.4, 6.8, 7.5, 7.2], ['qua', 'qui', 'sex', 'sáb', 'dom', 'seg', 'ter'], 'h', 1)) + ficha();
+        cartao('<div class="cartao-titulo"><h3>Horas por noite</h3></div>' + grafico('sono', [6.5, 7, 6.2, 7.4, 6.8, 7.5, 7.2], [-6, -5, -4, -3, -2, -1, 0].map(function (n) { return A.datas.semCurto(A.datas.somaDias(A.datas.hoje(), n)); }), 'h', 1)) + ficha();
     },
     humor: function () {
       return sub('humor', 'Humor', A.item(117)) +
@@ -255,7 +257,7 @@
           '<div class="lista-menu" style="padding:0">' +
           tomar('Remédio de uso diário (exemplo)', '1 comprimido · café da manhã', true) + tomar('Vitamina D (exemplo)', '1 cápsula · almoço', false) + tomar('Ômega 3 (exemplo)', '1 cápsula · jantar', false) + '</div>') +
         cartao('<div class="cartao-titulo"><h3>Aplicados na clínica</h3><span class="itens">' + A.item(90) + '</span></div>' +
-          '<table class="tabela"><tr><td>Complexo vitamínico (exemplo) · Thaís</td><td>08/10</td></tr><tr><td>Vitamina B12 (exemplo) · Eduarda</td><td>24/09</td></tr></table>') +
+          '<table class="tabela"><tr><td>Complexo vitamínico (exemplo) · Thaís</td><td>{d:-5}</td></tr><tr><td>Vitamina B12 (exemplo) · Eduarda</td><td>{d:-19}</td></tr></table>') +
         cartao('<div class="cartao-titulo"><h3>Lembrete dos remédios</h3>' + A.item(132) + '</div><div class="linha-ic"><div class="meio mudo" style="font-size:13.5px">Na hora de cada um</div><span class="chave on"></span></div>') + ficha();
     },
     sintomas: function () {
@@ -294,14 +296,14 @@
         '<p class="fraco" style="font-size:11.5px;text-align:center">Respostas simuladas para a prévia. Tudo fica registrado na sua ficha ' + A.item(48) + '.</p>';
     },
     avisos: function () {
-      var l = [['Dr. André', 'Lembrete: traga seus exames de sangue na consulta do dia 20.', 'hoje 08:10', 131], ['Clínica Evoluir', 'Nova receita no app: omelete de forno com legumes.', 'ontem', 133],
-        ['Lembrete', 'Hora da água! Você está em 1,6 L de 2,5 L.', 'ontem 15:00', 132], ['Thaís (enfermagem)', '"Oi Marina, tudo bem depois da aplicação?"', 'seg 10:22', 60]];
+      var l = [['Dr. André', 'Lembrete: traga seus exames de sangue na consulta de {wl:u+5}, {d:u+5}.', 'hoje {h:-70}', 131], ['Clínica Evoluir', 'Nova receita no app: omelete de forno com legumes.', 'ontem', 133],
+        ['Lembrete', 'Hora da água! Você está em 1,6 L de 2,5 L.', 'ontem 15:00', 132], ['Thaís (enfermagem)', '"Oi Marina, tudo bem depois da aplicação?"', '{ws:-4} 10:22', 60]];
       return sub('avisos', 'Avisos', A.item([131, 132])) + l.map(function (a) {
         return cartao('<div class="linha-ic">' + A.bolha(a[3] === 132 ? 'relogio' : 'sino', 'var(--c3)') + '<div class="meio"><b>' + a[0] + '</b> <span class="fraco" style="font-size:12px">' + a[2] + '</span><p class="mudo" style="font-size:13.5px">' + a[1] + '</p></div>' + A.item(a[3]) + '</div>');
       }).join('');
     },
     consultas: function () {
-      var slots = ['Ter, 20/10 · 09:30', 'Qua, 21/10 · 14:00', 'Qui, 22/10 · 10:30', 'Sex, 23/10 · 08:30'];
+      var slots = ['{Ws:u+5}, {d:u+5} · 09:30', '{Ws:u+6}, {d:u+6} · 14:00', '{Ws:u+7}, {d:u+7} · 10:30', '{Ws:u+8}, {d:u+8} · 08:30'];
       return sub('consultas', 'Minhas consultas', A.item(130) + A.item(158)) +
         cartao('<span class="rotulo">Próxima</span><h2 style="font-size:21px;margin:4px 0">' + E.consulta + '</h2><p class="mudo">Retorno com o Dr. André · presencial · Clínica Evoluir</p>' +
           '<div class="acoes" style="margin-top:12px"><button class="botao" type="button" data-acao="aviso" data-msg="Presença confirmada. Até lá!">Confirmar presença</button><button class="botao botao-claro" type="button" data-acao="remarcar">Remarcar</button></div>' +
@@ -309,7 +311,7 @@
           '<div class="opcoes" style="margin-top:6px">' + slots.map(function (s) { return '<button type="button" data-acao="slot" data-v="' + s + '">' + s + '</button>'; }).join('') + '</div></div>') +
         cartao('<div class="cartao-titulo"><h3>Marcar outra</h3></div>' + opcoes(['Nutrição · Felipe', 'Psicologia · Maria Clara', 'Aplicação · enfermagem', 'Bioimpedância'], 'marca', []) +
           '<button class="botao botao-claro botao-cheio" type="button" style="margin-top:12px" data-acao="aviso" data-msg="Pedido enviado. A clínica confirma pelo WhatsApp.">Ver horários</button>') +
-        cartao('<div class="cartao-titulo"><h3>Anteriores</h3></div><table class="tabela"><tr><td>Retorno · Dr. André</td><td>22/09</td></tr><tr><td>Nutrição · Felipe</td><td>15/09</td></tr><tr><td>Primeira consulta · Dr. André</td><td>01/09</td></tr></table>');
+        cartao('<div class="cartao-titulo"><h3>Anteriores</h3></div><table class="tabela"><tr><td>Retorno · Dr. André</td><td>{d:-21}</td></tr><tr><td>Nutrição · Felipe</td><td>{d:-28}</td></tr><tr><td>Primeira consulta · Dr. André</td><td>{d:-42}</td></tr></table>');
     },
     comunidade: function () {
       return sub('comunidade', 'Comunidade', A.item([139, 140]) + '<span class="item">versão completa</span>') +
@@ -330,31 +332,31 @@
     // ===== Evolução =====
     evolucao: function () {
       return '<header class="cab" style="padding-right:40px"><h1 style="font-size:24px">Evolução</h1></header><div class="cab-itens">' + A.item([118, 119, 120, 123]) + '</div>' +
-        cartao('<div class="cartao-titulo"><h3>Peso</h3><span class="chip" style="padding:4px 8px">−5,4 kg desde 01/09</span></div>' +
-          grafico('peso', [84, 83.1, 82.4, 81.6, 80.9, 80.1, 79.4, 78.6], ['01/09', '08/09', '15/09', '22/09', '29/09', '06/10', '10/10', '13/10'], 'kg', 1)) +
-        cartao('<div class="cartao-titulo"><h3>Gordura corporal</h3>' + A.item(119) + '</div>' + grafico('gordura', [38.2, 37.5, 36.9, 36.1, 35.4], ['01/09', '15/09', '22/09', '06/10', '13/10'], '%', 1)) +
-        cartao('<div class="cartao-titulo"><h3>Massa muscular</h3></div>' + grafico('massa', [26.8, 26.9, 27.1, 27.0, 27.3], ['01/09', '15/09', '22/09', '06/10', '13/10'], 'kg', 1)) +
+        cartao('<div class="cartao-titulo"><h3>Peso</h3><span class="chip" style="padding:4px 8px">−5,4 kg desde {d:-42}</span></div>' +
+          grafico('peso', [84, 83.1, 82.4, 81.6, 80.9, 80.1, 79.4, 78.6], ['{d:-42}', '{d:-35}', '{d:-28}', '{d:-21}', '{d:-14}', '{d:-7}', '{d:-3}', '{d:0}'], 'kg', 1)) +
+        cartao('<div class="cartao-titulo"><h3>Gordura corporal</h3>' + A.item(119) + '</div>' + grafico('gordura', [38.2, 37.5, 36.9, 36.1, 35.4], ['{d:-42}', '{d:-28}', '{d:-21}', '{d:-7}', '{d:0}'], '%', 1)) +
+        cartao('<div class="cartao-titulo"><h3>Massa muscular</h3></div>' + grafico('massa', [26.8, 26.9, 27.1, 27.0, 27.3], ['{d:-42}', '{d:-28}', '{d:-21}', '{d:-7}', '{d:0}'], 'kg', 1)) +
         cartao('<div class="cartao-titulo"><h3>Última bioimpedância</h3><span class="chip" style="padding:4px 8px">medido na clínica</span></div>' +
           '<table class="tabela"><tr><td>Peso</td><td>78,6 kg</td></tr><tr><td>Gordura</td><td>35,4%</td></tr><tr><td>Massa muscular</td><td>27,3 kg</td></tr><tr><td>Água corporal</td><td>48,1%</td></tr><tr><td>Gordura visceral</td><td>9</td></tr></table>' +
-          '<p class="fraco" style="font-size:12px;margin-top:8px">Balança Anovator · 13/10 · Eduarda ' + A.item(119) + '</p>') +
+          '<p class="fraco" style="font-size:12px;margin-top:8px">Balança Anovator · {d:0} · Eduarda ' + A.item(119) + '</p>') +
         '<div class="lista-menu cartao" style="padding:4px 16px">' +
           linMenu('medidas', 'fita', 'var(--c1)', 'Atualizar peso e medidas', 'você registra a cada 15 dias', A.item(118)) +
           linMenu('fotos', 'camera', 'var(--c4)', 'Fotos de progresso', 'privadas: só você e o médico', A.item(122)) +
           linMenu('documentos', 'documento', 'var(--c3)', 'Relatórios e exames', 'PDFs da ficha e seus exames', A.item([121, 136])) +
         '</div>' +
-        '<button class="botao botao-cheio" type="button" data-acao="aviso" data-msg="PDF de exemplo gerado: Minha evolução (01/09 a 13/10).">' + A.ic('download') + 'Exportar minha evolução em PDF</button>' +
+        '<button class="botao botao-cheio" type="button" data-acao="aviso" data-msg="PDF de exemplo gerado: Minha evolução ({d:-42} a {d:0}).">' + A.ic('download') + 'Exportar minha evolução em PDF</button>' +
         '<p class="nota-ficha">' + A.item(123) + ' Para mostrar a outro profissional.</p>';
     },
     fotos: function () {
       return sub('fotos', 'Fotos de progresso', A.item(122)) +
         cartao('<div class="linha-ic">' + A.bolha('cadeado', 'var(--c4)') + '<p class="meio" style="font-size:13.5px">Privadas. Só você e o Dr. André veem. Ficam fora da galeria do celular.</p></div>') +
-        '<div class="fotos">' + ['01/09 · frente', '01/09 · lado', '01/09 · costas', '13/10 · frente', '13/10 · lado', '+ Nova'].map(function (t) { return '<div class="foto">' + (t === '+ Nova' ? A.ic('camera') : A.ic('perfil')) + '<span>' + t + '</span></div>'; }).join('') + '</div>';
+        '<div class="fotos">' + ['{d:-42} · frente', '{d:-42} · lado', '{d:-42} · costas', '{d:0} · frente', '{d:0} · lado', '+ Nova'].map(function (t) { return '<div class="foto">' + (t === '+ Nova' ? A.ic('camera') : A.ic('perfil')) + '<span>' + t + '</span></div>'; }).join('') + '</div>';
     },
     documentos: function () {
       return sub('documentos', 'Relatórios e exames', A.item([121, 136])) +
         cartao('<div class="cartao-titulo"><h3>Da clínica</h3>' + A.item(121) + '</div><div class="lista-menu" style="padding:0">' +
-          doc('Ficha da consulta · 22/09', 'PDF com a balança anexada') + doc('Plano alimentar · Felipe', 'PDF · válido até 10/11') + doc('Receita · Dr. André', 'PDF assinado') + '</div>') +
-        cartao('<div class="cartao-titulo"><h3>Meus exames</h3>' + A.item(136) + '</div><div class="lista-menu" style="padding:0">' + doc('Hemograma · 05/10', 'enviado por você') + '</div>' +
+          doc('Ficha da consulta · {d:-21}', 'PDF com a balança anexada') + doc('Plano alimentar · Felipe', 'PDF · válido até {d:+28}') + doc('Receita · Dr. André', 'PDF assinado') + '</div>') +
+        cartao('<div class="cartao-titulo"><h3>Meus exames</h3>' + A.item(136) + '</div><div class="lista-menu" style="padding:0">' + doc('Hemograma · {d:-8}', 'enviado por você') + '</div>' +
           '<div class="acoes" style="margin-top:12px"><button class="botao" type="button" data-acao="aviso" data-msg="Exame enviado para a sua ficha.">' + A.ic('camera') + 'Fotografar exame</button><button class="botao botao-claro" type="button" data-acao="aviso" data-msg="PDF enviado para a sua ficha.">Enviar PDF</button></div>');
     },
 
@@ -365,13 +367,13 @@
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">' +
             '<div class="caixa-destaque"><span class="rotulo">Na seringa</span><div class="num" style="font-size:30px;font-weight:700">10 un.</div></div>' +
             '<div class="caixa-destaque"><span class="rotulo">Volume</span><div class="num" style="font-size:30px;font-weight:700">0,10 ml</div></div>' +
-          '</div><p style="font-size:12.5px;margin-top:10px" class="mudo">' + A.ic('escudo') + ' Conferido pela Thaís em 08/10. <b>O app não calcula dose</b>: mostra só o que a clínica registrou. ' + A.item(125) + '</p>', 'cartao-destaque') +
-        cartao('<div class="linha-ic">' + A.bolha('relogio', 'var(--c3)') + '<div class="meio"><b>Próxima: quinta, 15/10 · 08:00</b><div class="fraco" style="font-size:12px">Lembrete na hora e 1 hora antes</div></div><span class="chave on"></span></div><div style="margin-top:8px">' + A.item(126) + '</div>') +
+          '</div><p style="font-size:12.5px;margin-top:10px" class="mudo">' + A.ic('escudo') + ' Conferido pela Thaís em {d:-5}. <b>O app não calcula dose</b>: mostra só o que a clínica registrou. ' + A.item(125) + '</p>', 'cartao-destaque') +
+        cartao('<div class="linha-ic">' + A.bolha('relogio', 'var(--c3)') + '<div class="meio"><b>Próxima: {wl:p4}, {d:p4} · 08:00</b><div class="fraco" style="font-size:12px">Lembrete na hora e 1 hora antes</div></div><span class="chave on"></span></div><div style="margin-top:8px">' + A.item(126) + '</div>') +
         cartao('<div class="cartao-titulo"><h3>Onde aplicar</h3>' + A.item(127) + '</div>' + corpo() +
-          '<p class="mudo" style="font-size:12.5px;text-align:center;margin-top:6px">Última: <b>abdômen, lado esquerdo</b> (08/10). Toque no local de hoje.</p>') +
+          '<p class="mudo" style="font-size:12.5px;text-align:center;margin-top:6px">Última: <b>abdômen, lado esquerdo</b> ({d:-5}). Toque no local de hoje.</p>') +
         '<button class="botao botao-cheio" type="button" data-acao="aviso" data-msg="Aplicação registrada. Como você se sentiu? Conte em Sintomas.">Registrar aplicação</button>' +
         '<div class="lista-menu cartao" style="padding:4px 16px">' + linMenu('sintomas', 'termometro', 'var(--c6)', 'Como se sentiu', 'náusea, enjoo, intestino…', A.item([128, 129])) + '</div>' +
-        cartao('<div class="cartao-titulo"><h3>Histórico</h3></div><table class="tabela"><tr><td>08/10 · abdômen esq. · sem sintomas</td><td>10 un.</td></tr><tr><td>01/10 · abdômen dir. · enjoo leve</td><td>10 un.</td></tr><tr><td>24/09 · coxa esq. · sem sintomas</td><td>5 un.</td></tr></table>') + ficha();
+        cartao('<div class="cartao-titulo"><h3>Histórico</h3></div><table class="tabela"><tr><td>{d:-5} · abdômen esq. · sem sintomas</td><td>10 un.</td></tr><tr><td>{d:-12} · abdômen dir. · enjoo leve</td><td>10 un.</td></tr><tr><td>{d:-19} · coxa esq. · sem sintomas</td><td>5 un.</td></tr></table>') + ficha();
     },
 
     // ===== Equipe =====
@@ -389,7 +391,7 @@
         cartao('<div class="linha-ic">' + A.bolha('telefone', 'var(--c1)') + '<div class="meio"><b>Clínica Evoluir</b><div class="fraco" style="font-size:12.5px">WhatsApp, site e endereço (exemplo)</div></div>' + A.ic('globo', 'fraco') + '</div>');
     },
     chat: function () {
-      if (!E.chatEquipe) E.chatEquipe = [['eu', 'Thaís, tive um pouco de enjoo ontem depois da aplicação. É normal?', 'seg 09:40'],
+      if (!E.chatEquipe) E.chatEquipe = [['eu', 'Thaís, tive um pouco de enjoo ontem depois da aplicação. É normal?', '{ws:-4} 09:40'],
         ['ela', '<blockquote>Thaís, tive um pouco de enjoo ontem depois da aplicação. É normal?</blockquote>"Oi Marina! Pode acontecer nos primeiros dias. Coma devagar, em porções menores, e me avise se piorar ou se vomitar."<small>Thaís · enfermagem · enviado pela clínica, sem alteração</small>', 'seg 10:22']];
       return sub('chat', 'Equipe da clínica', A.item([58, 59, 60]) + A.item(157)) +
         '<p class="fraco" style="font-size:12px">A IA encaminha para a pessoa certa. A resposta chega citada, entre aspas e sem alteração.</p>' +
@@ -411,7 +413,7 @@
     perfil: function () {
       return '<header class="cab" style="padding-right:40px"><h1 style="font-size:24px">Perfil</h1></header>' +
         cartao('<div class="linha-ic">' + '<span class="avatar" style="background:var(--primaria);color:var(--sobre-primaria);width:54px;height:54px;font-size:18px">ML</span>' +
-          '<div class="meio"><h3 style="font-size:18px">' + PACIENTE.completo + '</h3><div class="fraco" style="font-size:12.5px">' + PACIENTE.id + ' · paciente desde 01/09/2026</div><div style="margin-top:6px"><span class="chip" style="padding:4px 9px">' + PACIENTE.fase + '</span></div></div></div>' +
+          '<div class="meio"><h3 style="font-size:18px">' + PACIENTE.completo + '</h3><div class="fraco" style="font-size:12.5px">' + PACIENTE.id + ' · paciente desde {a:-42}</div><div style="margin-top:6px"><span class="chip" style="padding:4px 9px">' + PACIENTE.fase + '</span></div></div></div>' +
           '<p class="fraco" style="font-size:12px;margin-top:10px">' + A.ic('escudo') + ' Tudo sincronizado. O app funciona sem internet e envia quando o sinal volta ' + A.item(100) + '</p>') +
         grupo('Saúde', [
           ['corpo', 'perfil', 'var(--c1)', 'Perfil corporal', 'altura, biotipo, objetivo', A.item(96)],
@@ -426,7 +428,7 @@
           ['pagamentos', 'cartao', 'var(--c5)', 'Pagamentos', 'Pix e cartão', A.item(159)]]) +
         grupo('Privacidade e conta', [
           ['dados', 'cadeado', 'var(--c6)', 'Meus dados (LGPD)', 'baixar ou pedir exclusão', A.item(98)],
-          ['consentimento', 'escudo', 'var(--c1)', 'Termo de uso e aviso de IA', 'aceito em 01/09/2026', A.item(97)],
+          ['consentimento', 'escudo', 'var(--c1)', 'Termo de uso e aviso de IA', 'aceito em {a:-42}', A.item(97)],
           ['tour', 'ia', 'var(--c2)', 'Rever o tutorial', '', A.item(99)],
           ['entrar', 'link', 'var(--c3)', 'Como se entra no app', 'link mágico, sem senha', A.item([92, 93, 95])]]) +
         '<div style="display:grid;gap:8px;justify-items:center;padding:4px 0"><div class="lojas"><span class="chip">' + A.item(141) + ' App Store · em breve</span><span class="chip">' + A.item(142) + ' Google Play · em breve</span></div>' +
@@ -470,7 +472,7 @@
     },
     pagamentos: function () {
       return sub('pagamentos', 'Pagamentos', A.item(159) + A.item(87)) +
-        cartao('<span class="rotulo">Em aberto</span><h2 style="font-size:24px;margin:4px 0" class="num">R$ 650,00</h2><p class="mudo">Programa trimestral · parcela 2 de 3 · vence 20/10 (valores de exemplo)</p>' +
+        cartao('<span class="rotulo">Em aberto</span><h2 style="font-size:24px;margin:4px 0" class="num">R$ 650,00</h2><p class="mudo">Programa trimestral · parcela 2 de 3 · vence {d:+7} (valores de exemplo)</p>' +
           '<div class="acoes" style="margin-top:12px"><button class="botao" type="button" data-acao="aviso" data-msg="Pix copia e cola copiado (exemplo).">Pagar com Pix</button><button class="botao botao-claro" type="button" data-acao="aviso" data-msg="Abre o pagamento com cartão (exemplo).">' + A.ic('cartao') + 'Cartão</button></div>', 'cartao-destaque') +
         cartao('<div class="cartao-titulo"><h3>Pagos</h3></div><table class="tabela"><tr><td>Parcela 1 de 3 · Pix</td><td>R$ 650,00</td></tr><tr><td>Consulta inicial · cartão</td><td>R$ 450,00</td></tr></table>') +
         '<p class="fraco" style="font-size:12px;text-align:center">Recibos no e-mail. Dúvidas: Emanuele (financeiro).</p>';
@@ -594,7 +596,7 @@
     if (a === 'porcao') { E.porcao = [170, 85, 100, 250][Number(v)]; render(true); return; }
     if (a === 'somar') { var f = E.porcao / 170; E.kcal += Math.round(110 * f); E.prot += Math.round(6.8 * f); avisoCurto('Somado ao dia: +' + Math.round(110 * f) + ' kcal, +' + Math.round(6.8 * f) + ' g de proteína.'); location.hash = '#alimentacao'; return; }
     if (a === 'remarcar') { E.slot = E.slot === 'abrir' ? null : 'abrir'; render(true); return; }
-    if (a === 'slot') { E.consulta = v.replace('Ter,', 'Terça,').replace('Qua,', 'Quarta,').replace('Qui,', 'Quinta,').replace('Sex,', 'Sexta,'); E.slot = null; render(true); avisoCurto('Consulta remarcada para ' + v + '.'); return; }
+    if (a === 'slot') { E.consulta = v.replace(/^(Seg|Ter|Qua|Qui|Sex),/, function (m, d) { return { Seg: 'Segunda', Ter: 'Terça', Qua: 'Quarta', Qui: 'Quinta', Sex: 'Sexta' }[d] + ','; }); E.slot = null; render(true); avisoCurto('Consulta remarcada para ' + v + '.'); return; }
     if (a === 'local') { E.local = v; render(true); avisoCurto('Local de hoje marcado.'); return; }
     if (a === 'chave') { el.classList.toggle('on'); return; }
     if (a === 'tomei') { el.textContent = '✓ tomei'; el.style.color = 'var(--ok)'; return; }
