@@ -9,15 +9,13 @@
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, TELAS = window.TELAS_ITEM || {};
-  var CHAVE = 'ag-escopo-reuniao-v' + D.versao + '-padrao-incluir';
+  var CHAVE = window.CALCULO.CHAVE;
   var ST_NOME = { incluir: 'Incluir', duvida: 'Dúvida', tirar: 'Tirar' };
   var LOTE = {}; D.lotes.forEach(function (l) { LOTE[l.id] = l; });
   var esc = A.esc;
 
   // ---------- marcações salvas só no aparelho ----------
-  function padrao() { var st = {}; D.itens.forEach(function (i) { st[i.n] = 'incluir'; }); return { marcados: {}, status: st, notas: {} }; }
-  var M = padrao();
-  try { var s = JSON.parse(localStorage.getItem(CHAVE) || 'null'); if (s && s.marcados) M = s; } catch (e) { /* aparelho sem armazenamento: segue só na memória */ }
+  var padrao = window.CALCULO.padrao, M = window.CALCULO.ler();
   function salvar() { try { localStorage.setItem(CHAVE, JSON.stringify(M)); } catch (e) { /* idem */ } }
   var notaAberta = {};
 
@@ -48,36 +46,9 @@
     return t === 0 ? '' : t === l.length ? 'lote retirado · fora da soma' : 'a recalcular (' + t + ' de ' + l.length + ' itens retirados)';
   }
 
-  // ---------- preços ----------
-  // Valores fora do dados.js (do escopo oficial, "Visão geral"), com a decisão de 12/10/2026: o Projeto 1 entra como desconto.
-  var P1 = { implantacao: 999, mensal: 599 };
-  var MENSAL = { 2: 1500, 3: { porPaciente: 9 } };   // Projeto 3 sem mínimo (decisão de 12/10/2026)
-  var BLOCO_VC = ['A9', 'A10', 'A11'], VC_VALOR = 20000;
-  function reais(n) { return 'R$ ' + Number(n).toLocaleString('pt-BR'); }
-  function valorLote(l) {
-    if (l.proposta) return null;
-    if (/incluído/i.test(l.preco)) return 0;
-    var m = l.preco.match(/R\$ ?([\d.]+)/); return m ? +m[1].replace(/\./g, '') : null;
-  }
-  function itensDe(ids) { return D.itens.filter(function (i) { return ids.indexOf(i.lote) >= 0 && !i.fora; }); }
-  function situacao(ids) {
-    var l = itensDe(ids), t = l.filter(function (i) { return M.status[i.n] === 'tirar'; }).length;
-    return { total: l.length, tirados: t, duvida: l.filter(function (i) { return M.status[i.n] === 'duvida'; }).length, fora: l.length > 0 && t === l.length, parcial: t > 0 && t < l.length };
-  }
-  function conta() {
-    var imp = 0, partes = [], recalc = [], semPreco = [], duvidas = 0, ativo = { 2: false, 3: false };
-    D.lotes.forEach(function (l) {
-      if (l.projeto === 1 || BLOCO_VC.indexOf(l.id) >= 0) return;
-      var s = situacao([l.id]); if (!s.fora) ativo[l.projeto] = true;
-      if (s.fora) return;
-      var v = valorLote(l);
-      if (v === null) { semPreco.push(l.nome); return; }
-      imp += v; duvidas += s.duvida; if (s.parcial) recalc.push(l.nome);
-    });
-    var vc = situacao(BLOCO_VC);
-    if (!vc.fora) { imp += VC_VALOR; ativo[3] = true; duvidas += vc.duvida; if (vc.parcial) recalc.push('Versão completa do app (A9 a A11)'); }
-    return { imp: imp, recalc: recalc, semPreco: semPreco, duvidas: duvidas, ativo: ativo };
-  }
+  // ---------- preços (a conta fica no calculo.js, usada também pelo orçamento em PDF) ----------
+  var C = window.CALCULO, P1 = C.P1, MENSAL = C.MENSAL, BLOCO_VC = C.BLOCO_VC, VC_VALOR = C.VC_VALOR, reais = C.reais;
+  function conta() { return C.conta(M); }
   function precoChip(l) {
     if (l.projeto === 1) return '<span class="preco">no plano do Projeto 1</span>';
     if (l.proposta) return '<span class="preco proposta">Proposta · preço a definir</span>';
@@ -113,7 +84,8 @@
     f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
     f.querySelector('form').addEventListener('submit', function (ev) {
       ev.preventDefault();
-      if (!A.liberarPrecos(String(new FormData(ev.target).get('s') || ''))) { avisoCurto('Senha incorreta.'); return; }
+      if (!A.liberarPrecos(String(new FormData(ev.target).get('s') || ''))) { A.log('senha-precos-errada', {}); avisoCurto('Senha incorreta.'); return; }
+      A.log('precos-liberados', {});
       f.remove(); desenhar(); botaoPrecos(); avisoCurto('Preços visíveis neste aparelho.');
     });
     f.querySelector('input').focus();
@@ -122,7 +94,7 @@
   document.addEventListener('click', function (ev) {
     var b = ev.target.closest('[data-preco]'); if (!b) return;
     if (b.dataset.preco === 'mostrar') pedirSenha();
-    else { A.ocultarPrecos(); desenhar(); botaoPrecos(); }
+    else { A.ocultarPrecos(); A.log('precos-ocultos', {}); desenhar(); botaoPrecos(); }
   });
 
   // ---------- desenho ----------
@@ -206,26 +178,56 @@
     function semAPI() {
       var a = document.createElement('textarea'); a.value = t; a.setAttribute('readonly', ''); a.style.position = 'fixed'; a.style.opacity = '0'; document.body.appendChild(a);
       a.select(); a.setSelectionRange(0, t.length); var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; } a.remove();
-      mostrarResumo(t, ok); if (ok) avisoCurto('Resumo copiado.');
+      mostrarResumo(t, ok); if (ok) { avisoCurto('Resumo copiado.'); A.log('resumo-copiado', {}); }
     }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { avisoCurto('Resumo copiado.'); mostrarResumo(t, true); }, semAPI);
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { avisoCurto('Resumo copiado.'); A.log('resumo-copiado', {}); mostrarResumo(t, true); }, semAPI);
     else semAPI();
   });
   $('limpar').addEventListener('click', function () {
     if (!confirm('Voltar ao padrão (todos os itens em "incluir") e apagar as anotações deste aparelho?')) return;
-    M = padrao(); notaAberta = {}; salvar(); desenhar();
+    M = padrao(); notaAberta = {}; salvar(); desenhar(); A.log('escopo-limpo', {});
   });
+
+  // ---------- Salvar e enviar à RXSync (cada envio vira uma versão nova no banco; nada fica só lá: o aparelho continua com tudo) ----------
+  var URL_SALVAR = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demo-salvar';
+  function desligados() { return D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; }).map(function (i) { return i.n; }); }
+  function ultimoEnvio() { try { return localStorage.getItem(CHAVE + '-enviado') || ''; } catch (e) { return ''; } }
+  function mostrarEnvio() { var u = ultimoEnvio(); $('salvo').textContent = u ? 'Salvo e enviado em ' + u : ''; }
+  $('salvar').addEventListener('click', function () {
+    var b = $('salvar'), c = conta();
+    var corpo = JSON.stringify({ tipo: 'escopo', usuario: A.usuario(), aparelho: A.aparelho(), sessao: A.sessao(), versao: D.versao,
+      marcacoes: { status: M.status, marcados: M.marcados }, anotacoes: M.notas, desligados: desligados(),
+      total: { implantacao: c.imp, recalcular: c.recalc, sem_preco: c.semPreco, duvidas: c.duvidas, projeto2: c.ativo[2], projeto3: c.ativo[3] } });
+    b.disabled = true; b.textContent = 'Enviando…';
+    function fim(ok) {
+      b.disabled = false; b.textContent = 'Salvar e enviar à RXSync';
+      var agora = A.datas.agora(), quando = A.datas.dma(agora) + ' às ' + A.datas.hm(agora);
+      A.log('escopo-salvo', { ok: ok, desligados: desligados().length });
+      if (ok) { try { localStorage.setItem(CHAVE + '-enviado', quando); } catch (e) { /* idem */ } mostrarEnvio(); avisoCurto('Salvo e enviado à RXSync em ' + quando + '.'); }
+      else avisoCurto('Não foi possível enviar agora. As marcações continuam salvas neste aparelho; tente de novo.');
+    }
+    try {
+      fetch(URL_SALVAR, { method: 'POST', body: corpo, mode: 'cors', credentials: 'omit' })
+        .then(function (r) { return r.json(); }).then(function (j) { fim(!!(j && j.ok)); }, function () { fim(false); });
+    } catch (e) { fim(false); }
+  });
+  mostrarEnvio();
 
   // ---------- ações ----------
   $('lista').addEventListener('click', function (ev) {
     var el = ev.target.closest('[data-acao]'); if (!el) return;
     var n = +el.closest('.item-esc').dataset.n, a = el.dataset.acao;
-    if (a === 'status') { M.status[n] = M.status[n] === el.dataset.st ? '' : el.dataset.st; if (!M.status[n]) delete M.status[n]; salvar(); desenhar(); }
+    if (a === 'status') { var de = M.status[n] || ''; M.status[n] = M.status[n] === el.dataset.st ? '' : el.dataset.st; if (!M.status[n]) delete M.status[n]; A.log('escopo-marcacao', { item: n, de: de, para: M.status[n] || '' }); salvar(); desenhar(); }
     if (a === 'nota') { notaAberta[n] = !notaAberta[n]; desenhar(); var t = document.querySelector('.item-esc[data-n="' + n + '"] textarea'); if (t) t.focus(); }
   });
   $('lista').addEventListener('change', function (ev) {
     if (ev.target.dataset.acao !== 'marcar') return;
-    var n = +ev.target.closest('.item-esc').dataset.n; if (ev.target.checked) M.marcados[n] = true; else delete M.marcados[n]; salvar(); contador();
+    var n = +ev.target.closest('.item-esc').dataset.n; if (ev.target.checked) M.marcados[n] = true; else delete M.marcados[n]; A.log('escopo-marcado', { item: n, marcado: ev.target.checked }); salvar(); contador();
+  });
+  // Anotação registrada quando sai do campo (não a cada letra).
+  $('lista').addEventListener('focusout', function (ev) {
+    if (!ev.target.dataset || ev.target.dataset.acao !== 'texto-nota') return;
+    var n = +ev.target.closest('.item-esc').dataset.n; A.log('escopo-anotacao', { item: n, texto: (M.notas[n] || '').slice(0, 300) });
   });
   $('lista').addEventListener('input', function (ev) {
     if (ev.target.dataset.acao !== 'texto-nota') return;

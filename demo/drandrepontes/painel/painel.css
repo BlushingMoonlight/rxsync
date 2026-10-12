@@ -292,3 +292,28 @@ button.mini { font-size: 12px; font-weight: 600; color: var(--primaria); text-de
 .campo-preco { width: 120px; text-align: right; }
 [data-estilo="cyber"] .reserva, [data-estilo="cyber"] .chip-bloq { border-radius: 2px; }
 .agenda-semana .cab-dia.hoje { color: var(--primaria); box-shadow: inset 0 -3px 0 var(--primaria); }
+
+/* ---------- Comunicação e equipe do paciente (equipe.js) ---------- */
+.chat-equipe { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .chat-equipe { grid-template-columns: 1fr; } }
+.conv-lista { display: grid; gap: 4px; }
+.conv-lista .rotulo { margin: 10px 4px 2px; display: flex; gap: 6px; align-items: center; }
+.conv { display: grid; text-align: left; padding: 8px 10px; border-radius: 10px; background: none; color: var(--texto); border: 1px solid transparent; position: relative; }
+.conv b { font-weight: 650; font-size: 14px; }
+.conv small { color: var(--texto-3); font-size: 11.5px; }
+.conv:hover { background: var(--superficie-2); }
+.conv.ativa { background: color-mix(in srgb, var(--primaria) 10%, var(--superficie)); border-color: color-mix(in srgb, var(--primaria) 35%, transparent); }
+.conv .bolinha { position: absolute; right: 10px; top: 10px; min-width: 20px; height: 20px; border-radius: 10px; background: var(--perigo); color: #fff; font-size: 11.5px; font-weight: 700; display: grid; place-items: center; padding: 0 5px; }
+.msgs-equipe { display: grid; gap: 10px; max-height: 460px; overflow-y: auto; padding: 4px 2px 8px; }
+.msg-eq { display: flex; gap: 10px; align-items: flex-start; padding: 8px; border-radius: 12px; }
+.msg-eq .meio { flex: 1; min-width: 0; }
+.msg-eq p { margin: 2px 0 0; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.msg-eq.me-cita { background: color-mix(in srgb, var(--alerta) 9%, transparent); }
+.msg-eq.restrita p { color: var(--texto-3); font-style: italic; }
+.mencao { color: var(--primaria); font-weight: 650; }
+.mencao.minha { background: color-mix(in srgb, var(--alerta) 18%, transparent); border-radius: 4px; padding: 0 3px; }
+.mencoes-rapidas { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+.mencoes-rapidas button { font-size: 12px; padding: 4px 9px; border-radius: 999px; border: 1px solid var(--linha); background: var(--superficie-2); color: var(--texto-2); }
+.equipe-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.equipe-chips .chip { padding: 3px 9px 3px 3px; font-size: 12px; }
+[data-estilo="cyber"] .conv, [data-estilo="cyber"] .msg-eq, [data-estilo="cyber"] .mencoes-rapidas button { border-radius: 2px; }

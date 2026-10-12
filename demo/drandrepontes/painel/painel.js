@@ -14,6 +14,10 @@
     { grupo: 'Centrais', itens: [
       { id: 'central-paciente', nome: 'Central do paciente', ic: 'pacientes' },
       { id: 'central', nome: 'Central do médico', ic: 'estetoscopio' }] },
+    { grupo: 'Equipe', itens: [
+      { id: 'equipe-chat', nome: 'Comunicação', ic: 'chat' },
+      { id: 'equipe-paciente', nome: 'Equipe do paciente', ic: 'equipe' },
+      { id: 'meus-pacientes', nome: 'Meus pacientes', ic: 'pacientes' }] },
     { grupo: 'Atendimento RXSync', itens: [
       { id: 'atendimento', nome: 'Conversas da IA', ic: 'whatsapp' },
       { id: 'agenda-ia', nome: 'Agenda da IA e pré-consulta', ic: 'calendario' },
@@ -539,12 +543,12 @@
   // O Dr. André vê tudo. Cada outra pessoa vê o próprio painel e o que é da função dela.
   var QUEM = (function () { var q = new URLSearchParams(location.search).get('quem'); return Object.prototype.hasOwnProperty.call(EQUIPE, q) ? q : 'andre'; })();
   var MENU_FUNCAO = {
-    emanuele: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-campanhas', 'crm-indicacoes', 'financeiro', 'estoque', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
-    felipe: ['central-paciente', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
-    mariaclara: ['central-paciente', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
-    eduarda: ['central-paciente', 'crm-tarefas', 'agenda', 'ficha', 'estoque', 'app', 'casos'],
-    thais: ['central-paciente', 'crm-tarefas', 'medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
-    elenice: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-modelos', 'crm-campanhas', 'crm-indicacoes', 'agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
+    emanuele: ['central-paciente', 'equipe-chat', 'equipe-paciente', 'meus-pacientes', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-campanhas', 'crm-indicacoes', 'financeiro', 'estoque', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
+    felipe: ['central-paciente', 'equipe-chat', 'equipe-paciente', 'meus-pacientes', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
+    mariaclara: ['central-paciente', 'equipe-chat', 'equipe-paciente', 'meus-pacientes', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
+    eduarda: ['central-paciente', 'equipe-chat', 'equipe-paciente', 'meus-pacientes', 'crm-tarefas', 'agenda', 'ficha', 'estoque', 'app', 'casos'],
+    thais: ['central-paciente', 'equipe-chat', 'equipe-paciente', 'meus-pacientes', 'crm-tarefas', 'medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
+    elenice: ['central-paciente', 'equipe-chat', 'equipe-paciente', 'meus-pacientes', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-modelos', 'crm-campanhas', 'crm-indicacoes', 'agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
   };
   function telaInicial() { return QUEM === 'andre' ? 'dia' : 'prof-' + QUEM; }
 
@@ -684,7 +688,7 @@
     clearTimeout(avisoCurto.t); avisoCurto.t = setTimeout(function () { v.remove(); }, 2800);
   }
   function perguntaIA(t) {
-    if (!t) return; E.chatIA.push(['eu', esc(t)]); render(true);
+    if (!t) return; A.log('pergunta', { chat: 'IA da equipe (tela)', texto: String(t).slice(0, 500) }); E.chatIA.push(['eu', esc(t)]); render(true);
     setTimeout(function () { E.chatIA.push(['ela', respostaEquipe(t)]); render(true); }, 600);
   }
   document.addEventListener('click', function (ev) {
@@ -711,7 +715,7 @@
     if (a === 'cancelar-sel') { E.selEvento = null; render(true); return; }
     if (a === 'pergunta-ia') { perguntaIA(v); return; }
     if (a === 'pergunta-ia-campo') { var c = document.getElementById('pergunta-ia'); perguntaIA(c.value.trim()); return; }
-    if (a === 'enviar-caixa') { var m = document.getElementById('msg-caixa'), t = m.value.trim(); if (!t) return; E.chatEquipe.push(['eq', '"' + esc(t) + '"', 'agora']); render(true); avisoCurto('Enviado pela clínica, entre aspas e sem alteração.'); return; }
+    if (a === 'enviar-caixa') { var m = document.getElementById('msg-caixa'), t = m.value.trim(); if (!t) return; A.log('pergunta', { chat: 'caixa de conversas', texto: t.slice(0, 500) }); E.chatEquipe.push(['eq', '"' + esc(t) + '"', 'agora']); render(true); avisoCurto('Enviado pela clínica, entre aspas e sem alteração.'); return; }
   });
   document.addEventListener('change', function (ev) {
     if (ev.target.dataset && ev.target.dataset.acao === 'trocar-paciente') { E.paciente = ev.target.value; render(true); }

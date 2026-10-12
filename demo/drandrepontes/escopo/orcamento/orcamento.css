@@ -1,0 +1,45 @@
+/* Orçamento: página de leitura na tela e A4 limpo na impressão. */
+.orcamento { background: var(--fundo); }
+.barra-imprimir { max-width: 860px; margin: 56px auto 0; padding: 0 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.barra-imprimir p { width: 100%; font-size: 12.5px; margin: 0; }
+#doc { max-width: 860px; margin: 0 auto; padding: 16px; display: grid; gap: 18px; }
+.capa { background: var(--superficie); border: var(--cartao-borda); border-radius: var(--raio); padding: 40px 28px; text-align: center; display: grid; justify-items: center; gap: 10px; }
+.capa h1 { font-size: clamp(32px, 6vw, 48px); }
+.capa .sub { font-size: 17px; color: var(--texto-2); }
+.capa .data { font-weight: 650; }
+.indice { text-align: left; margin: 12px 0 0; padding-left: 22px; display: grid; gap: 4px; }
+.indice a { color: var(--texto); }
+.nota-capa { font-size: 12.5px; max-width: 460px; }
+.secao { background: var(--superficie); border: var(--cartao-borda); border-radius: var(--raio); padding: 22px; display: grid; gap: 10px; }
+.secao h2 { font-size: 20px; display: flex; gap: 10px; align-items: baseline; }
+.secao h2 .num { color: var(--primaria); font-family: var(--fonte-num); }
+.secao h3 { font-size: 15px; margin-top: 8px; }
+.secao ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.resumo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 560px) { .resumo { grid-template-columns: 1fr; } }
+.resumo .grande { display: block; font-size: 26px; margin: 4px 0; }
+.lote { border-top: 1px solid var(--linha); padding-top: 8px; }
+.lote-cab { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.lote-cab em { color: var(--alerta); font-style: normal; font-weight: 650; }
+.lote p { font-size: 12.5px; margin: 4px 0 0; }
+.tirados li { font-size: 14px; }
+.grafico { width: 100%; height: auto; }
+.grafico .r { font-size: 13px; fill: var(--texto-2); }
+.grafico .v { font-size: 13px; font-weight: 700; fill: var(--texto); }
+.grafico .b { fill: var(--primaria); }
+.grafico .b.p3 { fill: var(--c3, var(--primaria)); }
+.grafico .b.recalc { fill: var(--alerta); }
+.prazos { width: 100%; border-collapse: collapse; }
+.prazos th, .prazos td { text-align: left; padding: 8px; border-bottom: 1px solid var(--linha); }
+.rodape { text-align: center; font-size: 12px; }
+@media print {
+  @page { size: A4; margin: 16mm 14mm; }
+  html, body { background: #fff !important; color: #111; }
+  .barra-imprimir, .selo-previa, .troca, .volta-demo, .troca-estilo { display: none !important; }
+  #doc { max-width: none; padding: 0; gap: 10px; }
+  .capa, .secao { border: 0; box-shadow: none; background: #fff; padding: 0; }
+  .capa { min-height: 240mm; align-content: center; break-after: page; }
+  .secao { break-inside: avoid-page; padding-top: 6mm; }
+  .grafico .b { fill: #2f6b4f; } .grafico .b.p3 { fill: #3d7ea6; } .grafico .b.recalc { fill: #b7791f; }
+  .grafico .r, .grafico .v { fill: #111; }
+}

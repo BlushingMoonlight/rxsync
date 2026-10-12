@@ -76,3 +76,6 @@
 .total-valor { font-size: clamp(24px, 4vw, 32px); font-weight: 750; line-height: 1.15; margin: 4px 0 2px; }
 .total-lista { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; color: var(--texto-2); }
 .total-lista .desconto s { color: var(--texto-3); }
+.salvo-linha { width: 100%; font-size: 12.5px; margin: 0; }
+.salvo-linha:empty { display: none; }
+.acoes-topo .botao[disabled] { opacity: .6; }

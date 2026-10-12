@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR" data-estilo="clean-claro" data-sem-selo>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f4f1ea">
+<title>Datalog · demonstração</title>
+<link rel="stylesheet" href="../comum/ds.css">
+<link rel="stylesheet" href="datalog.css">
+<script src="../comum/comum.js"></script>
+</head>
+<body>
+<main class="datalog">
+  <header class="topo-dl"><h1>Datalog da demonstração</h1><p class="mudo" id="estado">Digite a chave do banco para ver os dados.</p></header>
+  <form id="form-chave" class="chave-dl" autocomplete="off">
+    <input class="campo" type="password" name="chave" placeholder="Chave de leitura (demo_…)" aria-label="Chave de leitura">
+    <button class="botao" type="submit">Ver dados</button>
+    <button class="botao botao-claro" type="button" id="esquecer" hidden>Esquecer a chave</button>
+  </form>
+  <nav class="abas-tela" id="abas" hidden></nav>
+  <div id="conteudo"></div>
+</main>
+<script src="datalog.js"></script>
+</body>
+</html>

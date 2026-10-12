@@ -21,10 +21,13 @@
   <section class="painel-fixo" aria-label="Contador e ações">
     <div class="contador" id="contador"></div>
     <div class="acoes-topo">
-      <button class="botao" type="button" id="copiar">Copiar resumo da reunião</button>
+      <button class="botao" type="button" id="salvar">Salvar e enviar à RXSync</button>
+      <a class="botao botao-claro" id="pdf" href="orcamento/" data-leva-estilo style="text-decoration:none">Baixar orçamento em PDF</a>
+      <button class="botao botao-claro" type="button" id="copiar">Copiar resumo da reunião</button>
       <button class="botao botao-claro" type="button" id="precos">Mostrar preços</button>
       <button class="botao botao-claro" type="button" id="limpar">Limpar marcações</button>
     </div>
+    <p class="fraco salvo-linha" id="salvo" aria-live="polite"></p>
   </section>
 
   <section class="filtros" aria-label="Busca e filtros">
@@ -48,6 +51,7 @@
 </main>
 <script src="dados.js"></script>
 <script src="telas.js"></script>
+<script src="calculo.js"></script>
 <script src="escopo.js"></script>
 </body>
 </html>
