@@ -25,7 +25,8 @@
   };
   var TIPOS = {
     consulta: ['Consultas', 'estetoscopio', 'var(--c1)'], app: ['Registros do app', 'evolucao', 'var(--c2)'], balanca: ['Balança', 'balanca', 'var(--c3)'],
-    exame: ['Exames', 'documento', 'var(--c4)'], conversa: ['Conversas', 'chat', 'var(--c5)'], pagamento: ['Pagamentos', 'moeda', 'var(--c6)'], aplicacao: ['Aplicações', 'seringa', 'var(--info)']
+    exame: ['Exames', 'documento', 'var(--c4)'], conversa: ['Conversas', 'chat', 'var(--c5)'], pagamento: ['Pagamentos', 'moeda', 'var(--c6)'], aplicacao: ['Aplicações', 'seringa', 'var(--info)'],
+    interacao: ['Ligações e orçamentos', 'telefone', 'var(--c2)']
   };
   var PSICO = { 'P-DEMO3': '11/10', 'P-DEM12': '13/10' };
 
@@ -47,6 +48,7 @@
       ['22/09', '09:45', 'balanca', 'Bioimpedância: 80,2 kg · 36,9% de gordura', ''],
       ['15/09', '14:00', 'consulta', 'Nutrição com o Felipe', 'plano alimentar enviado ao app'],
       ['01/09', '09:00', 'consulta', 'Primeira consulta com o Dr. André', 'ficha v3'],
+      ['30/08', '11:00', 'interacao', 'Ligação: confirmou a primeira consulta', 'Elenice'],
       ['28/08', '18:40', 'conversa', 'Primeiro contato pelo WhatsApp', 'ID P-DEMO7 criado pela IA']];
     else if (p.status === 'Novo contato') l = [
       ['13/10', '08:12', 'conversa', 'Perguntou o preço da primeira consulta', 'respondida pela IA com os preços cadastrados'],
@@ -67,6 +69,7 @@
       if (id === 'P-DEMO5') l.unshift(['13/10', '07:42', 'app', 'Sintoma: náusea forte, 2 dias depois da aplicação', 'enfermagem avisada às 07:42']);
       if (id === 'P-DEM12') l.unshift(['12/10', '20:05', 'balanca', 'Peso no app: 90,7 kg (−2,4 kg em 7 dias)', 'alerta para o médico']);
     }
+    if (id === 'P-DEMO6') l.unshift(['13/10', '08:30', 'interacao', 'Orçamento do acompanhamento de 3 meses enviado', 'Emanuele']);
     if (PSICO[id]) l.splice(1, 0, [PSICO[id], '11:00', 'consulta', 'Psicologia com a Maria Clara', 'psicologia']);
     return (LINHA[id] = l);
   }
@@ -138,16 +141,16 @@
       '<div class="grade">' +
         cartao('<div class="linha-ic"><span class="pessoa" style="background:var(--c3);width:52px;height:52px;font-size:17px">' + iniciais(p.id) + '</span>' +
           '<div class="meio"><h2 style="font-size:20px">' + p.nome + '</h2><div class="fraco" style="font-size:12.5px"><span class="idp">' + p.id + '</span> · ' + p.idade + ' anos · ' + foneBonito(fone(p.id)) + '</div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' + P.st(p.status) + '<span class="chip">' + p.fase + '</span><span class="chip">' + p.prof + '</span></div></div></div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' + P.st(p.status) + '<span class="chip">' + p.fase + '</span><span class="chip">' + p.prof + '</span></div>' + (P.crm ? P.crm.chips(p.id) : '') + '</div></div>' +
           '<div class="estado-app"><span class="ponto" style="background:' + (app[0] ? 'var(--ok)' : 'var(--texto-3)') + '"></span><div><b>' + (app[0] ? 'App conectado' : 'App não conectado') + '</b><div class="fraco" style="font-size:12.5px">Último acesso: ' + app[1] + '</div></div></div>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' + botao(A.ic('chat') + 'Mandar mensagem', 'msg', p.id) +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' + botao(A.ic('chat') + 'Mandar mensagem', 'msg', p.id) + botao(A.ic('telefone') + 'Registrar interação', 'interacao', p.id, true) +
           (QUEM === 'andre' ? botao(A.ic('estetoscopio') + 'Iniciar consulta', 'iniciar', p.id, true) : '') +
           '<a class="botao botao-claro" href="#ficha" data-acao="abrir-ficha" data-v="' + p.id + '" style="text-decoration:none">Abrir ficha</a></div>', 's7') +
         cartao(titulo('Alertas', A.item([135, 129])) + (al.length ? al.map(function (a) {
           return '<div class="alerta-lin" style="--cor:' + a[1] + '">' + A.bolha('alerta', a[1]) + '<div><b>' + a[0] + '</b></div></div>';
         }).join('') : '<p class="mudo" style="font-size:13.5px">Nenhum alerta para este paciente.</p>'), 's5') +
       '</div>' +
-      cartao(titulo('Linha do tempo', A.item([191, 134, 72, 136, 89, 124])) +
+      cartao(titulo('Linha do tempo', A.item([191, 183, 134, 72, 136, 89, 124])) +
         '<div class="abas-tela" style="margin-bottom:12px"><button type="button" data-c="filtro" data-v="" class="' + (C.filtro ? '' : 'ativo') + '">Tudo</button>' +
           Object.keys(TIPOS).map(function (k) { return '<button type="button" data-c="filtro" data-v="' + k + '" class="' + (C.filtro === k ? 'ativo' : '') + '">' + TIPOS[k][0] + '</button>'; }).join('') + '</div>' +
         (itens.length ? '<ol class="linha-tempo">' + itens.map(function (x) {
@@ -341,6 +344,7 @@
   };
 
   // ---------- quadro da Visão do dia (Dr. André) ----------
+  P.linhaPaciente = linha;
   P.quadroCentral = function () {
     var prox = P.E.eventos.filter(function (e) { return e.prof === 'Dr. André' && e.dia >= 1; }).sort(function (a, b) { return a.dia - b.dia || a.slot - b.slot; }).slice(0, 4);
     return cartao('<div class="quadro-cab"><div><span class="rotulo">Central do paciente</span><h2 style="font-size:20px">Encontre qualquer paciente</h2></div><div class="itens">' + A.item([191, 165]) + '</div></div>' +
@@ -358,6 +362,7 @@
     var app = APP[id][0], f = document.createElement('div'); f.className = 'folha-fundo';
     f.innerHTML = '<form class="folha"><h2 style="font-size:20px">Mensagem para ' + nome(id) + '</h2>' +
       '<div class="opcoes"><label class="chip"><input type="radio" name="canal" value="app"' + (app ? ' checked' : ' disabled') + '> Pelo app' + (app ? '' : ' (não conectado)') + '</label><label class="chip"><input type="radio" name="canal" value="whatsapp"' + (app ? '' : ' checked') + '> Pelo WhatsApp</label></div>' +
+      (P.crm ? P.crm.seletorModelo(id) : '') +
       '<label><span class="rotulo">Mensagem</span><textarea class="campo" name="t" placeholder="Escreva a mensagem"></textarea></label>' +
       '<p class="nota">Vai ao paciente entre aspas e sem alteração, com o nome de quem enviou.</p>' +
       '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="botao botao-claro" data-fechar>Cancelar</button><button type="submit" class="botao">Enviar</button></div></form>';
@@ -371,6 +376,22 @@
     });
     f.querySelector('textarea').focus();
   }
+  // Item 183: ligação, orçamento ou anotação entram na mesma linha do tempo.
+  function interacao(id) {
+    var f = document.createElement('div'); f.className = 'folha-fundo';
+    f.innerHTML = '<form class="folha"><h2 style="font-size:20px">Registrar interação · ' + nome(id) + '</h2>' +
+      '<label><span class="rotulo">Tipo</span><select class="campo" name="tipo"><option>Ligação</option><option>Orçamento enviado</option><option>Anotação</option></select></label>' +
+      '<label><span class="rotulo">O que aconteceu</span><textarea class="campo" name="t" placeholder="Ex.: ligou para saber do preço do acompanhamento"></textarea></label>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="botao botao-claro" data-fechar>Cancelar</button><button type="submit" class="botao">Registrar</button></div></form>';
+    document.body.appendChild(f);
+    f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
+    f.querySelector('form').addEventListener('submit', function (ev) {
+      ev.preventDefault(); var d = new FormData(ev.target), t = String(d.get('t') || '').trim(); if (!t) return;
+      linha(id).unshift(['13/10', 'agora', 'interacao', esc(d.get('tipo')) + ': ' + esc(t.slice(0, 300)), P.EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André')]);
+      f.remove(); C.filtro = ''; P.render(true); P.avisoCurto('Interação registrada na linha do tempo.');
+    });
+    f.querySelector('textarea').focus();
+  }
   function iniciar(id) {
     parar(); C.cons = { pac: id, etapa: 'aceite', n: 0, seg: 0, pausa: false, campos: null, revisei: false, versao: 0 };
     C.ex.etapa = 'inicio'; C.doc.revisei = false; abrir('#central');
@@ -379,6 +400,7 @@
     'abrir-pac': function (v) { C.pac = v; C.filtro = ''; C.busca = ''; abrir('#central-paciente'); },
     'filtro': function (v) { C.filtro = v; P.render(true); },
     'msg': function (v) { mensagem(v); },
+    'interacao': function (v) { interacao(v); },
     'iniciar': iniciar,
     'cons-iniciar': function () { iniciar(C.cons.pac); },
     'cons-aceitou': function () {
@@ -431,6 +453,7 @@
     'sintese': function () { C.sintese = true; P.render(true); },
     'aviso': function (v) { P.avisoCurto(v); }
   };
+  P.abrirPaciente = AC['abrir-pac'];
   document.addEventListener('click', function (ev) {
     var el = ev.target.closest('[data-c]'); if (!el || !AC[el.dataset.c] || el.disabled) return;
     ev.preventDefault(); AC[el.dataset.c](el.dataset.v, el);
