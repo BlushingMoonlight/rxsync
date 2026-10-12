@@ -51,7 +51,7 @@
   // ---------- preços ----------
   // Valores fora do dados.js (do escopo oficial, "Visão geral"), com a decisão de 12/10/2026: o Projeto 1 entra como desconto.
   var P1 = { implantacao: 999, mensal: 599 };
-  var MENSAL = { 2: 1500, 3: { porPaciente: 9, minimo: 300 } };
+  var MENSAL = { 2: 1500, 3: { porPaciente: 9 } };   // Projeto 3 sem mínimo (decisão de 12/10/2026)
   var BLOCO_VC = ['A9', 'A10', 'A11'], VC_VALOR = 20000;
   function reais(n) { return 'R$ ' + Number(n).toLocaleString('pt-BR'); }
   function valorLote(l) {
@@ -89,12 +89,12 @@
     if (!A.precoVisivel()) return '<section class="cartao total-escopo"><h2>Total</h2><p class="mudo">Preços ocultos para a apresentação.</p><button type="button" class="botao" data-preco="mostrar">Mostrar preços</button></section>';
     var c = conta(), mens = [];
     if (c.ativo[2]) mens.push(['Projeto 2 · Gestão interna', reais(MENSAL[2]) + ' + IA por consumo']);
-    if (c.ativo[3]) mens.push(['Projeto 3 · App', reais(MENSAL[3].porPaciente) + ' por paciente ativo (mínimo ' + reais(MENSAL[3].minimo) + ') + IA por consumo']);
-    var minimoMes = (c.ativo[2] ? MENSAL[2] : 0) + (c.ativo[3] ? MENSAL[3].minimo : 0);
+    if (c.ativo[3]) mens.push(['Projeto 3 · App', reais(MENSAL[3].porPaciente) + ' por paciente ativo + IA por consumo']);
+    var mensal = [c.ativo[2] ? reais(MENSAL[2]) : '', c.ativo[3] ? reais(MENSAL[3].porPaciente) + ' por paciente ativo' : ''].filter(Boolean).join(' + ');
     return '<section class="cartao total-escopo"><div class="total-cab"><h2>Total</h2><button type="button" class="mini-botao" data-preco="ocultar">Ocultar preços</button></div>' +
       '<div class="total-grade">' +
         '<div><span class="rotulo">Implantação</span><div class="total-valor num">' + reais(c.imp) + '</div><small class="fraco">Projetos 2 e 3, lotes com preço</small></div>' +
-        '<div><span class="rotulo">Mensalidade</span><div class="total-valor num">' + (mens.length ? 'a partir de ' + reais(minimoMes) : '—') + '</div><small class="fraco">' + (mens.length ? 'por mês + IA por consumo' : 'nenhum projeto incluído') + '</small></div>' +
+        '<div><span class="rotulo">Mensalidade</span><div class="total-valor num">' + (mensal || '—') + '</div><small class="fraco">' + (mens.length ? 'por mês + IA por consumo' : 'nenhum projeto incluído') + '</small></div>' +
       '</div>' +
       (mens.length ? '<ul class="total-lista">' + mens.map(function (m) { return '<li><b>' + m[0] + ':</b> ' + m[1] + '</li>'; }).join('') + '</ul>' : '') +
       '<ul class="total-lista">' +
@@ -180,7 +180,7 @@
     var grupo = function (t, f) { var l = D.itens.filter(f); return t + ' (' + l.length + ')\n' + (l.length ? l.map(linha).join('\n') : '- nenhum') + '\n'; };
     var rec = D.lotes.map(function (l) { var p = l.projeto === 1 ? '' : loteParcial(l.id); return p ? '- ' + l.nome + (A.precoVisivel() ? ' (' + l.preco + ')' : '') + ': ' + p : ''; }).filter(Boolean);
     var c = conta(), tot = A.precoVisivel() ? 'TOTAL\n- Implantação: ' + reais(c.imp) + ' (Projetos 2 e 3)\n' +
-      (c.ativo[2] ? '- Mensalidade do Projeto 2: ' + reais(MENSAL[2]) + ' + IA por consumo\n' : '') + (c.ativo[3] ? '- Mensalidade do Projeto 3: ' + reais(MENSAL[3].porPaciente) + ' por paciente ativo (mínimo ' + reais(MENSAL[3].minimo) + ') + IA por consumo\n' : '') +
+      (c.ativo[2] ? '- Mensalidade do Projeto 2: ' + reais(MENSAL[2]) + ' + IA por consumo\n' : '') + (c.ativo[3] ? '- Mensalidade do Projeto 3: ' + reais(MENSAL[3].porPaciente) + ' por paciente ativo + IA por consumo\n' : '') +
       '- Projeto 1: desconto (' + reais(P1.implantacao) + ' de implantação e ' + reais(P1.mensal) + ' por mês riscados)\n' + (c.duvidas ? '- ' + c.duvidas + ' item(ns) em dúvida entram na soma\n' : '') +
       (c.semPreco.length ? '- Fora da soma (preço a definir): ' + c.semPreco.join(', ') + '\n' : '') + '\n' : '';
     return 'Reunião com o Dr. André · Clínica Evoluir\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n\n' +
