@@ -278,6 +278,8 @@
 
   // ======================= EDUARDA · TÉCNICA DE ENFERMAGEM =======================
   function estoqueTotal() { return F.lotes.reduce(function (s, l) { return s + l.qtd; }, 0); }
+  // Para o erp.js (agenda, financeiro e estoque completos), carregado depois deste arquivo.
+  P.F = F; P.estoqueTotal = estoqueTotal; P.reais = reais;
   T['prof-eduarda'] = function () {
     var feitas = F.aplicacoes.filter(function (a) { return a.st === 'feita'; }).length;
     return cabProf('eduarda', 'aplicações, bioimpedância, sinais vitais e estoque.', A.item([90, 72, 173, 174])) +
@@ -326,17 +328,17 @@
   };
   T['emanuele-receber'] = function () {
     var ST = { aberto: ['st-in', 'em aberto'], atraso: ['st-pe', 'em atraso'], pago: ['st-ok', 'pago'] };
-    return cab('Contas a receber', 'Cobranças dos pacientes por Pix ou cartão, com lembrete antes e depois do vencimento. Valores de exemplo.', A.item([87, 88, 89])) +
+    return cab('Contas a receber', 'Cobranças dos pacientes por Pix ou cartão, com lembrete antes e depois do vencimento. Valores de exemplo.', A.item([87, 88, 89, 198])) + (P.abasFin ? P.abasFin('emanuele-receber') : '') +
       '<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + kpi('Recebido no mês', reais(F.recebidoMes), 'Pix, cartão e boleto', 'sobe') + kpi('Em aberto', reais(soma(F.receber, function (r) { return r.st === 'aberto'; })), '', '') + kpi('Em atraso', reais(soma(F.receber, function (r) { return r.st === 'atraso'; })), '', 'desce') + '</div>' +
       cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Paciente</th><th>O quê</th><th>Valor</th><th>Vence</th><th>Situação</th><th></th></tr>' +
         F.receber.map(function (r) {
           return '<tr><td><b>' + nome(r.pac) + '</b></td><td>' + r.desc + '</td><td class="num">' + reais(r.valor) + '</td><td class="num">' + r.venc + '</td><td><span class="status ' + ST[r.st][0] + '">' + ST[r.st][1] + '</span></td><td style="white-space:nowrap">' +
-            (r.st === 'pago' ? '' : botao('Link de pagamento', 'cobrar', r.id, true) + ' ' + botao('Lembrete', 'lembrar', r.id, true) + ' ' + botao('Recebido', 'recebido', r.id)) + '</td></tr>';
+            (r.st === 'pago' ? (P.reciboBtn ? P.reciboBtn(r) : '') : botao('Link de pagamento', 'cobrar', r.id, true) + ' ' + botao('Lembrete', 'lembrar', r.id, true) + ' ' + botao('Recebido', 'recebido', r.id)) + '</td></tr>';
         }).join('') + '</table></div>');
   };
   T['emanuele-pagar'] = function () {
     var entra = F.recebidoMes + soma(F.receber, function (r) { return r.st !== 'pago'; }), sai = soma(F.pagar, function () { return true; }), max = Math.max(entra, sai);
-    return cab('Contas a pagar e fluxo de caixa', 'Amplia o ERP: além de cobrar os pacientes, as despesas da clínica e o saldo previsto do mês. Valores de exemplo.', A.item(178)) +
+    return cab('Contas a pagar e fluxo de caixa', 'Amplia o ERP: além de cobrar os pacientes, as despesas da clínica e o saldo previsto do mês. Valores de exemplo.', A.item(178)) + (P.abasFin ? P.abasFin('emanuele-pagar') : '') +
       '<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + kpi('Entradas do mês', reais(entra), 'recebido + a receber', 'sobe') + kpi('Saídas do mês', reais(sai), 'pagas + a pagar', '') + kpi('Saldo previsto', reais(entra - sai), 'outubro', entra - sai >= 0 ? 'sobe' : 'desce') + '</div>' +
       '<div class="grade">' +
         cartao(titulo('Despesas', A.item(178)) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Despesa</th><th>Categoria</th><th>Valor</th><th>Vence</th><th></th></tr>' +
@@ -349,7 +351,7 @@
       '</div>';
   };
   T['emanuele-repasse'] = function () {
-    return cab('Repasse por profissional', 'Produção do mês e repasse conforme a regra combinada com a clínica (regras de exemplo).', A.item(179)) +
+    return cab('Repasse por profissional', 'Produção do mês e repasse conforme a regra combinada com a clínica (regras de exemplo).', A.item(179)) + (P.abasFin ? P.abasFin('emanuele-repasse') : '') +
       cartao('<div class="rolar-x"><table class="tabela-larga"><tr><th>Profissional</th><th>Atendimentos</th><th>Produção</th><th>Regra</th><th>Repasse</th><th></th></tr>' +
         F.repasse.map(function (r, i) {
           return '<tr><td><b>' + r.prof + '</b></td><td class="num">' + r.atend + '</td><td class="num">' + reais(r.prod) + '</td><td>' + (r.regra === 1 ? 'sócio · sem repasse' : Math.round(r.regra * 100) + '% da produção') + '</td><td class="num">' + (r.regra === 1 ? '—' : reais(r.prod * r.regra)) + '</td><td>' +
@@ -463,7 +465,8 @@
           var lt = F.lotes.filter(function (l) { return l.lote === d.get('lote'); })[0]; if (!lt) return false;
           a.st = 'feita'; a.local = d.get('local'); a.lote = lt.lote; lt.qtd -= 1;
           (F.rodizio[a.pac] = F.rodizio[a.pac] || []).unshift(a.local); F.rodizio[a.pac] = F.rodizio[a.pac].slice(0, 3);
-          P.avisoCurto('Aplicação registrada: ' + a.local + ', lote ' + lt.lote + '. Estoque: ' + estoqueTotal() + ' frascos.'); P.render(true);
+          var extra = P.aoAplicar ? P.aoAplicar(a.pac, lt.lote) : '';
+          P.avisoCurto('Aplicação registrada: ' + a.local + ', lote ' + lt.lote + '. Estoque: ' + estoqueTotal() + ' frascos.' + (extra || '')); P.render(true);
         }, 'Registrar');
     },
     'bio': function (v) { var b = achar(F.bio, v); b.st = 'importada'; b.v = b.pac === 'P-DEMO9' ? '84,0 kg · 38,1% gordura' : '72,5 kg · 33,0% gordura'; P.avisoCurto('Medidas importadas da balança para a ficha.'); },
@@ -473,7 +476,7 @@
     },
     'cobrar': function (v) { P.avisoCurto('Link de Pix e cartão enviado a ' + nome(achar(F.receber, v).pac) + ' pelo WhatsApp (simulado).'); },
     'lembrar': function (v) { P.avisoCurto('Lembrete de pagamento enviado a ' + nome(achar(F.receber, v).pac) + ' (simulado).'); },
-    'recebido': function (v) { var r = achar(F.receber, v); r.st = 'pago'; F.recebidoMes += r.valor; P.avisoCurto('Baixa feita: ' + reais(r.valor) + ' de ' + nome(r.pac) + '.'); },
+    'recebido': function (v) { var r = achar(F.receber, v); r.st = 'pago'; r.forma = r.forma || 'Pix'; r.pagoEm = '13/10'; F.recebidoMes += r.valor; P.avisoCurto('Baixa feita: ' + reais(r.valor) + ' de ' + nome(r.pac) + '.'); },
     'pagar': function (v) { achar(F.pagar, v).st = 'pago'; },
     'despesa-nova': function () {
       folha('Nova despesa', campo('Despesa', '<input class="campo" name="desc" placeholder="Ex.: manutenção do ar">') + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + campo('Valor (R$)', '<input class="campo" name="valor" inputmode="decimal" value="500">') + campo('Vence', '<input class="campo" name="venc" value="25/10">') + '</div>' +
@@ -489,7 +492,11 @@
     'confirmou': function (v) { achar(F.confirmar, v).st = 'confirmada'; },
     'encaixar': function (v) {
       var f = achar(F.fila, v), livres = [];
-      for (var s = 8; s < 18; s++) if (!P.E.eventos.some(function (e) { return e.dia === 2 && e.slot === s; })) livres.push(s);
+      var quemAtende = f.prof === 'Felipe' ? 'Felipe' : 'Dr. André';
+      for (var s = 8; s < 18; s++) {
+        var teste = { id: 0, dia: 2, slot: s, pac: nome(f.pac), tipo: 'Retorno · 30 min', prof: quemAtende };
+        if (P.conflito ? !P.conflito(2, s, teste) : !P.E.eventos.some(function (e) { return e.dia === 2 && e.slot === s; })) livres.push(s);
+      }
       folha('Encaixar ' + nome(f.pac), campo('Horário (quarta, 14/10)', '<select class="campo" name="slot">' + livres.map(function (s) { return '<option value="' + s + '">' + P.HORAS[s] + '</option>'; }).join('') + '</select>'), function (d) {
         var s = +d.get('slot');
         P.E.eventos.push({ id: P.E.proxId++, dia: 2, slot: s, pac: nome(f.pac), tipo: 'Retorno · 30 min', prof: f.prof === 'Felipe' ? 'Felipe' : 'Dr. André' });

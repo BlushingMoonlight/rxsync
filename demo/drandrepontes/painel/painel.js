@@ -33,7 +33,8 @@
     { grupo: 'ERP', itens: [
       { id: 'agenda', nome: 'Agenda', ic: 'calendario' },
       { id: 'ficha', nome: 'Ficha e balança', ic: 'documento' },
-      { id: 'financeiro', nome: 'Financeiro e estoque', ic: 'moeda' },
+      { id: 'financeiro', nome: 'Financeiro', ic: 'moeda' },
+      { id: 'estoque', nome: 'Estoque', ic: 'pilula' },
       { id: 'ia-equipe', nome: 'IA da equipe e manual', ic: 'ia' },
       { id: 'config', nome: 'Configurações', ic: 'engrenagem' }] },
     { grupo: 'App do paciente', itens: [
@@ -106,7 +107,7 @@
   function pac(id) { return PACIENTES.filter(function (p) { return p.id === id; })[0] || PACIENTES[0]; }
   function pacPorNome(n) { return PACIENTES.filter(function (p) { return p.nome === n; })[0]; }
   function linkPac(p) { return '<a href="#ficha" data-acao="abrir-ficha" data-v="' + p.id + '" style="text-decoration:none;color:inherit"><b>' + p.nome + '</b></a> <span class="idp">' + p.id + '</span>'; }
-  function st(t) { var m = { 'Em tratamento': 'st-ok', 'Agendado': 'st-in', 'Novo contato': 'st-in', 'Retorno vencido': 'st-al', 'Inativo': 'st-pe' }; return '<span class="status ' + (m[t] || 'st-in') + '">' + t + '</span>'; }
+  function st(t) { var m = { 'Em tratamento': 'st-ok', 'Agendado': 'st-in', 'Novo contato': 'st-in', 'Retorno vencido': 'st-al', 'Inativo': 'st-pe' }; return '<span class="status ' + (m[t] || 'st-in') + '">' + esc(t) + '</span>'; }
   function chave(on) { return '<button type="button" class="chave' + (on ? ' on' : '') + '" data-acao="chave" aria-label="Ligar ou desligar"></button>'; }
   function funcao(nome, sub, itens, on, trava) {
     return '<div class="lin"><div class="meio"><b>' + nome + '</b> ' + (itens || '') + '<small>' + (sub || '') + '</small></div>' + (trava ? A.sempre() : chave(on)) + '</div>';
@@ -315,16 +316,21 @@
     // ===== ERP =====
     agenda: function () {
       var evs = E.eventos.filter(function (e) { return !E.filtroProf || e.prof === E.filtroProf; });
-      var cel = '<div></div>' + DIAS.map(function (d, i) { return '<div class="cab-dia">' + d + (i === 0 ? ' <span class="status st-pe" style="font-size:10px">feriado</span>' : '') + '</div>'; }).join('');
+      var cel = '<div></div>' + DIAS.map(function (d, i) { return '<div class="cab-dia">' + d + (i === 0 ? ' <span class="status st-pe" style="font-size:10px">feriado</span>' : '') + (PAINEL.chipDia ? PAINEL.chipDia(i, E.filtroProf) : '') + '</div>'; }).join('');
       HORAS.forEach(function (hh, s) {
         cel += '<div class="hora">' + hh + '</div>';
         for (var d = 0; d < 5; d++) {
-          var ev = evs.filter(function (e) { return e.dia === d && e.slot === s; })[0];
-          cel += '<div class="vaga' + (d === 0 ? ' bloq' : '') + '" data-dia="' + d + '" data-slot="' + s + '">' +
-            (ev ? '<div class="evento' + (E.selEvento === ev.id ? ' sel' : '') + '" data-evento="' + ev.id + '" style="--cor:' + corProf(ev.prof) + '"><b>' + ev.pac + '</b><span>' + ev.tipo.split(' · ')[0] + ' · ' + ev.prof + '</span></div>' : '') + '</div>';
+          var aqui = evs.filter(function (e) { return e.dia === d && e.slot === s; }), n = aqui.length;
+          var marca = d > 0 && PAINEL.marcaVaga ? PAINEL.marcaVaga(d, s, E.filtroProf) : null;
+          cel += '<div class="vaga' + (d === 0 ? ' bloq' : '') + (marca ? ' ' + marca.cls : '') + '" data-dia="' + d + '" data-slot="' + s + '"' + (marca ? ' title="' + esc(marca.titulo) + '"' : '') + '>' + (marca ? marca.html : '') +
+            aqui.map(function (ev, i) {
+              var lado = n > 1 ? ';left:calc(3px + ' + i + ' * (100% - 6px) / ' + n + ');right:auto;width:calc((100% - 6px) / ' + n + ' - 2px)' : '';
+              return '<div class="evento' + (E.selEvento === ev.id ? ' sel' : '') + (n > 1 ? ' estreito' : '') + '" data-evento="' + ev.id + '" style="--cor:' + corProf(ev.prof) + lado + '"><b>' + esc(ev.pac) + '</b><span>' + ev.tipo.split(' · ')[0] + ' · ' + ev.prof + '</span></div>';
+            }).join('') + '</div>';
         }
       });
-      return cab('Agenda', 'Semana de 12 a 16 de outubro. Toque num horário livre para marcar; arraste uma consulta (ou toque nela e depois no horário novo) para mover.', A.item([50, 51, 52, 79, 8])) +
+      return cab('Agenda', 'Semana de 12 a 16 de outubro. Toque num horário livre para marcar; arraste uma consulta (ou toque nela e depois no horário novo) para mover.', A.item([50, 51, 52, 79, 8, 188, 189])) +
+        (PAINEL.abasAgenda ? PAINEL.abasAgenda('agenda') : '') +
         '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between">' +
           '<div class="abas-tela"><button type="button" data-acao="filtro" data-v="" class="' + (E.filtroProf ? '' : 'ativo') + '">Todos</button>' + PROFS.map(function (p) { return '<button type="button" data-acao="filtro" data-v="' + p[0] + '" class="' + (E.filtroProf === p[0] ? 'ativo' : '') + '"><span class="ponto" style="background:' + p[1] + ';margin-right:6px"></span>' + p[0] + '</button>'; }).join('') + '</div>' +
           '<div style="display:flex;gap:8px"><button class="botao botao-claro" type="button" data-acao="melhor">' + A.ic('ia') + 'Melhor horário ' + A.item(79) + '</button><button class="botao" type="button" data-acao="nova">' + A.ic('mais') + 'Marcar</button></div>' +
@@ -524,10 +530,10 @@
   // O Dr. André vê tudo. Cada outra pessoa vê o próprio painel e o que é da função dela.
   var QUEM = (function () { var q = new URLSearchParams(location.search).get('quem'); return Object.prototype.hasOwnProperty.call(EQUIPE, q) ? q : 'andre'; })();
   var MENU_FUNCAO = {
-    emanuele: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-campanhas', 'crm-indicacoes', 'financeiro', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
+    emanuele: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-campanhas', 'crm-indicacoes', 'financeiro', 'estoque', 'pacientes', 'funil', 'casos', 'conversas', 'agenda', 'consumo', 'seguranca'],
     felipe: ['central-paciente', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
     mariaclara: ['central-paciente', 'crm-tarefas', 'pacientes', 'agenda', 'ficha', 'casos', 'conversas'],
-    eduarda: ['central-paciente', 'crm-tarefas', 'agenda', 'ficha', 'financeiro', 'app', 'casos'],
+    eduarda: ['central-paciente', 'crm-tarefas', 'agenda', 'ficha', 'estoque', 'app', 'casos'],
     thais: ['central-paciente', 'crm-tarefas', 'medico', 'agenda', 'ficha', 'app', 'casos', 'conversas'],
     elenice: ['central-paciente', 'crm-tarefas', 'crm-origens', 'crm-segmentos', 'crm-modelos', 'crm-campanhas', 'crm-indicacoes', 'agenda', 'pacientes', 'funil', 'conversas', 'atendimento', 'agenda-ia', 'relacionamento']
   };
@@ -609,10 +615,15 @@
     raiz.addEventListener('pointerup', fim);
     raiz.addEventListener('pointercancel', function () { if (fantasma) fantasma.remove(); if (el) el.classList.remove('arrastando'); el = null; fantasma = null; });
   }
+  // Conflito de horário: o erp.js troca pela regra completa (profissional, sala, equipamento e bloqueios).
+  function conflito(dia, slot, ev) {
+    if (PAINEL.conflito) return PAINEL.conflito(dia, slot, ev);
+    return E.eventos.some(function (e) { return e.dia === dia && e.slot === slot && e.id !== ev.id; }) ? 'Esse horário já está ocupado.' : '';
+  }
   function moverEvento(id, dia, slot) {
     var ev = E.eventos.filter(function (e) { return e.id === id; })[0];
     if (dia === 0) { avisoCurto('Segunda, 12/10, é feriado: horário bloqueado.'); return; }
-    if (E.eventos.some(function (e) { return e.dia === dia && e.slot === slot && e.id !== id; })) { avisoCurto('Esse horário já está ocupado.'); return; }
+    var c = conflito(dia, slot, ev); if (c) { avisoCurto(c); return; }
     ev.dia = dia; ev.slot = slot; E.selEvento = null; render(true);
     avisoCurto(ev.pac + ' movida para ' + DIAS[dia] + ' às ' + HORAS[slot] + '. O paciente recebe o aviso (simulado).');
   }
@@ -644,14 +655,16 @@
       '<label><span class="rotulo">Profissional</span><select class="campo" name="prof">' + PROFS.map(function (p) { return '<option>' + p[0] + '</option>'; }).join('') + '</select></label>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label><span class="rotulo">Dia</span><select class="campo" name="dia">' + opDia + '</select></label><label><span class="rotulo">Hora</span><select class="campo" name="slot">' + opHora + '</select></label></div>' +
       '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px"><button type="button" class="botao botao-claro" data-fechar>Cancelar</button><button type="submit" class="botao">Marcar</button></div>' +
-      '<p class="nota">' + A.item(51) + ' A mesma agenda que a IA usa.</p></form>';
+      '<p class="nota">' + A.item(51) + ' A mesma agenda que a IA usa.' + (PAINEL.notaMarcar ? ' ' + PAINEL.notaMarcar() : '') + '</p></form>';
     document.body.appendChild(f);
     f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
     f.querySelector('form').addEventListener('submit', function (ev) {
       ev.preventDefault(); var d = new FormData(ev.target), di = Number(d.get('dia')), sl = Number(d.get('slot'));
-      if (E.eventos.some(function (e) { return e.dia === di && e.slot === sl; })) { avisoCurto('Esse horário já está ocupado.'); return; }
-      E.eventos.push({ id: E.proxId++, dia: di, slot: sl, pac: d.get('pac'), tipo: d.get('tipo'), prof: d.get('prof') });
-      f.remove(); render(true); avisoCurto('Consulta marcada: ' + d.get('pac') + ', ' + DIAS[di] + ' às ' + HORAS[sl] + '.');
+      var nova = { id: E.proxId, dia: di, slot: sl, pac: d.get('pac'), tipo: d.get('tipo'), prof: d.get('prof') };
+      var c = conflito(di, sl, nova); if (c) { avisoCurto(c); return; }
+      E.proxId++; E.eventos.push(nova);
+      var extra = PAINEL.aoMarcar ? PAINEL.aoMarcar(nova) : '';
+      f.remove(); render(true); avisoCurto('Consulta marcada: ' + d.get('pac') + ', ' + DIAS[di] + ' às ' + HORAS[sl] + '.' + (extra || ''));
     });
   }
 
@@ -708,6 +721,7 @@
     el.innerHTML = TELAS[id] ? TELAS[id]() : emBreve(id);
     el.className = 'principal' + (manter ? '' : ' entra');
     var menuId = id.indexOf('prof-') === 0 && id !== 'prof-' + QUEM ? 'profissionais' : id.indexOf('central-') === 0 && id !== 'central-paciente' ? 'central' : id;
+    if (PAINEL.menuPai && !document.querySelector('.menu a[data-tela="' + id + '"]')) menuId = PAINEL.menuPai(id) || menuId;
     document.querySelectorAll('.menu a').forEach(function (a) { a.classList.toggle('ativo', a.dataset.tela === menuId); });
     document.querySelector('.casca').classList.remove('menu-aberto');
     ligarArrastar(id);
