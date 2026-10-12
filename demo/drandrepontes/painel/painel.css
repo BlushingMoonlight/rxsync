@@ -101,3 +101,88 @@ body.painel { min-height: 100vh; }
 .kpi .valor { white-space: nowrap; }
 [data-estilo="cyber"] .kpi .valor { font-size: clamp(26px, 2.6vw, 40px); }
 @media (max-width: 1023px) { .menu { box-shadow: none; } .casca.menu-aberto .menu { box-shadow: var(--sombra-g); } }
+
+/* ===== Telas do painel completo (PR 3) ===== */
+.sub { color: var(--texto-3); font-size: 13px; margin-top: 4px; }
+.cabeca .itens { margin-top: 6px; }
+.abas-tela { display: flex; gap: 6px; flex-wrap: wrap; }
+.abas-tela button, .abas-tela a { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--texto-2); background: var(--superficie); border: 1px solid var(--linha); text-decoration: none; }
+.abas-tela .ativo { background: var(--primaria); color: var(--sobre-primaria); border-color: transparent; }
+[data-estilo="cyber"] .abas-tela button, [data-estilo="cyber"] .abas-tela a { border-radius: 2px; font-family: var(--fonte-mono); font-size: 12px; }
+.tabela-larga { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.tabela-larga th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--texto-3); padding: 0 10px 8px 0; }
+[data-estilo="cyber"] .tabela-larga th { font-family: var(--fonte-mono); }
+.tabela-larga td { padding: 11px 10px 11px 0; border-top: 1px solid var(--linha); vertical-align: middle; }
+.tabela-larga tr.clicavel { cursor: pointer; }
+.tabela-larga tr.clicavel:hover td { background: var(--superficie-2); }
+.rolar-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.pilha { display: grid; gap: 10px; }
+.duas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .duas { grid-template-columns: 1fr; } }
+.linha-ic { display: flex; align-items: center; gap: 12px; }
+.linha-ic .meio { flex: 1; min-width: 0; }
+.pessoa { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12.5px; color: #fff; flex: none; }
+[data-estilo="cyber"] .pessoa { border-radius: 2px; }
+.riscado { text-decoration: line-through; color: var(--texto-3); }
+.nota { font-size: 12px; color: var(--texto-3); }
+.funcoes .lin { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--linha); }
+.funcoes .lin:first-child { border-top: 0; }
+.funcoes .lin .meio { flex: 1; min-width: 0; }
+.funcoes .lin small { display: block; color: var(--texto-3); font-size: 12px; }
+
+/* agenda da semana */
+.agenda-semana { display: grid; grid-template-columns: 52px repeat(5, minmax(120px, 1fr)); min-width: 680px; border: 1px solid var(--linha); border-radius: var(--raio-p); overflow: hidden; background: var(--superficie); }
+.agenda-semana .cab-dia { padding: 10px 8px; font-weight: 650; font-size: 13px; border-bottom: 1px solid var(--linha); background: var(--superficie-2); text-align: center; }
+.agenda-semana .hora { font-size: 11px; color: var(--texto-3); padding: 4px 6px; text-align: right; border-top: 1px solid var(--linha); height: 44px; font-family: var(--fonte-num); }
+.agenda-semana .vaga { border-top: 1px solid var(--linha); border-left: 1px solid var(--linha); height: 44px; position: relative; padding: 3px; cursor: pointer; }
+.agenda-semana .vaga:hover { background: color-mix(in srgb, var(--primaria) 5%, transparent); }
+.agenda-semana .vaga.destino { background: color-mix(in srgb, var(--primaria) 14%, transparent); }
+.agenda-semana .vaga.bloq { background: repeating-linear-gradient(135deg, var(--superficie-2) 0 6px, transparent 6px 12px); cursor: not-allowed; }
+.evento { position: absolute; inset: 3px; border-radius: 8px; padding: 4px 7px; font-size: 11.5px; line-height: 1.25; overflow: hidden; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  background: color-mix(in srgb, var(--cor) 16%, var(--superficie)); border-left: 3px solid var(--cor); color: var(--texto); }
+.evento b { display: block; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.evento span { color: var(--texto-2); white-space: nowrap; }
+.evento.sel { outline: 2px solid var(--primaria); outline-offset: 1px; }
+.evento.arrastando { opacity: .35; }
+.fantasma { position: fixed; z-index: 90; pointer-events: none; width: 130px; height: 38px; opacity: .92; box-shadow: var(--sombra-g); }
+[data-estilo="cyber"] .evento { border-radius: 2px; }
+.dica { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--primaria) 10%, transparent); color: var(--primaria); font-size: 13.5px; font-weight: 600; }
+[data-estilo="cyber"] .dica { border-radius: 2px; }
+
+/* funil (kanban) */
+.funil { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; min-width: 1040px; }
+.coluna { background: var(--superficie-2); border-radius: var(--raio); padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 360px; border: 1px solid var(--linha); }
+.coluna.destino { outline: 2px dashed var(--primaria); outline-offset: -4px; }
+.coluna h3 { font-size: 13px; display: flex; justify-content: space-between; padding: 4px 4px 6px; }
+[data-estilo="cyber"] .coluna h3 { font-family: var(--fonte-mono); text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+.ficha-cartao { background: var(--superficie); border-radius: 14px; padding: 10px 12px; box-shadow: var(--sombra); border: var(--cartao-borda); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; display: grid; gap: 4px; }
+.ficha-cartao.sel { outline: 2px solid var(--primaria); }
+.ficha-cartao.arrastando { opacity: .35; }
+.ficha-cartao b { font-size: 13.5px; }
+.ficha-cartao small { color: var(--texto-3); font-size: 11.5px; }
+[data-estilo="cyber"] .ficha-cartao { border-radius: 2px; }
+
+/* janela (folha) */
+.folha-fundo { position: fixed; inset: 0; z-index: 80; background: rgba(10, 20, 16, .35); display: grid; place-items: center; padding: 16px; animation: sobe .2s ease both; }
+.folha { width: min(460px, 100%); max-height: 90vh; overflow-y: auto; background: var(--superficie); border-radius: var(--raio-g); box-shadow: var(--sombra-g); padding: 20px; display: grid; gap: 12px; border: var(--cartao-borda); }
+.folha label { display: grid; gap: 4px; }
+select.campo { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--texto-3) 50%), linear-gradient(135deg, var(--texto-3) 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+
+/* barras horizontais (consumo de IA) */
+.barras { display: grid; gap: 10px; }
+.barras .lin { display: grid; grid-template-columns: 170px 1fr 92px; gap: 10px; align-items: center; font-size: 13px; }
+.barras .trilho { height: 14px; border-radius: 4px; background: var(--superficie-2); overflow: hidden; }
+.barras .trilho i { display: block; height: 100%; border-radius: 4px; background: var(--primaria); }
+.barras .val { text-align: right; font-family: var(--fonte-num); font-weight: 600; }
+@media (max-width: 640px) { .barras .lin { grid-template-columns: 110px 1fr 70px; } }
+
+/* transcrição */
+.transcricao { display: grid; gap: 8px; font-size: 14px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+.transcricao p b { color: var(--primaria); font-weight: 650; }
+.gravando { display: inline-flex; align-items: center; gap: 8px; color: var(--perigo); font-weight: 650; font-size: 13px; }
+.gravando i { width: 10px; height: 10px; border-radius: 50%; background: var(--perigo); animation: pisca 1.2s infinite; }
+@keyframes pisca { 50% { opacity: .25; } }
+.aviso-curto { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 95; max-width: min(520px, calc(100% - 32px)); padding: 12px 16px; border-radius: 14px; background: var(--texto); color: var(--fundo); font-size: 13.5px; font-weight: 600; box-shadow: var(--sombra-g); }
+[data-estilo="cyber"] .aviso-curto { border-radius: 3px; background: var(--primaria); color: #fff; }
+.coluna, .ficha-cartao { min-width: 0; }
+.ficha-cartao .status, .tabela-larga .status { white-space: normal; line-height: 1.3; }
