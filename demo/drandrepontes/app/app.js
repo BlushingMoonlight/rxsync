@@ -567,6 +567,7 @@
   }
   function perguntar(t) {
     if (!t) return;
+    A.log('pergunta', { chat: 'assistente do app', texto: String(t).slice(0, 500) });
     E.chat.push(['eu', esc(t)]);
     render(true);
     setTimeout(function () { var r = respostaIA(t); E.chat.push(['ela', r[0], r[1]]); render(true); rolarFim(); }, 700);
@@ -607,6 +608,7 @@
     if (a === 'perguntar-campo') { var c = document.getElementById('pergunta'); perguntar(c.value.trim()); return; }
     if (a === 'enviar-equipe') {
       var m = document.getElementById('msg-equipe'), t = m.value.trim(); if (!t) return;
+      A.log('pergunta', { chat: 'equipe (app)', texto: String(t).slice(0, 500) });
       E.chatEquipe.push(['eu', esc(t), 'agora']); render(true); rolarFim(); avisoCurto('Enviado. A IA encaminhou para a pessoa certa da equipe.'); return;
     }
   });

@@ -451,3 +451,9 @@ textarea.campo { height: 84px; padding: 10px 14px; resize: none; }
   color: var(--texto-2); background: var(--vidro); border: 1px solid var(--linha); box-shadow: var(--sombra); text-decoration: none;
   -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4); }
 [data-estilo="cyber"] .volta-demo { border-radius: 3px; font-family: var(--fonte-mono); }
+
+/* ---------- Itens tirados no escopo (aparecem apagados na demonstração) ---------- */
+.desligado { opacity: .42; filter: grayscale(.7); transition: opacity .2s; }
+.desligado .item-fora { opacity: 1; }
+.item.item-fora { color: var(--perigo); border-color: color-mix(in srgb, var(--perigo) 45%, transparent); background: color-mix(in srgb, var(--perigo) 10%, transparent); text-decoration: none; }
+.explica .aviso-fora { margin-top: 6px; padding: 8px 10px; border-radius: 10px; font-size: 13px; color: var(--perigo); background: color-mix(in srgb, var(--perigo) 9%, transparent); }

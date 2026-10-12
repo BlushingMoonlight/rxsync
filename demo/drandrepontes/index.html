@@ -26,6 +26,18 @@
   .quem-lista .ini { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; }
   [data-estilo="cyber"] .quem-lista a, [data-estilo="cyber"] .quem-lista .ini { border-radius: 3px; }
   .rodape-home { text-align: center; font-size: 12px; }
+  .usuario-linha { text-align: center; font-size: 12.5px; }
+  #link-questionario[hidden] { display: none; }
+  .usuario-linha button { background: none; color: var(--texto-3); text-decoration: underline; font-size: 12.5px; padding: 0 2px; }
+  .escolha-fundo { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; background: var(--fundo); }
+  .escolha { width: min(440px, 100%); display: grid; gap: 14px; text-align: center; }
+  .escolha .opcoes-usuario { display: grid; gap: 8px; }
+  .escolha .opcoes-usuario button { padding: 14px 16px; border-radius: var(--raio); border: 1px solid var(--linha); background: var(--superficie); color: var(--texto); font-size: 16px; font-weight: 650; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+  .escolha .opcoes-usuario button[aria-pressed="true"] { border-color: var(--primaria); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primaria) 30%, transparent); }
+  .escolha form { display: grid; gap: 8px; }
+  .escolha .erro { color: var(--perigo); font-size: 13px; min-height: 18px; }
+  [data-estilo="cyber"] .escolha .opcoes-usuario button { border-radius: 3px; }
+  .questionario-chamada { display: flex; justify-content: center; }
 </style>
 <script src="comum/comum.js"></script>
 </head>
@@ -49,8 +61,10 @@
     </article>
   </section>
 
-  <div style="display:flex;justify-content:center"><a class="botao botao-claro" href="escopo/" data-leva-estilo style="text-decoration:none">Escopo do projeto</a></div>
+  <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap"><a class="botao botao-claro" href="escopo/" data-leva-estilo style="text-decoration:none">Escopo do projeto</a>
+    <a class="botao" id="link-questionario" href="questionario/" data-leva-estilo style="text-decoration:none" hidden>Responder o questionário</a></div>
 
+  <p class="usuario-linha fraco" id="usuario-linha"></p>
   <p class="rodape-home fraco">Prévia com dados de exemplo. A IA é simulada: não diagnostica, não prescreve e o app não calcula dose. O estilo muda pelo botão do canto.</p>
 </main>
 <script>
@@ -77,6 +91,39 @@
     });
   }
   previas(); window.addEventListener('resize', previas); document.addEventListener('estilo', previas);
+
+  // Quem está usando (Datalog): Admin (Jean), Dr. André ou Convidado. A senha só identifica quem usa; fica guardado no aparelho.
+  function mostrarUsuario() {
+    var u = AG.usuario();
+    document.getElementById('usuario-linha').innerHTML = u ? 'Usando como ' + AG.USUARIOS[u][0] + ' · <button type="button" id="trocar-usuario">trocar usuário</button>' : '';
+    document.getElementById('link-questionario').hidden = !(u === 'andre' || u === 'convidado');
+  }
+  function escolha() {
+    var f = document.createElement('div'); f.className = 'escolha-fundo';
+    f.innerHTML = '<div class="escolha">' + AG.logo({ tamanho: 72 }) + '<h1 style="font-size:24px">Quem está usando?</h1><p class="mudo" style="font-size:14px">Escolha e digite a senha. Fica guardado neste aparelho.</p>' +
+      '<div class="opcoes-usuario">' + Object.keys(AG.USUARIOS).map(function (k) { return '<button type="button" data-usuario="' + k + '" aria-pressed="false">' + AG.USUARIOS[k][0] + '<span class="fraco">›</span></button>'; }).join('') + '</div>' +
+      '<form hidden><input class="campo" type="password" name="senha" placeholder="Senha" autocomplete="off" aria-label="Senha"><div class="erro" aria-live="polite"></div><button type="submit" class="botao">Entrar</button></form></div>';
+    document.body.appendChild(f);
+    var escolhido = '', form = f.querySelector('form');
+    f.querySelectorAll('[data-usuario]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        escolhido = b.dataset.usuario; f.querySelectorAll('[data-usuario]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        form.hidden = false; form.querySelector('.erro').textContent = ''; form.senha.value = ''; form.senha.focus();
+      });
+    });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (!AG.escolherUsuario(escolhido, form.senha.value)) { form.querySelector('.erro').textContent = 'Senha incorreta.'; form.senha.select(); return; }
+      var volta = AG.destinoVolta();
+      if (volta) { AG.enviarLog(true); location.replace(volta); return; }
+      f.remove(); mostrarUsuario();
+    });
+  }
+  document.addEventListener('click', function (ev) {
+    if (ev.target.id !== 'trocar-usuario') return;
+    AG.trocarUsuario(); mostrarUsuario(); escolha();
+  });
+  if (AG.usuario()) { mostrarUsuario(); if (AG.destinoVolta()) location.replace(AG.destinoVolta()); } else escolha();
 </script>
 </body>
 </html>

@@ -94,6 +94,8 @@
   }
 
   // Peças usadas pela Central do paciente, pela Caixa de conversas e pela lista de pacientes.
+  // Tarefa criada por outra tela (item 205: delegar pela conversa da equipe). t: {t, tipo, pac, resp, prazo (dias a partir de hoje)}.
+  P.crmNovaTarefa = function (t) { R.tarefas.push({ id: R.proxTarefa++, t: t.t, tipo: t.tipo || 'Outro', pac: t.pac, resp: t.resp, prazo: +t.prazo || 0, st: 'aberta' }); };
   P.crm = {
     origem: function (id) { return ORIGEM[id] || '—'; },
     chips: function (id) {

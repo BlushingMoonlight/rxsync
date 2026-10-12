@@ -13,6 +13,78 @@
   var ids = ESTILOS.map(function (e) { return e.id; });
   var html = document.documentElement;
 
+  // ---------- Quem está usando, aparelho e sessão (Datalog) ----------
+  // A home pede para escolher: Admin (Jean), Dr. André ou Convidado. A senha só identifica quem usa (fica no código
+  // público); a proteção dos dados é a chave do banco. Prévias dentro da home (iframe) não pedem usuário nem registram nada.
+  var CHAVE_USUARIO = 'ag-usuario', USUARIOS = { admin: ['Admin (Jean)', 'admin'], andre: ['Dr. André', 'andre'], convidado: ['Convidado', 'convidado'] };
+  var dentroDeQuadro = (function () { try { return window.top !== window; } catch (e) { return true; } })();
+  // A página do datalog não registra nada (só lê).
+  function lerArmazenado(onde, k) { try { return window[onde].getItem(k) || ''; } catch (e) { return ''; } }
+  function gravarArmazenado(onde, k, v) { try { if (v == null) window[onde].removeItem(k); else window[onde].setItem(k, v); } catch (e) { /* aparelho sem armazenamento */ } }
+  function novoCodigo() { var s = ''; for (var i = 0; i < 4; i++) s += Math.random().toString(16).slice(2, 10).padEnd(8, '0'); return s.slice(0, 8) + '-' + s.slice(8, 12) + '-' + s.slice(12, 16) + '-' + s.slice(16, 20) + '-' + s.slice(20, 32); }
+  var memoria = {};
+  function codigo(onde, k) { var v = lerArmazenado(onde, k) || memoria[k]; if (!v) { v = novoCodigo(); gravarArmazenado(onde, k, v); memoria[k] = v; } return v; }
+  function usuario() { var u = lerArmazenado('localStorage', CHAVE_USUARIO) || memoria.usuario || ''; return USUARIOS[u] ? u : ''; }
+  function escolherUsuario(id, senha) {
+    if (!USUARIOS[id] || senha !== USUARIOS[id][1]) return false;
+    memoria.usuario = id; gravarArmazenado('localStorage', CHAVE_USUARIO, id); log('entrou', { usuario: id }); return true;
+  }
+  function trocarUsuario() { log('saiu-usuario', {}); enviarLog(true); memoria.usuario = ''; gravarArmazenado('localStorage', CHAVE_USUARIO, null); }
+  // Raiz da demonstração (…/demo/drandrepontes/) e a página atual (home, app, painel, escopo, questionario, datalog).
+  var RAIZ = (function () { var p = location.pathname, i = p.indexOf('/drandrepontes/'); return i >= 0 ? p.slice(0, i + 15) : p.replace(/[^/]*$/, ''); })();
+  var PAGINA = (function () { var r = location.pathname.slice(RAIZ.length).split('/')[0]; return r === '' || r === 'index.html' ? 'home' : r; })();
+  var semRegistro = dentroDeQuadro || PAGINA === 'datalog';
+  // Sem usuário escolhido, toda página da demonstração manda para a home e volta ao destino depois da escolha.
+  if (!dentroDeQuadro && PAGINA !== 'home' && PAGINA !== 'datalog' && !usuario()) {
+    location.replace(RAIZ + '?volta=' + encodeURIComponent(location.pathname + location.search + location.hash));
+  }
+  // Destino de volta só dentro da demonstração.
+  function destinoVolta() { var v = new URLSearchParams(location.search).get('volta') || ''; return v.indexOf(RAIZ) === 0 && v.indexOf('//') < 0 ? v : ''; }
+
+  // ---------- Registro de uso (vai para o datalog da RXSync) ----------
+  // Em lotes a cada 10 s e ao sair da página (sendBeacon). Se falhar, a demonstração segue normal, sem erro na tela.
+  var URL_LOG = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demo-log';
+  var fila = [], telaAberta = '', telaDesde = Date.now(), paginaDesde = Date.now();
+  function telaAtual() { return (location.hash || '').slice(1).split('?')[0] || (PAGINA === 'home' ? '' : 'inicio'); }
+  function log(acao, detalhe, tela) {
+    if (semRegistro || !usuario()) return;
+    fila.push({ t: Date.now(), pagina: PAGINA, tela: tela == null ? telaAtual() : tela, acao: String(acao).slice(0, 60), detalhe: detalhe || {} });
+    if (fila.length > 500) fila = fila.slice(-500);
+    if (fila.length >= 50) enviarLog(false);
+  }
+  function corpoLog(eventos) { return JSON.stringify({ usuario: usuario(), aparelho: codigo('localStorage', 'ag-aparelho'), sessao: codigo('sessionStorage', 'ag-sessao'), eventos: eventos }); }
+  function enviarLog(saindo) {
+    if (semRegistro || !fila.length) return;
+    var lote = fila.splice(0, 50), corpo = corpoLog(lote);
+    try {
+      if (saindo && navigator.sendBeacon) { if (!navigator.sendBeacon(URL_LOG, corpo)) fila = lote.concat(fila); }
+      else if (window.fetch) fetch(URL_LOG, { method: 'POST', body: corpo, keepalive: corpo.length < 60000, mode: 'cors', credentials: 'omit' })
+        .then(function (r) { if (!r.ok) throw new Error(); }).catch(function () { fila = lote.concat(fila).slice(-500); });
+    } catch (e) { fila = lote.concat(fila).slice(-500); }
+    if (saindo && fila.length) enviarLog(true);
+  }
+  function fecharTela() { if (telaAberta !== null) log('saiu-tela', { seg: Math.round((Date.now() - telaDesde) / 1000) }, telaAberta); }
+  function abrirTela() { telaAberta = telaAtual(); telaDesde = Date.now(); log('abriu-tela', {}, telaAberta); }
+  if (!semRegistro) {
+    log('abriu-pagina', { endereco: location.pathname.slice(RAIZ.length) + location.search, largura: window.innerWidth });
+    abrirTela();
+    window.addEventListener('hashchange', function () { fecharTela(); abrirTela(); });
+    setInterval(function () { enviarLog(false); }, 10000);
+    var saiu = false;
+    window.addEventListener('pagehide', function () { if (saiu) return; saiu = true; fecharTela(); log('saiu-pagina', { seg: Math.round((Date.now() - paginaDesde) / 1000) }); enviarLog(true); });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') enviarLog(true); else saiu = false; });
+    // Toques em botões, links e marcadores (texto do botão, sem nada do que foi digitado).
+    document.addEventListener('click', function (ev) {
+      var el = ev.target.closest && ev.target.closest('button, a, [role="button"], .item, input[type="checkbox"], input[type="radio"], summary, [data-acao], [data-c], [data-r], [data-e], [data-f]');
+      if (!el) return;
+      var d = { texto: (el.getAttribute('aria-label') || el.textContent || el.value || '').replace(/\s+/g, ' ').trim().slice(0, 80) };
+      ['acao', 'c', 'r', 'e', 'f', 'v', 'itens', 'marca', 'st'].forEach(function (k) { if (el.dataset && el.dataset[k]) d[k] = String(el.dataset[k]).slice(0, 80); });
+      if (el.tagName === 'A' && el.getAttribute('href')) d.link = el.getAttribute('href').slice(0, 120);
+      if (el.type === 'checkbox' || el.type === 'radio') d.marcado = !!el.checked;
+      log(el.classList.contains('item') ? 'tocou-marcador' : 'tocou', d);
+    }, true);
+  }
+
   function lerEstilo() {
     var p = new URLSearchParams(location.search).get('e');
     if (p === 'clean') p = 'clean-claro';
@@ -158,12 +230,31 @@
   function precoVisivel() { return liberadoAgora || precosLiberados(); }
   // Preço de um lote para mostrar (Projeto 1 virou desconto: sem cobrança à parte).
   function precoLote(l) { return l.projeto === 1 ? 'Projeto 1 · desconto (sem cobrança à parte)' : l.preco; }
+  // ---------- Itens tirados no escopo: aparecem apagados na demonstração (com "fora do projeto") ----------
+  function tirados() {
+    var D = window.ESCOPO, o = {}; if (!D) return o;
+    try { var m = JSON.parse(localStorage.getItem('ag-escopo-reuniao-v' + D.versao + '-padrao-incluir') || 'null'); if (m && m.status) Object.keys(m.status).forEach(function (n) { if (m.status[n] === 'tirar') o[n] = 1; }); } catch (e) { /* sem armazenamento */ }
+    return o;
+  }
+  function marcarDesligados(raiz, t) {
+    if (PAGINA === 'escopo' || !raiz || raiz.nodeType !== 1) return;
+    t = t || tirados(); if (!Object.keys(t).length) return;
+    var lista = (raiz.matches('.item[data-itens]') ? [raiz] : []).concat([].slice.call(raiz.querySelectorAll('.item[data-itens]')));
+    lista.forEach(function (el) {
+      var ns = el.dataset.itens.split(',').filter(Boolean);
+      if (!ns.length || el.classList.contains('item-fora') || !ns.every(function (n) { return t[n]; })) return;
+      el.classList.add('item-fora'); el.setAttribute('title', 'Tirado no escopo: fora do projeto'); el.appendChild(document.createTextNode(' · fora do projeto'));
+      var bloco = el.closest('.lin, tr, li, .ficha-cartao, .alerta-lin, .lin-menu, .cartao, .atalho');
+      if (bloco) bloco.classList.add('desligado');
+    });
+  }
   function textoItem(n) {
     var D = window.ESCOPO; if (!D) return '<p>Item ' + n + ' do escopo.</p>';
     var i = D.itens.filter(function (x) { return x.n === n; })[0]; if (!i) return '<p>Item ' + n + ' do escopo.</p>';
     var l = D.lotes.filter(function (x) { return x.id === i.lote; })[0] || {};
     var noApp = html.dataset.contexto === 'app'; // no app, nada de preço nem de custo de IA (a IA é cobrada só da clínica)
-    return '<div class="explica-item"><b>' + n + ' · ' + esc(i.nome) + '</b><p>' + esc(i.desc) + '</p><small>' + esc(l.nome || '') +
+    return '<div class="explica-item"><b>' + n + ' · ' + esc(i.nome) + '</b><p>' + esc(i.desc) + '</p>' +
+      (tirados()[n] ? '<p class="aviso-fora">Tirado no escopo: aparece apagado nesta demonstração. Para religar, toque em "Ver no escopo" e marque "Incluir".</p>' : '') + '<small>' + esc(l.nome || '') +
       (noApp || !precoVisivel() ? '' : ' · ' + esc(precoLote(l) || '')) + (i.sempre ? ' · 🔒 sempre ligado' : '') + (!noApp && i.consumo ? ' · 💲 IA cobrada da clínica pelo uso' : '') + '</small></div>';
   }
   function fecharExplica() { var e = document.querySelector('.explica-fundo'); if (e) e.remove(); }
@@ -219,6 +310,7 @@
     }
     function enviar(t) {
       t = String(t || '').trim(); if (!t) return;
+      log('pergunta', { chat: String(o.titulo || 'chat').slice(0, 60), texto: t.slice(0, 500) });
       msgs.push(['eu', esc(t), '']); desenhar();
       setTimeout(function () { var r = o.responder(t); msgs.push(['ela', r[0], r[1] || '']); desenhar(); var c = pnl.querySelector('input'); if (c) c.focus(); }, 600);
     }
@@ -250,7 +342,7 @@
     document.body.appendChild(d);
     d.querySelector('.troca-botao').addEventListener('click', function (ev) { ev.stopPropagation(); d.classList.toggle('aberta'); });
     d.querySelectorAll('.troca-menu button[data-estilo]').forEach(function (b) {
-      b.addEventListener('click', function () { aplicarEstilo(b.dataset.estilo, true); d.classList.remove('aberta'); });
+      b.addEventListener('click', function () { aplicarEstilo(b.dataset.estilo, true); log('estilo', { estilo: b.dataset.estilo }); d.classList.remove('aberta'); });
     });
     document.addEventListener('click', function (ev) { if (!d.contains(ev.target)) d.classList.remove('aberta'); });
   }
@@ -346,8 +438,9 @@
     }
   }
   new MutationObserver(function (lista) {
+    var t = null;
     lista.forEach(function (m) {
-      if (m.type === 'childList') m.addedNodes.forEach(trocarEm);
+      if (m.type === 'childList') m.addedNodes.forEach(function (no) { trocarEm(no); if (no.nodeType === 1) marcarDesligados(no, t || (t = tirados())); });
       else if (m.type === 'characterData') trocarEm(m.target);
       else if (m.type === 'attributes' && !(m.attributeName === 'value' && m.target.tagName === 'OPTION')) { var v = m.target.getAttribute(m.attributeName); if (v && v.indexOf('{') >= 0) { var t = trocar(v); if (t !== v) m.target.setAttribute(m.attributeName, t); } }
     });
@@ -361,7 +454,8 @@
   };
 
   function iniciar() {
-    trocarEm(document.body);
+    if (!document.body) return; // página sendo trocada (sem usuário, indo para a escolha)
+    trocarEm(document.body); marcarDesligados(document.body);
     montarSelo(); montarTroca(); montarVoltar();
     aplicarEstilo(html.dataset.estilo, false);
     // links internos já saem com o estilo atual
@@ -377,5 +471,5 @@
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { datas: DATAS, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, precoVisivel: precoVisivel, liberarPrecos: liberarPrecos, ocultarPrecos: ocultarPrecos, precoLote: precoLote, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { datas: DATAS, log: log, enviarLog: enviarLog, usuario: usuario, USUARIOS: USUARIOS, escolherUsuario: escolherUsuario, trocarUsuario: trocarUsuario, destinoVolta: destinoVolta, raiz: RAIZ, pagina: PAGINA, aparelho: function () { return codigo('localStorage', 'ag-aparelho'); }, sessao: function () { return codigo('sessionStorage', 'ag-sessao'); }, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, precoVisivel: precoVisivel, liberarPrecos: liberarPrecos, ocultarPrecos: ocultarPrecos, precoLote: precoLote, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();

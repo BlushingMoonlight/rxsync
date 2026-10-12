@@ -142,7 +142,7 @@
       '<div class="grade">' +
         cartao('<div class="linha-ic"><span class="pessoa" style="background:var(--c3);width:52px;height:52px;font-size:17px">' + iniciais(p.id) + '</span>' +
           '<div class="meio"><h2 style="font-size:20px">' + p.nome + '</h2><div class="fraco" style="font-size:12.5px"><span class="idp">' + p.id + '</span> · ' + p.idade + ' anos · ' + foneBonito(fone(p.id)) + '</div>' +
-          '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' + P.st(p.status) + '<span class="chip">' + p.fase + '</span><span class="chip">' + p.prof + '</span></div>' + (P.crm ? P.crm.chips(p.id) : '') + '</div></div>' +
+          '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' + P.st(p.status) + '<span class="chip">' + p.fase + '</span><span class="chip">' + p.prof + '</span></div>' + (P.crm ? P.crm.chips(p.id) : '') + (P.equipeDo ? P.equipeDo(p.id) : '') + '</div></div>' +
           '<div class="estado-app"><span class="ponto" style="background:' + (app[0] ? 'var(--ok)' : 'var(--texto-3)') + '"></span><div><b>' + (app[0] ? 'App conectado' : 'App não conectado') + '</b><div class="fraco" style="font-size:12.5px">Último acesso: ' + app[1] + '</div></div></div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' + botao(A.ic('chat') + 'Mandar mensagem', 'msg', p.id) + botao(A.ic('telefone') + 'Registrar interação', 'interacao', p.id, true) +
           (QUEM === 'andre' ? botao(A.ic('estetoscopio') + 'Iniciar consulta', 'iniciar', p.id, true) : '') +
@@ -370,7 +370,7 @@
     document.body.appendChild(f);
     f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
     f.querySelector('form').addEventListener('submit', function (ev) {
-      ev.preventDefault(); var d = new FormData(ev.target), t = String(d.get('t') || '').trim(); if (!t) return;
+      ev.preventDefault(); var d = new FormData(ev.target), t = String(d.get('t') || '').trim(); if (!t) return; A.log('pergunta', { chat: 'mensagem ao paciente', paciente: id, texto: t.slice(0, 500) });
       var canal = d.get('canal') === 'app' ? 'pelo app' : 'pelo WhatsApp', quem = P.EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André');
       linha(id).unshift(['{d:0}', 'agora', 'conversa', 'Mensagem ' + canal + ': "' + esc(t.slice(0, 400)) + '"', 'enviada por ' + quem]);
       f.remove(); C.filtro = ''; P.render(true); P.avisoCurto('Enviada ' + canal + ', entre aspas e sem alteração.');
