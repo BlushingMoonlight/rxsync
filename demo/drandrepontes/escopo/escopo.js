@@ -1,5 +1,5 @@
 /* Escopo interativo para a reunião com o Dr. André (prévia).
-   Dados: dados.js (gerado do docs/escopo.md) e telas.js ("ver na tela").
+   Dados: dados.js (gerado a partir do escopo oficial) e telas.js ("ver na tela").
    Marcações (caixa, incluir · dúvida · tirar, anotações) ficam só neste aparelho (localStorage).
    Sem cálculo automático de preço: um lote com item retirado fica "a recalcular". */
 (function () {
