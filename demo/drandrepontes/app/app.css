@@ -188,3 +188,8 @@ body.app { background-color: var(--fundo-2); }
 .caixa-destaque { padding: 12px; border-radius: var(--raio-p); background: color-mix(in srgb, var(--destaque-texto) 9%, transparent); border: 1px solid color-mix(in srgb, var(--destaque-texto) 14%, transparent); }
 .cartao-destaque .ic { display: inline-block; vertical-align: -5px; }
 p > .ic, .msg .ic { display: inline-block; vertical-align: -4px; width: 17px; height: 17px; margin-right: 2px; }
+/* balão de chat dentro do aparelho, acima da barra de baixo */
+.aparelho .balao-botao { position: absolute; right: 14px; bottom: 84px; width: 52px; height: 52px; }
+.aparelho .balao-painel { position: absolute; right: 10px; left: 10px; width: auto; bottom: 146px; height: auto; top: 56px; }
+@media (min-width: 600px) and (min-height: 700px) { .aparelho .balao-botao { bottom: 94px; } .aparelho .balao-painel { bottom: 156px; top: 24px; } }
+.sem-barra .balao-botao, .sem-barra .balao-painel { display: none !important; }
