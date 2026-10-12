@@ -197,3 +197,44 @@ select.campo { appearance: none; -webkit-appearance: none; background-image: lin
 .kpi .valor { font-size: clamp(22px, 2.3vw, 34px); }
 .menu { padding-top: 54px; }
 @media (max-width: 1023px) { .menu { padding-top: 54px; } }
+
+/* ---------- Central do paciente e Central do médico (centrais.js) ---------- */
+.quadro-central { border: 2px solid color-mix(in srgb, var(--primaria) 55%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--primaria) 7%, var(--cartao-fundo)) 0%, var(--cartao-fundo) 70%); }
+.quadro-cab { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 12px; }
+.quadro-corpo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; }
+@media (max-width: 900px) { .quadro-corpo { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .quadro-central .lin { flex-wrap: wrap; } .quadro-central .lin .botao { margin-left: 64px; } }
+.busca-viva { position: relative; }
+.busca-viva .busca { width: 100%; min-width: 0; height: 46px; color: var(--texto-3); }
+.busca-campo { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--texto); font: inherit; font-size: 16px; outline: none; }
+.resultados { display: grid; gap: 4px; margin-top: 6px; }
+.resultado { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 12px; background: var(--superficie-2); border: 1px solid var(--linha); color: var(--texto); font-size: 14px; }
+.resultado .fraco { width: 100%; font-size: 12.5px; }
+button.resultado:hover { border-color: var(--primaria); }
+.link-pac { color: inherit; padding: 0; background: none; text-align: left; }
+.estado-app { display: flex; gap: 10px; align-items: center; margin-top: 14px; padding: 10px 12px; border-radius: 12px; background: var(--superficie-2); }
+.linha-tempo { list-style: none; margin: 0; padding: 0; display: grid; }
+.linha-tempo li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--linha); }
+.linha-tempo li:first-child { border-top: 0; }
+.linha-tempo .meio { flex: 1; min-width: 0; }
+.linha-tempo .meio b { font-weight: 600; }
+.linha-tempo .quando { font-size: 12px; white-space: nowrap; }
+@media (max-width: 560px) { .linha-tempo li { flex-wrap: wrap; } .linha-tempo .quando { width: 100%; padding-left: 48px; } }
+.selo-rascunho { font-size: 11px; font-weight: 750; letter-spacing: .08em; padding: 4px 9px; border-radius: 6px; color: var(--alerta); border: 1.5px dashed var(--alerta); background: color-mix(in srgb, var(--alerta) 8%, transparent); }
+.campo-ficha { height: 150px; font-size: 15px; line-height: 1.45; }
+.campo-doc { height: 300px; font-size: 14.5px; line-height: 1.5; }
+.confirma { display: flex; gap: 8px; align-items: center; margin-top: 12px; font-size: 14px; font-weight: 600; }
+.confirma input { width: 20px; height: 20px; accent-color: var(--primaria); }
+.botao[disabled] { opacity: .45; pointer-events: none; }
+.transcricao.viva p.nova { animation: entra-fala .4s ease both; }
+.transcricao .digitando { font-style: italic; }
+@keyframes entra-fala { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.documento { padding: 16px; border-radius: 12px; background: var(--superficie-2); border: 1px solid var(--linha); font-size: 14px; line-height: 1.55; }
+.grafico { width: 100%; height: auto; display: block; }
+.grafico .faixa { fill: color-mix(in srgb, var(--ok) 12%, transparent); }
+.grafico polyline { fill: none; stroke: var(--primaria); stroke-width: 2.5; stroke-linejoin: round; }
+.grafico circle { fill: var(--cartao-fundo, #fff); stroke: var(--primaria); stroke-width: 2.5; }
+.grafico text { font-size: 12px; fill: var(--texto-3); font-family: var(--fonte-num, inherit); }
+.grafico text.v { fill: var(--texto); font-weight: 700; }
+[data-estilo="cyber"] .resultado, [data-estilo="cyber"] .estado-app, [data-estilo="cyber"] .documento, [data-estilo="cyber"] .selo-rascunho { border-radius: 2px; }
+[data-estilo="cyber"] .selo-rascunho, [data-estilo="cyber"] .grafico text { font-family: var(--fonte-mono); }
