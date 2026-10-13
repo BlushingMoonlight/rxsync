@@ -2,8 +2,9 @@
    Dados: dados.js (gerado a partir do escopo oficial) e telas.js ("ver na tela").
    Marcações (caixa, incluir · dúvida · tirar, anotações) ficam só neste aparelho (localStorage).
    Começa com todas as caixinhas marcadas e todos os itens em "incluir"; "Limpar marcações" volta a esse padrão.
-   A página mostra os itens, os lotes (código novo e o antigo ao lado) e o prazo em semanas por subprojeto
-   (Projeto 1, ERP, CRM, CDX e App). Lote com todos os itens tirados sai do prazo. Itens obrigatórios
+   A página mostra os itens, os lotes (código novo e o antigo ao lado), o prazo em semanas por subprojeto
+   (Projeto 1, ERP, CRM, CDX e App) e o cronograma, a partir da assinatura, com o recesso de fim de ano como pausa
+   (a conta fica no calculo.js). Lote com todos os itens tirados sai do prazo. Itens obrigatórios
    (lotes obrigatórios e o 172) não têm "Tirar".
    Preços (AG.precos()): Dr. André sempre vê; Admin só com os preços liberados (botão "Esconder/Liberar preços" aqui e
    na home); Convidado nunca ("sob consulta"). Com preços, cada item mostra o seu preço, e cada lote e subprojeto mostra o
@@ -83,11 +84,12 @@
     return '<section class="cartao total-escopo"><div class="total-cab"><h2>' + (V ? 'Valores, itens e prazo' : 'Itens e prazo') + '</h2></div>' + valoresHTML() +
       '<div class="total-grade">' +
         '<div><span class="rotulo">Itens incluídos</span><div class="total-valor num">' + c.incluidos + ' de ' + D.itens.length + '</div><small class="fraco">' + c.tirados + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +
-        '<div><span class="rotulo">Prazo</span><div class="total-valor num">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</div><small class="fraco">' + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div>' +
+        '<div><span class="rotulo">Prazo · a partir da assinatura</span><div class="total-valor num">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</div><small class="fraco">' + (c.recesso ? 'com 2 semanas de recesso de fim de ano · ' : '') + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div>' +
       '</div>' +
       '<ul class="total-lista">' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') + '</ul>' +
       '<ul class="total-lista">' +
         '<li><b>Etapas:</b> ' + c.etapas.map(function (e) { return 'etapa ' + e.etapa + ' · ' + esc(e.nome) + ' (' + e.prazo + ')'; }).join('; ') + '.</li>' +
+        (c.recesso ? '<li><b>Recesso de fim de ano:</b> ' + C.textoRecesso(c.recesso, c.etapas) + '. Exemplo: assinando até 16/10/2026, início em 19/10/2026 e recesso de 21/12 a 01/01.</li>' : '') +
         (c.recalc.length ? '<li><b>Lotes com itens tirados (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '.' + (V ? ' O preço dos itens tirados já foi descontado.' : '') + ' O lote continua no prazo.</li>' : '') +
         (c.duvidas ? '<li><b>' + c.duvidas + ' item(ns) em dúvida</b> contam como incluídos.</li>' : '') +
         (V ? '' : '<li><b>Valores:</b> sob consulta.</li>') +
@@ -159,8 +161,9 @@
     var rec = D.lotes.map(function (l) { var p = l.projeto === 1 ? '' : loteParcial(l.id); return p ? '- ' + l.nome + ': ' + p : ''; }).filter(Boolean);
     var c = conta(), tot = 'ITENS E PRAZO\n- Itens incluídos: ' + c.incluidos + ' de ' + D.itens.length + ' (' + c.tirados + ' tirados, ' + c.duvidas + ' em dúvida)\n' +
       c.ordem.map(function (k) { var s = c.subs[k]; return '- ' + s.nome + ': ' + linhaSub(s) + '\n'; }).join('') +
-      '- Prazo: ' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + (c.semanasTotal !== c.semanasCheias ? ' (de ' + semanas(c.semanasCheias) + ' com tudo incluído)' : '') + '\n' +
-      c.etapas.map(function (e) { return '- Etapa ' + e.etapa + ' · ' + e.nome + ': ' + e.prazo + '\n'; }).join('') + '\n';
+      '- Prazo, a partir da assinatura: ' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + (c.recesso ? ' (com 2 semanas de recesso de fim de ano)' : '') + (c.semanasTotal !== c.semanasCheias ? ' (de ' + semanas(c.semanasCheias) + ' com tudo incluído)' : '') + '\n' +
+      c.etapas.map(function (e) { return '- Etapa ' + e.etapa + ' · ' + e.nome + ': ' + e.prazo + '\n'; }).join('') +
+      (c.recesso ? '- Recesso de fim de ano: ' + C.textoRecesso(c.recesso, c.etapas) + '\n' : '') + '\n';
     return 'Reunião com o Dr. André · Clínica Evoluir\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n\n' +
       grupo('INCLUIR', function (i) { return M.status[i.n] === 'incluir'; }) + '\n' +
       grupo('DÚVIDAS', function (i) { return M.status[i.n] === 'duvida'; }) + '\n' +
@@ -206,6 +209,7 @@
   // Os valores só vão no total quando quem salva é o Admin com os preços liberados.
   function totalEnviado(c) {
     var t = { itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, lotes_com_itens_tirados: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
+      recesso: c.recesso ? C.textoRecesso(c.recesso, c.etapas) : '',
       subprojetos: c.ordem.reduce(function (o, k) { var x = c.subs[k]; o[k] = { itens: x.incluidos, de: x.total, tirados: x.tirados, semanas: x.semanas }; return o; }, {}) };
     var v = A.usuario() === 'admin' && c.valores;
     if (v) t.valores = { implantacao: v.implantacao, cheio: v.cheio, desconto: v.desconto, com_desconto: v.comDesconto, a_vista: v.avista, mensal: v.mensal,

@@ -1,5 +1,8 @@
 /* Conta do escopo (usada pela página do escopo e pelo resumo em PDF). Dados: dados.js (sem preço).
    Por subprojeto (Projeto 1, ERP, CRM, CDX e App): itens incluídos, tirados e em dúvida, e o prazo em semanas.
+   Cronograma: etapas na ordem do dados.js (ERP, CDX, CRM e App), contadas a partir da assinatura, sem folga. O recesso de
+   fim de ano (dados.js: semanas 10 e 11) é uma pausa de 2 semanas dentro da etapa em andamento; se cair entre duas
+   etapas, vira pausa antes da seguinte; se o trabalho acabar antes dele, não entra.
    Lote com algum item tirado continua no prazo; lote com todos os itens tirados sai do prazo.
    Itens obrigatórios (lotes obrigatórios e o 172) não podem ser tirados. Itens em dúvida contam como incluídos.
    Valores: só quando o usuário vê preços (AG.precos(): Dr. André sempre, Admin com os preços liberados, Convidado nunca).
@@ -45,7 +48,7 @@
     });
     ORDEM_SUB.forEach(function (k) { var s = subs[k]; s.ativo = s.incluidos > 0; s.semanas = Math.round(s.semanas * 10) / 10; s.semanasCheias = Math.round(s.semanasCheias * 10) / 10; });
     var c = cronograma(subs);
-    var r = { subs: subs, ordem: ORDEM_SUB, recalc: recalc, duvidas: duvidas, tirados: tirados, incluidos: D.itens.length - tirados, etapas: c.etapas, semanasTotal: c.total, semanasCheias: c.cheias };
+    var r = { subs: subs, ordem: ORDEM_SUB, recalc: recalc, duvidas: duvidas, tirados: tirados, incluidos: D.itens.length - tirados, etapas: c.etapas, semanasTotal: c.total, semanasCheias: c.cheias, recesso: c.recesso };
     var P = window.AG.precos(); if (P) r.valores = valores(M, P, subs);
     return r;
   }
@@ -77,19 +80,37 @@
     return fechar(P, imp, imp, mensal);
   }
   // Etapas em sequência (cada uma entrega um subprojeto inteiro); o Projeto 1 é ativado na semana 1, em paralelo.
-  // Subprojeto sem nenhum lote incluído sai do cronograma, e as etapas seguintes sobem.
-  function cronograma(subs) {
-    var ini = 1, fim = 0, cheias = 0, etapas = [];
+  // Subprojeto sem nenhum lote incluído sai do cronograma, e as etapas seguintes sobem. Conta em semanas corridas desde
+  // a assinatura (t); a etapa vai da semana t0 + 1 até t1, como no escopo ("8 a 15", "16 a 19,5").
+  function plano(subs, chave) {
+    var R = D.recesso, r0 = R ? R.ini - 1 : 0, r1 = R ? r0 + R.semanas : 0, t = 0, usado = false, rec = null, etapas = [];
     (D.etapas || []).slice().sort(function (a, b) { return a.etapa - b.etapa; }).forEach(function (e) {
       var s = subs[e.sub]; if (!s) return;
-      if (e.sub === 'P1') { etapas.push({ etapa: e.etapa, sub: e.sub, nome: s.nome, prazo: 'semana 1, em paralelo', semanas: 0, obs: e.obs, ativo: true }); return; }
-      cheias += s.semanasCheias;
-      if (!s.semanas) { etapas.push({ etapa: e.etapa, sub: e.sub, nome: s.nome, prazo: 'fora (nenhum lote incluído)', semanas: 0, obs: e.obs, ativo: false }); return; }
-      fim = Math.round((ini + s.semanas - 1) * 10) / 10;
-      etapas.push({ etapa: e.etapa, sub: e.sub, nome: s.nome, ini: ini, fim: fim, prazo: 'semanas ' + num(ini) + ' a ' + num(fim), semanas: s.semanas, obs: e.obs, ativo: true });
-      ini = Math.round((fim + 1) * 10) / 10;
+      var base = { etapa: e.etapa, sub: e.sub, nome: s.nome, obs: e.obs, marco: e.marco || '', falta: e.falta || '' };
+      if (e.sub === 'P1') { etapas.push(Object.assign(base, { prazo: 'semana 1, em paralelo', semanas: 0, ativo: true })); return; }
+      var sem = s[chave];
+      if (!sem) { etapas.push(Object.assign(base, { prazo: 'fora (nenhum lote incluído)', semanas: 0, ativo: false })); return; }
+      var t0 = t, t1, dentro = false;
+      if (R && !usado && t0 >= r0 && t0 < r1) { t0 = r1; usado = true; rec = { antes: e.etapa }; }
+      t1 = t0 + sem;
+      if (R && !usado && t0 < r0 && t1 > r0) { t1 += R.semanas; usado = true; dentro = true; rec = { dentro: e.etapa }; }
+      t1 = Math.round(t1 * 10) / 10;
+      etapas.push(Object.assign(base, { ini: Math.round((t0 + 1) * 10) / 10, fim: t1, semanas: sem, recesso: dentro, ativo: true,
+        prazo: 'semanas ' + num(Math.round((t0 + 1) * 10) / 10) + ' a ' + num(t1) + (dentro ? ' (com o recesso)' : '') }));
+      t = t1;
     });
-    return { etapas: etapas, total: fim, cheias: Math.round(cheias * 10) / 10 };
+    if (rec) { rec.ini = R.ini; rec.fim = R.ini + R.semanas - 1; rec.semanas = R.semanas; rec.prazo = 'semanas ' + rec.ini + ' e ' + rec.fim; rec.obs = R.obs; }
+    return { etapas: etapas, total: Math.round(t * 10) / 10, recesso: rec };
   }
-  window.CALCULO = { CHAVE: CHAVE, ORDEM_SUB: ORDEM_SUB, padrao: padrao, ler: ler, semanas: semanas, num: num, situacao: situacao, conta: conta, pacote: pacote, reais: window.AG.reais };
+  function cronograma(subs) {
+    var p = plano(subs, 'semanas'), cheio = plano(subs, 'semanasCheias');
+    return { etapas: p.etapas, total: p.total, cheias: cheio.total, recesso: p.recesso };
+  }
+  // Texto do recesso para as listas: "Recesso de fim de ano: semanas 10 e 11, pausa dentro da etapa 2 (CDX)".
+  function textoRecesso(r, etapas) {
+    if (!r) return '';
+    var e = etapas.filter(function (x) { return x.etapa === (r.dentro != null ? r.dentro : r.antes); })[0] || {};
+    return 'semanas ' + r.ini + ' e ' + r.fim + (r.dentro != null ? ', pausa dentro da etapa ' : ', pausa antes da etapa ') + e.etapa + ' (' + (e.sub === 'APP' ? 'App' : e.sub) + ')';
+  }
+  window.CALCULO = { textoRecesso: textoRecesso, CHAVE: CHAVE, ORDEM_SUB: ORDEM_SUB, padrao: padrao, ler: ler, semanas: semanas, num: num, situacao: situacao, conta: conta, pacote: pacote, reais: window.AG.reais };
 })();

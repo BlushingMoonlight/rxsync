@@ -1,6 +1,7 @@
 /* Resumo do escopo para imprimir ou salvar em PDF, montado a partir das marcações do escopo neste aparelho.
-   Capa com a logo, a data real e o índice; subprojetos e lotes incluídos; itens tirados; prazos por etapa com o
-   gráfico de semanas. Valores só para quem vê preços (Dr. André; Admin com os preços liberados): implantação, desconto, à vista,
+   Capa com a logo, a data real e o índice; subprojetos e lotes incluídos; itens tirados; prazos por etapa (a partir da
+   assinatura, com o recesso de fim de ano como pausa), o gráfico de semanas e os marcos de cada etapa (o que funciona e o
+   que ainda falta). Valores só para quem vê preços (Dr. André; Admin com os preços liberados): implantação, desconto, à vista,
    mensalidade, Projeto 1 à parte, valor de cada lote e de cada item, e o gráfico de implantação por subprojeto. */
 (function () {
   'use strict';
@@ -12,13 +13,18 @@
   function incluidos(id) { return itensLote(id).filter(function (i) { return M.status[i.n] !== 'tirar'; }); }
   function nomeLote(id) { return (D.lotes.filter(function (l) { return l.id === id; })[0] || {}).nome || ''; }
 
-  // Cronograma em barras (SVG, sem biblioteca): cada etapa de "início" a "fim", em semanas.
-  function gantt(etapas, total) {
+  // Cronograma em barras (SVG, sem biblioteca): cada etapa de "início" a "fim", em semanas; o recesso numa linha própria.
+  function gantt(etapas, total, rec) {
     var lista = etapas.filter(function (e) { return e.ativo; }), h = 34, W = 640, rot = 150, k = (W - rot - 150) / Math.max(1, total);
-    return '<svg class="grafico" viewBox="0 0 ' + W + ' ' + (lista.length * h + 8) + '" role="img" aria-label="Semanas de cada etapa">' + lista.map(function (e, n) {
-      var x = rot + (e.sub === 'P1' ? 0 : (e.ini - 1) * k), w = Math.max(3, (e.sub === 'P1' ? 1 : e.semanas) * k), y = n * h + 4;
-      return '<text x="0" y="' + (y + 20) + '" class="r">' + esc('Etapa ' + e.etapa + ' · ' + (e.sub === 'P1' ? 'Projeto 1' : e.sub === 'APP' ? 'App' : e.sub)) + '</text><rect x="' + x.toFixed(1) + '" y="' + (y + 6) + '" width="' + w.toFixed(1) + '" height="20" rx="4" class="b ' + 'p' + e.etapa + '"/>' +
-        '<text x="' + (x + w + 8).toFixed(1) + '" y="' + (y + 20) + '" class="v">' + esc(e.prazo) + '</text>';
+    var linhas = lista.map(function (e) {
+      var x = rot + (e.sub === 'P1' ? 0 : (e.ini - 1) * k), w = Math.max(3, (e.sub === 'P1' ? 1 : e.fim - e.ini + 1) * k);
+      return [esc('Etapa ' + e.etapa + ' · ' + (e.sub === 'P1' ? 'Projeto 1' : e.sub === 'APP' ? 'App' : e.sub)), x, w, 'p' + e.etapa, esc(e.prazo)];
+    });
+    if (rec) linhas.push(['Recesso', rot + (rec.ini - 1) * k, Math.max(3, rec.semanas * k), 'rec', esc(rec.prazo)]);
+    return '<svg class="grafico" viewBox="0 0 ' + W + ' ' + (linhas.length * h + 8) + '" role="img" aria-label="Semanas de cada etapa">' + linhas.map(function (l, n) {
+      var y = n * h + 4;
+      return '<text x="0" y="' + (y + 20) + '" class="r">' + l[0] + '</text><rect x="' + l[1].toFixed(1) + '" y="' + (y + 6) + '" width="' + l[2].toFixed(1) + '" height="20" rx="4" class="b ' + l[3] + '"/>' +
+        '<text x="' + (l[1] + l[2] + 8).toFixed(1) + '" y="' + (y + 20) + '" class="v">' + l[4] + '</text>';
     }).join('') + '</svg>';
   }
   function secao(n, titulo, corpo) { return '<section class="secao" id="s' + n + '"><h2><span class="num">' + n + '</span> ' + esc(titulo) + '</h2>' + corpo + '</section>'; }
@@ -58,7 +64,7 @@
   }
   var dataExt = DT.cap(DT.extenso(agora)) + ' de ' + agora.getFullYear();
   var SECOES = c.ordem.map(function (k) { var sp = D.subprojetos[k]; return [k, k === 'P1' ? D.projetos[1] : 'Projeto ' + sp.projeto + ' · ' + sp.nome]; });
-  var indice = ['Resumo'].concat(SECOES.map(function (x) { return x[1]; }), ['Itens tirados', 'Prazos por etapa']);
+  var indice = ['Resumo'].concat(SECOES.map(function (x) { return x[1]; }), ['Itens tirados', 'Prazos e marcos por etapa']);
 
   var h = '<section class="capa">' + A.logo({ tamanho: 120 }) +
     '<h1>Resumo do escopo</h1><p class="sub">Clínica Evoluir · Dr. André Pontes Gonçalves</p>' +
@@ -68,7 +74,7 @@
 
   h += secao(1, 'Resumo',
     '<div class="resumo"><div><span class="rotulo">Itens incluídos</span><b class="grande">' + c.incluidos + ' de ' + D.itens.length + '</b><small>' + tirados.length + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +
-    '<div><span class="rotulo">Prazo</span><b class="grande">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</b><small>' + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div></div>' +
+    '<div><span class="rotulo">Prazo · a partir da assinatura</span><b class="grande">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</b><small>' + (c.recesso ? 'com 2 semanas de recesso de fim de ano · ' : '') + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div></div>' +
     '<ul>' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') +
     (c.recalc.length ? '<li><b>Lotes com itens tirados:</b> ' + c.recalc.map(esc).join(', ') + ' (continuam no prazo' + (V ? '; o preço dos itens tirados já foi descontado' : '') + ')</li>' : '') + '</ul>' + valoresHTML());
   SECOES.forEach(function (x, n) {
@@ -77,13 +83,30 @@
   });
   var nT = SECOES.length + 2;
   h += secao(nT, 'Itens tirados', tirados.length ? '<ul class="tirados">' + tirados.map(function (i) { return '<li><b>' + i.n + '</b> ' + esc(i.nome) + ' <span class="fraco">(' + esc(nomeLote(i.lote)) + ')</span></li>'; }).join('') + '</ul>' : '<p class="mudo">Nenhum item tirado.</p>');
-  h += secao(nT + 1, 'Prazos por etapa',
-    '<p>Cada etapa entrega um subprojeto inteiro. Tirar lotes encurta o prazo. Prazo final: <b>' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</b>' + (c.semanasTotal ? ', cerca de ' + num(Math.round(c.semanasTotal / 4.345 * 2) / 2) + ' meses' : '') + '.</p>' +
-    '<table class="prazos"><tr><th>Etapa</th><th>Subprojeto</th><th>Semanas</th><th>Observação</th></tr>' + c.etapas.map(function (e) {
-      return '<tr><td>' + e.etapa + '</td><td>' + esc(e.nome) + '</td><td>' + esc(e.prazo) + '</td><td>' + esc(e.obs || '') + '</td></tr>';
-    }).join('') + '</table>' +
-    '<h3>Semanas de cada etapa</h3>' + gantt(c.etapas, c.semanasTotal || 1) +
-    '<p class="fraco">Prazos que não dependem da RXSync (certificado, plataformas externas, lojas e pareceres jurídicos) podem deslocar as etapas ligadas a eles.</p>');
+  // Linhas da tabela de prazos, com o recesso logo depois da etapa em que cai (ou antes da etapa seguinte).
+  function linhasPrazo() {
+    var r = c.recesso, l = [];
+    c.etapas.forEach(function (e) {
+      var linhaRec = r ? '<tr class="recesso"><td>—</td><td>Recesso de fim de ano</td><td>' + esc(r.prazo) + '</td><td>Pausa ' + (r.dentro != null ? 'dentro da etapa ' + r.dentro : 'antes da etapa ' + r.antes) + ' (21/12 a 01/01 no exemplo)</td></tr>' : '';
+      if (r && r.antes === e.etapa) l.push(linhaRec);
+      l.push('<tr><td>' + e.etapa + '</td><td>' + esc(e.nome) + '</td><td>' + esc(e.prazo) + '</td><td>' + esc(e.obs || '') + '</td></tr>');
+      if (r && r.dentro === e.etapa) l.push(linhaRec);
+    });
+    return l.join('');
+  }
+  function marcos() {
+    return '<table class="prazos marcos"><tr><th>Etapa</th><th>Funcionando ao fim da etapa</th><th>Ainda falta</th></tr>' + c.etapas.map(function (e) {
+      return '<tr><td>' + e.etapa + ' · ' + esc(e.sub === 'P1' ? 'Projeto 1' : e.sub === 'APP' ? 'App' : e.sub) + '</td>' +
+        (e.ativo ? '<td>' + esc(DT.cap(e.marco)) + '</td><td>' + esc(DT.cap(e.falta)) + '</td>' : '<td colspan="2" class="fraco">Fora do projeto (nenhum lote incluído).</td>') + '</tr>';
+    }).join('') + '</table>';
+  }
+  h += secao(nT + 1, 'Prazos e marcos por etapa',
+    '<p>Cada etapa entrega um subprojeto inteiro, nesta ordem: ERP, CDX, CRM e App. As semanas contam a partir da assinatura. Tirar lotes encurta o prazo. Prazo final: <b>' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</b>' + (c.semanasTotal ? ', cerca de ' + num(Math.round(c.semanasTotal / 4.345 * 2) / 2) + ' meses' : '') + (c.recesso ? ', com 2 semanas de recesso de fim de ano' : '') + '.</p>' +
+    '<p class="fraco">Exemplo: assinando até 16/10/2026, o início é em 19/10/2026 e o recesso vai de 21/12 a 01/01.</p>' +
+    '<table class="prazos"><tr><th>Etapa</th><th>Subprojeto</th><th>Semanas</th><th>Observação</th></tr>' + linhasPrazo() + '</table>' +
+    '<h3>Semanas de cada etapa</h3>' + gantt(c.etapas, c.semanasTotal || 1, c.recesso) +
+    '<h3>Marcos de cada etapa</h3><p class="fraco">O que a clínica vê funcionando ao fim de cada etapa, com tudo incluído, e o que ainda falta porque chega numa etapa seguinte.</p>' + marcos() +
+    '<p class="fraco">Prazos que não dependem da RXSync (certificado, plataforma de receita, lojas e API da balança) podem atrasar o lote ligado a eles. Nesse caso, a etapa é entregue sem esse lote, e ele entra depois, sem cobrança extra.</p>');
   h += '<p class="rodape fraco">Gerado em ' + DT.dma(agora) + ' às ' + DT.hm(agora) + '. Escopo sujeito a confirmação.</p>';
   document.getElementById('doc').innerHTML = h;
   A.log('resumo-pdf-aberto', { tirados: tirados.length, semanas: c.semanasTotal, precos: !!V });
