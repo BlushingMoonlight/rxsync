@@ -34,6 +34,10 @@
 .grafico .b.p2 { fill: var(--c2, var(--primaria)); }
 .grafico .b.p3 { fill: var(--c3, var(--primaria)); }
 .grafico .b.p4 { fill: var(--c4, var(--primaria)); }
+.grafico .b.rec { fill: var(--texto-3); opacity: .45; }
+.prazos tr.recesso td { color: var(--texto-2); font-style: italic; }
+.marcos td { font-size: 13px; vertical-align: top; }
+.marcos td:first-child { white-space: nowrap; font-weight: 650; }
 .prazos { width: 100%; border-collapse: collapse; }
 .prazos th, .prazos td { text-align: left; padding: 8px; border-bottom: 1px solid var(--linha); }
 .rodape { text-align: center; font-size: 12px; }
@@ -45,6 +49,10 @@
   .capa, .secao { border: 0; box-shadow: none; background: #fff; padding: 0; }
   .capa { min-height: 240mm; align-content: center; break-after: page; }
   .secao { break-inside: avoid-page; padding-top: 6mm; }
-  .grafico .b { fill: #2f6b4f; } .grafico .b.p0 { fill: #8a8a8a; } .grafico .b.p2 { fill: #6b4f8f; } .grafico .b.p3 { fill: #3d7ea6; } .grafico .b.p4 { fill: #b7791f; }
+  /* Prazos e marcos: pode quebrar de página; em bloco (não grade), para a tabela quebrar sem sobrepor o texto seguinte */
+  .secao:last-of-type { break-inside: auto; display: block; }
+  .secao:last-of-type > * + * { margin-top: 10px; }
+  .grafico .b { fill: #2f6b4f; } .grafico .b.p0 { fill: #8a8a8a; } .grafico .b.p2 { fill: #6b4f8f; } .grafico .b.p3 { fill: #3d7ea6; } .grafico .b.p4 { fill: #b7791f; } .grafico .b.rec { fill: #bbb; opacity: 1; }
+  .marcos tr { break-inside: avoid; }
   .grafico .r, .grafico .v { fill: #111; }
 }
