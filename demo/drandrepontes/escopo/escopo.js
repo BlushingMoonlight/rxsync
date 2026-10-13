@@ -5,8 +5,9 @@
    A página mostra os itens, os lotes (código novo e o antigo ao lado) e o prazo em semanas por subprojeto
    (Projeto 1, ERP, CRM, CDX e App). Lote com todos os itens tirados sai do prazo. Itens obrigatórios
    (lotes obrigatórios e o 172) não têm "Tirar".
-   Preços: só para o Admin com os preços abertos (arquivo cifrado). Aí cada item mostra o seu preço, e cada lote e
-   subprojeto mostra o valor atual (sem o que foi tirado) e o cheio; o total recalcula na hora. */
+   Preços (AG.precos()): Dr. André sempre vê; Admin só com os preços liberados (botão "Esconder/Liberar preços" aqui e
+   na home); Convidado nunca ("sob consulta"). Com preços, cada item mostra o seu preço, e cada lote e subprojeto mostra o
+   valor atual (sem o que foi tirado) e o cheio; o total recalcula na hora. */
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, TELAS = window.TELAS_ITEM || {};
@@ -51,7 +52,7 @@
   }
 
   // ---------- itens e prazo (a conta fica no calculo.js, usada também pelo resumo em PDF) ----------
-  var C = window.CALCULO, semanas = C.semanas, reais = A.reais, V = null; // V: valores (só com os preços abertos)
+  var C = window.CALCULO, semanas = C.semanas, reais = A.reais, V = null; // V: valores (só para quem vê preços)
   function conta() { return C.conta(M); }
   function valor(atual, cheio) { return atual === cheio ? reais(cheio) : reais(atual) + ' de ' + reais(cheio); }
   function chipsLote(l) {
@@ -89,7 +90,7 @@
         '<li><b>Etapas:</b> ' + c.etapas.map(function (e) { return 'etapa ' + e.etapa + ' · ' + esc(e.nome) + ' (' + e.prazo + ')'; }).join('; ') + '.</li>' +
         (c.recalc.length ? '<li><b>Lotes com itens tirados (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '.' + (V ? ' O preço dos itens tirados já foi descontado.' : '') + ' O lote continua no prazo.</li>' : '') +
         (c.duvidas ? '<li><b>' + c.duvidas + ' item(ns) em dúvida</b> contam como incluídos.</li>' : '') +
-        (V ? '' : '<li>Os valores ficam na proposta da RXSync, à parte.</li>') +
+        (V ? '' : '<li><b>Valores:</b> sob consulta.</li>') +
       '</ul></section>';
   }
 
@@ -171,7 +172,7 @@
         '- Desconto pelo valor: ' + Math.round(V.desconto * 100) + '% · com desconto: ' + reais(V.comDesconto) + '\n- À vista em dinheiro ou cripto: ' + reais(V.avista) + '\n' +
         '- Mensalidade: ' + reais(V.mensal) + ' + IA por consumo\n- Projeto 1: ' + reais(V.p1.implantacao) + ' + ' + reais(V.p1.mensal) + ' por mês (fora do desconto)\n' +
         '- Com o Projeto 1: ' + reais(V.comP1) + ' com desconto · ' + reais(V.avistaComP1) + ' à vista · ' + reais(V.mensalComP1) + ' por mês'
-        : 'Valores: na proposta da RXSync, à parte.');
+        : 'Valores: sob consulta.');
   }
   function avisoCurto(m) { var v = document.querySelector('.aviso-curto'); if (v) v.remove(); v = document.createElement('div'); v.className = 'aviso-curto'; v.textContent = m; document.body.appendChild(v); setTimeout(function () { v.remove(); }, 2600); }
   function mostrarResumo(texto, copiou) {
@@ -202,7 +203,7 @@
   function desligados() { return D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; }).map(function (i) { return i.n; }); }
   function ultimoEnvio() { try { return localStorage.getItem(CHAVE + '-enviado') || ''; } catch (e) { return ''; } }
   function mostrarEnvio() { var u = ultimoEnvio(); $('salvo').textContent = u ? 'Salvo e enviado em ' + u : ''; }
-  // Os valores só vão no total quando quem salva é o Admin com os preços abertos.
+  // Os valores só vão no total quando quem salva é o Admin com os preços liberados.
   function totalEnviado(c) {
     var t = { itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, lotes_com_itens_tirados: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
       subprojetos: c.ordem.reduce(function (o, k) { var x = c.subs[k]; o[k] = { itens: x.incluidos, de: x.total, tirados: x.tirados, semanas: x.semanas }; return o; }, {}) };
@@ -212,29 +213,15 @@
       subprojetos: Object.keys(v.subs).reduce(function (o, k) { o[k] = v.subs[k]; return o; }, {}) };
     return t;
   }
-  // Admin numa aba sem os preços abertos (ex.: veio de "Ver no escopo"): pode abrir aqui com a senha.
+  // Admin: esconde ou libera os preços com um toque (vale para a demo toda neste aparelho, como o controle da home).
   function botaoPrecos() {
     var b = $('precos'); if (!b) return;
-    b.hidden = !(A.usuario() === 'admin' && !A.precos());
+    b.hidden = A.usuario() !== 'admin';
+    b.textContent = A.precosLiberados() ? 'Esconder preços' : 'Liberar preços';
   }
-  function pedirSenha() {
-    var f = document.createElement('div'); f.className = 'folha-fundo';
-    f.innerHTML = '<form class="folha"><h2 style="font-size:20px">Abrir preços</h2><p class="mudo" style="font-size:13.5px">Digite a senha do Admin. Os preços ficam abertos só nesta aba.</p>' +
-      '<input class="campo" type="password" name="s" autocomplete="off" aria-label="Senha do Admin"><div class="erro" aria-live="polite" style="font-size:13px"></div>' +
-      '<div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="botao botao-claro" data-fechar>Cancelar</button><button type="submit" class="botao">Abrir</button></div></form>';
-    document.body.appendChild(f);
-    f.addEventListener('click', function (ev) { if (ev.target === f || ev.target.hasAttribute('data-fechar')) f.remove(); });
-    f.querySelector('form').addEventListener('submit', function (ev) {
-      ev.preventDefault(); var erro = f.querySelector('.erro'), bt = f.querySelector('[type=submit]'); bt.disabled = true; erro.textContent = 'Conferindo…';
-      A.abrirPrecos(String(new FormData(ev.target).get('s') || '')).then(function (ok) {
-        bt.disabled = false;
-        if (!ok) { erro.textContent = 'Senha incorreta.'; A.log('senha-admin-errada', {}); return; }
-        A.log('precos-abertos', {}); f.remove(); desenhar(); avisoCurto('Preços abertos nesta aba.');
-      });
-    });
-    f.querySelector('input').focus();
-  }
-  $('precos').addEventListener('click', pedirSenha);
+  $('precos').addEventListener('click', function () {
+    var sim = !A.precosLiberados(); A.liberarPrecos(sim); desenhar(); avisoCurto(sim ? 'Preços liberados.' : 'Preços escondidos.');
+  });
   $('salvar').addEventListener('click', function () {
     var b = $('salvar'), c = conta();
     var corpo = JSON.stringify({ tipo: 'escopo', usuario: A.usuario(), aparelho: A.aparelho(), sessao: A.sessao(), versao: D.versao,
