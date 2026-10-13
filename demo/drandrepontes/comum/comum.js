@@ -14,13 +14,16 @@
   var html = document.documentElement;
 
   // ---------- Quem está usando, aparelho e sessão (Datalog) ----------
-  // A home pede para escolher: Admin (Jean), Dr. André ou Convidado. As senhas do Dr. André e do Convidado só identificam
-  // quem usa (ficam no código público); a proteção dos dados é a chave do banco. A senha do Admin NÃO está no código:
-  // ela é conferida abrindo o arquivo de preços cifrado (escopo/precos.json, AES-GCM com chave derivada da senha por
-  // PBKDF2). Abriu: entra como Admin e os preços ficam abertos só nesta aba (sessionStorage); "trocar usuário" apaga.
-  // Prévias dentro da home (iframe) não pedem usuário nem registram nada.
-  var CHAVE_USUARIO = 'ag-usuario-2', CHAVE_PRECOS = 'ag-precos-abertos', USUARIOS = { admin: ['Admin (Jean)', null], andre: ['Dr. André', 'andre'], convidado: ['Convidado', 'convidado'] };
-  try { localStorage.removeItem('ag-usuario'); localStorage.removeItem('ag-precos-liberados'); } catch (e) { /* escolha antiga (senha "admin") não vale mais */ }
+  // A home pede para escolher: Admin (Jean), Dr. André ou Convidado. As senhas só identificam quem usa (ficam no código
+  // público); a proteção dos dados é a chave do banco. Prévias dentro da home (iframe) não pedem usuário nem registram nada.
+  // Preços da proposta (escopo/precos.js, arquivo público: é uma cortina visual, não uma proteção):
+  //   - Admin: começam escondidos sempre que entra; "Preços: escondidos / liberados" na home e no escopo (vale para a demo
+  //     toda neste aparelho);
+  //   - Dr. André: sempre aparecem;
+  //   - Convidado: nunca aparecem ("sob consulta").
+  // O app do paciente e as páginas com data-sem-precos nunca mostram preço.
+  var CHAVE_USUARIO = 'ag-usuario-2', CHAVE_PRECOS = 'ag-precos-admin', USUARIOS = { admin: ['Admin (Jean)', 'admin'], andre: ['Dr. André', 'andre'], convidado: ['Convidado', 'convidado'] };
+  try { localStorage.removeItem('ag-usuario'); localStorage.removeItem('ag-precos-liberados'); sessionStorage.removeItem('ag-precos-abertos'); } catch (e) { /* chaves antigas (preços cifrados) não valem mais */ }
   var dentroDeQuadro = (function () { try { return window.top !== window; } catch (e) { return true; } })();
   // A página do datalog não registra nada (só lê).
   function lerArmazenado(onde, k) { try { return window[onde].getItem(k) || ''; } catch (e) { return ''; } }
@@ -29,40 +32,35 @@
   var memoria = {};
   function codigo(onde, k) { var v = lerArmazenado(onde, k) || memoria[k]; if (!v) { v = novoCodigo(); gravarArmazenado(onde, k, v); memoria[k] = v; } return v; }
   function usuario() { var u = lerArmazenado('localStorage', CHAVE_USUARIO) || memoria.usuario || ''; return USUARIOS[u] ? u : ''; }
-  function marcarUsuario(id) { memoria.usuario = id; gravarArmazenado('localStorage', CHAVE_USUARIO, id); log('entrou', { usuario: id }); }
-  // Dr. André e Convidado (senha simples, só identificação).
+  // Entrar como Admin sempre começa com os preços escondidos.
+  function marcarUsuario(id) { memoria.usuario = id; gravarArmazenado('localStorage', CHAVE_USUARIO, id); fecharPrecos(); log('entrou', { usuario: id }); }
   function escolherUsuario(id, senha) {
-    if (!USUARIOS[id] || !USUARIOS[id][1] || senha !== USUARIOS[id][1]) return false;
+    if (!USUARIOS[id] || senha !== USUARIOS[id][1]) return false;
     marcarUsuario(id); return true;
   }
-  // Abre o arquivo de preços com a senha (Web Crypto). Devolve uma promessa: true se abriu.
-  function b64(t) { var b = atob(t), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
-  function abrirPrecos(senha) {
-    var sub = window.crypto && window.crypto.subtle;
-    if (!sub || !senha) return Promise.resolve(false);
-    return fetch(RAIZ + 'escopo/precos.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (c) {
-      return sub.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey']).then(function (base) {
-        return sub.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: b64(c.salt), iterations: c.iteracoes }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-      }).then(function (chave) { return sub.decrypt({ name: 'AES-GCM', iv: b64(c.iv) }, chave, b64(c.dados)); });
-    }).then(function (claro) {
-      var texto = new TextDecoder().decode(claro); JSON.parse(texto);
-      memoria.precos = texto; gravarArmazenado('sessionStorage', CHAVE_PRECOS, texto); return true;
-    }, function () { return false; });
+  // Devolve uma promessa (a home espera uma), true se a senha confere.
+  function entrar(id, senha) { return Promise.resolve(escolherUsuario(id, senha)); }
+  // Admin: preços liberados neste aparelho? (o padrão é escondido)
+  function precosLiberados() { return usuario() === 'admin' && (lerArmazenado('localStorage', CHAVE_PRECOS) || memoria.precos) === 'liberados'; }
+  function liberarPrecos(sim) {
+    if (usuario() !== 'admin') return;
+    memoria.precos = sim ? 'liberados' : ''; gravarArmazenado('localStorage', CHAVE_PRECOS, sim ? 'liberados' : null);
+    log(sim ? 'precos-liberados' : 'precos-escondidos', { onde: PAGINA }); enviarLog(false);
   }
-  // Entrar: Admin pela senha que abre os preços; os outros pela senha simples. Devolve uma promessa.
-  function entrar(id, senha) {
-    if (id !== 'admin') return Promise.resolve(escolherUsuario(id, senha));
-    return abrirPrecos(senha).then(function (ok) { if (ok) marcarUsuario('admin'); else log('senha-admin-errada', {}); return ok; });
-  }
-  // Preços abertos (só para o Admin, nunca no app do paciente nem nas páginas com data-sem-precos). null quando fechados.
+  // Preços visíveis nesta tela, pela regra do usuário. null quando não aparecem.
   function precos() {
-    if (usuario() !== 'admin' || html.dataset.contexto === 'app' || PAGINA === 'app' || html.dataset.semPrecos !== undefined) return null;
-    var t = memoria.precos || lerArmazenado('sessionStorage', CHAVE_PRECOS);
-    try { return t ? JSON.parse(t) : null; } catch (e) { return null; }
+    var P = window.PRECOS_DEMO, u = usuario();
+    if (!P || html.dataset.contexto === 'app' || PAGINA === 'app' || html.dataset.semPrecos !== undefined) return null;
+    return u === 'andre' || (u === 'admin' && precosLiberados()) ? P : null;
   }
-  function fecharPrecos() { memoria.precos = ''; gravarArmazenado('sessionStorage', CHAVE_PRECOS, null); }
+  function fecharPrecos() { memoria.precos = ''; gravarArmazenado('localStorage', CHAVE_PRECOS, null); }
   function reais(n) { return 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); }
   function trocarUsuario() { log('saiu-usuario', {}); enviarLog(true); memoria.usuario = ''; fecharPrecos(); gravarArmazenado('localStorage', CHAVE_USUARIO, null); }
+  // Trocou o usuário ou os preços em outra aba: o escopo e o resumo se refazem com a regra nova, na hora
+  // (os balões do painel já leem a regra quando abrem).
+  window.addEventListener('storage', function (ev) {
+    if ((ev.key === CHAVE_USUARIO || ev.key === CHAVE_PRECOS) && PAGINA === 'escopo' && !dentroDeQuadro) location.reload();
+  });
   // Marcações do escopo neste aparelho (a mesma chave do escopo e do resumo em PDF).
   function chaveEscopo() { var D = window.ESCOPO; return 'ag-escopo-reuniao-v' + (D ? D.versao : '') + '-tudo-marcado'; }
   // Raiz da demonstração (…/demo/drandrepontes/) e a página atual (home, app, painel, escopo, questionario, fluxo, datalog).
@@ -502,5 +500,5 @@
   }, true);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 
-  window.AG = { datas: DATAS, log: log, enviarLog: enviarLog, usuario: usuario, USUARIOS: USUARIOS, escolherUsuario: escolherUsuario, entrar: entrar, abrirPrecos: abrirPrecos, precos: precos, fecharPrecos: fecharPrecos, reais: reais, chaveEscopo: chaveEscopo, trocarUsuario: trocarUsuario, destinoVolta: destinoVolta, raiz: RAIZ, pagina: PAGINA, aparelho: function () { return codigo('localStorage', 'ag-aparelho'); }, sessao: function () { return codigo('sessionStorage', 'ag-sessao'); }, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, nomeSub: nomeSub, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
+  window.AG = { datas: DATAS, log: log, enviarLog: enviarLog, usuario: usuario, USUARIOS: USUARIOS, escolherUsuario: escolherUsuario, entrar: entrar, precos: precos, precosLiberados: precosLiberados, liberarPrecos: liberarPrecos, fecharPrecos: fecharPrecos, reais: reais, chaveEscopo: chaveEscopo, trocarUsuario: trocarUsuario, destinoVolta: destinoVolta, raiz: RAIZ, pagina: PAGINA, aparelho: function () { return codigo('localStorage', 'ag-aparelho'); }, sessao: function () { return codigo('sessionStorage', 'ag-sessao'); }, ESTILOS: ESTILOS, balao: balao, esc: esc, logo: logo, ic: ic, bolha: bolha, anel: anel, item: item, novo: novo, juridico: juridico, proposta: proposta, sempre: sempre, nomeSub: nomeSub, estilo: function () { return html.dataset.estilo; }, aplicarEstilo: aplicarEstilo };
 })();

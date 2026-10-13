@@ -1,6 +1,6 @@
 /* Resumo do escopo para imprimir ou salvar em PDF, montado a partir das marcações do escopo neste aparelho.
    Capa com a logo, a data real e o índice; subprojetos e lotes incluídos; itens tirados; prazos por etapa com o
-   gráfico de semanas. Valores só para o Admin com os preços abertos (arquivo cifrado): implantação, desconto, à vista,
+   gráfico de semanas. Valores só para quem vê preços (Dr. André; Admin com os preços liberados): implantação, desconto, à vista,
    mensalidade, Projeto 1 à parte, valor de cada lote e de cada item, e o gráfico de implantação por subprojeto. */
 (function () {
   'use strict';
@@ -64,7 +64,7 @@
     '<h1>Resumo do escopo</h1><p class="sub">Clínica Evoluir · Dr. André Pontes Gonçalves</p>' +
     '<p class="data">' + dataExt + ' · escopo versão ' + esc(D.versao) + '</p>' +
     '<ol class="indice">' + indice.map(function (t, i) { return '<li><a href="#s' + (i + 1) + '">' + esc(t) + '</a></li>'; }).join('') + '</ol>' +
-    '<p class="fraco nota-capa">Montado a partir das marcações feitas no escopo deste aparelho.' + (V ? '' : ' Os valores ficam na proposta da RXSync, à parte.') + '</p></section>';
+    '<p class="fraco nota-capa">Montado a partir das marcações feitas no escopo deste aparelho.' + (V ? '' : ' Valores sob consulta.') + '</p></section>';
 
   h += secao(1, 'Resumo',
     '<div class="resumo"><div><span class="rotulo">Itens incluídos</span><b class="grande">' + c.incluidos + ' de ' + D.itens.length + '</b><small>' + tirados.length + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +

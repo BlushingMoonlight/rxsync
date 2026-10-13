@@ -38,6 +38,12 @@
   .escolha .erro { color: var(--perigo); font-size: 13px; min-height: 18px; }
   [data-estilo="cyber"] .escolha .opcoes-usuario button { border-radius: 3px; }
   .questionario-chamada { display: flex; justify-content: center; }
+  .precos-admin { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; font-weight: 600; }
+  .precos-admin[hidden] { display: none; }
+  .precos-admin .alternar { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--superficie-2); border: 1px solid var(--linha); }
+  .precos-admin .alternar button { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 650; color: var(--texto-2); }
+  .precos-admin .alternar button[aria-pressed="true"] { background: var(--primaria); color: var(--sobre-primaria); }
+  [data-estilo="cyber"] .precos-admin .alternar, [data-estilo="cyber"] .precos-admin .alternar button { border-radius: 2px; }
 </style>
 <script src="comum/comum.js"></script>
 </head>
@@ -66,6 +72,8 @@
     <a class="botao botao-claro" href="escopo/resumo/" data-leva-estilo style="text-decoration:none">Resumo do escopo em PDF</a>
     <a class="botao" href="questionario/" data-leva-estilo style="text-decoration:none">Responder o questionário</a></div>
 
+  <div class="precos-admin" id="precos-admin" hidden><span>Preços:</span><span class="alternar" role="group" aria-label="Preços da proposta na demonstração">
+    <button type="button" data-precos="escondidos" aria-pressed="true">escondidos</button><button type="button" data-precos="liberados" aria-pressed="false">liberados</button></span></div>
   <p class="usuario-linha fraco" id="usuario-linha"></p>
   <p class="rodape-home fraco">Prévia com dados de exemplo. A IA é simulada: não diagnostica, não prescreve e o app não calcula dose. O estilo muda pelo botão do canto.</p>
 </main>
@@ -94,12 +102,19 @@
   }
   previas(); window.addEventListener('resize', previas); document.addEventListener('estilo', previas);
 
-  // Quem está usando (Datalog): Admin (Jean), Dr. André ou Convidado. Fica guardado no aparelho. A senha do Admin é conferida
-  // abrindo o arquivo de preços cifrado (não está no código); as do Dr. André e do Convidado só identificam quem usa.
+  // Quem está usando (Datalog): Admin (Jean), Dr. André ou Convidado. Fica guardado no aparelho. As senhas só identificam quem usa.
+  // Só o Admin vê o controle dos preços (começam escondidos a cada entrada; a escolha vale para a demo toda neste aparelho).
   function mostrarUsuario() {
-    var u = AG.usuario();
+    var u = AG.usuario(), lib = AG.precosLiberados();
     document.getElementById('usuario-linha').innerHTML = u ? 'Usando como ' + AG.USUARIOS[u][0] + ' · <button type="button" id="trocar-usuario">trocar usuário</button>' : '';
+    document.getElementById('precos-admin').hidden = u !== 'admin';
+    document.querySelectorAll('[data-precos]').forEach(function (b) { b.setAttribute('aria-pressed', String((b.dataset.precos === 'liberados') === lib)); });
   }
+  document.getElementById('precos-admin').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-precos]'); if (!b) return;
+    var sim = b.dataset.precos === 'liberados'; if (sim !== AG.precosLiberados()) AG.liberarPrecos(sim);
+    mostrarUsuario();
+  });
   function escolha() {
     var f = document.createElement('div'); f.className = 'escolha-fundo';
     f.innerHTML = '<div class="escolha">' + AG.logo({ tamanho: 72 }) + '<h1 style="font-size:24px">Quem está usando?</h1><p class="mudo" style="font-size:14px">Escolha e digite a senha. Fica guardado neste aparelho.</p>' +
@@ -117,7 +132,7 @@
       ev.preventDefault();
       var botao = form.querySelector('button'), erro = form.querySelector('.erro');
       if (!escolhido) return;
-      botao.disabled = true; erro.textContent = escolhido === 'admin' ? 'Conferindo…' : '';
+      botao.disabled = true; erro.textContent = '';
       AG.entrar(escolhido, form.senha.value).then(function (ok) {
         botao.disabled = false;
         if (!ok) { erro.textContent = 'Senha incorreta.'; form.senha.select(); return; }

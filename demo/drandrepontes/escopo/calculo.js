@@ -2,7 +2,8 @@
    Por subprojeto (Projeto 1, ERP, CRM, CDX e App): itens incluídos, tirados e em dúvida, e o prazo em semanas.
    Lote com algum item tirado continua no prazo; lote com todos os itens tirados sai do prazo.
    Itens obrigatórios (lotes obrigatórios e o 172) não podem ser tirados. Itens em dúvida contam como incluídos.
-   Valores: SÓ quando o Admin abriu os preços (AG.precos(), arquivo cifrado). Nenhum valor está escrito neste código.
+   Valores: só quando o usuário vê preços (AG.precos(): Dr. André sempre, Admin com os preços liberados, Convidado nunca).
+   Nenhum valor está escrito neste código; eles vêm do precos.js.
    Tirar um item desconta o preço dele do lote, do subprojeto e do total, na hora; a mensalidade do subprojeto só conta
    se algum item dele estiver incluído; desconto por faixa e à vista recalculados; Projeto 1 à parte, fora do desconto.
    As marcações ficam só no aparelho (localStorage), na chave da versão do escopo. */
