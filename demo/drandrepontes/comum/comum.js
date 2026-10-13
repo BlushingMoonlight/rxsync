@@ -54,9 +54,9 @@
     if (id !== 'admin') return Promise.resolve(escolherUsuario(id, senha));
     return abrirPrecos(senha).then(function (ok) { if (ok) marcarUsuario('admin'); else log('senha-admin-errada', {}); return ok; });
   }
-  // Preços abertos (só para o Admin, nunca no app do paciente). null quando fechados.
+  // Preços abertos (só para o Admin, nunca no app do paciente nem nas páginas com data-sem-precos). null quando fechados.
   function precos() {
-    if (usuario() !== 'admin' || html.dataset.contexto === 'app' || PAGINA === 'app') return null;
+    if (usuario() !== 'admin' || html.dataset.contexto === 'app' || PAGINA === 'app' || html.dataset.semPrecos !== undefined) return null;
     var t = memoria.precos || lerArmazenado('sessionStorage', CHAVE_PRECOS);
     try { return t ? JSON.parse(t) : null; } catch (e) { return null; }
   }
@@ -65,7 +65,7 @@
   function trocarUsuario() { log('saiu-usuario', {}); enviarLog(true); memoria.usuario = ''; fecharPrecos(); gravarArmazenado('localStorage', CHAVE_USUARIO, null); }
   // Marcações do escopo neste aparelho (a mesma chave do escopo e do resumo em PDF).
   function chaveEscopo() { var D = window.ESCOPO; return 'ag-escopo-reuniao-v' + (D ? D.versao : '') + '-tudo-marcado'; }
-  // Raiz da demonstração (…/demo/drandrepontes/) e a página atual (home, app, painel, escopo, questionario, datalog).
+  // Raiz da demonstração (…/demo/drandrepontes/) e a página atual (home, app, painel, escopo, questionario, fluxo, datalog).
   var RAIZ = (function () { var p = location.pathname, i = p.indexOf('/drandrepontes/'); return i >= 0 ? p.slice(0, i + 15) : p.replace(/[^/]*$/, ''); })();
   var PAGINA = (function () { var r = location.pathname.slice(RAIZ.length).split('/')[0]; return r === '' || r === 'index.html' ? 'home' : r; })();
   var semRegistro = dentroDeQuadro || PAGINA === 'datalog';
