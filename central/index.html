@@ -672,6 +672,60 @@ TELAS.mais = async c => {
     bloco('Links', el('ul', { class: 'lista' }, link(GH + '/issues/89', 'Pendências (#89)'), link(GH + '/blob/main/docs/decisoes.md', 'Decisões'), link(GH + '/blob/main/docs/mapa/README.md', 'Mapa do sistema'))),
     el('div', { class: 'acoes' }, el('button', { class: 'btn perigo plena', type: 'button', text: 'Sair', onclick: sair })));
 };
+// --- Fase 2: funil completo
+TELAS.funil_completo = async c => {
+  const r = await chamar('funil_completo'); if (falhou(c, r)) return;
+  const d = r.dados, t = d.funil_90d.totais;
+  const lst = (arr, fn) => arr.length ? el('ul', { class: 'lista' }, arr.map(fn)) : vazio();
+  c.replaceChildren(el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: '‹ Funil', onclick: () => ir('funil') })),
+    el('h1', { text: 'Funil completo (90 dias)' }),
+    el('div', { class: 'grade' }, cartao('Pedidos', fmtNum(t.pedidos_demonstracao)), cartao('Mini testes', fmtNum(t.mini_testes), fmtNum(t.mini_testes_com_consulta) + ' marcaram consulta'),
+      cartao('Testes que viraram contrato', fmtNum(d.testes_que_viraram_contrato), 'desde o começo'), cartao('Dias até o go-live (média)', d.dias_ate_go_live_media == null ? '—' : String(d.dias_ate_go_live_media))),
+    bloco('Por dia', grafBarras(d.funil_90d.por_dia.map(x => ({ r: diaCurto(x.dia), v: x.pedidos + x.mini_testes + x.cadastros })), 'Pedidos, mini testes e cadastros por dia')),
+    bloco('Mini teste por origem', lst(d.mini_teste_por_origem_90d, x => el('li', {}, el('div', { class: 'cresce titulo-item', text: x.origem }), el('span', { class: 'mudo num', text: `${x.testes} testes · ${x.com_consulta} com consulta` })))),
+    bloco('Mini teste por especialidade', campos(Object.entries(d.mini_teste_por_especialidade_90d || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, fmtNum(v)]))),
+    bloco('Cadastros por origem', lst(d.cadastros_por_origem, x => el('li', {}, el('div', { class: 'cresce titulo-item', text: x.origem }), el('span', { class: 'mudo num', text: fmtNum(x.cadastros) })))),
+    bloco('Cadastros parados (mais de 14 dias sem ir ao ar)', lst(d.cadastros_parados, x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce titulo-item', text: nomeCli(x) }), el('span', { class: 'mudo peq', text: `${x.status} · ${x.dias} dias` }))))),
+    bloco('Onboarding vencido', lst(d.onboarding_vencido, x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce titulo-item', text: nomeCli(x) }), el('span', { class: 'mudo peq', text: 'venceu ' + fmtData(x.venceu) }))))),
+    el('p', { class: 'mudo peq', text: `Testes encerrados sem contrato: ${fmtNum(d.testes_encerrados_sem_contrato)}.` }));
+};
+
+// --- Fase 2: registro e chaves da API (dentro de Segurança)
+const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
+  chave: 'Chave mudada', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
+  avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
+  primeiro_codigo_pedido: 'Código de primeiro acesso pedido', primeiro_senha_criada: 'Senha criada', primeiro_acesso_concluido: 'Primeiro acesso concluído', reinicio_por_sql: 'Reinício por SQL' };
+const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como); if (d.prefixo) p.push(d.prefixo + '…');
+  if (d.antes && d.depois && typeof d.antes === 'object') p.push(Object.keys(d.depois).map(k => `${k}: ${d.antes[k] ?? '—'} → ${d.depois[k] ?? '—'}`).join(', ')); return p.join(' · '); };
+GANCHOS.seguranca.push(async () => {
+  if (est.chaves.tela_registro !== 'SIM') return null;
+  const r = await chamar('registro'); if (!r.ok) return bloco('Registro', el('div', { class: 'faixa alerta', text: r.mensagem || 'Não consegui carregar.' }));
+  return bloco('Registro (12 meses)', r.dados.registro.length ? el('ul', { class: 'lista' }, r.dados.registro.map(x => el('li', {}, el('div', { class: 'cresce' },
+    el('div', { class: 'titulo-item', text: (NOMES_EVENTO[x.evento] || x.evento) + (x.desfeito_em ? ' (desfeita)' : '') }),
+    el('div', { class: 'mudo peq', text: `${fmtHora(x.quando)} · ${x.navegador || '?'} · IP ${x.ip || '?'}${resumoDetalhe(x.detalhe) ? ' · ' + resumoDetalhe(x.detalhe) : ''}` })),
+    GANCHOS.desfazer ? GANCHOS.desfazer(x) : null))) : vazio());
+});
+GANCHOS.seguranca.push(async () => {
+  if (est.chaves.tela_chaves_api !== 'SIM') return null;
+  const r = await chamar('chaves_api'); if (!r.ok) return bloco('Chaves da API', el('div', { class: 'faixa alerta', text: r.mensagem || 'Não consegui carregar.' }));
+  const d = r.dados;
+  return bloco('Chaves da API (Enterprise)', el('p', { class: 'mudo peq', text: `Chamadas com chave desconhecida em 7 dias: ${fmtNum(d.chaves_desconhecidas_7d)}.` }),
+    d.chaves.length ? el('ul', { class: 'lista' }, d.chaves.map(k => el('li', {}, el('div', { class: 'cresce' },
+      el('div', { class: 'titulo-item', text: `${k.prefixo}… · ${k.nome || 'sem nome'} · ${k.nome_clinica || k.cliente_id}` }),
+      el('div', { class: 'mudo peq', text: `criada ${fmtData(k.criada_em)} · último uso ${fmtHora(k.ultimo_uso_em)} · limites ${k.limite_minuto}/min e ${k.limite_dia}/dia · 7 dias: ${Object.entries(k.uso_7d || {}).map(([a, b]) => a + ' ' + b).join(', ') || 'sem uso'}` })),
+      k.revogada_em ? el('span', { class: 'pill alerta', text: 'revogada' }) : (GANCHOS.revogar ? GANCHOS.revogar(k) : el('span', { class: 'pill ok', text: 'ativa' }))))) : vazio('Nenhuma chave.'),
+    GANCHOS.criarChave ? GANCHOS.criarChave() : null);
+});
+
+// --- Fase 2: agregados de pacientes (desligada até a análise jurídica; DEC-057)
+TELAS.agregados = async c => {
+  const r = await chamar('agregados'); if (falhou(c, r)) return;
+  const cols = [['pacientes', 'Pacientes'], ['consultas_30d_ia', 'Consultas pela IA (30 d)'], ['consultas_30d_equipe', 'Pela equipe (30 d)'], ['lista_espera_ativa', 'Lista de espera'],
+    ['documentos_30d', 'Documentos (30 d)'], ['preconsulta_30d', 'Pré-consulta (30 d)'], ['pesquisa_nota_media_90d', 'Nota média (90 d)'], ['relacionamento_30d', 'Relacionamento (30 d)']];
+  c.replaceChildren(el('h1', { text: 'Agregados de pacientes' }), el('p', { class: 'mudo', text: 'Só contagens e médias por clínica; nenhum dado de paciente.' }),
+    bloco(null, el('div', { class: 'tabela-rolagem' }, el('table', { class: 'dados' }, el('tr', {}, el('th', { text: 'Clínica' }), cols.map(([, n]) => el('th', { text: n }))),
+      r.dados.clinicas.map(x => el('tr', {}, el('td', { text: x.nome }), cols.map(([k]) => el('td', { class: 'num', text: x[k] == null ? '—' : fmtNum(x[k]) }))))))));
+};
 /* TELAS */
 
 // ---------------------------------------------------------------- começo
