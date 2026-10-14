@@ -726,7 +726,75 @@ TELAS.agregados = async c => {
     bloco(null, el('div', { class: 'tabela-rolagem' }, el('table', { class: 'dados' }, el('tr', {}, el('th', { text: 'Clínica' }), cols.map(([, n]) => el('th', { text: n }))),
       r.dados.clinicas.map(x => el('tr', {}, el('td', { text: x.nome }), cols.map(([k]) => el('td', { class: 'num', text: x[k] == null ? '—' : fmtNum(x[k]) }))))))));
 };
-/* TELAS */
+// --- Fase 3: edições (cada uma só aparece com a chave ligada; o servidor confere de novo)
+async function editar(acao, dados, titulo, linhas, aviso) {
+  if (!(await confirmarEdicao(titulo, linhas, aviso))) return null;
+  const r = await chamar(acao, { ...dados, confirmacao: 'CONFIRMAR' });
+  if (!r.ok) { toast(r.mensagem || 'Não consegui.'); return null; }
+  return r;
+}
+async function desfazer(registroId) {
+  const r = await editar('desfazer', { registro_id: registroId }, 'Desfazer a edição', [], 'Volta ao valor de antes. Fica no registro.');
+  if (r) { toast('Desfeito.'); rotear(); }
+}
+GANCHOS.desfazer = x => (['edicao_limites', 'chave_api_criada'].includes(x.evento) && !x.desfeito_em)
+  ? el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(x.id) }) : null;
+GANCHOS.ficha.push(x => {
+  const partes = [];
+  if (est.chaves.editar_limites === 'SIM') {
+    const L = x.limites;
+    const franquia = el('input', { inputmode: 'numeric', value: L.franquia_mensagens || '', placeholder: 'vazio = 5.000' });
+    const limitar = el('select', {}, ['', 'SIM', 'NAO'].map(v => el('option', { value: v, text: v || '(vazio = não limita)', selected: (L.limitar_franquia || '') === v })));
+    const dono = el('input', { inputmode: 'numeric', value: L.dono_limite_dia || '', placeholder: 'vazio = padrão' });
+    partes.push(el('form', { onsubmit: async e => {
+      e.preventDefault();
+      const novo = { franquia_mensagens: franquia.value.replace(/\D/g, ''), limitar_franquia: limitar.value, dono_limite_dia: dono.value.replace(/\D/g, '') };
+      const r = await editar('editar_limites', { cliente_id: x.cliente_id, ...novo }, 'Limites de ' + x.nome,
+        [['Franquia', L.franquia_mensagens, novo.franquia_mensagens], ['Limitar na franquia', L.limitar_franquia, novo.limitar_franquia], ['Limite diário do assistente do dono', L.dono_limite_dia, novo.dono_limite_dia]]);
+      if (r) { toast('Limites mudados.'); await rotear(); const c = $('conteudo'); c.prepend(el('div', { class: 'faixa ok' }, 'Limites mudados. ', el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(r.registro_id) }))); }
+    } }, el('h2', { text: 'Limites' }), el('label', { class: 'campo' }, 'Franquia de mensagens por mês', franquia), el('label', { class: 'campo' }, 'Limitar na franquia', limitar),
+      el('label', { class: 'campo' }, 'Limite diário do assistente do dono', dono), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e salvar' })));
+  }
+  if (est.chaves.editar_onboarding === 'SIM') {
+    partes.push(el('div', { class: 'mt' }, el('h2', { text: 'Onboarding' }), x.pode_reenviar_onboarding
+      ? el('button', { class: 'btn sec', type: 'button', text: 'Reenviar o link de onboarding', onclick: async () => {
+        const r = await editar('reenviar_onboarding', { cliente_id: x.cliente_id }, 'Reenviar o onboarding de ' + x.nome, [['Status', x.status, x.modalidade === 'teste' ? 'Em teste' : 'Pago'], ['Link atual', 'vale', 'deixa de valer']],
+          'O workflow 21 manda o link novo por e-mail em até 10 minutos. Não dá para desfazer.');
+        if (r) { toast(r.mensagem || 'Pronto.'); rotear(); }
+      } })
+      : el('p', { class: 'mudo', text: 'Só dá para reenviar quando a clínica está em "Aguardando dados".' })));
+  }
+  if (est.chaves.editar_avisos_eventos === 'SIM') {
+    const url = el('input', { type: 'url', inputmode: 'url', autocomplete: 'off', placeholder: 'https://…', spellcheck: 'false' });
+    partes.push(el('form', { class: 'mt', onsubmit: async e => {
+      e.preventDefault();
+      const r = await editar('aviso_destino_definir', { cliente_id: x.cliente_id, url: url.value.trim() }, 'Avisos de eventos de ' + x.nome,
+        [['Servidor', x.avisos_eventos ? x.avisos_eventos.servidor : '—', (url.value.match(/^https:\/\/([^/]+)/) || [])[1] || url.value]], 'Gera um segredo novo; o antigo deixa de valer.');
+      if (r) { mostrarSegredo('Segredo dos avisos de eventos', r.segredo, r.mensagem); rotear(); }
+    } }, el('h2', { text: 'Avisos de eventos (Enterprise)' }), el('label', { class: 'campo' }, 'Endereço que recebe os avisos', url),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Definir endereço' }),
+        x.avisos_eventos && x.avisos_eventos.ativo ? el('button', { class: 'btn perigo', type: 'button', text: 'Desligar', onclick: async () => {
+          const r = await editar('aviso_destino_desligar', { cliente_id: x.cliente_id }, 'Desligar os avisos de eventos de ' + x.nome, [['Avisos', 'ligados', 'desligados']]);
+          if (r) { toast(r.mensagem || 'Desligado.'); rotear(); }
+        } }) : null)));
+  }
+  return partes.length ? bloco('Edições', ...partes) : null;
+});
+GANCHOS.revogar = k => est.chaves.editar_chaves_api === 'SIM'
+  ? el('button', { class: 'btn perigo', type: 'button', text: 'Revogar', onclick: async () => {
+    const r = await editar('chave_api_revogar', { id: k.id }, 'Revogar a chave ' + k.prefixo + '…', [['Chave', 'ativa', 'revogada']], 'O sistema que usa esta chave para de funcionar na hora. Não dá para desfazer.');
+    if (r) { toast('Chave revogada.'); rotear(); }
+  } }) : el('span', { class: 'pill ok', text: 'ativa' });
+GANCHOS.criarChave = () => {
+  if (est.chaves.editar_chaves_api !== 'SIM') return null;
+  const cli = el('input', { autocomplete: 'off', autocapitalize: 'characters', placeholder: 'CLI-…', spellcheck: 'false' });
+  const nome = el('input', { autocomplete: 'off', placeholder: 'ex.: Painel Enterprise' });
+  return el('form', { class: 'mt', onsubmit: async e => {
+    e.preventDefault();
+    const r = await editar('chave_api_criar', { cliente_id: cli.value.trim(), nome: nome.value.trim() }, 'Criar chave da API', [['Clínica', '', cli.value.trim()], ['Nome', '', nome.value.trim()]], 'Só clínica Enterprise; no máximo 2 chaves ativas.');
+    if (r) { mostrarSegredo('Chave da API', r.chave, r.mensagem); rotear(); }
+  } }, el('h2', { text: 'Criar chave' }), el('label', { class: 'campo' }, 'Código da clínica', cli), el('label', { class: 'campo' }, 'Nome da chave', nome), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e criar' }));
+};
 
 // ---------------------------------------------------------------- começo
 if (est.sessao) abrirApp(); else entrada();
