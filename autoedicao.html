@@ -3143,6 +3143,9 @@ function partesTz(ms) {
   function impMapaAuto(cab) {
     var mapa = {}, usados = {};
     IMP_CAMPOS.forEach(function (f) {
+      // A observação NUNCA é escolhida sozinha, mesmo com o título "Observação" ou "Notes": pode ter conteúdo clínico.
+      // Começa em "Não importar"; só entra se a clínica escolher a coluna.
+      if (f.k === "observacao") { mapa[f.k] = -1; return; }
       var nomes = IMP_NOMES[f.k] || [];
       var i = cab.findIndex(function (h, j) { return !usados[j] && nomes.indexOf(impSem(h)) >= 0; });
       if (i < 0) i = cab.findIndex(function (h, j) { var x = impSem(h); return !usados[j] && x && nomes.some(function (n) { return n.length > 3 && x.indexOf(n) >= 0; }); });
@@ -3236,11 +3239,17 @@ function partesTz(ms) {
     IMP_CAMPOS.forEach(function (f) {
       var lb = h$("label", null, f.rot + (f.obrig ? " *" : "")); lb.htmlFor = "impCol_" + f.k; bl.appendChild(lb);
       var sel = h$("select"); sel.id = "impCol_" + f.k;
-      var o0 = h$("option", null, f.obrig ? "Escolha a coluna" : "Não usar"); o0.value = "-1"; sel.appendChild(o0);
+      var o0 = h$("option", null, f.obrig ? "Escolha a coluna" : (f.k === "observacao" ? "Não importar" : "Não usar")); o0.value = "-1"; sel.appendChild(o0);
       IMP.cab.forEach(function (h, i) { var o = h$("option", null, h || "Coluna " + (i + 1)); o.value = String(i); sel.appendChild(o); });
       sel.value = String(IMP.mapa[f.k]);
-      sel.onchange = function () { IMP.mapa[f.k] = +sel.value; amostra(); };
       bl.appendChild(sel);
+      var avObs = null;
+      if (f.k === "observacao") {
+        avObs = h$("div", "aviso ambar", "Só importe se essa coluna tiver informação administrativa (ex.: 'prefere manhã', 'convênio X'). Nada clínico: diagnóstico, alergia, medicamento ou queixa.");
+        avObs.id = "impAvisoObs"; avObs.style.cssText = "grid-column:1 / -1;margin:0"; avObs.hidden = IMP.mapa.observacao < 0;
+        bl.appendChild(avObs);
+      }
+      sel.onchange = function () { IMP.mapa[f.k] = +sel.value; if (avObs) avObs.hidden = IMP.mapa[f.k] < 0; amostra(); };
     });
     t.appendChild(bl);
     var nao = h$("p", "pc-dica"); t.appendChild(nao);
@@ -3303,7 +3312,8 @@ function partesTz(ms) {
   }
   function impBaixarErros(erros) {
     // CSV gerado aqui no aparelho, com as colunas originais da linha e o motivo.
-    var q = function (x) { x = String(x == null ? "" : x); return /[";\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    // Valor que começa com =, +, - ou @ ganha um apóstrofo na frente: o Numbers e o Excel não tratam como fórmula.
+    var q = function (x) { x = String(x == null ? "" : x); if (/^[=+\-@]/.test(x)) x = "'" + x; return /[";\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
     var linhas = [["linha", "motivo"].concat(IMP.cab).map(q).join(";")];
     erros.forEach(function (e) { linhas.push([e.linha, e.motivo].concat(IMP.dados[e.linha - 2] || []).map(q).join(";")); });
     var blob = new Blob(["﻿" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
@@ -3349,6 +3359,7 @@ function partesTz(ms) {
     var det = [];
     if (p.existentes) det.push("Os já cadastrados (mesmo nome, sem contar acento, e mesmo telefone) não são duplicados: só completamos o e-mail, o nascimento e a observação que estiverem vazios.");
     if (p.parecidos) det.push("Os que têm o telefone de outro paciente com outro nome (por exemplo, mãe e filho) entram como pacientes novos; confira depois em Possíveis duplicados.");
+    if (IMP.mapa.observacao >= 0) { var nObs = IMP.validas.filter(function (v) { return v.observacao; }).length; det.push(nObs === 1 ? "1 linha tem observação preenchida (vai ser importada). Confira se é só informação administrativa." : nObs + " linhas têm observação preenchida (vão ser importadas). Confira se é só informação administrativa."); }
     if (IMP.repetidas + p.repetidas) det.push((IMP.repetidas + p.repetidas) + " linha(s) repetida(s) no próprio arquivo ficaram de fora.");
     det.forEach(function (x) { t.appendChild(h$("p", "pc-dica", x)); });
     impListaErros(t, erros);
