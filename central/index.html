@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="CSP_DA_PAGINA">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zq7bHjQdDi6/xjChwLU319w5h+LIyJyzV+HyJn0nRVk='; style-src 'sha256-ZyFjVqDF1fxqS4NZDU1Y2ngPML+fpAbMZ8zHaJDiMQc='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -51,6 +51,7 @@ a { color: var(--brand-ink); }
 .marca { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #059669); display: grid; place-items: center; font-weight: 800; color: #fff; flex: none; }
 .topbar .titulo { font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .topbar button { background: rgba(255,255,255,.1); border: 0; color: #fff; border-radius: 10px; min-height: 40px; padding: 0 12px; }
+#conteudo:focus { outline: none; }
 .main { max-width: 860px; margin: 0 auto; padding: 18px calc(env(safe-area-inset-right, 0px) + 16px) calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom, 0px)) calc(env(safe-area-inset-left, 0px) + 16px); }
 /* abas de baixo */
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -190,7 +191,7 @@ function el(tag, props, ...filhos) {
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
     else e.setAttribute(k, v === true ? '' : String(v));
   }
-  for (const f of filhos.flat()) if (f != null && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
+  for (const f of filhos.flat(Infinity)) if (f != null && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
   return e;
 }
 const ICONES = {
@@ -386,8 +387,13 @@ async function rotear() {
   const t = TELAS[nome] ? nome : 'inicio';
   const titulo = (MENU.find(m => m[0] === t) || [t, 'Central RXSync'])[1];
   $('topo-titulo').textContent = titulo; document.title = titulo + ' · Central RXSync';
-  for (const b of document.querySelectorAll('[data-tela]')) b.toggleAttribute('aria-current', b.dataset.tela === t || (b.dataset.tela === 'mais' && !['inicio', 'clientes', 'dinheiro', 'sistema'].includes(t)));
-  for (const b of document.querySelectorAll('[aria-current]')) b.setAttribute('aria-current', 'page');
+  const PAI = { cliente: 'clientes', funil_completo: 'funil' };
+  const marcada = PAI[t] || t;
+  for (const b of document.querySelectorAll('[data-tela]')) {
+    const naAba = b.closest('#tabbar');
+    const ativa = b.dataset.tela === marcada || (naAba && b.dataset.tela === 'mais' && !['inicio', 'clientes', 'dinheiro', 'sistema'].includes(marcada));
+    if (ativa) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  }
   const c = $('conteudo'); c.replaceChildren(el('p', { class: 'mudo', text: 'Carregando…' }));
   try { await TELAS[t](c, resto.map(decodeURIComponent)); } catch (e) { c.replaceChildren(el('div', { class: 'faixa alerta', text: 'Algo deu errado nesta tela. Toque em Atualizar.' })); }
   c.focus({ preventScroll: true }); window.scrollTo(0, 0);
