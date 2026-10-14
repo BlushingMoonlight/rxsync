@@ -702,7 +702,7 @@ var LIMITE_CATALOGO = 500;
 var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link final ficar em outro endereço
 
 (function () {
-  var WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/autoedicao";
+  var WEBHOOK = "https://n8n.rxsync.com.br/webhook/autoedicao";
   var ORIGEM = "rxsync-site-2026";
   var params = new URLSearchParams(window.location.search);
   var token = params.get("t") || "";
@@ -1184,7 +1184,7 @@ function partesTz(ms) {
     return c;
   }
   // ---------- Aba Assistente IA (chat com o assistente de gestão) ----------
-  var ASSIST_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/assistente-dono";
+  var ASSIST_WEBHOOK = "https://n8n.rxsync.com.br/webhook/assistente-dono";
   var PLANO_ESSENCIAL = false, chatHist = [], chatOcupado = false, chatPronto = false;
   var CHAT_SUGESTOES = ["Como está minha agenda hoje?", "Quem vem amanhã?", "Quantas consultas a IA marcou esta semana?", "Chegou algum documento de paciente?", "Bloqueia sexta à tarde", "Quarta não vou mais atender de manhã"];
   function chatBolha(de, texto) {
@@ -1237,7 +1237,7 @@ function partesTz(ms) {
 
 
   // ---------- Aba Integração (agenda externa: Reservio) ----------
-  var INTEG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/integracao-agenda";
+  var INTEG_WEBHOOK = "https://n8n.rxsync.com.br/webhook/integracao-agenda";
   function intChamar(acao, dados) {
     return fetch(INTEG_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(function (r) { return r.json(); });
   }
@@ -2582,7 +2582,7 @@ function partesTz(ms) {
 
 
   // ===== TESTE DA ASSISTENTE =====
-  var CONECTAR_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/conectar";
+  var CONECTAR_WEBHOOK = "https://n8n.rxsync.com.br/webhook/conectar";
   function chamarConectar(acao, extra) {
     var body = { token: savedValues._token_conexao || "", acao: acao };
     Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });

@@ -1,7 +1,7 @@
 // Conferência do site em todo pull request: links e imagens internos existem, JSON válido,
-// todas as páginas apontam para o mesmo n8n e nenhuma aponta para endereço de teste.
+// todas as páginas e scripts apontam para o mesmo n8n e nenhum aponta para endereço de teste.
 import fs from 'node:fs'; import path from 'node:path';
-const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io';
+const N8N = 'https://n8n.rxsync.com.br';
 let erros = 0; const erro = m => { erros++; console.log('::error::' + m); };
 const todos = [];
 (function andar(d) { for (const f of fs.readdirSync(d)) { if (f.startsWith('.') || f === 'node_modules' || f === 'scripts') continue; const p = path.join(d, f); fs.statSync(p).isDirectory() ? andar(p) : todos.push(p); } })('.');
@@ -18,7 +18,11 @@ for (const f of htmls) {
     if (fs.existsSync(alvo) && fs.statSync(alvo).isDirectory()) alvo = path.join(alvo, 'index.html');
     if (!fs.existsSync(alvo) && !fs.existsSync(alvo + '.html')) erro(`${f}: link para "${m[1]}", que não existe no repositório`);
   }
-  for (const m of s.matchAll(/https?:\/\/[a-z0-9.-]*sslip\.io/gi)) if (m[0] !== N8N) erro(`${f}: aponta para outro n8n (${m[0]})`);
+}
+// O n8n só pode ser chamado pelo endereço oficial. O nome antigo (sslip.io) foi aposentado.
+for (const f of todos.filter(f => /\.(html|js|mjs)$/.test(f))) {
+  const s = fs.readFileSync(f, 'utf8');
+  for (const m of s.matchAll(/https?:\/\/(?:[a-z0-9.-]*\.(?:sslip|nip)\.io|n8n\.[a-z0-9.-]+)/gi)) if (m[0] !== N8N) erro(`${f}: aponta para outro n8n (${m[0]})`);
   if (/https?:\/\/(localhost|127\.0\.0\.1)/i.test(s)) erro(`${f}: tem endereço de teste (localhost)`);
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }

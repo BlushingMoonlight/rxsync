@@ -76,7 +76,7 @@
 
   // ---------- Registro de uso (vai para o datalog da RXSync) ----------
   // Em lotes a cada 10 s e ao sair da página (sendBeacon). Se falhar, a demonstração segue normal, sem erro na tela.
-  var URL_LOG = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demo-log';
+  var URL_LOG = 'https://n8n.rxsync.com.br/webhook/demo-log';
   var fila = [], telaAberta = '', telaDesde = Date.now(), paginaDesde = Date.now();
   function telaAtual() { return (location.hash || '').slice(1).split('?')[0] || (PAGINA === 'home' ? '' : 'inicio'); }
   function log(acao, detalhe, tela) {

@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   var A = window.AG, esc = A.esc;
-  var URL_VER = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demo-log-ver';
+  var URL_VER = 'https://n8n.rxsync.com.br/webhook/demo-log-ver';
   var CHAVE = 'ag-datalog-chave', USUARIOS = [['andre', 'Dr. André'], ['convidado', 'Convidado'], ['admin', 'Admin (Jean)'], ['outro', 'Outros']];
   var $ = function (id) { return document.getElementById(id); };
   var dados = null, aba = 'andre';

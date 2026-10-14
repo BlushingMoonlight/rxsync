@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var A = window.AG, esc = A.esc, DT = A.datas;
-  var URL_SALVAR = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demo-salvar';
+  var URL_SALVAR = 'https://n8n.rxsync.com.br/webhook/demo-salvar';
   // [assunto, [número, pergunta, opções (se houver)]]
   var GRUPOS = [
     ['Clínica e equipe', [

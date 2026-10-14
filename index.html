@@ -1661,7 +1661,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         var textoBtn = btn.innerHTML;
         btn.innerHTML = 'Enviando...';
         try {
-            var r = await fetch('https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/formulario-site', {
+            var r = await fetch('https://n8n.rxsync.com.br/webhook/formulario-site', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
                 body: JSON.stringify({ nome: v('nome'), clinica: v('clinica'), email: v('email'), telefone: v('telefone'),
@@ -1781,7 +1781,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 
     // ===================== TESTE AO VIVO (mini teste) =====================
     // Conversa de verdade com a IA, limitada a 5 mensagens. Backend: workflow n8n "11 - Mini teste do site".
-    var MT_API = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
+    var MT_API = 'https://n8n.rxsync.com.br/webhook/';
     var mt = { sessao: null, restantes: 5, agenda: null, profs: [], agendamento: null, dia: 'd1', enviando: false };
 
     function mtPost(rota, dados) {

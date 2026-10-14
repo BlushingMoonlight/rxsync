@@ -202,7 +202,7 @@
   });
 
   // ---------- Salvar e enviar à RXSync (cada envio vira uma versão nova no banco; nada fica só lá: o aparelho continua com tudo) ----------
-  var URL_SALVAR = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demo-salvar';
+  var URL_SALVAR = 'https://n8n.rxsync.com.br/webhook/demo-salvar';
   function desligados() { return D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; }).map(function (i) { return i.n; }); }
   function ultimoEnvio() { try { return localStorage.getItem(CHAVE + '-enviado') || ''; } catch (e) { return ''; } }
   function mostrarEnvio() { var u = ultimoEnvio(); $('salvo').textContent = u ? 'Salvo e enviado em ' + u : ''; }
