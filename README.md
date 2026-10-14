@@ -24,3 +24,15 @@ Os workflows do n8n e o banco ficam no repositório privado `rxsync-sistema`.
 4. Em 1 ou 2 minutos o site está atualizado.
 
 Para desfazer: no pull request, botão **Revert**, e depois Merge do pull request de reversão.
+
+## Pendências, decisões e mapa
+
+Tudo neste repositório é público, inclusive Issues, PRs, `README.md` e `CLAUDE.md` (o GitHub Pages publica o repositório
+inteiro). Por isso:
+
+- **Issues ficam no repositório privado `rxsync-sistema`**, mesmo as corrigidas aqui. As Issues deste repositório estão
+  desligadas.
+- **Decisões** ficam no registro do `rxsync-sistema` (`docs/decisoes.md`).
+- **Mapa** do site e do painel fica no `rxsync-sistema` (`docs/mapa/site.md` e `docs/mapa/painel.md`). PR que muda uma
+  página atualiza o mapa num PR de lá, com a ordem do Merge.
+- **Falha de segurança:** ver [SECURITY.md](SECURITY.md).
