@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="CSP_DA_PAGINA">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Central">
+<meta name="format-detection" content="telephone=no">
+<title>Central RXSync</title>
+<link rel="manifest" href="/central/manifest.webmanifest">
+<link rel="icon" href="/assets/favicon-rxsync.png.PNG">
+<link rel="apple-touch-icon" href="/assets/favicon-rxsync.png.PNG">
+<style>
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-600.woff2') format('woff2'); font-weight: 500 600; font-display: swap; }
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+:root {
+  --bg: #f2f5f4; --surface: #fff; --surface-2: #f7f9f8; --ink: #0f172a; --ink-2: #445263; --ink-3: #66727f;
+  --line: #e0e7e4; --line-2: #cfd9d5; --brand: #059669; --brand-h: #047857; --brand-ink: #065f46; --brand-soft: #e6f5ee;
+  --navy: #0f172a; --navy-2: #16213a; --amber-ink: #92400e; --amber-soft: #fef3c7; --rose-ink: #9f1239; --rose-soft: #ffe4e6;
+  --blue-ink: #3730a3; --blue-soft: #e0e7ff; --r-lg: 18px; --r-md: 12px; --tabbar-h: 62px;
+  --sombra: 0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.05);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220; --surface: #121b2d; --surface-2: #17223a; --ink: #e8edf5; --ink-2: #b4c0d0; --ink-3: #8a97a8;
+    --line: #23314a; --line-2: #2e3f5c; --brand: #10b981; --brand-h: #34d399; --brand-ink: #6ee7b7; --brand-soft: #0f2e27;
+    --amber-ink: #fcd34d; --amber-soft: #3a2d0c; --rose-ink: #fda4af; --rose-soft: #3b1420; --blue-ink: #c7d2fe; --blue-soft: #1e2550;
+    --sombra: none;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.5 'Figtree', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; } /* 16px: o iPad não dá zoom ao tocar no campo */
+a { color: var(--brand-ink); }
+.num { font-variant-numeric: tabular-nums; }
+.mudo { color: var(--ink-3); }
+.peq { font-size: 13px; }
+/* barra de cima (celular e iPad em pé) */
+.topbar { position: sticky; top: 0; z-index: 30; background: var(--navy); color: #fff; padding: calc(env(safe-area-inset-top, 0px) + 10px) calc(env(safe-area-inset-right, 0px) + 16px) 10px calc(env(safe-area-inset-left, 0px) + 16px); display: flex; align-items: center; gap: 12px; }
+.marca { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #059669); display: grid; place-items: center; font-weight: 800; color: #fff; flex: none; }
+.topbar .titulo { font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar button { background: rgba(255,255,255,.1); border: 0; color: #fff; border-radius: 10px; min-height: 40px; padding: 0 12px; }
+.main { max-width: 860px; margin: 0 auto; padding: 18px calc(env(safe-area-inset-right, 0px) + 16px) calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom, 0px)) calc(env(safe-area-inset-left, 0px) + 16px); }
+/* abas de baixo */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar button { height: var(--tabbar-h); border: 0; background: none; color: var(--ink-3); font-size: 11.5px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.tabbar button svg, .rail button svg { width: 22px; height: 22px; }
+.tabbar button[aria-current="page"] { color: var(--brand-ink); }
+body.teclado .tabbar { display: none; }
+/* menu lateral (iPad deitado e computador) */
+.rail { display: none; }
+@media (min-width: 1024px) {
+  .topbar, .tabbar { display: none; }
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .rail { display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; background: var(--navy); color: #fff; padding: calc(env(safe-area-inset-top, 0px) + 20px) 14px 20px; overflow-y: auto; }
+  .rail .cab { display: flex; align-items: center; gap: 10px; padding: 0 8px 18px; font-weight: 700; }
+  .rail button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 2px; border: 0; border-radius: 10px; background: none; color: #a7b3c2; font-size: 15px; font-weight: 600; text-align: left; }
+  .rail button:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .rail button[aria-current="page"] { background: rgba(255,255,255,.1); color: #fff; }
+  .rail .sep { height: 1px; background: rgba(255,255,255,.08); margin: 10px 4px; }
+  .main { padding-bottom: 40px; }
+}
+/* blocos */
+h1 { font-size: 24px; line-height: 1.2; margin: 4px 0 14px; font-weight: 800; }
+h2 { font-size: 17px; margin: 0 0 10px; font-weight: 700; }
+.bloco { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; box-shadow: var(--sombra); }
+.bloco + .bloco, .bloco + .grade, .grade + .bloco { margin-top: 14px; }
+.grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .grade { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.cartao { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; }
+.cartao .valor { font-size: 24px; font-weight: 800; line-height: 1.15; }
+.cartao .rot { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+.lista { list-style: none; margin: 0; padding: 0; }
+.lista li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.lista li:first-child { border-top: 0; }
+.lista .cresce { flex: 1; min-width: 0; }
+.lista .titulo-item { font-weight: 600; overflow-wrap: anywhere; }
+.lista button.item { all: unset; display: flex; gap: 10px; align-items: center; width: 100%; cursor: pointer; }
+.pill { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; border: 1px solid var(--line); }
+.pill.ok { background: var(--brand-soft); color: var(--brand-ink); border-color: transparent; }
+.pill.pend { background: var(--amber-soft); color: var(--amber-ink); border-color: transparent; }
+.pill.alerta { background: var(--rose-soft); color: var(--rose-ink); border-color: transparent; }
+.pill.plano { background: var(--blue-soft); color: var(--blue-ink); border-color: transparent; }
+.faixa { border-radius: var(--r-md); padding: 10px 14px; font-weight: 700; margin-bottom: 14px; }
+.faixa.pend { background: var(--amber-soft); color: var(--amber-ink); }
+.faixa.alerta { background: var(--rose-soft); color: var(--rose-ink); }
+.faixa.ok { background: var(--brand-soft); color: var(--brand-ink); }
+.barra { height: 8px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.barra > i { display: block; height: 100%; background: var(--brand); }
+.barra.alto > i { background: #f59e0b; } .barra.cheio > i { background: #e11d48; }
+.campos { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; }
+.campos dt { color: var(--ink-3); font-size: 14px; } .campos dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.chips button { border: 1px solid var(--line-2); background: var(--surface); border-radius: 99px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+/* botões e campos */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid transparent; font-weight: 700; cursor: pointer; }
+.btn.pri { background: var(--brand); color: #fff; } .btn.pri:hover { background: var(--brand-h); }
+.btn.sec { background: var(--surface); color: var(--ink); border-color: var(--line-2); }
+.btn.perigo { background: var(--surface); color: var(--rose-ink); border-color: var(--rose-soft); }
+.btn.plena { width: 100%; } .btn:disabled { opacity: .55; cursor: default; }
+.acoes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+label.campo { display: block; margin-bottom: 12px; font-weight: 600; font-size: 14px; color: var(--ink-2); }
+label.campo input, label.campo select { display: block; width: 100%; margin-top: 6px; min-height: 46px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink); }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; }
+input.codigo { letter-spacing: .3em; font-size: 22px !important; text-align: center; font-weight: 700; }
+.chave-totp { font: 700 20px/1.5 ui-monospace, Menlo, monospace; letter-spacing: .08em; background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: 12px; padding: 12px; text-align: center; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.codigos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font: 700 17px ui-monospace, Menlo, monospace; }
+.codigos span { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; }
+/* entrada */
+.entrada { min-height: 100vh; display: grid; place-items: center; padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); background: var(--navy); }
+.entrada .bloco { width: 100%; max-width: 440px; }
+.entrada .cab { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.passos { margin: 0 0 12px; padding-left: 20px; } .passos li { margin-bottom: 6px; }
+.nome-grande { font-weight: 800; font-size: 19px; } .mt { margin-top: 14px; } label.campo.linha { display: flex; gap: 10px; align-items: center; }
+.erro { color: var(--rose-ink); font-weight: 600; min-height: 1.5em; }
+/* gráficos */
+svg.grafico { width: 100%; height: 120px; display: block; }
+svg.grafico .b { fill: var(--brand); } svg.grafico .eixo { stroke: var(--line); }
+svg.grafico text { fill: var(--ink-3); font-size: 10px; }
+/* aviso flutuante e janela */
+#toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + 20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600; z-index: 80; max-width: calc(100% - 32px); }
+@media (min-width: 1024px) { #toast { bottom: 28px; } }
+.fundo { position: fixed; inset: 0; background: rgba(15,23,42,.55); z-index: 70; display: grid; place-items: center; padding: 16px; }
+.janela { background: var(--surface); border-radius: var(--r-lg); padding: 18px; width: 100%; max-width: 460px; max-height: 90vh; overflow: auto; }
+table.antes-depois { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 14px; }
+table.antes-depois th, table.antes-depois td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.tabela-rolagem { overflow-x: auto; }
+table.dados { border-collapse: collapse; font-size: 14px; min-width: 100%; }
+table.dados th, table.dados td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div id="entrada" class="entrada" hidden>
+  <div class="bloco">
+    <div class="cab"><div class="marca">RX</div><div><div class="nome-grande">Central RXSync</div><div class="mudo peq">Área do administrador</div></div></div>
+    <div id="entrada-corpo"></div>
+  </div>
+</div>
+
+<div id="app" class="app" hidden>
+  <aside class="rail" aria-label="Menu">
+    <div class="cab"><div class="marca">RX</div>Central RXSync</div>
+    <nav id="rail-nav"></nav>
+  </aside>
+  <div>
+    <header class="topbar">
+      <div class="marca">RX</div>
+      <div class="titulo" id="topo-titulo">Central RXSync</div>
+      <button type="button" id="btn-atualizar" aria-label="Atualizar">Atualizar</button>
+    </header>
+    <main class="main" id="conteudo" tabindex="-1"></main>
+  </div>
+  <nav class="tabbar" id="tabbar" aria-label="Abas"></nav>
+</div>
+<div id="toast" role="status" hidden></div>
+<div id="janela" class="fundo" hidden></div>
+
+<script>
+'use strict';
+// Central RXSync. Contrato: rxsync-sistema/docs/mapa/central.md (DEC-053 a DEC-061).
+// Tudo o que vem do servidor entra na página como TEXTO (textContent), nunca como HTML.
+(function () {
+const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/central';
+const ORIGEM = 'rxsync-site-2026';
+
+// A página não abre dentro de outra (o GitHub Pages não deixa mandar o cabeçalho que bloqueia isso).
+if (window.top !== window.self) { document.body.textContent = 'A Central não abre dentro de outra página.'; try { window.top.location = window.location.href; } catch (e) {} return; }
+
+// ---------------------------------------------------------------- utilidades
+const $ = id => document.getElementById(id);
+function el(tag, props, ...filhos) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'text') e.textContent = String(v);
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const f of filhos.flat()) if (f != null && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
+  return e;
+}
+const ICONES = {
+  inicio: 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z', clientes: 'M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M21 19v-1a4 4 0 0 0-3-3.9M16 3.1a3.5 3.5 0 0 1 0 6.8',
+  dinheiro: 'M3 7h18v10H3zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 7v10M18 7v10', sistema: 'M3 12h4l3-8 4 16 3-8h4',
+  mais: 'M5 12h.01M12 12h.01M19 12h.01', uso: 'M4 20V10M10 20V4M16 20v-7M22 20H2', avisos: 'M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4',
+  funil: 'M3 4h18l-7 8v6l-4 2v-8z', seguranca: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', chaves: 'M15 7a4 4 0 1 1-3.5 6.1L4 20.5V17h3v-3h3l1.5-1.5A4 4 0 0 1 15 7',
+  agregados: 'M3 3v18h18M7 15l4-4 3 3 5-6'
+};
+const icone = n => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.9'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', ICONES[n] || ''); s.append(p); return s; };
+const fmtReal = v => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const fmtNum = v => (Number(v) || 0).toLocaleString('pt-BR');
+const fmtData = v => { if (!v) return '—'; const d = new Date(String(v).length === 10 ? v + 'T12:00:00' : v); return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR'); };
+const fmtHora = v => { if (!v) return '—'; const d = new Date(v); return isNaN(d) ? String(v) : d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); };
+const vazio = t => el('p', { class: 'mudo', text: t || 'Nada por aqui.' });
+function toast(t) { const x = $('toast'); x.textContent = t; x.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { x.hidden = true; }, 3500); }
+async function copiar(t) { try { await navigator.clipboard.writeText(t); toast('Copiado.'); } catch (e) { toast('Não consegui copiar: selecione e copie à mão.'); } }
+
+// ---------------------------------------------------------------- sessão e chamadas
+// A sessão fica na memória e no sessionStorage desta aba (some ao fechar). Nunca no localStorage nem no endereço.
+const est = { sessao: '', chaves: {}, config: null };
+try { est.sessao = sessionStorage.getItem('central_sessao') || ''; } catch (e) {}
+function guardarSessao(s) { est.sessao = s || ''; try { if (s) sessionStorage.setItem('central_sessao', s); else sessionStorage.removeItem('central_sessao'); } catch (e) {} }
+const ua = navigator.userAgent;
+const aparelho = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
+const ehApp = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+async function chamar(acao, dados) {
+  const cab = { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM, 'x-rxsync-aparelho': aparelho, 'x-rxsync-app': ehApp ? 'sim' : 'nao' };
+  if (est.sessao) cab['x-rxsync-sessao'] = est.sessao;
+  let r;
+  try {
+    const resp = await fetch(N8N, { method: 'POST', headers: cab, body: JSON.stringify({ acao, dados: dados || {} }), cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+    r = await resp.json();
+  } catch (e) { r = { ok: false, mensagem: 'Sem conexão com a Central. Confira a internet e tente de novo.' }; }
+  r = r || { ok: false, mensagem: 'Resposta vazia.' };
+  if (r.sair && acao !== 'sair' && acao !== 'sair_todos') { guardarSessao(''); entrada(r.mensagem); }
+  return r;
+}
+// Teclado aberto no celular ou iPad em pé: esconde as abas de baixo.
+document.addEventListener('focusin', e => { if (e.target.matches('input, select, textarea')) document.body.classList.add('teclado'); });
+document.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('input, select, textarea')) document.body.classList.remove('teclado'); }, 50));
+
+// ---------------------------------------------------------------- janela de confirmação
+function janela(conteudo) {
+  const f = $('janela'); f.replaceChildren(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true' }, conteudo)); f.hidden = false;
+  const fechar = () => { f.hidden = true; f.replaceChildren(); };
+  f.onclick = e => { if (e.target === f) fechar(); };
+  const primeiro = f.querySelector('input, button'); if (primeiro) primeiro.focus();
+  return fechar;
+}
+// Pede o código de 6 dígitos (ligar chaves). Devolve o código ou '' se cancelar.
+function pedirCodigo(titulo, texto) {
+  return new Promise(ok => {
+    const inp = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', enterkeyhint: 'done', 'aria-label': 'Código de 6 dígitos' });
+    let fechar;
+    const enviar = e => { e.preventDefault(); const c = inp.value.replace(/\D/g, ''); if (c.length !== 6) { inp.focus(); return; } fechar(); ok(c); };
+    fechar = janela(el('form', { onsubmit: enviar }, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }),
+      el('label', { class: 'campo' }, 'Código do app Senhas', inp),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Confirmar' }), el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); ok(''); } }))));
+  });
+}
+// Edição: mostra o antes e o depois e só segue com "CONFIRMAR" digitado.
+function confirmarEdicao(titulo, linhas, aviso) {
+  return new Promise(ok => {
+    const inp = el('input', { autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Digite CONFIRMAR' });
+    const tab = el('table', { class: 'antes-depois' }, el('tr', {}, el('th', { text: '' }), el('th', { text: 'Antes' }), el('th', { text: 'Depois' })),
+      linhas.map(([r, a, d]) => el('tr', {}, el('th', { text: r }), el('td', { text: a === '' || a == null ? '(vazio)' : a }), el('td', { text: d === '' || d == null ? '(vazio)' : d }))));
+    let fechar;
+    const enviar = e => { e.preventDefault(); if (inp.value.trim().toUpperCase() !== 'CONFIRMAR') { inp.focus(); return; } fechar(); ok(true); };
+    fechar = janela(el('form', { onsubmit: enviar }, el('h2', { text: titulo }), linhas.length ? tab : null, aviso ? el('p', { class: 'mudo', text: aviso }) : null,
+      el('label', { class: 'campo' }, 'Para confirmar, digite CONFIRMAR', inp),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Confirmar' }), el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); ok(false); } }))));
+  });
+}
+function mostrarSegredo(titulo, valor, texto) {
+  const fechar = janela(el('div', {}, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }), el('div', { class: 'chave-totp', text: valor }),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', text: 'Copiar', onclick: () => copiar(valor) }), el('button', { class: 'btn sec', type: 'button', text: 'Já copiei', onclick: () => fechar() }))));
+}
+
+// ---------------------------------------------------------------- entrada
+function base32(bytes) { const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = 0, v = 0, s = ''; for (const b of bytes) { v = (v << 8) | b; bits += 8; while (bits >= 5) { s += A[(v >>> (bits - 5)) & 31]; bits -= 5; } } if (bits) s += A[(v << (5 - bits)) & 31]; return s; }
+function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; $('entrada-corpo').replaceChildren(...filhos); const i = $('entrada-corpo').querySelector('input'); if (i) i.focus(); }
+const msgErro = () => el('p', { class: 'erro', role: 'alert' });
+async function entrada(mensagem) {
+  const r = await chamar('estado');
+  if (r.ok && r.primeiro_acesso) return primeiroAcesso();
+  formEntrada(mensagem || (r.ok ? '' : r.mensagem));
+}
+function formEntrada(mensagem, comRecuperacao) {
+  const usuario = el('input', { type: 'text', autocomplete: 'username', value: 'Central RXSync', readonly: true, hidden: true });
+  const senha = el('input', { type: 'password', autocomplete: 'current-password', required: true, enterkeyhint: 'next' });
+  const codigo = comRecuperacao
+    ? el('input', { type: 'text', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX', required: true })
+    : el('input', { class: 'codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', required: true, enterkeyhint: 'go' });
+  const erro = msgErro(); erro.textContent = mensagem || '';
+  const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Entrar' });
+  const enviar = async e => {
+    e.preventDefault(); btn.disabled = true; erro.textContent = '';
+    const dados = comRecuperacao ? { senha: senha.value, recuperacao: codigo.value.trim().toUpperCase() } : { senha: senha.value, codigo: codigo.value.replace(/\D/g, '') };
+    const r = await chamar('entrar', dados); btn.disabled = false;
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); if (r.recuperacao_restam != null) toast(`Restam ${r.recuperacao_restam} códigos de recuperação.`); return abrirApp(); }
+    if (r.primeiro_acesso) return primeiroAcesso();
+    erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, usuario,
+    el('label', { class: 'campo' }, 'Senha', senha),
+    el('label', { class: 'campo' }, comRecuperacao ? 'Código de recuperação' : 'Código do app Senhas (6 dígitos)', codigo),
+    erro, btn,
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: comRecuperacao ? 'Usar o código do app Senhas' : 'Usar um código de recuperação', onclick: () => formEntrada('', !comRecuperacao) }))));
+}
+function primeiroAcesso() {
+  const erro = msgErro();
+  const btn = el('button', { class: 'btn pri plena', type: 'button', text: 'Mandar código pelo Telegram' });
+  btn.onclick = async () => { btn.disabled = true; const r = await chamar('primeiro_pedir'); btn.disabled = false; if (r.ok) primeiroSenha(r.mensagem); else erro.textContent = r.mensagem || 'Não consegui.'; };
+  telaEntrada(el('h2', { text: 'Primeiro acesso' }),
+    el('p', { class: 'mudo', text: 'A Central ainda não tem senha. Um código de 8 dígitos vai para o seu Telegram (vale 10 minutos).' }), erro, btn,
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Já tenho o código', onclick: () => primeiroSenha('') })));
+}
+function primeiroSenha(aviso) {
+  const usuario = el('input', { type: 'text', autocomplete: 'username', value: 'Central RXSync', readonly: true, hidden: true });
+  const codigo = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'off', maxlength: '8', required: true });
+  const s1 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true });
+  const s2 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true });
+  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Criar a senha' });
+  const enviar = async e => {
+    e.preventDefault(); erro.textContent = '';
+    if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; return; }
+    if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; return; }
+    btn.disabled = true; const r = await chamar('primeiro_senha', { codigo: codigo.value.replace(/\D/g, ''), senha: s1.value }); btn.disabled = false;
+    if (r.ok && r.desafio) return primeiroAutenticador(r.desafio);
+    erro.textContent = r.mensagem || 'Não consegui.';
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: 'Primeiro acesso: senha' }), aviso ? el('p', { class: 'mudo', text: aviso }) : null,
+    el('label', { class: 'campo' }, 'Código do Telegram (8 dígitos)', codigo),
+    el('label', { class: 'campo' }, 'Senha nova (12 caracteres ou mais; deixe o app Senhas sugerir)', s1),
+    el('label', { class: 'campo' }, 'Repita a senha', s2), erro, btn));
+}
+function primeiroAutenticador(desafio) {
+  // A chave do autenticador é sorteada AQUI, no iPad (crypto.getRandomValues). Ela não vai para o banco: você a guarda no
+  // app Senhas e cola a mesma chave na credencial "TOTP Central" do n8n (DEC-054).
+  const chave = base32(crypto.getRandomValues(new Uint8Array(20)));
+  const link = 'otpauth://totp/RXSync:Central?secret=' + chave + '&issuer=RXSync&algorithm=SHA1&digits=6&period=30';
+  const codigo = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', required: true });
+  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Confirmar o código' });
+  const enviar = async e => {
+    e.preventDefault(); btn.disabled = true; erro.textContent = '';
+    const r = await chamar('primeiro_confirmar', { desafio, codigo: codigo.value.replace(/\D/g, '') }); btn.disabled = false;
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); return mostrarRecuperacao(r.recuperacao || []); }
+    if (r.recomecar) return primeiroAcesso();
+    erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = '';
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Primeiro acesso: código de 6 dígitos' }),
+    el('ol', { class: 'passos' },
+      el('li', {}, 'Toque em ', el('a', { href: link, text: 'adicionar ao app Senhas' }), '. Se não abrir: app Senhas › Códigos › + › "Inserir chave de configuração" e cole a chave abaixo.'),
+      el('li', { text: 'No n8n: Credentials › "TOTP Central" › Secret: cole a mesma chave (troque a provisória) e salve.' }),
+      el('li', { text: 'Digite o código de 6 dígitos que o app Senhas mostra.' })),
+    el('div', { class: 'chave-totp', text: chave }),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Copiar a chave', onclick: () => copiar(chave) })),
+    el('label', { class: 'campo mt' }, 'Código do app Senhas', codigo), erro, btn,
+    el('p', { class: 'mudo peq', text: 'Este passo vale 30 minutos. A chave só aparece aqui, agora.' })));
+}
+function mostrarRecuperacao(codigos) {
+  const texto = codigos.join('\n');
+  const ok = el('input', { type: 'checkbox' });
+  const btn = el('button', { class: 'btn pri plena', type: 'button', text: 'Entrar na Central', disabled: true, onclick: () => abrirApp() });
+  ok.onchange = () => { btn.disabled = !ok.checked; };
+  telaEntrada(el('h2', { text: 'Códigos de recuperação' }),
+    el('p', { class: 'mudo', text: 'Guarde estes 10 códigos (por exemplo, numa nota do app Senhas). Cada um entra uma vez, no lugar do código de 6 dígitos. Eles não aparecem de novo.' }),
+    el('div', { class: 'codigos' }, codigos.map(c => el('span', { text: c }))),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Copiar os 10 códigos', onclick: () => copiar(texto) })),
+    el('label', { class: 'campo linha mt' }, ok, 'Guardei os códigos'), btn);
+}
+
+// ---------------------------------------------------------------- navegação
+const MENU = [
+  ['inicio', 'Início', 1], ['clientes', 'Clientes', 1], ['dinheiro', 'Dinheiro', 1], ['sistema', 'Sistema', 1],
+  ['uso', 'Uso e limites'], ['avisos', 'Avisos'], ['funil', 'Funil'], ['seguranca', 'Segurança'], ['chaves', 'Chaves'], ['agregados', 'Agregados de pacientes'], ['mais', 'Mais', 1]
+];
+const TELAS = {};
+function montarMenu() {
+  const rail = $('rail-nav'), tab = $('tabbar'); rail.replaceChildren(); tab.replaceChildren();
+  for (const [id, nome, naAba] of MENU) {
+    if (id === 'agregados' && est.chaves.tela_agregados_pacientes !== 'SIM') continue;
+    if (id !== 'mais') rail.append(el('button', { type: 'button', 'data-tela': id, onclick: () => ir(id) }, icone(id), nome));
+    if (naAba) tab.append(el('button', { type: 'button', 'data-tela': id, onclick: () => ir(id) }, icone(id), nome));
+  }
+  rail.append(el('div', { class: 'sep' }), el('button', { type: 'button', onclick: sair }, 'Sair'));
+}
+function ir(rota) { if (location.hash === '#' + rota) rotear(); else location.hash = rota; }
+async function rotear() {
+  if (!est.sessao) return;
+  const [nome, ...resto] = (location.hash || '#inicio').slice(1).split('/');
+  const t = TELAS[nome] ? nome : 'inicio';
+  const titulo = (MENU.find(m => m[0] === t) || [t, 'Central RXSync'])[1];
+  $('topo-titulo').textContent = titulo; document.title = titulo + ' · Central RXSync';
+  for (const b of document.querySelectorAll('[data-tela]')) b.toggleAttribute('aria-current', b.dataset.tela === t || (b.dataset.tela === 'mais' && !['inicio', 'clientes', 'dinheiro', 'sistema'].includes(t)));
+  for (const b of document.querySelectorAll('[aria-current]')) b.setAttribute('aria-current', 'page');
+  const c = $('conteudo'); c.replaceChildren(el('p', { class: 'mudo', text: 'Carregando…' }));
+  try { await TELAS[t](c, resto.map(decodeURIComponent)); } catch (e) { c.replaceChildren(el('div', { class: 'faixa alerta', text: 'Algo deu errado nesta tela. Toque em Atualizar.' })); }
+  c.focus({ preventScroll: true }); window.scrollTo(0, 0);
+}
+// Tela desligada ou com erro: mostra o motivo e para.
+function falhou(c, r) {
+  if (r.desligada) { c.replaceChildren(el('h1', { text: 'Tela desligada' }), el('div', { class: 'bloco' }, el('p', { text: 'Esta tela ainda está desligada (chave ' + (r.chave || '') + ').' }), el('button', { class: 'btn sec', type: 'button', text: 'Ver as chaves', onclick: () => ir('chaves') }))); return true; }
+  if (!r.ok) { c.replaceChildren(el('div', { class: 'faixa alerta', text: r.mensagem || 'Não consegui carregar.' })); return true; }
+  return false;
+}
+async function abrirApp() {
+  const r = await chamar('config');
+  if (!r.ok) return entrada(r.mensagem);
+  est.config = r; est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor]));
+  $('entrada').hidden = true; $('app').hidden = false; montarMenu(); rotear();
+}
+async function sair() { await chamar('sair'); guardarSessao(''); entrada('Você saiu.'); }
+window.addEventListener('hashchange', rotear);
+$('btn-atualizar').onclick = () => rotear();
+// Ao voltar para a Central (iPad acordou ou trocou de app), confere se a sessão ainda vale.
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && est.sessao && !$('app').hidden) chamar('config').then(r => { if (r.ok) est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor])); }); });
+
+// ---------------------------------------------------------------- telas
+/* TELAS */
+
+// ---------------------------------------------------------------- começo
+if (est.sessao) abrirApp(); else entrada();
+})();
+</script>
+</body>
+</html>
