@@ -411,6 +411,267 @@ $('btn-atualizar').onclick = () => rotear();
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && est.sessao && !$('app').hidden) chamar('config').then(r => { if (r.ok) est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor])); }); });
 
 // ---------------------------------------------------------------- telas
+// --- apoio das telas
+const TIPOS = {
+  cadastro_teste: 'Teste novo (7 dias)', contratacao_nova: 'Contratação nova', mini_teste_comecou: 'Mini teste começou', mini_teste_terminou: 'Mini teste terminou',
+  pedido_demonstracao: 'Pedido de demonstração', pedido_demonstracao_nao_gravado: 'Pedido de demonstração NÃO guardado',
+  onboarding_enviado: 'Link de onboarding enviado', onboarding_concluido: 'Onboarding concluído', no_ar: 'Clínica no ar', teste_ambiente_criado: 'Ambiente de teste criado',
+  teste_fim_proximo: 'Teste chegando ao fim', teste_encerrado: 'Teste encerrado', teste_virou_contrato: 'Teste virou contrato', pago_na_implantacao: 'Pago na implantação', teste_parado: 'Teste parado',
+  aviso_equipe_nao_chegou: 'Aviso à equipe da clínica NÃO chegou', franquia_100: 'Franquia atingida', franquia_80: '80% da franquia', integracao_agenda: 'Problema na agenda externa',
+  assistente_dono_falhou: 'Assistente do dono falhou', whatsapp_caiu: 'WhatsApp desconectado', whatsapp_voltou: 'WhatsApp reconectado', aviso_evento_nao_entregue: 'Aviso de evento não entregue',
+  mini_teste_teto: 'Mini teste no teto', copia_n8n_parada: 'Cópia do n8n parada',
+  cobranca_criada: 'Cobrança criada', cobranca_faltam_dados: 'Cobrança: faltam dados', cobranca_incompleta: 'Cobrança pela metade', pagamento_confirmado: 'Pagamento confirmado',
+  mensalidade_recebida: 'Mensalidade recebida', taxa_recebida: 'Taxa de implantação recebida', atraso_na_implantacao: 'Atraso (ainda em implantação)', pagamento_atrasado: 'Pagamento atrasado',
+  pagamento_nao_identificado: 'Pagamento não identificado', nota_fiscal_erro: 'Erro na nota fiscal', reativado_apos_atraso: 'Pagou o atraso', valor_divergente: 'Valor diferente do esperado',
+  aviso_suspensao: 'Aviso de suspensão', suspenso: 'Suspenso', reativado: 'Reativado', atraso_30_dias: '30 dias sem pagamento', contrato_encerrado: 'Contrato encerrado',
+  valor_atualizado: 'Valor atualizado', resumo_do_dia: 'Resumo do dia', troca_de_plano: 'Troca de plano', teste_encerrado_pelo_cliente: 'Teste encerrado pelo cliente',
+  pedido_cancelamento: 'Pedido de cancelamento', cancelamento_agendado: 'Cancelamento agendado', cancelamento_desfeito: 'Desistiu do cancelamento', teste_quer_pagar: 'Teste quer pagar', pedido_assinatura: 'Pedido sobre a assinatura',
+  ajuda_agenda: 'Pedido de ajuda com a agenda', email_recebido: 'E-mail recebido', painel_movimento: 'Movimento no painel',
+  exclusao_amanha: 'Dados serão apagados amanhã', exclusao_falhou: 'Falha ao apagar dados', dados_apagados: 'Dados apagados', outro: 'Outro aviso'
+};
+const CATEGORIAS = ['vendas', 'clientes', 'financeiro', 'alertas', 'suporte', 'painel', 'sistema'];
+const rotuloTipo = t => TIPOS[t] || t || 'Aviso';
+const pillStatus = s => { const t = String(s || '—'); const cls = /Ativo|Em teste/.test(t) ? 'ok' : /Suspenso|Cancelado|apagados|encerrado/i.test(t) ? 'alerta' : 'pend'; return el('span', { class: 'pill ' + cls, text: t }); };
+function barraUso(usadas, franquia) { const p = franquia ? Math.min(100, Math.round(usadas / franquia * 100)) : 0; const b = el('div', { class: 'barra' + (p >= 100 ? ' cheio' : p >= 80 ? ' alto' : ''), role: 'img', 'aria-label': p + '% da franquia' }); const i = el('i'); i.style.width = p + '%'; b.append(i); return b; }
+const cartao = (rot, valor, extra) => el('div', { class: 'cartao' }, el('div', { class: 'rot', text: rot }), el('div', { class: 'valor num', text: valor }), extra ? el('div', { class: 'mudo peq', text: extra }) : null);
+const bloco = (titulo, ...filhos) => el('section', { class: 'bloco' }, titulo ? el('h2', { text: titulo }) : null, ...filhos);
+const campos = pares => el('dl', { class: 'campos' }, pares.filter(Boolean).map(([k, v]) => [el('dt', { text: k }), el('dd', { text: v == null || v === '' ? '—' : v })]));
+const nomeCli = x => x.nome || x.cliente_id || '—';
+const irCliente = id => ir('cliente/' + encodeURIComponent(id));
+// Gráfico de barras simples (SVG desenhado aqui, sem biblioteca de fora).
+function grafBarras(pontos, rotulo) {
+  const NS = 'http://www.w3.org/2000/svg', W = 600, H = 120, n = Math.max(pontos.length, 1), max = Math.max(1, ...pontos.map(p => p.v || 0));
+  const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', `0 0 ${W} ${H}`); s.setAttribute('class', 'grafico'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', rotulo);
+  const larg = W / n;
+  pontos.forEach((p, i) => { const h = Math.round((p.v || 0) / max * (H - 22)); const r = document.createElementNS(NS, 'rect'); r.setAttribute('class', 'b'); r.setAttribute('x', i * larg + 1); r.setAttribute('y', H - 16 - h); r.setAttribute('width', Math.max(1, larg - 2)); r.setAttribute('height', h); r.setAttribute('rx', 2); const t = document.createElementNS(NS, 'title'); t.textContent = `${p.r}: ${p.v}`; r.append(t); s.append(r); });
+  const ln = document.createElementNS(NS, 'line'); ln.setAttribute('class', 'eixo'); ln.setAttribute('x1', 0); ln.setAttribute('x2', W); ln.setAttribute('y1', H - 16); ln.setAttribute('y2', H - 16); s.append(ln);
+  [[0, 'start'], [n - 1, 'end']].forEach(([i, a]) => { if (!pontos[i]) return; const t = document.createElementNS(NS, 'text'); t.setAttribute('x', a === 'start' ? 0 : W); t.setAttribute('y', H - 3); t.setAttribute('text-anchor', a); t.textContent = pontos[i].r; s.append(t); });
+  const t = document.createElementNS(NS, 'text'); t.setAttribute('x', W); t.setAttribute('y', 10); t.setAttribute('text-anchor', 'end'); t.textContent = 'máx. ' + fmtNum(max); s.append(t);
+  return s;
+}
+const diaCurto = d => fmtData(d).slice(0, 5);
+function listaAvisos(avisos, comClinica) {
+  if (!avisos || !avisos.length) return vazio('Nenhum aviso.');
+  return el('ul', { class: 'lista' }, avisos.map(a => el('li', {},
+    el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: rotuloTipo(a.tipo) }),
+      el('div', { class: 'mudo peq', text: fmtHora(a.recebido_em) + (comClinica && a.cliente_id ? ' · ' + (a.nome || a.cliente_id) : '') })),
+    el('span', { class: 'pill', text: a.categoria }))));
+}
+// Ganchos preenchidos pelas partes seguintes (edições da fase 3).
+const GANCHOS = { ficha: [], seguranca: [] };
+
+// --- Início
+TELAS.inicio = async c => {
+  const r = await chamar('inicio'); if (falhou(c, r)) return;
+  const d = r.dados, p = d.pendencias, n = d.numeros, f = d.funil_30d;
+  const pend = [];
+  const item = (txt, alvo, cls) => pend.push(el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => ir(alvo) }, el('span', { class: 'pill ' + (cls || 'pend'), text: '!' }), el('span', { class: 'cresce titulo-item', text: txt }))));
+  for (const w of p.whatsapp_fora) item(`WhatsApp fora do ar: ${nomeCli(w)} (desde ${fmtHora(w.desde)})`, 'cliente/' + encodeURIComponent(w.cliente_id), 'alerta');
+  for (const x of p.suspensos) item(`Suspenso: ${nomeCli(x)}`, 'dinheiro', 'alerta');
+  for (const x of p.aviso_atraso) item(`Aviso de atraso: ${nomeCli(x)}`, 'dinheiro');
+  for (const x of p.cancelamentos_agendados) item(`Cancelamento em ${fmtData(x.em)}: ${nomeCli(x)}`, 'dinheiro');
+  for (const x of p.onboarding_vencido) item(`Onboarding vencido: ${nomeCli(x)}`, 'cliente/' + encodeURIComponent(x.cliente_id));
+  for (const x of p.franquia_80) item(`${nomeCli(x)}: ${fmtNum(x.usadas)} de ${fmtNum(x.franquia)} mensagens`, 'uso');
+  if (p.falhas_24h) item(`${p.falhas_24h} falha(s) de workflow nas últimas 24 horas`, 'sistema', 'alerta');
+  if (p.integracoes_com_erro) item(`${p.integracoes_com_erro} integração(ões) de agenda com erro`, 'sistema');
+  if (p.avisos_eventos_desistidos_7d) item(`${p.avisos_eventos_desistidos_7d} aviso(s) de eventos não entregue(s) em 7 dias`, 'sistema');
+  if (p.pedidos_demonstracao_7d) item(`${p.pedidos_demonstracao_7d} pedido(s) de demonstração em 7 dias`, 'funil', 'ok');
+  c.replaceChildren(
+    el('h1', { text: 'Início' }),
+    n.asaas_ambiente === 'sandbox' ? el('div', { class: 'faixa pend', text: 'SANDBOX: os valores do Asaas não são dinheiro real.' }) : null,
+    bloco('O que precisa de você', pend.length ? el('ul', { class: 'lista' }, pend) : vazio('Nada pendente agora.')),
+    el('div', { class: 'grade' }, cartao('Pagantes no ar', fmtNum(n.pagantes_no_ar)), cartao('Receita do mês', fmtReal(n.receita_mensal)), cartao('Em teste', fmtNum(n.em_teste)), cartao('Em implantação', fmtNum(n.em_implantacao)),
+      cartao('Mensagens hoje', fmtNum(n.mensagens_hoje)), cartao('Falhas hoje', fmtNum(n.falhas_hoje)), cartao('Avisos hoje', fmtNum(n.avisos_hoje)), cartao('Pedidos de demonstração (30 dias)', fmtNum(f.totais.pedidos_demonstracao))),
+    bloco('Funil dos últimos 30 dias',
+      el('div', { class: 'grade' }, cartao('Mini testes', fmtNum(f.totais.mini_testes), fmtNum(f.totais.mini_testes_com_consulta) + ' marcaram consulta'), cartao('Cadastros de teste', fmtNum(f.totais.cadastros_teste)), cartao('Contratações', fmtNum(f.totais.cadastros_contratacao)), cartao('No ar', fmtNum(f.totais.go_lives))),
+      grafBarras(f.por_dia.map(x => ({ r: diaCurto(x.dia), v: x.pedidos + x.mini_testes + x.cadastros })), 'Pedidos, mini testes e cadastros por dia')),
+    bloco('Últimos avisos', listaAvisos(d.ultimos_avisos, true), el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: 'Ver todos', onclick: () => ir('avisos') }))));
+};
+
+// --- Clientes
+TELAS.clientes = async c => {
+  const r = await chamar('clientes'); if (falhou(c, r)) return;
+  const todos = r.dados.clientes;
+  const FILTROS = [['todos', 'Todos', () => true], ['ar', 'No ar', x => x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => x.ativo && x.modalidade === 'teste'],
+    ['implantacao', 'Implantação', x => ['Pago', 'Aguardando dados', 'Em implantação'].includes(x.status)], ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)]];
+  let filtro = 'todos';
+  const busca = el('input', { type: 'search', placeholder: 'Buscar por nome ou código', autocomplete: 'off', enterkeyhint: 'search' });
+  const lista = el('ul', { class: 'lista' });
+  const chips = el('div', { class: 'chips' });
+  const desenhar = () => {
+    const q = busca.value.trim().toLowerCase();
+    chips.replaceChildren(...FILTROS.map(([id, nome]) => el('button', { type: 'button', 'aria-pressed': String(id === filtro), text: nome, onclick: () => { filtro = id; desenhar(); } })));
+    const fn = FILTROS.find(f => f[0] === filtro)[2];
+    const vis = todos.filter(x => fn(x) && (!q || (x.nome + ' ' + x.cliente_id).toLowerCase().includes(q)));
+    lista.replaceChildren(...vis.map(x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) },
+      el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: x.nome }),
+        el('div', { class: 'mudo peq', text: `${x.cliente_id} · ${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)} mensagens no mês` + (x.whatsapp && x.whatsapp !== 'open' ? ' · WhatsApp fora' : '') }), barraUso(x.mensagens_mes, x.franquia)),
+      x.interna ? el('span', { class: 'pill', text: 'interna' }) : null, el('span', { class: 'pill plano', text: x.plano || '—' }), pillStatus(x.status)))));
+    if (!vis.length) lista.replaceChildren(el('li', {}, vazio('Nenhuma clínica com esse filtro.')));
+  };
+  busca.oninput = desenhar;
+  c.replaceChildren(el('h1', { text: 'Clientes' }), el('label', { class: 'campo' }, busca), chips, bloco(null, lista));
+  desenhar();
+};
+TELAS.cliente = async (c, [id]) => {
+  const r = await chamar('cliente', { cliente_id: id }); if (falhou(c, r)) return;
+  const x = r.cliente;
+  const F = x.funcoes || {};
+  const funcoes = Object.entries(F).map(([k, v]) => el('span', { class: 'pill ' + (String(v).toUpperCase() === 'SIM' ? 'ok' : ''), text: k.replace(/_/g, ' ') }));
+  const integ = x.integracao;
+  c.replaceChildren(
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: '‹ Clientes', onclick: () => ir('clientes') })),
+    el('h1', { text: x.nome }),
+    el('div', { class: 'chips' }, el('span', { class: 'pill plano', text: x.plano || '—' }), pillStatus(x.status), x.interna ? el('span', { class: 'pill', text: 'clínica interna' }) : null, el('span', { class: 'pill', text: x.cliente_id })),
+    bloco('Contrato', campos([['Modalidade', x.modalidade], ['Valor mensal', fmtReal(x.valor_mensal)], ['Implantação', fmtReal(x.valor_setup)], ['Ciclo', x.ciclo], ['Forma', x.forma_pagamento],
+      ['Aceite', fmtData(x.aceite)], ['Versão dos termos', x.versao_termos], ['No ar desde', fmtData(x.go_live)], ['Fim do teste', fmtData(x.fim_teste)], ['Onboarding', x.onboarding],
+      ['Onboarding vence', fmtData(x.onboarding_expira)], ['Último pagamento', fmtData(x.ultimo_pagamento)], x.aviso_atraso_em && ['Aviso de atraso', fmtData(x.aviso_atraso_em)],
+      x.suspenso_em && ['Suspenso em', fmtData(x.suspenso_em)], x.cancelar_em && ['Cancelamento em', fmtData(x.cancelar_em)]])),
+    bloco('Contato', campos([['Razão social', x.razao_social], ['Representante', x.representante], ['E-mail', x.email], ['Telefone', x.telefone], ['Cidade', x.cidade], ['Sistema de gestão', x.sistema_gestao], ['Origem', x.origem]])),
+    bloco('Uso do mês', el('p', { class: 'num', text: `${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)} mensagens` }), barraUso(x.mensagens_mes, x.franquia),
+      x.uso_30d.length ? grafBarras(x.uso_30d.map(u => ({ r: diaCurto(u.dia), v: u.recebidas + u.enviadas })), 'Mensagens por dia (30 dias)') : null,
+      campos([['Franquia', x.limites.franquia_mensagens || '5.000 (padrão)'], ['Limitar na franquia', x.limites.limitar_franquia || 'NAO'], ['Limite diário do assistente do dono', x.limites.dono_limite_dia || 'padrão'], ['Limite diário de relacionamento', x.limites.relac_limite_dia || 'padrão']]),
+      x.pacientes != null ? el('p', { class: 'mudo', text: `Pacientes cadastrados: ${fmtNum(x.pacientes)}` }) : null),
+    bloco('Funções', el('div', { class: 'chips' }, funcoes)),
+    bloco('Integrações', campos([['WhatsApp', x.whatsapp ? `${x.whatsapp.estado === 'open' ? 'conectado' : x.whatsapp.estado} (desde ${fmtHora(x.whatsapp.desde)})` : 'não vigiado'],
+      ['Agenda externa', integ ? `${integ.plataforma} · ${integ.ativo ? 'ligada' : 'desligada'}${integ.ultimo_erro ? ' · erro: ' + integ.ultimo_erro : ''}` : '—'],
+      ['Médicos ativos', fmtNum(x.medicos_ativos)], ['Chaves da API ativas', fmtNum(x.chaves_api_ativas)],
+      ['Avisos de eventos', x.avisos_eventos ? `${x.avisos_eventos.ativo ? 'ligados' : 'desligados'} · ${x.avisos_eventos.servidor || ''}` : '—']])),
+    bloco('Últimos avisos desta clínica', listaAvisos(x.ultimos_avisos, false)),
+    ...GANCHOS.ficha.map(g => g(x)).filter(Boolean));
+};
+
+// --- Dinheiro
+TELAS.dinheiro = async c => {
+  const r = await chamar('dinheiro'); if (falhou(c, r)) return;
+  const d = r.dados;
+  const linhas = (arr, fn) => arr.length ? el('ul', { class: 'lista' }, arr.map(x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce titulo-item', text: nomeCli(x) }), el('span', { class: 'mudo num', text: fn(x) }))))) : vazio();
+  c.replaceChildren(el('h1', { text: 'Dinheiro' }),
+    d.asaas_ambiente === 'sandbox' ? el('div', { class: 'faixa pend', text: 'SANDBOX: o Asaas está no ambiente de testes. Não é dinheiro real.' }) : null,
+    el('div', { class: 'grade' }, cartao('Pagantes no ar', fmtNum(d.pagantes_no_ar)), cartao('Receita do mês', fmtReal(d.receita_mensal), 'anual à vista conta 1/12'), cartao('Em teste', fmtNum(d.em_teste)), cartao('Em implantação', fmtNum(d.em_implantacao))),
+    d.receita_12_meses.length ? bloco('Receita no fim de cada mês', grafBarras(d.receita_12_meses.map(x => ({ r: fmtData(x.dia).slice(3), v: Number(x.receita_mensal) || 0 })), 'Receita mensal')) : null,
+    bloco('Pagantes', linhas(d.pagantes, x => `${fmtReal(x.valor_no_mes)} · ${x.plano}`)),
+    bloco('Em teste', linhas(d.testes, x => 'até ' + fmtData(x.fim_teste))),
+    bloco('Aviso de atraso enviado', linhas(d.aviso_atraso, x => 'desde ' + fmtData(x.desde)), el('p', { class: 'mudo peq', text: 'Dias e valor do atraso vêm do Asaas e aparecem no resumo diário do Telegram.' })),
+    bloco('Suspensos', linhas(d.suspensos, x => 'desde ' + fmtData(x.desde))),
+    bloco('Cancelamentos agendados', linhas(d.cancelamentos, x => fmtData(x.em))));
+};
+
+// --- Uso e limites
+TELAS.uso = async c => {
+  const r = await chamar('uso'); if (falhou(c, r)) return;
+  const d = r.dados, frac = d.dia_do_mes / d.dias_no_mes;
+  c.replaceChildren(el('h1', { text: 'Uso e limites' }),
+    el('p', { class: 'mudo', text: `Dia ${d.dia_do_mes} de ${d.dias_no_mes}. A projeção supõe o mesmo ritmo até o fim do mês.` }),
+    bloco('Mensagens por dia (todas as clínicas, 30 dias)', grafBarras(d.total_30d.map(x => ({ r: diaCurto(x.dia), v: x.mensagens })), 'Mensagens por dia')),
+    bloco('Clínicas', d.clinicas.length ? el('ul', { class: 'lista' }, d.clinicas.map(x => {
+      const proj = frac ? Math.round(x.mensagens_mes / frac) : 0;
+      return el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce' },
+        el('div', { class: 'titulo-item', text: x.nome }), el('div', { class: 'mudo peq num', text: `${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)}${x.franquia_padrao ? ' (padrão)' : ''} · projeção ${fmtNum(proj)}${x.limitar_franquia ? ' · limita na franquia' : ''}` }),
+        barraUso(x.mensagens_mes, x.franquia)), el('span', { class: 'pill plano', text: x.plano || '—' })));
+    })) : vazio()));
+};
+
+// --- Sistema
+TELAS.sistema = async c => {
+  const r = await chamar('sistema'); if (falhou(c, r)) return;
+  const d = r.dados;
+  const gh = d.github && d.github.dados;
+  c.replaceChildren(el('h1', { text: 'Sistema' }),
+    el('div', { class: 'grade' }, cartao('Último aviso recebido', d.ultimo_aviso_recebido ? fmtHora(d.ultimo_aviso_recebido) : '—'), cartao('Última foto do dia', d.ultima_foto_indicadores ? fmtHora(d.ultima_foto_indicadores) : '—'),
+      cartao('WhatsApp fora', fmtNum(d.whatsapp.filter(w => w.estado !== 'open').length)), cartao('Falhas em 7 dias', fmtNum(d.falhas_por_workflow_7d.reduce((s, x) => s + Number(x.falhas), 0)))),
+    bloco('Falhas por workflow (7 dias)', d.falhas_por_workflow_7d.length ? el('ul', { class: 'lista' }, d.falhas_por_workflow_7d.map(x => el('li', {}, el('div', { class: 'cresce titulo-item', text: x.workflow }), el('span', { class: 'mudo peq', text: 'última ' + fmtHora(x.ultima) }), el('span', { class: 'pill alerta num', text: x.falhas })))) : vazio('Nenhuma falha em 7 dias.')),
+    bloco('Últimas falhas', d.ultimas_falhas.length ? el('ul', { class: 'lista' }, d.ultimas_falhas.map(x => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: x.workflow }), el('div', { class: 'mudo peq', text: `${fmtHora(x.quando)} · nó: ${x.no || '(gatilho)'}${x.execucao_id ? ' · execução ' + x.execucao_id : ''}` }))))) : vazio('Nenhuma.')),
+    bloco('WhatsApp das clínicas no ar', d.whatsapp.length ? el('ul', { class: 'lista' }, d.whatsapp.map(w => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(w.cliente_id) }, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: nomeCli(w) }), el('div', { class: 'mudo peq', text: `desde ${fmtHora(w.desde)} · conferido ${fmtHora(w.verificado_em)}` })),
+      el('span', { class: 'pill ' + (w.estado === 'open' ? 'ok' : 'alerta'), text: w.estado === 'open' ? 'conectado' : w.estado })))) ) : vazio('O workflow 05 ainda não conferiu nenhum WhatsApp.')),
+    bloco('Agendas externas', d.integracoes.length ? el('ul', { class: 'lista' }, d.integracoes.map(i => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: `${nomeCli(i)} · ${i.plataforma}` }), el('div', { class: 'mudo peq', text: `${i.ativo ? 'ligada' : 'desligada'} · última sincronização ${fmtHora(i.ultima_sync)}${i.ultimo_erro ? ' · erro: ' + i.ultimo_erro : ''}` })), el('span', { class: 'pill ' + (i.ultimo_erro ? 'alerta' : 'ok'), text: i.ultimo_erro ? 'erro' : 'ok' })))) : vazio()),
+    bloco('Avisos de eventos (Enterprise)', d.avisos_eventos.length ? el('ul', { class: 'lista' }, d.avisos_eventos.map(a => el('li', {}, el('div', { class: 'cresce titulo-item', text: a.cliente_id }), el('span', { class: 'mudo peq num', text: `${a.pendentes} pendentes · ${a.enviados_7d} enviados e ${a.desistidos_7d} desistidos em 7 dias` })))) : vazio()),
+    bloco('SQL aplicados', d.sql_aplicados.length ? el('ul', { class: 'lista' }, d.sql_aplicados.map(s => el('li', {}, el('div', { class: 'cresce titulo-item', text: s.arquivo }), el('span', { class: 'mudo peq', text: fmtHora(s.aplicado_em) })))) : vazio()),
+    gh ? bloco('GitHub', el('p', { class: 'mudo peq', text: 'Recebido ' + fmtHora(d.github.recebido_em) }),
+      el('ul', { class: 'lista' }, (gh.actions || []).map(a => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: a.nome }), el('div', { class: 'mudo peq', text: fmtHora(a.quando) + ' · ' + a.evento })),
+        el('span', { class: 'pill ' + (a.resultado === 'success' ? 'ok' : a.resultado ? 'alerta' : 'pend'), text: a.resultado === 'success' ? 'verde' : a.resultado || a.status })))),
+      campos([['Issues abertas', fmtNum((gh.issues || {}).abertas)], ...Object.entries((gh.issues || {}).por_prioridade || {}).sort().map(([k, v]) => [k, fmtNum(v)]), ['PRs abertos', fmtNum(gh.prs_abertos)]]),
+      ((gh.issues || {}).p1 || []).length ? el('ul', { class: 'lista' }, gh.issues.p1.map(i => el('li', {}, el('span', { class: 'pill alerta', text: '#' + i.numero }), el('span', { class: 'cresce', text: i.titulo })))) : null)
+      : (est.chaves.tela_sistema_github === 'SIM' ? bloco('GitHub', vazio('A Action "Central: dados do GitHub" ainda não mandou nada.')) : null));
+};
+
+// --- Avisos
+TELAS.avisos = async c => {
+  let cat = '';
+  const chips = el('div', { class: 'chips' }), corpo = el('div');
+  const carregar = async () => {
+    chips.replaceChildren(...['', ...CATEGORIAS].map(k => el('button', { type: 'button', 'aria-pressed': String(k === cat), text: k || 'todas', onclick: () => { cat = k; carregar(); } })));
+    const r = await chamar('avisos', { categoria: cat }); if (falhou(corpo, r)) return;
+    const pc = r.dados.por_categoria_7d || {};
+    corpo.replaceChildren(el('p', { class: 'mudo peq', text: '7 dias: ' + (Object.entries(pc).map(([k, v]) => `${k} ${v}`).join(' · ') || 'nenhum') }), bloco(null, listaAvisos(r.dados.avisos, true)));
+  };
+  c.replaceChildren(el('h1', { text: 'Avisos' }), el('p', { class: 'mudo', text: 'O que passou pelo Telegram, sem o texto (o texto fica só no Telegram).' }), chips, corpo);
+  await carregar();
+};
+
+// --- Funil
+TELAS.funil = async c => {
+  const r = await chamar('funil'); if (falhou(c, r)) return;
+  const d = r.dados, t = d.totais;
+  const wa = tel => { const dig = String(tel || '').replace(/\D/g, ''); return dig ? 'https://wa.me/' + (dig.length <= 11 ? '55' + dig : dig) : null; };
+  c.replaceChildren(el('h1', { text: 'Funil' }),
+    el('div', { class: 'grade' }, cartao('Pedidos de demonstração', fmtNum(t.pedidos_demonstracao)), cartao('Mini testes', fmtNum(t.mini_testes), fmtNum(t.mini_testes_com_consulta) + ' marcaram consulta'),
+      cartao('Cadastros (teste / contrato)', `${fmtNum(t.cadastros_teste)} / ${fmtNum(t.cadastros_contratacao)}`), cartao('No ar', fmtNum(t.go_lives))),
+    bloco('Por dia (30 dias)', grafBarras(d.por_dia.map(x => ({ r: diaCurto(x.dia), v: x.pedidos + x.mini_testes + x.cadastros })), 'Pedidos, mini testes e cadastros por dia')),
+    bloco('Pedidos de demonstração', el('p', { class: 'mudo peq', text: 'Guardados por 180 dias (Política v9). O Telegram recebe só o aviso.' }),
+      d.pedidos.length ? el('ul', { class: 'lista' }, d.pedidos.map(p => el('li', {}, el('div', { class: 'cresce' },
+        el('div', { class: 'titulo-item', text: `${p.nome} · ${p.clinica}` }),
+        el('div', { class: 'mudo peq', text: `${fmtHora(p.criado_em)} · ${p.email} · ${p.telefone}${p.sistema_atual ? ' · usa ' + p.sistema_atual : ''} · plano: ${p.plano_interesse || 'indeciso'}` })),
+        wa(p.telefone) ? el('a', { class: 'btn sec', href: wa(p.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' }) : null))) : vazio('Nenhum pedido nos últimos 180 dias.')),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: 'Funil completo', onclick: () => ir('funil_completo') })));
+};
+
+// --- Segurança (aparelhos; o registro e as chaves da API entram pelos ganchos)
+TELAS.seguranca = async c => {
+  const r = await chamar('sessoes'); if (falhou(c, r)) return;
+  const d = r.dados;
+  const lista = el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'cresce' },
+    el('div', { class: 'titulo-item', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }),
+    el('div', { class: 'mudo peq', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
+    s.esta ? null : el('button', { class: 'btn perigo', type: 'button', text: 'Encerrar', onclick: async () => { const x = await chamar('encerrar_sessao', { id: s.id }); toast(x.ok ? 'Sessão encerrada.' : x.mensagem); rotear(); } }))));
+  c.replaceChildren(el('h1', { text: 'Segurança' }),
+    bloco('Aparelhos conectados', lista, el('p', { class: 'mudo peq', text: `Códigos de recuperação que ainda valem: ${d.recuperacao_restam}. A sessão vale 8 horas, ou 30 minutos sem uso.` }),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn perigo', type: 'button', text: 'Sair de todos os aparelhos', onclick: async () => {
+        if (!(await confirmarEdicao('Sair de todos os aparelhos', [], 'Todas as sessões, inclusive esta, terminam agora.'))) return;
+        await chamar('sair_todos'); guardarSessao(''); entrada('Você saiu de todos os aparelhos.');
+      } }))));
+  for (const g of GANCHOS.seguranca) { const b = await g(); if (b) c.append(b); }
+};
+
+// --- Chaves de ligar e desligar
+TELAS.chaves = async c => {
+  const r = await chamar('config'); if (falhou(c, r)) return;
+  est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor]));
+  const linha = k => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: k.chave }), el('div', { class: 'mudo peq', text: k.descricao + ' · fase ' + k.fase })),
+    k.so_por_sql ? el('span', { class: 'pill', text: (k.valor === 'SIM' || k.valor === 'NAO' ? (k.valor === 'SIM' ? 'ligada' : 'desligada') : k.valor) + ' · só por PR' })
+      : el('button', { class: 'btn ' + (k.valor === 'SIM' ? 'perigo' : 'pri'), type: 'button', text: k.valor === 'SIM' ? 'Desligar' : 'Ligar', onclick: async () => {
+        const novo = k.valor === 'SIM' ? 'NAO' : 'SIM';
+        const cod = await pedirCodigo((novo === 'SIM' ? 'Ligar ' : 'Desligar ') + k.chave, 'Para mudar uma chave, digite o código de 6 dígitos do app Senhas.');
+        if (!cod) return;
+        const x = await chamar('ligar_chave', { chave: k.chave, valor: novo, codigo: cod });
+        toast(x.ok ? `${k.chave}: ${x.antes} → ${x.depois}` : (x.mensagem || 'Não consegui.')); if (x.ok) { montarMenu(); rotear(); }
+      } }));
+  c.replaceChildren(el('h1', { text: 'Chaves' }), el('p', { class: 'mudo', text: 'Liga e desliga telas e edições. Cada mudança pede o código de 6 dígitos, fica no registro e avisa no Telegram.' }),
+    bloco(null, el('ul', { class: 'lista' }, (r.chaves || []).map(linha))));
+};
+
+// --- Mais
+TELAS.mais = async c => {
+  const ent = (rota, nome, txt) => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => ir(rota) }, icone(rota), el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: nome }), el('div', { class: 'mudo peq', text: txt }))));
+  const link = (href, nome) => el('li', {}, el('a', { href, target: '_blank', rel: 'noopener noreferrer', text: nome }));
+  const GH = 'https://github.com/BlushingMoonlight/rxsync-sistema';
+  c.replaceChildren(el('h1', { text: 'Mais' }),
+    bloco(null, el('ul', { class: 'lista' }, ent('uso', 'Uso e limites', 'Mensagens × franquia'), ent('avisos', 'Avisos', 'O que passou pelo Telegram'), ent('funil', 'Funil', 'Pedidos, mini testes e cadastros'),
+      ent('seguranca', 'Segurança', 'Aparelhos, registro e chaves da API'), ent('chaves', 'Chaves', 'Ligar e desligar telas e edições'),
+      est.chaves.tela_agregados_pacientes === 'SIM' ? ent('agregados', 'Agregados de pacientes', 'Contagens e médias por clínica') : null)),
+    bloco('Links', el('ul', { class: 'lista' }, link(GH + '/issues/89', 'Pendências (#89)'), link(GH + '/blob/main/docs/decisoes.md', 'Decisões'), link(GH + '/blob/main/docs/mapa/README.md', 'Mapa do sistema'))),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn perigo plena', type: 'button', text: 'Sair', onclick: sair })));
+};
 /* TELAS */
 
 // ---------------------------------------------------------------- começo
