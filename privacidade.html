@@ -46,7 +46,7 @@
   <header class="bg-primary-900 text-white">
     <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
       <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v6</span>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v7</span>
     </div>
   </header>
 
@@ -56,7 +56,7 @@
       <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para Serviços de Saúde</p>
 
       <div class="doc">
-        <p><strong>Versão 2026-10-v6</strong> · Vigente a partir de 11 de outubro de 2026</p>
+        <p><strong>Versão 2026-10-v7</strong> · Vigente a partir de 14 de outubro de 2026</p>
 
         <blockquote>
           <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros.</p>
@@ -170,6 +170,8 @@
             <li>Conteúdo das mensagens, incluindo áudios (transcritos para texto) e os dados que o paciente decidir informar;</li>
             <li>No plano Gestão Inteligente, fotos e documentos em PDF que o paciente enviar (como pedido de exame, guia, carteirinha do convênio ou documento de identidade), dos quais a assistente extrai apenas dados administrativos para a equipe da clínica;</li>
             <li>Dados de agendamento, lista de espera, lembretes e pesquisa de satisfação (nota e comentário, ligados ao código do paciente);</li>
+            <li>A data em que o telefone do paciente conversou com a clínica pela primeira vez, usada para que as mensagens de relacionamento (seção 4.2) só vão a quem já conversou com a clínica;</li>
+            <li>No plano Gestão Inteligente, o cadastro que a clínica mantém no painel, na área Pacientes: e-mail, data de nascimento e uma observação administrativa curta, que nunca deve ter conteúdo clínico, além, quando o paciente vem de uma importação feita pela clínica (por planilha ou de outro sistema), da origem e da data dessa importação. A clínica, como controladora, responde pela base legal e pela exatidão dos dados que importa;</li>
             <li>No plano Gestão Inteligente, o registro das mensagens de relacionamento enviadas ao paciente (aviso de retorno, convite para voltar e convite para avaliar a clínica no Google: data, tipo e situação do envio) e, se o paciente pedir, a marca de que ele não quer receber essas mensagens;</li>
             <li>No plano Enterprise, quando a clínica liga a ligação com o sistema dela (seção 4.2), o registro dos avisos enviados a esse sistema e dos pedidos de envio de mensagem feitos por ele (o texto da mensagem é apagado assim que o pedido termina);</li>
             <li>No plano Gestão Inteligente, quando a clínica liga a função “Perguntas antes de agendar”, as respostas do paciente às perguntas que a própria clínica cadastrou, guardadas no agendamento e no resumo do paciente para a equipe da clínica;</li>
@@ -183,7 +185,7 @@
             <li><strong>Convite para voltar:</strong> para quem já consultou e não volta há um tempo definido pela clínica, no máximo uma vez por período; depois de dois convites sem resposta, a assistente para;</li>
             <li><strong>Convite para avaliar a clínica no Google:</strong> enviado a quem responde a pesquisa de satisfação, <strong>qualquer que seja a nota</strong>, e uma única vez a quem não responde, dois dias depois. Cada paciente recebe no máximo um convite por ano, e a pesquisa vai no máximo uma vez a cada 30 dias. Avaliar no Google é opcional e feito pelo próprio paciente, na página do Google.</li>
           </ul>
-          <p>Essas mensagens saem só em dias úteis, em horário comercial, com limite por dia e por hora para cada clínica, e trazem a <strong>opção de sair</strong>: quem responde <strong>SAIR</strong> (ou pede de outro jeito na conversa) deixa de receber os avisos de retorno, os convites, a pesquisa de satisfação e o convite para avaliar. Os lembretes das consultas já marcadas continuam.</p>
+          <p>Essas mensagens só vão a quem já conversou com a clínica pelo WhatsApp (quem foi cadastrado ou importado pela clínica e nunca escreveu não as recebe), saem só em dias úteis, em horário comercial, com limite por dia e por hora para cada clínica, e trazem a <strong>opção de sair</strong>: quem responde <strong>SAIR</strong> (ou pede de outro jeito na conversa) deixa de receber os avisos de retorno, os convites, a pesquisa de satisfação e o convite para avaliar. Os lembretes das consultas já marcadas continuam.</p>
           <p>No plano <strong>Enterprise</strong>, por instrução da clínica, a RXSync também se liga ao <strong>sistema indicado pela própria clínica</strong> (por exemplo, o sistema de gestão dela), por uma interface protegida por chave de acesso exclusiva da clínica:</p>
           <ul>
             <li><strong>Consulta e alteração:</strong> o sistema da clínica lê os dados dos pacientes dela (nome, telefone, consultas, resumo do paciente, nota da pesquisa e respostas da pré-consulta), a agenda e as configurações, e pode marcar, remarcar e cancelar consultas, como a equipe faz no painel;</li>
@@ -254,6 +256,7 @@
               <tr><td>Conversas do WhatsApp com pacientes (histórico do atendimento)</td><td>Enquanto durar o contrato, sob decisão da clínica; eliminadas com os demais dados da clínica ao fim do contrato. As cópias que a equipe da clínica recebe no próprio WhatsApp ficam com ela.</td></tr>
               <tr><td>Registro dos documentos lidos pela assistente (dados administrativos)</td><td>Enquanto durar o contrato, podendo a clínica excluí-los a qualquer momento no painel; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Registro das mensagens de relacionamento enviadas (aviso de retorno, convite para voltar e convite para avaliar no Google: data, tipo e situação do envio, sem o texto da mensagem)</td><td>Apagado automaticamente <strong>400 dias</strong> depois do envio (o convite para voltar olha até um ano para trás, para não repetir).</td></tr>
+              <tr><td>Cadastro do paciente na área Pacientes do painel (plano Gestão Inteligente): nome, telefone, e-mail, data de nascimento, observação administrativa e, se veio de importação, a origem e a data</td><td>Enquanto durar o contrato, sob decisão da clínica, que pode corrigir os dados a qualquer momento. A pedido do paciente, a clínica exclui o cadastro: as consultas passadas ficam na agenda sem nome, telefone, resumo nem comentário, e fica só um registro com o código do paciente, a data e a origem da exclusão, como prova do atendimento ao pedido. Tudo é eliminado com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Pedido do paciente para não receber as mensagens de relacionamento (“não contatar”)</td><td>Enquanto durar o contrato, para que o pedido continue sendo respeitado; eliminado com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Avisos de eventos enviados ao sistema da clínica (plano Enterprise)</td><td>Apagados <strong>30 dias</strong> depois do evento. O que chega ao sistema da clínica fica com ela.</td></tr>
               <tr><td>Pedidos de envio de mensagem feitos pelo sistema da clínica (plano Enterprise)</td><td>O texto da mensagem é apagado assim que o pedido termina (enviada, não enviada ou expirada); o registro do pedido, sem o texto, <strong>90 dias</strong> depois.</td></tr>
@@ -316,6 +319,7 @@
           <p>Podemos atualizar esta Política para refletir mudanças no serviço, nos fornecedores ou na lei. A versão vigente é sempre a publicada nesta página, com o número da versão e a data de início de vigência no topo. Mudanças relevantes que afetem clientes serão comunicadas ao e-mail cadastrado, com a antecedência prevista nos Termos de Uso. O uso do site e do serviço depois da vigência da nova versão não afeta os direitos que você tem pela lei.</p>
           <p><strong>Histórico de versões</strong></p>
           <ul>
+            <li><strong>2026-10-v7</strong>, vigente a partir de 14 de outubro de 2026: entram, nos dados de pacientes (seção 4), a data em que o telefone conversou com a clínica pela primeira vez e, no plano Gestão Inteligente, o cadastro da área Pacientes do painel (e-mail, data de nascimento, observação administrativa e, para quem foi importado pela clínica, a origem e a data da importação); as mensagens de relacionamento só vão a quem já conversou com a clínica (seção 4.2); a seção 8 ganha o prazo do cadastro e o que acontece na exclusão a pedido do paciente.</li>
             <li><strong>2026-10-v6</strong>, vigente a partir de 11 de outubro de 2026: entra a ligação do plano Enterprise com o sistema indicado pela clínica (consulta e alteração pela interface de acesso, avisos de eventos, inclusive as mensagens dos números da equipe, e envio de mensagens pedido pelo sistema da clínica) na seção 4; a seção 6 diz o que esse sistema recebe; a seção 8 ganha os prazos dos avisos (30 dias) e dos pedidos de envio (texto apagado no fim do pedido; registro, 90 dias).</li>
             <li><strong>2026-10-v5</strong>, vigente a partir de 11 de outubro de 2026: entram as mensagens de relacionamento do plano Gestão Inteligente (aviso de retorno, convite para voltar e convite para avaliar a clínica no Google, enviado a todos, qualquer que seja a nota), com limites e a opção de responder SAIR (seção 4); a seção 8 ganha os prazos do registro dessas mensagens (400 dias), do pedido para não recebê-las e da nota da pesquisa de satisfação.</li>
             <li><strong>2026-10-v4</strong>, vigente a partir de 11 de outubro de 2026: as respostas da pré-consulta entram nos dados de pacientes (seção 4); a seção 8 diz onde elas ficam guardadas e ganha o prazo das conversas do WhatsApp com pacientes; o Google deixa de guardar o cadastro e a base de conhecimento, e fica só a análise de uso do site (seções 6 e 7).</li>
@@ -329,7 +333,7 @@
 
     <p class="text-center text-xs text-slate-400 mt-6">
       &copy; 2026 RXSync Tecnologia e Automação em Saúde · CNPJ 52.970.673/0001-78 · Florianópolis/SC
-      <br><a href="/" class="underline">Voltar ao site</a> · <a href="/termos/2026-10-v2.html" class="underline">Termos de Uso</a>
+      <br><a href="/" class="underline">Voltar ao site</a> · <a href="/termos/2026-10-v3.html" class="underline">Termos de Uso</a>
     </p>
   </main>
 </body>

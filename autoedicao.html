@@ -41,7 +41,7 @@
   .ponto.alerta { background: #fbbf24; }
   .ponto.off { background: #fb7185; }
   .main { max-width: 760px; margin: 0 auto; padding: 20px 16px calc(var(--tabbar-h) + 96px + env(safe-area-inset-bottom, 0px)); }
-  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(10px); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(6, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .tabbar button { position: relative; height: var(--tabbar-h); border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--ink-3); font-size: 11.5px; font-weight: 600; cursor: pointer; }
   .tabbar button svg { width: 23px; height: 23px; }
   .tabbar button[aria-current="page"] { color: var(--ink); }
@@ -227,7 +227,7 @@
 
   .cap1::first-letter { text-transform: uppercase; }
   /* nas telas de preencher, no celular, o botão fica só com o ícone para não tampar os campos */
-  @media (max-width: 1023px) { body[data-area="assistente"] .fab, body[data-area="conta"] .fab { width: 52px; height: 52px; padding: 0; justify-content: center; } body[data-area="assistente"] .fab-txt, body[data-area="conta"] .fab-txt { display: none; } }
+  @media (max-width: 1023px) { body[data-area="assistente"] .fab, body[data-area="conta"] .fab, body[data-area="pacientes"] .fab { width: 52px; height: 52px; padding: 0; justify-content: center; } body[data-area="assistente"] .fab-txt, body[data-area="conta"] .fab-txt, body[data-area="pacientes"] .fab-txt { display: none; } }
   .demo { background: #f6f8f7; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
   .demo .b { max-width: 85%; border-radius: 16px; padding: 8px 12px; font-size: 14px; line-height: 1.45; }
   .demo .eu { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
@@ -238,6 +238,56 @@
   .boot { min-height: 100vh; display: grid; place-items: center; color: var(--ink-2); }
   .porta { max-width: 400px; margin: 12vh auto 0; padding: 0 16px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  /* ---------- Pacientes (plano Gestão Inteligente) ---------- */
+  .pc-busca { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+  .pc-busca input { flex: 1; min-width: 0; box-sizing: border-box; min-height: 44px; border: 1px solid #cfd8d5; border-radius: 12px; padding: 10px 14px; font-size: 16px; background: #fff; color: var(--ink); -webkit-appearance: none; }
+  .pc-busca input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(5, 150, 105, .15); }
+  .pc-dica { font-size: 12.5px; color: var(--ink-3); margin: 0 0 12px; }
+  .pc-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px 12px; padding: 0 16px; }
+  .pc-chips::-webkit-scrollbar { display: none; }
+  .pc-chips button { flex: none; white-space: nowrap; min-height: 38px; border: 1px solid #cfd8d5; background: #fff; border-radius: 99px; padding: 0 14px; font-size: 14px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+  .pc-chips button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .pc-total { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13.5px; color: var(--ink-2); margin: 0 0 8px; }
+  .pc-total button { border: 0; background: none; color: var(--brand-ink); font-weight: 700; font-size: 13.5px; cursor: pointer; padding: 6px 0; }
+  .pc-item { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 12px 16px; background: none; border: 0; border-top: 1px solid var(--line); text-align: left; cursor: pointer; color: inherit; }
+  .pc-item:first-child { border-top: 0; }
+  .pc-item:hover { background: #f8faf9; }
+  .pc-av { width: 38px; height: 38px; border-radius: 99px; background: var(--brand-soft); color: var(--brand-ink); display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+  .pc-item .tx { flex: 1; min-width: 0; }
+  .pc-item .t1 { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pc-item .t2 { font-size: 13px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  .pc-item .seta { color: var(--ink-3); width: 18px; height: 18px; flex: none; }
+  .pc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .pill.alerta { background: var(--rose-soft); color: var(--rose-ink); }
+  .pc-cab { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+  .pc-cab .pc-av { width: 52px; height: 52px; font-size: 18px; }
+  .pc-cab .titulo { font-size: 24px; overflow-wrap: anywhere; }
+  .pc-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+  .pc-acoes .btn { flex: 1 1 150px; }
+  .btn.perigo { background: #fff; color: var(--rose-ink); border-color: #fecdd3; }
+  .btn.perigo:hover { border-color: var(--rose-ink); }
+  .pc-sec { font-size: 15px; font-weight: 700; margin: 24px 0 8px; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .pc-sec span { font-weight: 500; font-size: 13px; color: var(--ink-2); }
+  .pc-cons { padding: 12px 18px; border-top: 1px solid var(--line); }
+  .pc-cons:first-child { border-top: 0; }
+  .pc-cons .c1 { font-weight: 600; font-size: 14.5px; }
+  .pc-cons .c2 { font-size: 13px; color: var(--ink-2); }
+  .pc-cons.cancelada .c1 { text-decoration: line-through; color: var(--ink-3); }
+  .pc-painel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px; margin: 12px 0; }
+  .pc-painel .sec { margin-bottom: 6px; }
+  .pc-painel .btn + .btn { margin-left: 8px; }
+  .pc-escolha { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; cursor: pointer; border-top: 1px solid var(--line); }
+  .pc-escolha:first-of-type { border-top: 0; }
+  .pc-escolha input { width: 20px; height: 20px; accent-color: var(--brand); margin-top: 2px; flex: none; }
+  .pc-escolha small { display: block; color: var(--ink-2); font-size: 13px; }
+  .pc-frase { display: block; margin: 8px 0; padding: 10px 12px; border-radius: var(--r-sm); background: #f6f8f7; font-weight: 700; }
+  .pc-form .fld input[type=email], .pc-form .fld input[type=date], .pc-painel input[type=text] { width: 100%; box-sizing: border-box; min-height: 46px; border: 1px solid #cfd8d5; border-radius: var(--r-sm); background: #fff; color: var(--ink); padding: 11px 12px; font-size: 16px; line-height: 1.45; -webkit-appearance: none; }
+  .pc-form .fld input:focus, .pc-painel input[type=text]:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(5, 150, 105, .15); }
+  .pc-form .obrig { color: var(--rose-ink); }
+  .pc-demo { background: #f6f8f7; border-radius: 16px; padding: 6px 0; margin: 14px 0; }
+  .pc-demo .pc-item { cursor: default; min-height: 54px; padding: 9px 14px; }
+  .pc-demo .pc-item:hover { background: none; }
+  @media (max-width: 400px) { .tabbar button { font-size: 10.5px; } }
 </style>
 </head>
 <body>
@@ -440,6 +490,66 @@
       <div id="resAvaliacoes" class="hidden mt-5"></div>
     </section>
 
+    <!-- ================= PACIENTES (plano Gestão Inteligente; no Essencial, só a vitrine) ================= -->
+    <section data-view="pacientes" hidden>
+      <div data-sub-pane="">
+        <div class="cab"><h1 class="titulo">Pacientes</h1><p class="subtitulo">Quem conversou com a assistente, marcou consulta ou foi cadastrado aqui.</p></div>
+
+        <div id="pacUpsell" class="bloco pad" hidden>
+          <span class="pill plano">Plano Gestão Inteligente</span>
+          <h2 class="titulo" style="font-size:22px;margin-top:10px">Todos os seus pacientes num lugar só</h2>
+          <p class="subtitulo" style="font-size:14.5px">Encontre qualquer paciente pelo nome, pelo telefone ou pelo código, veja as consultas dele e mantenha o cadastro em ordem.</p>
+          <div class="pc-demo" aria-label="Exemplo da lista de pacientes">
+            <div class="pc-item"><span class="pc-av">AS</span><span class="tx"><span class="t1">Ana Souza</span><span class="t2"><span>(48) 99999-0001</span><span>Próxima: qui, 23/10 às 14:00</span></span></span></div>
+            <div class="pc-item"><span class="pc-av">CL</span><span class="tx"><span class="t1">Carlos Lima</span><span class="t2"><span>(48) 98888-0002</span><span>Última: 02/09/2026</span></span></span></div>
+            <div class="pc-item"><span class="pc-av">MJ</span><span class="tx"><span class="t1">Maria José Pereira</span><span class="t2"><span>(48) 97777-0003</span><span>Pediu para não receber avisos</span></span></span></div>
+          </div>
+          <ul class="beneficios">
+            <li>Busca pelo nome, pelo final do telefone ou pelo código do paciente</li>
+            <li>Ficha com e-mail, data de nascimento e as consultas futuras e passadas</li>
+            <li>Junta os cadastros repetidos da mesma pessoa</li>
+            <li>Marca quem não quer receber avisos e exclui a pedido do paciente</li>
+            <li>Traz os pacientes do sistema que você usa hoje, por planilha (em breve)</li>
+          </ul>
+          <button class="btn pri plena" type="button" data-ir="conta/assinatura" style="margin-top:16px">Conhecer o plano Gestão Inteligente</button>
+          <p class="subtitulo" style="font-size:13px;text-align:center">No seu plano, a assistente continua reconhecendo os pacientes, e eles aparecem nas consultas da Agenda.</p>
+        </div>
+
+        <div id="pacConteudo" hidden>
+          <div class="pc-busca">
+            <input id="pacBusca" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Buscar paciente" aria-label="Buscar paciente">
+            <button id="pacNovo" class="btn pri" type="button">Novo</button>
+          </div>
+          <p class="pc-dica">Pelo nome (com ou sem acento), pelo final do telefone ou pelo código (P-…).</p>
+          <div class="pc-chips" id="pacFiltros" role="group" aria-label="Filtrar pacientes">
+            <button type="button" data-filtro="todos" aria-pressed="true">Todos</button>
+            <button type="button" data-filtro="sem_conversa" aria-pressed="false">Sem conversa</button>
+            <button type="button" data-filtro="importados_sem_conversa" aria-pressed="false">Importados sem conversa</button>
+            <button type="button" data-filtro="nao_contatar" aria-pressed="false">Não contatar</button>
+          </div>
+          <div class="pc-total"><span id="pacTotal" class="num"></span><button type="button" data-ir="pacientes/duplicados">Possíveis duplicados</button></div>
+          <div id="pacLista" class="lista"><div class="vazio">Carregando…</div></div>
+          <button id="pacMais" class="btn sec plena" type="button" style="margin-top:12px" hidden>Mostrar mais 50</button>
+        </div>
+      </div>
+
+      <div data-sub-pane="ficha" hidden>
+        <button class="voltar" type="button" data-ir="pacientes">Pacientes</button>
+        <div id="pacFicha"><div class="vazio">Carregando…</div></div>
+      </div>
+
+      <div data-sub-pane="editar" hidden>
+        <button class="voltar" type="button" id="pacFormVoltar">Pacientes</button>
+        <div id="pacForm"></div>
+      </div>
+
+      <div data-sub-pane="duplicados" hidden>
+        <button class="voltar" type="button" data-ir="pacientes">Pacientes</button>
+        <div class="cab"><h1 class="titulo">Possíveis duplicados</h1><p class="subtitulo">Cadastros com o mesmo nome (sem contar acento, maiúsculas e espaços). Junte quando forem a mesma pessoa; mãe e filha com o mesmo nome continuam separadas.</p></div>
+        <div id="pacDup"><div class="vazio">Carregando…</div></div>
+      </div>
+    </section>
+
     <!-- ================= CONTA ================= -->
     <section data-view="conta" hidden>
       <div data-sub-pane="">
@@ -452,7 +562,7 @@
           <button type="button" data-ir="conta/contrato"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Dados do contrato</span><span class="t2">Razão social, CNPJ e representante</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
         <div class="lista" style="margin-top:14px">
-          <a href="/termos/2026-10-v2.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span><span class="tx"><span class="t1">Termos de Uso</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
+          <a href="/termos/2026-10-v3.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span><span class="tx"><span class="t1">Termos de Uso</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
           <a href="/privacidade.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Política de Privacidade</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
           <a href="mailto:contato@rxsync.com.br"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg></span><span class="tx"><span class="t1">Falar com a RXSync</span><span class="t2">contato@rxsync.com.br</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
         </div>
@@ -614,8 +724,9 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     window.location.href = window.location.pathname;
   });
 
-  // ===== Navegação: 5 áreas (Hoje, Agenda, Assistente, Resultados, Conta), com o endereço no #, para o voltar do celular funcionar =====
-  var AREAS = [["hoje", "Hoje", "sol"], ["agenda", "Agenda", "calendario"], ["assistente", "Assistente", "assist"], ["resultados", "Resultados", "grafico"], ["conta", "Conta", "usuario"]];
+  // ===== Navegação: 6 áreas (Hoje, Agenda, Pacientes, Assistente, Resultados, Conta), com o endereço no #, para o voltar do celular funcionar =====
+  ICONES.pacientes = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  var AREAS = [["hoje", "Hoje", "sol"], ["agenda", "Agenda", "calendario"], ["pacientes", "Pacientes", "pacientes"], ["assistente", "Assistente", "assist"], ["resultados", "Resultados", "grafico"], ["conta", "Conta", "usuario"]];
   function svg(nome) { return ICONES[nome] || ""; }
   function montarNav() {
     [el("navBar"), el("navRail")].forEach(function (nav) {
@@ -668,6 +779,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (area === "resultados" && !abertas.resultados) { abertas.resultados = true; resultadosCarregar(); }
     if (area === "conta" && sub === "assinatura") assinCarregar();
     if (area === "assistente" || area === "conta") listasAtualizar();
+    if (area === "pacientes") pacRotear(temSub ? sub : "", partes[2] || "");
     window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", rotear);
@@ -2483,6 +2595,457 @@ function partesTz(ms) {
 
   function mostrarBannerConta(conta) { mostrarEstado(conta); }
 
+  // ===== PACIENTES (Projeto 1, item 210; sempre disponível no Gestão Inteligente). No Essencial, só a vitrine do plano:
+  // o servidor (workflow 24, rx_paciente_painel) também recusa. A importação por planilha entra num PR seguinte. =====
+  var PAC = { busca: "", filtro: "todos", pagina: 0, total: 0, itens: [], seq: 0, sujo: true, aviso: "", atual: null };
+  var PAC_FRASE = "O paciente pediu para voltar a receber os avisos";
+  var PAC_ERROS = {
+    nome: "Escreva o nome do paciente (até 120 letras).",
+    telefone: "Informe o telefone com DDD (ex.: 48 99999-0000).",
+    email: "Confira o e-mail.",
+    nascimento: "Confira a data de nascimento.",
+    observacao: "A observação pode ter até 300 letras.",
+    nao_encontrado: "Esse paciente não existe mais (pode ter sido juntado a outro ou excluído).",
+    plano: "O cadastro de pacientes faz parte do plano Gestão Inteligente.",
+    frase: "A frase de confirmação não confere.",
+    dados: "Confira os dados e tente de novo.",
+    interno: "Não consegui agora. Tente de novo em instantes."
+  };
+  var PAC_OBS_AVISO = "Só informação administrativa (ex.: prefere a manhã, convênio, precisa de acessibilidade). Nunca escreva sintomas, diagnóstico, exames ou tratamento: a ficha clínica não fica aqui.";
+  var PAC_SEM_CONVERSA = "Ainda não conversou no WhatsApp: não recebe mensagens automáticas até escrever para a clínica.";
+  function pacErro(r) { return (r && (r.mensagem || PAC_ERROS[r.erro])) || PAC_ERROS.interno; }
+  // Resposta do painel: {ok, data}; "data" é o que o banco devolveu ({ok, ...} ou {ok: false, erro}).
+  function pacChamar(acao, dados) { return chamar(acao, dados).then(function (r) { if (!r || !r.ok || !r.data) throw 0; return r.data; }); }
+  function pacReservio() { return String(savedValues.func_reservio || "").trim().toUpperCase() === "SIM"; }
+  function pacDig(t) { var d = String(t || "").replace(/\D/g, ""); if (d.length >= 12 && d.slice(0, 2) === "55") d = d.slice(2); return d; }
+  function pacTel(t) {
+    var d = pacDig(t);
+    if (d.length === 11) return "(" + d.slice(0, 2) + ") " + d.slice(2, 7) + "-" + d.slice(7);
+    if (d.length === 10) return "(" + d.slice(0, 2) + ") " + d.slice(2, 6) + "-" + d.slice(6);
+    return t || "";
+  }
+  // Mesmo telefone para a assistente: DDD + 8 últimos dígitos (como todo o sistema).
+  function pacMesmoTel(a, b) { var x = pacDig(a), y = pacDig(b); return x.length >= 10 && y.length >= 10 && x.slice(0, 2) + x.slice(-8) === y.slice(0, 2) + y.slice(-8); }
+  function pacIniciais(n) { var p = String(n || "").trim().split(/\s+/).filter(Boolean); return ((p[0] || "?").charAt(0) + (p.length > 1 ? p[p.length - 1].charAt(0) : "")).toUpperCase(); }
+  function pacDia(iso) { return iso ? new Date(iso).toLocaleDateString("pt-BR", { timeZone: TZ, day: "2-digit", month: "2-digit", year: "numeric" }) : ""; }
+  function pacQuando(iso) { return new Date(iso).toLocaleString("pt-BR", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).replace(",", ""); }
+  function pacNasc(d) {
+    var m = String(d || "").match(/^(\d{4})-(\d{2})-(\d{2})/); if (!m) return "";
+    var hoje = new Date(), idade = hoje.getFullYear() - +m[1] - ((hoje.getMonth() + 1 < +m[2] || (hoje.getMonth() + 1 === +m[2] && hoje.getDate() < +m[3])) ? 1 : 0);
+    return m[3] + "/" + m[2] + "/" + m[1] + " (" + idade + (idade === 1 ? " ano)" : " anos)");
+  }
+  function pacOrigem(p) {
+    if (p.origem === "planilha") return "Importado da planilha" + (p.importado_em ? " em " + pacDia(p.importado_em) : "");
+    if (p.origem === "reservio_clientes") return "Importado do Reservio" + (p.importado_em ? " em " + pacDia(p.importado_em) : "");
+    if (p.origem === "painel") return "Cadastrado no painel";
+    return "";
+  }
+  function pacAviso(cls, txt) { return h$("div", "aviso " + cls, txt); }
+  function pacBtn(txt, cls, fn) { var b = h$("button", "btn " + cls, txt); b.type = "button"; b.onclick = fn; return b; }
+
+  function pacPreparar() {
+    el("pacUpsell").hidden = !PLANO_ESSENCIAL;
+    el("pacConteudo").hidden = PLANO_ESSENCIAL;
+    document.querySelectorAll("section[data-view='pacientes'] .voltar").forEach(function (b) { if (!b.querySelector("svg")) b.insertAdjacentHTML("afterbegin", svg("voltar")); });
+  }
+  function pacRotear(sub, id) {
+    if (PLANO_ESSENCIAL && sub) { ir("pacientes"); return; }
+    if (PLANO_ESSENCIAL) return;
+    if (!sub && PAC.sujo) pacListaCarregar(false);
+    if (sub === "ficha") pacFichaAbrir(id);
+    if (sub === "editar") pacFormAbrir(id);
+    if (sub === "duplicados") pacDupCarregar();
+  }
+
+  // ---------- Lista (50 por página; "Mostrar mais 50" acrescenta a próxima) ----------
+  function pacListaCarregar(maisUma) {
+    var seq = ++PAC.seq, lista = el("pacLista");
+    if (!maisUma) { PAC.pagina = 0; PAC.itens = []; lista.innerHTML = '<div class="vazio">Carregando…</div>'; el("pacTotal").textContent = ""; }
+    el("pacMais").hidden = true;
+    pacChamar("paciente_listar", { busca: PAC.busca, filtro: PAC.filtro, pagina: PAC.pagina }).then(function (d) {
+      if (seq !== PAC.seq) return;   // chegou a resposta de uma busca antiga
+      if (!d.ok) { lista.innerHTML = ""; lista.appendChild(pacAviso("rosa", pacErro(d))); return; }
+      PAC.sujo = false;
+      PAC.total = d.total || 0;
+      PAC.itens = PAC.itens.concat(d.pacientes || []);
+      pacListaRender();
+    }).catch(function () { if (seq === PAC.seq) { lista.innerHTML = ""; lista.appendChild(pacAviso("rosa", PAC_ERROS.interno)); } });
+  }
+  function pacListaRender() {
+    var lista = el("pacLista"); lista.innerHTML = "";
+    el("pacTotal").textContent = PAC.total === 1 ? "1 paciente" : PAC.total.toLocaleString("pt-BR") + " pacientes";
+    if (!PAC.itens.length) {
+      var v = h$("div", "vazio");
+      v.appendChild(h$("strong", null, PAC.busca ? "Nenhum paciente encontrado" : "Nenhum paciente aqui ainda"));
+      v.appendChild(document.createTextNode(PAC.busca ? "Confira a busca ou tente só um pedaço do nome." : "Os pacientes aparecem quando conversam com a assistente, marcam consulta ou são cadastrados em Novo."));
+      lista.appendChild(v);
+      return;
+    }
+    PAC.itens.forEach(function (p) {
+      var b = h$("button", "pc-item"); b.type = "button";
+      b.appendChild(h$("span", "pc-av", pacIniciais(p.nome)));
+      var tx = h$("span", "tx");
+      tx.appendChild(h$("span", "t1", p.nome));
+      var t2 = h$("span", "t2");
+      t2.appendChild(h$("span", "num", pacTel(p.telefone)));
+      if (p.proxima_consulta) t2.appendChild(h$("span", null, "Próxima: " + fmt(p.proxima_consulta)));
+      else if (p.ultima_consulta) t2.appendChild(h$("span", null, "Última: " + pacDia(p.ultima_consulta)));
+      tx.appendChild(t2);
+      var tags = h$("span", "pc-tags");
+      if (p.nao_contatar_em) tags.appendChild(h$("span", "pill alerta", "Não contatar"));
+      if (!p.conversou_em) tags.appendChild(h$("span", "pill pend", "Sem conversa"));
+      if (p.importado_em) tags.appendChild(h$("span", "pill", "Importado"));
+      if (tags.childNodes.length) tx.appendChild(tags);
+      b.appendChild(tx);
+      b.insertAdjacentHTML("beforeend", svg("seta"));
+      b.onclick = function () { ir("pacientes/ficha/" + p.paciente_id); };
+      lista.appendChild(b);
+    });
+    el("pacMais").hidden = PAC.itens.length >= PAC.total;
+  }
+  var pacBuscaTimer = null;
+  el("pacBusca").addEventListener("input", function () {
+    var v = this.value.trim();
+    clearTimeout(pacBuscaTimer);
+    pacBuscaTimer = setTimeout(function () {
+      if (v === PAC.busca || (v.length === 1)) return;   // uma letra só traria quase todos: espera a segunda
+      PAC.busca = v; pacListaCarregar(false);
+    }, 350);
+  });
+  el("pacBusca").addEventListener("keydown", function (e) { if (e.key === "Enter") { this.blur(); } });
+  el("pacFiltros").querySelectorAll("button").forEach(function (b) {
+    b.onclick = function () {
+      PAC.filtro = b.dataset.filtro;
+      el("pacFiltros").querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      pacListaCarregar(false);
+    };
+  });
+  el("pacMais").onclick = function () { PAC.pagina += 1; pacListaCarregar(true); };
+  el("pacNovo").onclick = function () { ir("pacientes/editar"); };
+
+  // ---------- Ficha ----------
+  function pacFichaAbrir(id) {
+    var box = el("pacFicha");
+    box.innerHTML = '<div class="vazio">Carregando…</div>';
+    pacChamar("paciente_ver", { paciente_id: id }).then(function (d) {
+      if (!d.ok) { box.innerHTML = ""; box.appendChild(pacAviso("rosa", pacErro(d))); return; }
+      PAC.atual = d;
+      // Código de um paciente que foi juntado: o endereço passa a ser o do paciente que ficou.
+      if (d.juntado_de) history.replaceState(null, "", "#pacientes/ficha/" + d.paciente.paciente_id);
+      pacFichaRender(d);
+    }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
+  }
+  function pacFichaRender(d) {
+    var p = d.paciente, box = el("pacFicha");
+    box.innerHTML = "";
+    if (PAC.aviso) { box.appendChild(pacAviso("verde", PAC.aviso)); PAC.aviso = ""; }
+    if (d.juntado_de) box.appendChild(pacAviso("neutro", "O código " + d.juntado_de + " foi juntado a este paciente."));
+
+    var cab = h$("div", "pc-cab");
+    cab.appendChild(h$("span", "pc-av", pacIniciais(p.nome)));
+    var ct = h$("div"); ct.style.minWidth = "0";
+    ct.appendChild(h$("h1", "titulo", p.nome));
+    var tags = h$("div", "pc-tags");
+    tags.appendChild(h$("span", "pill num", p.paciente_id));
+    var org = pacOrigem(p); if (org) tags.appendChild(h$("span", "pill", org));
+    ct.appendChild(tags);
+    cab.appendChild(ct);
+    box.appendChild(cab);
+
+    if (!p.conversou_em) box.appendChild(pacAviso("ambar", PAC_SEM_CONVERSA));
+    if (p.nao_contatar_em) box.appendChild(pacAviso("rosa", "Pediu para não receber avisos de retorno, convites para voltar nem o convite do Google (desde " + pacDia(p.nao_contatar_em) + "). Os lembretes de consultas marcadas continuam."));
+
+    var bl = h$("div", "bloco");
+    function linha(rot, val) { var r = h$("div", "ro-row"); r.appendChild(h$("span", "lbl", rot)); r.appendChild(h$("span", "val", val || "—")); bl.appendChild(r); }
+    linha("Telefone", pacTel(p.telefone));
+    linha("E-mail", p.email || "");
+    linha("Nascimento", pacNasc(p.data_nascimento));
+    linha("Última consulta", d.ultima_consulta ? pacDia(d.ultima_consulta) : "");
+    linha("Observação", p.observacao || "");
+    linha("No cadastro desde", pacDia(p.criado_em));
+    box.appendChild(bl);
+    var obs = h$("p", "pc-dica", "Observação: " + PAC_OBS_AVISO); obs.style.marginTop = "8px"; box.appendChild(obs);
+
+    var ac = h$("div", "pc-acoes");
+    ac.appendChild(pacBtn("Editar", "sec", function () { ir("pacientes/editar/" + p.paciente_id); }));
+    ac.appendChild(pacBtn("Juntar com outro", "sec", function () { pacJuntarBuscar(p); }));
+    ac.appendChild(pacBtn(p.nao_contatar_em ? "Voltar a enviar avisos" : "Não quer receber avisos", "sec", function () { pacNaoContatar(p); }));
+    ac.appendChild(pacBtn("Excluir", "perigo", function () { pacExcluir(p); }));
+    box.appendChild(ac);
+    var area = h$("div"); area.id = "pacAcaoArea"; box.appendChild(area);
+
+    function consultas(titulo, lista, extra) {
+      var s = h$("div", "pc-sec"); s.appendChild(document.createTextNode(titulo)); if (extra) s.appendChild(h$("span", null, extra)); box.appendChild(s);
+      var b2 = h$("div", "bloco");
+      if (!lista.length) b2.appendChild(h$("div", "vazio", "Nenhuma."));
+      lista.forEach(function (c) {
+        var r = h$("div", "pc-cons" + (c.status === "cancelado" ? " cancelada" : ""));
+        r.appendChild(h$("div", "c1 cap1", pacQuando(c.inicio)));
+        var info = [c.tipo || c.servico, c.medico, c.status === "cancelado" ? "cancelada" : (c.presenca_confirmada ? "✅ confirmou presença" : ""), c.criado_por === "ia" ? "🤖 marcada pela assistente" : "", c.pesquisa_nota != null ? "nota " + c.pesquisa_nota : ""].filter(Boolean).join(" · ");
+        if (info) r.appendChild(h$("div", "c2", info));
+        b2.appendChild(r);
+      });
+      box.appendChild(b2);
+    }
+    consultas("Próximas consultas", d.consultas_futuras || []);
+    var tp = d.total_passadas || 0, np = (d.consultas_passadas || []).length;
+    consultas("Consultas passadas", d.consultas_passadas || [], tp > np ? "as " + np + " mais recentes de " + tp : "");
+
+    var dups = d.possiveis_duplicados || [];
+    if (dups.length) {
+      var s = h$("div", "pc-sec", "Possíveis duplicados"); box.appendChild(s);
+      var bd = h$("div", "lista");
+      dups.forEach(function (q) {
+        var b = h$("button", "pc-item"); b.type = "button";
+        b.appendChild(h$("span", "pc-av", pacIniciais(q.nome)));
+        var tx = h$("span", "tx"); tx.appendChild(h$("span", "t1", q.nome));
+        var t2 = h$("span", "t2"); t2.appendChild(h$("span", "num", pacTel(q.telefone))); t2.appendChild(h$("span", null, q.mesmo_telefone ? "mesmo telefone" : "outro telefone")); tx.appendChild(t2);
+        b.appendChild(tx);
+        b.appendChild(h$("span", "pill ok", "Juntar"));
+        b.onclick = function () { pacJuntarConfirmar(p, q, el("pacAcaoArea")); el("pacAcaoArea").scrollIntoView({ behavior: "smooth", block: "center" }); };
+        bd.appendChild(b);
+      });
+      box.appendChild(bd);
+    }
+  }
+
+  // ---------- Juntar ----------
+  // 1) escolher o outro paciente (busca); 2) escolher quem fica; 3) confirmar.
+  function pacJuntarBuscar(p) {
+    var area = el("pacAcaoArea"); area.innerHTML = "";
+    var pn = h$("div", "pc-painel");
+    pn.appendChild(h$("div", "sec", "Juntar com outro paciente"));
+    pn.appendChild(h$("p", "subtitulo", "Use quando os dois cadastros forem a mesma pessoa. Busque o outro cadastro:"));
+    var inp = h$("input"); inp.type = "search"; inp.placeholder = "Nome, final do telefone ou código"; inp.setAttribute("autocomplete", "off");
+    inp.className = "pc-busca-inp"; inp.style.cssText = "width:100%;box-sizing:border-box;min-height:44px;border:1px solid #cfd8d5;border-radius:12px;padding:10px 14px;font-size:16px;margin-top:10px;-webkit-appearance:none";
+    pn.appendChild(inp);
+    var res = h$("div", "lista"); res.style.marginTop = "10px"; pn.appendChild(res);
+    var fechar = pacBtn("Cancelar", "sec", function () { area.innerHTML = ""; }); fechar.style.marginTop = "12px"; pn.appendChild(fechar);
+    area.appendChild(pn);
+    var t = null, seq = 0;
+    inp.addEventListener("input", function () {
+      var v = inp.value.trim(); clearTimeout(t);
+      if (v.length < 2) { res.innerHTML = ""; return; }
+      t = setTimeout(function () {
+        var s = ++seq;
+        pacChamar("paciente_listar", { busca: v, filtro: "todos", pagina: 0 }).then(function (d) {
+          if (s !== seq) return;
+          res.innerHTML = "";
+          var lst = (d.pacientes || []).filter(function (q) { return q.paciente_id !== p.paciente_id; });
+          if (!lst.length) { res.appendChild(h$("div", "vazio", "Nenhum outro paciente encontrado.")); return; }
+          lst.slice(0, 10).forEach(function (q) {
+            var b = h$("button", "pc-item"); b.type = "button";
+            b.appendChild(h$("span", "pc-av", pacIniciais(q.nome)));
+            var tx = h$("span", "tx"); tx.appendChild(h$("span", "t1", q.nome));
+            var t2 = h$("span", "t2"); t2.appendChild(h$("span", "num", pacTel(q.telefone))); t2.appendChild(h$("span", null, q.paciente_id)); tx.appendChild(t2);
+            b.appendChild(tx);
+            b.onclick = function () { pacJuntarConfirmar(p, q, area); };
+            res.appendChild(b);
+          });
+        }).catch(function () { res.innerHTML = ""; res.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
+      }, 350);
+    });
+    setTimeout(function () { inp.focus(); }, 50);
+  }
+  function pacJuntarConfirmar(a, b, area) {
+    area.innerHTML = "";
+    var pn = h$("div", "pc-painel");
+    pn.appendChild(h$("div", "sec", "Qual cadastro fica?"));
+    pn.appendChild(h$("p", "subtitulo", "As consultas, as respostas da pré-consulta e os avisos de quem sai passam para quem fica. O que estiver vazio em quem fica (e-mail, nascimento, observação) é completado com o de quem sai, e o código de quem sai continua levando a quem fica."));
+    var nomeRadio = "pacFica" + Date.now();
+    [a, b].forEach(function (q, i) {
+      var lb = h$("label", "pc-escolha");
+      var r = h$("input"); r.type = "radio"; r.name = nomeRadio; r.value = q.paciente_id; r.checked = i === 0;
+      lb.appendChild(r);
+      var tx = h$("span"); tx.appendChild(h$("strong", null, q.nome)); tx.appendChild(h$("small", "num", pacTel(q.telefone) + " · " + q.paciente_id)); lb.appendChild(tx);
+      pn.appendChild(lb);
+    });
+    var avisoTel = h$("div", "aviso ambar"); avisoTel.style.margin = "10px 0 0"; pn.appendChild(avisoTel);
+    function atualizar() {
+      var fica = pn.querySelector("input:checked").value === a.paciente_id ? a : b, sai = fica === a ? b : a;
+      avisoTel.hidden = pacMesmoTel(a.telefone, b.telefone);
+      avisoTel.textContent = "Os telefones são diferentes. Fica o telefone de " + fica.nome + " (" + pacTel(fica.telefone) + "); o " + pacTel(sai.telefone) + " deixa de ser reconhecido pela assistente." + (pacReservio() ? " Se a clínica usa o Reservio, junte também lá." : "");
+    }
+    pn.querySelectorAll("input[type=radio]").forEach(function (r) { r.onchange = atualizar; });
+    atualizar();
+    var ok = pacBtn("Juntar", "pri", function () {
+      var fica = pn.querySelector("input:checked").value === a.paciente_id ? a : b, sai = fica === a ? b : a;
+      if (!confirm("Juntar " + sai.nome + " (" + sai.paciente_id + ") em " + fica.nome + " (" + fica.paciente_id + ")? Não dá para desfazer.")) return;
+      ok.disabled = true;
+      pacChamar("paciente_juntar", { fica: fica.paciente_id, sai: sai.paciente_id }).then(function (r) {
+        ok.disabled = false;
+        if (!r.ok) { toast(pacErro(r)); return; }
+        PAC.sujo = true;
+        PAC.aviso = "Cadastros juntados. " + (r.consultas ? r.consultas + (r.consultas === 1 ? " consulta passou" : " consultas passaram") + " para este paciente. " : "")
+          + (r.telefone_descartado ? "O telefone " + pacTel(sai.telefone) + " deixou de ser reconhecido: a assistente só reconhece o telefone deste cadastro. Se a pessoa ainda usa aquele número, edite o telefone." : "");
+        if (location.hash === "#pacientes/ficha/" + fica.paciente_id) pacFichaAbrir(fica.paciente_id); else ir("pacientes/ficha/" + fica.paciente_id);
+      }).catch(function () { ok.disabled = false; toast(PAC_ERROS.interno); });
+    });
+    ok.style.marginTop = "14px"; pn.appendChild(ok);
+    var cancela = pacBtn("Cancelar", "sec", function () { area.innerHTML = ""; }); cancela.style.marginTop = "14px"; pn.appendChild(cancela);
+    area.appendChild(pn);
+  }
+
+  // ---------- Não contatar (marcar com confirmação; desmarcar só com a frase exata) ----------
+  function pacNaoContatar(p) {
+    var area = el("pacAcaoArea"); area.innerHTML = "";
+    if (!p.nao_contatar_em) {
+      if (!confirm("Marcar que " + p.nome + " não quer receber avisos de retorno, convites para voltar nem o convite do Google? Vale para todos os pacientes deste telefone. Os lembretes de consultas marcadas continuam.")) return;
+      pacChamar("paciente_nao_contatar", { paciente_id: p.paciente_id, marcar: true }).then(function (r) {
+        if (!r.ok) { toast(pacErro(r)); return; }
+        PAC.sujo = true; PAC.aviso = "Marcado: não recebe mais avisos" + (r.pacientes > 1 ? " (vale para os " + r.pacientes + " pacientes deste telefone)." : ".");
+        pacFichaAbrir(p.paciente_id);
+      }).catch(function () { toast(PAC_ERROS.interno); });
+      return;
+    }
+    var pn = h$("div", "pc-painel");
+    pn.appendChild(h$("div", "sec", "Voltar a enviar avisos"));
+    pn.appendChild(h$("p", "subtitulo", "Só faça isso se o próprio paciente pediu. Para confirmar, digite a frase:"));
+    pn.appendChild(h$("span", "pc-frase", PAC_FRASE));
+    var inp = h$("input"); inp.type = "text"; inp.setAttribute("autocomplete", "off"); inp.setAttribute("aria-label", "Frase de confirmação"); pn.appendChild(inp);
+    var norm = function (s) { return String(s || "").replace(/\s+/g, " ").trim().toLowerCase(); };
+    var ok = pacBtn("Voltar a enviar avisos", "pri", function () {
+      if (norm(inp.value) !== norm(PAC_FRASE)) { toast("A frase não confere. Digite exatamente como está acima."); return; }
+      ok.disabled = true;
+      pacChamar("paciente_nao_contatar", { paciente_id: p.paciente_id, marcar: false, frase: PAC_FRASE }).then(function (r) {
+        ok.disabled = false;
+        if (!r.ok) { toast(pacErro(r)); return; }
+        PAC.sujo = true; PAC.aviso = "Pronto: volta a receber os avisos" + (r.pacientes > 1 ? " (vale para os " + r.pacientes + " pacientes deste telefone)." : ".");
+        pacFichaAbrir(p.paciente_id);
+      }).catch(function () { ok.disabled = false; toast(PAC_ERROS.interno); });
+    });
+    ok.disabled = true; ok.style.marginTop = "12px";
+    inp.addEventListener("input", function () { ok.disabled = norm(inp.value) !== norm(PAC_FRASE); });
+    pn.appendChild(ok);
+    var cancela = pacBtn("Cancelar", "sec", function () { area.innerHTML = ""; }); cancela.style.marginTop = "12px"; pn.appendChild(cancela);
+    area.appendChild(pn);
+    setTimeout(function () { inp.focus(); }, 50);
+  }
+
+  // ---------- Excluir (pedido do paciente, LGPD) ----------
+  function pacExcluir(p) {
+    var area = el("pacAcaoArea"); area.innerHTML = "";
+    var msg = "Excluir " + p.nome + "? Use só quando o próprio paciente pedir (LGPD).\n\n"
+      + "• O cadastro é apagado. As consultas passadas ficam na agenda como \"Paciente excluído\", sem nome, telefone nem resumo.\n"
+      + "• Saem também as respostas da pré-consulta, o lugar na lista de espera e os documentos lidos desse telefone (se nenhum outro paciente usa o número).\n"
+      + "• A conversa continua no WhatsApp da clínica.\n\nNão dá para desfazer."
+      + (pacReservio() ? "\n\nA clínica usa o Reservio: exclua o paciente também lá, senão a próxima sincronização pode trazê-lo de volta." : "");
+    if (!confirm(msg)) return;
+    pacChamar("paciente_excluir", { paciente_id: p.paciente_id, confirmar: true }).then(function (r) {
+      if (!r.ok && r.erro === "consulta_futura") {
+        var n = r.consultas_futuras || 1;
+        var av = pacAviso("rosa", p.nome + " tem " + n + (n === 1 ? " consulta futura marcada" : " consultas futuras marcadas") + ". Cancele na Agenda antes de excluir. ");
+        var lk = h$("button", "link", "Abrir a Agenda"); lk.type = "button"; lk.setAttribute("data-ir", "agenda"); av.appendChild(lk);
+        area.appendChild(av); area.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (!r.ok) { toast(pacErro(r)); return; }
+      PAC.sujo = true;
+      toast("Paciente excluído." + (r.consultas_anonimizadas ? " " + r.consultas_anonimizadas + " consulta(s) ficaram como \"Paciente excluído\"." : ""));
+      if (r.documentos_mantidos) setTimeout(function () { toast("Os documentos desse telefone ficaram, porque outro paciente usa o mesmo número. Veja em Agenda › Documentos."); }, 2600);
+      ir("pacientes");
+    }).catch(function () { toast(PAC_ERROS.interno); });
+  }
+
+  // ---------- Criar e editar ----------
+  function pacFormAbrir(id) {
+    var box = el("pacForm"); box.innerHTML = "";
+    el("pacFormVoltar").onclick = function () { history.length > 1 ? history.back() : ir("pacientes"); };
+    if (!id) { pacFormRender(null); return; }
+    box.innerHTML = '<div class="vazio">Carregando…</div>';
+    var p0 = PAC.atual && PAC.atual.paciente && PAC.atual.paciente.paciente_id === id ? PAC.atual.paciente : null;
+    if (p0) { pacFormRender(p0); return; }
+    pacChamar("paciente_ver", { paciente_id: id }).then(function (d) {
+      if (!d.ok) { box.innerHTML = ""; box.appendChild(pacAviso("rosa", pacErro(d))); return; }
+      PAC.atual = d; pacFormRender(d.paciente);
+    }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
+  }
+  function pacFormRender(p) {
+    var box = el("pacForm"); box.innerHTML = "";
+    var cab = h$("div", "cab"); cab.appendChild(h$("h1", "titulo", p ? "Editar paciente" : "Novo paciente")); box.appendChild(cab);
+    var erro = h$("div"); box.appendChild(erro);
+    var bl = h$("div", "bloco pc-form");
+    var campos = {};
+    function campo(chave, rot, tipo, val, extra) {
+      var f = h$("div", "fld");
+      var top = h$("div", "fld-top"); var lb = h$("label", "rot", rot); lb.htmlFor = "pacF_" + chave; top.appendChild(lb); f.appendChild(top);
+      if (extra && extra.hint) f.appendChild(h$("p", "fld-hint", extra.hint));
+      var i = h$(tipo === "textarea" ? "textarea" : "input"); i.id = "pacF_" + chave;
+      if (tipo !== "textarea") i.type = tipo;
+      i.value = val || "";
+      if (extra && extra.max) i.maxLength = extra.max;
+      if (extra && extra.ph) i.placeholder = extra.ph;
+      if (extra && extra.attrs) Object.keys(extra.attrs).forEach(function (k) { i.setAttribute(k, extra.attrs[k]); });
+      f.appendChild(i);
+      if (tipo === "textarea") { var ct = h$("div", "cont", ""); f.appendChild(ct); var upd = function () { ct.textContent = i.value.length + " de " + extra.max; cresce(i); }; i.addEventListener("input", upd); setTimeout(upd, 0); }
+      bl.appendChild(f); campos[chave] = i;
+    }
+    campo("nome", "Nome completo *", "text", p && p.nome, { max: 120, ph: "Ana Souza", attrs: { autocomplete: "off", autocapitalize: "words" } });
+    campo("telefone", "Telefone com DDD *", "tel", p && pacTel(p.telefone), { max: 25, ph: "(48) 99999-0000", hint: "É por ele que a assistente reconhece o paciente no WhatsApp.", attrs: { inputmode: "tel", autocomplete: "off" } });
+    campo("email", "E-mail", "email", p && p.email, { max: 120, ph: "ana@exemplo.com", attrs: { inputmode: "email", autocapitalize: "off", autocomplete: "off" } });
+    campo("data_nascimento", "Data de nascimento", "date", p && p.data_nascimento ? String(p.data_nascimento).slice(0, 10) : "", { attrs: { max: new Date().toISOString().slice(0, 10), min: "1900-01-01" } });
+    campo("observacao", "Observação", "textarea", p && p.observacao, { max: 300, hint: PAC_OBS_AVISO, ph: "Prefere horários pela manhã" });
+    box.appendChild(bl);
+    if (p && pacReservio()) box.appendChild(h$("p", "pc-dica", "A clínica usa o Reservio: se mudar o nome ou o telefone, mude também lá."));
+    if (p) box.appendChild(h$("p", "pc-dica", "Ao mudar o nome ou o telefone, as consultas futuras deste paciente passam a usar os novos; as passadas ficam como estão."));
+    var salvar = pacBtn(p ? "Salvar" : "Cadastrar paciente", "pri plena", function () {
+      erro.innerHTML = "";
+      var dados = { nome: campos.nome.value, telefone: campos.telefone.value, email: campos.email.value, data_nascimento: campos.data_nascimento.value, observacao: campos.observacao.value };
+      if (p) dados.paciente_id = p.paciente_id;
+      if (!dados.nome.trim()) { erro.appendChild(pacAviso("rosa", PAC_ERROS.nome)); campos.nome.focus(); return; }
+      if (pacDig(dados.telefone).length < 10) { erro.appendChild(pacAviso("rosa", PAC_ERROS.telefone)); campos.telefone.focus(); return; }
+      salvar.disabled = true;
+      pacChamar("paciente_salvar", dados).then(function (r) {
+        salvar.disabled = false;
+        if (!r.ok && r.erro === "duplicado") {
+          var av = pacAviso("ambar", "Já existe um paciente com esse nome e esse telefone. ");
+          var lk = h$("button", "link", "Abrir o cadastro que já existe"); lk.type = "button"; lk.setAttribute("data-ir", "pacientes/ficha/" + r.paciente_id_existente); av.appendChild(lk);
+          if (p) av.appendChild(document.createTextNode(" (se for a mesma pessoa, junte os dois pela ficha)."));
+          erro.appendChild(av); window.scrollTo(0, 0); return;
+        }
+        if (!r.ok) { erro.appendChild(pacAviso("rosa", pacErro(r))); window.scrollTo(0, 0); var c = campos[r.erro === "nascimento" ? "data_nascimento" : r.erro]; if (c) c.focus(); return; }
+        PAC.sujo = true;
+        PAC.aviso = p ? "Salvo." + (r.consultas_futuras_atualizadas ? " " + r.consultas_futuras_atualizadas + (r.consultas_futuras_atualizadas === 1 ? " consulta futura passou" : " consultas futuras passaram") + " a usar o nome e o telefone novos." : "") : "Paciente cadastrado.";
+        history.replaceState(null, "", "#pacientes/ficha/" + r.paciente_id);
+        rotear();
+      }).catch(function () { salvar.disabled = false; erro.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
+    });
+    salvar.style.marginTop = "16px"; box.appendChild(salvar);
+    setTimeout(function () { if (!p) campos.nome.focus(); }, 50);
+  }
+
+  // ---------- Possíveis duplicados (mesmo nome sem acento) ----------
+  function pacDupCarregar() {
+    var box = el("pacDup"); box.innerHTML = '<div class="vazio">Carregando…</div>';
+    pacChamar("paciente_duplicados", {}).then(function (d) {
+      box.innerHTML = "";
+      if (!d.ok) { box.appendChild(pacAviso("rosa", pacErro(d))); return; }
+      var gs = d.grupos || [];
+      if (!gs.length) { var v = h$("div", "vazio"); v.appendChild(h$("strong", null, "Nenhum duplicado encontrado")); v.appendChild(document.createTextNode("Não há dois cadastros com o mesmo nome.")); box.appendChild(v); return; }
+      box.appendChild(h$("p", "pc-total", gs.length === 1 ? "1 grupo" : gs.length + " grupos" + (gs.length >= 200 ? " (os 200 primeiros, em ordem alfabética)" : "")));
+      gs.forEach(function (g) {
+        var pn = h$("div", "pc-painel");
+        var t = h$("div", "sec"); t.appendChild(document.createTextNode(g.nome + " ")); t.appendChild(h$("span", "pill " + (g.mesmo_telefone ? "pend" : ""), g.mesmo_telefone ? "mesmo telefone" : "telefones diferentes")); pn.appendChild(t);
+        var lst = h$("div", "lista"); lst.style.margin = "8px 0";
+        (g.pacientes || []).forEach(function (q) {
+          var b = h$("button", "pc-item"); b.type = "button";
+          b.appendChild(h$("span", "pc-av", pacIniciais(q.nome)));
+          var tx = h$("span", "tx"); tx.appendChild(h$("span", "t1", q.nome));
+          var t2 = h$("span", "t2"); t2.appendChild(h$("span", "num", pacTel(q.telefone))); t2.appendChild(h$("span", null, q.paciente_id)); var org = pacOrigem(q); if (org) t2.appendChild(h$("span", null, org)); tx.appendChild(t2);
+          b.appendChild(tx); b.insertAdjacentHTML("beforeend", svg("seta"));
+          b.onclick = function () { ir("pacientes/ficha/" + q.paciente_id); };
+          lst.appendChild(b);
+        });
+        pn.appendChild(lst);
+        var area = h$("div");
+        if ((g.pacientes || []).length === 2) pn.appendChild(pacBtn("Juntar estes dois", "sec", function () { pacJuntarConfirmar(g.pacientes[0], g.pacientes[1], area); }));
+        else pn.appendChild(h$("p", "pc-dica", "Abra cada cadastro para juntar dois de cada vez."));
+        pn.appendChild(area);
+        box.appendChild(pn);
+      });
+    }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
+  }
+
   chamar("abrir").then(function (resp) {
     el("carregando").hidden = true;
     if (!resp.ok) { mostrarErro(resp.mensagem || "Este link não abriu. Peça um link novo com o e-mail cadastrado."); return; }
@@ -2538,6 +3101,7 @@ function partesTz(ms) {
     el("zapNumero").textContent = sl.numero_whatsapp || "Ainda não conectado";
     if (sl.plano) el("contaPlanoResumo").textContent = "Plano " + sl.plano + (sl.valor_mensal ? " · " + sl.valor_mensal : "");
     if (sl.numero_whatsapp) el("contaZapResumo").textContent = sl.numero_whatsapp;
+    pacPreparar();
     aplicarDependencias();
     listasAtualizar();
     rotear();
