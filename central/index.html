@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zq7bHjQdDi6/xjChwLU319w5h+LIyJyzV+HyJn0nRVk='; style-src 'sha256-ZyFjVqDF1fxqS4NZDU1Y2ngPML+fpAbMZ8zHaJDiMQc='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Central">
+<meta name="format-detection" content="telephone=no">
+<title>Central RXSync</title>
+<link rel="manifest" href="/central/manifest.webmanifest">
+<link rel="icon" href="/assets/favicon-rxsync.png.PNG">
+<link rel="apple-touch-icon" href="/assets/favicon-rxsync.png.PNG">
+<style>
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-600.woff2') format('woff2'); font-weight: 500 600; font-display: swap; }
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Figtree'; src: url('/central/fontes/figtree-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+:root {
+  --bg: #f2f5f4; --surface: #fff; --surface-2: #f7f9f8; --ink: #0f172a; --ink-2: #445263; --ink-3: #66727f;
+  --line: #e0e7e4; --line-2: #cfd9d5; --brand: #059669; --brand-h: #047857; --brand-ink: #065f46; --brand-soft: #e6f5ee;
+  --navy: #0f172a; --navy-2: #16213a; --amber-ink: #92400e; --amber-soft: #fef3c7; --rose-ink: #9f1239; --rose-soft: #ffe4e6;
+  --blue-ink: #3730a3; --blue-soft: #e0e7ff; --r-lg: 18px; --r-md: 12px; --tabbar-h: 62px;
+  --sombra: 0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.05);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220; --surface: #121b2d; --surface-2: #17223a; --ink: #e8edf5; --ink-2: #b4c0d0; --ink-3: #8a97a8;
+    --line: #23314a; --line-2: #2e3f5c; --brand: #10b981; --brand-h: #34d399; --brand-ink: #6ee7b7; --brand-soft: #0f2e27;
+    --amber-ink: #fcd34d; --amber-soft: #3a2d0c; --rose-ink: #fda4af; --rose-soft: #3b1420; --blue-ink: #c7d2fe; --blue-soft: #1e2550;
+    --sombra: none;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.5 'Figtree', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+input, select, textarea { font-size: 16px; } /* 16px: o iPad não dá zoom ao tocar no campo */
+a { color: var(--brand-ink); }
+.num { font-variant-numeric: tabular-nums; }
+.mudo { color: var(--ink-3); }
+.peq { font-size: 13px; }
+/* barra de cima (celular e iPad em pé) */
+.topbar { position: sticky; top: 0; z-index: 30; background: var(--navy); color: #fff; padding: calc(env(safe-area-inset-top, 0px) + 10px) calc(env(safe-area-inset-right, 0px) + 16px) 10px calc(env(safe-area-inset-left, 0px) + 16px); display: flex; align-items: center; gap: 12px; }
+.marca { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #1e3a8a, #059669); display: grid; place-items: center; font-weight: 800; color: #fff; flex: none; }
+.topbar .titulo { font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar button { background: rgba(255,255,255,.1); border: 0; color: #fff; border-radius: 10px; min-height: 40px; padding: 0 12px; }
+#conteudo:focus { outline: none; }
+.main { max-width: 860px; margin: 0 auto; padding: 18px calc(env(safe-area-inset-right, 0px) + 16px) calc(var(--tabbar-h) + 32px + env(safe-area-inset-bottom, 0px)) calc(env(safe-area-inset-left, 0px) + 16px); }
+/* abas de baixo */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.tabbar button { height: var(--tabbar-h); border: 0; background: none; color: var(--ink-3); font-size: 11.5px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.tabbar button svg, .rail button svg { width: 22px; height: 22px; }
+.tabbar button[aria-current="page"] { color: var(--brand-ink); }
+body.teclado .tabbar { display: none; }
+/* menu lateral (iPad deitado e computador) */
+.rail { display: none; }
+@media (min-width: 1024px) {
+  .topbar, .tabbar { display: none; }
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .rail { display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; background: var(--navy); color: #fff; padding: calc(env(safe-area-inset-top, 0px) + 20px) 14px 20px; overflow-y: auto; }
+  .rail .cab { display: flex; align-items: center; gap: 10px; padding: 0 8px 18px; font-weight: 700; }
+  .rail button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 2px; border: 0; border-radius: 10px; background: none; color: #a7b3c2; font-size: 15px; font-weight: 600; text-align: left; }
+  .rail button:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .rail button[aria-current="page"] { background: rgba(255,255,255,.1); color: #fff; }
+  .rail .sep { height: 1px; background: rgba(255,255,255,.08); margin: 10px 4px; }
+  .main { padding-bottom: 40px; }
+}
+/* blocos */
+h1 { font-size: 24px; line-height: 1.2; margin: 4px 0 14px; font-weight: 800; }
+h2 { font-size: 17px; margin: 0 0 10px; font-weight: 700; }
+.bloco { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; box-shadow: var(--sombra); }
+.bloco + .bloco, .bloco + .grade, .grade + .bloco { margin-top: 14px; }
+.grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .grade { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.cartao { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; }
+.cartao .valor { font-size: 24px; font-weight: 800; line-height: 1.15; }
+.cartao .rot { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+.lista { list-style: none; margin: 0; padding: 0; }
+.lista li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.lista li:first-child { border-top: 0; }
+.lista .cresce { flex: 1; min-width: 0; }
+.lista .titulo-item { font-weight: 600; overflow-wrap: anywhere; }
+.lista button.item { all: unset; display: flex; gap: 10px; align-items: center; width: 100%; cursor: pointer; }
+.pill { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; border: 1px solid var(--line); }
+.pill.ok { background: var(--brand-soft); color: var(--brand-ink); border-color: transparent; }
+.pill.pend { background: var(--amber-soft); color: var(--amber-ink); border-color: transparent; }
+.pill.alerta { background: var(--rose-soft); color: var(--rose-ink); border-color: transparent; }
+.pill.plano { background: var(--blue-soft); color: var(--blue-ink); border-color: transparent; }
+.faixa { border-radius: var(--r-md); padding: 10px 14px; font-weight: 700; margin-bottom: 14px; }
+.faixa.pend { background: var(--amber-soft); color: var(--amber-ink); }
+.faixa.alerta { background: var(--rose-soft); color: var(--rose-ink); }
+.faixa.ok { background: var(--brand-soft); color: var(--brand-ink); }
+.barra { height: 8px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+.barra > i { display: block; height: 100%; background: var(--brand); }
+.barra.alto > i { background: #f59e0b; } .barra.cheio > i { background: #e11d48; }
+.campos { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; }
+.campos dt { color: var(--ink-3); font-size: 14px; } .campos dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.chips button { border: 1px solid var(--line-2); background: var(--surface); border-radius: 99px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+/* botões e campos */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid transparent; font-weight: 700; cursor: pointer; }
+.btn.pri { background: var(--brand); color: #fff; } .btn.pri:hover { background: var(--brand-h); }
+.btn.sec { background: var(--surface); color: var(--ink); border-color: var(--line-2); }
+.btn.perigo { background: var(--surface); color: var(--rose-ink); border-color: var(--rose-soft); }
+.btn.plena { width: 100%; } .btn:disabled { opacity: .55; cursor: default; }
+.acoes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+label.campo { display: block; margin-bottom: 12px; font-weight: 600; font-size: 14px; color: var(--ink-2); }
+label.campo input, label.campo select { display: block; width: 100%; margin-top: 6px; min-height: 46px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink); }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; }
+input.codigo { letter-spacing: .3em; font-size: 22px !important; text-align: center; font-weight: 700; }
+.chave-totp { font: 700 20px/1.5 ui-monospace, Menlo, monospace; letter-spacing: .08em; background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: 12px; padding: 12px; text-align: center; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.codigos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font: 700 17px ui-monospace, Menlo, monospace; }
+.codigos span { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; }
+/* entrada */
+.entrada { min-height: 100vh; display: grid; place-items: center; padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); background: var(--navy); }
+.entrada .bloco { width: 100%; max-width: 440px; }
+.entrada .cab { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.passos { margin: 0 0 12px; padding-left: 20px; } .passos li { margin-bottom: 6px; }
+.nome-grande { font-weight: 800; font-size: 19px; } .mt { margin-top: 14px; } label.campo.linha { display: flex; gap: 10px; align-items: center; }
+.erro { color: var(--rose-ink); font-weight: 600; min-height: 1.5em; }
+/* gráficos */
+svg.grafico { width: 100%; height: 120px; display: block; }
+svg.grafico .b { fill: var(--brand); } svg.grafico .eixo { stroke: var(--line); }
+svg.grafico text { fill: var(--ink-3); font-size: 10px; }
+/* aviso flutuante e janela */
+#toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + 20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--navy); color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600; z-index: 80; max-width: calc(100% - 32px); }
+@media (min-width: 1024px) { #toast { bottom: 28px; } }
+.fundo { position: fixed; inset: 0; background: rgba(15,23,42,.55); z-index: 70; display: grid; place-items: center; padding: 16px; }
+.janela { background: var(--surface); border-radius: var(--r-lg); padding: 18px; width: 100%; max-width: 460px; max-height: 90vh; overflow: auto; }
+table.antes-depois { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 14px; }
+table.antes-depois th, table.antes-depois td { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.tabela-rolagem { overflow-x: auto; }
+table.dados { border-collapse: collapse; font-size: 14px; min-width: 100%; }
+table.dados th, table.dados td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div id="entrada" class="entrada" hidden>
+  <div class="bloco">
+    <div class="cab"><div class="marca">RX</div><div><div class="nome-grande">Central RXSync</div><div class="mudo peq">Área do administrador</div></div></div>
+    <div id="entrada-corpo"></div>
+  </div>
+</div>
+
+<div id="app" class="app" hidden>
+  <aside class="rail" aria-label="Menu">
+    <div class="cab"><div class="marca">RX</div>Central RXSync</div>
+    <nav id="rail-nav"></nav>
+  </aside>
+  <div>
+    <header class="topbar">
+      <div class="marca">RX</div>
+      <div class="titulo" id="topo-titulo">Central RXSync</div>
+      <button type="button" id="btn-atualizar" aria-label="Atualizar">Atualizar</button>
+    </header>
+    <main class="main" id="conteudo" tabindex="-1"></main>
+  </div>
+  <nav class="tabbar" id="tabbar" aria-label="Abas"></nav>
+</div>
+<div id="toast" role="status" hidden></div>
+<div id="janela" class="fundo" hidden></div>
+
+<script>
+'use strict';
+// Central RXSync. Contrato: rxsync-sistema/docs/mapa/central.md (DEC-053 a DEC-061).
+// Tudo o que vem do servidor entra na página como TEXTO (textContent), nunca como HTML.
+(function () {
+const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/central';
+const ORIGEM = 'rxsync-site-2026';
+
+// A página não abre dentro de outra (o GitHub Pages não deixa mandar o cabeçalho que bloqueia isso).
+if (window.top !== window.self) { document.body.textContent = 'A Central não abre dentro de outra página.'; try { window.top.location = window.location.href; } catch (e) {} return; }
+
+// ---------------------------------------------------------------- utilidades
+const $ = id => document.getElementById(id);
+function el(tag, props, ...filhos) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'text') e.textContent = String(v);
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const f of filhos.flat(Infinity)) if (f != null && f !== false) e.append(f instanceof Node ? f : document.createTextNode(String(f)));
+  return e;
+}
+const ICONES = {
+  inicio: 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z', clientes: 'M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M21 19v-1a4 4 0 0 0-3-3.9M16 3.1a3.5 3.5 0 0 1 0 6.8',
+  dinheiro: 'M3 7h18v10H3zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M6 7v10M18 7v10', sistema: 'M3 12h4l3-8 4 16 3-8h4',
+  mais: 'M5 12h.01M12 12h.01M19 12h.01', uso: 'M4 20V10M10 20V4M16 20v-7M22 20H2', avisos: 'M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4',
+  funil: 'M3 4h18l-7 8v6l-4 2v-8z', seguranca: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', chaves: 'M15 7a4 4 0 1 1-3.5 6.1L4 20.5V17h3v-3h3l1.5-1.5A4 4 0 0 1 15 7',
+  agregados: 'M3 3v18h18M7 15l4-4 3 3 5-6'
+};
+const icone = n => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.9'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', ICONES[n] || ''); s.append(p); return s; };
+const fmtReal = v => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const fmtNum = v => (Number(v) || 0).toLocaleString('pt-BR');
+const fmtData = v => { if (!v) return '—'; const d = new Date(String(v).length === 10 ? v + 'T12:00:00' : v); return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR'); };
+const fmtHora = v => { if (!v) return '—'; const d = new Date(v); return isNaN(d) ? String(v) : d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); };
+const vazio = t => el('p', { class: 'mudo', text: t || 'Nada por aqui.' });
+function toast(t) { const x = $('toast'); x.textContent = t; x.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { x.hidden = true; }, 3500); }
+async function copiar(t) { try { await navigator.clipboard.writeText(t); toast('Copiado.'); } catch (e) { toast('Não consegui copiar: selecione e copie à mão.'); } }
+
+// ---------------------------------------------------------------- sessão e chamadas
+// A sessão fica na memória e no sessionStorage desta aba (some ao fechar). Nunca no localStorage nem no endereço.
+const est = { sessao: '', chaves: {}, config: null };
+try { est.sessao = sessionStorage.getItem('central_sessao') || ''; } catch (e) {}
+function guardarSessao(s) { est.sessao = s || ''; try { if (s) sessionStorage.setItem('central_sessao', s); else sessionStorage.removeItem('central_sessao'); } catch (e) {} }
+const ua = navigator.userAgent;
+const aparelho = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
+const ehApp = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+async function chamar(acao, dados) {
+  const cab = { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM, 'x-rxsync-aparelho': aparelho, 'x-rxsync-app': ehApp ? 'sim' : 'nao' };
+  if (est.sessao) cab['x-rxsync-sessao'] = est.sessao;
+  let r;
+  try {
+    const resp = await fetch(N8N, { method: 'POST', headers: cab, body: JSON.stringify({ acao, dados: dados || {} }), cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+    r = await resp.json();
+  } catch (e) { r = { ok: false, mensagem: 'Sem conexão com a Central. Confira a internet e tente de novo.' }; }
+  r = r || { ok: false, mensagem: 'Resposta vazia.' };
+  if (r.sair && acao !== 'sair' && acao !== 'sair_todos') { guardarSessao(''); entrada(r.mensagem); }
+  return r;
+}
+// Teclado aberto no celular ou iPad em pé: esconde as abas de baixo.
+document.addEventListener('focusin', e => { if (e.target.matches('input, select, textarea')) document.body.classList.add('teclado'); });
+document.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('input, select, textarea')) document.body.classList.remove('teclado'); }, 50));
+
+// ---------------------------------------------------------------- janela de confirmação
+function janela(conteudo) {
+  const f = $('janela'); f.replaceChildren(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true' }, conteudo)); f.hidden = false;
+  const fechar = () => { f.hidden = true; f.replaceChildren(); };
+  f.onclick = e => { if (e.target === f) fechar(); };
+  const primeiro = f.querySelector('input, button'); if (primeiro) primeiro.focus();
+  return fechar;
+}
+// Pede o código de 6 dígitos (ligar chaves). Devolve o código ou '' se cancelar.
+function pedirCodigo(titulo, texto) {
+  return new Promise(ok => {
+    const inp = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', enterkeyhint: 'done', 'aria-label': 'Código de 6 dígitos' });
+    let fechar;
+    const enviar = e => { e.preventDefault(); const c = inp.value.replace(/\D/g, ''); if (c.length !== 6) { inp.focus(); return; } fechar(); ok(c); };
+    fechar = janela(el('form', { onsubmit: enviar }, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }),
+      el('label', { class: 'campo' }, 'Código do app Senhas', inp),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Confirmar' }), el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); ok(''); } }))));
+  });
+}
+// Edição: mostra o antes e o depois e só segue com "CONFIRMAR" digitado.
+function confirmarEdicao(titulo, linhas, aviso) {
+  return new Promise(ok => {
+    const inp = el('input', { autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Digite CONFIRMAR' });
+    const tab = el('table', { class: 'antes-depois' }, el('tr', {}, el('th', { text: '' }), el('th', { text: 'Antes' }), el('th', { text: 'Depois' })),
+      linhas.map(([r, a, d]) => el('tr', {}, el('th', { text: r }), el('td', { text: a === '' || a == null ? '(vazio)' : a }), el('td', { text: d === '' || d == null ? '(vazio)' : d }))));
+    let fechar;
+    const enviar = e => { e.preventDefault(); if (inp.value.trim().toUpperCase() !== 'CONFIRMAR') { inp.focus(); return; } fechar(); ok(true); };
+    fechar = janela(el('form', { onsubmit: enviar }, el('h2', { text: titulo }), linhas.length ? tab : null, aviso ? el('p', { class: 'mudo', text: aviso }) : null,
+      el('label', { class: 'campo' }, 'Para confirmar, digite CONFIRMAR', inp),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Confirmar' }), el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); ok(false); } }))));
+  });
+}
+function mostrarSegredo(titulo, valor, texto) {
+  const fechar = janela(el('div', {}, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }), el('div', { class: 'chave-totp', text: valor }),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', text: 'Copiar', onclick: () => copiar(valor) }), el('button', { class: 'btn sec', type: 'button', text: 'Já copiei', onclick: () => fechar() }))));
+}
+
+// ---------------------------------------------------------------- entrada
+function base32(bytes) { const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = 0, v = 0, s = ''; for (const b of bytes) { v = (v << 8) | b; bits += 8; while (bits >= 5) { s += A[(v >>> (bits - 5)) & 31]; bits -= 5; } } if (bits) s += A[(v << (5 - bits)) & 31]; return s; }
+function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; $('entrada-corpo').replaceChildren(...filhos); const i = $('entrada-corpo').querySelector('input'); if (i) i.focus(); }
+const msgErro = () => el('p', { class: 'erro', role: 'alert' });
+async function entrada(mensagem) {
+  const r = await chamar('estado');
+  if (r.ok && r.primeiro_acesso) return primeiroAcesso();
+  formEntrada(mensagem || (r.ok ? '' : r.mensagem));
+}
+function formEntrada(mensagem, comRecuperacao) {
+  const usuario = el('input', { type: 'text', autocomplete: 'username', value: 'Central RXSync', readonly: true, hidden: true });
+  const senha = el('input', { type: 'password', autocomplete: 'current-password', required: true, enterkeyhint: 'next' });
+  const codigo = comRecuperacao
+    ? el('input', { type: 'text', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX', required: true })
+    : el('input', { class: 'codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', required: true, enterkeyhint: 'go' });
+  const erro = msgErro(); erro.textContent = mensagem || '';
+  const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Entrar' });
+  const enviar = async e => {
+    e.preventDefault(); btn.disabled = true; erro.textContent = '';
+    const dados = comRecuperacao ? { senha: senha.value, recuperacao: codigo.value.trim().toUpperCase() } : { senha: senha.value, codigo: codigo.value.replace(/\D/g, '') };
+    const r = await chamar('entrar', dados); btn.disabled = false;
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); if (r.recuperacao_restam != null) toast(`Restam ${r.recuperacao_restam} códigos de recuperação.`); return abrirApp(); }
+    if (r.primeiro_acesso) return primeiroAcesso();
+    erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, usuario,
+    el('label', { class: 'campo' }, 'Senha', senha),
+    el('label', { class: 'campo' }, comRecuperacao ? 'Código de recuperação' : 'Código do app Senhas (6 dígitos)', codigo),
+    erro, btn,
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: comRecuperacao ? 'Usar o código do app Senhas' : 'Usar um código de recuperação', onclick: () => formEntrada('', !comRecuperacao) }))));
+}
+function primeiroAcesso() {
+  const erro = msgErro();
+  const btn = el('button', { class: 'btn pri plena', type: 'button', text: 'Mandar código pelo Telegram' });
+  btn.onclick = async () => { btn.disabled = true; const r = await chamar('primeiro_pedir'); btn.disabled = false; if (r.ok) primeiroSenha(r.mensagem); else erro.textContent = r.mensagem || 'Não consegui.'; };
+  telaEntrada(el('h2', { text: 'Primeiro acesso' }),
+    el('p', { class: 'mudo', text: 'A Central ainda não tem senha. Um código de 8 dígitos vai para o seu Telegram (vale 10 minutos).' }), erro, btn,
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Já tenho o código', onclick: () => primeiroSenha('') })));
+}
+function primeiroSenha(aviso) {
+  const usuario = el('input', { type: 'text', autocomplete: 'username', value: 'Central RXSync', readonly: true, hidden: true });
+  const codigo = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'off', maxlength: '8', required: true });
+  const s1 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true });
+  const s2 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true });
+  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Criar a senha' });
+  const enviar = async e => {
+    e.preventDefault(); erro.textContent = '';
+    if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; return; }
+    if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; return; }
+    btn.disabled = true; const r = await chamar('primeiro_senha', { codigo: codigo.value.replace(/\D/g, ''), senha: s1.value }); btn.disabled = false;
+    if (r.ok && r.desafio) return primeiroAutenticador(r.desafio);
+    erro.textContent = r.mensagem || 'Não consegui.';
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: 'Primeiro acesso: senha' }), aviso ? el('p', { class: 'mudo', text: aviso }) : null,
+    el('label', { class: 'campo' }, 'Código do Telegram (8 dígitos)', codigo),
+    el('label', { class: 'campo' }, 'Senha nova (12 caracteres ou mais; deixe o app Senhas sugerir)', s1),
+    el('label', { class: 'campo' }, 'Repita a senha', s2), erro, btn));
+}
+function primeiroAutenticador(desafio) {
+  // A chave do autenticador é sorteada AQUI, no iPad (crypto.getRandomValues). Ela não vai para o banco: você a guarda no
+  // app Senhas e cola a mesma chave na credencial "TOTP Central" do n8n (DEC-054).
+  const chave = base32(crypto.getRandomValues(new Uint8Array(20)));
+  const link = 'otpauth://totp/RXSync:Central?secret=' + chave + '&issuer=RXSync&algorithm=SHA1&digits=6&period=30';
+  const codigo = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', required: true });
+  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Confirmar o código' });
+  const enviar = async e => {
+    e.preventDefault(); btn.disabled = true; erro.textContent = '';
+    const r = await chamar('primeiro_confirmar', { desafio, codigo: codigo.value.replace(/\D/g, '') }); btn.disabled = false;
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); return mostrarRecuperacao(r.recuperacao || []); }
+    if (r.recomecar) return primeiroAcesso();
+    erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = '';
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Primeiro acesso: código de 6 dígitos' }),
+    el('ol', { class: 'passos' },
+      el('li', {}, 'Toque em ', el('a', { href: link, text: 'adicionar ao app Senhas' }), '. Se não abrir: app Senhas › Códigos › + › "Inserir chave de configuração" e cole a chave abaixo.'),
+      el('li', { text: 'No n8n: Credentials › "TOTP Central" › Secret: cole a mesma chave (troque a provisória) e salve.' }),
+      el('li', { text: 'Digite o código de 6 dígitos que o app Senhas mostra.' })),
+    el('div', { class: 'chave-totp', text: chave }),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Copiar a chave', onclick: () => copiar(chave) })),
+    el('label', { class: 'campo mt' }, 'Código do app Senhas', codigo), erro, btn,
+    el('p', { class: 'mudo peq', text: 'Este passo vale 30 minutos. A chave só aparece aqui, agora.' })));
+}
+function mostrarRecuperacao(codigos) {
+  const texto = codigos.join('\n');
+  const ok = el('input', { type: 'checkbox' });
+  const btn = el('button', { class: 'btn pri plena', type: 'button', text: 'Entrar na Central', disabled: true, onclick: () => abrirApp() });
+  ok.onchange = () => { btn.disabled = !ok.checked; };
+  telaEntrada(el('h2', { text: 'Códigos de recuperação' }),
+    el('p', { class: 'mudo', text: 'Guarde estes 10 códigos (por exemplo, numa nota do app Senhas). Cada um entra uma vez, no lugar do código de 6 dígitos. Eles não aparecem de novo.' }),
+    el('div', { class: 'codigos' }, codigos.map(c => el('span', { text: c }))),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Copiar os 10 códigos', onclick: () => copiar(texto) })),
+    el('label', { class: 'campo linha mt' }, ok, 'Guardei os códigos'), btn);
+}
+
+// ---------------------------------------------------------------- navegação
+const MENU = [
+  ['inicio', 'Início', 1], ['clientes', 'Clientes', 1], ['dinheiro', 'Dinheiro', 1], ['sistema', 'Sistema', 1],
+  ['uso', 'Uso e limites'], ['avisos', 'Avisos'], ['funil', 'Funil'], ['seguranca', 'Segurança'], ['chaves', 'Chaves'], ['agregados', 'Agregados de pacientes'], ['mais', 'Mais', 1]
+];
+const TELAS = {};
+function montarMenu() {
+  const rail = $('rail-nav'), tab = $('tabbar'); rail.replaceChildren(); tab.replaceChildren();
+  for (const [id, nome, naAba] of MENU) {
+    if (id === 'agregados' && est.chaves.tela_agregados_pacientes !== 'SIM') continue;
+    if (id !== 'mais') rail.append(el('button', { type: 'button', 'data-tela': id, onclick: () => ir(id) }, icone(id), nome));
+    if (naAba) tab.append(el('button', { type: 'button', 'data-tela': id, onclick: () => ir(id) }, icone(id), nome));
+  }
+  rail.append(el('div', { class: 'sep' }), el('button', { type: 'button', onclick: sair }, 'Sair'));
+}
+function ir(rota) { if (location.hash === '#' + rota) rotear(); else location.hash = rota; }
+async function rotear() {
+  if (!est.sessao) return;
+  const [nome, ...resto] = (location.hash || '#inicio').slice(1).split('/');
+  const t = TELAS[nome] ? nome : 'inicio';
+  const titulo = (MENU.find(m => m[0] === t) || [t, 'Central RXSync'])[1];
+  $('topo-titulo').textContent = titulo; document.title = titulo + ' · Central RXSync';
+  const PAI = { cliente: 'clientes', funil_completo: 'funil' };
+  const marcada = PAI[t] || t;
+  for (const b of document.querySelectorAll('[data-tela]')) {
+    const naAba = b.closest('#tabbar');
+    const ativa = b.dataset.tela === marcada || (naAba && b.dataset.tela === 'mais' && !['inicio', 'clientes', 'dinheiro', 'sistema'].includes(marcada));
+    if (ativa) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  }
+  const c = $('conteudo'); c.replaceChildren(el('p', { class: 'mudo', text: 'Carregando…' }));
+  try { await TELAS[t](c, resto.map(decodeURIComponent)); } catch (e) { c.replaceChildren(el('div', { class: 'faixa alerta', text: 'Algo deu errado nesta tela. Toque em Atualizar.' })); }
+  c.focus({ preventScroll: true }); window.scrollTo(0, 0);
+}
+// Tela desligada ou com erro: mostra o motivo e para.
+function falhou(c, r) {
+  if (r.desligada) { c.replaceChildren(el('h1', { text: 'Tela desligada' }), el('div', { class: 'bloco' }, el('p', { text: 'Esta tela ainda está desligada (chave ' + (r.chave || '') + ').' }), el('button', { class: 'btn sec', type: 'button', text: 'Ver as chaves', onclick: () => ir('chaves') }))); return true; }
+  if (!r.ok) { c.replaceChildren(el('div', { class: 'faixa alerta', text: r.mensagem || 'Não consegui carregar.' })); return true; }
+  return false;
+}
+async function abrirApp() {
+  const r = await chamar('config');
+  if (!r.ok) return entrada(r.mensagem);
+  est.config = r; est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor]));
+  $('entrada').hidden = true; $('app').hidden = false; montarMenu(); rotear();
+}
+async function sair() { await chamar('sair'); guardarSessao(''); entrada('Você saiu.'); }
+window.addEventListener('hashchange', rotear);
+$('btn-atualizar').onclick = () => rotear();
+// Ao voltar para a Central (iPad acordou ou trocou de app), confere se a sessão ainda vale.
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && est.sessao && !$('app').hidden) chamar('config').then(r => { if (r.ok) est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor])); }); });
+
+// ---------------------------------------------------------------- telas
+// --- apoio das telas
+const TIPOS = {
+  cadastro_teste: 'Teste novo (7 dias)', contratacao_nova: 'Contratação nova', mini_teste_comecou: 'Mini teste começou', mini_teste_terminou: 'Mini teste terminou',
+  pedido_demonstracao: 'Pedido de demonstração', pedido_demonstracao_nao_gravado: 'Pedido de demonstração NÃO guardado',
+  onboarding_enviado: 'Link de onboarding enviado', onboarding_concluido: 'Onboarding concluído', no_ar: 'Clínica no ar', teste_ambiente_criado: 'Ambiente de teste criado',
+  teste_fim_proximo: 'Teste chegando ao fim', teste_encerrado: 'Teste encerrado', teste_virou_contrato: 'Teste virou contrato', pago_na_implantacao: 'Pago na implantação', teste_parado: 'Teste parado',
+  aviso_equipe_nao_chegou: 'Aviso à equipe da clínica NÃO chegou', franquia_100: 'Franquia atingida', franquia_80: '80% da franquia', integracao_agenda: 'Problema na agenda externa',
+  assistente_dono_falhou: 'Assistente do dono falhou', whatsapp_caiu: 'WhatsApp desconectado', whatsapp_voltou: 'WhatsApp reconectado', aviso_evento_nao_entregue: 'Aviso de evento não entregue',
+  mini_teste_teto: 'Mini teste no teto', copia_n8n_parada: 'Cópia do n8n parada',
+  cobranca_criada: 'Cobrança criada', cobranca_faltam_dados: 'Cobrança: faltam dados', cobranca_incompleta: 'Cobrança pela metade', pagamento_confirmado: 'Pagamento confirmado',
+  mensalidade_recebida: 'Mensalidade recebida', taxa_recebida: 'Taxa de implantação recebida', atraso_na_implantacao: 'Atraso (ainda em implantação)', pagamento_atrasado: 'Pagamento atrasado',
+  pagamento_nao_identificado: 'Pagamento não identificado', nota_fiscal_erro: 'Erro na nota fiscal', reativado_apos_atraso: 'Pagou o atraso', valor_divergente: 'Valor diferente do esperado',
+  aviso_suspensao: 'Aviso de suspensão', suspenso: 'Suspenso', reativado: 'Reativado', atraso_30_dias: '30 dias sem pagamento', contrato_encerrado: 'Contrato encerrado',
+  valor_atualizado: 'Valor atualizado', resumo_do_dia: 'Resumo do dia', troca_de_plano: 'Troca de plano', teste_encerrado_pelo_cliente: 'Teste encerrado pelo cliente',
+  pedido_cancelamento: 'Pedido de cancelamento', cancelamento_agendado: 'Cancelamento agendado', cancelamento_desfeito: 'Desistiu do cancelamento', teste_quer_pagar: 'Teste quer pagar', pedido_assinatura: 'Pedido sobre a assinatura',
+  ajuda_agenda: 'Pedido de ajuda com a agenda', email_recebido: 'E-mail recebido', painel_movimento: 'Movimento no painel',
+  exclusao_amanha: 'Dados serão apagados amanhã', exclusao_falhou: 'Falha ao apagar dados', dados_apagados: 'Dados apagados', outro: 'Outro aviso'
+};
+const CATEGORIAS = ['vendas', 'clientes', 'financeiro', 'alertas', 'suporte', 'painel', 'sistema'];
+const rotuloTipo = t => TIPOS[t] || t || 'Aviso';
+const pillStatus = s => { const t = String(s || '—'); const cls = /Ativo|Em teste/.test(t) ? 'ok' : /Suspenso|Cancelado|apagados|encerrado/i.test(t) ? 'alerta' : 'pend'; return el('span', { class: 'pill ' + cls, text: t }); };
+function barraUso(usadas, franquia) { const p = franquia ? Math.min(100, Math.round(usadas / franquia * 100)) : 0; const b = el('div', { class: 'barra' + (p >= 100 ? ' cheio' : p >= 80 ? ' alto' : ''), role: 'img', 'aria-label': p + '% da franquia' }); const i = el('i'); i.style.width = p + '%'; b.append(i); return b; }
+const cartao = (rot, valor, extra) => el('div', { class: 'cartao' }, el('div', { class: 'rot', text: rot }), el('div', { class: 'valor num', text: valor }), extra ? el('div', { class: 'mudo peq', text: extra }) : null);
+const bloco = (titulo, ...filhos) => el('section', { class: 'bloco' }, titulo ? el('h2', { text: titulo }) : null, ...filhos);
+const campos = pares => el('dl', { class: 'campos' }, pares.filter(Boolean).map(([k, v]) => [el('dt', { text: k }), el('dd', { text: v == null || v === '' ? '—' : v })]));
+const nomeCli = x => x.nome || x.cliente_id || '—';
+const irCliente = id => ir('cliente/' + encodeURIComponent(id));
+// Gráfico de barras simples (SVG desenhado aqui, sem biblioteca de fora).
+function grafBarras(pontos, rotulo) {
+  const NS = 'http://www.w3.org/2000/svg', W = 600, H = 120, n = Math.max(pontos.length, 1), max = Math.max(1, ...pontos.map(p => p.v || 0));
+  const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', `0 0 ${W} ${H}`); s.setAttribute('class', 'grafico'); s.setAttribute('role', 'img'); s.setAttribute('aria-label', rotulo);
+  const larg = W / n;
+  pontos.forEach((p, i) => { const h = Math.round((p.v || 0) / max * (H - 22)); const r = document.createElementNS(NS, 'rect'); r.setAttribute('class', 'b'); r.setAttribute('x', i * larg + 1); r.setAttribute('y', H - 16 - h); r.setAttribute('width', Math.max(1, larg - 2)); r.setAttribute('height', h); r.setAttribute('rx', 2); const t = document.createElementNS(NS, 'title'); t.textContent = `${p.r}: ${p.v}`; r.append(t); s.append(r); });
+  const ln = document.createElementNS(NS, 'line'); ln.setAttribute('class', 'eixo'); ln.setAttribute('x1', 0); ln.setAttribute('x2', W); ln.setAttribute('y1', H - 16); ln.setAttribute('y2', H - 16); s.append(ln);
+  [[0, 'start'], [n - 1, 'end']].forEach(([i, a]) => { if (!pontos[i]) return; const t = document.createElementNS(NS, 'text'); t.setAttribute('x', a === 'start' ? 0 : W); t.setAttribute('y', H - 3); t.setAttribute('text-anchor', a); t.textContent = pontos[i].r; s.append(t); });
+  const t = document.createElementNS(NS, 'text'); t.setAttribute('x', W); t.setAttribute('y', 10); t.setAttribute('text-anchor', 'end'); t.textContent = 'máx. ' + fmtNum(max); s.append(t);
+  return s;
+}
+const diaCurto = d => fmtData(d).slice(0, 5);
+function listaAvisos(avisos, comClinica) {
+  if (!avisos || !avisos.length) return vazio('Nenhum aviso.');
+  return el('ul', { class: 'lista' }, avisos.map(a => el('li', {},
+    el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: rotuloTipo(a.tipo) }),
+      el('div', { class: 'mudo peq', text: fmtHora(a.recebido_em) + (comClinica && a.cliente_id ? ' · ' + (a.nome || a.cliente_id) : '') })),
+    el('span', { class: 'pill', text: a.categoria }))));
+}
+// Ganchos preenchidos pelas partes seguintes (edições da fase 3).
+const GANCHOS = { ficha: [], seguranca: [] };
+
+// --- Início
+TELAS.inicio = async c => {
+  const r = await chamar('inicio'); if (falhou(c, r)) return;
+  const d = r.dados, p = d.pendencias, n = d.numeros, f = d.funil_30d;
+  const pend = [];
+  const item = (txt, alvo, cls) => pend.push(el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => ir(alvo) }, el('span', { class: 'pill ' + (cls || 'pend'), text: '!' }), el('span', { class: 'cresce titulo-item', text: txt }))));
+  for (const w of p.whatsapp_fora) item(`WhatsApp fora do ar: ${nomeCli(w)} (desde ${fmtHora(w.desde)})`, 'cliente/' + encodeURIComponent(w.cliente_id), 'alerta');
+  for (const x of p.suspensos) item(`Suspenso: ${nomeCli(x)}`, 'dinheiro', 'alerta');
+  for (const x of p.aviso_atraso) item(`Aviso de atraso: ${nomeCli(x)}`, 'dinheiro');
+  for (const x of p.cancelamentos_agendados) item(`Cancelamento em ${fmtData(x.em)}: ${nomeCli(x)}`, 'dinheiro');
+  for (const x of p.onboarding_vencido) item(`Onboarding vencido: ${nomeCli(x)}`, 'cliente/' + encodeURIComponent(x.cliente_id));
+  for (const x of p.franquia_80) item(`${nomeCli(x)}: ${fmtNum(x.usadas)} de ${fmtNum(x.franquia)} mensagens`, 'uso');
+  if (p.falhas_24h) item(`${p.falhas_24h} falha(s) de workflow nas últimas 24 horas`, 'sistema', 'alerta');
+  if (p.integracoes_com_erro) item(`${p.integracoes_com_erro} integração(ões) de agenda com erro`, 'sistema');
+  if (p.avisos_eventos_desistidos_7d) item(`${p.avisos_eventos_desistidos_7d} aviso(s) de eventos não entregue(s) em 7 dias`, 'sistema');
+  if (p.pedidos_demonstracao_7d) item(`${p.pedidos_demonstracao_7d} pedido(s) de demonstração em 7 dias`, 'funil', 'ok');
+  c.replaceChildren(
+    el('h1', { text: 'Início' }),
+    n.asaas_ambiente === 'sandbox' ? el('div', { class: 'faixa pend', text: 'SANDBOX: os valores do Asaas não são dinheiro real.' }) : null,
+    bloco('O que precisa de você', pend.length ? el('ul', { class: 'lista' }, pend) : vazio('Nada pendente agora.')),
+    el('div', { class: 'grade' }, cartao('Pagantes no ar', fmtNum(n.pagantes_no_ar)), cartao('Receita do mês', fmtReal(n.receita_mensal)), cartao('Em teste', fmtNum(n.em_teste)), cartao('Em implantação', fmtNum(n.em_implantacao)),
+      cartao('Mensagens hoje', fmtNum(n.mensagens_hoje)), cartao('Falhas hoje', fmtNum(n.falhas_hoje)), cartao('Avisos hoje', fmtNum(n.avisos_hoje)), cartao('Pedidos de demonstração (30 dias)', fmtNum(f.totais.pedidos_demonstracao))),
+    bloco('Funil dos últimos 30 dias',
+      el('div', { class: 'grade' }, cartao('Mini testes', fmtNum(f.totais.mini_testes), fmtNum(f.totais.mini_testes_com_consulta) + ' marcaram consulta'), cartao('Cadastros de teste', fmtNum(f.totais.cadastros_teste)), cartao('Contratações', fmtNum(f.totais.cadastros_contratacao)), cartao('No ar', fmtNum(f.totais.go_lives))),
+      grafBarras(f.por_dia.map(x => ({ r: diaCurto(x.dia), v: x.pedidos + x.mini_testes + x.cadastros })), 'Pedidos, mini testes e cadastros por dia')),
+    bloco('Últimos avisos', listaAvisos(d.ultimos_avisos, true), el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: 'Ver todos', onclick: () => ir('avisos') }))));
+};
+
+// --- Clientes
+TELAS.clientes = async c => {
+  const r = await chamar('clientes'); if (falhou(c, r)) return;
+  const todos = r.dados.clientes;
+  const FILTROS = [['todos', 'Todos', () => true], ['ar', 'No ar', x => x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => x.ativo && x.modalidade === 'teste'],
+    ['implantacao', 'Implantação', x => ['Pago', 'Aguardando dados', 'Em implantação'].includes(x.status)], ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)]];
+  let filtro = 'todos';
+  const busca = el('input', { type: 'search', placeholder: 'Buscar por nome ou código', autocomplete: 'off', enterkeyhint: 'search' });
+  const lista = el('ul', { class: 'lista' });
+  const chips = el('div', { class: 'chips' });
+  const desenhar = () => {
+    const q = busca.value.trim().toLowerCase();
+    chips.replaceChildren(...FILTROS.map(([id, nome]) => el('button', { type: 'button', 'aria-pressed': String(id === filtro), text: nome, onclick: () => { filtro = id; desenhar(); } })));
+    const fn = FILTROS.find(f => f[0] === filtro)[2];
+    const vis = todos.filter(x => fn(x) && (!q || (x.nome + ' ' + x.cliente_id).toLowerCase().includes(q)));
+    lista.replaceChildren(...vis.map(x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) },
+      el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: x.nome }),
+        el('div', { class: 'mudo peq', text: `${x.cliente_id} · ${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)} mensagens no mês` + (x.whatsapp && x.whatsapp !== 'open' ? ' · WhatsApp fora' : '') }), barraUso(x.mensagens_mes, x.franquia)),
+      x.interna ? el('span', { class: 'pill', text: 'interna' }) : null, el('span', { class: 'pill plano', text: x.plano || '—' }), pillStatus(x.status)))));
+    if (!vis.length) lista.replaceChildren(el('li', {}, vazio('Nenhuma clínica com esse filtro.')));
+  };
+  busca.oninput = desenhar;
+  c.replaceChildren(el('h1', { text: 'Clientes' }), el('label', { class: 'campo' }, busca), chips, bloco(null, lista));
+  desenhar();
+};
+TELAS.cliente = async (c, [id]) => {
+  const r = await chamar('cliente', { cliente_id: id }); if (falhou(c, r)) return;
+  const x = r.cliente;
+  const F = x.funcoes || {};
+  const funcoes = Object.entries(F).map(([k, v]) => el('span', { class: 'pill ' + (String(v).toUpperCase() === 'SIM' ? 'ok' : ''), text: k.replace(/_/g, ' ') }));
+  const integ = x.integracao;
+  c.replaceChildren(
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: '‹ Clientes', onclick: () => ir('clientes') })),
+    el('h1', { text: x.nome }),
+    el('div', { class: 'chips' }, el('span', { class: 'pill plano', text: x.plano || '—' }), pillStatus(x.status), x.interna ? el('span', { class: 'pill', text: 'clínica interna' }) : null, el('span', { class: 'pill', text: x.cliente_id })),
+    bloco('Contrato', campos([['Modalidade', x.modalidade], ['Valor mensal', fmtReal(x.valor_mensal)], ['Implantação', fmtReal(x.valor_setup)], ['Ciclo', x.ciclo], ['Forma', x.forma_pagamento],
+      ['Aceite', fmtData(x.aceite)], ['Versão dos termos', x.versao_termos], ['No ar desde', fmtData(x.go_live)], ['Fim do teste', fmtData(x.fim_teste)], ['Onboarding', x.onboarding],
+      ['Onboarding vence', fmtData(x.onboarding_expira)], ['Último pagamento', fmtData(x.ultimo_pagamento)], x.aviso_atraso_em && ['Aviso de atraso', fmtData(x.aviso_atraso_em)],
+      x.suspenso_em && ['Suspenso em', fmtData(x.suspenso_em)], x.cancelar_em && ['Cancelamento em', fmtData(x.cancelar_em)]])),
+    bloco('Contato', campos([['Razão social', x.razao_social], ['Representante', x.representante], ['E-mail', x.email], ['Telefone', x.telefone], ['Cidade', x.cidade], ['Sistema de gestão', x.sistema_gestao], ['Origem', x.origem]])),
+    bloco('Uso do mês', el('p', { class: 'num', text: `${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)} mensagens` }), barraUso(x.mensagens_mes, x.franquia),
+      x.uso_30d.length ? grafBarras(x.uso_30d.map(u => ({ r: diaCurto(u.dia), v: u.recebidas + u.enviadas })), 'Mensagens por dia (30 dias)') : null,
+      campos([['Franquia', x.limites.franquia_mensagens || '5.000 (padrão)'], ['Limitar na franquia', x.limites.limitar_franquia || 'NAO'], ['Limite diário do assistente do dono', x.limites.dono_limite_dia || 'padrão'], ['Limite diário de relacionamento', x.limites.relac_limite_dia || 'padrão']]),
+      x.pacientes != null ? el('p', { class: 'mudo', text: `Pacientes cadastrados: ${fmtNum(x.pacientes)}` }) : null),
+    bloco('Funções', el('div', { class: 'chips' }, funcoes)),
+    bloco('Integrações', campos([['WhatsApp', x.whatsapp ? `${x.whatsapp.estado === 'open' ? 'conectado' : x.whatsapp.estado} (desde ${fmtHora(x.whatsapp.desde)})` : 'não vigiado'],
+      ['Agenda externa', integ ? `${integ.plataforma} · ${integ.ativo ? 'ligada' : 'desligada'}${integ.ultimo_erro ? ' · erro: ' + integ.ultimo_erro : ''}` : '—'],
+      ['Médicos ativos', fmtNum(x.medicos_ativos)], ['Chaves da API ativas', fmtNum(x.chaves_api_ativas)],
+      ['Avisos de eventos', x.avisos_eventos ? `${x.avisos_eventos.ativo ? 'ligados' : 'desligados'} · ${x.avisos_eventos.servidor || ''}` : '—']])),
+    bloco('Últimos avisos desta clínica', listaAvisos(x.ultimos_avisos, false)),
+    ...GANCHOS.ficha.map(g => g(x)).filter(Boolean));
+};
+
+// --- Dinheiro
+TELAS.dinheiro = async c => {
+  const r = await chamar('dinheiro'); if (falhou(c, r)) return;
+  const d = r.dados;
+  const linhas = (arr, fn) => arr.length ? el('ul', { class: 'lista' }, arr.map(x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce titulo-item', text: nomeCli(x) }), el('span', { class: 'mudo num', text: fn(x) }))))) : vazio();
+  c.replaceChildren(el('h1', { text: 'Dinheiro' }),
+    d.asaas_ambiente === 'sandbox' ? el('div', { class: 'faixa pend', text: 'SANDBOX: o Asaas está no ambiente de testes. Não é dinheiro real.' }) : null,
+    el('div', { class: 'grade' }, cartao('Pagantes no ar', fmtNum(d.pagantes_no_ar)), cartao('Receita do mês', fmtReal(d.receita_mensal), 'anual à vista conta 1/12'), cartao('Em teste', fmtNum(d.em_teste)), cartao('Em implantação', fmtNum(d.em_implantacao))),
+    d.receita_12_meses.length ? bloco('Receita no fim de cada mês', grafBarras(d.receita_12_meses.map(x => ({ r: fmtData(x.dia).slice(3), v: Number(x.receita_mensal) || 0 })), 'Receita mensal')) : null,
+    bloco('Pagantes', linhas(d.pagantes, x => `${fmtReal(x.valor_no_mes)} · ${x.plano}`)),
+    bloco('Em teste', linhas(d.testes, x => 'até ' + fmtData(x.fim_teste))),
+    bloco('Aviso de atraso enviado', linhas(d.aviso_atraso, x => 'desde ' + fmtData(x.desde)), el('p', { class: 'mudo peq', text: 'Dias e valor do atraso vêm do Asaas e aparecem no resumo diário do Telegram.' })),
+    bloco('Suspensos', linhas(d.suspensos, x => 'desde ' + fmtData(x.desde))),
+    bloco('Cancelamentos agendados', linhas(d.cancelamentos, x => fmtData(x.em))));
+};
+
+// --- Uso e limites
+TELAS.uso = async c => {
+  const r = await chamar('uso'); if (falhou(c, r)) return;
+  const d = r.dados, frac = d.dia_do_mes / d.dias_no_mes;
+  c.replaceChildren(el('h1', { text: 'Uso e limites' }),
+    el('p', { class: 'mudo', text: `Dia ${d.dia_do_mes} de ${d.dias_no_mes}. A projeção supõe o mesmo ritmo até o fim do mês.` }),
+    bloco('Mensagens por dia (todas as clínicas, 30 dias)', grafBarras(d.total_30d.map(x => ({ r: diaCurto(x.dia), v: x.mensagens })), 'Mensagens por dia')),
+    bloco('Clínicas', d.clinicas.length ? el('ul', { class: 'lista' }, d.clinicas.map(x => {
+      const proj = frac ? Math.round(x.mensagens_mes / frac) : 0;
+      return el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce' },
+        el('div', { class: 'titulo-item', text: x.nome }), el('div', { class: 'mudo peq num', text: `${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)}${x.franquia_padrao ? ' (padrão)' : ''} · projeção ${fmtNum(proj)}${x.limitar_franquia ? ' · limita na franquia' : ''}` }),
+        barraUso(x.mensagens_mes, x.franquia)), el('span', { class: 'pill plano', text: x.plano || '—' })));
+    })) : vazio()));
+};
+
+// --- Sistema
+TELAS.sistema = async c => {
+  const r = await chamar('sistema'); if (falhou(c, r)) return;
+  const d = r.dados;
+  const gh = d.github && d.github.dados;
+  c.replaceChildren(el('h1', { text: 'Sistema' }),
+    el('div', { class: 'grade' }, cartao('Último aviso recebido', d.ultimo_aviso_recebido ? fmtHora(d.ultimo_aviso_recebido) : '—'), cartao('Última foto do dia', d.ultima_foto_indicadores ? fmtHora(d.ultima_foto_indicadores) : '—'),
+      cartao('WhatsApp fora', fmtNum(d.whatsapp.filter(w => w.estado !== 'open').length)), cartao('Falhas em 7 dias', fmtNum(d.falhas_por_workflow_7d.reduce((s, x) => s + Number(x.falhas), 0)))),
+    bloco('Falhas por workflow (7 dias)', d.falhas_por_workflow_7d.length ? el('ul', { class: 'lista' }, d.falhas_por_workflow_7d.map(x => el('li', {}, el('div', { class: 'cresce titulo-item', text: x.workflow }), el('span', { class: 'mudo peq', text: 'última ' + fmtHora(x.ultima) }), el('span', { class: 'pill alerta num', text: x.falhas })))) : vazio('Nenhuma falha em 7 dias.')),
+    bloco('Últimas falhas', d.ultimas_falhas.length ? el('ul', { class: 'lista' }, d.ultimas_falhas.map(x => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: x.workflow }), el('div', { class: 'mudo peq', text: `${fmtHora(x.quando)} · nó: ${x.no || '(gatilho)'}${x.execucao_id ? ' · execução ' + x.execucao_id : ''}` }))))) : vazio('Nenhuma.')),
+    bloco('WhatsApp das clínicas no ar', d.whatsapp.length ? el('ul', { class: 'lista' }, d.whatsapp.map(w => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(w.cliente_id) }, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: nomeCli(w) }), el('div', { class: 'mudo peq', text: `desde ${fmtHora(w.desde)} · conferido ${fmtHora(w.verificado_em)}` })),
+      el('span', { class: 'pill ' + (w.estado === 'open' ? 'ok' : 'alerta'), text: w.estado === 'open' ? 'conectado' : w.estado })))) ) : vazio('O workflow 05 ainda não conferiu nenhum WhatsApp.')),
+    bloco('Agendas externas', d.integracoes.length ? el('ul', { class: 'lista' }, d.integracoes.map(i => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: `${nomeCli(i)} · ${i.plataforma}` }), el('div', { class: 'mudo peq', text: `${i.ativo ? 'ligada' : 'desligada'} · última sincronização ${fmtHora(i.ultima_sync)}${i.ultimo_erro ? ' · erro: ' + i.ultimo_erro : ''}` })), el('span', { class: 'pill ' + (i.ultimo_erro ? 'alerta' : 'ok'), text: i.ultimo_erro ? 'erro' : 'ok' })))) : vazio()),
+    bloco('Avisos de eventos (Enterprise)', d.avisos_eventos.length ? el('ul', { class: 'lista' }, d.avisos_eventos.map(a => el('li', {}, el('div', { class: 'cresce titulo-item', text: a.cliente_id }), el('span', { class: 'mudo peq num', text: `${a.pendentes} pendentes · ${a.enviados_7d} enviados e ${a.desistidos_7d} desistidos em 7 dias` })))) : vazio()),
+    bloco('SQL aplicados', d.sql_aplicados.length ? el('ul', { class: 'lista' }, d.sql_aplicados.map(s => el('li', {}, el('div', { class: 'cresce titulo-item', text: s.arquivo }), el('span', { class: 'mudo peq', text: fmtHora(s.aplicado_em) })))) : vazio()),
+    gh ? bloco('GitHub', el('p', { class: 'mudo peq', text: 'Recebido ' + fmtHora(d.github.recebido_em) }),
+      el('ul', { class: 'lista' }, (gh.actions || []).map(a => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: a.nome }), el('div', { class: 'mudo peq', text: fmtHora(a.quando) + ' · ' + a.evento })),
+        el('span', { class: 'pill ' + (a.resultado === 'success' ? 'ok' : a.resultado ? 'alerta' : 'pend'), text: a.resultado === 'success' ? 'verde' : a.resultado || a.status })))),
+      campos([['Issues abertas', fmtNum((gh.issues || {}).abertas)], ...Object.entries((gh.issues || {}).por_prioridade || {}).sort().map(([k, v]) => [k, fmtNum(v)]), ['PRs abertos', fmtNum(gh.prs_abertos)]]),
+      ((gh.issues || {}).p1 || []).length ? el('ul', { class: 'lista' }, gh.issues.p1.map(i => el('li', {}, el('span', { class: 'pill alerta', text: '#' + i.numero }), el('span', { class: 'cresce', text: i.titulo })))) : null)
+      : (est.chaves.tela_sistema_github === 'SIM' ? bloco('GitHub', vazio('A Action "Central: dados do GitHub" ainda não mandou nada.')) : null));
+};
+
+// --- Avisos
+TELAS.avisos = async c => {
+  let cat = '';
+  const chips = el('div', { class: 'chips' }), corpo = el('div');
+  const carregar = async () => {
+    chips.replaceChildren(...['', ...CATEGORIAS].map(k => el('button', { type: 'button', 'aria-pressed': String(k === cat), text: k || 'todas', onclick: () => { cat = k; carregar(); } })));
+    const r = await chamar('avisos', { categoria: cat }); if (falhou(corpo, r)) return;
+    const pc = r.dados.por_categoria_7d || {};
+    corpo.replaceChildren(el('p', { class: 'mudo peq', text: '7 dias: ' + (Object.entries(pc).map(([k, v]) => `${k} ${v}`).join(' · ') || 'nenhum') }), bloco(null, listaAvisos(r.dados.avisos, true)));
+  };
+  c.replaceChildren(el('h1', { text: 'Avisos' }), el('p', { class: 'mudo', text: 'O que passou pelo Telegram, sem o texto (o texto fica só no Telegram).' }), chips, corpo);
+  await carregar();
+};
+
+// --- Funil
+TELAS.funil = async c => {
+  const r = await chamar('funil'); if (falhou(c, r)) return;
+  const d = r.dados, t = d.totais;
+  const wa = tel => { const dig = String(tel || '').replace(/\D/g, ''); return dig ? 'https://wa.me/' + (dig.length <= 11 ? '55' + dig : dig) : null; };
+  c.replaceChildren(el('h1', { text: 'Funil' }),
+    el('div', { class: 'grade' }, cartao('Pedidos de demonstração', fmtNum(t.pedidos_demonstracao)), cartao('Mini testes', fmtNum(t.mini_testes), fmtNum(t.mini_testes_com_consulta) + ' marcaram consulta'),
+      cartao('Cadastros (teste / contrato)', `${fmtNum(t.cadastros_teste)} / ${fmtNum(t.cadastros_contratacao)}`), cartao('No ar', fmtNum(t.go_lives))),
+    bloco('Por dia (30 dias)', grafBarras(d.por_dia.map(x => ({ r: diaCurto(x.dia), v: x.pedidos + x.mini_testes + x.cadastros })), 'Pedidos, mini testes e cadastros por dia')),
+    bloco('Pedidos de demonstração', el('p', { class: 'mudo peq', text: 'Guardados por 180 dias (Política v9). O Telegram recebe só o aviso.' }),
+      d.pedidos.length ? el('ul', { class: 'lista' }, d.pedidos.map(p => el('li', {}, el('div', { class: 'cresce' },
+        el('div', { class: 'titulo-item', text: `${p.nome} · ${p.clinica}` }),
+        el('div', { class: 'mudo peq', text: `${fmtHora(p.criado_em)} · ${p.email} · ${p.telefone}${p.sistema_atual ? ' · usa ' + p.sistema_atual : ''} · plano: ${p.plano_interesse || 'indeciso'}` })),
+        wa(p.telefone) ? el('a', { class: 'btn sec', href: wa(p.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' }) : null))) : vazio('Nenhum pedido nos últimos 180 dias.')),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: 'Funil completo', onclick: () => ir('funil_completo') })));
+};
+
+// --- Segurança (aparelhos; o registro e as chaves da API entram pelos ganchos)
+TELAS.seguranca = async c => {
+  const r = await chamar('sessoes'); if (falhou(c, r)) return;
+  const d = r.dados;
+  const lista = el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'cresce' },
+    el('div', { class: 'titulo-item', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }),
+    el('div', { class: 'mudo peq', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
+    s.esta ? null : el('button', { class: 'btn perigo', type: 'button', text: 'Encerrar', onclick: async () => { const x = await chamar('encerrar_sessao', { id: s.id }); toast(x.ok ? 'Sessão encerrada.' : x.mensagem); rotear(); } }))));
+  c.replaceChildren(el('h1', { text: 'Segurança' }),
+    bloco('Aparelhos conectados', lista, el('p', { class: 'mudo peq', text: `Códigos de recuperação que ainda valem: ${d.recuperacao_restam}. A sessão vale 8 horas, ou 30 minutos sem uso.` }),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn perigo', type: 'button', text: 'Sair de todos os aparelhos', onclick: async () => {
+        if (!(await confirmarEdicao('Sair de todos os aparelhos', [], 'Todas as sessões, inclusive esta, terminam agora.'))) return;
+        await chamar('sair_todos'); guardarSessao(''); entrada('Você saiu de todos os aparelhos.');
+      } }))));
+  for (const g of GANCHOS.seguranca) { const b = await g(); if (b) c.append(b); }
+};
+
+// --- Chaves de ligar e desligar
+TELAS.chaves = async c => {
+  const r = await chamar('config'); if (falhou(c, r)) return;
+  est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor]));
+  const linha = k => el('li', {}, el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: k.chave }), el('div', { class: 'mudo peq', text: k.descricao + ' · fase ' + k.fase })),
+    k.so_por_sql ? el('span', { class: 'pill', text: (k.valor === 'SIM' || k.valor === 'NAO' ? (k.valor === 'SIM' ? 'ligada' : 'desligada') : k.valor) + ' · só por PR' })
+      : el('button', { class: 'btn ' + (k.valor === 'SIM' ? 'perigo' : 'pri'), type: 'button', text: k.valor === 'SIM' ? 'Desligar' : 'Ligar', onclick: async () => {
+        const novo = k.valor === 'SIM' ? 'NAO' : 'SIM';
+        const cod = await pedirCodigo((novo === 'SIM' ? 'Ligar ' : 'Desligar ') + k.chave, 'Para mudar uma chave, digite o código de 6 dígitos do app Senhas.');
+        if (!cod) return;
+        const x = await chamar('ligar_chave', { chave: k.chave, valor: novo, codigo: cod });
+        toast(x.ok ? `${k.chave}: ${x.antes} → ${x.depois}` : (x.mensagem || 'Não consegui.')); if (x.ok) { montarMenu(); rotear(); }
+      } }));
+  c.replaceChildren(el('h1', { text: 'Chaves' }), el('p', { class: 'mudo', text: 'Liga e desliga telas e edições. Cada mudança pede o código de 6 dígitos, fica no registro e avisa no Telegram.' }),
+    bloco(null, el('ul', { class: 'lista' }, (r.chaves || []).map(linha))));
+};
+
+// --- Mais
+TELAS.mais = async c => {
+  const ent = (rota, nome, txt) => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => ir(rota) }, icone(rota), el('div', { class: 'cresce' }, el('div', { class: 'titulo-item', text: nome }), el('div', { class: 'mudo peq', text: txt }))));
+  const link = (href, nome) => el('li', {}, el('a', { href, target: '_blank', rel: 'noopener noreferrer', text: nome }));
+  const GH = 'https://github.com/BlushingMoonlight/rxsync-sistema';
+  c.replaceChildren(el('h1', { text: 'Mais' }),
+    bloco(null, el('ul', { class: 'lista' }, ent('uso', 'Uso e limites', 'Mensagens × franquia'), ent('avisos', 'Avisos', 'O que passou pelo Telegram'), ent('funil', 'Funil', 'Pedidos, mini testes e cadastros'),
+      ent('seguranca', 'Segurança', 'Aparelhos, registro e chaves da API'), ent('chaves', 'Chaves', 'Ligar e desligar telas e edições'),
+      est.chaves.tela_agregados_pacientes === 'SIM' ? ent('agregados', 'Agregados de pacientes', 'Contagens e médias por clínica') : null)),
+    bloco('Links', el('ul', { class: 'lista' }, link(GH + '/issues/89', 'Pendências (#89)'), link(GH + '/blob/main/docs/decisoes.md', 'Decisões'), link(GH + '/blob/main/docs/mapa/README.md', 'Mapa do sistema'))),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn perigo plena', type: 'button', text: 'Sair', onclick: sair })));
+};
+// --- Fase 2: funil completo
+TELAS.funil_completo = async c => {
+  const r = await chamar('funil_completo'); if (falhou(c, r)) return;
+  const d = r.dados, t = d.funil_90d.totais;
+  const lst = (arr, fn) => arr.length ? el('ul', { class: 'lista' }, arr.map(fn)) : vazio();
+  c.replaceChildren(el('div', { class: 'acoes' }, el('button', { class: 'btn sec', type: 'button', text: '‹ Funil', onclick: () => ir('funil') })),
+    el('h1', { text: 'Funil completo (90 dias)' }),
+    el('div', { class: 'grade' }, cartao('Pedidos', fmtNum(t.pedidos_demonstracao)), cartao('Mini testes', fmtNum(t.mini_testes), fmtNum(t.mini_testes_com_consulta) + ' marcaram consulta'),
+      cartao('Testes que viraram contrato', fmtNum(d.testes_que_viraram_contrato), 'desde o começo'), cartao('Dias até o go-live (média)', d.dias_ate_go_live_media == null ? '—' : String(d.dias_ate_go_live_media))),
+    bloco('Por dia', grafBarras(d.funil_90d.por_dia.map(x => ({ r: diaCurto(x.dia), v: x.pedidos + x.mini_testes + x.cadastros })), 'Pedidos, mini testes e cadastros por dia')),
+    bloco('Mini teste por origem', lst(d.mini_teste_por_origem_90d, x => el('li', {}, el('div', { class: 'cresce titulo-item', text: x.origem }), el('span', { class: 'mudo num', text: `${x.testes} testes · ${x.com_consulta} com consulta` })))),
+    bloco('Mini teste por especialidade', campos(Object.entries(d.mini_teste_por_especialidade_90d || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, fmtNum(v)]))),
+    bloco('Cadastros por origem', lst(d.cadastros_por_origem, x => el('li', {}, el('div', { class: 'cresce titulo-item', text: x.origem }), el('span', { class: 'mudo num', text: fmtNum(x.cadastros) })))),
+    bloco('Cadastros parados (mais de 14 dias sem ir ao ar)', lst(d.cadastros_parados, x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce titulo-item', text: nomeCli(x) }), el('span', { class: 'mudo peq', text: `${x.status} · ${x.dias} dias` }))))),
+    bloco('Onboarding vencido', lst(d.onboarding_vencido, x => el('li', {}, el('button', { class: 'item', type: 'button', onclick: () => irCliente(x.cliente_id) }, el('div', { class: 'cresce titulo-item', text: nomeCli(x) }), el('span', { class: 'mudo peq', text: 'venceu ' + fmtData(x.venceu) }))))),
+    el('p', { class: 'mudo peq', text: `Testes encerrados sem contrato: ${fmtNum(d.testes_encerrados_sem_contrato)}.` }));
+};
+
+// --- Fase 2: registro e chaves da API (dentro de Segurança)
+const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
+  chave: 'Chave mudada', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
+  avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
+  primeiro_codigo_pedido: 'Código de primeiro acesso pedido', primeiro_senha_criada: 'Senha criada', primeiro_acesso_concluido: 'Primeiro acesso concluído', reinicio_por_sql: 'Reinício por SQL' };
+const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como); if (d.prefixo) p.push(d.prefixo + '…');
+  if (d.antes && d.depois && typeof d.antes === 'object') p.push(Object.keys(d.depois).map(k => `${k}: ${d.antes[k] ?? '—'} → ${d.depois[k] ?? '—'}`).join(', ')); return p.join(' · '); };
+GANCHOS.seguranca.push(async () => {
+  if (est.chaves.tela_registro !== 'SIM') return null;
+  const r = await chamar('registro'); if (!r.ok) return bloco('Registro', el('div', { class: 'faixa alerta', text: r.mensagem || 'Não consegui carregar.' }));
+  return bloco('Registro (12 meses)', r.dados.registro.length ? el('ul', { class: 'lista' }, r.dados.registro.map(x => el('li', {}, el('div', { class: 'cresce' },
+    el('div', { class: 'titulo-item', text: (NOMES_EVENTO[x.evento] || x.evento) + (x.desfeito_em ? ' (desfeita)' : '') }),
+    el('div', { class: 'mudo peq', text: `${fmtHora(x.quando)} · ${x.navegador || '?'} · IP ${x.ip || '?'}${resumoDetalhe(x.detalhe) ? ' · ' + resumoDetalhe(x.detalhe) : ''}` })),
+    GANCHOS.desfazer ? GANCHOS.desfazer(x) : null))) : vazio());
+});
+GANCHOS.seguranca.push(async () => {
+  if (est.chaves.tela_chaves_api !== 'SIM') return null;
+  const r = await chamar('chaves_api'); if (!r.ok) return bloco('Chaves da API', el('div', { class: 'faixa alerta', text: r.mensagem || 'Não consegui carregar.' }));
+  const d = r.dados;
+  return bloco('Chaves da API (Enterprise)', el('p', { class: 'mudo peq', text: `Chamadas com chave desconhecida em 7 dias: ${fmtNum(d.chaves_desconhecidas_7d)}.` }),
+    d.chaves.length ? el('ul', { class: 'lista' }, d.chaves.map(k => el('li', {}, el('div', { class: 'cresce' },
+      el('div', { class: 'titulo-item', text: `${k.prefixo}… · ${k.nome || 'sem nome'} · ${k.nome_clinica || k.cliente_id}` }),
+      el('div', { class: 'mudo peq', text: `criada ${fmtData(k.criada_em)} · último uso ${fmtHora(k.ultimo_uso_em)} · limites ${k.limite_minuto}/min e ${k.limite_dia}/dia · 7 dias: ${Object.entries(k.uso_7d || {}).map(([a, b]) => a + ' ' + b).join(', ') || 'sem uso'}` })),
+      k.revogada_em ? el('span', { class: 'pill alerta', text: 'revogada' }) : (GANCHOS.revogar ? GANCHOS.revogar(k) : el('span', { class: 'pill ok', text: 'ativa' }))))) : vazio('Nenhuma chave.'),
+    GANCHOS.criarChave ? GANCHOS.criarChave() : null);
+});
+
+// --- Fase 2: agregados de pacientes (desligada até a análise jurídica; DEC-057)
+TELAS.agregados = async c => {
+  const r = await chamar('agregados'); if (falhou(c, r)) return;
+  const cols = [['pacientes', 'Pacientes'], ['consultas_30d_ia', 'Consultas pela IA (30 d)'], ['consultas_30d_equipe', 'Pela equipe (30 d)'], ['lista_espera_ativa', 'Lista de espera'],
+    ['documentos_30d', 'Documentos (30 d)'], ['preconsulta_30d', 'Pré-consulta (30 d)'], ['pesquisa_nota_media_90d', 'Nota média (90 d)'], ['relacionamento_30d', 'Relacionamento (30 d)']];
+  c.replaceChildren(el('h1', { text: 'Agregados de pacientes' }), el('p', { class: 'mudo', text: 'Só contagens e médias por clínica; nenhum dado de paciente.' }),
+    bloco(null, el('div', { class: 'tabela-rolagem' }, el('table', { class: 'dados' }, el('tr', {}, el('th', { text: 'Clínica' }), cols.map(([, n]) => el('th', { text: n }))),
+      r.dados.clinicas.map(x => el('tr', {}, el('td', { text: x.nome }), cols.map(([k]) => el('td', { class: 'num', text: x[k] == null ? '—' : fmtNum(x[k]) }))))))));
+};
+// --- Fase 3: edições (cada uma só aparece com a chave ligada; o servidor confere de novo)
+async function editar(acao, dados, titulo, linhas, aviso) {
+  if (!(await confirmarEdicao(titulo, linhas, aviso))) return null;
+  const r = await chamar(acao, { ...dados, confirmacao: 'CONFIRMAR' });
+  if (!r.ok) { toast(r.mensagem || 'Não consegui.'); return null; }
+  return r;
+}
+async function desfazer(registroId) {
+  const r = await editar('desfazer', { registro_id: registroId }, 'Desfazer a edição', [], 'Volta ao valor de antes. Fica no registro.');
+  if (r) { toast('Desfeito.'); rotear(); }
+}
+GANCHOS.desfazer = x => (['edicao_limites', 'chave_api_criada'].includes(x.evento) && !x.desfeito_em)
+  ? el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(x.id) }) : null;
+GANCHOS.ficha.push(x => {
+  const partes = [];
+  if (est.chaves.editar_limites === 'SIM') {
+    const L = x.limites;
+    const franquia = el('input', { inputmode: 'numeric', value: L.franquia_mensagens || '', placeholder: 'vazio = 5.000' });
+    const limitar = el('select', {}, ['', 'SIM', 'NAO'].map(v => el('option', { value: v, text: v || '(vazio = não limita)', selected: (L.limitar_franquia || '') === v })));
+    const dono = el('input', { inputmode: 'numeric', value: L.dono_limite_dia || '', placeholder: 'vazio = padrão' });
+    partes.push(el('form', { onsubmit: async e => {
+      e.preventDefault();
+      const novo = { franquia_mensagens: franquia.value.replace(/\D/g, ''), limitar_franquia: limitar.value, dono_limite_dia: dono.value.replace(/\D/g, '') };
+      const r = await editar('editar_limites', { cliente_id: x.cliente_id, ...novo }, 'Limites de ' + x.nome,
+        [['Franquia', L.franquia_mensagens, novo.franquia_mensagens], ['Limitar na franquia', L.limitar_franquia, novo.limitar_franquia], ['Limite diário do assistente do dono', L.dono_limite_dia, novo.dono_limite_dia]]);
+      if (r) { toast('Limites mudados.'); await rotear(); const c = $('conteudo'); c.prepend(el('div', { class: 'faixa ok' }, 'Limites mudados. ', el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(r.registro_id) }))); }
+    } }, el('h2', { text: 'Limites' }), el('label', { class: 'campo' }, 'Franquia de mensagens por mês', franquia), el('label', { class: 'campo' }, 'Limitar na franquia', limitar),
+      el('label', { class: 'campo' }, 'Limite diário do assistente do dono', dono), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e salvar' })));
+  }
+  if (est.chaves.editar_onboarding === 'SIM') {
+    partes.push(el('div', { class: 'mt' }, el('h2', { text: 'Onboarding' }), x.pode_reenviar_onboarding
+      ? el('button', { class: 'btn sec', type: 'button', text: 'Reenviar o link de onboarding', onclick: async () => {
+        const r = await editar('reenviar_onboarding', { cliente_id: x.cliente_id }, 'Reenviar o onboarding de ' + x.nome, [['Status', x.status, x.modalidade === 'teste' ? 'Em teste' : 'Pago'], ['Link atual', 'vale', 'deixa de valer']],
+          'O workflow 21 manda o link novo por e-mail em até 10 minutos. Não dá para desfazer.');
+        if (r) { toast(r.mensagem || 'Pronto.'); rotear(); }
+      } })
+      : el('p', { class: 'mudo', text: 'Só dá para reenviar quando a clínica está em "Aguardando dados".' })));
+  }
+  if (est.chaves.editar_avisos_eventos === 'SIM') {
+    const url = el('input', { type: 'url', inputmode: 'url', autocomplete: 'off', placeholder: 'https://…', spellcheck: 'false' });
+    partes.push(el('form', { class: 'mt', onsubmit: async e => {
+      e.preventDefault();
+      const r = await editar('aviso_destino_definir', { cliente_id: x.cliente_id, url: url.value.trim() }, 'Avisos de eventos de ' + x.nome,
+        [['Servidor', x.avisos_eventos ? x.avisos_eventos.servidor : '—', (url.value.match(/^https:\/\/([^/]+)/) || [])[1] || url.value]], 'Gera um segredo novo; o antigo deixa de valer.');
+      if (r) { mostrarSegredo('Segredo dos avisos de eventos', r.segredo, r.mensagem); rotear(); }
+    } }, el('h2', { text: 'Avisos de eventos (Enterprise)' }), el('label', { class: 'campo' }, 'Endereço que recebe os avisos', url),
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Definir endereço' }),
+        x.avisos_eventos && x.avisos_eventos.ativo ? el('button', { class: 'btn perigo', type: 'button', text: 'Desligar', onclick: async () => {
+          const r = await editar('aviso_destino_desligar', { cliente_id: x.cliente_id }, 'Desligar os avisos de eventos de ' + x.nome, [['Avisos', 'ligados', 'desligados']]);
+          if (r) { toast(r.mensagem || 'Desligado.'); rotear(); }
+        } }) : null)));
+  }
+  return partes.length ? bloco('Edições', ...partes) : null;
+});
+GANCHOS.revogar = k => est.chaves.editar_chaves_api === 'SIM'
+  ? el('button', { class: 'btn perigo', type: 'button', text: 'Revogar', onclick: async () => {
+    const r = await editar('chave_api_revogar', { id: k.id }, 'Revogar a chave ' + k.prefixo + '…', [['Chave', 'ativa', 'revogada']], 'O sistema que usa esta chave para de funcionar na hora. Não dá para desfazer.');
+    if (r) { toast('Chave revogada.'); rotear(); }
+  } }) : el('span', { class: 'pill ok', text: 'ativa' });
+GANCHOS.criarChave = () => {
+  if (est.chaves.editar_chaves_api !== 'SIM') return null;
+  const cli = el('input', { autocomplete: 'off', autocapitalize: 'characters', placeholder: 'CLI-…', spellcheck: 'false' });
+  const nome = el('input', { autocomplete: 'off', placeholder: 'ex.: Painel Enterprise' });
+  return el('form', { class: 'mt', onsubmit: async e => {
+    e.preventDefault();
+    const r = await editar('chave_api_criar', { cliente_id: cli.value.trim(), nome: nome.value.trim() }, 'Criar chave da API', [['Clínica', '', cli.value.trim()], ['Nome', '', nome.value.trim()]], 'Só clínica Enterprise; no máximo 2 chaves ativas.');
+    if (r) { mostrarSegredo('Chave da API', r.chave, r.mensagem); rotear(); }
+  } }, el('h2', { text: 'Criar chave' }), el('label', { class: 'campo' }, 'Código da clínica', cli), el('label', { class: 'campo' }, 'Nome da chave', nome), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e criar' }));
+};
+
+// ---------------------------------------------------------------- começo
+if (est.sessao) abrirApp(); else entrada();
+})();
+</script>
+</body>
+</html>
