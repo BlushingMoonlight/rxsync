@@ -287,6 +287,33 @@
   .pc-demo { background: #f6f8f7; border-radius: 16px; padding: 6px 0; margin: 14px 0; }
   .pc-demo .pc-item { cursor: default; min-height: 54px; padding: 9px 14px; }
   .pc-demo .pc-item:hover { background: none; }
+  .pc-links { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 6px; }
+  .pc-links button { border: 0; background: none; color: var(--brand-ink); font-weight: 700; font-size: 14px; cursor: pointer; padding: 8px 0; min-height: 36px; }
+  .pc-passos { display: flex; gap: 6px; list-style: none; margin: 0 0 16px; padding: 0; counter-reset: passo; }
+  .pc-passos li { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-3); padding-top: 8px; border-top: 3px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; counter-increment: passo; }
+  .pc-passos li::before { content: counter(passo) ". "; }
+  .pc-passos li.pc-feito { color: var(--brand-ink); border-color: var(--brand); }
+  .pc-passos li.pc-agora { color: var(--ink); border-color: var(--navy); }
+  .pc-arquivo { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 26px 18px; border: 2px dashed #cfd8d5; border-radius: var(--r-lg); background: #fff; }
+  .pc-arquivo input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .pc-mapa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 10px 12px; align-items: center; padding: 14px 18px; }
+  .pc-mapa label { font-weight: 600; font-size: 14.5px; }
+  .pc-mapa select { width: 100%; min-height: 44px; border: 1px solid #cfd8d5; border-radius: var(--r-sm); background: #fff; color: var(--ink); padding: 8px 10px; font-size: 16px; }
+  .pc-amostra { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pc-amostra table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  .pc-amostra th, .pc-amostra td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+  .pc-amostra th { background: #f6f8f7; font-weight: 700; color: var(--ink-2); border-top: 0; }
+  .pc-numeros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
+  @media (min-width: 640px) { .pc-numeros { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .pc-num { background: #fff; border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; }
+  .pc-num b { display: block; font-size: 24px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .pc-num span { font-size: 13px; color: var(--ink-2); }
+  .pc-num.erro b { color: var(--rose-ink); }
+  .pc-barra { height: 10px; border-radius: 99px; background: #e6ecea; overflow: hidden; margin: 12px 0 8px; }
+  .pc-barra div { height: 100%; width: 0; background: var(--brand); border-radius: 99px; transition: width .25s; }
+  .pc-erros { max-height: 320px; overflow-y: auto; }
+  .pc-check { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-md); background: #fff; cursor: pointer; margin: 14px 0; font-weight: 600; }
+  .pc-check input { width: 22px; height: 22px; accent-color: var(--brand); flex: none; margin-top: 1px; }
   @media (max-width: 400px) { .tabbar button { font-size: 10.5px; } }
 </style>
 </head>
@@ -509,7 +536,7 @@
             <li>Ficha com e-mail, data de nascimento e as consultas futuras e passadas</li>
             <li>Junta os cadastros repetidos da mesma pessoa</li>
             <li>Marca quem não quer receber avisos e exclui a pedido do paciente</li>
-            <li>Traz os pacientes do sistema que você usa hoje, por planilha (em breve)</li>
+            <li>Traz os pacientes do sistema que você usa hoje, por planilha, sem duplicar</li>
           </ul>
           <button class="btn pri plena" type="button" data-ir="conta/assinatura" style="margin-top:16px">Conhecer o plano Gestão Inteligente</button>
           <p class="subtitulo" style="font-size:13px;text-align:center">No seu plano, a assistente continua reconhecendo os pacientes, e eles aparecem nas consultas da Agenda.</p>
@@ -527,7 +554,8 @@
             <button type="button" data-filtro="importados_sem_conversa" aria-pressed="false">Importados sem conversa</button>
             <button type="button" data-filtro="nao_contatar" aria-pressed="false">Não contatar</button>
           </div>
-          <div class="pc-total"><span id="pacTotal" class="num"></span><button type="button" data-ir="pacientes/duplicados">Possíveis duplicados</button></div>
+          <div class="pc-links"><button type="button" data-ir="pacientes/importar">Importar planilha</button><button type="button" data-ir="pacientes/importacoes">Importações</button><button type="button" data-ir="pacientes/duplicados">Possíveis duplicados</button></div>
+          <div class="pc-total"><span id="pacTotal" class="num"></span></div>
           <div id="pacLista" class="lista"><div class="vazio">Carregando…</div></div>
           <button id="pacMais" class="btn sec plena" type="button" style="margin-top:12px" hidden>Mostrar mais 50</button>
         </div>
@@ -541,6 +569,19 @@
       <div data-sub-pane="editar" hidden>
         <button class="voltar" type="button" id="pacFormVoltar">Pacientes</button>
         <div id="pacForm"></div>
+      </div>
+
+      <div data-sub-pane="importar" hidden>
+        <button class="voltar" type="button" data-ir="pacientes">Pacientes</button>
+        <div class="cab"><h1 class="titulo">Importar pacientes</h1><p class="subtitulo">Traga os pacientes do Reservio ou de outro sistema por uma planilha CSV. Você vê uma prévia antes de gravar, e quem já está cadastrado não é duplicado.</p></div>
+        <ol class="pc-passos" id="impPassos" aria-label="Etapas"><li data-passo="1">Arquivo</li><li data-passo="2">Colunas</li><li data-passo="3">Prévia</li><li data-passo="4">Importar</li></ol>
+        <div id="impTela"></div>
+      </div>
+
+      <div data-sub-pane="importacoes" hidden>
+        <button class="voltar" type="button" data-ir="pacientes">Pacientes</button>
+        <div class="cab"><h1 class="titulo">Importações</h1><p class="subtitulo">As 10 últimas. Dá para desfazer uma importação em até 7 dias.</p></div>
+        <div id="impLista"><div class="vazio">Carregando…</div></div>
       </div>
 
       <div data-sub-pane="duplicados" hidden>
@@ -2596,7 +2637,7 @@ function partesTz(ms) {
   function mostrarBannerConta(conta) { mostrarEstado(conta); }
 
   // ===== PACIENTES (Projeto 1, item 210; sempre disponível no Gestão Inteligente). No Essencial, só a vitrine do plano:
-  // o servidor (workflow 24, rx_paciente_painel) também recusa. A importação por planilha entra num PR seguinte. =====
+  // o servidor (workflow 24, rx_paciente_painel) também recusa. A importação por planilha (item 211) fica mais abaixo. =====
   var PAC = { busca: "", filtro: "todos", pagina: 0, total: 0, itens: [], seq: 0, sujo: true, aviso: "", atual: null };
   var PAC_FRASE = "O paciente pediu para voltar a receber os avisos";
   var PAC_ERROS = {
@@ -2655,6 +2696,8 @@ function partesTz(ms) {
     if (sub === "ficha") pacFichaAbrir(id);
     if (sub === "editar") pacFormAbrir(id);
     if (sub === "duplicados") pacDupCarregar();
+    if (sub === "importar" && !el("impTela").childNodes.length) impInicio();
+    if (sub === "importacoes") impListaCarregar();
   }
 
   // ---------- Lista (50 por página; "Mostrar mais 50" acrescenta a próxima) ----------
@@ -3041,6 +3084,364 @@ function partesTz(ms) {
         if ((g.pacientes || []).length === 2) pn.appendChild(pacBtn("Juntar estes dois", "sec", function () { pacJuntarConfirmar(g.pacientes[0], g.pacientes[1], area); }));
         else pn.appendChild(h$("p", "pc-dica", "Abra cada cadastro para juntar dois de cada vez."));
         pn.appendChild(area);
+        box.appendChild(pn);
+      });
+    }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
+  }
+
+  // ===== IMPORTAR PACIENTES (Projeto 1, item 211). Tudo é lido e limpo AQUI, no aparelho: só as colunas escolhidas
+  // (nome, telefone, e-mail, nascimento, observação) vão para o servidor, em lotes de 500 (paciente_importar).
+  // CPF, endereço e as outras colunas do arquivo nunca saem do aparelho. Sem IA. =====
+  var IMP_LOTE = 500, IMP_MAX_LINHAS = 20000;
+  var IMP_CAMPOS = [
+    { k: "nome", rot: "Nome", obrig: true },
+    { k: "sobrenome", rot: "Sobrenome (se vier separado)" },
+    { k: "telefone", rot: "Telefone", obrig: true },
+    { k: "email", rot: "E-mail" },
+    { k: "nascimento", rot: "Nascimento" },
+    { k: "observacao", rot: "Observação" }
+  ];
+  // Cabeçalhos comuns (sem acento, minúsculas), em português e em inglês.
+  var IMP_NOMES = {
+    nome: ["nome", "nome completo", "nome do paciente", "paciente", "cliente", "nome do cliente", "name", "full name", "client", "client name", "customer", "customer name", "first name", "primeiro nome"],
+    sobrenome: ["sobrenome", "ultimo nome", "last name", "surname"],
+    telefone: ["telefone", "celular", "whatsapp", "fone", "telefone celular", "telefone 1", "tel", "phone", "phone number", "mobile", "mobile phone", "cell", "telephone"],
+    email: ["email", "e-mail", "e mail", "mail", "endereco de email", "email address"],
+    nascimento: ["nascimento", "data de nascimento", "data nascimento", "dt nascimento", "aniversario", "birth date", "birthdate", "date of birth", "birthday", "dob"],
+    observacao: ["observacao", "observacoes", "obs", "nota", "notas", "anotacao", "anotacoes", "comentario", "comentarios", "note", "notes", "comment", "comments"]
+  };
+  var IMP = null;   // estado da importação em andamento
+  function impSem(t) { return String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[_.]+/g, " ").replace(/\s+/g, " ").trim(); }
+
+  // ---- leitura do arquivo ----
+  function impDecodificar(buf) {
+    var b = new Uint8Array(buf);
+    try { return new TextDecoder("utf-8", { fatal: true }).decode(b).replace(/^﻿/, ""); }
+    catch (e) { return new TextDecoder("windows-1252").decode(b); }   // Excel no Windows salva assim
+  }
+  function impSeparador(texto) {
+    var linha = texto.split(/\r\n|\n|\r/)[0] || "", conta = { ";": 0, ",": 0, "\t": 0 }, dentro = false;
+    for (var i = 0; i < linha.length; i++) { var c = linha[i]; if (c === '"') dentro = !dentro; else if (!dentro && conta[c] !== undefined) conta[c]++; }
+    return conta[";"] >= conta[","] && conta[";"] >= conta["\t"] && conta[";"] > 0 ? ";" : (conta["\t"] > conta[","] ? "\t" : ",");
+  }
+  // CSV com aspas (campo com separador ou quebra de linha dentro de aspas, "" = aspas).
+  function impCsv(texto, sep) {
+    var linhas = [], campo = "", linha = [], dentro = false;
+    for (var i = 0; i < texto.length; i++) {
+      var c = texto[i];
+      if (dentro) {
+        if (c === '"') { if (texto[i + 1] === '"') { campo += '"'; i++; } else dentro = false; }
+        else campo += c;
+      } else if (c === '"') dentro = true;
+      else if (c === sep) { linha.push(campo); campo = ""; }
+      else if (c === "\n" || c === "\r") { if (c === "\r" && texto[i + 1] === "\n") i++; linha.push(campo); linhas.push(linha); linha = []; campo = ""; }
+      else campo += c;
+    }
+    if (campo !== "" || linha.length) { linha.push(campo); linhas.push(linha); }
+    return linhas;
+  }
+  function impMapaAuto(cab) {
+    var mapa = {}, usados = {};
+    IMP_CAMPOS.forEach(function (f) {
+      // A observação NUNCA é escolhida sozinha, mesmo com o título "Observação" ou "Notes": pode ter conteúdo clínico.
+      // Começa em "Não importar"; só entra se a clínica escolher a coluna.
+      if (f.k === "observacao") { mapa[f.k] = -1; return; }
+      var nomes = IMP_NOMES[f.k] || [];
+      var i = cab.findIndex(function (h, j) { return !usados[j] && nomes.indexOf(impSem(h)) >= 0; });
+      if (i < 0) i = cab.findIndex(function (h, j) { var x = impSem(h); return !usados[j] && x && nomes.some(function (n) { return n.length > 3 && x.indexOf(n) >= 0; }); });
+      mapa[f.k] = i; if (i >= 0) usados[i] = true;
+    });
+    if (mapa.sobrenome >= 0 && mapa.nome < 0) { mapa.nome = mapa.sobrenome; mapa.sobrenome = -1; }
+    return mapa;
+  }
+
+  // ---- limpeza (as mesmas regras do servidor, para a lista de erros sair completa) ----
+  function impTel(t) { return String(t || "").replace(/\D/g, ""); }
+  function impTelOk(d) { var x = d.length >= 12 && d.slice(0, 2) === "55" ? d.slice(2) : d; return d.length <= 13 && x.length >= 10; }
+  function impChaveTel(d) { var x = d.length >= 12 && d.slice(0, 2) === "55" ? d.slice(2) : d; return x.slice(0, 2) + x.slice(-8); }
+  // Datas: dd/mm/aaaa, dd-mm-aaaa, dd.mm.aaaa, dd/mm/aa, aaaa-mm-dd (com ou sem hora depois). "" = vazio; null = inválida.
+  function impData(t) {
+    var v = String(t || "").trim(); if (!v) return "";
+    var m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/), a, me, d;
+    if (m) { a = +m[1]; me = +m[2]; d = +m[3]; }
+    else if ((m = v.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})(\s|$|T)/))) {
+      d = +m[1]; me = +m[2]; a = +m[3];
+      if (m[3].length === 2) { var aa = new Date().getFullYear() % 100; a += a > aa ? 1900 : 2000; }
+    } else return null;
+    var dt = new Date(Date.UTC(a, me - 1, d));
+    if (dt.getUTCFullYear() !== a || dt.getUTCMonth() !== me - 1 || dt.getUTCDate() !== d) return null;
+    if (a < 1900 || dt.getTime() > Date.now()) return null;
+    return a + "-" + String(me).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+  }
+  function impPreparar() {
+    var m = IMP.mapa, col = function (r, k) { return m[k] >= 0 ? String(r[m[k]] == null ? "" : r[m[k]]).trim() : ""; };
+    var validas = [], erros = [], vistos = {}, repetidas = 0, vazias = 0;
+    IMP.dados.forEach(function (r, i) {
+      var linha = i + 2;   // a linha 1 é o cabeçalho
+      if (!r.some(function (x) { return String(x).trim(); })) { vazias++; return; }
+      var nome = (col(r, "nome") + " " + col(r, "sobrenome")).replace(/\s+/g, " ").trim().slice(0, 120);
+      var tel = impTel(col(r, "telefone")), email = col(r, "email").toLowerCase(), nasc = impData(col(r, "nascimento"));
+      var motivo = !nome ? "sem nome" : !impTelOk(tel) ? "telefone sem DDD" : (email && (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) ? "e-mail inválido" : nasc === null ? "data de nascimento inválida" : "";
+      if (motivo) { erros.push({ linha: linha, motivo: motivo, i: i }); return; }
+      var chave = impChaveTel(tel) + "|" + impSem(nome);
+      if (vistos[chave]) { repetidas++; return; }
+      vistos[chave] = true;
+      validas.push({ linha: String(linha), nome: nome, telefone: tel, email: email, nascimento: nasc, observacao: col(r, "observacao").slice(0, 300) });
+    });
+    IMP.validas = validas; IMP.erros = erros; IMP.repetidas = repetidas; IMP.vazias = vazias;
+  }
+
+  // ---- telas ----
+  function impPasso(n) { el("impPassos").querySelectorAll("li").forEach(function (li) { var p = +li.dataset.passo; li.className = p < n ? "pc-feito" : (p === n ? "pc-agora" : ""); }); }
+  function impNum(rot, n, cls) { var d = h$("div", "pc-num" + (cls ? " " + cls : "")); d.appendChild(h$("b", null, Number(n || 0).toLocaleString("pt-BR"))); d.appendChild(h$("span", null, rot)); return d; }
+  function impTela() { var t = el("impTela"); t.innerHTML = ""; return t; }
+  function impInicio() {
+    IMP = null; impPasso(1);
+    var t = impTela();
+    var cx = h$("label", "pc-arquivo");
+    cx.insertAdjacentHTML("afterbegin", svg("baixar"));
+    cx.appendChild(h$("strong", null, "Escolher a planilha (CSV)"));
+    cx.appendChild(h$("span", "subtitulo", "No iPad e no iPhone, abre o app Arquivos."));
+    var inp = h$("input"); inp.type = "file"; inp.id = "impArquivo";
+    inp.accept = ".csv,.txt,.xlsx,.xls,.numbers,text/csv,text/plain,text/comma-separated-values,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    cx.appendChild(inp);
+    var bt = h$("span", "btn pri", "Escolher arquivo"); cx.appendChild(bt);
+    t.appendChild(cx);
+    var dica = h$("div", "aviso neutro"); dica.style.marginTop = "14px";
+    dica.innerHTML = "<strong>Como exportar:</strong> no Reservio (ou no seu sistema), exporte a lista de clientes. Se vier em Excel (.xlsx), abra no app <strong>Numbers</strong>, toque em <strong>⋯ › Exportar › CSV</strong> e escolha o arquivo exportado aqui. A planilha precisa ter pelo menos o nome e o telefone com DDD de cada paciente; a primeira linha deve ser a dos títulos das colunas.";
+    t.appendChild(dica);
+    t.appendChild(h$("p", "pc-dica", "O arquivo é lido aqui no seu aparelho. Só o nome, o telefone, o e-mail, o nascimento e a observação de cada paciente vão para a RXSync; as outras colunas (CPF, endereço etc.) ficam só no aparelho. Até " + IMP_MAX_LINHAS.toLocaleString("pt-BR") + " linhas por arquivo."));
+    var msg = h$("div"); t.appendChild(msg);
+    inp.onchange = function () {
+      var f = inp.files && inp.files[0]; msg.innerHTML = ""; if (!f) return;
+      var r = new FileReader();
+      r.onload = function () {
+        var b = new Uint8Array(r.result);
+        var zip = b[0] === 0x50 && b[1] === 0x4B, ext = (f.name.split(".").pop() || "").toLowerCase();
+        if (zip || ["xlsx", "xls", "numbers"].indexOf(ext) >= 0) { msg.appendChild(pacAviso("ambar", "Este arquivo é uma planilha do Excel ou do Numbers, não um CSV. Abra no app Numbers, toque em ⋯ › Exportar › CSV e escolha o arquivo .csv exportado.")); inp.value = ""; return; }
+        var texto = impDecodificar(r.result), sep = impSeparador(texto);
+        var linhas = impCsv(texto, sep).filter(function (l, i) { return i === 0 || l.some(function (x) { return String(x).trim(); }); });
+        if (linhas.length < 2) { msg.appendChild(pacAviso("rosa", "Não encontrei pacientes nesse arquivo. Confira se é a planilha certa e se a primeira linha tem os títulos das colunas.")); inp.value = ""; return; }
+        if (linhas.length - 1 > IMP_MAX_LINHAS) { msg.appendChild(pacAviso("rosa", "O arquivo tem " + (linhas.length - 1).toLocaleString("pt-BR") + " linhas. Divida em arquivos de até " + IMP_MAX_LINHAS.toLocaleString("pt-BR") + " linhas e importe um de cada vez.")); inp.value = ""; return; }
+        var cab = linhas[0].map(function (h) { return String(h).trim(); });
+        IMP = { arquivo: f.name, sep: sep, cab: cab, dados: linhas.slice(1), mapa: impMapaAuto(cab) };
+        impColunas();
+      };
+      r.onerror = function () { msg.appendChild(pacAviso("rosa", "Não consegui abrir esse arquivo. Tente de novo.")); };
+      r.readAsArrayBuffer(f);
+    };
+  }
+  function impColunas() {
+    impPasso(2);
+    var t = impTela();
+    t.appendChild(h$("p", "subtitulo", "Arquivo " + IMP.arquivo + ": " + IMP.dados.length.toLocaleString("pt-BR") + (IMP.dados.length === 1 ? " linha" : " linhas") + ". Confira de qual coluna vem cada informação. Ajuste o que não estiver certo."));
+    var bl = h$("div", "bloco pc-mapa"); bl.style.marginTop = "12px";
+    IMP_CAMPOS.forEach(function (f) {
+      var lb = h$("label", null, f.rot + (f.obrig ? " *" : "")); lb.htmlFor = "impCol_" + f.k; bl.appendChild(lb);
+      var sel = h$("select"); sel.id = "impCol_" + f.k;
+      var o0 = h$("option", null, f.obrig ? "Escolha a coluna" : (f.k === "observacao" ? "Não importar" : "Não usar")); o0.value = "-1"; sel.appendChild(o0);
+      IMP.cab.forEach(function (h, i) { var o = h$("option", null, h || "Coluna " + (i + 1)); o.value = String(i); sel.appendChild(o); });
+      sel.value = String(IMP.mapa[f.k]);
+      bl.appendChild(sel);
+      var avObs = null;
+      if (f.k === "observacao") {
+        avObs = h$("div", "aviso ambar", "Só importe se essa coluna tiver informação administrativa (ex.: 'prefere manhã', 'convênio X'). Nada clínico: diagnóstico, alergia, medicamento ou queixa.");
+        avObs.id = "impAvisoObs"; avObs.style.cssText = "grid-column:1 / -1;margin:0"; avObs.hidden = IMP.mapa.observacao < 0;
+        bl.appendChild(avObs);
+      }
+      sel.onchange = function () { IMP.mapa[f.k] = +sel.value; if (avObs) avObs.hidden = IMP.mapa[f.k] < 0; amostra(); };
+    });
+    t.appendChild(bl);
+    var nao = h$("p", "pc-dica"); t.appendChild(nao);
+    t.appendChild(h$("div", "pc-sec", "Como vai ficar (5 primeiras linhas)"));
+    var am = h$("div", "bloco pc-amostra"); t.appendChild(am);
+    var erro = h$("div"); erro.style.marginTop = "12px"; t.appendChild(erro);
+    var seguir = pacBtn("Ver a prévia", "pri plena", function () {
+      erro.innerHTML = "";
+      if (IMP.mapa.nome < 0 || IMP.mapa.telefone < 0) { erro.appendChild(pacAviso("rosa", "Escolha as colunas do nome e do telefone.")); return; }
+      impPrevia();
+    });
+    seguir.style.marginTop = "16px"; t.appendChild(seguir);
+    var outro = pacBtn("Escolher outro arquivo", "sec plena", impInicio); outro.style.marginTop = "8px"; t.appendChild(outro);
+    function amostra() {
+      var usadas = IMP_CAMPOS.map(function (f) { return IMP.mapa[f.k]; });
+      var fora = IMP.cab.filter(function (h, i) { return usadas.indexOf(i) < 0; });
+      nao.textContent = fora.length ? "Ficam só no aparelho (não são enviadas): " + fora.map(function (h, i) { return h || "coluna sem título"; }).join(", ") + "." : "";
+      am.innerHTML = "";
+      var tb = h$("table"), tr = h$("tr");
+      ["Linha", "Nome", "Telefone", "E-mail", "Nascimento", "Observação"].forEach(function (x) { tr.appendChild(h$("th", null, x)); });
+      tb.appendChild(tr);
+      var m = IMP.mapa, col = function (r, k) { return m[k] >= 0 ? String(r[m[k]] == null ? "" : r[m[k]]).trim() : ""; };
+      IMP.dados.slice(0, 5).forEach(function (r, i) {
+        var nasc = impData(col(r, "nascimento"));
+        var cel = [String(i + 2), (col(r, "nome") + " " + col(r, "sobrenome")).trim(), pacTel(impTel(col(r, "telefone"))) || impTel(col(r, "telefone")), col(r, "email").toLowerCase(), nasc ? nasc.split("-").reverse().join("/") : (nasc === null ? "inválida" : ""), col(r, "observacao")];
+        var l = h$("tr"); cel.forEach(function (x) { l.appendChild(h$("td", null, x || "—")); }); tb.appendChild(l);
+      });
+      am.appendChild(tb);
+    }
+    amostra();
+  }
+  // Manda os lotes um por vez. "gravar" = false é a prévia. Devolve os totais somados.
+  function impLotes(gravar, aoAvancar) {
+    var lotes = [];
+    for (var i = 0; i < IMP.validas.length; i += IMP_LOTE) lotes.push(IMP.validas.slice(i, i + IMP_LOTE));
+    var tot = { novos: 0, existentes: 0, completados: 0, parecidos: 0, repetidas: 0, erros: 0, lista_erros: [] };
+    var k = gravar ? (IMP.proximo || 0) : 0;
+    if (gravar && IMP.totGravacao) tot = IMP.totGravacao;
+    function um() {
+      if (k >= lotes.length) return Promise.resolve(tot);
+      aoAvancar(k, lotes.length);
+      var dados = { origem: "planilha", gravar: gravar, linhas: lotes[k] };
+      if (gravar && IMP.importacao_id) dados.importacao_id = String(IMP.importacao_id);
+      return pacChamar("paciente_importar", dados).then(function (r) {
+        if (!r.ok) { var e = new Error("servidor"); e.r = r; throw e; }
+        ["novos", "existentes", "completados", "parecidos", "repetidas", "erros"].forEach(function (x) { tot[x] += r[x] || 0; });
+        (r.lista_erros || []).forEach(function (x) { tot.lista_erros.push(x); });
+        if (gravar) { IMP.importacao_id = IMP.importacao_id || r.importacao_id; IMP.proximo = k + 1; IMP.totGravacao = tot; }
+        k++; return um();
+      });
+    }
+    if (!lotes.length) return Promise.resolve(tot);
+    return um();
+  }
+  function impErrosTodos(tot) {
+    // Erros conferidos aqui + os que o servidor ainda achar (não deveria, as regras são as mesmas).
+    var l = IMP.erros.map(function (e) { return { linha: e.linha, motivo: e.motivo }; });
+    (tot.lista_erros || []).forEach(function (e) { l.push({ linha: +e.linha, motivo: e.motivo }); });
+    return l.sort(function (a, b) { return a.linha - b.linha; });
+  }
+  function impBaixarErros(erros) {
+    // CSV gerado aqui no aparelho, com as colunas originais da linha e o motivo.
+    // Valor que começa com =, +, - ou @ ganha um apóstrofo na frente: o Numbers e o Excel não tratam como fórmula.
+    var q = function (x) { x = String(x == null ? "" : x); if (/^[=+\-@]/.test(x)) x = "'" + x; return /[";\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    var linhas = [["linha", "motivo"].concat(IMP.cab).map(q).join(";")];
+    erros.forEach(function (e) { linhas.push([e.linha, e.motivo].concat(IMP.dados[e.linha - 2] || []).map(q).join(";")); });
+    var blob = new Blob(["﻿" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "linhas-com-erro-" + String(IMP.arquivo || "planilha").replace(/\.[^.]+$/, "") + ".csv";
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function impListaErros(t, erros) {
+    if (!erros.length) return;
+    var s = h$("div", "pc-sec"); s.appendChild(document.createTextNode("Linhas com erro")); s.appendChild(h$("span", null, erros.length > 100 ? "as 100 primeiras de " + erros.length.toLocaleString("pt-BR") : "")); t.appendChild(s);
+    var b = h$("div", "bloco pc-erros");
+    erros.slice(0, 100).forEach(function (e) { var r = h$("div", "pc-cons"); r.appendChild(h$("div", "c1", "Linha " + e.linha)); r.appendChild(h$("div", "c2", e.motivo)); b.appendChild(r); });
+    t.appendChild(b);
+    var bx = pacBtn("Baixar as linhas com erro (CSV)", "sec plena", function () { impBaixarErros(erros); }); bx.style.marginTop = "10px"; t.appendChild(bx);
+    t.appendChild(h$("p", "pc-dica", "Essas linhas não são importadas. Corrija na planilha e importe só elas depois, se quiser."));
+  }
+  function impPrevia() {
+    impPasso(3);
+    impPreparar();
+    // Prévia nova = importação nova (as colunas podem ter mudado).
+    delete IMP.importacao_id; delete IMP.proximo; delete IMP.totGravacao;
+    var t = impTela();
+    t.appendChild(h$("p", "subtitulo", "Conferindo " + IMP.validas.length.toLocaleString("pt-BR") + " pacientes com o cadastro da clínica. Nada é gravado nesta etapa."));
+    var barra = h$("div", "pc-barra"), fill = h$("div"); barra.appendChild(fill); t.appendChild(barra);
+    var st = h$("p", "pc-dica", ""); t.appendChild(st);
+    impLotes(false, function (k, n) { fill.style.width = Math.round(k / n * 100) + "%"; st.textContent = "Lote " + (k + 1) + " de " + n + "…"; }).then(function (tot) {
+      IMP.previa = tot;
+      impConfirmar();
+    }).catch(function (e) {
+      t.appendChild(pacAviso("rosa", (e && e.r && pacErro(e.r)) || PAC_ERROS.interno));
+      t.appendChild(pacBtn("Tentar de novo", "pri plena", impPrevia));
+    });
+  }
+  function impConfirmar() {
+    var p = IMP.previa, t = impTela();
+    var erros = impErrosTodos(p);
+    var nums = h$("div", "pc-numeros");
+    nums.appendChild(impNum("pacientes novos", p.novos));
+    nums.appendChild(impNum("já cadastrados", p.existentes));
+    nums.appendChild(impNum("com o telefone de outro paciente", p.parecidos));
+    nums.appendChild(impNum("com erro", erros.length, erros.length ? "erro" : ""));
+    t.appendChild(nums);
+    var det = [];
+    if (p.existentes) det.push("Os já cadastrados (mesmo nome, sem contar acento, e mesmo telefone) não são duplicados: só completamos o e-mail, o nascimento e a observação que estiverem vazios.");
+    if (p.parecidos) det.push("Os que têm o telefone de outro paciente com outro nome (por exemplo, mãe e filho) entram como pacientes novos; confira depois em Possíveis duplicados.");
+    if (IMP.mapa.observacao >= 0) { var nObs = IMP.validas.filter(function (v) { return v.observacao; }).length; det.push(nObs === 1 ? "1 linha tem observação preenchida (vai ser importada). Confira se é só informação administrativa." : nObs + " linhas têm observação preenchida (vão ser importadas). Confira se é só informação administrativa."); }
+    if (IMP.repetidas + p.repetidas) det.push((IMP.repetidas + p.repetidas) + " linha(s) repetida(s) no próprio arquivo ficaram de fora.");
+    det.forEach(function (x) { t.appendChild(h$("p", "pc-dica", x)); });
+    impListaErros(t, erros);
+    if (!p.novos && !p.existentes) { t.appendChild(pacAviso("ambar", "Não há nenhum paciente para importar neste arquivo.")); t.appendChild(pacBtn("Escolher outro arquivo", "sec plena", impInicio)); return; }
+    var av = h$("div"); av.style.marginTop = "18px";
+    av.appendChild(pacAviso("ambar", "Os pacientes importados não recebem nenhuma mensagem automática (aviso de retorno, convite para voltar, convite do Google, lembretes) até escreverem para a clínica no WhatsApp."));
+    av.appendChild(pacAviso("neutro", "A observação é só administrativa. Se a planilha tiver sintomas, diagnóstico ou tratamento nessa coluna, volte e marque Observação como \"Não usar\"."));
+    av.appendChild(pacAviso("neutro", "Dá para desfazer esta importação em até 7 dias, em Pacientes › Importações."));
+    t.appendChild(av);
+    var ck = h$("label", "pc-check"); var cb = h$("input"); cb.type = "checkbox"; ck.appendChild(cb);
+    ck.appendChild(h$("span", null, "Confirmo que a clínica tem autorização para guardar esses dados dos pacientes (LGPD)."));
+    t.appendChild(ck);
+    var total = p.novos + p.existentes;
+    var ir1 = pacBtn(p.novos ? "Importar " + p.novos.toLocaleString("pt-BR") + (p.novos === 1 ? " paciente" : " pacientes") : "Completar " + p.existentes.toLocaleString("pt-BR") + " cadastro(s)", "pri plena", function () { if (cb.checked) impGravar(); });
+    ir1.disabled = true; cb.onchange = function () { ir1.disabled = !cb.checked; };
+    t.appendChild(ir1);
+    var volta = pacBtn("Voltar às colunas", "sec plena", impColunas); volta.style.marginTop = "8px"; t.appendChild(volta);
+    IMP.total = total;
+  }
+  function impGravar() {
+    impPasso(4);
+    var t = impTela();
+    t.appendChild(h$("p", "subtitulo", "Importando. Deixe esta tela aberta até terminar."));
+    var barra = h$("div", "pc-barra"), fill = h$("div"); barra.appendChild(fill); t.appendChild(barra);
+    var st = h$("p", "pc-dica", ""); t.appendChild(st);
+    impLotes(true, function (k, n) { fill.style.width = Math.round(k / n * 100) + "%"; st.textContent = "Lote " + (k + 1) + " de " + n + "…"; }).then(function (tot) {
+      fill.style.width = "100%";
+      PAC.sujo = true;
+      impResultado(tot);
+    }).catch(function (e) {
+      var r = e && e.r;
+      if (r && r.erro === "limite") { t.appendChild(pacAviso("rosa", "A clínica chegou ao limite de 50.000 pacientes. Fale com a RXSync.")); return; }
+      t.appendChild(pacAviso("rosa", "A importação parou no lote " + ((IMP.proximo || 0) + 1) + ". " + ((r && pacErro(r)) || "Verifique a internet.") + " O que já foi gravado está salvo; tentar de novo continua de onde parou, sem duplicar."));
+      t.appendChild(pacBtn("Tentar de novo", "pri plena", impGravar));
+    });
+  }
+  function impResultado(tot) {
+    var t = impTela();
+    t.appendChild(pacAviso("verde", "Importação concluída."));
+    var nums = h$("div", "pc-numeros");
+    nums.appendChild(impNum("pacientes novos", tot.novos));
+    nums.appendChild(impNum("já cadastrados", tot.existentes));
+    nums.appendChild(impNum("cadastros completados", tot.completados));
+    nums.appendChild(impNum("com erro (não importados)", impErrosTodos(tot).length, "erro"));
+    t.appendChild(nums);
+    t.appendChild(pacBtn("Ver pacientes importados", "pri plena", function () {
+      PAC.filtro = "importados_sem_conversa"; PAC.busca = ""; el("pacBusca").value = ""; PAC.sujo = true;
+      el("pacFiltros").querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x.dataset.filtro === PAC.filtro)); });
+      ir("pacientes");
+    }));
+    var des = pacBtn("Desfazer importação", "perigo plena", function () { impDesfazer({ id: IMP.importacao_id, completados: tot.completados }, function () { impInicio(); }); });
+    des.style.marginTop = "8px"; t.appendChild(des);
+    var outra = pacBtn("Importar outro arquivo", "sec plena", impInicio); outra.style.marginTop = "8px"; t.appendChild(outra);
+  }
+  function impDesfazer(imp, depois) {
+    var msg = "Desfazer esta importação?\n\n• Saem os pacientes criados por ela que ainda não têm consulta, não conversaram com a clínica e não foram editados.\n• Os que já tinham consulta, conversa ou edição ficam."
+      + (imp.completados === 1 ? "\n• O paciente que já existia e foi completado (e-mail, nascimento, observação) NÃO volta atrás." : imp.completados ? "\n• Os " + imp.completados + " pacientes que já existiam e foram completados (e-mail, nascimento, observação) NÃO voltam atrás." : "\n• Os pacientes que já existiam e foram completados (e-mail, nascimento, observação) NÃO voltam atrás.");
+    if (!confirm(msg)) return;
+    pacChamar("paciente_importacao_desfazer", { importacao_id: String(imp.id) }).then(function (r) {
+      if (!r.ok) { toast(r.erro === "prazo" ? "Essa importação já foi desfeita ou passou dos 7 dias." : pacErro(r)); return; }
+      PAC.sujo = true;
+      alert("Importação desfeita.\n\n" + r.removidos + " paciente(s) removido(s)." + (r.mantidos ? "\n" + r.mantidos + " ficaram porque já têm consulta, conversa ou edição." : "") + (r.completados_mantidos ? "\n" + r.completados_mantidos + " cadastro(s) completado(s) continuam como estão." : ""));
+      if (depois) depois();
+    }).catch(function () { toast(PAC_ERROS.interno); });
+  }
+  function impListaCarregar() {
+    var box = el("impLista"); box.innerHTML = '<div class="vazio">Carregando…</div>';
+    pacChamar("paciente_importacoes", {}).then(function (d) {
+      box.innerHTML = "";
+      if (!d.ok) { box.appendChild(pacAviso("rosa", pacErro(d))); return; }
+      var l = d.importacoes || [];
+      if (!l.length) { var v = h$("div", "vazio"); v.appendChild(h$("strong", null, "Nenhuma importação ainda")); v.appendChild(document.createTextNode("Use Importar planilha na lista de pacientes.")); box.appendChild(v); return; }
+      l.forEach(function (i) {
+        var pn = h$("div", "pc-painel");
+        var t = h$("div", "sec"); t.appendChild(document.createTextNode(pacQuando(i.criado_em) + " ")); t.appendChild(h$("span", "pill", i.origem === "planilha" ? "Planilha" : "Reservio")); pn.appendChild(t);
+        pn.appendChild(h$("p", "subtitulo", [i.novos + " novo(s)", i.existentes + " já cadastrado(s)", i.completados + " completado(s)", i.erros + " com erro"].join(" · ")));
+        if (i.desfeita_em) pn.appendChild(h$("p", "pc-dica", "Desfeita em " + pacQuando(i.desfeita_em) + "."));
+        else if (i.pode_desfazer) {
+          var b = pacBtn("Desfazer", "perigo", function () { impDesfazer({ id: i.id, completados: i.completados }, impListaCarregar); });
+          b.style.marginTop = "10px"; pn.appendChild(b);
+          pn.appendChild(h$("p", "pc-dica", "Pode desfazer até " + pacDia(new Date(new Date(i.criado_em).getTime() + 7 * 86400000).toISOString()) + ". Os pacientes que já existiam e foram completados não voltam atrás."));
+        } else pn.appendChild(h$("p", "pc-dica", "Passou o prazo de 7 dias para desfazer."));
         box.appendChild(pn);
       });
     }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
