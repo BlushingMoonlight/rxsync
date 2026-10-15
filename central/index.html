@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s2NJAY8UlA+MWdnZbEowaBTL9QdO+SKFqD7sooN+JBc='; style-src 'sha256-kGZtCSZH3pjLIaH/cFLNJvUTt6ExStD9f+QvRLVXUPw='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-E9OfSI4WdiWlsNr1KDtR1+vgc3gVJbTKFgN2gVB52BI='; style-src 'sha256-KxUmcBKsDYkn8N3aYOlucuw4k2qAFJ+Zdui/lyBtqGg='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -56,7 +56,8 @@ a { color: var(--brand-ink); }
 /* abas de baixo */
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .tabbar button { height: var(--tabbar-h); border: 0; background: none; color: var(--ink-3); font-size: 11.5px; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
-.tabbar button svg, .rail button svg { width: 22px; height: 22px; }
+/* Todo ícone tem tamanho fixo (sem isso, um <svg> sem tamanho ocupa a largura toda). */
+svg.icone { width: 22px; height: 22px; flex: none; display: block; }
 .tabbar button[aria-current="page"] { color: var(--brand-ink); }
 body.teclado .tabbar { display: none; }
 /* menu lateral (iPad deitado e computador) */
@@ -83,11 +84,15 @@ h2 { font-size: 17px; margin: 0 0 10px; font-weight: 700; }
 .cartao .valor { font-size: 24px; font-weight: 800; line-height: 1.15; }
 .cartao .rot { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
 .lista { list-style: none; margin: 0; padding: 0; }
-.lista li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.lista li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 10px 0; border-top: 1px solid var(--line); }
 .lista li:first-child { border-top: 0; }
-.lista .cresce { flex: 1; min-width: 0; }
+/* O texto principal da linha ocupa o resto e nunca fica espremido: sem espaço, os botões e os números descem. */
+.lista .cresce { flex: 1 1 11em; min-width: 0; }
+.lista li > :not(.cresce):not(.pill) { flex: 0 1 auto; min-width: 0; }
 .lista .titulo-item { font-weight: 600; overflow-wrap: anywhere; }
-.lista button.item { all: unset; display: flex; gap: 10px; align-items: center; width: 100%; cursor: pointer; }
+.lista button.item { all: unset; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; width: 100%; min-width: 0; cursor: pointer; }
+.lista button.item svg.icone { color: var(--ink-3); }
+.lista button.item > .cresce { flex: 1 1 11em; min-width: 0; }
 .pill { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); white-space: nowrap; border: 1px solid var(--line); }
 .pill.ok { background: var(--brand-soft); color: var(--brand-ink); border-color: transparent; }
 .pill.pend { background: var(--amber-soft); color: var(--amber-ink); border-color: transparent; }
@@ -100,7 +105,7 @@ h2 { font-size: 17px; margin: 0 0 10px; font-weight: 700; }
 .barra { height: 8px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
 .barra > i { display: block; height: 100%; background: var(--brand); }
 .barra.alto > i { background: #f59e0b; } .barra.cheio > i { background: #e11d48; }
-.campos { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0; }
+.campos { display: grid; grid-template-columns: fit-content(45%) minmax(0, 1fr); gap: 6px 14px; margin: 0; }
 .campos dt { color: var(--ink-3); font-size: 14px; } .campos dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
 .chips button { border: 1px solid var(--line-2); background: var(--surface); border-radius: 99px; padding: 6px 12px; min-height: 36px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
@@ -206,7 +211,7 @@ const ICONES = {
   funil: 'M3 4h18l-7 8v6l-4 2v-8z', seguranca: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', chaves: 'M15 7a4 4 0 1 1-3.5 6.1L4 20.5V17h3v-3h3l1.5-1.5A4 4 0 0 1 15 7',
   agregados: 'M3 3v18h18M7 15l4-4 3 3 5-6'
 };
-const icone = n => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.9'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', ICONES[n] || ''); s.append(p); return s; };
+const icone = n => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('class', 'icone'); s.setAttribute('width', '22'); s.setAttribute('height', '22'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.9'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', ICONES[n] || ''); s.append(p); return s; };
 const fmtReal = v => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const fmtNum = v => (Number(v) || 0).toLocaleString('pt-BR');
 const fmtData = v => { if (!v) return '—'; const d = new Date(String(v).length === 10 ? v + 'T12:00:00' : v); return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR'); };
