@@ -36,11 +36,26 @@ for (const f of htmls) {
     for (const m of s.matchAll(/\b(?:src|href)\s*=\s*"(https?:[^"]*)"/gi)) erro(`${arq}: carrega coisa de fora (${m[1]})`);
     if (/style="/.test(s)) erro(`${arq}: atributo style= é bloqueado pela CSP; use uma classe`);
     if (/localStorage\s*\./.test(s)) erro(`${arq}: a sessão não pode ir para o localStorage`);
+    // Dados sensíveis (CPF, CNPJ, e-mail, telefone) nunca ficam no navegador: só a sessão vai para o sessionStorage.
+    for (const m of s.matchAll(/sessionStorage\.setItem\(\s*([^,)]*)/g)) if (m[1].trim() !== "'central_sessao'") erro(`${arq}: só a sessão pode ir para o sessionStorage (achei ${m[1].trim()})`);
+    if (/indexedDB|document\.cookie|caches\.open/.test(s)) erro(`${arq}: nada da Central fica no navegador (indexedDB, cookie ou cache)`);
+    // Aba Clientes (DEC-065): CPF e CNPJ só na tela de dados sensíveis, pela ação cliente_sensivel.
+    if (!/TELAS\.sensivel\s*=/.test(s) || !/chamar\('cliente_sensivel'/.test(s)) erro(`${arq}: falta a tela de dados sensíveis (cliente_sensivel)`);
     if (/\.innerHTML\s*=/.test(s)) erro(`${arq}: use textContent (innerHTML deixa o texto do servidor virar código)`);
     // Entrada da Central: e-mail + senha + código no Telegram. Nada de app autenticador, e nenhum endereço de e-mail
     // escrito na página (o e-mail do administrador fica só no servidor).
     if (/otpauth:|totp|base32|app Senhas/i.test(s)) erro(`${arq}: a Central não usa mais app autenticador (otpauth, TOTP ou "app Senhas" na página)`);
     for (const m of s.matchAll(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi)) erro(`${arq}: tem um endereço de e-mail escrito na página (${m[0]}); ele fica só no servidor`);
+  }
+}
+// Painel (autoedicao.html): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
+{
+  const arq = 'autoedicao.html';
+  if (fs.existsSync(arq)) {
+    const s = fs.readFileSync(arq, 'utf8');
+    if (!/resp\.recursos/.test(s)) erro(`${arq}: o painel precisa ler "recursos" da resposta do abrir (DEC-063)`);
+    if ((s.match(/\/\^essencial\//g) || []).length > 1) erro(`${arq}: o plano só pode ser conferido pelo nome na regra de reserva (servidor sem "recursos")`);
+    if (/PLANO_ESSENCIAL/.test(s)) erro(`${arq}: PLANO_ESSENCIAL voltou; use sem("recurso")`);
   }
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }

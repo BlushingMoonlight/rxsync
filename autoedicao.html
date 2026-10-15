@@ -856,7 +856,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       if (g.key === "automaticas") {
         var l = String(savedValues.lembrete_horarios || "");
         txt = l === "nao" ? "Lembretes desligados" : "Lembretes " + (l ? l.split(",") : ["24", "2"]).map(function (x) { return x === "M" ? "na manhã do dia" : x + "h antes"; }).join(" e ");
-        if (!PLANO_ESSENCIAL) txt += savedValues.pesquisa_ativa === "SIM" ? " · pesquisa ligada" : " · pesquisa desligada";
+        if (!sem("pesquisa")) txt += savedValues.pesquisa_ativa === "SIM" ? " · pesquisa ligada" : " · pesquisa desligada";
       } else if (cs.length) {
         txt = cheios === cs.length ? "Completo" : cheios + " de " + cs.length + " preenchidos";
         if (cheios < cs.length && ["clinica", "urgencia"].indexOf(g.key) >= 0) pill = "<span class='pill pend'>Completar</span>";
@@ -864,7 +864,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       alvo.innerHTML = txt + (pill ? " " + pill : "");
     });
     var pg = el("pillGestao");
-    if (pg) pg.innerHTML = PLANO_ESSENCIAL ? "<span class='pill plano'>Gestão</span>" : (savedValues.assistente_dono_ativa === "SIM" ? "<span class='pill ok'>Ligado</span>" : "<span class='pill'>Desligado</span>");
+    if (pg) pg.innerHTML = sem("assistente_dono") ? "<span class='pill plano'>Gestão</span>" : (savedValues.assistente_dono_ativa === "SIM" ? "<span class='pill ok'>Ligado</span>" : "<span class='pill'>Desligado</span>");
   }
 
   // ===== Campos =====
@@ -1067,10 +1067,10 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   // ===== Chat do assistente de gestão (folha que abre por cima de qualquer tela) =====
   function abrirChat() {
     el("veuChat").hidden = false; el("folhaChat").hidden = false;
-    var ligado = !PLANO_ESSENCIAL && savedValues.assistente_dono_ativa === "SIM";
-    el("chatUpsell").hidden = !PLANO_ESSENCIAL;
-    el("chatDesligado").hidden = PLANO_ESSENCIAL || ligado;
-    el("chatMsgs").hidden = !ligado; el("chatSugestoes").hidden = !ligado; el("chatEntrada").hidden = PLANO_ESSENCIAL;
+    var semAssist = sem("assistente_dono"), ligado = !semAssist && savedValues.assistente_dono_ativa === "SIM";
+    el("chatUpsell").hidden = !semAssist;
+    el("chatDesligado").hidden = semAssist || ligado;
+    el("chatMsgs").hidden = !ligado; el("chatSugestoes").hidden = !ligado; el("chatEntrada").hidden = semAssist;
     el("chatTexto").disabled = !ligado; el("chatEnviar").disabled = !ligado;
     if (ligado) { chatIniciar(); setTimeout(function () { el("chatTexto").focus(); }, 80); }
   }
@@ -1185,7 +1185,10 @@ function partesTz(ms) {
   }
   // ---------- Aba Assistente IA (chat com o assistente de gestão) ----------
   var ASSIST_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/assistente-dono";
-  var PLANO_ESSENCIAL = false, chatHist = [], chatOcupado = false, chatPronto = false;
+  // Recursos que valem para a clínica (DEC-063): vêm do servidor no "abrir" (o plano ou uma liberação da equipe RXSync).
+  // Antes de abrir (REC vazio), nada fica travado; quem decide de verdade é sempre o servidor.
+  var REC = null, chatHist = [], chatOcupado = false, chatPronto = false;
+  function sem(k) { return !!REC && REC[k] !== true; }
   var CHAT_SUGESTOES = ["Como está minha agenda hoje?", "Quem vem amanhã?", "Quantas consultas a IA marcou esta semana?", "Chegou algum documento de paciente?", "Bloqueia sexta à tarde", "Quarta não vou mais atender de manhã"];
   function chatBolha(de, texto) {
     var linha = h$("div", "flex " + (de === "dono" ? "justify-end" : "justify-start")); linha.style.display = "flex";
@@ -1213,7 +1216,7 @@ function partesTz(ms) {
   function chatEnviar() {
     var txt = el("chatTexto").value.trim();
     if (!txt || chatOcupado) return;
-    if (PLANO_ESSENCIAL) { toast("O assistente faz parte do plano Gestão Inteligente."); return; }
+    if (sem("assistente_dono")) { toast("O assistente faz parte do plano Gestão Inteligente."); return; }
     if (savedValues.assistente_dono_ativa !== "SIM") { abrirChat(); return; }
     chatOcupado = true; el("chatEnviar").disabled = true; el("chatTexto").value = "";
     el("chatSugestoes").innerHTML = "";
@@ -1473,7 +1476,7 @@ function partesTz(ms) {
   // Na ordem da lista, com a preferência de médico (vazio = tanto faz, no modo médicos) e, na vaga oferecida, o médico e o tipo dela.
   function filaCarregar() {
     var box = el("filaLista");
-    if (PLANO_ESSENCIAL) { box.innerHTML = ""; return; }
+    if (sem("fila")) { box.innerHTML = ""; return; }
     box.innerHTML = '<div class="vazio">Carregando…</div>';
     agChamar("agenda_fila").then(function (rows) {
       box.innerHTML = "";
@@ -1744,7 +1747,7 @@ function partesTz(ms) {
   // Avaliações da pesquisa de satisfação (item 39): as 20 mais recentes, com o código do paciente e as notas anteriores dele.
   function resAvaliacoes() {
     var box = el("resAvaliacoes");
-    if (PLANO_ESSENCIAL) { box.classList.add("hidden"); return; }
+    if (sem("pesquisa")) { box.classList.add("hidden"); return; }
     agChamar("agenda_avaliacoes").then(function (rows) {
       rows = (rows || []).slice(0, 20);
       box.innerHTML = "";
@@ -2036,7 +2039,7 @@ function partesTz(ms) {
     // Médico (Gestão): só aparece se há médico ativo ou se a consulta já tem médico. Sem médico = vale para todos.
     // No modo médicos a consulta exige médico; "Sem médico" só vale para bloqueio (Serviço = BLOQUEIO).
     var medSel = null;
-    if (!PLANO_ESSENCIAL && (medDados.some(function (m) { return m.ativo; }) || (a && a.medico_id))) {
+    if (!sem("medicos") && (medDados.some(function (m) { return m.ativo; }) || (a && a.medico_id))) {
       f.appendChild(h$("label", "block text-xs text-slate-500 mb-1", "Médico"));
       medSel = h$("select", cls);
       var op0 = h$("option", "", MODO_MED ? "Sem médico (só para bloqueio, vale para todos)" : "Sem médico (vale para todos)"); op0.value = ""; medSel.appendChild(op0);
@@ -2685,13 +2688,13 @@ function partesTz(ms) {
   function pacBtn(txt, cls, fn) { var b = h$("button", "btn " + cls, txt); b.type = "button"; b.onclick = fn; return b; }
 
   function pacPreparar() {
-    el("pacUpsell").hidden = !PLANO_ESSENCIAL;
-    el("pacConteudo").hidden = PLANO_ESSENCIAL;
+    el("pacUpsell").hidden = !sem("pacientes");
+    el("pacConteudo").hidden = sem("pacientes");
     document.querySelectorAll("section[data-view='pacientes'] .voltar").forEach(function (b) { if (!b.querySelector("svg")) b.insertAdjacentHTML("afterbegin", svg("voltar")); });
   }
   function pacRotear(sub, id) {
-    if (PLANO_ESSENCIAL && sub) { ir("pacientes"); return; }
-    if (PLANO_ESSENCIAL) return;
+    if (sem("pacientes") && sub) { ir("pacientes"); return; }
+    if (sem("pacientes")) return;
     if (!sub && PAC.sujo) pacListaCarregar(false);
     if (sub === "ficha") pacFichaAbrir(id);
     if (sub === "editar") pacFormAbrir(id);
@@ -3481,15 +3484,26 @@ function partesTz(ms) {
 
     mostrarBannerConta(resp.conta);
 
-    // Recursos do Gestão Inteligente: no Essencial ficam visíveis, travados, com o convite para mudar de plano.
+    // Recursos do Gestão Inteligente (DEC-063): cada um vale pelo que o servidor devolve em "recursos" (o plano ou uma
+    // liberação da equipe RXSync). O que não vale fica visível, travado, com o convite para mudar de plano.
     var sl = resp.somenteLeitura || {};
-    if (/^essencial/i.test(String(sl.plano || ""))) {
-      PLANO_ESSENCIAL = true;
-      ["avaliacoesUpsell", "docUpsell", "assistUpsell", "filaUpsell"].forEach(function (k) { var x = el(k); if (x) x.classList.remove("hidden"); });
-      CAMPOS.forEach(function (c) { if (!c.gestao) return; var x = el("campo_" + c.key); if (!x) return; x.disabled = true; if (x.desabilitar) x.desabilitar(); });
-    } else {
-      el("medBox").classList.remove("hidden"); medCarregar();
-      el("preBox").classList.remove("hidden"); preCarregar();
+    REC = resp.recursos && typeof resp.recursos === "object" ? resp.recursos : null;
+    if (!REC) { // servidor antigo, sem "recursos": a regra de antes, pelo nome do plano
+      var g = !/^essencial/i.test(String(sl.plano || ""));
+      REC = {}; ["documentos", "fila", "pesquisa", "reconhecer", "tipo_visita", "empilhamento", "preconsulta", "medicos", "relacionamento", "assistente_dono", "pacientes"].forEach(function (k) { REC[k] = g; });
+    }
+    [["avaliacoesUpsell", "pesquisa"], ["docUpsell", "documentos"], ["assistUpsell", "assistente_dono"], ["filaUpsell", "fila"]].forEach(function (p) { var x = el(p[0]); if (x && sem(p[1])) x.classList.remove("hidden"); });
+    // Qual recurso destrava cada campo do Gestão (o mesmo que o servidor confere ao salvar).
+    var CAMPO_RECURSO = { pesquisa_ativa: "pesquisa", pesquisa_horas: "pesquisa", link_avaliacao_google: "pesquisa", func_empilhamento: "empilhamento",
+      assistente_dono_ativa: "assistente_dono", dono_whatsapp: "assistente_dono", dono_pode_editar: "assistente_dono", briefing_horario: "assistente_dono", briefing_dias: "assistente_dono",
+      func_documentos: "documentos", func_fila: "fila", func_reconhecer: "reconhecer", func_tipo_visita: "tipo_visita", func_preconsulta: "preconsulta",
+      func_retorno: "relacionamento", retorno_prazo_dias: "relacionamento", func_reativacao: "relacionamento", reativacao_dias: "relacionamento", relac_limite_dia: "relacionamento" };
+    var GESTAO = ["documentos", "fila", "pesquisa", "reconhecer", "tipo_visita", "empilhamento", "preconsulta", "medicos", "relacionamento", "assistente_dono", "pacientes"];
+    var travado = function (k) { var rk = CAMPO_RECURSO[k]; return rk ? sem(rk) : GESTAO.some(sem); }; // campo novo sem recurso: trava se faltar algum
+    CAMPOS.forEach(function (c) { if (!c.gestao || !travado(c.key)) return; var x = el("campo_" + c.key); if (!x) return; x.disabled = true; if (x.desabilitar) x.desabilitar(); });
+    if (!sem("medicos")) { el("medBox").classList.remove("hidden"); medCarregar(); }
+    if (!sem("preconsulta")) { el("preBox").classList.remove("hidden"); preCarregar(); }
+    if (!sem("documentos")) {
       agChamar("agenda_documentos").then(function (rows) {
         var lim = Date.now() - 7 * 86400000;
         ESTADO.docs7 = (rows || []).filter(function (d) { return new Date(d.recebido_em).getTime() > lim; }).length;
