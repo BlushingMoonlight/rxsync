@@ -1,0 +1,35 @@
+/* ---------- Marketing › Prospecção (central/fonte/08_prospeccao.js) ---------- */
+.abas-p { margin: 0; padding: 0; }
+.p-camada { display: flex; align-items: center; min-width: 0; }
+.p-camada > .linha { flex: 1 1 auto; min-width: 0; }
+.p-chave { flex: none; padding: 0 var(--e-4) 0 var(--e-1); display: flex; align-items: center; }
+.p-campanha { border-bottom: 1px solid var(--borda); }
+.p-filhos { padding-left: var(--e-4); }
+.p-anuncios { padding-left: var(--e-6); border-top: 1px solid var(--borda); }
+.p-anuncios .linha { min-height: 52px; }
+.p-novo { padding: var(--e-1) var(--e-4); }
+@media (max-width: 767px) { .p-filhos { padding-left: var(--e-2); } .p-anuncios { padding-left: var(--e-3); } }
+.p-topo-form { padding-top: var(--e-4); }
+.p-busca { display: flex; gap: var(--e-2); align-items: center; min-width: 0; }
+.p-busca .entrada { flex: 1 1 auto; min-width: 0; }
+.p-pagina { align-self: center; }
+.p-filtros .campo { margin-bottom: 0; }
+.p-custo { display: grid; gap: 0 var(--e-4); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .p-custo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+/* prévia do anúncio e conversa: bolhas como no WhatsApp */
+.p-previa { display: grid; gap: var(--e-3); margin-bottom: var(--e-4); }
+.p-bolha { max-width: min(520px, 92%); padding: var(--e-2) var(--e-3); border-radius: var(--r-3); background: var(--superficie-3); color: var(--texto); font-size: var(--t-14); overflow-wrap: anywhere; }
+.p-bolha p { margin: 0 0 var(--e-1); white-space: pre-wrap; }
+.p-bolha p:last-child { margin-bottom: 0; }
+.p-bolha.saiu { justify-self: end; background: var(--primaria-suave); border-bottom-right-radius: var(--r-1); }
+.p-bolha.entrou { justify-self: start; border-bottom-left-radius: var(--r-1); }
+.p-quem { font-size: var(--t-12); color: var(--texto-3); font-weight: 600; }
+.p-conversa { list-style: none; margin: 0; padding: 0 var(--e-4) var(--e-4); display: grid; gap: var(--e-2); }
+.p-confere { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-1); font-size: var(--t-14); }
+.p-confere li { display: flex; gap: var(--e-2); align-items: center; }
+.p-confere li.ok { color: var(--ok-texto); } .p-confere li.falta { color: var(--perigo-texto); font-weight: 600; }
+/* QR: só na janela, num quadro branco (o leitor do WhatsApp precisa de contraste) */
+.p-qr-corpo { display: grid; justify-items: center; gap: var(--e-3); text-align: center; }
+.p-qr { width: 264px; height: 264px; max-width: 100%; background: #fff; padding: 12px; border-radius: var(--r-2); border: 1px solid var(--borda-forte); image-rendering: pixelated; }
+.p-passos-qr { text-align: left; margin: 0; padding-left: 1.3em; font-size: var(--t-14); justify-self: stretch; }
+.p-dias button { min-width: var(--alvo); justify-content: center; }

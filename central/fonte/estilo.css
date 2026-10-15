@@ -297,7 +297,7 @@ table.ad td.depois { font-weight: 700; color: var(--texto); }
 .rapida { position: fixed; z-index: 80; left: calc(env(safe-area-inset-left, 0px) + var(--e-4)); right: calc(env(safe-area-inset-right, 0px) + var(--e-4)); bottom: calc(var(--barra-h) + var(--e-3) + env(safe-area-inset-bottom, 0px));
   display: flex; align-items: center; gap: var(--e-3); min-height: 52px; padding: var(--e-2) var(--e-2) var(--e-2) var(--e-4); background: var(--rapida-fundo); color: var(--superficie); border-radius: var(--r-3); box-shadow: var(--sombra-3); font-size: var(--t-14); font-weight: 600; }
 .rapida > span { flex: 1; min-width: 0; }
-.rapida button { min-height: var(--alvo); padding: 0 var(--e-3); border-radius: var(--r-2); border: 0; background: transparent; color: var(--rapida-acao); font-weight: 800; cursor: pointer; }
+.rapida button { min-height: var(--alvo); min-width: var(--alvo); padding: 0 var(--e-3); border-radius: var(--r-2); border: 0; background: transparent; color: var(--rapida-acao); font-weight: 800; cursor: pointer; }
 @media (min-width: 768px) { .rapida { left: auto; right: var(--e-6); bottom: var(--e-6); max-width: 440px; } }
 /* esqueleto */
 .esq { display: block; height: 16px; margin: 14px 0; border-radius: 8px; background: linear-gradient(90deg, var(--superficie-3), var(--superficie-2), var(--superficie-3)); background-size: 200% 100%; animation: brilho 1.4s infinite; }

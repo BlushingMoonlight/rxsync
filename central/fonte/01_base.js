@@ -140,6 +140,10 @@ function mostrarSegredo(titulo, valor, texto) {
 function nivelDe(acao, d) {
   d = d || {};
   if (acao === 'editar_limites' && String((d.campos || {}).limitar_franquia || '').toUpperCase() === 'SIM') return 2;
+  // Prospecção (sql/031, DEC-078): as mesmas regras de rx_central_nivel. Desligar ou pausar é um toque.
+  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) ? 2 : 1;
+  if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
+  if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
   if (acao === 'cobranca_teste_definir' && !d.cliente_id) return 2;
   if (acao === 'sair_todos') return 2;
   const n = Number((est.niveis.acoes || {})[acao]);
@@ -148,8 +152,8 @@ function nivelDe(acao, d) {
 // Pede o que a ação precisa (campos, antes/depois, nome da clínica) e devolve os dados prontos para mandar, ou null.
 // op: { titulo, texto, linhas, campos: [{k, rot, tipo, valor, opcoes, longo, obrig, minimo, erro, ajuda, min, max, ph}], nome, botao, perigo }
 function pedirAcao(acao, d, op) {
-  const nivel = nivelDe(acao, d);
   op = op || {};
+  const nivel = op.nivel || nivelDe(acao, d); // op.nivel: a página sabe que a camada está ativa (o servidor confere de novo)
   const campos = op.campos || [];
   if (nivel === 1 && !campos.length) return Promise.resolve({ ...d }); // nível 1: o próprio Salvar já é a confirmação
   return new Promise(resolver => {
@@ -173,18 +177,18 @@ function pedirAcao(acao, d, op) {
         v[f.k] = ins[f.k].value.trim();
         if (f.obrig && v[f.k].length < (f.minimo || 1)) { erro.textContent = f.erro || ('Preencha: ' + f.rot + '.'); ins[f.k].focus(); return; }
       }
-      if (nomeIn) { if (semAcento(nomeIn.value) !== semAcento(op.nome)) { erro.textContent = 'Digite o nome da clínica exatamente como aparece.'; nomeIn.focus(); return; } v.confirmacao_nome = nomeIn.value.trim(); }
+      if (nomeIn) { if (semAcento(nomeIn.value) !== semAcento(op.nome)) { erro.textContent = 'Digite ' + (op.rotuloNome || 'o nome da clínica') + ' exatamente como aparece.'; nomeIn.focus(); return; } v.confirmacao_nome = nomeIn.value.trim(); }
       if (nivel >= 2) v.confirmacao = 'CONFIRMAR';
       resolver(v); fechar();
     };
-    const rotNivel = nivel === 3 ? 'Nível 3 · irreversível ou dinheiro' : nivel === 2 ? 'Nível 2 · afeta a clínica' : null;
+    const rotNivel = nivel === 3 ? 'Nível 3 · ' + (op.rotuloNivel || 'irreversível ou dinheiro') : nivel === 2 ? 'Nível 2 · ' + (op.rotuloNivel || 'afeta a clínica') : null;
     const form = el('form', { class: 'janela', role: nivel === 3 ? 'alertdialog' : 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-acao', onsubmit: enviar },
       el('div', { class: 'alca', 'aria-hidden': 'true' }),
       el('div', { class: 'cab' }, rotNivel ? el('span', { class: 'icone-risco' + (nivel === 3 ? ' n3' : '') }, icone(nivel === 3 ? 'alerta' : 'info', 'g')) : null,
         el('div', { class: 'texto' }, rotNivel ? el('span', { class: 'nivel' + (nivel === 3 ? ' n3' : ''), text: rotNivel }) : null, el('h2', { id: 'tit-acao', text: op.titulo || 'Confirmar' })),
         el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => { fechar(); resolver(null); } }, icone('fechar'))),
       el('div', { class: 'corpo' }, op.texto ? el('p', { class: 'mudo', text: op.texto }) : null, op.linhas && op.linhas.length ? tabelaAntesDepois(op.linhas) : null, corpoCampos,
-        nomeIn ? el('label', { class: 'campo', for: 'c-nome-clinica' }, el('span', { class: 'rot' }, 'Para confirmar, digite o nome da clínica: ', el('b', { text: op.nome })), nomeIn,
+        nomeIn ? el('label', { class: 'campo', for: 'c-nome-clinica' }, el('span', { class: 'rot' }, 'Para confirmar, digite ' + (op.rotuloNome || 'o nome da clínica') + ': ', el('b', { text: op.nome })), nomeIn,
           el('span', { class: 'ajuda', id: 'ajuda-nome', text: 'Sem diferença de maiúsculas e acentos.' })) : null, erro),
       el('div', { class: 'pe' }, el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); resolver(null); } }), confirmar));
     fechar = janela(form, { aoFechar: () => resolver(null) });
@@ -194,11 +198,14 @@ function pedirAcao(acao, d, op) {
 async function fazer(acao, d, op) {
   const v = await pedirAcao(acao, d, op);
   if (!v) return null;
-  const r = await chamar(acao, v);
+  const r = await chamar(acao, op && op.preparar ? op.preparar(v) : v);
   if (r.desligada) { rapida('Esta edição está desligada em Ajustes da Central (' + (r.chave || '') + ').'); return null; }
-  if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return null; }
+  // O servidor pediu um nível maior (ex.: a camada ficou ativa noutro aparelho): pergunta de novo, uma vez.
+  if (!r.ok && r.nivel > (op && op.nivel || nivelDe(acao, d)) && !(op && op.repetido)) return fazer(acao, d, { ...op, nivel: r.nivel, repetido: true });
+  if (!r.ok) { if (op && op.erro) op.erro(r); else rapida(r.mensagem || 'Não consegui.'); return null; }
   if (op && op.depois) op.depois(r); else await rotear();
   const texto = r.aviso_email || r.mensagem || (op && op.ok) || 'Pronto.';
+  if (op && op.silencioso) return r; // a própria tela já mostra o resultado (ex.: o QR)
   rapida(texto, r.pode_desfazer && r.registro_id ? () => desfazer(r.registro_id) : null);
   return r;
 }

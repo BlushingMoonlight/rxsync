@@ -6,7 +6,7 @@
 // Confere também: interruptor de Ajustes num toque, com Desfazer; dados protegidos fora do armazenamento do navegador
 // e escondidos quando a Central vai para o fundo; Desfazer do registro e da mensagem rápida.
 // Uso (precisa do Playwright): node scripts/central_acoes.mjs
-import { abrirNavegador, servirSite, entrar, CHAVES_LIGADAS, NIVEIS, ficha } from './central_simulado.mjs';
+import { abrirNavegador, servirSite, entrar, CHAVES_LIGADAS, NIVEIS, ficha, CFG } from './central_simulado.mjs';
 let falhas = 0, feitos = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } return c; };
 const NOME = 'Clínica Sorriso Odontologia Integrada';
 const hoje = new Date().toISOString().slice(0, 10), daqui = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
@@ -70,6 +70,8 @@ async function caso({ acao, rota, extra, abrirCom, campos = {}, nome, espera = {
 }
 const ordenar = o => o && typeof o === 'object' && !Array.isArray(o) ? Object.fromEntries(Object.keys(o).sort().map(k => [k, ordenar(o[k])])) : o;
 const C = { cliente_id: 'CLI-001' }, M = 'motivo de teste';
+const P = 'prospeccao', ABORD = 'Olá! Sou a assistente virtual da {marca}. Vi a {nome} no Google Maps: posso te contar como respondemos pacientes à noite?';
+const chave = nome => page.locator('#conteudo').getByRole('switch', { name: nome, exact: true }).first();
 const F = 'clientes/CLI-001';
 // Formulário de grupo (details): abre, muda um campo, Salvar.
 const grupo = (titulo, campo, valor) => async () => {
@@ -123,6 +125,43 @@ const CASOS = [
   { acao: 'chave_api_criar', rota: 'api', abrirCom: () => botao('Criar chave').click(), campos: { cliente_id: 'CLI-004', nome: 'Painel novo' }, espera: { cliente_id: 'CLI-004', nome: 'Painel novo' } },
   // Segurança
   { acao: 'desfazer', rota: 'seguranca/registro', abrirCom: () => botao('Desfazer').click(), espera: { registro_id: 50 } },
+  // Prospecção (sql/031 e sql/032): camadas, números, leads, relatórios, buscas, regras e custos
+  { acao: 'prosp_campanha_salvar', nivel: 2, rota: P + '/campanha/CMP-0001', antes: () => page.fill('#p-marca', 'RXSync Saúde'), abrirCom: () => botao('Salvar a versão nova').click(),
+    espera: { id: 'CMP-0001', nome: 'Odonto Sul', config: { ...CFG.campanha, marca: 'RXSync Saúde' } } },
+  { acao: 'prosp_conjunto_salvar', nivel: 3, rota: P + '/conjunto/CJ-0001', antes: () => page.selectOption('#p-numero', '2'), abrirCom: () => botao('Salvar a versão nova').click(), nome: 'Dentistas Curitiba',
+    espera: { id: 'CJ-0001', nome: 'Dentistas Curitiba', config: CFG.conjunto, numero_id: '2' } },
+  { acao: 'prosp_anuncio_salvar', rota: P + '/anuncio/novo/CJ-0001', antes: async () => { await page.fill('#p-nome', 'D · Teste'); await page.fill('#p-abordagem', ABORD); }, abrirCom: () => botao('Criar').click(),
+    espera: { id: '', nome: 'D · Teste', config: { ...CFG.anuncio, abordagem: ABORD }, conjunto_id: 'CJ-0001' } },
+  { acao: 'prosp_duplicar', rota: P + '/campanha/CMP-0001', abrirCom: () => botao('Duplicar').click(), espera: { tipo: 'campanha', id: 'CMP-0001' } },
+  { acao: 'prosp_apagar_rascunho', rota: P + '/campanha/CMP-0002', abrirCom: () => botao('Apagar o rascunho').click(), espera: { tipo: 'campanha', id: 'CMP-0002' } },
+  { acao: 'prosp_encerrar', rota: P + '/campanha/CMP-0001', abrirCom: () => botao('Encerrar').click(), nome: 'Odonto Sul', espera: { tipo: 'campanha', id: 'CMP-0001' } },
+  { acao: 'prosp_ligar', nivel: 1, rota: P, abrirCom: () => chave('Pausar Odonto Sul').click(), espera: { tipo: 'campanha', id: 'CMP-0001', valor: 'NAO' } },
+  { acao: 'prosp_ligar', nivel: 3, rota: P, abrirCom: () => chave('Ligar Dermatologia (rascunho)').click(), nome: 'Dermatologia (rascunho)', espera: { tipo: 'campanha', id: 'CMP-0002', valor: 'SIM' } },
+  { acao: 'prosp_ligar', nivel: 2, rota: P, abrirCom: () => chave('Ligar Ortodontistas Joinville').click(), espera: { tipo: 'conjunto', id: 'CJ-0002', valor: 'SIM' } },
+  { acao: 'prosp_ligar', nivel: 1, rota: P + '/numeros', abrirCom: () => chave('Pausar prospec-01').click(), espera: { tipo: 'numero', id: 1, valor: 'NAO' } },
+  { acao: 'prosp_numero_criar', rota: P + '/numeros', abrirCom: () => botao('Novo número').click(), campos: { nome: 'Prospecção 3' }, espera: { nome: 'Prospecção 3' } },
+  { acao: 'prosp_numero_qr', rota: P + '/numeros', abrirCom: () => botao('Mostrar o código').click(), espera: { id: 2 } },
+  { acao: 'prosp_numero_situacao', rota: P + '/numeros', abrirCom: () => botao('Situação agora').click(), espera: { id: 1 } },
+  { acao: 'prosp_numero_teto', rota: P + '/numeros', abrirCom: () => botao('Teto').click(), campos: { teto: '30' }, espera: { id: 1, teto: '30' } },
+  { acao: 'prosp_numero_desconectar', rota: P + '/numeros', abrirCom: () => botao('Desconectar').click(), espera: { id: 1 } },
+  { acao: 'prosp_numero_webhook', rota: P + '/numeros', abrirCom: () => botao('Webhook de novo').click(), espera: { id: 1 } },
+  { acao: 'prosp_numero_apagar', rota: P + '/numeros', abrirCom: () => botao('Apagar').click(), nome: 'prospec-01', espera: { id: 1 } },
+  { acao: 'prosp_exportar', rota: P + '/leads', abrirCom: () => botao('Exportar CSV').click(), espera: { conjunto_id: '', situacao: '' } },
+  { acao: 'prosp_leads_aprovar_todos', rota: P + '/leads', antes: async () => { await page.selectOption('#conteudo select[aria-label="Conjunto"]', 'CJ-0001'); await page.waitForFunction(() => !document.querySelector('#conteudo .esq')); await page.waitForTimeout(200); },
+    abrirCom: () => botao('Aprovar os 6 "para aprovar" deste conjunto').click(), espera: { conjunto_id: 'CJ-0001' } },
+  { acao: 'prosp_lead_aprovar', rota: P + '/lead/PX-CCCCC', abrirCom: () => botao('Aprovar').click(), espera: { id: 'PX-CCCCC', valor: 'SIM' } },
+  { acao: 'prosp_lead_assumir', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Assumir a conversa').click(), espera: { id: 'PX-AAAAA' } },
+  { acao: 'prosp_lead_devolver', rota: P + '/lead/PX-DDDDD', abrirCom: () => botao('Devolver à IA').click(), espera: { id: 'PX-DDDDD' } },
+  { acao: 'prosp_lead_marcar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Marcar').click(), campos: { situacao: 'recusou' }, espera: { id: 'PX-AAAAA', situacao: 'recusou' } },
+  { acao: 'prosp_lead_nao_contatar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Não contatar').click(), espera: { id: 'PX-AAAAA' } },
+  { acao: 'prosp_anotar', rota: P + '/relatorios', abrirCom: () => botao('Anotar').click(), campos: { texto: 'Liguei o anúncio C' }, espera: { campanha_id: '', dia: hoje, texto: 'Liguei o anúncio C' } },
+  { acao: 'prosp_relatorio_salvar', rota: P + '/relatorios', abrirCom: () => botao('Guardar como padrão').click(), espera: { nome: 'Padrão', config: { visao: 'desempenho' } } },
+  { acao: 'prosp_buscar_agora', rota: P + '/buscas', abrirCom: () => botao('Buscar agora').click(), campos: { conjunto_id: 'CJ-0001' }, espera: { conjunto_id: 'CJ-0001' } },
+  { acao: 'prosp_regra_salvar', rota: P + '/regras', abrirCom: () => botao('Nova regra').click(), campos: { valor: '20' },
+    espera: { nivel: 'anuncio', alvo_id: '', metrica: 'recusa', operador: '>', valor: '20', depois_de: '30', janela_dias: '7', acao: 'avisar' } },
+  { acao: 'prosp_regra_ligar', nivel: 2, rota: P + '/regras', abrirCom: () => chave('Desligar a regra 7').click(), espera: { id: 7, valor: 'NAO' } },
+  { acao: 'prosp_custos_salvar', rota: P + '/custos', antes: () => page.fill('#cu-preco_mil_tokens_entrada', '0,02'), abrirCom: () => botao('Salvar').click(),
+    espera: { itens: [{ tipo: 'preco_credito_serpapi', valor: '0.075', descricao: 'plano de 5.000 buscas' }, { tipo: 'preco_mil_tokens_entrada', valor: '0.02', descricao: '' }, { tipo: 'fixo_mensal', valor: '60', descricao: 'chip' }] } },
   { acao: 'sair_todos', nivel: 2, rota: 'seguranca', abrirCom: () => botao('Sair de todos os aparelhos').click(), espera: {} }
 ];
 for (const k of CASOS) {
@@ -178,6 +217,38 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
 {
   await abrir('seguranca'); const desde = chamadas.length; await botao('Encerrar').click();
   const d = await chamada('encerrar_sessao', desde); ok(d && d.id === 2 && Object.keys(d).length === 1, `encerrar_sessao (${JSON.stringify(d)})`); feitos++;
+}
+// Prospecção: o QR só na tela. Aparece na janela; nada dele vai para o armazenamento do navegador ou o endereço; some ao
+// fechar a janela e quando a Central vai para o fundo.
+{
+  const qrNaTela = async () => { await abrir(P + '/numeros'); await botao('Mostrar o código').click(); await page.waitForSelector(janela + ' button[type=submit]'); await page.locator(janela + ' button[type=submit]').click();
+    await page.waitForSelector('#camada img.p-qr'); };
+  await qrNaTela();
+  ok(await page.evaluate(() => /^data:image\/png;base64,/.test(document.querySelector('#camada img.p-qr').src)), 'QR: aparece na janela');
+  const guardado = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }) + location.href + document.cookie + history.length);
+  ok(!/base64|iVBOR/.test(guardado), 'QR: nada no localStorage, sessionStorage, cookie ou endereço');
+  await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+  ok(await page.locator('img.p-qr').count() === 0, 'QR: some ao fechar a janela');
+  await qrNaTela();
+  await page.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
+  await page.waitForTimeout(200);
+  ok(await page.locator('img.p-qr').count() === 0, 'QR: some quando a Central vai para o fundo');
+  await page.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true }); });
+  feitos++;
+}
+// Ajustes da prospecção: desligar a IA é um toque; ligar pede o nível 2; o disparo fica travado sem a Política v10 e o balanceamento.
+{
+  await abrir('ajustes'); let desde = chamadas.length;
+  await page.getByRole('switch', { name: 'IA de resposta', exact: true }).click();
+  let d = await chamada('ligar_chave', desde);
+  ok(d && d.chave === 'prosp_ia' && d.valor === 'NAO' && d.confirmacao === undefined && await page.locator(janela).count() === 0, `prosp_ia: desligar num toque (${JSON.stringify(d)})`);
+  await page.waitForTimeout(300); await abrir('ajustes'); desde = chamadas.length;
+  await page.getByRole('switch', { name: 'IA de resposta', exact: true }).click();
+  await page.waitForSelector(janela); await page.locator(janela + ' button[type=submit]').click();
+  d = await chamada('ligar_chave', desde);
+  ok(d && d.chave === 'prosp_ia' && d.valor === 'SIM' && d.confirmacao === 'CONFIRMAR', `prosp_ia: ligar pede o nível 2 (${JSON.stringify(d)})`);
+  ok(await page.getByRole('switch', { name: 'Disparo de prospecção' }).count() === 0 && await page.locator('#conteudo').getByText('Travado até a Política v10').count() === 1, 'prosp_disparo: travado, sem interruptor');
+  feitos += 2;
 }
 // Nenhuma chamada saiu sem a origem certa: o simulado só responde ao n8n da Central (o resto é bloqueado).
 ok(!erros.length, 'erro no console: ' + erros.join(' | '));
