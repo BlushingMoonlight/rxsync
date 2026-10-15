@@ -12,7 +12,11 @@ const FICHA = 'Clínica Sorriso Odontologia Integrada';
 const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', FICHA], ['clientes/CLI-001/cobranca', FICHA], ['clientes/CLI-001/recursos', FICHA],
   ['clientes/CLI-001/cadastro', FICHA, 'protegidos'], ['clientes/CLI-001/historico', FICHA], ['financeiro', 'Financeiro'], ['sistema', 'Saúde do sistema'], ['crescimento', 'Crescimento'],
   ['crescimento/90', 'Crescimento'], ['uso', 'Uso e limites'], ['avisos', 'Avisos'], ['agregados', 'Agregados de pacientes'], ['seguranca', 'Segurança'], ['seguranca/registro', 'Segurança'],
-  ['api', 'API (Enterprise)'], ['ajustes', 'Ajustes da Central'], ['mais', 'Mais'], ['clientes/CLI-001/cobranca', FICHA, 'janela']];
+  ['api', 'API (Enterprise)'], ['ajustes', 'Ajustes da Central'], ['mais', 'Mais'], ['clientes/CLI-001/cobranca', FICHA, 'janela'],
+  // Marketing › Prospecção (sql/031 e sql/032)
+  ['prospeccao', 'Prospecção'], ['prospeccao/campanha/CMP-0001', 'Odonto Sul'], ['prospeccao/conjunto/CJ-0001', 'Dentistas Curitiba'], ['prospeccao/anuncio/AN-0001', 'A · Pergunta do WhatsApp'],
+  ['prospeccao/campanha/novo', 'Nova campanha'], ['prospeccao/numeros', 'Números de WhatsApp'], ['prospeccao/numeros', 'Números de WhatsApp', 'qr'], ['prospeccao/leads', 'Leads'],
+  ['prospeccao/lead/PX-AAAAA', 'Clínica Sorriso Batel'], ['prospeccao/relatorios', 'Relatórios'], ['prospeccao/buscas', 'Buscas'], ['prospeccao/regras', 'Regras'], ['prospeccao/custos', 'Custos']];
 const APARELHOS = [['celular', { width: 390, height: 844 }, true], ['ipad_em_pe', { width: 820, height: 1180 }, true], ['ipad_deitado', { width: 1180, height: 820 }, true], ['computador', { width: 1440, height: 900 }, false]];
 const TEMAS = ['claro', 'escuro'];
 
@@ -73,6 +77,8 @@ for (const tema of TEMAS) for (const [nomeAp, vp, toque] of APARELHOS) {
     await page.waitForTimeout(200);
     if (extra === 'protegidos') { await page.getByRole('button', { name: 'Mostrar os dados protegidos' }).click(); await page.waitForSelector('[data-sensivel]'); }
     if (extra === 'janela') { await page.getByRole('button', { name: 'Trocar o plano' }).first().click(); await page.waitForSelector('#camada .janela'); await page.waitForTimeout(250); }
+    if (extra === 'qr') { await page.getByRole('button', { name: 'Mostrar o código' }).first().click(); await page.waitForSelector('#camada .janela button[type=submit]'); await page.locator('#camada .janela button[type=submit]').click();
+      await page.waitForSelector('#camada img.p-qr'); await page.waitForTimeout(250); }
     await page.evaluate(() => document.querySelectorAll('#conteudo details').forEach(d => { d.open = true; }));
     const med = await page.evaluate(medir);
     const titOk = await page.evaluate(t => document.title.startsWith(t), titulo);
@@ -87,7 +93,7 @@ for (const tema of TEMAS) for (const [nomeAp, vp, toque] of APARELHOS) {
     if (FOTOS) {
       // Foto da página inteira: a janela do navegador cresce até a altura da página (assim a barra de baixo e o menu
       // lateral ficam no lugar certo, em vez de aparecerem no meio da foto). A janela de confirmação sai do tamanho da tela.
-      const alto = extra === 'janela' ? vp.height : Math.max(vp.height, await page.evaluate(() => document.documentElement.scrollHeight));
+      const alto = extra === 'janela' || extra === 'qr' ? vp.height : Math.max(vp.height, await page.evaluate(() => document.documentElement.scrollHeight));
       if (alto !== vp.height) { await page.setViewportSize({ width: vp.width, height: alto }); await page.waitForTimeout(150); }
       await page.screenshot({ path: `${OUT}/${pre}_${String(n).padStart(2, '0')}_${rota.replace(/\//g, '-')}${extra ? '_' + extra : ''}.png` }); fotos++;
       if (alto !== vp.height) await page.setViewportSize(vp);

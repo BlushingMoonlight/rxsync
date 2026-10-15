@@ -14,7 +14,12 @@ const TIPOS = {
   valor_atualizado: 'Valor atualizado', resumo_do_dia: 'Resumo do dia', troca_de_plano: 'Troca de plano', teste_encerrado_pelo_cliente: 'Teste encerrado pelo cliente',
   pedido_cancelamento: 'Pedido de cancelamento', cancelamento_agendado: 'Cancelamento agendado', cancelamento_desfeito: 'Desistiu do cancelamento', teste_quer_pagar: 'Teste quer pagar', pedido_assinatura: 'Pedido sobre a assinatura',
   ajuda_agenda: 'Pedido de ajuda com a agenda', email_recebido: 'E-mail recebido', painel_movimento: 'Movimento no painel',
-  exclusao_amanha: 'Dados serão apagados amanhã', exclusao_falhou: 'Falha ao apagar dados', dados_apagados: 'Dados apagados', outro: 'Outro aviso'
+  exclusao_amanha: 'Dados serão apagados amanhã', exclusao_falhou: 'Falha ao apagar dados', dados_apagados: 'Dados apagados', outro: 'Outro aviso',
+  prosp_numero_caiu: 'Prospecção: número caiu', prosp_numero_conectado: 'Prospecção: número conectado', prosp_token_aceito: 'Prospecção: token aceito',
+  prosp_token_recusado: 'Prospecção: token recusado', prosp_busca: 'Prospecção: busca', prosp_conjunto_pausado: 'Prospecção: conjunto pausado', prosp_regra: 'Prospecção: regra automática',
+  prosp_saiu: 'Prospecção: pediu para sair', prosp_interesse: 'Prospecção: mostrou interesse', prosp_quer_contratar: 'Prospecção: quer contratar', prosp_recusou: 'Prospecção: recusou',
+  prosp_respondeu: 'Prospecção: respondeu', prosp_cliente: 'Prospecção: virou cliente', prosp_cadastro: 'Prospecção: fez o cadastro', prosp_com_voce: 'Prospecção: conversa com você',
+  prosp_resumo_do_dia: 'Prospecção: resumo do dia'
 };
 const CATEGORIAS = ['vendas', 'clientes', 'financeiro', 'alertas', 'suporte', 'painel', 'sistema'];
 const rotuloTipo = t => TIPOS[t] || t || 'Aviso';

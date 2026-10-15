@@ -331,6 +331,12 @@ let forma = 'parcelado';
 let tipo  = 'pj';
 let etapa = 1;
 const INICIO = Date.now();
+// Prospecção (DEC-082): o link que a assistente da RXSync manda traz ?ref=PX-XXXXX. Só esse código (sem dado pessoal) vai
+// junto do cadastro, para saber que o cadastro veio da prospecção, e o clique avisa o servidor uma vez. Fica só na memória.
+const REF_PROSP = (() => { const r = String(q.get('ref') || '').trim().toUpperCase(); return /^PX-[ACDEFGHJKMNPQRTUVWXY3479]{5}$/.test(r) ? r : ''; })();
+const ORIGEM_CADASTRO = REF_PROSP ? 'prospeccao ' + REF_PROSP : (document.referrer || 'direto');
+if (REF_PROSP) fetch('https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/prospeccao-clique', { method: 'POST', keepalive: true,
+  headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE }, body: JSON.stringify({ ref: REF_PROSP }) }).catch(() => {});
 let CLIENTE_ID = '';
 let LEAD_ENVIADO = false;
 
@@ -524,7 +530,7 @@ async function registrarLead() {
         observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
         _nome_fantasia: v('clinica'),
         _ciclo: ciclo,
-        _origem: document.referrer || 'direto'
+        _origem: ORIGEM_CADASTRO
       })
     });
     const j = await r.json().catch(() => ({}));
@@ -620,7 +626,7 @@ document.getElementById('form').addEventListener('submit', async evt => {
     _aceite_termos: true,
     _armadilha: (document.getElementById('empresa_site').value || ''),
     _tempo_preenchimento_s: Math.round((Date.now() - INICIO) / 1000),
-    _origem: document.referrer || 'direto',
+    _origem: ORIGEM_CADASTRO,
     _user_agent: navigator.userAgent
   };
 
