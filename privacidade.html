@@ -36,7 +36,7 @@
   <header class="bg-primary-900 text-white">
     <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
       <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v9</span>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v10</span>
     </div>
   </header>
 
@@ -46,10 +46,10 @@
       <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para Serviços de Saúde</p>
 
       <div class="doc">
-        <p><strong>Versão 2026-10-v9</strong> · Vigente a partir de 14 de outubro de 2026</p>
+        <p><strong>Versão 2026-10-v10</strong> · Vigente a partir de 15 de outubro de 2026</p>
 
         <blockquote>
-          <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros.</p>
+          <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros. Para oferecer o serviço, a RXSync também pode entrar em contato, pelo WhatsApp, com empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões cujo contato comercial está publicado na internet (como no Google Maps). Nesses contatos, dizemos quem somos e de onde veio o número, e basta responder SAIR para nunca mais receber (<a href="#prospeccao">seção 3.1</a>).</p>
         </blockquote>
 
         <nav class="sumario bg-slate-50 border border-slate-200 rounded-xl p-4 my-6" aria-label="Sumário">
@@ -87,6 +87,7 @@
               <tr><td>Visitantes do site e quem pede uma demonstração</td><td>Dados de navegação e dados do formulário</td><td><strong>Controladora</strong></td></tr>
               <tr><td>Clínicas e profissionais que contratam ou testam a RXSync, seus representantes, responsáveis técnicos e usuários do painel</td><td>Cadastro, contratação, cobrança, configuração e uso da Plataforma</td><td><strong>Controladora</strong></td></tr>
               <tr><td>Pacientes e potenciais pacientes das clínicas</td><td>Mensagens, dados de contato e de agendamento</td><td><strong>Operadora</strong> (a clínica é a controladora)</td></tr>
+              <tr><td>Empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões que a RXSync procura para oferecer o serviço (prospecção)</td><td>Nome do negócio, telefone comercial, cidade e bairro, categoria e avaliação públicas, conversa pelo WhatsApp</td><td><strong>Controladora</strong></td></tr>
             </tbody>
           </table></div>
         </section>
@@ -145,10 +146,26 @@
                 <td>Entender como o site é usado e melhorar o conteúdo e a contratação</td>
                 <td>Legítimo interesse (art. 7º, IX). Veja a <a href="#cookies">seção 9</a>, inclusive como recusar</td>
               </tr>
+              <tr>
+                <td><strong>Prospecção comercial</strong> (contato que a RXSync inicia; <a href="#prospeccao">seção 3.1</a>)</td>
+                <td>Do negócio, como publicado no Google Maps e coletado por meio do fornecedor SerpApi: nome, telefone comercial, cidade, bairro, categoria, nota e número de avaliações, e o identificador do local no Google. Da conversa pelo WhatsApp: as mensagens trocadas, as datas de entrega, leitura e resposta e o que a pessoa decidiu (interesse, recusa, pedido para sair)</td>
+                <td>Oferecer a Plataforma a empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões, responder às perguntas, medir e melhorar a abordagem, e respeitar o pedido de não receber mais mensagens</td>
+                <td>Legítimo interesse (art. 7º, IX, e art. 10), com teste de balanceamento documentado; para o registro de quem pediu para sair, também o cumprimento desse pedido</td>
+              </tr>
             </tbody>
           </table></div>
-          <p>Não vendemos dados pessoais e não os usamos para publicidade de terceiros. Usamos o e-mail e o WhatsApp informados por você para falar sobre o seu pedido, a sua contratação e o serviço (avisos de implantação, de fim de teste, de cobrança e de alterações importantes). Não enviamos boletim promocional sem que você peça.</p>
+          <p>Não vendemos dados pessoais e não os usamos para publicidade de terceiros. Usamos o e-mail e o WhatsApp informados por você para falar sobre o seu pedido, a sua contratação e o serviço (avisos de implantação, de fim de teste, de cobrança e de alterações importantes). Não enviamos boletim promocional a clientes nem a quem nos procurou sem que peça. A única mensagem que a RXSync inicia sem pedido é a de prospecção, descrita na <a href="#prospeccao">seção 3.1</a>, com as limitações de lá.</p>
           <p>Não coletamos de propósito dados pessoais sensíveis dos contratantes. O número de registro do responsável técnico em conselho profissional é coletado como prova da aprovação do conteúdo, e não para tratar informação de saúde.</p>
+          <h3 id="prospeccao">3.1. Prospecção pelo WhatsApp</h3>
+          <p>A RXSync procura empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões que publicam um contato comercial na internet (por exemplo, no Google Maps) e envia, pelo WhatsApp, uma mensagem apresentando a Plataforma. Nessa mensagem:</p>
+          <ul>
+            <li>dizemos que quem escreve é a assistente virtual da RXSync e de onde veio o contato;</li>
+            <li>basta responder <strong>SAIR</strong> (ou pedir para não receber mais, com qualquer palavra) para que o número nunca mais receba mensagens da RXSync, em nenhuma campanha. Para cumprir esse pedido, guardamos só um código gerado a partir do número (um resumo que não permite ver o número), a data e a origem do pedido;</li>
+            <li>mandamos no máximo três mensagens para cada contato (a primeira e até dois lembretes, com pelo menos dois dias úteis entre elas), só de segunda a sexta, fora dos feriados nacionais, entre 8h e 18h no horário local da região buscada, e não voltamos a procurar o mesmo número por pelo menos 60 dias;</li>
+            <li>quando a pessoa responde, uma assistente virtual (inteligência artificial) conversa com ela sobre a Plataforma e, quando pedido ou quando a conversa pede, passa a conversa para uma pessoa da RXSync. A assistente é programada para nunca dizer que é uma pessoa;</li>
+            <li>não usamos a base de pacientes das clínicas para prospecção: a RXSync guarda esses dados só em nome das clínicas (<a href="#dados-pacientes">seção 4</a>), e o sistema de prospecção não os consulta. Também não procuramos clientes da RXSync nem quem nos pediu uma demonstração, e não contatamos órgãos públicos.</li>
+          </ul>
+          <p>Para medir e melhorar a abordagem, cada mensagem fica registrada com a campanha, a versão da mensagem, o dia e a hora, o nicho e a cidade. Quando a conversa termina, ela é classificada (em que etapa parou e os motivos, numa lista fixa), sem o telefone, o nome ou o código do contato. Não vendemos esses dados e não os usamos para publicidade de terceiros.</p>
         </section>
 
         <section id="dados-pacientes">
@@ -202,6 +219,7 @@
             <li>O conteúdo que a assistente usa (horários, serviços, preços, orientações) é <strong>aprovado pelo responsável técnico</strong> da clínica antes de entrar no ar.</li>
           </ul>
           <p>A assistente não toma decisões com efeitos jurídicos ou semelhantes sobre o paciente. Se, ainda assim, você quiser a revisão de uma decisão tomada com base em tratamento automatizado (art. 20 da LGPD), basta pedir à clínica ou a nós, e a revisão será feita por uma pessoa.</p>
+          <p>Na prospecção (<a href="#prospeccao">seção 3.1</a>), a assistente virtual também conversa com empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões que responderam à nossa mensagem, usando o mesmo fornecedor de modelo de linguagem.</p>
         </section>
 
         <section id="compartilhamento">
@@ -211,11 +229,12 @@
             <thead><tr><th>Fornecedor</th><th>Para quê</th><th>Dados</th><th>Onde</th></tr></thead>
             <tbody>
               <tr><td>Hostinger International Ltd.</td><td>Hospedagem da Plataforma e das bases de dados (conversas, agendamentos, atendimento)</td><td>Todos os dados da Plataforma</td><td>Brasil (datacenter em São Paulo)</td></tr>
-              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente (inclusive no teste ao vivo do site), transcrição de áudio e leitura de fotos e documentos enviados pelo paciente</td><td>Conteúdo da conversa e arquivos necessários para a resposta</td><td>Exterior</td></tr>
-              <tr><td>Meta Platforms, Inc. (WhatsApp)</td><td>Canal de mensagens com o paciente</td><td>Mensagens e número de telefone</td><td>Exterior</td></tr>
+              <tr><td>OpenAI, L.L.C.</td><td>Geração das respostas da assistente (inclusive no teste ao vivo do site), transcrição de áudio e leitura de fotos e documentos enviados pelo paciente, e as respostas da assistente na prospecção (seção 3.1)</td><td>Conteúdo da conversa e arquivos necessários para a resposta</td><td>Exterior</td></tr>
+              <tr><td>Meta Platforms, Inc. (WhatsApp)</td><td>Canal de mensagens com o paciente e com os negócios contatados na prospecção</td><td>Mensagens e número de telefone</td><td>Exterior</td></tr>
               <tr><td>Google LLC</td><td>Análise de uso do site (Google Analytics)</td><td>Dados de navegação</td><td>Exterior</td></tr>
               <tr><td>Resend, Inc.</td><td>Envio de e-mails operacionais aos clientes</td><td>Nome e e-mail do cliente e conteúdo do aviso</td><td>Exterior</td></tr>
-              <tr><td>Telegram</td><td>Avisos internos à equipe da RXSync sobre o andamento de clientes, pagamentos, falhas e testes feitos no site</td><td>Nome da clínica, identificador do cliente e informações do aviso; no teste ao vivo do site, os dados preenchidos e o resumo da conversa de teste; em caso de falha na entrega de um aviso de urgência ou de pedido de atendimento, nome, telefone e motivo informados pelo paciente</td><td>Exterior</td></tr>
+              <tr><td>Telegram</td><td>Avisos internos à equipe da RXSync sobre o andamento de clientes, pagamentos, falhas e testes feitos no site</td><td>Nome da clínica, identificador do cliente e informações do aviso; no teste ao vivo do site, os dados preenchidos e o resumo da conversa de teste; em caso de falha na entrega de um aviso de urgência ou de pedido de atendimento, nome, telefone e motivo informados pelo paciente; na prospecção, só códigos internos (de campanha, de contato e de número), sem nome, telefone nem o texto das mensagens</td><td>Exterior</td></tr>
+              <tr><td>SerpApi, LLC</td><td>Busca de negócios no Google Maps para a prospecção (seção 3.1)</td><td>Termos de busca e cidade; recebemos dele os dados públicos dos negócios</td><td>Exterior (Estados Unidos)</td></tr>
               <tr><td>Asaas</td><td>Cobrança, recebimento e emissão de nota fiscal</td><td>Dados cadastrais e de cobrança do cliente</td><td>Brasil</td></tr>
               <tr><td>GitHub, Inc.</td><td>Hospedagem das páginas do site</td><td>Endereço IP e dados técnicos do acesso às páginas</td><td>Exterior</td></tr>
               <tr><td>Sistema indicado pela clínica (sistema de gestão integrado ou, no plano Enterprise, o sistema ligado à RXSync)</td><td>Agendamento e prontuário, conforme escolha da clínica; no plano Enterprise, por instrução da clínica, recebe os avisos de eventos, consulta e altera os dados da clínica e pede o envio de mensagens (seção 4.2)</td><td>Dados de agendamento; no plano Enterprise, também os dados de pacientes consultados, o motivo dos encaminhamentos e as mensagens dos números da equipe</td><td>Conforme contrato próprio da clínica</td></tr>
@@ -228,7 +247,7 @@
 
         <section id="internacional">
           <h2>7. Transferência internacional de dados</h2>
-          <p>Alguns dos fornecedores acima (em especial o provedor do modelo de linguagem, o canal de mensagens, o envio de e-mail, a mensageria interna, a análise de uso do site e a hospedagem das páginas) têm infraestrutura no exterior. Por isso, parte dos dados pode ser transferida para fora do Brasil, com fundamento no art. 33 da LGPD e, quando aplicável, nas cláusulas-padrão contratuais aprovadas pela Resolução CD/ANPD nº 19/2024, limitada ao conteúdo estritamente necessário para cada finalidade.</p>
+          <p>Alguns dos fornecedores acima (em especial o provedor do modelo de linguagem, o canal de mensagens, o envio de e-mail, a mensageria interna, a análise de uso do site, a hospedagem das páginas e a busca de negócios para a prospecção) têm infraestrutura no exterior. Por isso, parte dos dados pode ser transferida para fora do Brasil, com fundamento no art. 33 da LGPD e, quando aplicável, nas cláusulas-padrão contratuais aprovadas pela Resolução CD/ANPD nº 19/2024, limitada ao conteúdo estritamente necessário para cada finalidade.</p>
         </section>
 
         <section id="retencao">
@@ -239,6 +258,13 @@
               <tr><td>Teste ao vivo do site</td><td>Até <strong>90 dias</strong> do teste. Depois, apagamos automaticamente, se não houver contratação.</td></tr>
               <tr><td>Pedido de demonstração (formulário do site)</td><td>Até <strong>180 dias</strong> do pedido, para responder e acompanhar o contato. Depois, apagamos automaticamente. Se você contratar, os dados da contratação seguem o prazo do cadastro (abaixo).</td></tr>
               <tr><td>Conversas do chat do site</td><td>Pelo tempo necessário para responder e acompanhar o contato. Depois disso, apagamos ou anonimizamos, se não houver contratação.</td></tr>
+              <tr><td>Prospecção: contato que não respondeu</td><td>Até <strong>90 dias</strong> da última mensagem enviada, ou da data em que foi encontrado, se nunca recebeu mensagem. Depois, apagamos automaticamente.</td></tr>
+              <tr><td>Prospecção: contato que respondeu e não contratou</td><td>Até <strong>180 dias</strong> da última mensagem. Depois, apagamos automaticamente.</td></tr>
+              <tr><td>Prospecção: contato que pediu para sair</td><td>Até <strong>30 dias</strong> do pedido. Depois, fica só o registro da linha “pedido para não receber mais mensagens”.</td></tr>
+              <tr><td>Prospecção: contato que contratou</td><td>Até <strong>30 dias</strong> da contratação; os dados da contratação seguem o prazo do cadastro (abaixo).</td></tr>
+              <tr><td>Prospecção: quem já recebeu mensagem</td><td>Até <strong>13 meses</strong>: só o código gerado a partir do número, a data e a campanha, para não procurar o mesmo número antes do prazo.</td></tr>
+              <tr><td>Prospecção: registro das mensagens (sem o texto, o telefone e o nome) e classificação das conversas (sem telefone, nome ou código)</td><td>Até <strong>25 meses</strong>, para medir e comparar as campanhas.</td></tr>
+              <tr><td>Prospecção: pedido para não receber mais mensagens</td><td>Enquanto a RXSync fizer prospecção, para que o pedido seja respeitado: só o código gerado a partir do número, a data e a origem.</td></tr>
               <tr><td>Cadastro, contratação, aceite e cobrança</td><td>Durante o contrato e, depois dele, pelo prazo necessário para cumprir obrigações legais e fiscais (em regra, 5 anos) e para exercer direitos em eventual disputa (prazos de prescrição aplicáveis). O registro do aceite dos Termos é mantido como prova.</td></tr>
               <tr><td>Teste grátis encerrado sem continuidade</td><td>Configuração e histórico mantidos por até <strong>15 dias corridos</strong> do término, para retomada ou exportação. Depois, são eliminados.</td></tr>
               <tr><td>Cadastro iniciado, mas WhatsApp nunca conectado</td><td>Se a conexão não ocorrer em até <strong>30 dias corridos</strong> do aceite, a configuração preenchida pode ser eliminada, mantido o registro do aceite.</td></tr>
@@ -296,6 +322,7 @@
           </ul>
           <p><strong>Como pedir:</strong> escreva para <a href="mailto:contato@rxsync.com.br?subject=Privacidade%20e%20dados%20pessoais">contato@rxsync.com.br</a>, com o assunto “Privacidade”, informando seu nome e e-mail ou telefone usados no cadastro. Para sua segurança, podemos pedir uma confirmação de identidade antes de entregar ou alterar dados. Respondemos em até <strong>15 dias</strong>, como prevê o art. 19, II, da LGPD.</p>
           <p><strong>Alguns pedidos têm limites legais.</strong> Por exemplo, não podemos eliminar dados que a lei nos obriga a guardar (como os fiscais) nem os que precisamos manter para nos defendermos em processo; nesses casos, explicamos o motivo e a duração da guarda.</p>
+          <p><strong>Prospecção:</strong> se você recebeu uma mensagem de prospecção da RXSync, pode responder SAIR a qualquer momento (o número nunca mais recebe) ou escrever para <a href="mailto:contato@rxsync.com.br?subject=Privacidade%20e%20dados%20pessoais">contato@rxsync.com.br</a> para saber de onde veio o seu contato, pedir os dados que temos ou se opor ao tratamento.</p>
           <p><strong>Pacientes:</strong> o pedido deve ser dirigido à clínica; veja a <a href="#dados-pacientes">seção 4.4</a>.</p>
           <p>Se entender que o tratamento de seus dados viola a LGPD, você também pode reclamar à <strong>Autoridade Nacional de Proteção de Dados (ANPD)</strong>, em <a href="https://www.gov.br/anpd" target="_blank" rel="noopener">gov.br/anpd</a>, sem prejuízo de procurar os órgãos de defesa do consumidor ou o Poder Judiciário.</p>
         </section>
@@ -310,6 +337,7 @@
           <p>Podemos atualizar esta Política para refletir mudanças no serviço, nos fornecedores ou na lei. A versão vigente é sempre a publicada nesta página, com o número da versão e a data de início de vigência no topo. Mudanças relevantes que afetem clientes serão comunicadas ao e-mail cadastrado, com a antecedência prevista nos Termos de Uso. O uso do site e do serviço depois da vigência da nova versão não afeta os direitos que você tem pela lei.</p>
           <p><strong>Histórico de versões</strong></p>
           <ul>
+            <li><strong>2026-10-v10</strong>, vigente a partir de 15 de outubro de 2026: entra a prospecção comercial pelo WhatsApp (seções 2, 3, 3.1, 5, 6, 7, 8 e 11): de onde vêm os dados (Google Maps, por meio da SerpApi), a base legal (legítimo interesse), como sair (SAIR), os limites de mensagens, o uso da assistente virtual, que a base de pacientes das clínicas não é usada, o registro para medir as campanhas e os prazos de guarda.</li>
             <li><strong>2026-10-v9</strong>, vigente a partir de 14 de outubro de 2026: o pedido de demonstração feito pelo formulário do site passa a ter prazo de guarda próprio, de 180 dias do pedido, com exclusão automática (seção 8); o prazo das conversas do chat do site não muda.</li>
             <li><strong>2026-10-v8</strong>, vigente a partir de 14 de outubro de 2026: o link para os Termos de Uso na seção 1 passa a levar à versão vigente (2026-10-v3).</li>
             <li><strong>2026-10-v7</strong>, vigente a partir de 14 de outubro de 2026: entram, nos dados de pacientes (seção 4), a data em que o telefone conversou com a clínica pela primeira vez e, no plano Gestão Inteligente, o cadastro da área Pacientes do painel (e-mail, data de nascimento, observação administrativa e, para quem foi importado pela clínica, a origem e a data da importação); as mensagens de relacionamento só vão a quem já conversou com a clínica (seção 4.2); a seção 8 ganha o prazo do cadastro e o que acontece na exclusão a pedido do paciente.</li>
