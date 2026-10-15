@@ -35,6 +35,12 @@ for (const f of htmls) {
     if ((s.match(/<script/g) || []).length !== 1) erro(`${arq}: só pode ter um <script>, dentro da página`);
     for (const m of s.matchAll(/\b(?:src|href)\s*=\s*"(https?:[^"]*)"/gi)) erro(`${arq}: carrega coisa de fora (${m[1]})`);
     if (/style="/.test(s)) erro(`${arq}: atributo style= é bloqueado pela CSP; use uma classe`);
+    // Ícones: todo <svg> de ícone tem a classe "icone", e a regra dela tem tamanho fixo de até 48 px.
+    // A foto de todas as telas (scripts/central_telas.mjs) confere o mesmo na página de verdade.
+    const regra = (s.match(/svg\.icone\s*\{([^}]*)\}/) || [])[1] || '';
+    const px = k => Number(((regra.match(new RegExp('(?:^|;)\\s*' + k + '\\s*:\\s*(\\d+)px')) || [])[1]) || 0);
+    if (!px('width') || !px('height') || px('width') > 48 || px('height') > 48) erro(`${arq}: os ícones precisam de tamanho fixo de até 48 px (regra svg.icone)`);
+    if (!/createElementNS\('http:\/\/www\.w3\.org\/2000\/svg', 'svg'\); s\.setAttribute\('class', 'icone'\)/.test(s)) erro(`${arq}: a função icone() precisa pôr a classe "icone" no <svg>`);
     if (/localStorage\s*\./.test(s)) erro(`${arq}: a sessão não pode ir para o localStorage`);
     // Dados sensíveis (CPF, CNPJ, e-mail, telefone) nunca ficam no navegador: só a sessão vai para o sessionStorage.
     for (const m of s.matchAll(/sessionStorage\.setItem\(\s*([^,)]*)/g)) if (m[1].trim() !== "'central_sessao'") erro(`${arq}: só a sessão pode ir para o sessionStorage (achei ${m[1].trim()})`);
