@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pdUqSIAw1BCKxVKBfLxJ1dq3rKBnIGWUgXWXz6GCN0w='; style-src 'sha256-N4jlKwCgQcE2VI2KdXLHpGtDIVtKBLB1uli8C8ilLE4='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s2NJAY8UlA+MWdnZbEowaBTL9QdO+SKFqD7sooN+JBc='; style-src 'sha256-kGZtCSZH3pjLIaH/cFLNJvUTt6ExStD9f+QvRLVXUPw='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -137,6 +137,14 @@ table.antes-depois th, table.antes-depois td { border-bottom: 1px solid var(--li
 .tabela-rolagem { overflow-x: auto; }
 table.dados { border-collapse: collapse; font-size: 14px; min-width: 100%; }
 table.dados th, table.dados td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; white-space: nowrap; }
+label.campo textarea { display: block; width: 100%; margin-top: 6px; min-height: 84px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink); resize: vertical; }
+.dica { display: block; font-weight: 400; font-size: 13px; color: var(--ink-3); margin-top: 4px; }
+.pilha > * + * { margin-top: 14px; } .pilha { margin-top: 14px; }
+details.grupo { border-top: 1px solid var(--line); padding: 4px 0; } details.grupo:first-of-type { border-top: 0; }
+details.grupo > summary { cursor: pointer; font-weight: 700; padding: 10px 0; min-height: 44px; list-style-position: inside; }
+details.grupo > form { padding: 6px 0 12px; }
+details.grupo.bloco { padding: 6px 16px; border: 1px solid var(--line); }
+.lista li .acoes { margin-top: 8px; } .lista li .acoes .btn { min-height: 38px; padding: 0 12px; font-size: 14px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -168,7 +176,7 @@ table.dados th, table.dados td { border-bottom: 1px solid var(--line); padding: 
 
 <script>
 'use strict';
-// Central RXSync. Contrato: rxsync-sistema/docs/mapa/central.md (DEC-053 a DEC-062).
+// Central RXSync. Contrato: rxsync-sistema/docs/mapa/central.md (DEC-053 a DEC-065).
 // Tudo o que vem do servidor entra na página como TEXTO (textContent), nunca como HTML.
 (function () {
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/central';
@@ -375,7 +383,7 @@ async function rotear() {
   const t = TELAS[nome] ? nome : 'inicio';
   const titulo = (MENU.find(m => m[0] === t) || [t, 'Central RXSync'])[1];
   $('topo-titulo').textContent = titulo; document.title = titulo + ' · Central RXSync';
-  const PAI = { cliente: 'clientes', funil_completo: 'funil' };
+  const PAI = { cliente: 'clientes', sensivel: 'clientes', funil_completo: 'funil' };
   const marcada = PAI[t] || t;
   for (const b of document.querySelectorAll('[data-tela]')) {
     const naAba = b.closest('#tabbar');
@@ -688,7 +696,13 @@ TELAS.funil_completo = async c => {
 const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
   chave: 'Chave mudada', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
   avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
-  codigo_pedido: 'Código pedido no Telegram', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código não saiu pelo Telegram', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL' };
+  codigo_pedido: 'Código pedido no Telegram', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código não saiu pelo Telegram', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
+  viu_dados_sensiveis: 'Viu os dados sensíveis', edicao_empresa: 'Empresa editada', edicao_assistente: 'Assistente editada', edicao_configuracoes: 'Configurações editadas', edicao_recursos: 'Botões dos recursos editados',
+  aviso_limitacao_franquia: 'Aviso de limitação da franquia', recurso_liberado: 'Recurso liberado', recurso_revogado: 'Liberação revogada', plano_trocado: 'Plano trocado', preco_especial: 'Preço especial',
+  cobranca_proxima_data: 'Próxima cobrança mudada', cobranca_vencimento: 'Vencimento mudado', implantacao_isentar: 'Implantação isenta', pagamento_receber_dinheiro: 'Recebido em dinheiro',
+  teste_estendido: 'Teste estendido', situacao_suspender: 'Suspensa', situacao_reativar: 'Reativada', situacao_pausar: 'Assistente pausada', situacao_retomar: 'Assistente retomada',
+  cancelamento_agendar: 'Cancelamento agendado', cancelamento_desfazer: 'Cancelamento desfeito', link_reenviado: 'Link reenviado', token_painel_novo: 'Link novo do painel',
+  cobranca_teste_cliente: 'Clínica de teste da cobrança', chave_api_limites: 'Limites da chave da API' };
 const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como); if (d.finalidade) p.push(d.finalidade === 'senha' ? 'troca de senha' : 'entrada'); if (d.prefixo) p.push(d.prefixo + '…');
   if (d.antes && d.depois && typeof d.antes === 'object') p.push(Object.keys(d.depois).map(k => `${k}: ${d.antes[k] ?? '—'} → ${d.depois[k] ?? '—'}`).join(', ')); return p.join(' · '); };
 GANCHOS.seguranca.push(async () => {
@@ -707,6 +721,7 @@ GANCHOS.seguranca.push(async () => {
     d.chaves.length ? el('ul', { class: 'lista' }, d.chaves.map(k => el('li', {}, el('div', { class: 'cresce' },
       el('div', { class: 'titulo-item', text: `${k.prefixo}… · ${k.nome || 'sem nome'} · ${k.nome_clinica || k.cliente_id}` }),
       el('div', { class: 'mudo peq', text: `criada ${fmtData(k.criada_em)} · último uso ${fmtHora(k.ultimo_uso_em)} · limites ${k.limite_minuto}/min e ${k.limite_dia}/dia · 7 dias: ${Object.entries(k.uso_7d || {}).map(([a, b]) => a + ' ' + b).join(', ') || 'sem uso'}` })),
+      GANCHOS.limitesChave ? GANCHOS.limitesChave(k) : null,
       k.revogada_em ? el('span', { class: 'pill alerta', text: 'revogada' }) : (GANCHOS.revogar ? GANCHOS.revogar(k) : el('span', { class: 'pill ok', text: 'ativa' }))))) : vazio('Nenhuma chave.'),
     GANCHOS.criarChave ? GANCHOS.criarChave() : null);
 });
@@ -731,24 +746,11 @@ async function desfazer(registroId) {
   const r = await editar('desfazer', { registro_id: registroId }, 'Desfazer a edição', [], 'Volta ao valor de antes. Fica no registro.');
   if (r) { toast('Desfeito.'); rotear(); }
 }
-GANCHOS.desfazer = x => (['edicao_limites', 'chave_api_criada'].includes(x.evento) && !x.desfeito_em)
+GANCHOS.desfazer = x => (['edicao_limites', 'chave_api_criada', 'edicao_assistente', 'edicao_configuracoes', 'edicao_recursos', 'recurso_liberado'].includes(x.evento) && !x.desfeito_em)
   ? el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(x.id) }) : null;
 GANCHOS.ficha.push(x => {
   const partes = [];
-  if (est.chaves.editar_limites === 'SIM') {
-    const L = x.limites;
-    const franquia = el('input', { inputmode: 'numeric', value: L.franquia_mensagens || '', placeholder: 'vazio = 5.000' });
-    const limitar = el('select', {}, ['', 'SIM', 'NAO'].map(v => el('option', { value: v, text: v || '(vazio = não limita)', selected: (L.limitar_franquia || '') === v })));
-    const dono = el('input', { inputmode: 'numeric', value: L.dono_limite_dia || '', placeholder: 'vazio = padrão' });
-    partes.push(el('form', { onsubmit: async e => {
-      e.preventDefault();
-      const novo = { franquia_mensagens: franquia.value.replace(/\D/g, ''), limitar_franquia: limitar.value, dono_limite_dia: dono.value.replace(/\D/g, '') };
-      const r = await editar('editar_limites', { cliente_id: x.cliente_id, ...novo }, 'Limites de ' + x.nome,
-        [['Franquia', L.franquia_mensagens, novo.franquia_mensagens], ['Limitar na franquia', L.limitar_franquia, novo.limitar_franquia], ['Limite diário do assistente do dono', L.dono_limite_dia, novo.dono_limite_dia]]);
-      if (r) { toast('Limites mudados.'); await rotear(); const c = $('conteudo'); c.prepend(el('div', { class: 'faixa ok' }, 'Limites mudados. ', el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(r.registro_id) }))); }
-    } }, el('h2', { text: 'Limites' }), el('label', { class: 'campo' }, 'Franquia de mensagens por mês', franquia), el('label', { class: 'campo' }, 'Limitar na franquia', limitar),
-      el('label', { class: 'campo' }, 'Limite diário do assistente do dono', dono), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e salvar' })));
-  }
+  // Limites: no grupo "Limites" da fase 4 (sql/029: o servidor recebe os campos em "campos").
   if (est.chaves.editar_onboarding === 'SIM') {
     partes.push(el('div', { class: 'mt' }, el('h2', { text: 'Onboarding' }), x.pode_reenviar_onboarding
       ? el('button', { class: 'btn sec', type: 'button', text: 'Reenviar o link de onboarding', onclick: async () => {
@@ -789,6 +791,344 @@ GANCHOS.criarChave = () => {
     if (r) { mostrarSegredo('Chave da API', r.chave, r.mensagem); rotear(); }
   } }, el('h2', { text: 'Criar chave' }), el('label', { class: 'campo' }, 'Código da clínica', cli), el('label', { class: 'campo' }, 'Nome da chave', nome), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e criar' }));
 };
+
+// --- Fase 4: aba Clientes completa (DEC-063 a DEC-065). Cada bloco só aparece com a sua chave ligada (todas começam
+// desligadas); o servidor confere tudo de novo. Plano, cobrança e situação também valem para a clínica de teste da
+// cobrança (sandbox). Dados sensíveis (CPF, CNPJ, faturamento, IP) só na tela à parte, nunca guardados no navegador.
+const ligada = k => est.chaves[k] === 'SIM';
+const ehTesteCobranca = x => !!x && !!x.cliente_id && est.chaves.cobranca_teste_cliente === x.cliente_id;
+const semAcento = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+const hojeISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const somaDias = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+async function recarregarChaves() { const r = await chamar('config'); if (r.ok) est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor])); }
+function tabelaAntesDepois(linhas) {
+  return el('table', { class: 'antes-depois' }, el('tr', {}, el('th', { text: '' }), el('th', { text: 'Antes' }), el('th', { text: 'Depois' })),
+    linhas.map(([r, a, d]) => el('tr', {}, el('th', { text: r }), el('td', { text: a === '' || a == null ? '(vazio)' : a }), el('td', { text: d === '' || d == null ? '(vazio)' : d }))));
+}
+// Janela com campos + "CONFIRMAR" (e, quando pede, o código ou o nome da clínica digitado). Devolve os valores ou null.
+function pedir({ titulo, aviso, linhas, campos = [], digitar }) {
+  return new Promise(ok => {
+    const ins = {}; const erro = msgErro(); let fechar;
+    const corpo = campos.map(f => {
+      let i;
+      if (f.opcoes) i = el('select', {}, f.opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(f.valor == null ? '' : f.valor) === v })));
+      else if (f.longo) { i = el('textarea', { rows: '3', maxlength: String(f.max || 500), autocomplete: 'off' }); i.value = f.valor || ''; }
+      else i = el('input', { type: f.tipo || 'text', inputmode: f.inputmode, autocomplete: 'off', spellcheck: 'false', value: f.valor == null ? null : String(f.valor), min: f.min, max: f.max, placeholder: f.ph });
+      ins[f.k] = i;
+      return el('label', { class: 'campo' }, f.rot, i, f.dica ? el('span', { class: 'dica', text: f.dica }) : null);
+    });
+    const conf = el('input', { autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false' });
+    const dig = digitar ? el('input', { autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false' }) : null;
+    const enviar = e => {
+      e.preventDefault(); erro.textContent = '';
+      const v = {};
+      for (const f of campos) {
+        v[f.k] = ins[f.k].value.trim();
+        if (f.obrig && v[f.k].length < (f.minimo || 1)) { erro.textContent = f.erro || ('Preencha: ' + f.rot + '.'); ins[f.k].focus(); return; }
+      }
+      if (dig && semAcento(dig.value) !== semAcento(digitar.esperado)) { erro.textContent = 'Digite ' + digitar.rot + ' exatamente como aparece.'; dig.focus(); return; }
+      if (conf.value.trim().toUpperCase() !== 'CONFIRMAR') { erro.textContent = 'Digite CONFIRMAR.'; conf.focus(); return; }
+      if (dig) v._digitado = dig.value.trim();
+      fechar(); ok(v);
+    };
+    fechar = janela(el('form', { onsubmit: enviar }, el('h2', { text: titulo }), linhas && linhas.length ? tabelaAntesDepois(linhas) : null,
+      aviso ? el('p', { class: 'mudo', text: aviso }) : null, corpo,
+      dig ? el('label', { class: 'campo' }, 'Para confirmar, digite ' + digitar.rot + ': ' + digitar.esperado, dig) : null,
+      el('label', { class: 'campo' }, 'Para confirmar, digite CONFIRMAR', conf), erro,
+      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Confirmar' }), el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); ok(null); } }))));
+  });
+}
+// Manda a ação (sempre com "CONFIRMAR"), mostra o resultado no alto da tela e, quando dá, o botão "Desfazer".
+async function fazer(acao, dados, textoOk) {
+  const r = await chamar(acao, { ...dados, confirmacao: 'CONFIRMAR' });
+  if (r.desligada) { toast('Edição desligada (chave ' + (r.chave || '') + ').'); return null; }
+  if (!r.ok) { toast(r.mensagem || 'Não consegui.'); return null; }
+  await rotear();
+  $('conteudo').prepend(el('div', { class: 'faixa ' + (r.aviso_email ? 'alerta' : 'ok') }, (r.aviso_email || r.mensagem || textoOk || 'Pronto.') + ' ',
+    r.pode_desfazer && r.registro_id ? el('button', { class: 'btn sec', type: 'button', text: 'Desfazer', onclick: () => desfazer(r.registro_id) }) : null));
+  return r;
+}
+const RECURSOS_NOMES = { documentos: 'Leitura de fotos e PDFs', fila: 'Lista de espera', pesquisa: 'Pesquisa de satisfação e Google', reconhecer: 'Reconhecer quem volta',
+  tipo_visita: '1ª vez ou retorno', empilhamento: 'Empilhamento de horários', preconsulta: 'Perguntas antes de agendar', medicos: 'Agenda por médico',
+  relacionamento: 'Retorno, convite e "não contatar"', assistente_dono: 'Assistente de gestão', pacientes: 'Aba Pacientes' };
+// Campos de cada grupo (os mesmos do servidor, rx_central_campos). A empresa fica na tela de dados sensíveis.
+const GRUPOS = {
+  assistente: ['nome_exibicao', 'descricao_curta', 'servicos', 'nao_oferecemos', 'profissionais', 'como_chegar', 'endereco_atendimento', 'horario_funcionamento',
+    'horario_humano', 'formas_pagamento', 'convenios_parcerias', 'politica_agendamento', 'politica_precos', 'tom_de_voz', 'saudacao', 'restricoes', 'nunca_dizer',
+    'gatilhos_escalonamento', 'gatilhos_urgencia', 'resposta_urgencia', 'mensagem_fora_horario', 'telefone_urgencia', 'whatsapp_alerta', 'catalogo_de_vendas',
+    'resp_tecnico_nome', 'resp_tecnico_conselho', 'sistema_gestao', 'usuarios_painel', 'numero_reserva'],
+  configuracoes: ['pausa_humano_horas', 'fuso_horario', 'duracao_padrao_min', 'antecedencia_minima_h', 'janela_agendamento_dias', 'buffer_min', 'numeros_sem_ia',
+    'lembrete_horarios', 'followup_horas', 'link_privacidade', 'pesquisa_horas', 'pesquisa_nota_minima', 'link_avaliacao_google', 'dono_whatsapp', 'briefing_horario',
+    'briefing_dias', 'link_agendamento', 'retorno_prazo_dias', 'reativacao_dias'],
+  recursos: ['func_documentos', 'func_agendamento', 'func_briefing', 'func_lembretes', 'func_fila', 'func_feriados', 'func_reservio', 'func_regras_linguagem',
+    'func_reconhecer', 'func_tipo_visita', 'func_empilhamento', 'func_medicos', 'func_preconsulta', 'func_retorno', 'func_reativacao', 'pesquisa_ativa',
+    'assistente_dono_ativa', 'dono_pode_editar', 'link_agendamento_ativo'],
+  limites: ['franquia_mensagens', 'limitar_franquia', 'dono_limite_dia', 'relac_limite_dia', 'limite_info_extra', 'envio_limite_dia'],
+  empresa: ['razao_social', 'cnpj', '_tipo_pessoa', '_nome_fantasia', 'representante_nome', 'representante_cpf', 'endereco_faturamento', '_cep', '_logradouro',
+    '_numero', '_complemento', '_bairro', '_cidade', '_uf', 'email', 'telefone']
+};
+const ROTULOS = { nome_exibicao: 'Nome da clínica', descricao_curta: 'Descrição curta', servicos: 'Serviços', nao_oferecemos: 'Não oferecemos', profissionais: 'Profissionais',
+  como_chegar: 'Como chegar', endereco_atendimento: 'Endereço de atendimento', horario_funcionamento: 'Horário de funcionamento', horario_humano: 'Horário da equipe',
+  formas_pagamento: 'Formas de pagamento', convenios_parcerias: 'Convênios e parcerias', politica_agendamento: 'Regras de agendamento', politica_precos: 'Preços',
+  tom_de_voz: 'Tom de voz', saudacao: 'Saudação', restricoes: 'Restrições', nunca_dizer: 'Nunca dizer', gatilhos_escalonamento: 'Quando chamar a equipe',
+  gatilhos_urgencia: 'Sinais de urgência', resposta_urgencia: 'Resposta de urgência', mensagem_fora_horario: 'Mensagem fora do horário', telefone_urgencia: 'Telefone de urgência',
+  whatsapp_alerta: 'WhatsApp da equipe (alertas)', catalogo_de_vendas: 'Informações extras', resp_tecnico_nome: 'Responsável técnico', resp_tecnico_conselho: 'Conselho do responsável',
+  sistema_gestao: 'Sistema de gestão', usuarios_painel: 'Usuários do painel', numero_reserva: 'Número reserva',
+  pausa_humano_horas: 'Pausa quando a equipe responde', fuso_horario: 'Fuso horário', duracao_padrao_min: 'Duração da consulta (min)', antecedencia_minima_h: 'Antecedência mínima (h)',
+  janela_agendamento_dias: 'Agenda aberta (dias)', buffer_min: 'Intervalo entre consultas (min)', numeros_sem_ia: 'Números sem IA', lembrete_horarios: 'Horários dos lembretes',
+  followup_horas: 'Retomar conversa parada (h)', link_privacidade: 'Link da privacidade', pesquisa_horas: 'Pesquisa depois de (h)', pesquisa_nota_minima: 'Nota mínima para o Google',
+  link_avaliacao_google: 'Link de avaliação no Google', dono_whatsapp: 'WhatsApp do dono', briefing_horario: 'Hora do resumo do dia', briefing_dias: 'Dias do resumo',
+  link_agendamento: 'Link de agendamento', retorno_prazo_dias: 'Prazo de retorno (dias)', reativacao_dias: 'Convite para quem sumiu (dias)',
+  func_documentos: 'Ler fotos e PDFs', func_agendamento: 'Agendamento direto', func_briefing: 'Briefing', func_lembretes: 'Lembretes', func_fila: 'Lista de espera',
+  func_feriados: 'Feriados', func_reservio: 'Reservio', func_regras_linguagem: 'Regras de linguagem', func_reconhecer: 'Reconhecer quem volta', func_tipo_visita: '1ª vez ou retorno',
+  func_empilhamento: 'Empilhamento', func_medicos: 'Agenda por médico', func_preconsulta: 'Perguntas antes de agendar', func_retorno: 'Aviso de retorno', func_reativacao: 'Convite para quem sumiu',
+  pesquisa_ativa: 'Pesquisa de satisfação', assistente_dono_ativa: 'Assistente de gestão', dono_pode_editar: 'Dono pode editar pelo WhatsApp', link_agendamento_ativo: 'Link de agendamento ligado',
+  franquia_mensagens: 'Franquia por mês (mínimo 5.000)', limitar_franquia: 'Limitar na franquia', dono_limite_dia: 'Perguntas ao assistente por dia', relac_limite_dia: 'Avisos de relacionamento por dia',
+  limite_info_extra: 'Tamanho das informações extras', envio_limite_dia: 'Envios por dia pela API',
+  razao_social: 'Razão social', cnpj: 'CNPJ (só números)', _tipo_pessoa: 'Tipo (PJ ou PF)', _nome_fantasia: 'Nome fantasia', representante_nome: 'Representante',
+  representante_cpf: 'CPF do representante (só números)', endereco_faturamento: 'Endereço de faturamento', _cep: 'CEP', _logradouro: 'Logradouro', _numero: 'Número',
+  _complemento: 'Complemento', _bairro: 'Bairro', _cidade: 'Cidade', _uf: 'UF', email: 'E-mail', telefone: 'Telefone (só números)' };
+const ROTULOS_LIMITE = { franquia_mensagens: 'vazio = 5.000', dono_limite_dia: 'vazio = 60', relac_limite_dia: 'vazio = 30', limite_info_extra: 'vazio = pelo plano', envio_limite_dia: 'vazio = 50/200' };
+const LONGOS = new Set(['descricao_curta', 'servicos', 'nao_oferecemos', 'profissionais', 'como_chegar', 'endereco_atendimento', 'horario_funcionamento', 'formas_pagamento',
+  'convenios_parcerias', 'politica_agendamento', 'politica_precos', 'tom_de_voz', 'saudacao', 'restricoes', 'nunca_dizer', 'gatilhos_escalonamento', 'gatilhos_urgencia',
+  'resposta_urgencia', 'mensagem_fora_horario', 'catalogo_de_vendas', 'usuarios_painel', 'numeros_sem_ia', 'endereco_faturamento']);
+const SIM_NAO = new Set([...GRUPOS.recursos, 'limitar_franquia']);
+// Formulário de um grupo de campos: mostra os valores atuais e manda só o que mudou (antes e depois na confirmação).
+function formGrupo(x, grupo, valores, acao, titulo) {
+  const chaves = GRUPOS[grupo].filter(k => Object.prototype.hasOwnProperty.call(valores, k));
+  const ins = {};
+  const campo = k => {
+    const v = valores[k] == null ? '' : String(valores[k]);
+    let i;
+    if (SIM_NAO.has(k)) i = el('select', {}, ['', 'SIM', 'NAO'].map(o => el('option', { value: o, text: o || '(vazio)', selected: v.toUpperCase() === o })));
+    else if (LONGOS.has(k)) { i = el('textarea', { rows: '3', autocomplete: 'off', spellcheck: 'false' }); i.value = v; }
+    else i = el('input', { autocomplete: 'off', spellcheck: 'false', autocapitalize: 'none', value: v || null, placeholder: ROTULOS_LIMITE[k] || null });
+    ins[k] = i;
+    return el('label', { class: 'campo' }, ROTULOS[k] || k, i);
+  };
+  const enviar = async e => {
+    e.preventDefault();
+    const mudou = {}, linhas = [];
+    for (const k of chaves) { const novo = ins[k].value.trim(), velho = valores[k] == null ? '' : String(valores[k]); if (novo !== velho) { mudou[k] = novo; linhas.push([ROTULOS[k] || k, velho, novo]); } }
+    if (!linhas.length) { toast('Nada mudou.'); return; }
+    if (!(await confirmarEdicao(titulo + ' · ' + x.nome, linhas, grupo === 'empresa' ? 'Antes da primeira edição, o servidor guarda a cópia fixa do aceite. Esta edição não tem "desfazer".' : 'Fica no registro e avisa no Telegram (só os nomes dos campos).'))) return;
+    await fazer(acao, { cliente_id: x.cliente_id, campos: mudou }, 'Salvo.');
+  };
+  return el('details', { class: 'grupo' }, el('summary', { text: titulo }),
+    el('form', { onsubmit: enviar }, chaves.map(campo), el('button', { class: 'btn pri', type: 'submit', text: 'Revisar e salvar' })));
+}
+const btnAcao = (texto, fn, cls) => el('button', { class: 'btn ' + (cls || 'sec'), type: 'button', text: texto, onclick: fn });
+const STATUS_COB = { PENDING: ['em aberto', 'pend'], OVERDUE: ['vencida', 'alerta'], RECEIVED: ['recebida', 'ok'], CONFIRMED: ['confirmada', 'ok'], RECEIVED_IN_CASH: ['recebida em dinheiro', 'ok'], REFUNDED: ['estornada', 'alerta'] };
+const pillCob = s => { const [t, c] = STATUS_COB[s] || [s || '—', '']; return el('span', { class: 'pill ' + c, text: t }); };
+
+GANCHOS.ficha.push(x => {
+  const comp = x.completa || null, sit = (comp && comp.situacao) || {};
+  const teste = ehTesteCobranca(x);
+  const pode = k => ligada(k) || (teste && ['editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste', 'editar_situacao', 'tela_cliente_asaas'].includes(k));
+  const blocos = [];
+  const recarregar = () => rotear();
+
+  // Atalho para os dados sensíveis (tela à parte, chave própria).
+  if (ligada('tela_cliente_sensivel')) blocos.push(el('div', { class: 'acoes' }, btnAcao('Dados sensíveis (CPF, CNPJ, faturamento)', () => ir('sensivel/' + encodeURIComponent(x.cliente_id)))));
+  if (teste) blocos.push(el('div', { class: 'faixa pend', text: 'Esta é a clínica de teste da cobrança: plano, cobrança e situação dela mudam mesmo com as chaves desligadas.' }));
+
+  // Situação: suspender, reativar, pausar (cláusula 8.4), cancelamento.
+  if (pode('editar_situacao')) {
+    const st = x.status, parada = ['Suspenso', 'Cancelado', 'Teste encerrado'].includes(st);
+    const acoes = [];
+    if (st === 'Suspenso') acoes.push(btnAcao('Reativar', async () => { if (await confirmarEdicao('Reativar ' + x.nome, [['Situação', 'Suspenso', 'Ativo']], 'A assistente volta a atender na hora.')) fazer('situacao_reativar', { cliente_id: x.cliente_id }, 'Reativada.'); }, 'pri'));
+    else if (!parada) acoes.push(btnAcao('Suspender', async () => {
+      const v = await pedir({ titulo: 'Suspender ' + x.nome, aviso: 'A assistente para de atender na hora. Inadimplência: o 31 e o 30 reativam sozinhos quando ela pagar. Equipe: só volta pela Central.',
+        campos: [{ k: 'suspensao_motivo', rot: 'Por quê?', opcoes: [['equipe', 'Decisão da equipe'], ['inadimplencia', 'Inadimplência']] }, { k: 'motivo', rot: 'Motivo (fica no registro)', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }],
+        digitar: { rot: 'o código da clínica', esperado: x.cliente_id } });
+      if (v) fazer('situacao_suspender', { cliente_id: x.cliente_id, suspensao_motivo: v.suspensao_motivo, motivo: v.motivo, confirmacao_cliente: v._digitado }, 'Suspensa.');
+    }, 'perigo'));
+    if (x.ativo && !parada) acoes.push(btnAcao('Pausar a pedido (8.4)', async () => { if (await confirmarEdicao('Pausar a assistente de ' + x.nome, [['Assistente', 'atendendo', 'pausada']], 'A pedido da clínica (cláusula 8.4). A mensalidade continua.')) fazer('situacao_pausar', { cliente_id: x.cliente_id }, 'Pausada.'); }));
+    if (!x.ativo && !parada) acoes.push(btnAcao('Retomar', async () => { if (await confirmarEdicao('Retomar a assistente de ' + x.nome, [['Assistente', 'pausada', 'atendendo']])) fazer('situacao_retomar', { cliente_id: x.cliente_id }, 'A assistente voltou a atender.'); }, 'pri'));
+    if (!x.cancelar_em && st !== 'Cancelado') acoes.push(btnAcao('Agendar cancelamento', async () => {
+      const v = await pedir({ titulo: 'Agendar o cancelamento de ' + x.nome, aviso: 'No dia, o 31 cancela a assinatura e desconecta o WhatsApp. A clínica recebe um e-mail agora.',
+        campos: [{ k: 'data', rot: 'Data', tipo: 'date', min: somaDias(hojeISO(), 1), obrig: true }, { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }],
+        digitar: { rot: 'o código da clínica', esperado: x.cliente_id } });
+      if (v) fazer('cancelamento_agendar', { cliente_id: x.cliente_id, data: v.data, motivo: v.motivo, confirmacao_cliente: v._digitado }, 'Cancelamento agendado.');
+    }, 'perigo'));
+    if (x.cancelar_em) acoes.push(btnAcao('Desfazer o cancelamento', async () => { if (await confirmarEdicao('Desfazer o cancelamento de ' + x.nome, [['Cancelamento', fmtData(x.cancelar_em), '(nenhum)']], 'A clínica recebe um e-mail.')) fazer('cancelamento_desfazer', { cliente_id: x.cliente_id }, 'Cancelamento desfeito.'); }));
+    blocos.push(bloco('Situação', campos([['Situação', st], ['Assistente', x.ativo ? 'atendendo' : 'parada'], st === 'Suspenso' && ['Motivo da suspensão', x.suspensao_motivo === 'equipe' ? 'equipe (só volta pela Central)' : 'inadimplência (volta sozinha ao pagar)'],
+      x.cancelar_em && ['Cancelamento em', fmtData(x.cancelar_em)]]), el('div', { class: 'acoes' }, acoes)));
+  }
+
+  // Links: o e-mail vai sempre para o e-mail do cadastro; o token nunca aparece aqui.
+  if (ligada('editar_links')) blocos.push(bloco('Links da clínica', el('p', { class: 'mudo peq', text: 'O e-mail vai para o e-mail do cadastro. O link não aparece aqui.' }), el('div', { class: 'acoes' },
+    btnAcao('Reenviar o link do painel', async () => { if (await confirmarEdicao('Reenviar o link do painel', [], 'Vai para o e-mail do cadastro de ' + x.nome + '.')) fazer('link_painel_reenviar', { cliente_id: x.cliente_id }); }),
+    btnAcao('Gerar link novo do painel', async () => { if (await confirmarEdicao('Gerar um link novo do painel', [['Link atual', 'vale', 'deixa de valer']], 'Use se o link vazou. O novo vai para o e-mail do cadastro.')) fazer('link_painel_novo', { cliente_id: x.cliente_id }); }, 'perigo'),
+    btnAcao('Reenviar o link de conexão', async () => { if (await confirmarEdicao('Reenviar o link de conexão do WhatsApp', [], 'Vai para o e-mail do cadastro de ' + x.nome + '.')) fazer('link_conectar_reenviar', { cliente_id: x.cliente_id }); }))));
+
+  // Plano e preço (DEC-064).
+  if (pode('editar_plano') || pode('editar_preco')) {
+    const acoes = [];
+    if (pode('editar_plano')) acoes.push(btnAcao('Trocar o plano', async () => {
+      const ops = [['essencial', 'Essencial'], ['gestao', 'Gestão Inteligente'], ['enterprise', 'Enterprise']].filter(([, n]) => semAcento(n).split(' ')[0] !== semAcento(x.plano).split(' ')[0]);
+      const v = await pedir({ titulo: 'Trocar o plano de ' + x.nome, aviso: 'Essencial e Gestão: o valor oficial da tabela. Enterprise: o valor da proposta. A assinatura do Asaas muda pela fila (até 15 minutos) e a clínica recebe um e-mail.',
+        campos: [{ k: 'plano', rot: 'Plano novo', opcoes: ops }, { k: 'valor', rot: 'Valor da proposta (só no Enterprise)', inputmode: 'decimal', ph: 'ex.: 1.490,00' },
+          { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }, { k: 'combinado', rot: 'Como foi combinado com a clínica (obrigatório no Enterprise)', longo: true }] });
+      if (v) fazer('plano_trocar', { cliente_id: x.cliente_id, ...v }, 'Plano trocado.');
+    }));
+    if (pode('editar_preco')) acoes.push(btnAcao('Preço especial', async () => {
+      const v = await pedir({ titulo: 'Preço especial para ' + x.nome, aviso: 'Fica em "Combinados" e a clínica recebe um e-mail. O Asaas muda pela fila.',
+        campos: [{ k: 'valor', rot: 'Valor mensal novo', inputmode: 'decimal', obrig: true }, { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' },
+          { k: 'combinado', rot: 'Como foi combinado com a clínica', longo: true, obrig: true, minimo: 5, erro: 'Escreva como foi combinado (obrigatório).' }] });
+      if (v) fazer('preco_especial', { cliente_id: x.cliente_id, ...v }, 'Preço especial gravado.');
+    }));
+    blocos.push(bloco('Plano e preço', campos([['Plano', x.plano], ['Valor mensal', fmtReal(x.valor_mensal)], ['Ciclo', x.ciclo]]), x.interna ? el('p', { class: 'mudo', text: 'A clínica interna não tem cobrança.' }) : el('div', { class: 'acoes' }, acoes)));
+  }
+
+  // Cobrança (foto do Asaas + pedidos pela fila).
+  const verAsaas = pode('tela_cliente_asaas');
+  if ((verAsaas || pode('editar_cobranca')) && !x.interna) {
+    const foto = comp && comp.asaas, cobs = (foto && foto.cobrancas) || [];
+    const editarCob = pode('editar_cobranca');
+    const lista = cobs.length ? el('ul', { class: 'lista' }, cobs.map(cb => el('li', {}, el('div', { class: 'cresce' },
+      el('div', { class: 'titulo-item', text: (cb.taxa ? 'Taxa de implantação' : (cb.descricao || 'Cobrança')) + ' · ' + fmtReal(cb.valor) }),
+      el('div', { class: 'mudo peq', text: 'vence ' + fmtData(cb.vencimento) + (cb.pago_em ? ' · paga ' + fmtData(cb.pago_em) : '') + ' · ' + (cb.forma || '') + ' · ' + cb.id }),
+      editarCob && ['PENDING', 'OVERDUE'].includes(cb.status) ? el('div', { class: 'acoes' },
+        btnAcao('Mudar vencimento', async () => {
+          const v = await pedir({ titulo: 'Mudar o vencimento', linhas: [['Vencimento', fmtData(cb.vencimento), '(a escolher)']], campos: [{ k: 'data', rot: 'Novo vencimento', tipo: 'date', min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 60), obrig: true },
+            { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }] });
+          if (v) fazer('cobranca_vencimento', { cliente_id: x.cliente_id, cobranca_id: cb.id, ...v });
+        }),
+        btnAcao('Recebi em dinheiro', async () => {
+          const v = await pedir({ titulo: 'Recebido em dinheiro', aviso: 'O Asaas marca esta cobrança como recebida (pela fila). O 30 só marca "Pago" quando o aviso do Asaas chegar.',
+            campos: [{ k: 'valor', rot: 'Valor recebido', inputmode: 'decimal', valor: String(cb.valor || '').replace('.', ',') }, { k: 'data', rot: 'Data do pagamento', tipo: 'date', valor: hojeISO(), max: hojeISO(), min: somaDias(hojeISO(), -60) },
+              { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }] });
+          if (v) fazer('pagamento_receber_dinheiro', { cliente_id: x.cliente_id, cobranca_id: cb.id, ...v });
+        })) : null), pillCob(cb.status)))) : vazio(foto ? 'Nenhuma cobrança na foto.' : 'Ainda sem foto do Asaas (o 31 tira todo dia às 8h10).');
+    const acoes = [];
+    if (verAsaas) acoes.push(btnAcao('Atualizar a foto agora', async () => { if (await confirmarEdicao('Atualizar a foto do Asaas', [], 'Só leitura no Asaas. Fica pronta em até 15 minutos.')) fazer('asaas_foto_atualizar', { cliente_id: x.cliente_id }); }));
+    if (editarCob) {
+      acoes.push(btnAcao('Data da próxima cobrança', async () => {
+        const v = await pedir({ titulo: 'Data da próxima cobrança', campos: [{ k: 'data', rot: 'Nova data', tipo: 'date', min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 60), obrig: true },
+          { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }] });
+        if (v) fazer('cobranca_proxima_data', { cliente_id: x.cliente_id, ...v });
+      }));
+      if (Number(x.valor_setup) > 0) acoes.push(btnAcao('Isentar a implantação', async () => {
+        const v = await pedir({ titulo: 'Isentar a implantação de ' + x.nome, linhas: [['Implantação', fmtReal(x.valor_setup), fmtReal(0)]], aviso: 'Se a taxa está em aberto no Asaas, ela é cancelada (pela fila). Taxa já paga: estorno fica fora da Central.',
+          campos: [{ k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }, { k: 'combinado', rot: 'Como foi combinado com a clínica', longo: true, obrig: true, minimo: 5, erro: 'Escreva como foi combinado.' }] });
+        if (v) fazer('implantacao_isentar', { cliente_id: x.cliente_id, ...v });
+      }, 'perigo'));
+    }
+    blocos.push(bloco('Cobrança no Asaas', foto ? el('p', { class: 'mudo peq', text: 'Foto de ' + fmtHora(foto.tirada_em) + (foto.erro_em ? ' · a última tentativa falhou em ' + fmtHora(foto.erro_em) : '') }) : null,
+      comp || !verAsaas ? lista : el('p', { class: 'mudo', text: 'Para ver as cobranças, ligue também a chave tela_cliente_completa (só leitura).' }), el('div', { class: 'acoes' }, acoes)));
+  }
+
+  // Teste grátis: estender (até 30 dias a mais no total).
+  if (pode('editar_teste') && x.modalidade === 'teste' && !x.interna) {
+    const usados = Number(sit.teste_dias_estendidos) || 0;
+    blocos.push(bloco('Teste grátis', campos([['Fim do teste', fmtData(x.fim_teste)], comp && ['Dias já estendidos', usados + ' de 30']]), el('div', { class: 'acoes' },
+      btnAcao('Estender o teste', async () => {
+        const v = await pedir({ titulo: 'Estender o teste de ' + x.nome, aviso: 'Até 30 dias a mais no total por clínica. Se o teste já acabou, a assistente volta a atender.',
+          campos: [{ k: 'dias', rot: 'Quantos dias a mais', inputmode: 'numeric', obrig: true, valor: '7' }, { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }, { k: 'combinado', rot: 'Combinado com a clínica (se houver)', longo: true }] });
+        if (v) fazer('teste_estender', { cliente_id: x.cliente_id, ...v });
+      }))));
+  }
+
+  // Recursos do plano e liberações (DEC-063).
+  if (comp) {
+    const rec = comp.recursos || {}, libs = comp.liberacoes || [], essencial = /^essencial/i.test(String(x.plano || '').trim());
+    const linhas = Object.keys(RECURSOS_NOMES).map(k => el('li', {}, el('div', { class: 'cresce titulo-item', text: RECURSOS_NOMES[k] }),
+      el('span', { class: 'pill ' + (rec[k] ? 'ok' : ''), text: rec[k] ? (essencial && (rec.liberados || []).includes(k) ? 'liberado' : 'pelo plano') : 'não' })));
+    const vigor = libs.filter(l => l.em_vigor);
+    const acoes = [];
+    if (ligada('liberar_recursos') && essencial) acoes.push(btnAcao('Liberar um recurso', async () => {
+      const ops = (comp.liberaveis || []).filter(k => !rec[k]).map(k => [k, RECURSOS_NOMES[k] || k]);
+      if (!ops.length) { toast('Todos os recursos já estão liberados.'); return; }
+      const v = await pedir({ titulo: 'Liberar recurso para ' + x.nome, aviso: 'Os recursos do Enterprise (API, avisos de eventos, envio de mensagens) não se liberam: troque o plano. O botão do recurso continua valendo.',
+        campos: [{ k: 'recurso', rot: 'Recurso', opcoes: ops }, { k: 'ate', rot: 'Até (deixe vazio para sem data de fim)', tipo: 'date', min: somaDias(hojeISO(), 1) }, { k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }] });
+      if (v) fazer('recurso_liberar', { cliente_id: x.cliente_id, ...v });
+    }, 'pri'));
+    blocos.push(bloco('Recursos', el('ul', { class: 'lista' }, linhas),
+      vigor.length ? el('div', { class: 'mt' }, el('h2', { text: 'Liberações em vigor' }), el('ul', { class: 'lista' }, vigor.map(l => el('li', {}, el('div', { class: 'cresce' },
+        el('div', { class: 'titulo-item', text: RECURSOS_NOMES[l.recurso] || l.recurso }), el('div', { class: 'mudo peq', text: 'desde ' + fmtData(l.liberado_em) + (l.ate ? ' · até ' + fmtData(l.ate) : ' · sem data de fim') + ' · ' + (l.motivo || '') })),
+        ligada('liberar_recursos') ? btnAcao('Revogar', async () => {
+          const v = await pedir({ titulo: 'Revogar ' + (RECURSOS_NOMES[l.recurso] || l.recurso), campos: [{ k: 'motivo', rot: 'Motivo', longo: true, obrig: true, minimo: 5, erro: 'Escreva o motivo (5 letras ou mais).' }] });
+          if (v) fazer('recurso_revogar', { cliente_id: x.cliente_id, id: l.id, motivo: v.motivo }, 'Liberação revogada.');
+        }, 'perigo') : null)))) : null,
+      el('p', { class: 'mudo peq', text: 'Informações extras: até ' + fmtNum(rec.info_extra) + ' letras.' }), el('div', { class: 'acoes' }, acoes)));
+  }
+
+  // Edições do cadastro por grupo (as mesmas regras do painel). A empresa fica na tela de dados sensíveis.
+  const grupos = [];
+  if (comp && ligada('editar_assistente')) grupos.push(formGrupo(x, 'assistente', comp.campos, 'cliente_editar_assistente', 'Assistente (o que o onboarding grava)'));
+  if (comp && ligada('editar_configuracoes')) grupos.push(formGrupo(x, 'configuracoes', comp.campos, 'cliente_editar_configuracoes', 'Configurações'));
+  if (comp && ligada('editar_recursos')) grupos.push(formGrupo(x, 'recursos', comp.campos, 'cliente_editar_recursos', 'Botões dos recursos'));
+  if (ligada('editar_limites')) {
+    grupos.push(formGrupo(x, 'limites', comp ? comp.campos : x.limites, 'editar_limites', 'Limites'));
+    grupos.push(el('div', { class: 'acoes' }, btnAcao('Registrar o aviso de limitação da franquia', async () => {
+      if (await confirmarEdicao('Aviso de limitação da franquia', [], 'Confirme que avisou a clínica (cláusula 11.4). A limitação só pode ser ligada 15 dias depois, se ela seguir acima da franquia.'))
+        fazer('franquia_aviso_registrar', { cliente_id: x.cliente_id });
+    })));
+  }
+  if (grupos.length) blocos.push(bloco('Editar o cadastro', ...grupos));
+
+  // Combinados, pedidos ao Asaas e linha do tempo (só leitura).
+  if (comp) {
+    const comb = comp.combinados || [], peds = comp.pedidos_asaas || [];
+    if (comb.length) blocos.push(bloco('Combinados com a clínica', el('ul', { class: 'lista' }, comb.map(k => el('li', {}, el('div', { class: 'cresce' },
+      el('div', { class: 'titulo-item', text: k.tipo.replace(/_/g, ' ') + ' · ' + fmtHora(k.criado_em) }), el('div', { class: 'mudo peq', text: 'Motivo: ' + (k.motivo || '—') + (k.combinado ? ' · Combinado: ' + k.combinado : '') })))))));
+    if (peds.length) blocos.push(bloco('Pedidos ao Asaas', el('ul', { class: 'lista' }, peds.map(p => el('li', {}, el('div', { class: 'cresce' },
+      el('div', { class: 'titulo-item', text: p.tipo.replace(/_/g, ' ') + ' · pedido ' + p.id }), el('div', { class: 'mudo peq', text: fmtHora(p.criado_em) + (p.feito_em ? ' → ' + fmtHora(p.feito_em) : '') + (p.resposta ? ' · ' + p.resposta : '') })),
+      el('span', { class: 'pill ' + (p.status === 'feito' ? 'ok' : p.status === 'falhou' ? 'alerta' : 'pend'), text: p.status }))))));
+    const lt = comp.linha_do_tempo || [];
+    if (lt.length) blocos.push(el('details', { class: 'grupo bloco' }, el('summary', { text: 'Linha do tempo (' + lt.length + ')' }), el('ul', { class: 'lista' }, lt.map(t => {
+      const o = String(t.o_que || ''); const txt = o.startsWith('Aviso: ') ? 'Aviso: ' + rotuloTipo(o.slice(7)) : o.startsWith('Central: ') ? 'Central: ' + (NOMES_EVENTO[o.slice(9)] || o.slice(9)) : o;
+      return el('li', {}, el('span', { class: 'mudo peq num', text: String(t.quando || '').length > 10 ? fmtHora(String(t.quando).replace(' ', 'T')) : fmtData(t.quando) }), el('span', { class: 'cresce', text: txt }));
+    }))));
+  }
+
+  // Clínica de teste da cobrança (só no sandbox): pede CONFIRMAR e o nome da clínica; o servidor só aceita clínica nova de teste.
+  if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
+    blocos.push(bloco('Teste da cobrança (sandbox)', teste
+      ? el('div', {}, el('p', { class: 'mudo', text: 'Esta é a clínica de teste da cobrança.' }), btnAcao('Limpar a clínica de teste da cobrança', async () => {
+        if (!(await confirmarEdicao('Limpar a clínica de teste da cobrança', [['Clínica de teste', x.cliente_id, '(nenhuma)']]))) return;
+        const r = await chamar('cobranca_teste_definir', { cliente_id: '', confirmacao: 'CONFIRMAR' });
+        if (!r.ok) { toast(r.mensagem || 'Não consegui.'); return; } await recarregarChaves(); toast('Clínica de teste limpa.'); recarregar();
+      }, 'perigo'))
+      : el('div', {}, el('p', { class: 'mudo peq', text: 'Só para uma clínica nova de teste, criada por você no contratar.html. O servidor recusa clínica que já pagou ou que é cliente de verdade.' }),
+        btnAcao('Usar como clínica de teste da cobrança', async () => {
+          const v = await pedir({ titulo: 'Clínica de teste da cobrança', aviso: 'Nela, plano, cobrança e situação mudam mesmo com as chaves desligadas. Chega um aviso no Telegram.', digitar: { rot: 'o nome da clínica', esperado: x.nome } });
+          if (!v) return;
+          const r = await chamar('cobranca_teste_definir', { cliente_id: x.cliente_id, confirmacao_nome: v._digitado, confirmacao: 'CONFIRMAR' });
+          if (!r.ok) { toast(r.mensagem || 'Não consegui.'); return; } await recarregarChaves(); toast('Clínica de teste da cobrança definida.'); recarregar();
+        }))));
+  }
+  return blocos.length ? el('div', { class: 'pilha' }, blocos) : null;
+});
+
+// --- Fase 4: tela de dados sensíveis (chave tela_cliente_sensivel). Os dados ficam só nesta tela: não vão para o
+// armazenamento do navegador e somem ao sair dela ou quando a Central vai para o fundo (iPad trocou de app).
+TELAS.sensivel = async (c, [id]) => {
+  const r = await chamar('cliente_sensivel', { cliente_id: id }); if (falhou(c, r)) return;
+  const d = r.dados, e = d.empresa || {}, a = d.aceite || {}, cp = d.copia_do_aceite;
+  c.replaceChildren(
+    el('div', { class: 'acoes' }, btnAcao('‹ Ficha', () => irCliente(d.cliente_id))),
+    el('h1', { text: 'Dados sensíveis · ' + d.nome }),
+    el('div', { class: 'faixa pend', text: 'Só nesta tela. Ao sair dela, os dados somem da página. Ver esta tela fica no registro.' }),
+    bloco('Empresa', campos(GRUPOS.empresa.map(k => [ROTULOS[k] || k, e[k]]))),
+    bloco('Registro do aceite (não editável)', campos([['Data do aceite', a.data_aceite], ['Versão dos termos', a.versao_termos], ['IP do aceite', a.ip_aceite], ['Acordo de tratamento (DPA)', a.aceite_dpa]])),
+    bloco('Cópia fixa do aceite', cp ? campos([['Guardada em', fmtHora(cp.copiado_em)], ['Razão social', cp.razao_social], ['CNPJ', cp.cnpj], ['Representante', cp.representante_nome],
+      ['CPF', cp.representante_cpf], ['E-mail', cp.email], ['Telefone', cp.telefone], ['Data do aceite', cp.data_aceite], ['Versão', cp.versao_termos], ['IP', cp.ip_aceite], ['Plano', cp.plano], ['Valor', cp.valor_mensal]])
+      : vazio('Ainda sem cópia: ela é guardada antes da primeira edição dos dados da empresa.')),
+    ligada('editar_empresa') ? bloco('Editar os dados da empresa', formGrupo({ cliente_id: d.cliente_id, nome: d.nome }, 'empresa', e, 'cliente_editar_empresa', 'Empresa')) : null);
+};
+// A Central foi para o fundo: tira os dados sensíveis da tela (volta com "Atualizar").
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && /^#sensivel\//.test(location.hash)) $('conteudo').replaceChildren(el('h1', { text: 'Dados sensíveis' }), el('p', { class: 'mudo', text: 'Escondidos porque a Central saiu da tela. Toque em Atualizar para ver de novo.' }));
+});
+
+// --- Fase 4: limites de uma chave da API (Enterprise), em Segurança › Chaves da API
+GANCHOS.limitesChave = k => est.chaves.editar_chaves_api === 'SIM' && !k.revogada_em ? btnAcao('Limites', async () => {
+  const v = await pedir({ titulo: 'Limites da chave ' + k.prefixo + '…', linhas: [['Por minuto', String(k.limite_minuto), '(a escolher)'], ['Por dia', String(k.limite_dia), '(a escolher)']],
+    campos: [{ k: 'limite_minuto', rot: 'Por minuto (1 a 600)', inputmode: 'numeric', valor: String(k.limite_minuto), obrig: true }, { k: 'limite_dia', rot: 'Por dia (1 a 100.000)', inputmode: 'numeric', valor: String(k.limite_dia), obrig: true }] });
+  if (v) fazer('chave_api_limites', { id: k.id, limite_minuto: v.limite_minuto.replace(/\D/g, ''), limite_dia: v.limite_dia.replace(/\D/g, '') }, 'Limites mudados.');
+}) : null;
 
 // ---------------------------------------------------------------- começo
 if (est.sessao) abrirApp(); else entrada();
