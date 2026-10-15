@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-zq7bHjQdDi6/xjChwLU319w5h+LIyJyzV+HyJn0nRVk='; style-src 'sha256-ZyFjVqDF1fxqS4NZDU1Y2ngPML+fpAbMZ8zHaJDiMQc='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-pdUqSIAw1BCKxVKBfLxJ1dq3rKBnIGWUgXWXz6GCN0w='; style-src 'sha256-N4jlKwCgQcE2VI2KdXLHpGtDIVtKBLB1uli8C8ilLE4='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -116,14 +116,11 @@ label.campo { display: block; margin-bottom: 12px; font-weight: 600; font-size: 
 label.campo input, label.campo select { display: block; width: 100%; margin-top: 6px; min-height: 46px; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink); }
 input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 45%, transparent); outline-offset: 2px; }
 input.codigo { letter-spacing: .3em; font-size: 22px !important; text-align: center; font-weight: 700; }
-.chave-totp { font: 700 20px/1.5 ui-monospace, Menlo, monospace; letter-spacing: .08em; background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: 12px; padding: 12px; text-align: center; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
-.codigos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font: 700 17px ui-monospace, Menlo, monospace; }
-.codigos span { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; text-align: center; }
+.segredo { font: 700 20px/1.5 ui-monospace, Menlo, monospace; letter-spacing: .08em; background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: 12px; padding: 12px; text-align: center; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
 /* entrada */
 .entrada { min-height: 100vh; display: grid; place-items: center; padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); background: var(--navy); }
 .entrada .bloco { width: 100%; max-width: 440px; }
 .entrada .cab { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.passos { margin: 0 0 12px; padding-left: 20px; } .passos li { margin-bottom: 6px; }
 .nome-grande { font-weight: 800; font-size: 19px; } .mt { margin-top: 14px; } label.campo.linha { display: flex; gap: 10px; align-items: center; }
 .erro { color: var(--rose-ink); font-weight: 600; min-height: 1.5em; }
 /* gráficos */
@@ -171,7 +168,7 @@ table.dados th, table.dados td { border-bottom: 1px solid var(--line); padding: 
 
 <script>
 'use strict';
-// Central RXSync. Contrato: rxsync-sistema/docs/mapa/central.md (DEC-053 a DEC-061).
+// Central RXSync. Contrato: rxsync-sistema/docs/mapa/central.md (DEC-053 a DEC-062).
 // Tudo o que vem do servidor entra na página como TEXTO (textContent), nunca como HTML.
 (function () {
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/central';
@@ -242,17 +239,6 @@ function janela(conteudo) {
   const primeiro = f.querySelector('input, button'); if (primeiro) primeiro.focus();
   return fechar;
 }
-// Pede o código de 6 dígitos (ligar chaves). Devolve o código ou '' se cancelar.
-function pedirCodigo(titulo, texto) {
-  return new Promise(ok => {
-    const inp = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', enterkeyhint: 'done', 'aria-label': 'Código de 6 dígitos' });
-    let fechar;
-    const enviar = e => { e.preventDefault(); const c = inp.value.replace(/\D/g, ''); if (c.length !== 6) { inp.focus(); return; } fechar(); ok(c); };
-    fechar = janela(el('form', { onsubmit: enviar }, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }),
-      el('label', { class: 'campo' }, 'Código do app Senhas', inp),
-      el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: 'Confirmar' }), el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => { fechar(); ok(''); } }))));
-  });
-}
 // Edição: mostra o antes e o depois e só segue com "CONFIRMAR" digitado.
 function confirmarEdicao(titulo, linhas, aviso) {
   return new Promise(ok => {
@@ -267,102 +253,104 @@ function confirmarEdicao(titulo, linhas, aviso) {
   });
 }
 function mostrarSegredo(titulo, valor, texto) {
-  const fechar = janela(el('div', {}, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }), el('div', { class: 'chave-totp', text: valor }),
+  const fechar = janela(el('div', {}, el('h2', { text: titulo }), el('p', { class: 'mudo', text: texto }), el('div', { class: 'segredo', text: valor }),
     el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', text: 'Copiar', onclick: () => copiar(valor) }), el('button', { class: 'btn sec', type: 'button', text: 'Já copiei', onclick: () => fechar() }))));
 }
 
-// ---------------------------------------------------------------- entrada
-function base32(bytes) { const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = 0, v = 0, s = ''; for (const b of bytes) { v = (v << 8) | b; bits += 8; while (bits >= 5) { s += A[(v >>> (bits - 5)) & 31]; bits -= 5; } } if (bits) s += A[(v << (5 - bits)) & 31]; return s; }
-function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; $('entrada-corpo').replaceChildren(...filhos); const i = $('entrada-corpo').querySelector('input'); if (i) i.focus(); }
+// ---------------------------------------------------------------- entrada (DEC-062)
+// E-mail (só o nome de usuário; quem confere é o servidor) + senha → o código de 6 dígitos vai para o Telegram do Jean
+// (nunca para esta página) → código. "Criar senha" e "Esqueci a senha" usam o mesmo código no Telegram.
+function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; $('entrada-corpo').replaceChildren(...filhos); const i = $('entrada-corpo').querySelector('input:not([hidden])'); if (i) i.focus(); }
 const msgErro = () => el('p', { class: 'erro', role: 'alert' });
+const soDigitos = v => String(v || '').replace(/\D/g, '');
+const campoEmail = valor => el('input', { type: 'email', inputmode: 'email', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', required: true, enterkeyhint: 'next', value: valor || null });
+const campoCodigo = () => el('input', { class: 'codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', required: true, enterkeyhint: 'go' });
 async function entrada(mensagem) {
   const r = await chamar('estado');
-  if (r.ok && r.primeiro_acesso) return primeiroAcesso();
+  if (r.ok && r.tem_senha === false) return pedirCodigoSenha(true, mensagem);
   formEntrada(mensagem || (r.ok ? '' : r.mensagem));
 }
-function formEntrada(mensagem, comRecuperacao) {
-  const usuario = el('input', { type: 'text', autocomplete: 'username', value: 'Central RXSync', readonly: true, hidden: true });
-  const senha = el('input', { type: 'password', autocomplete: 'current-password', required: true, enterkeyhint: 'next' });
-  const codigo = comRecuperacao
-    ? el('input', { type: 'text', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', placeholder: 'XXXX-XXXX', required: true })
-    : el('input', { class: 'codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', required: true, enterkeyhint: 'go' });
+function formEntrada(mensagem, emailAntes) {
+  const email = campoEmail(emailAntes);
+  const senha = el('input', { type: 'password', autocomplete: 'current-password', required: true, enterkeyhint: 'go' });
   const erro = msgErro(); erro.textContent = mensagem || '';
-  const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Entrar' });
+  const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Continuar' });
   const enviar = async e => {
     e.preventDefault(); btn.disabled = true; erro.textContent = '';
-    const dados = comRecuperacao ? { senha: senha.value, recuperacao: codigo.value.trim().toUpperCase() } : { senha: senha.value, codigo: codigo.value.replace(/\D/g, '') };
-    const r = await chamar('entrar', dados); btn.disabled = false;
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); if (r.recuperacao_restam != null) toast(`Restam ${r.recuperacao_restam} códigos de recuperação.`); return abrirApp(); }
-    if (r.primeiro_acesso) return primeiroAcesso();
+    const r = await chamar('entrar', { email: email.value.trim(), senha: senha.value }); btn.disabled = false;
+    if (r.ok && r.desafio) return formCodigo(r.desafio, r.mensagem, email.value.trim());
+    if (r.criar_senha) return pedirCodigoSenha(true, r.mensagem);
+    erro.textContent = r.mensagem || 'Não consegui entrar.'; senha.value = ''; senha.focus();
+  };
+  telaEntrada(el('form', { onsubmit: enviar },
+    el('label', { class: 'campo' }, 'E-mail', email),
+    el('label', { class: 'campo' }, 'Senha', senha), erro, btn,
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Esqueci a senha', onclick: () => pedirCodigoSenha(false, '', email.value.trim()) }))));
+}
+// "Mandar outro código" só libera depois de 1 minuto (o servidor também limita).
+function esperarUmMinuto(btn, texto) {
+  let falta = 60; btn.disabled = true; btn.textContent = `${texto} (${falta} s)`;
+  const t = setInterval(() => { falta--; if (!btn.isConnected) return clearInterval(t); if (falta <= 0) { clearInterval(t); btn.disabled = false; btn.textContent = texto; } else btn.textContent = `${texto} (${falta} s)`; }, 1000);
+}
+function formCodigo(desafio, aviso, email) {
+  const codigo = campoCodigo();
+  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Entrar' });
+  const outro = el('button', { class: 'btn sec plena', type: 'button', text: 'Mandar outro código', onclick: () => formEntrada('Digite a senha de novo para receber outro código.', email) });
+  const enviar = async e => {
+    e.preventDefault(); const c = soDigitos(codigo.value); if (c.length !== 6) { codigo.focus(); return; }
+    btn.disabled = true; erro.textContent = '';
+    const r = await chamar('entrar_codigo', { desafio, codigo: c }); btn.disabled = false;
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); return abrirApp(); }
+    if (r.recomecar) return formEntrada(r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
   };
-  telaEntrada(el('form', { onsubmit: enviar }, usuario,
-    el('label', { class: 'campo' }, 'Senha', senha),
-    el('label', { class: 'campo' }, comRecuperacao ? 'Código de recuperação' : 'Código do app Senhas (6 dígitos)', codigo),
-    erro, btn,
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: comRecuperacao ? 'Usar o código do app Senhas' : 'Usar um código de recuperação', onclick: () => formEntrada('', !comRecuperacao) }))));
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Código no Telegram' }),
+    el('p', { class: 'mudo', text: aviso || 'Mandei um código de 6 dígitos no seu Telegram. Ele vale 10 minutos.' }),
+    el('label', { class: 'campo' }, 'Código de 6 dígitos', codigo), erro, btn,
+    el('div', { class: 'acoes' }, outro, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email) }))));
+  esperarUmMinuto(outro, 'Mandar outro código');
 }
-function primeiroAcesso() {
-  const erro = msgErro();
-  const btn = el('button', { class: 'btn pri plena', type: 'button', text: 'Mandar código pelo Telegram' });
-  btn.onclick = async () => { btn.disabled = true; const r = await chamar('primeiro_pedir'); btn.disabled = false; if (r.ok) primeiroSenha(r.mensagem); else erro.textContent = r.mensagem || 'Não consegui.'; };
-  telaEntrada(el('h2', { text: 'Primeiro acesso' }),
-    el('p', { class: 'mudo', text: 'A Central ainda não tem senha. Um código de 8 dígitos vai para o seu Telegram (vale 10 minutos).' }), erro, btn,
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Já tenho o código', onclick: () => primeiroSenha('') })));
-}
-function primeiroSenha(aviso) {
-  const usuario = el('input', { type: 'text', autocomplete: 'username', value: 'Central RXSync', readonly: true, hidden: true });
-  const codigo = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'off', maxlength: '8', required: true });
-  const s1 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true });
-  const s2 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true });
-  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Criar a senha' });
-  const enviar = async e => {
-    e.preventDefault(); erro.textContent = '';
-    if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; return; }
-    if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; return; }
-    btn.disabled = true; const r = await chamar('primeiro_senha', { codigo: codigo.value.replace(/\D/g, ''), senha: s1.value }); btn.disabled = false;
-    if (r.ok && r.desafio) return primeiroAutenticador(r.desafio);
-    erro.textContent = r.mensagem || 'Não consegui.';
-  };
-  telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: 'Primeiro acesso: senha' }), aviso ? el('p', { class: 'mudo', text: aviso }) : null,
-    el('label', { class: 'campo' }, 'Código do Telegram (8 dígitos)', codigo),
-    el('label', { class: 'campo' }, 'Senha nova (12 caracteres ou mais; deixe o app Senhas sugerir)', s1),
-    el('label', { class: 'campo' }, 'Repita a senha', s2), erro, btn));
-}
-function primeiroAutenticador(desafio) {
-  // A chave do autenticador é sorteada AQUI, no iPad (crypto.getRandomValues). Ela não vai para o banco: você a guarda no
-  // app Senhas e cola a mesma chave na credencial "TOTP Central" do n8n (DEC-054).
-  const chave = base32(crypto.getRandomValues(new Uint8Array(20)));
-  const link = 'otpauth://totp/RXSync:Central?secret=' + chave + '&issuer=RXSync&algorithm=SHA1&digits=6&period=30';
-  const codigo = el('input', { class: 'codigo', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', required: true });
-  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Confirmar o código' });
+// Primeira senha (primeira = true) ou "Esqueci a senha": o código vai para o Telegram.
+function pedirCodigoSenha(primeira, mensagem, emailAntes) {
+  const email = campoEmail(emailAntes);
+  const erro = msgErro(); erro.textContent = mensagem || '';
+  const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Mandar código no Telegram' });
   const enviar = async e => {
     e.preventDefault(); btn.disabled = true; erro.textContent = '';
-    const r = await chamar('primeiro_confirmar', { desafio, codigo: codigo.value.replace(/\D/g, '') }); btn.disabled = false;
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); return mostrarRecuperacao(r.recuperacao || []); }
-    if (r.recomecar) return primeiroAcesso();
-    erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = '';
+    const r = await chamar('senha_pedir', { email: email.value.trim() }); btn.disabled = false;
+    if (r.ok && r.desafio) return formSenhaNova(r.desafio, r.mensagem, primeira, email.value.trim());
+    erro.textContent = r.mensagem || 'Não consegui.';
   };
-  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Primeiro acesso: código de 6 dígitos' }),
-    el('ol', { class: 'passos' },
-      el('li', {}, 'Toque em ', el('a', { href: link, text: 'adicionar ao app Senhas' }), '. Se não abrir: app Senhas › Códigos › + › "Inserir chave de configuração" e cole a chave abaixo.'),
-      el('li', { text: 'No n8n: Credentials › "TOTP Central" › Secret: cole a mesma chave (troque a provisória) e salve.' }),
-      el('li', { text: 'Digite o código de 6 dígitos que o app Senhas mostra.' })),
-    el('div', { class: 'chave-totp', text: chave }),
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Copiar a chave', onclick: () => copiar(chave) })),
-    el('label', { class: 'campo mt' }, 'Código do app Senhas', codigo), erro, btn,
-    el('p', { class: 'mudo peq', text: 'Este passo vale 30 minutos. A chave só aparece aqui, agora.' })));
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: primeira ? 'Criar senha' : 'Esqueci a senha' }),
+    el('p', { class: 'mudo', text: primeira ? 'A Central ainda não tem senha. Digite o seu e-mail: um código de 6 dígitos vai para o seu Telegram (vale 10 minutos).'
+      : 'Digite o seu e-mail: um código de 6 dígitos vai para o seu Telegram (vale 10 minutos). Com ele, você cria uma senha nova.' }),
+    el('label', { class: 'campo' }, 'E-mail', email), erro, btn,
+    primeira ? null : el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email.value.trim()) }))));
 }
-function mostrarRecuperacao(codigos) {
-  const texto = codigos.join('\n');
-  const ok = el('input', { type: 'checkbox' });
-  const btn = el('button', { class: 'btn pri plena', type: 'button', text: 'Entrar na Central', disabled: true, onclick: () => abrirApp() });
-  ok.onchange = () => { btn.disabled = !ok.checked; };
-  telaEntrada(el('h2', { text: 'Códigos de recuperação' }),
-    el('p', { class: 'mudo', text: 'Guarde estes 10 códigos (por exemplo, numa nota do app Senhas). Cada um entra uma vez, no lugar do código de 6 dígitos. Eles não aparecem de novo.' }),
-    el('div', { class: 'codigos' }, codigos.map(c => el('span', { text: c }))),
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Copiar os 10 códigos', onclick: () => copiar(texto) })),
-    el('label', { class: 'campo linha mt' }, ok, 'Guardei os códigos'), btn);
+function formSenhaNova(desafio, aviso, primeira, email) {
+  // O e-mail vai num campo escondido só para o iPad guardar a senha nova junto com ele.
+  const usuario = el('input', { type: 'email', autocomplete: 'username', value: email || null, readonly: true, hidden: true });
+  const codigo = campoCodigo(); codigo.setAttribute('enterkeyhint', 'next');
+  const s1 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true, enterkeyhint: 'next' });
+  const s2 = el('input', { type: 'password', autocomplete: 'new-password', minlength: '12', required: true, enterkeyhint: 'done' });
+  const erro = msgErro(); const btn = el('button', { class: 'btn pri plena', type: 'submit', text: 'Salvar e entrar' });
+  const enviar = async e => {
+    e.preventDefault(); erro.textContent = '';
+    const c = soDigitos(codigo.value); if (c.length !== 6) { erro.textContent = 'Digite o código de 6 dígitos do Telegram.'; codigo.focus(); return; }
+    if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; s1.focus(); return; }
+    if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; s2.focus(); return; }
+    btn.disabled = true; const r = await chamar('senha_nova', { desafio, codigo: c, senha: s1.value }); btn.disabled = false;
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); toast(primeira ? 'Senha criada.' : 'Senha trocada. Os outros aparelhos saíram da Central.'); return abrirApp(); }
+    if (r.recomecar) return pedirCodigoSenha(primeira, r.mensagem, email);
+    erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = ''; codigo.focus();
+  };
+  telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: primeira ? 'Criar senha' : 'Senha nova' }),
+    el('p', { class: 'mudo', text: aviso || 'Se o e-mail estiver certo, o código chega no seu Telegram em instantes. Ele vale 10 minutos.' }),
+    el('label', { class: 'campo' }, 'Código de 6 dígitos (no Telegram)', codigo),
+    el('label', { class: 'campo' }, 'Senha nova (12 caracteres ou mais)', s1),
+    el('label', { class: 'campo' }, 'Repita a senha', s2), erro, btn,
+    el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central e chega um aviso no Telegram.' }),
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => primeira ? pedirCodigoSenha(true, '', email) : formEntrada('', email) }))));
 }
 
 // ---------------------------------------------------------------- navegação
@@ -641,7 +629,7 @@ TELAS.seguranca = async c => {
     el('div', { class: 'mudo peq', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
     s.esta ? null : el('button', { class: 'btn perigo', type: 'button', text: 'Encerrar', onclick: async () => { const x = await chamar('encerrar_sessao', { id: s.id }); toast(x.ok ? 'Sessão encerrada.' : x.mensagem); rotear(); } }))));
   c.replaceChildren(el('h1', { text: 'Segurança' }),
-    bloco('Aparelhos conectados', lista, el('p', { class: 'mudo peq', text: `Códigos de recuperação que ainda valem: ${d.recuperacao_restam}. A sessão vale 8 horas, ou 30 minutos sem uso.` }),
+    bloco('Aparelhos conectados', lista, el('p', { class: 'mudo peq', text: `A sessão vale 8 horas, ou 30 minutos sem uso.${d.senha_trocada_em ? ' Senha criada ou trocada em ' + fmtHora(d.senha_trocada_em) + '.' : ''} Para trocar a senha, saia e toque em "Esqueci a senha".` }),
       el('div', { class: 'acoes' }, el('button', { class: 'btn perigo', type: 'button', text: 'Sair de todos os aparelhos', onclick: async () => {
         if (!(await confirmarEdicao('Sair de todos os aparelhos', [], 'Todas as sessões, inclusive esta, terminam agora.'))) return;
         await chamar('sair_todos'); guardarSessao(''); entrada('Você saiu de todos os aparelhos.');
@@ -657,12 +645,12 @@ TELAS.chaves = async c => {
     k.so_por_sql ? el('span', { class: 'pill', text: (k.valor === 'SIM' || k.valor === 'NAO' ? (k.valor === 'SIM' ? 'ligada' : 'desligada') : k.valor) + ' · só por PR' })
       : el('button', { class: 'btn ' + (k.valor === 'SIM' ? 'perigo' : 'pri'), type: 'button', text: k.valor === 'SIM' ? 'Desligar' : 'Ligar', onclick: async () => {
         const novo = k.valor === 'SIM' ? 'NAO' : 'SIM';
-        const cod = await pedirCodigo((novo === 'SIM' ? 'Ligar ' : 'Desligar ') + k.chave, 'Para mudar uma chave, digite o código de 6 dígitos do app Senhas.');
-        if (!cod) return;
-        const x = await chamar('ligar_chave', { chave: k.chave, valor: novo, codigo: cod });
+        // Sem código (DEC-062): só "CONFIRMAR", como nas edições. Chave "só por SQL" nem tem botão (e o servidor recusa).
+        if (!(await confirmarEdicao((novo === 'SIM' ? 'Ligar ' : 'Desligar ') + k.chave, [[k.chave, k.valor, novo]], 'A mudança fica no registro e avisa no Telegram.'))) return;
+        const x = await chamar('ligar_chave', { chave: k.chave, valor: novo, confirmacao: 'CONFIRMAR' });
         toast(x.ok ? `${k.chave}: ${x.antes} → ${x.depois}` : (x.mensagem || 'Não consegui.')); if (x.ok) { montarMenu(); rotear(); }
       } }));
-  c.replaceChildren(el('h1', { text: 'Chaves' }), el('p', { class: 'mudo', text: 'Liga e desliga telas e edições. Cada mudança pede o código de 6 dígitos, fica no registro e avisa no Telegram.' }),
+  c.replaceChildren(el('h1', { text: 'Chaves' }), el('p', { class: 'mudo', text: 'Liga e desliga telas e edições. Cada mudança pede "CONFIRMAR", fica no registro e avisa no Telegram.' }),
     bloco(null, el('ul', { class: 'lista' }, (r.chaves || []).map(linha))));
 };
 
@@ -700,8 +688,8 @@ TELAS.funil_completo = async c => {
 const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
   chave: 'Chave mudada', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
   avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
-  primeiro_codigo_pedido: 'Código de primeiro acesso pedido', primeiro_senha_criada: 'Senha criada', primeiro_acesso_concluido: 'Primeiro acesso concluído', reinicio_por_sql: 'Reinício por SQL' };
-const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como); if (d.prefixo) p.push(d.prefixo + '…');
+  codigo_pedido: 'Código pedido no Telegram', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código não saiu pelo Telegram', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL' };
+const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como); if (d.finalidade) p.push(d.finalidade === 'senha' ? 'troca de senha' : 'entrada'); if (d.prefixo) p.push(d.prefixo + '…');
   if (d.antes && d.depois && typeof d.antes === 'object') p.push(Object.keys(d.depois).map(k => `${k}: ${d.antes[k] ?? '—'} → ${d.depois[k] ?? '—'}`).join(', ')); return p.join(' · '); };
 GANCHOS.seguranca.push(async () => {
   if (est.chaves.tela_registro !== 'SIM') return null;
