@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="{{CSP}}">
+<meta name="theme-color" content="#0a1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Central">
+<meta name="format-detection" content="telephone=no">
+<title>Central RXSync</title>
+<link rel="manifest" href="/central/manifest.webmanifest">
+<link rel="icon" href="/assets/favicon-rxsync.png.PNG">
+<link rel="apple-touch-icon" href="/assets/favicon-rxsync.png.PNG">
+<style>{{CSS}}</style>
+</head>
+<body>
+<!-- Página montada por scripts/central_montar.mjs a partir de central/fonte/. Não edite este arquivo à mão. -->
+<div id="entrada" class="tela-entrada" hidden>
+  <div class="cartao" role="main">
+    <div class="cab-entrada"><div class="marca">RX</div><div><div class="nome-grande">Central RXSync</div><div class="mudo peq">Área do administrador</div></div></div>
+    <div id="entrada-corpo"></div>
+  </div>
+</div>
+<div id="app" class="casca" hidden>
+  <aside class="lateral" id="lateral" aria-label="Menu principal"></aside>
+  <nav class="trilho" id="trilho" aria-label="Menu principal"></nav>
+  <div class="coluna">
+    <header class="topo" id="topo"></header>
+    <main class="conteudo" id="conteudo" tabindex="-1"></main>
+  </div>
+  <nav class="barra" id="barra" aria-label="Seções"></nav>
+</div>
+<div id="camada"></div>
+<div id="rapida" class="rapida" role="status" aria-live="polite" hidden></div>
+<script>{{JS}}</script>
+</body>
+</html>
