@@ -36,7 +36,7 @@
   <header class="bg-primary-900 text-white">
     <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
       <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v10</span>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v11</span>
     </div>
   </header>
 
@@ -46,7 +46,7 @@
       <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para negócios que atendem com hora marcada</p>
 
       <div class="doc">
-        <p><strong>Versão 2026-10-v10</strong> · Vigente a partir de 15 de outubro de 2026</p>
+        <p><strong>Versão 2026-10-v11</strong> · Vigente a partir de 16 de outubro de 2026</p>
 
         <blockquote>
           <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros. Para oferecer o serviço, a RXSync também pode entrar em contato, pelo WhatsApp, com empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões cujo contato comercial está publicado na internet (como no Google Maps). Nesses contatos, dizemos quem somos e de onde veio o número, e basta responder SAIR para nunca mais receber (<a href="#prospeccao">seção 3.1</a>).</p>
@@ -177,6 +177,7 @@
             <li>Conteúdo das mensagens, incluindo áudios (transcritos para texto) e os dados que o paciente decidir informar;</li>
             <li>No plano Gestão Inteligente, fotos e documentos em PDF que o paciente enviar (como pedido de exame, guia, carteirinha do convênio ou documento de identidade), dos quais a assistente extrai apenas dados administrativos para a equipe da clínica;</li>
             <li>Dados de agendamento, lista de espera, lembretes e pesquisa de satisfação (nota e comentário, ligados ao código do paciente);</li>
+            <li>Quando a clínica usa essa função, a situação do pagamento da consulta (paga ou não, quando e se foi marcada pela equipe da clínica ou herdada de uma consulta remarcada) e a data em que a assistente enviou ao paciente o link de pagamento definido pela clínica. A RXSync não recebe o pagamento nem os dados usados para pagar: o link é da própria clínica (por exemplo, da maquininha ou do banco dela);</li>
             <li>A data em que o telefone do paciente conversou com a clínica pela primeira vez, usada para que as mensagens de relacionamento (seção 4.2) só vão a quem já conversou com a clínica;</li>
             <li>No plano Gestão Inteligente, o cadastro que a clínica mantém no painel, na área Pacientes: e-mail, data de nascimento e uma observação administrativa curta, que nunca deve ter conteúdo clínico, além, quando o paciente vem de uma importação feita pela clínica (por planilha ou de outro sistema), da origem e da data dessa importação. A clínica, como controladora, responde pela base legal e pela exatidão dos dados que importa;</li>
             <li>No plano Gestão Inteligente, o registro das mensagens de relacionamento enviadas ao paciente (aviso de retorno, convite para voltar e convite para avaliar a clínica no Google: data, tipo e situação do envio) e, se o paciente pedir, a marca de que ele não quer receber essas mensagens;</li>
@@ -186,6 +187,7 @@
           </ul>
           <h3>4.2. Para que a RXSync os usa</h3>
           <p>Atendimento automatizado e humano, triagem administrativa, agendamento, perguntas antes do agendamento definidas pela clínica (pré-consulta), lembretes de consulta, mensagens de retomada de conversa, avisos de vaga da lista de espera, pesquisa de satisfação, indicadores operacionais, e o assistente de gestão e o resumo diário da agenda enviados à equipe da clínica da própria clínica. A mensagem de retomada não é enviada a quem pediu para não receber mais mensagens.</p>
+          <p>Quando a clínica liga essa função, em qualquer plano, a assistente envia ao paciente, logo depois de marcar a consulta, uma mensagem com o dia, o horário e o <strong>link de pagamento</strong> definido pela clínica, e, se a clínica pedir, repete o link no lembrete da consulta ainda não paga. A assistente não informa valores nem confirma pagamentos: a equipe da clínica marca a consulta como paga no painel, e nenhuma consulta é cancelada por falta de pagamento.</p>
           <p>No plano Gestão Inteligente, quando a clínica liga essas funções, a assistente também envia <strong>mensagens de relacionamento</strong> em nome da clínica:</p>
           <ul>
             <li><strong>Aviso de retorno:</strong> quando passa o prazo de retorno da última consulta, uma vez por consulta, oferecendo horários;</li>
@@ -277,6 +279,7 @@
               <tr><td>Pedido do paciente para não receber as mensagens de relacionamento (“não contatar”)</td><td>Enquanto durar o contrato, para que o pedido continue sendo respeitado; eliminado com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Avisos de eventos enviados ao sistema da clínica (plano Enterprise)</td><td>Apagados <strong>30 dias</strong> depois do evento. O que chega ao sistema da clínica fica com ela.</td></tr>
               <tr><td>Pedidos de envio de mensagem feitos pelo sistema da clínica (plano Enterprise)</td><td>O texto da mensagem é apagado assim que o pedido termina (enviada, não enviada ou expirada); o registro do pedido, sem o texto, <strong>90 dias</strong> depois.</td></tr>
+              <tr><td>Situação do pagamento da consulta e data do envio do link de pagamento (quando a clínica usa essa função)</td><td>Enquanto durar o contrato, junto do agendamento; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Nota e comentário da pesquisa de satisfação</td><td>Enquanto durar o contrato, junto do agendamento; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Dados de contexto da conversa em bases transitórias</td><td>Expurgados automaticamente após a resolução do atendimento.</td></tr>
               <tr><td>Cópias de segurança (backup)</td><td>Rotativas, com retenção mínima de 7 dias; os dados eliminados saem dos backups no ciclo de renovação.</td></tr>
@@ -337,6 +340,7 @@
           <p>Podemos atualizar esta Política para refletir mudanças no serviço, nos fornecedores ou na lei. A versão vigente é sempre a publicada nesta página, com o número da versão e a data de início de vigência no topo. Mudanças relevantes que afetem clientes serão comunicadas ao e-mail cadastrado, com a antecedência prevista nos Termos de Uso. O uso do site e do serviço depois da vigência da nova versão não afeta os direitos que você tem pela lei.</p>
           <p><strong>Histórico de versões</strong></p>
           <ul>
+            <li><strong>2026-10-v11</strong>, vigente a partir de 16 de outubro de 2026: entram, nos dados de pacientes, a situação do pagamento da consulta e o envio do link de pagamento definido pela clínica (seções 4.1 e 4.2) e o prazo de guarda desses dados (seção 8).</li>
             <li><strong>2026-10-v10</strong>, vigente a partir de 15 de outubro de 2026: entra a prospecção comercial pelo WhatsApp (seções 2, 3, 3.1, 5, 6, 7, 8 e 11): de onde vêm os dados (Google Maps, por meio da SerpApi), a base legal (legítimo interesse), como sair (SAIR), os limites de mensagens, o uso da assistente virtual, que a base de pacientes das clínicas não é usada, o registro para medir as campanhas e os prazos de guarda; o subtítulo e a seção 12 passam a falar de profissionais e empresas que atendem com hora marcada.</li>
             <li><strong>2026-10-v9</strong>, vigente a partir de 14 de outubro de 2026: o pedido de demonstração feito pelo formulário do site passa a ter prazo de guarda próprio, de 180 dias do pedido, com exclusão automática (seção 8); o prazo das conversas do chat do site não muda.</li>
             <li><strong>2026-10-v8</strong>, vigente a partir de 14 de outubro de 2026: o link para os Termos de Uso na seção 1 passa a levar à versão vigente (2026-10-v3).</li>
