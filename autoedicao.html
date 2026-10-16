@@ -468,6 +468,14 @@
             <p class="subtitulo" style="margin:0">Para quem agenda por iClinic, Doctoralia, Feegow ou outro sistema com página de agendamento. Em vez de marcar, a assistente envia o link.</p></div>
           <div id="campos_linkagenda"></div>
         </div>
+        <div class="bloco pad" id="aiBox" style="margin-top:14px">
+          <h2 class="sec">Importar a agenda de outro sistema</h2>
+          <p class="subtitulo" style="margin:0 0 12px;font-size:14px">Traga as consultas passadas, atuais e futuras de outro sistema (Reservio, iClinic, planilha própria), por um arquivo CSV. O arquivo é lido aqui no seu aparelho: só a data, a hora, o nome, o telefone, o serviço e as colunas que você escolher vão para a RXSync. Anotações e observações do outro sistema nunca são enviadas.</p>
+          <ol class="pc-passos" id="aiPassos"><li data-passo="1">Arquivo</li><li data-passo="2">Colunas</li><li data-passo="3">Prévia</li><li data-passo="4">Pronto</li></ol>
+          <div id="aiTela"></div>
+          <div class="pc-sec" style="margin-top:18px">Importações da agenda</div>
+          <div id="aiLista"><div class="vazio">Carregando…</div></div>
+        </div>
       </div>
     </section>
 
@@ -820,7 +828,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
       if (abaAg) segAg.scrollLeft += abaAg.getBoundingClientRect().left - segAg.getBoundingClientRect().left - (segAg.clientWidth - abaAg.offsetWidth) / 2;
       if (sub === "documentos") docCarregar();
       if (sub === "espera") filaCarregar();
-      if (sub === "integracao") intCarregar();
+      if (sub === "integracao") { intCarregar(); if (!AI) aiInicio(); aiListar(); }
       if (sub === "horarios") { gradeChecarInteg(); ferCarregar(); asaasCarregar(); }
     }
     if (area === "hoje") hojeRender();
@@ -1298,6 +1306,253 @@ function partesTz(ms) {
       }).catch(function () { ch.value = ""; bc.disabled = false; msg.appendChild(h$("div", "aviso rosa", "Não consegui falar com o servidor. Tente de novo.")); });
     });
     bc.style.marginTop = "12px"; box.appendChild(bc);
+  }
+
+  // ===== IMPORTAR AGENDA (DEC-093). Tudo é lido e limpo AQUI, no aparelho, como a importação de pacientes: só as colunas
+  // escolhidas da lista abaixo vão para o servidor, em lotes de 500 (agenda_importar). Anotações nunca saem do aparelho.
+  var AI = null, AI_LOTE = 500, AI_MAX = 20000;
+  var AI_CAMPOS = [
+    { k: "data", rot: "Data (ou data e hora)", obrig: true }, { k: "hora", rot: "Hora de início (se vier separada)" },
+    { k: "fim", rot: "Hora de término" }, { k: "duracao", rot: "Duração em minutos" },
+    { k: "nome", rot: "Nome", obrig: true }, { k: "sobrenome", rot: "Sobrenome (se vier separado)" }, { k: "telefone", rot: "Telefone", obrig: true },
+    { k: "servico", rot: "Serviço" }, { k: "medico", rot: "Profissional (médico)", med: true }, { k: "tipo", rot: "Tipo de consulta", med: true },
+    { k: "codigo", rot: "Código da reserva no outro sistema" }, { k: "situacao", rot: "Situação (para achar as canceladas)" }, { k: "pago", rot: "Pago (sim/não)" }
+  ];
+  var AI_NOMES = {
+    data: ["data", "dia", "date", "data da consulta", "data do agendamento", "inicio", "start", "start date", "data hora", "data/hora", "data e hora", "date time"],
+    hora: ["hora", "horario", "hora inicio", "hora de inicio", "time", "start time"], fim: ["fim", "termino", "hora fim", "hora de termino", "end", "end time"],
+    duracao: ["duracao", "duration", "minutos", "duracao min"], nome: ["nome", "nome completo", "paciente", "cliente", "nome do paciente", "nome do cliente", "name", "client", "client name", "customer", "first name"],
+    sobrenome: ["sobrenome", "last name", "surname"], telefone: ["telefone", "celular", "whatsapp", "fone", "phone", "phone number", "mobile"],
+    servico: ["servico", "service", "procedimento", "evento", "event"], medico: ["profissional", "medico", "medica", "recurso", "resource", "staff", "doctor"],
+    tipo: ["tipo", "tipo de consulta"], codigo: ["id", "codigo", "booking id", "reserva", "id da reserva", "booking"], situacao: ["status", "situacao", "estado", "state"],
+    pago: ["pago", "paga", "pagamento", "paid", "payment status"]
+  };
+  function aiTela() { var t = el("aiTela"); t.innerHTML = ""; return t; }
+  function aiPasso(n) { el("aiPassos").querySelectorAll("li").forEach(function (li) { var p = +li.dataset.passo; li.className = p < n ? "pc-feito" : (p === n ? "pc-agora" : ""); }); }
+  function aiMapaAuto(cab) {
+    var mapa = {}, usados = {};
+    AI_CAMPOS.forEach(function (f) {
+      if (f.med && !MODO_MED) { mapa[f.k] = -1; return; }
+      var nomes = AI_NOMES[f.k] || [];
+      var i = cab.findIndex(function (h, j) { return !usados[j] && nomes.indexOf(impSem(h)) >= 0; });
+      mapa[f.k] = i; if (i >= 0) usados[i] = true;
+    });
+    return mapa;
+  }
+  // "AAAA-MM-DD", "DD/MM/AAAA" (com ou sem hora), e a hora em outra coluna ("9:00", "09h30"). Devolve "AAAA-MM-DD HH:MM" ou null.
+  function aiDataHora(dt, hr) {
+    var v = String(dt || "").trim(), a, me, d, h = null, mi = null, m;
+    if ((m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2})[:h](\d{2}))?/))) { a = +m[1]; me = +m[2]; d = +m[3]; if (m[4]) { h = +m[4]; mi = +m[5]; } }
+    else if ((m = v.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4}|\d{2})(?:[ T,]+(\d{1,2})[:h](\d{2}))?/))) { d = +m[1]; me = +m[2]; a = +m[3]; if (m[3].length === 2) a += 2000; if (m[4]) { h = +m[4]; mi = +m[5]; } }
+    else return null;
+    var hv = String(hr || "").trim();
+    if (hv) { var mh = hv.match(/^(\d{1,2})[:h](\d{2})/); if (!mh) return null; h = +mh[1]; mi = +mh[2]; }
+    if (h === null) return null;
+    var x = new Date(Date.UTC(a, me - 1, d));
+    if (x.getUTCFullYear() !== a || x.getUTCMonth() !== me - 1 || x.getUTCDate() !== d || h > 23 || mi > 59) return null;
+    var p = function (n) { return String(n).padStart(2, "0"); };
+    return a + "-" + p(me) + "-" + p(d) + " " + p(h) + ":" + p(mi);
+  }
+  function aiInicio() {
+    AI = null; aiPasso(1);
+    var t = aiTela();
+    var cx = h$("label", "pc-arquivo");
+    cx.insertAdjacentHTML("afterbegin", svg("baixar"));
+    cx.appendChild(h$("strong", null, "Escolher o arquivo da agenda (CSV)"));
+    cx.appendChild(h$("span", "subtitulo", "No iPad e no iPhone, abre o app Arquivos."));
+    var inp = h$("input"); inp.type = "file"; inp.accept = ".csv,.txt,.xlsx,.xls,.numbers,text/csv,text/plain";
+    cx.appendChild(inp); cx.appendChild(h$("span", "btn pri", "Escolher arquivo")); t.appendChild(cx);
+    var dica = h$("div", "aviso neutro"); dica.style.marginTop = "14px";
+    dica.textContent = "Como exportar: no Reservio (ou no seu sistema), exporte as reservas ou a agenda. Se vier em Excel (.xlsx), abra no app Numbers e use ⋯ › Exportar › CSV.";
+    t.appendChild(dica);
+    var msg = h$("div"); t.appendChild(msg);
+    inp.onchange = function () {
+      var fl = inp.files && inp.files[0]; msg.innerHTML = ""; if (!fl) return;
+      var r = new FileReader();
+      r.onload = function () {
+        var b = new Uint8Array(r.result), ext = (fl.name.split(".").pop() || "").toLowerCase();
+        if ((b[0] === 0x50 && b[1] === 0x4B) || ["xlsx", "xls", "numbers"].indexOf(ext) >= 0) { msg.appendChild(pacAviso("ambar", "Este arquivo é do Excel ou do Numbers, não um CSV. Abra no app Numbers e use ⋯ › Exportar › CSV.")); inp.value = ""; return; }
+        var texto = impDecodificar(r.result), linhas = impCsv(texto, impSeparador(texto)).filter(function (l, i) { return i === 0 || l.some(function (x) { return String(x).trim(); }); });
+        if (linhas.length < 2) { msg.appendChild(pacAviso("rosa", "Não encontrei consultas nesse arquivo. A primeira linha precisa ter os títulos das colunas.")); inp.value = ""; return; }
+        if (linhas.length - 1 > AI_MAX) { msg.appendChild(pacAviso("rosa", "O arquivo tem mais de " + AI_MAX.toLocaleString("pt-BR") + " linhas. Divida em arquivos menores.")); inp.value = ""; return; }
+        var cab = linhas[0].map(function (h) { return String(h).trim(); });
+        AI = { arquivo: fl.name, cab: cab, dados: linhas.slice(1), mapa: aiMapaAuto(cab), sistema: /reservio/i.test(fl.name) ? "reservio" : "outro", medMapa: {}, tipoMapa: {}, lembretes: false };
+        aiColunas();
+      };
+      r.readAsArrayBuffer(fl);
+    };
+  }
+  function aiCol(r, k) { var i = AI.mapa[k]; return i >= 0 ? String(r[i] == null ? "" : r[i]).trim() : ""; }
+  function aiColunas() {
+    aiPasso(2);
+    var t = aiTela();
+    t.appendChild(h$("p", "subtitulo", "Arquivo " + AI.arquivo + ": " + AI.dados.length.toLocaleString("pt-BR") + " linha(s). Confira de qual coluna vem cada informação."));
+    var bl = h$("div", "bloco pc-mapa"); bl.style.marginTop = "12px";
+    AI_CAMPOS.forEach(function (f) {
+      if (f.med && !MODO_MED) return;
+      var lb = h$("label", null, f.rot + (f.obrig ? " *" : "")); lb.htmlFor = "aiCol_" + f.k; bl.appendChild(lb);
+      var sel = h$("select"); sel.id = "aiCol_" + f.k;
+      var o0 = h$("option", null, f.obrig ? "Escolha a coluna" : "Não usar"); o0.value = "-1"; sel.appendChild(o0);
+      AI.cab.forEach(function (h, i) { var o = h$("option", null, h || "Coluna " + (i + 1)); o.value = String(i); sel.appendChild(o); });
+      sel.value = String(AI.mapa[f.k]); sel.onchange = function () { AI.mapa[f.k] = +sel.value; aiExtras(); };
+      bl.appendChild(sel);
+    });
+    t.appendChild(bl);
+    var lbS = h$("label", "rot", "De qual sistema veio o arquivo?"); t.appendChild(lbS);
+    var sS = h$("select"); [["reservio", "Reservio"], ["outro", "Outro sistema ou planilha"]].forEach(function (o) { var op = h$("option", null, o[1]); op.value = o[0]; sS.appendChild(op); });
+    sS.value = AI.sistema; sS.onchange = function () { AI.sistema = sS.value; }; t.appendChild(sS);
+    var fora = h$("p", "pc-dica"); t.appendChild(fora);
+    var extras = h$("div"); t.appendChild(extras);
+    var erro = h$("div"); erro.style.marginTop = "12px"; t.appendChild(erro);
+    var seguir = pacBtn("Ver a prévia", "pri plena", function () {
+      erro.innerHTML = "";
+      if (AI.mapa.data < 0 || AI.mapa.nome < 0 || AI.mapa.telefone < 0) { erro.appendChild(pacAviso("rosa", "Escolha as colunas da data, do nome e do telefone.")); return; }
+      aiPrevia();
+    });
+    seguir.style.marginTop = "16px"; t.appendChild(seguir);
+    t.appendChild(pacBtn("Escolher outro arquivo", "sec plena", aiInicio));
+    function aiExtras() {
+      var usadas = AI_CAMPOS.map(function (f) { return AI.mapa[f.k]; });
+      var nao = AI.cab.filter(function (h, i) { return usadas.indexOf(i) < 0; });
+      fora.textContent = nao.length ? "Ficam só no aparelho (não são enviadas): " + nao.join(", ") + "." : "";
+      extras.innerHTML = "";
+      // Médico e tipo (só no modo médicos): cada nome do arquivo é ligado a um médico e a um tipo cadastrado aqui.
+      if (MODO_MED && AI.mapa.medico >= 0) {
+        var nomes = {}; AI.dados.forEach(function (r) { var v = aiCol(r, "medico"); if (v) nomes[v] = true; });
+        extras.appendChild(h$("div", "pc-sec", "Profissionais do arquivo"));
+        Object.keys(nomes).slice(0, 50).forEach(function (n) {
+          var lb = h$("label", "rot", n); extras.appendChild(lb);
+          var s2 = h$("select"), o0 = h$("option", null, "Sem médico"); o0.value = ""; s2.appendChild(o0);
+          medDados.forEach(function (m) { var o = h$("option", null, m.nome + (m.ativo ? "" : " (removido)")); o.value = String(m.id); s2.appendChild(o); });
+          if (AI.medMapa[n] === undefined) { var achou = medDados.find(function (m) { return impSem(m.nome) === impSem(n); }); AI.medMapa[n] = achou ? String(achou.id) : ""; }
+          s2.value = AI.medMapa[n]; s2.onchange = function () { AI.medMapa[n] = s2.value; }; extras.appendChild(s2);
+        });
+      }
+      if (MODO_MED && AI.mapa.tipo >= 0) {
+        var tipos = {}; AI.dados.forEach(function (r) { var v = aiCol(r, "tipo"); if (v) tipos[v] = true; });
+        extras.appendChild(h$("div", "pc-sec", "Tipos de consulta do arquivo"));
+        Object.keys(tipos).slice(0, 50).forEach(function (n) {
+          var lb = h$("label", "rot", n); extras.appendChild(lb);
+          var s3 = h$("select"), o0 = h$("option", null, "Sem tipo"); o0.value = ""; s3.appendChild(o0);
+          medDados.forEach(function (m) { (m.tipos || []).forEach(function (tp) { var o = h$("option", null, m.nome + " · " + tp.nome); o.value = String(tp.id); s3.appendChild(o); }); });
+          if (AI.tipoMapa[n] === undefined) { var achou = null; medDados.forEach(function (m) { (m.tipos || []).forEach(function (tp) { if (!achou && impSem(tp.nome) === impSem(n)) achou = tp; }); }); AI.tipoMapa[n] = achou ? String(achou.id) : ""; }
+          s3.value = AI.tipoMapa[n]; s3.onchange = function () { AI.tipoMapa[n] = s3.value; }; extras.appendChild(s3);
+        });
+      }
+    }
+    aiExtras();
+  }
+  // Monta as linhas que vão ao servidor (lista fechada) e as que já ficam com erro aqui.
+  function aiPreparar() {
+    var validas = [], erros = [], vistos = {}, rep = 0;
+    var CANC = /cancel|desmarc|recusad|rejeit|declin/, PAGO = /^(sim|s|pago|paga|paid|yes|true|1|quitado)$/;
+    AI.dados.forEach(function (r, i) {
+      var linha = i + 2;
+      if (!r.some(function (x) { return String(x).trim(); })) return;
+      var ini = aiDataHora(aiCol(r, "data"), aiCol(r, "hora"));
+      var nome = (aiCol(r, "nome") + " " + aiCol(r, "sobrenome")).replace(/\s+/g, " ").trim().slice(0, 120);
+      var tel = impTel(aiCol(r, "telefone"));
+      var fimTxt = aiCol(r, "fim"), fim = "";
+      if (fimTxt && ini) fim = /^\d{1,2}[:h]\d{2}/.test(fimTxt) ? aiDataHora(ini.slice(0, 10), fimTxt) : aiDataHora(fimTxt, "");
+      var motivo = !ini ? "data ou hora inválida" : !nome ? "sem nome" : !impTelOk(tel) ? "telefone sem DDD" : (fimTxt && !fim) ? "hora de término inválida" : "";
+      if (motivo) { erros.push({ linha: linha, motivo: motivo }); return; }
+      var k = ini + "|" + tel.slice(-8);
+      if (vistos[k]) { rep++; return; }
+      vistos[k] = true;
+      var med = AI.mapa.medico >= 0 ? (AI.medMapa[aiCol(r, "medico")] || "") : "", tipo = AI.mapa.tipo >= 0 ? (AI.tipoMapa[aiCol(r, "tipo")] || "") : "";
+      var dur = aiCol(r, "duracao").replace(/\D/g, "").slice(0, 3);
+      validas.push({ linha: String(linha), inicio: ini, fim: fim || "", duracao_min: dur, nome: nome, telefone: tel, servico: aiCol(r, "servico").slice(0, 80),
+        medico_id: med, tipo_id: tipo, codigo: aiCol(r, "codigo").slice(0, 80), cancelada: CANC.test(impSem(aiCol(r, "situacao"))), paga: PAGO.test(impSem(aiCol(r, "pago"))) });
+    });
+    AI.validas = validas; AI.erros = erros; AI.repetidas = rep;
+  }
+  function aiLotes(gravar, aoAvancar) {
+    var lotes = []; for (var i = 0; i < AI.validas.length; i += AI_LOTE) lotes.push(AI.validas.slice(i, i + AI_LOTE));
+    var tot = { novas: 0, existentes: 0, repetidas: 0, conflitos: 0, erros: 0, canceladas: 0, futuras: 0, pacientes_lembrete: 0, lista_erros: [], lembretes_clinica: true };
+    var k = gravar ? (AI.proximo || 0) : 0; if (gravar && AI.totGravacao) tot = AI.totGravacao;
+    function um() {
+      if (k >= lotes.length) return Promise.resolve(tot);
+      aoAvancar(k, lotes.length);
+      var d = { gravar: gravar, linhas: lotes[k], lembretes: AI.lembretes, sistema: AI.sistema };
+      if (gravar && AI.importacao_id) d.importacao_id = String(AI.importacao_id);
+      return agChamar("agenda_importar", d).then(function (r) {
+        if (!r || !r.ok) { var e = new Error("servidor"); e.r = r; throw e; }
+        ["novas", "existentes", "repetidas", "conflitos", "erros", "canceladas", "futuras", "pacientes_lembrete"].forEach(function (x) { tot[x] += r[x] || 0; });
+        tot.lembretes_clinica = r.lembretes_clinica !== false;
+        (r.lista_erros || []).forEach(function (x) { tot.lista_erros.push(x); });
+        if (gravar) { AI.importacao_id = AI.importacao_id || r.importacao_id; AI.proximo = k + 1; AI.totGravacao = tot; }
+        k++; return um();
+      });
+    }
+    return lotes.length ? um() : Promise.resolve(tot);
+  }
+  function aiErrosTodos(tot) {
+    var l = AI.erros.slice(); (tot.lista_erros || []).forEach(function (e) { l.push({ linha: +e.linha, motivo: e.motivo }); });
+    return l.sort(function (a, b) { return a.linha - b.linha; });
+  }
+  // Relatório de conflitos e erros: CSV gerado aqui, com as colunas originais da linha e o motivo (nada vai ao servidor).
+  function aiBaixarRelatorio(erros) {
+    var q = function (x) { x = String(x == null ? "" : x); if (/^[=+\-@]/.test(x)) x = "'" + x; return /[";\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+    var linhas = [["linha", "motivo"].concat(AI.cab).map(q).join(";")];
+    erros.forEach(function (e) { linhas.push([e.linha, e.motivo].concat(AI.dados[e.linha - 2] || []).map(q).join(";")); });
+    var blob = new Blob(["\ufeff" + linhas.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "agenda-conflitos-e-erros.csv";
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function aiPrevia() {
+    aiPreparar(); aiPasso(3);
+    var t = aiTela(), prog = h$("p", "subtitulo", "Conferindo…"); t.appendChild(prog);
+    Promise.all([aiLotes(false, function (k, n) { prog.textContent = "Conferindo o lote " + (k + 1) + " de " + n + "…"; }),
+                 intChamar("status").catch(function () { return {}; })]).then(function (res) {
+      var tot = res[0], reservio = !!(res[1] && res[1].conectado);
+      t.innerHTML = ""; AI.prev = tot;
+      var g = h$("div", "pc-numeros");
+      [["vão entrar", tot.novas], ["já existiam", tot.existentes], ["repetidas", tot.repetidas + AI.repetidas], ["conflitos", tot.conflitos], ["com erro", tot.erros + AI.erros.length], ["canceladas (histórico)", tot.canceladas], ["futuras", tot.futuras]]
+        .forEach(function (x) { g.appendChild(impNum(x[0], x[1])); });
+      t.appendChild(g);
+      if (reservio && AI.mapa.codigo < 0 && tot.futuras) t.appendChild(pacAviso("ambar", "O Reservio está conectado e o arquivo não tem a coluna do código da reserva. As consultas futuras entram assim mesmo, mas a mesma consulta pode aparecer duas vezes se for alterada lá depois. A RXSync não cria a do Reservio quando já existe uma com o mesmo horário e telefone."));
+      var lt = h$("label", "opc"), cb = h$("input"); cb.type = "checkbox"; cb.checked = AI.lembretes;
+      lt.appendChild(cb); lt.appendChild(document.createTextNode(" Mandar lembrete das consultas futuras importadas (" + tot.pacientes_lembrete + " paciente(s) receberiam)."));
+      cb.onchange = function () { AI.lembretes = cb.checked; };
+      t.appendChild(lt);
+      if (!tot.lembretes_clinica) t.appendChild(h$("p", "pc-dica", "Os lembretes da clínica estão desligados agora: mesmo marcando, nenhum lembrete sai até você ligar em Assistente › Mensagens automáticas."));
+      var erros = aiErrosTodos(tot);
+      if (erros.length) t.appendChild(pacBtn("Baixar o relatório de conflitos e erros (CSV)", "sec plena", function () { aiBaixarRelatorio(erros); }));
+      var gr = pacBtn("Importar " + tot.novas + " consulta(s)", "pri plena", function () { gr.disabled = true; aiGravar(); });
+      gr.style.marginTop = "12px"; if (!tot.novas) gr.disabled = true; t.appendChild(gr);
+      t.appendChild(pacBtn("Voltar às colunas", "sec plena", aiColunas));
+    }).catch(function (e) { t.innerHTML = ""; t.appendChild(pacAviso("rosa", "Não consegui conferir o arquivo agora. Tente de novo.")); t.appendChild(pacBtn("Voltar às colunas", "sec plena", aiColunas)); });
+  }
+  function aiGravar() {
+    var t = aiTela(), prog = h$("p", "subtitulo", "Importando…"); t.appendChild(prog);
+    aiLotes(true, function (k, n) { prog.textContent = "Importando o lote " + (k + 1) + " de " + n + "…"; }).then(function (tot) {
+      aiPasso(4); t.innerHTML = "";
+      t.appendChild(pacAviso("verde", tot.novas + " consulta(s) importada(s). Dá para desfazer em até 7 dias, aqui embaixo."));
+      var erros = aiErrosTodos(tot);
+      if (erros.length) t.appendChild(pacBtn("Baixar o relatório de conflitos e erros (CSV)", "sec plena", function () { aiBaixarRelatorio(erros); }));
+      t.appendChild(pacBtn("Importar outro arquivo", "sec plena", aiInicio));
+      aiListar(); agCarregar();
+    }).catch(function () { t.innerHTML = ""; t.appendChild(pacAviso("rosa", "A importação parou no meio. O que já entrou fica; toque para continuar de onde parou.")); t.appendChild(pacBtn("Continuar", "pri plena", aiGravar)); });
+  }
+  function aiListar() {
+    var box = el("aiLista"); if (!box) return;
+    agChamar("agenda_importacoes").then(function (lista) {
+      box.innerHTML = "";
+      if (!lista || !lista.length) { box.appendChild(h$("div", "vazio", "Nenhuma importação ainda.")); return; }
+      lista.forEach(function (i) {
+        var c = h$("div", "border border-slate-200 rounded-xl p-3 bg-white mt-2");
+        c.appendChild(h$("div", "text-sm font-semibold", new Date(i.criado_em).toLocaleString("pt-BR") + (i.desfeita_em ? " · desfeita" : "")));
+        c.appendChild(h$("div", "text-xs text-slate-500", i.novas + " entraram · " + i.existentes + " já existiam · " + i.conflitos + " conflitos · " + i.erros + " com erro" + (i.lembretes ? " · com lembrete" : " · sem lembrete")));
+        if (i.pode_desfazer) c.appendChild(agBtn("Desfazer", "border-rose-200 text-rose-700 mt-2", function () {
+          if (!confirm("Desfazer esta importação? Saem as consultas dela que ninguém mexeu depois, e os pacientes criados por ela que não têm outra consulta.")) return;
+          agChamar("agenda_importacao_desfazer", { id: i.id }).then(function (r) {
+            toast(r && r.ok ? r.removidas + " consulta(s) removida(s)" + (r.mantidas ? "; " + r.mantidas + " ficaram (foram mexidas depois)" : "") + "." : "O prazo de 7 dias já passou.");
+            aiListar(); agCarregar();
+          }).catch(function () { toast("Não consegui desfazer. Tente de novo."); });
+        }));
+        box.appendChild(c);
+      });
+    }).catch(function () { box.innerHTML = ""; box.appendChild(h$("div", "aviso rosa", "Não consegui carregar as importações.")); });
   }
 
   // ---------- Aba Integração (agenda externa: Reservio) ----------

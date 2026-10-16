@@ -36,7 +36,7 @@
   <header class="bg-primary-900 text-white">
     <div class="max-w-4xl mx-auto px-5 py-5 flex items-center justify-between gap-4">
       <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v12</span>
+      <span class="text-xs font-bold bg-white/10 border border-white/20 rounded-full px-3 py-1.5">Versão 2026-10-v13</span>
     </div>
   </header>
 
@@ -46,7 +46,7 @@
       <p class="text-slate-500 mt-2 mb-8">Plataforma RXSync de Atendimento Automatizado para negócios que atendem com hora marcada</p>
 
       <div class="doc">
-        <p><strong>Versão 2026-10-v12</strong> · Vigente a partir de 16 de outubro de 2026</p>
+        <p><strong>Versão 2026-10-v13</strong> · Vigente a partir de 16 de outubro de 2026</p>
 
         <blockquote>
           <p><strong>Em resumo.</strong> A RXSync faz o atendimento de clínicas pelo WhatsApp com uma assistente virtual. Para as <strong>clínicas e quem visita nosso site</strong>, a RXSync é a responsável pelos dados e explica aqui o que faz com eles. Para os <strong>pacientes das clínicas</strong>, quem decide sobre os dados é a clínica; a RXSync só os trata, como operadora, para prestar o serviço contratado, sem uso próprio, sem venda e sem usá-los para treinar modelos de inteligência artificial de terceiros. Para oferecer o serviço, a RXSync também pode entrar em contato, pelo WhatsApp, com empresas e profissionais que atendem com hora marcada, como clínicas, consultórios e salões cujo contato comercial está publicado na internet (como no Google Maps). Nesses contatos, dizemos quem somos e de onde veio o número, e basta responder SAIR para nunca mais receber (<a href="#prospeccao">seção 3.1</a>).</p>
@@ -178,6 +178,7 @@
             <li>No plano Gestão Inteligente, fotos e documentos em PDF que o paciente enviar (como pedido de exame, guia, carteirinha do convênio ou documento de identidade), dos quais a assistente extrai apenas dados administrativos para a equipe da clínica;</li>
             <li>Dados de agendamento, lista de espera, lembretes e pesquisa de satisfação (nota e comentário, ligados ao código do paciente);</li>
             <li>Quando a clínica usa essa função, a situação do pagamento da consulta (paga ou não, quando e se foi marcada pela equipe da clínica ou herdada de uma consulta remarcada) e a data em que a assistente enviou ao paciente o link de pagamento definido pela clínica. A RXSync não recebe o pagamento nem os dados usados para pagar: o link é da própria clínica (por exemplo, da maquininha ou do banco dela);</li>
+            <li>Quando a clínica importa a agenda de outro sistema, as consultas importadas: data, hora, nome e telefone do paciente, serviço, médico e tipo de consulta, o código da consulta no sistema de origem e se ela foi cancelada ou paga, além da origem e da data da importação. Anotações e observações do outro sistema não são importadas: o arquivo é lido no aparelho da clínica, e só essas colunas são enviadas. A clínica, como controladora, responde pela base legal e pela exatidão dos dados que importa;</li>
             <li>Quando a clínica conecta a conta de pagamentos que ela contratou no Asaas, o link de pagamento criado para cada consulta: o valor definido pela clínica, a data, um código da consulta e a situação do link (aberto, pago, estornado ou desativado). O link não leva nome, telefone nem documento do paciente, que informa os próprios dados diretamente na página do Asaas, conforme as regras do Asaas e da clínica;</li>
             <li>A data em que o telefone do paciente conversou com a clínica pela primeira vez, usada para que as mensagens de relacionamento (seção 4.2) só vão a quem já conversou com a clínica;</li>
             <li>No plano Gestão Inteligente, o cadastro que a clínica mantém no painel, na área Pacientes: e-mail, data de nascimento e uma observação administrativa curta, que nunca deve ter conteúdo clínico, além, quando o paciente vem de uma importação feita pela clínica (por planilha ou de outro sistema), da origem e da data dessa importação. A clínica, como controladora, responde pela base legal e pela exatidão dos dados que importa;</li>
@@ -282,6 +283,7 @@
               <tr><td>Pedido do paciente para não receber as mensagens de relacionamento (“não contatar”)</td><td>Enquanto durar o contrato, para que o pedido continue sendo respeitado; eliminado com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Avisos de eventos enviados ao sistema da clínica (plano Enterprise)</td><td>Apagados <strong>30 dias</strong> depois do evento. O que chega ao sistema da clínica fica com ela.</td></tr>
               <tr><td>Pedidos de envio de mensagem feitos pelo sistema da clínica (plano Enterprise)</td><td>O texto da mensagem é apagado assim que o pedido termina (enviada, não enviada ou expirada); o registro do pedido, sem o texto, <strong>90 dias</strong> depois.</td></tr>
+              <tr><td>Consultas importadas pela clínica de outro sistema</td><td>As mesmas regras da agenda: enquanto durar o contrato, sob decisão da clínica, e eliminadas com os demais dados da clínica ao fim do contrato. A clínica pode desfazer a importação em até 7 dias. O registro de cada importação guarda só contagens, sem nome de arquivo nem dado de paciente.</td></tr>
               <tr><td>Situação do pagamento da consulta e data do envio do link de pagamento (quando a clínica usa essa função)</td><td>Enquanto durar o contrato, junto do agendamento; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
               <tr><td>Links de pagamento do Asaas da clínica (valor, data, código da consulta e situação) e a chave de acesso da clínica, guardada cifrada</td><td>Os links, enquanto durar o contrato, junto do agendamento, e eliminados com os demais dados da clínica ao fim do contrato. A chave é apagada quando a clínica desconecta a conta ou no fim do contrato. Avisos de pagamentos que não são de links criados pela RXSync não são guardados.</td></tr>
               <tr><td>Nota e comentário da pesquisa de satisfação</td><td>Enquanto durar o contrato, junto do agendamento; eliminados com os demais dados da clínica ao fim do contrato.</td></tr>
@@ -344,6 +346,7 @@
           <p>Podemos atualizar esta Política para refletir mudanças no serviço, nos fornecedores ou na lei. A versão vigente é sempre a publicada nesta página, com o número da versão e a data de início de vigência no topo. Mudanças relevantes que afetem clientes serão comunicadas ao e-mail cadastrado, com a antecedência prevista nos Termos de Uso. O uso do site e do serviço depois da vigência da nova versão não afeta os direitos que você tem pela lei.</p>
           <p><strong>Histórico de versões</strong></p>
           <ul>
+            <li><strong>2026-10-v13</strong>, vigente a partir de 16 de outubro de 2026: entra a importação da agenda de outro sistema pela clínica (seção 4.1) e o prazo das consultas importadas (seção 8).</li>
             <li><strong>2026-10-v12</strong>, vigente a partir de 16 de outubro de 2026: entra a cobrança pela conta de pagamentos da própria clínica no Asaas, com um link para cada consulta (seções 4.1, 4.2, 6 e 8), e os links para os Termos de Uso passam a levar à versão 2026-10-v4.</li>
             <li><strong>2026-10-v11</strong>, vigente a partir de 16 de outubro de 2026: entram, nos dados de pacientes, a situação do pagamento da consulta e o envio do link de pagamento definido pela clínica (seções 4.1 e 4.2) e o prazo de guarda desses dados (seção 8).</li>
             <li><strong>2026-10-v10</strong>, vigente a partir de 15 de outubro de 2026: entra a prospecção comercial pelo WhatsApp (seções 2, 3, 3.1, 5, 6, 7, 8 e 11): de onde vêm os dados (Google Maps, por meio da SerpApi), a base legal (legítimo interesse), como sair (SAIR), os limites de mensagens, o uso da assistente virtual, que a base de pacientes das clínicas não é usada, o registro para medir as campanhas e os prazos de guarda; o subtítulo e a seção 12 passam a falar de profissionais e empresas que atendem com hora marcada.</li>
