@@ -17,7 +17,10 @@ const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', 
   ['prospeccao', 'Prospecção'], ['prospeccao/campanha/CMP-0001', 'Odonto Sul'], ['prospeccao/conjunto/CJ-0001', 'Dentistas Curitiba'], ['prospeccao/anuncio/AN-0001', 'A · Pergunta do WhatsApp'],
   ['prospeccao/campanha/novo', 'Nova campanha'], ['prospeccao/numeros', 'Números de WhatsApp'], ['prospeccao/numeros', 'Números de WhatsApp', 'qr'], ['prospeccao/leads', 'Leads'],
   ['prospeccao/lead/PX-AAAAA', 'Clínica Sorriso Batel'], ['prospeccao/relatorios', 'Relatórios'], ['prospeccao/buscas', 'Buscas'], ['prospeccao/regras', 'Regras'], ['prospeccao/custos', 'Custos'],
-  ['prospeccao', 'Prospecção', 'segurado'], ['ajustes', 'Ajustes da Central', 'segurado']];
+  ['prospeccao', 'Prospecção', 'segurado'], ['ajustes', 'Ajustes da Central', 'segurado'],
+  // Públicos (sql/036, DEC-088)
+  ['prospeccao/publicos', 'Públicos'], ['prospeccao/publico/PB-0001', 'Dentistas Curitiba'], ['prospeccao/publico/PB-0001/configuracao', 'Dentistas Curitiba'], ['prospeccao/publico/novo', 'Novo público'],
+  ['prospeccao/publico/PB-0002', 'Ortodontia Joinville']];
 const APARELHOS = [['celular', { width: 390, height: 844 }, true], ['ipad_em_pe', { width: 820, height: 1180 }, true], ['ipad_deitado', { width: 1180, height: 820 }, true], ['computador', { width: 1440, height: 900 }, false]];
 const TEMAS = ['claro', 'escuro'];
 
