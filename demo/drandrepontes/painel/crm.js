@@ -87,7 +87,7 @@
   }
   function preencher(t, id) {
     var p = P.pac(id);
-    return t.replace(/\{nome\}/g, primeiro(id)).replace(/\{profissional\}/g, p.prof === '—' ? 'a equipe' : p.prof).replace(/\{clinica\}/g, 'Clínica Evoluir');
+    return t.replace(/\{nome\}/g, primeiro(id)).replace(/\{profissional\}/g, p.prof === '—' ? 'a equipe' : p.prof).replace(/\{clinica\}/g, 'AG Melhor Versão');
   }
   function chipsEtiq(id, remover) {
     return (ETIQ[id] || []).map(function (e) { return '<span class="chip chip-etiqueta">' + esc(e) + (remover ? ' <button type="button" data-r="etiq-tirar" data-v="' + esc(e) + '" aria-label="Tirar etiqueta">✕</button>' : '') + '</span>'; }).join('');

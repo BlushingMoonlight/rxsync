@@ -29,7 +29,7 @@
   // ---------- filtros ----------
   var $ = function (id) { return document.getElementById(id); };
   document.getElementById('logo').innerHTML = A.logo({ tamanho: 54, texto: false });
-  $('versao').textContent = 'Clínica Evoluir · escopo versão ' + D.versao + ' (' + D.atualizado + ') · ' + D.itens.length + ' itens';
+  $('versao').textContent = 'AG Melhor Versão · escopo versão ' + D.versao + ' (' + D.atualizado + ') · ' + D.itens.length + ' itens';
   // Filtro por projeto e subprojeto (Projeto 2: ERP, CRM e CDX).
   $('f-projeto').innerHTML = '<option value="">Todos os projetos</option>' + window.CALCULO.ORDEM_SUB.map(function (k) {
     var sp = D.subprojetos[k]; return '<option value="' + k + '">' + esc(k === 'P1' ? D.projetos[1] : 'Projeto ' + sp.projeto + ' · ' + sp.nome) + '</option>';
@@ -174,7 +174,7 @@
       c.etapas.map(function (e) { return '- Etapa ' + e.etapa + ' · ' + e.nome + ': ' + e.prazo + '\n'; }).join('') +
       (c.recesso ? '- Recesso de fim de ano: ' + C.textoRecesso(c.recesso, c.etapas) + '\n' : '') +
       (pa ? '- ' + C.avisoMarcos(pa) + '\n' : '') + '\n';
-    return 'Reunião com o Dr. André · Clínica Evoluir\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n' +
+    return 'Reunião com o Dr. André · AG Melhor Versão\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n' +
       'Pacote aplicado: ' + (pa ? C.textoPacote(pa) + ' · ' + pa.tirados + ' itens tirados pelo pacote' : 'nenhum (escopo completo)') + '\n\n' +
       grupo('INCLUIR', function (i) { return M.status[i.n] === 'incluir'; }) + '\n' +
       grupo('DÚVIDAS', function (i) { return M.status[i.n] === 'duvida'; }) + '\n' +

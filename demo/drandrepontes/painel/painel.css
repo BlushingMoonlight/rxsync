@@ -317,3 +317,18 @@ button.mini { font-size: 12px; font-weight: 600; color: var(--primaria); text-de
 .equipe-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .equipe-chips .chip { padding: 3px 9px 3px 3px; font-size: 12px; }
 [data-estilo="cyber"] .conv, [data-estilo="cyber"] .msg-eq, [data-estilo="cyber"] .mencoes-rapidas button { border-radius: 2px; }
+
+/* ===== Identidade AG Melhor Versão (AG claro e AG escuro) ===== */
+.kpi { position: relative; }
+.kpi .ilu-kpi { position: absolute; right: 12px; top: 12px; width: 46px; height: 46px; }
+.kpi .rotulo { padding-right: 50px; }
+[data-estilo="cyber"] .kpi .ilu-kpi { display: none; }
+[data-estilo="clean-claro"] .cabeca h1, [data-estilo="clean-escuro"] .cabeca h1 { font-size: 34px; font-weight: var(--peso-pagina); letter-spacing: -0.03em; }
+[data-estilo="clean-claro"] .sub, [data-estilo="clean-escuro"] .sub { color: var(--texto-2); font-size: 15px; }
+[data-estilo="clean-claro"] .menu, [data-estilo="clean-escuro"] .menu { background: var(--superficie); }
+[data-estilo="clean-claro"] .menu a.ativo, [data-estilo="clean-escuro"] .menu a.ativo { background: var(--verde-claro); color: var(--primaria); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--verde-claro-borda) 35%, transparent); }
+[data-estilo="clean-claro"] .menu .marca b, [data-estilo="clean-escuro"] .menu .marca b { font-weight: 800; font-size: 16px; }
+[data-estilo="clean-claro"] .tabela-larga th, [data-estilo="clean-escuro"] .tabela-larga th { color: var(--texto-2); }
+[data-estilo="clean-claro"] .abas-tela button, [data-estilo="clean-claro"] .abas-tela a { background: var(--bege); color: var(--bege-texto); border-color: transparent; }
+[data-estilo="clean-claro"] .abas-tela .ativo { background: var(--primaria); background-image: var(--botao-fundo); color: var(--sobre-primaria); }
+[data-estilo="clean-claro"] .busca { box-shadow: var(--sombra); }

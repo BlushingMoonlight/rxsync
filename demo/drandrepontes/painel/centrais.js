@@ -283,7 +283,7 @@
   // Documentos (193) com assinatura (194).
   var MODELOS = { pedido: 'Pedido de exame', atestado: 'Atestado de comparecimento', orientacoes: 'Orientações' };
   function textoModelo(m, id) {
-    var p = P.pac(id), cabec = 'Clínica Evoluir · Dr. André Pontes Gonçalves · CRM 000000 (exemplo)\nPaciente: ' + p.nome + ' · ' + p.id + ' · ' + p.idade + ' anos\nData: {a:0}\n\n';
+    var p = P.pac(id), cabec = 'AG Melhor Versão · Dr. André Pontes Gonçalves · CRM 000000 (exemplo)\nPaciente: ' + p.nome + ' · ' + p.id + ' · ' + p.idade + ' anos\nData: {a:0}\n\n';
     if (m === 'pedido') return cabec + 'Solicito os exames abaixo (modelo da clínica para ' + (p.status === 'Agendado' ? 'primeira consulta' : 'acompanhamento') + '):\n- Hemograma completo\n- Glicemia de jejum\n- Hemoglobina glicada\n- Colesterol total e frações\n- Triglicerídeos\n- TSH\n- Ferritina\n- Vitamina D\n\nJejum conforme orientação do laboratório.';
     if (m === 'atestado') return cabec + 'Atesto, para os devidos fins, que ' + p.nome + ' esteve em consulta nesta clínica em {a:0}, das 09:00 às 10:00.';
     return cabec + 'Orientações combinadas na consulta:\n- Registrar as refeições, a água e o humor no app todos os dias.\n- Fazer os exames pedidos e enviar o resultado pelo app.\n- Consulta de nutrição com o Felipe na próxima semana.\n- Em caso de sintoma forte, avisar pelo app ou pelo WhatsApp da clínica.';

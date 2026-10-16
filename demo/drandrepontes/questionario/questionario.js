@@ -37,7 +37,7 @@
       [23, 'Qual o teto mensal de gasto com IA, e ao atingir o teto: pausar ou continuar?', ['Pausar', 'Continuar']],
       [24, 'Quais funções com IA quer ligadas desde o início (foto do prato, chat da equipe, resumo pré-consulta, assistente)?']]],
     ['Preferências', [
-      [25, 'Qual estilo de design você prefere para o app e o painel?', ['Clean claro', 'Clean escuro', 'Couro', 'Cyber']],
+      [25, 'Qual estilo de design você prefere para o app e o painel?', ['AG claro', 'AG escuro', 'Couro', 'Cyber']],
       [26, 'A IA que acompanha o paciente deve conversar pelo app (notificação) ou pelo WhatsApp?', ['Pelo app (notificação)', 'Pelo WhatsApp', 'Pelos dois']]]],
     ['Jurídico e projeto', [
       [27, 'A clínica tem advogado ou encarregado de dados (LGPD)? Já usa termo de consentimento com os pacientes?'],
@@ -49,6 +49,8 @@
   var CHAVE = 'ag-questionario-' + (A.usuario() || 'sem-usuario');
   var R = {};
   try { R = JSON.parse(localStorage.getItem(CHAVE) || '{}') || {}; } catch (e) { R = {}; }
+  // Os estilos Clean claro e Clean escuro passaram a se chamar AG claro e AG escuro: a resposta já salva continua marcada.
+  Object.keys(R).forEach(function (n) { var o = R[n] && R[n].opcao; if (o === 'Clean claro' || o === 'Clean escuro') R[n].opcao = o.replace('Clean', 'AG'); });
   function guardar() { try { localStorage.setItem(CHAVE, JSON.stringify(R)); } catch (e) { /* aparelho sem armazenamento: só na memória */ } }
   function respondida(n) { var r = R[n]; return !!(r && ((r.texto || '').trim() || r.opcao)); }
 
