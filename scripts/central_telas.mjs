@@ -4,7 +4,7 @@
 // campos com pelo menos 44 px, nenhum "null" ou "undefined" escrito na tela (links do caminho, 32 px), contraste do texto (4,5:1; texto grande 3:1) e nenhum erro no console.
 // Uso (precisa do Playwright): node scripts/central_telas.mjs [pasta das fotos]   ·   sem fotos: node scripts/central_telas.mjs - sem-fotos
 import fs from 'node:fs';
-import { abrirNavegador, servirSite, entrar, CHAVES_LIGADAS } from './central_simulado.mjs';
+import { abrirNavegador, servirSite, entrar, CHAVES_LIGADAS, ESTADO } from './central_simulado.mjs';
 const OUT = process.argv[2] && process.argv[2] !== '-' ? process.argv[2] : 'fotos-central', FOTOS = process.argv[3] !== 'sem-fotos';
 if (FOTOS) fs.mkdirSync(OUT, { recursive: true });
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } return c; };
@@ -16,7 +16,8 @@ const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', 
   // Marketing › Prospecção (sql/031 e sql/032)
   ['prospeccao', 'Prospecção'], ['prospeccao/campanha/CMP-0001', 'Odonto Sul'], ['prospeccao/conjunto/CJ-0001', 'Dentistas Curitiba'], ['prospeccao/anuncio/AN-0001', 'A · Pergunta do WhatsApp'],
   ['prospeccao/campanha/novo', 'Nova campanha'], ['prospeccao/numeros', 'Números de WhatsApp'], ['prospeccao/numeros', 'Números de WhatsApp', 'qr'], ['prospeccao/leads', 'Leads'],
-  ['prospeccao/lead/PX-AAAAA', 'Clínica Sorriso Batel'], ['prospeccao/relatorios', 'Relatórios'], ['prospeccao/buscas', 'Buscas'], ['prospeccao/regras', 'Regras'], ['prospeccao/custos', 'Custos']];
+  ['prospeccao/lead/PX-AAAAA', 'Clínica Sorriso Batel'], ['prospeccao/relatorios', 'Relatórios'], ['prospeccao/buscas', 'Buscas'], ['prospeccao/regras', 'Regras'], ['prospeccao/custos', 'Custos'],
+  ['prospeccao', 'Prospecção', 'segurado'], ['ajustes', 'Ajustes da Central', 'segurado']];
 const APARELHOS = [['celular', { width: 390, height: 844 }, true], ['ipad_em_pe', { width: 820, height: 1180 }, true], ['ipad_deitado', { width: 1180, height: 820 }, true], ['computador', { width: 1440, height: 900 }, false]];
 const TEMAS = ['claro', 'escuro'];
 
@@ -72,6 +73,7 @@ for (const tema of TEMAS) for (const [nomeAp, vp, toque] of APARELHOS) {
     n++;
     if (rota === 'mais' && nomeAp !== 'celular') continue;
     await page.evaluate(() => { const j = document.querySelector('#camada .janela'); if (j) document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); });
+    ESTADO.segurado = extra === 'segurado';   // sinal de vida: disparo ligado e o 52 parado
     await page.evaluate(r => { location.hash = r; }, rota);
     await page.waitForFunction(t => document.title.startsWith(t) && !document.querySelector('#conteudo .esq'), titulo, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(200);

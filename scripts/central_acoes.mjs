@@ -6,7 +6,7 @@
 // Confere também: interruptor de Ajustes num toque, com Desfazer; dados protegidos fora do armazenamento do navegador
 // e escondidos quando a Central vai para o fundo; Desfazer do registro e da mensagem rápida.
 // Uso (precisa do Playwright): node scripts/central_acoes.mjs
-import { abrirNavegador, servirSite, entrar, CHAVES_LIGADAS, NIVEIS, ficha, CFG } from './central_simulado.mjs';
+import { abrirNavegador, servirSite, entrar, CHAVES_LIGADAS, NIVEIS, ficha, CFG, ESTADO } from './central_simulado.mjs';
 let falhas = 0, feitos = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } return c; };
 const NOME = 'Clínica Sorriso Odontologia Integrada';
 const hoje = new Date().toISOString().slice(0, 10), daqui = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
@@ -249,6 +249,22 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   ok(d && d.chave === 'prosp_ia' && d.valor === 'SIM' && d.confirmacao === 'CONFIRMAR', `prosp_ia: ligar pede o nível 2 (${JSON.stringify(d)})`);
   ok(await page.getByRole('switch', { name: 'Disparo de prospecção' }).count() === 0 && await page.locator('#conteudo').getByText('Travado até a Política v10').count() === 1, 'prosp_disparo: travado, sem interruptor');
   feitos += 2;
+}
+// Sinal de vida do 52 e do 53 (DEC-087): sem disparo, o cartão mostra quem rodou, sem aviso; com o disparo ligado e o 52
+// parado, a tela inicial e os Ajustes dizem "Disparo parado: o workflow 52 … não roda desde …".
+{
+  const motor = () => page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Sinal de vida' }) });
+  ESTADO.segurado = false; await abrir('prospeccao');
+  ok(await motor().count() === 1 && await motor().getByText('52 · Respostas e IA').count() === 1 && await motor().getByText('ainda não rodou').count() === 1, 'sinal de vida: o cartão mostra o 52 e o 53');
+  ok(await page.locator('#conteudo [role=alert]', { hasText: 'Disparo parado' }).count() === 0, 'sinal de vida: sem disparo ligado, nenhum aviso de disparo parado');
+  ESTADO.segurado = true; await abrir('prospeccao');
+  const aviso = page.locator('#conteudo [role=alert]', { hasText: 'Disparo parado' });
+  ok(await aviso.count() === 1 && /o workflow 52 \(Respostas e IA\) não roda desde \d{2}\/\d{2}/.test(await aviso.innerText()), 'sinal de vida: disparo parado na tela inicial, com o workflow e desde quando');
+  ok(await page.locator('#conteudo .etq', { hasText: 'disparo parado' }).count() >= 1, 'sinal de vida: a etiqueta do disparo diz "disparo parado"');
+  await abrir('ajustes');
+  ok(await motor().count() === 1 && await page.locator('#conteudo [role=alert]', { hasText: 'Disparo parado: o workflow 52' }).count() === 1, 'sinal de vida: o mesmo aviso nos Ajustes, abaixo das chaves da prospecção');
+  ESTADO.segurado = false;
+  feitos += 3;
 }
 // Nenhuma chamada saiu sem a origem certa: o simulado só responde ao n8n da Central (o resto é bloqueado).
 ok(!erros.length, 'erro no console: ' + erros.join(' | '));

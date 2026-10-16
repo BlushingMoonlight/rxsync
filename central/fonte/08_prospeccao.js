@@ -67,6 +67,26 @@ TELAS.prospeccao = async (c, [parte, a, b]) => {
   await fn(c, parte, a, b);
 };
 
+// ---------- sinal de vida do 52 e do 53 (DEC-087): o banco segura o disparo sem eles (DEC-083)
+const P_MOTOR = { '52': ['Respostas e IA', 'a cada 15 minutos; parado depois de 30'], '53': ['Rotinas e medição', 'todo dia às 3h40; parado depois de 48 horas'] };
+function textoParado(p) { return `o workflow ${p.workflow} (${p.nome || P_MOTOR[p.workflow][0]}) ${p.desde ? 'não roda desde ' + fmtHora(p.desde) : 'ainda não rodou'}`; }
+function avisoMotor(m) {
+  if (!m || !m.segurado) return null;
+  return el('div', { class: 'aviso perigo', role: 'alert' }, icone('alerta'),
+    el('div', {}, el('b', { text: 'Disparo parado: ' }), (m.parados || []).map(textoParado).join(' e ') + '. Nada sai até ele voltar a rodar.'));
+}
+function cartaoMotor(m) {
+  if (!m) return null;
+  const parado = w => (m.parados || []).some(p => p.workflow === w);
+  const linha = (w, em) => el('li', {}, el('div', { class: 'linha' }, el('span', { class: 'icone-caixa' }, icone('relogio')),
+    el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${w} · ${P_MOTOR[w][0]}` }),
+      el('div', { class: 't2', text: (em ? 'rodou pela última vez ' + fmtHora(em) : 'ainda não rodou') + ' · ' + P_MOTOR[w][1] })),
+    el('div', { class: 'direita' }, etq(parado(w) ? 'parado' : 'rodando', parado(w) ? (m.disparo_ligado ? 'perigo' : 'atencao') : 'ok'))));
+  const aviso = avisoMotor(m);
+  return cartao('Sinal de vida', etq(m.segurado ? 'disparo parado' : m.disparo_ligado ? 'disparo saindo' : 'disparo desligado', m.segurado ? 'perigo' : m.disparo_ligado ? 'ok' : '', true),
+    aviso ? corpo(aviso) : null, el('ul', { class: 'lista' }, linha('52', m.sinal_52), linha('53', m.sinal_53)));
+}
+
 async function pInicio(c) {
   topo('Prospecção', [['Marketing'], ['Prospecção']]);
   const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Prospecção')) return;
@@ -76,9 +96,11 @@ async function pInicio(c) {
   const att = [];
   if (res.para_aprovar) att.push(['atencao', `${fmtNum(res.para_aprovar)} lead(s) para aprovar`, 'Antes de entrar na fila', () => ir('prospeccao/leads/para_aprovar')]);
   if (res.com_voce) att.push(['atencao', `${fmtNum(res.com_voce)} conversa(s) com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
-  if (res.avisos_na_fila) att.push(['info', `${fmtNum(res.avisos_na_fila)} aviso(s) esperando o Telegram`, 'O relógio do workflow 54 está desativado (DEC-080)', null]);
+  const motor = res.motor || null;
+  if (motor && motor.segurado) att.push(['critico', 'Disparo parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O'), null]);
+  if (res.avisos_na_fila) att.push(['info', `${fmtNum(res.avisos_na_fila)} aviso(s) esperando o Telegram`, 'O workflow 54 manda a cada 5 minutos', null]);
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
-  const disparo = ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
+  const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
   const campanhas = d.campanhas || [];
   // Uma camada: a linha (abre a camada) e, ao lado, o interruptor.
   const camada = (tipo, o, t2, ic, extra) => el('div', { class: 'p-camada' + (extra ? ' ' + extra : '') },
@@ -102,6 +124,7 @@ async function pInicio(c) {
       el('div', { class: 'kpis' }, kpi('Abordagens (7 dias)', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
       att.length ? cartao('Precisa da sua atenção', null, el('ul', { class: 'lista' }, att.map(([prior, t, s, fn]) => el('li', {}, el(fn ? 'button' : 'div', { class: 'linha', type: fn ? 'button' : null, onclick: fn || null },
         el('span', { class: 'prior ' + prior, 'aria-hidden': 'true' }), el('div', { class: 'cresce' }, el('div', { class: 't1', text: t }), el('div', { class: 't2', text: s })), fn ? icone('seta') : null))))) : null,
+      cartaoMotor(motor),
       editar ? null : nota('Criar, editar, ligar e pausar estão desligados (editar_prospeccao).', true),
       ...arvore));
 }
