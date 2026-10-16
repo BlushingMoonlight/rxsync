@@ -15,7 +15,7 @@
   <header class="topo-escopo">
     <a class="voltar-home" href="../" data-leva-estilo>‹ Início</a>
     <div class="linha-titulo"><div id="logo"></div><div><h1>Escopo do projeto</h1><p class="mudo" id="versao"></p></div></div>
-    <p class="mudo dica-topo">Tudo começa marcado e em <b>incluir</b>. Mude para <b>dúvida</b> ou <b>tirar</b>, desmarque o que ainda não foi conversado e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião".</p>
+    <p class="mudo dica-topo">Tudo começa marcado e em <b>incluir</b>. Mude para <b>dúvida</b> ou <b>tirar</b>, desmarque o que ainda não foi conversado e anote. Tudo fica salvo só neste aparelho. No fim, toque em "Copiar resumo da reunião". "Aplicar Pacote V1" mostra o pacote que sugerimos depois da reunião, com o motivo de cada item tirado; "Limpar marcações" volta ao escopo completo.</p>
   </header>
 
   <section class="painel-fixo" aria-label="Contador e ações">
@@ -24,9 +24,11 @@
       <button class="botao" type="button" id="salvar">Salvar e enviar à RXSync</button>
       <a class="botao botao-claro" id="pdf" href="resumo/" data-leva-estilo style="text-decoration:none">Resumo do escopo em PDF</a>
       <button class="botao botao-claro" type="button" id="copiar">Copiar resumo da reunião</button>
+      <button class="botao botao-claro" type="button" id="pacote" hidden>Aplicar Pacote V1 · pós-reunião</button>
       <button class="botao botao-claro" type="button" id="limpar">Limpar marcações</button>
       <button class="botao botao-claro" type="button" id="precos" hidden>Liberar preços</button>
     </div>
+    <button type="button" class="aviso-pacote" id="aviso-pacote" hidden></button>
     <p class="fraco salvo-linha" id="salvo" aria-live="polite"></p>
   </section>
 

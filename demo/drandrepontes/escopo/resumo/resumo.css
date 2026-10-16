@@ -26,6 +26,10 @@
 .lote-cab em { color: var(--alerta); font-style: normal; font-weight: 650; }
 .lote p { font-size: 12.5px; margin: 4px 0 0; }
 .tirados li { font-size: 14px; }
+/* Pacote sugerido aplicado: nome na capa, motivo de cada item tirado e aviso sobre os marcos. */
+.pacote-capa { font-weight: 650; color: var(--primaria); }
+.tirados .motivo { font-size: 12.5px; color: var(--texto-2); }
+.aviso-marcos { font-size: 13px; padding: 6px 10px; border-left: 3px solid var(--info); background: color-mix(in srgb, var(--info) 9%, transparent); }
 .grafico { width: 100%; height: auto; }
 .grafico .r { font-size: 13px; fill: var(--texto-2); }
 .grafico .v { font-size: 13px; font-weight: 700; fill: var(--texto); }
@@ -54,5 +58,7 @@
   .secao:last-of-type > * + * { margin-top: 10px; }
   .grafico .b { fill: #2f6b4f; } .grafico .b.p0 { fill: #8a8a8a; } .grafico .b.p2 { fill: #6b4f8f; } .grafico .b.p3 { fill: #3d7ea6; } .grafico .b.p4 { fill: #b7791f; } .grafico .b.rec { fill: #bbb; opacity: 1; }
   .marcos tr { break-inside: avoid; }
+  .tirados li { break-inside: avoid; }
+  .tirados .motivo, .aviso-marcos { color: #333; } .aviso-marcos { background: none; border-left-color: #999; }
   .grafico .r, .grafico .v { fill: #111; }
 }

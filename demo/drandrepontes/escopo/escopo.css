@@ -81,3 +81,15 @@
 /* Preço do item: só aparece para o Admin com os preços abertos. */
 .preco-item { margin-left: auto; font-size: 12.5px; font-weight: 700; white-space: nowrap; color: var(--primaria); }
 .preco-item.tirado { text-decoration: line-through; color: var(--texto-3); }
+/* Pacote sugerido aplicado: aviso no painel (toque filtra os tirados) e o motivo em cada item do pacote. */
+.aviso-pacote { width: 100%; min-height: 44px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; padding: 8px 12px;
+  border-radius: var(--raio-p); border: 1px solid color-mix(in srgb, var(--info) 40%, transparent); background: color-mix(in srgb, var(--info) 12%, var(--superficie));
+  color: var(--texto); font: inherit; font-size: 13.5px; font-weight: 650; text-align: left; cursor: pointer; }
+.aviso-pacote[hidden] { display: none; }
+.aviso-pacote.ajustado { border-color: color-mix(in srgb, var(--alerta) 45%, transparent); background: color-mix(in srgb, var(--alerta) 12%, var(--superficie)); }
+.aviso-pacote-ver { color: var(--primaria); font-size: 12.5px; white-space: nowrap; }
+.motivo-pacote { grid-column: 2; margin-top: 4px; padding: 6px 10px; font-size: 13px; color: var(--texto-2); border-left: 3px solid var(--info); border-radius: 0 var(--raio-p) var(--raio-p) 0;
+  background: color-mix(in srgb, var(--info) 9%, transparent); }
+.motivo-pacote b { color: var(--texto); }
+[data-estilo="cyber"] .aviso-pacote, [data-estilo="cyber"] .motivo-pacote { border-radius: 2px; font-family: var(--fonte-mono); }
+@media (max-width: 560px) { .aviso-pacote-ver { width: 100%; } }
