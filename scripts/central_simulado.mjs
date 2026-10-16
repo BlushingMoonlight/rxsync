@@ -90,6 +90,14 @@ export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k,
 const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
   aceite: { data_aceite: '01/10/2026, 10:00:00', versao_termos: '2026-10-v3', ip_aceite: '10.0.0.9', aceite_dpa: 'SIM' }, copia_do_aceite: null } };
+// Sinal de vida do 52 e do 53 (sql/035, DEC-087). ESTADO.segurado = true: disparo ligado e o 52 parado (para as fotos e
+// os testes da tela "disparo parado").
+export const ESTADO = { segurado: false };
+export const motorDe = () => ESTADO.segurado
+  ? { vivo: false, sinal_52: '2026-10-16T11:05:00Z', sinal_53: '2026-10-16T06:40:00Z', disparo_ligado: true, segurado: true,
+      parados: [{ workflow: '52', nome: 'Respostas e IA', desde: '2026-10-16T11:05:00Z', limite_minutos: 30 }], agora: '2026-10-16T14:00:00Z' }
+  : { vivo: false, sinal_52: '2026-10-16T13:50:00Z', sinal_53: null, disparo_ligado: false, segurado: false,
+      parados: [{ workflow: '53', nome: 'Rotinas e medição', desde: null, limite_minutos: 2880 }], agora: '2026-10-16T14:00:00Z' };
 // Responde o n8n simulado. Guarda cada chamada em "chamadas" ({acao, dados}) para os testes conferirem.
 export function servidor(chaves, chamadas = [], respostas = {}) {
   return async route => {
@@ -100,8 +108,8 @@ export function servidor(chaves, chamadas = [], respostas = {}) {
     if (b.acao === 'estado') return r({ ok: true, tem_senha: true });
     if (b.acao === 'entrar') return r({ ok: true, desafio: 'd', mensagem: 'Mandei o código no Telegram.' });
     if (b.acao === 'entrar_codigo') return r({ ok: true, sessao: 'a'.repeat(64) });
-    if (b.acao === 'config') return r({ ok: true, chaves: Object.entries(chaves).map(([chave, valor]) => ({ chave, valor, descricao: 'Descrição da chave ' + chave, fase: 4, so_por_sql: SO_POR_SQL.includes(chave) })),
-      sessao: {}, niveis: { acoes: NIVEIS, regras: {} } });
+    if (b.acao === 'config') return r({ ok: true, chaves: Object.entries({ ...chaves, ...(ESTADO.segurado ? { prosp_disparo: 'SIM', prosp_politica_v10: 'SIM', prosp_balanceamento: 'SIM' } : {}) }).map(([chave, valor]) => ({ chave, valor, descricao: 'Descrição da chave ' + chave, fase: 4, so_por_sql: SO_POR_SQL.includes(chave) })),
+      sessao: {}, niveis: { acoes: NIVEIS, regras: {} }, prosp_motor: motorDe() });
     if (b.acao === 'ligar_chave') { const antes = chaves[b.dados.chave]; chaves[b.dados.chave] = b.dados.valor; return r({ ok: true, antes, depois: b.dados.valor }); }
     if (b.acao === 'cliente') return r({ ok: true, cliente: ficha() });
     if (b.acao === 'cliente_sensivel') return r(SENSIVEL);
@@ -177,8 +185,9 @@ const MSGS = [{ id: 1, direcao: 'saiu', autor: 'disparo', texto: 'Oi! Aqui é a 
 const okD = dados => ({ ok: true, dados });
 export const PROSP = {
   prosp_inicio: () => okD({ campanhas: ARVORE(), numeros: [N1, N2].map(({ id, instancia, nome, situacao, ligado, teto_hoje }) => ({ id, instancia, nome, situacao, ligado, teto_hoje })),
-    chaves: { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' }, nao_contatar: 14, travas: TRAVAS,
-    resultados: { ultimos_7_dias: [linhaRel('CMP-0001', '', 180)], para_aprovar: 6, com_voce: 1, na_fila: 40, avisos_na_fila: 3, disparo_liberado: false,
+    chaves: ESTADO.segurado ? { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'SIM', prosp_politica_v10: 'SIM', prosp_balanceamento: 'SIM' }
+      : { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' }, nao_contatar: 14, travas: TRAVAS,
+    resultados: { ultimos_7_dias: [linhaRel('CMP-0001', '', 180)], para_aprovar: 6, com_voce: 1, na_fila: 40, avisos_na_fila: 3, disparo_liberado: false, motor: motorDe(),
       custos: { preco_credito_serpapi: { valor: 0.075, descricao: 'plano de 5.000 buscas' }, fixo_mensal: { valor: 60, descricao: 'chip' } } } }),
   prosp_objeto: d => { const arv = ARVORE(), todos = arv.flatMap(c => [{ ...c, tipo: 'campanha', pai: '' }, ...c.conjuntos.flatMap(j => [{ ...j, tipo: 'conjunto', pai: c.id, numero_id: j.numero && j.numero.id }, ...j.anuncios.map(a => ({ ...a, tipo: 'anuncio', pai: j.id }))])]);
     const o = todos.find(x => x.id === d.id && x.tipo === d.tipo);

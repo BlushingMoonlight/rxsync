@@ -111,7 +111,10 @@ TELAS.ajustes = async c => {
       : el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(k.valor === 'SIM'), 'aria-label': nome, onclick: e => { const t = e.currentTarget; const novo = t.getAttribute('aria-checked') === 'true' ? 'NAO' : 'SIM'; t.setAttribute('aria-checked', String(novo === 'SIM')); mudarChave(k.chave, novo); } });
     return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: (k.descricao || '') + ' · ' + k.chave })), el('div', { class: 'direita' }, controle)));
   };
-  const blocos = GRUPOS_CHAVE.map(([titulo, fn]) => { const ks = todas.filter(k => !k.so_por_sql && fn(k)); return ks.length ? cartao(titulo, titulo.startsWith('Dinheiro') ? etq('ligue só depois do teste no sandbox', 'atencao', true) : null, el('ul', { class: 'lista' }, ks.map(linhaChave))) : null; });
+  const blocos = GRUPOS_CHAVE.flatMap(([titulo, fn]) => { const ks = todas.filter(k => !k.so_por_sql && fn(k)); if (!ks.length) return [];
+    const b = cartao(titulo, titulo.startsWith('Dinheiro') ? etq('ligue só depois do teste no sandbox', 'atencao', true) : null, el('ul', { class: 'lista' }, ks.map(linhaChave)));
+    // Prospecção: o sinal de vida do 52 e do 53 logo abaixo das chaves (DEC-087).
+    return titulo === 'Prospecção' ? [b, cartaoMotor(est.prospMotor)] : [b]; });
   const resto = todas.filter(k => !usadas.has(k.chave));
   const aparenciaSel = el('div', { class: 'filtros', role: 'radiogroup', 'aria-label': 'Aparência' }, [['auto', 'Automática'], ['claro', 'Clara'], ['escuro', 'Escura']].map(([v, t]) =>
     el('button', { type: 'button', role: 'radio', 'aria-checked': String(aparencia === v), 'aria-pressed': String(aparencia === v), onclick: () => { guardarAparencia(v); rotear(); } }, t)));

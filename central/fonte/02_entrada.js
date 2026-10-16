@@ -96,6 +96,7 @@ async function carregarConfig() {
   est.chaves = Object.fromEntries((r.chaves || []).map(k => [k.chave, k.valor]));
   est.listaChaves = r.chaves || [];
   est.niveis = r.niveis || { acoes: {} };
+  est.prospMotor = r.prosp_motor || null;   // sinal de vida do 52 e do 53 (DEC-087)
   return r;
 }
 async function abrirApp() {
