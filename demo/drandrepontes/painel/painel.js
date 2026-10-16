@@ -52,7 +52,7 @@
 
   // ---------- dados de exemplo ----------
   var PACIENTES = [
-    { id: 'P-DEMO7', nome: 'Marina Lopes', idade: 41, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:0}', peso: '78,6', var: '−5,4 kg', adesao: 82, alerta: '' },
+    { id: 'P-DEMO7', nome: 'Mariana Lopes', idade: 41, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:0}', peso: '78,6', var: '−5,4 kg', adesao: 82, alerta: '' },
     { id: 'P-DEMO5', nome: 'Carlos Menezes', idade: 52, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Dr. André', ultimo: '{d:0}', peso: '101,2', var: '−7,9 kg', adesao: 64, alerta: 'Náusea forte depois da aplicação' },
     { id: 'P-DEMO9', nome: 'Larissa Moreira', idade: 36, fase: 'Início', status: 'Agendado', prof: 'Dr. André', ultimo: '—', peso: '84,0', var: '—', adesao: 0, alerta: '' },
     { id: 'P-DEMO4', nome: 'Rodrigo Alves', idade: 47, fase: 'Perda de peso', status: 'Em tratamento', prof: 'Felipe', ultimo: '{d:-5}', peso: '93,4', var: '−3,1 kg', adesao: 21, alerta: '5 dias sem registrar' },
@@ -95,11 +95,11 @@
       { id: 2, dia: diaDe(0), slot: 1, pac: 'Carlos Menezes', tipo: 'Bioimpedância', prof: 'Enfermagem' },
       { id: 3, dia: diaDe(0), slot: 2, pac: 'Larissa Moreira', tipo: 'Primeira consulta · 60 min', prof: 'Dr. André' },
       { id: 4, dia: diaDe(0), slot: 4, pac: 'Rodrigo Alves', tipo: 'Nutrição', prof: 'Felipe' },
-      { id: 5, dia: diaDe(0), slot: 5, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
+      { id: 5, dia: diaDe(0), slot: 5, pac: 'Mariana Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
       { id: 6, dia: diaDe(0), slot: 6, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' },
       { id: 7, dia: diaDe(1), slot: 3, pac: 'Sofia Martins', tipo: 'Nutrição', prof: 'Felipe' },
       { id: 8, dia: diaDe(1), slot: 12, pac: 'Renata Costa', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
-      { id: 9, dia: diaDe(2), slot: 0, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
+      { id: 9, dia: diaDe(2), slot: 0, pac: 'Mariana Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem' },
       { id: 10, dia: diaDe(2), slot: 8, pac: 'Fernando Lima', tipo: 'Retorno · 30 min', prof: 'Dr. André' },
       { id: 11, dia: diaDe(3), slot: 2, pac: 'Juliana Prado', tipo: 'Primeira consulta · 60 min', prof: 'Dr. André' },
       { id: 12, dia: diaDe(3), slot: 14, pac: 'Paula Freitas', tipo: 'Psicologia', prof: 'Maria Clara' }
@@ -125,7 +125,11 @@
   function funcao(nome, sub, itens, on, trava) {
     return '<div class="lin"><div class="meio"><b>' + nome + '</b> ' + (itens || '') + '<small>' + (sub || '') + '</small></div>' + (trava ? A.sempre() : chave(on)) + '</div>';
   }
-  function kpi(nome, valor, extra, cls) { return cartao('<span class="rotulo">' + nome + '</span><div class="valor num">' + valor + '</div><div class="var ' + (cls || '') + '">' + extra + '</div>', 'kpi'); }
+  // Indicador com uma ilustração da biblioteca comum (comum/ilustracoes.js), escolhida pelo nome do indicador.
+  var ILU_KPI = [[/consulta|sess|agenda|aplicações hoje/i, 'calendario'], [/falta|humor/i, 'rosto-1'], [/ativos|pacientes|acompanhamento|contatos|viraram/i, 'avatar'], [/adesão|registra|questionário|conversão|notas|conferir/i, 'prancheta'],
+    [/perda|peso/i, 'gordura'], [/frasco|lote|estoque|materiais/i, 'frasco'], [/proteína/i, 'prato-proteina'], [/bioimped/i, 'corpo'], [/rodízio|casos|alertas|sinais/i, 'seringa']];
+  function iluKpi(nome) { for (var i = 0; i < ILU_KPI.length; i++) if (ILU_KPI[i][0].test(nome)) return A.ilu ? A.ilu(ILU_KPI[i][1], 46, 'ilu-kpi') : ''; return ''; }
+  function kpi(nome, valor, extra, cls) { return cartao(iluKpi(nome) + '<span class="rotulo">' + nome + '</span><div class="valor num">' + valor + '</div><div class="var ' + (cls || '') + '">' + extra + '</div>', 'kpi'); }
   function caso(nome, n, sub, cor) { return '<div class="caso"><span class="fraco" style="font-size:12px;font-weight:600">' + nome + '</span><span class="num" style="color:' + (cor || 'inherit') + '">' + n + '</span><span class="fraco" style="font-size:11.5px">' + sub + '</span></div>'; }
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
   function lista(linhas) { return '<div class="lista">' + linhas.join('') + '</div>'; }
@@ -193,7 +197,7 @@
     // ===== Atendimento RXSync (Projeto 1, itens 1 a 40) =====
     atendimento: function () {
       var conv = [['Juliana Prado', 'Quanto custa a primeira consulta?', 'IA respondeu com os preços cadastrados', 'st-ok', 'respondida'], ['Carlos Menezes', 'Estou muito enjoado desde ontem', 'Assunto sensível: passou para a enfermagem', 'st-al', 'com a equipe'],
-        ['Larissa Moreira', '(foto de um pedido de exame)', 'IA leu o pedido e anexou', 'st-ok', 'respondida'], ['Lucas Teixeira', 'Tem horário quinta de manhã?', 'IA ofereceu 3 horários e marcou', 'st-in', 'agendou'], ['Marina Lopes', 'Oi, é a Marina de novo', 'Reconheceu pelo telefone e chamou pelo nome', 'st-ok', 'respondida']];
+        ['Larissa Moreira', '(foto de um pedido de exame)', 'IA leu o pedido e anexou', 'st-ok', 'respondida'], ['Lucas Teixeira', 'Tem horário quinta de manhã?', 'IA ofereceu 3 horários e marcou', 'st-in', 'agendou'], ['Mariana Lopes', 'Oi, é a Mariana de novo', 'Reconheceu pelo telefone e chamou pelo nome', 'st-ok', 'respondida']];
       return cab('Conversas da IA', 'O atendimento por IA no WhatsApp da clínica (Gestão Inteligente da RXSync).', A.item([1, 2, 3, 10, 11, 15])) +
         '<div class="grade">' +
           cartao(titulo('Conversas de hoje', A.item([1, 3, 10, 15])) + lista(conv.map(function (c) {
@@ -249,12 +253,12 @@
             '<p class="nota" style="margin-top:8px">Limite de 30 avisos por dia. Quem responde SAIR não recebe mais.</p>', 's6') +
           cartao(titulo('Últimas avaliações', A.item(39)) + lista([
             lin('<span class="num" style="font-weight:700;font-size:20px">10</span>', '<b>Beatriz Nogueira</b> <span class="idp">P-DEMO2</span><div class="mudo" style="font-size:13px">"Equipe muito atenciosa."</div>'),
-            lin('<span class="num" style="font-weight:700;font-size:20px">9</span>', '<b>Marina Lopes</b> <span class="idp">P-DEMO7</span>'),
+            lin('<span class="num" style="font-weight:700;font-size:20px">9</span>', '<b>Mariana Lopes</b> <span class="idp">P-DEMO7</span>'),
             lin('<span class="num" style="font-weight:700;font-size:20px;color:var(--alerta)">6</span>', '<b>Rodrigo Alves</b> <span class="idp">P-DEMO4</span><div class="mudo" style="font-size:13px">"Esperei 25 minutos."</div>')]), 's6') +
         '</div>';
     },
     api: function () {
-      return cab('Ligação com o painel', 'Como o painel da Clínica Evoluir conversa com o atendimento da RXSync. O painel nunca acessa o banco da RXSync, só esta ligação.', A.item([31, 32, 33, 34, 35, 36])) +
+      return cab('Ligação com o painel', 'Como o painel da AG Melhor Versão conversa com o atendimento da RXSync. O painel nunca acessa o banco da RXSync, só esta ligação.', A.item([31, 32, 33, 34, 35, 36])) +
         '<div class="grade">' +
           cartao(titulo('Avisos de eventos', A.item(31)) + lista([
             lin('<span class="num fraco">{h:-8}</span>', '<b>agendou</b> · Lucas Teixeira · {wl:u+2} 10:30', '<span class="status st-ok">recebido</span>'),
@@ -308,14 +312,14 @@
           '<p class="nota" style="margin-top:8px">A IA identifica a área ' + A.item(57) + ' (usa IA por consumo). Sem resposta no prazo, o caso sobe até o dono ' + A.item(61) + '.</p>');
     },
     conversas: function () {
-      if (!E.chatEquipe) E.chatEquipe = [['ela', 'Oi, tudo bem? Queria saber se posso remarcar minha aplicação de quinta.', '{h:-3}'], ['ia', 'Claro, Marina! Tenho quinta 10:30 ou sexta 08:00. Qual prefere?', '{h:-3}']];
+      if (!E.chatEquipe) E.chatEquipe = [['ela', 'Oi, tudo bem? Queria saber se posso remarcar minha aplicação de quinta.', '{h:-3}'], ['ia', 'Claro, Mariana! Tenho quinta 10:30 ou sexta 08:00. Qual prefere?', '{h:-3}']];
       return cab('Caixa de conversas', 'Todas as conversas da clínica dentro do painel. A equipe assume no lugar da IA e devolve quando terminar.', A.item([84, 85, 86, 185])) +
         '<div class="duas">' +
           cartao(titulo('Conversas', A.item(84)) + lista([
-            lin('<span class="pessoa" style="background:var(--c1)">ML</span>', '<b>Marina Lopes</b> <span class="idp">P-DEMO7</span><div class="fraco" style="font-size:12px">remarcar aplicação · IA atendendo</div>', '<span class="status st-in">IA</span>'),
+            lin('<span class="pessoa" style="background:var(--c1)">ML</span>', '<b>Mariana Lopes</b> <span class="idp">P-DEMO7</span><div class="fraco" style="font-size:12px">remarcar aplicação · IA atendendo</div>', '<span class="status st-in">IA</span>'),
             lin('<span class="pessoa" style="background:var(--c3)">CM</span>', '<b>Carlos Menezes</b> <span class="idp">P-DEMO5</span><div class="fraco" style="font-size:12px">náusea · Thaís assumiu</div>', '<span class="status st-al">equipe</span>'),
             lin('<span class="pessoa" style="background:var(--c2)">JP</span>', '<b>Juliana Prado</b> <span class="idp">P-DEMO6</span><div class="fraco" style="font-size:12px">preços · IA atendendo</div>', '<span class="status st-in">IA</span>')])) +
-          cartao(titulo('Marina Lopes · P-DEMO7', A.item([85, 86])) +
+          cartao(titulo('Mariana Lopes · P-DEMO7', A.item([85, 86])) +
             '<div class="chat" id="chat-caixa">' + E.chatEquipe.map(function (m) {
               return '<div class="msg ' + (m[0] === 'ela' ? 'ela' : 'eu') + '">' + m[1] + '<small>' + (m[0] === 'ia' ? 'IA' : m[0] === 'eq' ? 'Equipe' : 'Paciente') + ' · ' + m[2] + '</small></div>';
             }).join('') + '</div>' +
@@ -403,13 +407,13 @@
         '<div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + kpi('Recebido no mês', 'R$ 48.250', '+12% vs. {m:-1}', 'sobe') + kpi('A receber', 'R$ 9.100', '14 cobranças', '') + kpi('Em atraso', 'R$ 1.300', '2 pacientes', 'desce') + kpi('Frascos', '4', 'mínimo 6', 'desce') + '</div>' +
         '<div class="grade">' +
           cartao(titulo('Cobranças', A.item([87, 88])) + '<div class="rolar-x"><table class="tabela-larga"><tr><th>Paciente</th><th>O quê</th><th>Valor</th><th>Vence</th><th>Situação</th></tr>' +
-            '<tr><td><b>Marina Lopes</b></td><td>Programa · 2/3</td><td class="num">R$ 650</td><td class="num">{d:+7}</td><td><span class="status st-in">lembrete enviado</span></td></tr>' +
+            '<tr><td><b>Mariana Lopes</b></td><td>Programa · 2/3</td><td class="num">R$ 650</td><td class="num">{d:+7}</td><td><span class="status st-in">lembrete enviado</span></td></tr>' +
             '<tr><td><b>Paula Freitas</b></td><td>Psicologia</td><td class="num">R$ 650</td><td class="num">{d:-8}</td><td><span class="status st-pe">em atraso</span></td></tr>' +
             '<tr><td><b>Fernando Lima</b></td><td>Retorno</td><td class="num">R$ 650</td><td class="num">{d:-15}</td><td><span class="status st-pe">em atraso</span></td></tr>' +
             '<tr><td><b>Beatriz Nogueira</b></td><td>Programa · 3/3</td><td class="num">R$ 650</td><td class="num">{d:-3}</td><td><span class="status st-ok">pago · Pix</span></td></tr></table></div>' +
             '<p class="nota" style="margin-top:8px">Link de Pix ou cartão pelo WhatsApp ' + A.item(87) + '; aviso antes e depois do vencimento ' + A.item(88) + '; quem está em aberto aparece também no CRM ' + A.item(89) + '.</p>', 's7') +
           cartao(titulo('Aplicações e estoque', A.item([90, 91])) + lista([
-            lin('<span class="num">{h:-20}</span>', '<b>Marina Lopes</b> · aplicação na clínica · Thaís', '<span class="status st-ok">registrada</span>'),
+            lin('<span class="num">{h:-20}</span>', '<b>Mariana Lopes</b> · aplicação na clínica · Thaís', '<span class="status st-ok">registrada</span>'),
             lin('<span class="num">{h:-50}</span>', '<b>Carlos Menezes</b> · complexo vitamínico · Eduarda', '<span class="status st-ok">registrada</span>')]) +
             '<div class="alerta-lin" style="--cor:var(--alerta);margin-top:10px">' + A.bolha('alerta', 'var(--alerta)') + '<div><b>Estoque baixo: 4 frascos</b><div class="fraco" style="font-size:12.5px">entrada: 20 em {d:-12} · saída: 16</div></div></div>', 's5') +
         '</div>';
@@ -448,7 +452,7 @@
       return cab('Prescrições e conteúdo do app', 'O que a equipe cadastra no painel e o paciente vê no app.', A.item([124, 125, 112, 113, 131, 133, 129, 92])) +
         '<div class="grade">' +
           cartao(titulo('Picadinha: prescrição', A.item([124, 125])) +
-            '<div class="lista">' + lin('', '<span class="rotulo">Paciente</span><div><b>Marina Lopes</b> · P-DEMO7</div>') + lin('', '<span class="rotulo">Medicação</span><div>Medicação semanal (exemplo) · quinta 08:00</div>') +
+            '<div class="lista">' + lin('', '<span class="rotulo">Paciente</span><div><b>Mariana Lopes</b> · P-DEMO7</div>') + lin('', '<span class="rotulo">Medicação</span><div>Medicação semanal (exemplo) · quinta 08:00</div>') +
             lin('', '<span class="rotulo">Instrução conferida</span><div class="num">10 unidades · 0,10 ml</div>', '<span class="status st-ok">conferida por Thaís</span>') + '</div>' +
             '<p class="nota" style="margin-top:8px">A clínica digita unidades e ml já conferidos. <b>O sistema não calcula dose.</b></p>', 's6') +
           cartao(titulo('Sintomas que avisam a enfermagem', A.item(129)) + '<div class="opcoes">' + ['Vômito', 'Náusea forte', 'Dor abdominal forte', 'Tontura', 'Sangue nas fezes'].map(function (t) { return '<button type="button" class="sel" data-acao="marca">' + t + '</button>'; }).join('') + ['Enjoo leve', 'Azia'].map(function (t) { return '<button type="button" data-acao="marca">' + t + '</button>'; }).join('') + '</div>', 's6') +
@@ -492,13 +496,13 @@
         '</div>';
     },
     seguranca: function () {
-      var l = [[41, 'Servidor e banco dedicados', 'ambiente só da Clínica Evoluir'], [42, 'Backup diário', 'último: hoje 03:10 · ok'], [43, 'Login da equipe', 'link no e-mail, sem senha'], [44, 'Perfis de acesso', 'médico, secretária, nutrição, enfermagem, financeiro'],
+      var l = [[41, 'Servidor e banco dedicados', 'ambiente só da AG Melhor Versão'], [42, 'Backup diário', 'último: hoje 03:10 · ok'], [43, 'Login da equipe', 'link no e-mail, sem senha'], [44, 'Perfis de acesso', 'médico, secretária, nutrição, enfermagem, financeiro'],
         [45, 'Registro de acessos', 'quem abriu ou alterou, e quando'], [46, 'Monitoramento de erros', 'nenhum erro nas últimas 24 h'], [47, 'Ambiente de testes', 'cada mudança é testada antes'], [48, 'Registro das respostas da IA', 'para revisão e auditoria (CFM 2.454/2026)'], [49, 'Exportação total dos dados', 'os dados são da clínica']];
       return cab('Segurança e dados', 'A base que sustenta tudo. Sempre ligada.', A.item([41, 42, 43, 44, 45, 46, 47, 48, 49, 13])) +
         '<div class="grade">' +
           cartao('<div class="funcoes">' + l.map(function (x) { return funcao(x[1], x[2], A.item(x[0]), true, true); }).join('') + '</div>', 's6') +
           '<div class="s6 pilha">' +
-            cartao(titulo('Registro de acessos (hoje)', A.item(45)) + lista([lin('<span class="num">{h:-6}</span>', '<b>Dr. André</b> abriu a ficha de Larissa Moreira'), lin('<span class="num">{h:-28}</span>', '<b>Thaís</b> registrou aplicação de Marina Lopes'), lin('<span class="num">{h:-49}</span>', '<b>Elenice</b> remarcou Fernando Lima'), lin('<span class="num">{h:-78}</span>', '<b>Emanuele</b> exportou o financeiro de {m:-1}')])) +
+            cartao(titulo('Registro de acessos (hoje)', A.item(45)) + lista([lin('<span class="num">{h:-6}</span>', '<b>Dr. André</b> abriu a ficha de Larissa Moreira'), lin('<span class="num">{h:-28}</span>', '<b>Thaís</b> registrou aplicação de Mariana Lopes'), lin('<span class="num">{h:-49}</span>', '<b>Elenice</b> remarcou Fernando Lima'), lin('<span class="num">{h:-78}</span>', '<b>Emanuele</b> exportou o financeiro de {m:-1}')])) +
             cartao(titulo('Exportar tudo', A.item(49)) + '<button class="botao" type="button" data-acao="aviso" data-msg="Exportação de exemplo iniciada: o arquivo chega no e-mail do responsável.">' + A.ic('download') + 'Baixar todos os dados</button>') +
           '</div></div>';
     }
@@ -571,7 +575,7 @@
       [/paula|semana|resumo/, 'Paula Freitas, semana: humor "baixo" em 3 dias, fome alta à noite em 4 dias, 2 registros de sono abaixo de 6 h. É um resumo dos registros; a avaliação é sua.'],
       [/sess/, 'Hoje: 11:00 Paula Freitas (presencial) e 16:00 Sofia Martins (on-line).']] },
     eduarda: { sug: ['Aplicações de hoje', 'Bioimpedâncias marcadas', 'Como está o estoque?'], r: [
-      [/aplic/, 'Aplicações de hoje na clínica: 10:30 Marina Lopes e 14:00 Carlos Menezes. Instruções já conferidas pela Thaís.'],
+      [/aplic/, 'Aplicações de hoje na clínica: 10:30 Mariana Lopes e 14:00 Carlos Menezes. Instruções já conferidas pela Thaís.'],
       [/bio|balan/, 'Bioimpedâncias de hoje: 08:30 Carlos Menezes e 09:00 Larissa Moreira (primeira consulta). Os dados entram sozinhos na ficha (item 72).'],
       [/estoq|frasc/, 'Estoque: 4 frascos, abaixo do mínimo de 6. Entrada de 20 em {d:-12}, saída de 16 (item 91).']] },
     thais: { sug: ['Alertas de sintomas de hoje', 'Prescrições a conferir', 'Posso aumentar a dose do Carlos?'], r: [
@@ -743,7 +747,7 @@
 
   function montar() {
     document.getElementById('menu').innerHTML =
-      '<div class="marca">' + A.logo({ tamanho: 46, texto: false }) + '<div><b>Clínica Evoluir</b><small>Dr. André Pontes Gonçalves</small></div></div>' +
+      '<div class="marca">' + A.logo({ tamanho: 46, texto: false }) + '<div><b>AG Melhor Versão</b><small>Doutor André Pontes Gonçalves</small></div></div>' +
       '<div class="quem">' + pessoa(EQUIPE[QUEM]) + '<div style="flex:1;min-width:0"><span class="rotulo">Entrou como</span><b>' + EQUIPE[QUEM].nome.replace('Dr. André Pontes Gonçalves', 'Dr. André') + '</b>' +
         '<small>' + (QUEM === 'andre' ? 'vê tudo' : EQUIPE[QUEM].papel) + ' · <a href="../" data-leva-estilo>trocar</a></small></div>' + A.item(169) + '</div>' +
       (QUEM === 'andre' ? '' : '<nav class="grupo"><span>Meu painel</span>' + (PAINEL.meuMenu[QUEM] || [['prof-' + QUEM, 'Meu dia', 'inicio']]).map(function (i) {

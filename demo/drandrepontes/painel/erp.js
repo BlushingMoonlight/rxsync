@@ -66,7 +66,7 @@
     proxReserva: 3, diaSalas: P.REF,
     bloqueios: bloqueiosDeExemplo(),
     proxBloq: 3,
-    series: [{ id: 1, pac: 'Marina Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem', dow: 4, slot: 0, passo: 7, vezes: 12, criada: '{d:-28}', proximas: proximasDe(4, 7) }],
+    series: [{ id: 1, pac: 'Mariana Lopes', tipo: 'Aplicação na clínica', prof: 'Enfermagem', dow: 4, slot: 0, passo: 7, vezes: 12, criada: '{d:-28}', proximas: proximasDe(4, 7) }],
     proxSerie: 2,
     rec: { pac: 'Carlos Menezes', tipo: 'Aplicação na clínica', prof: 'Enfermagem', dow: 3, slot: 13, passo: 7, vezes: 8 }
   };
@@ -297,7 +297,7 @@
   function mostrarRecibo(v) {
     var r = reciboDe(v), p = P.pac(r.pac);
     var f = folha('Recibo nº ' + r.n,
-      '<div class="documento"><b>Clínica Evoluir</b> · CNPJ 00.000.000/0001-00 (exemplo)<br><br>Recebemos de <b>' + esc(p.nome) + '</b> (' + p.id + ') a quantia de <b>' + reais(r.valor) + '</b>, referente a ' + esc(r.desc) + ', paga em ' + esc(r.forma.toLowerCase()) + ' em ' + r.data + '/2026.<br><br>Clínica Evoluir · recibo gerado pelo sistema</div>' +
+      '<div class="documento"><b>AG Melhor Versão</b> · CNPJ 00.000.000/0001-00 (exemplo)<br><br>Recebemos de <b>' + esc(p.nome) + '</b> (' + p.id + ') a quantia de <b>' + reais(r.valor) + '</b>, referente a ' + esc(r.desc) + ', paga em ' + esc(r.forma.toLowerCase()) + ' em ' + r.data + '/2026.<br><br>AG Melhor Versão · recibo gerado pelo sistema</div>' +
       '<p class="nota">O recibo não substitui a nota fiscal; a emissão de nota fiscal fica fora deste projeto.</p>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' + botao(A.ic('whatsapp') + 'Enviar pelo WhatsApp', 'recibo-enviar', r.pac + ':whatsapp:' + r.n) + botao(A.ic('chat') + 'Enviar pelo app', 'recibo-enviar', r.pac + ':app:' + r.n, true) + botao(A.ic('download') + 'PDF', 'aviso', 'PDF do recibo gerado (simulado).', true) + '</div>');
     return f;

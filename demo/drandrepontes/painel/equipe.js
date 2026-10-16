@@ -38,7 +38,7 @@
     [5, 'c:enfermagem', 'emanuele', '{h:-52}', 'Pedido feito, chega {wl:u+2}.', false],
     [6, 'c:recepcao', 'elenice', '{h:-40}', 'Larissa chegou para a primeira consulta das 09:00.', false],
     [7, 'c:nutricao', 'felipe', '{d:-1} 17:40', 'Rodrigo está há 5 dias sem registrar. Vou mandar mensagem pelo app.', false],
-    [8, 'p:P-DEMO7', 'felipe', '{d:-2} 15:10', 'Marina pediu para trocar o jantar por algo mais leve. Ajustei o plano.', false],
+    [8, 'p:P-DEMO7', 'felipe', '{d:-2} 15:10', 'Mariana pediu para trocar o jantar por algo mais leve. Ajustei o plano.', false],
     [9, 'p:P-DEMO7', 'andre', '{d:-1} 09:20', '@felipe ótimo. No retorno vemos a adesão de novo.', false],
     [10, 'p:P-DEMO3', 'mariaclara', '{d:-1} 19:05', 'Sessão de ontem: combinamos registrar a fome à noite. Detalhes no prontuário de psicologia.', true],
     [11, 'p:P-DEMO3', 'andre', '{d:-1} 20:00', '@mariaclara obrigado. Mantenho o plano até o retorno.', false],

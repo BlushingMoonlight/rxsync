@@ -1,12 +1,12 @@
 /* AG Melhor Versão · código comum do app, do painel e da página de entrada (prévia com dados de exemplo).
-   - Estilo: vem do endereço (?e=clean-claro | clean-escuro | couro | cyber). Sem ele, Clean claro.
+   - Estilo: vem do endereço (?e=clean-claro | clean-escuro | couro | cyber). Sem ele, AG claro (id clean-claro; o AG escuro é o clean-escuro).
      Trocar o estilo muda só o endereço (sem recarregar), então a tela (#tela) continua a mesma.
    - Selo "Prévia · dados de exemplo", botão de troca de estilo, logo em SVG e ícones. */
 (function () {
   'use strict';
   var ESTILOS = [
-    { id: 'clean-claro', nome: 'Clean claro' },
-    { id: 'clean-escuro', nome: 'Clean escuro' },
+    { id: 'clean-claro', nome: 'AG claro' },
+    { id: 'clean-escuro', nome: 'AG escuro' },
     { id: 'couro', nome: 'Couro' },
     { id: 'cyber', nome: 'Cyber' }
   ];
@@ -144,21 +144,12 @@
   aplicarEstilo(lerEstilo(), false);
 
   // ---------- Logo "AG · MELHOR VERSÃO" ----------
-  // Monograma: anel aberto, "A" de traço fino e "G" que abraça o "A". As cores vêm do estilo (--logo-1, --logo-2, --logo-txt).
+  // O logo da AG Melhor Versão (comum/marca/): quadrado verde-oliva de cantos arredondados, "AG" e "MELHOR VERSÃO" em creme.
+  // O texto "MELHOR VERSÃO" já está no desenho; a opção texto fica só por compatibilidade.
   function logo(opc) {
     opc = opc || {};
-    var t = opc.tamanho || 64, texto = opc.texto !== false;
-    var svg =
-      '<svg width="' + t + '" height="' + t + '" viewBox="0 0 120 120" role="img" aria-label="AG Melhor Versão">' +
-      '<circle cx="60" cy="60" r="55" fill="none" stroke="var(--logo-2)" stroke-width="2" stroke-dasharray="300 46" stroke-dashoffset="-20" stroke-linecap="round" opacity=".9"/>' +
-      '<path d="M26 86 L47 30 L68 86" fill="none" stroke="var(--logo-1)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '<path d="M34.5 66 H59.5" fill="none" stroke="var(--logo-1)" stroke-width="5.5" stroke-linecap="round"/>' +
-      '<path d="M96.5 40.5 A25 25 0 1 0 98 70 L98 60 H82" fill="none" stroke="var(--logo-2)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>' +
-      '</svg>';
-    if (!texto) return '<span class="logo">' + svg + '</span>';
-    var f = Math.max(8, Math.round(t * 0.15));
-    return '<span class="logo">' + svg +
-      '<span style="font:600 ' + f + 'px/1 var(--fonte);letter-spacing:.28em;margin-right:-.28em;white-space:nowrap">MELHOR VERSÃO</span></span>';
+    var t = opc.tamanho || 64, arq = t > 96 ? 'logo-512.png' : 'logo-192.png';
+    return '<span class="logo"><img src="' + RAIZ + 'comum/marca/' + arq + '" width="' + t + '" height="' + t + '" alt="AG Melhor Versão" decoding="async"></span>';
   }
 
   // ---------- Ícones (traço fino, cor herdada) ----------
@@ -215,6 +206,31 @@
     link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
     letra: '<path d="M4 19 9 5l5 14M5.8 14h6.4"/><path d="M15 19l3-8 3 8M15.9 16.5h4.2"/>',
     relogio: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    sol: '<circle cx="12" cy="12" r="3.8"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6"/>',
+    folha: '<path d="M5 19c0-8 5-14 15-14 0 9-6 14-15 14z"/><path d="M5 19c3-4 6-7 10-9"/>',
+    ondas: '<path d="M3.5 9.5c2-2 4-2 6 0s4 2 6 0 4-2 5 0M3.5 15c2-2 4-2 6 0s4 2 6 0 4-2 5 0"/>',
+    nuvem: '<path d="M7 18.5h10a4 4 0 0 0 .5-8A5.5 5.5 0 0 0 7 10a4.3 4.3 0 0 0 0 8.5z"/>',
+    raio: '<path d="M13 3 5.5 13.5H12L11 21l7.5-10.5H12z"/>',
+    lua: '<path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>',
+    casa: '<path d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/>',
+    clinica: '<rect x="4" y="6" width="16" height="14" rx="2"/><path d="M9 6V4h6v2M12 9.5v6M9 12.5h6"/>',
+    abdome: '<path d="M7 4c1 4 1 7-1 10-1 3 0 6 6 6s7-3 6-6c-2-3-2-6-1-10"/><path d="M8.5 14c2 1.5 5 1.5 7 0"/>',
+    coxa: '<path d="M9 3c-1 5-1 9 1 13l1 5h3l-.5-5c1-4 1.5-8 1.5-13"/>',
+    braco: '<path d="M5 20c1-5 3-8 6-9l3-1c2-.5 2-3 0-3.5L11 6M11 11c3 1 6 3 8 7"/>',
+    balao: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4 4v-4h0A2 2 0 0 1 4 14z"/>',
+    bolhas: '<path d="M3.5 13V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H7l-3.5 3z"/><path d="M18 9h1a1.5 1.5 0 0 1 1.5 1.5V19l-3-2.5H11a1.5 1.5 0 0 1-1.5-1.5v-1"/>',
+    pessoas: '<circle cx="12" cy="7.5" r="2.6"/><circle cx="5.5" cy="9.5" r="2"/><circle cx="18.5" cy="9.5" r="2"/><path d="M7.5 19c.4-3.3 2.2-5.3 4.5-5.3s4.1 2 4.5 5.3M2.5 18c.3-2.3 1.4-3.6 3-3.8M21.5 18c-.3-2.3-1.4-3.6-3-3.8"/>',
+    lapis: '<path d="M14.5 5.5l4 4L9 19H5v-4z"/><path d="M12.5 7.5l4 4"/>',
+    lixo: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 10.5v6M14 10.5v6"/>',
+    voltar: '<path d="M15 5l-7 7 7 7"/>',
+    baixo: '<path d="M6 9l6 6 6-6"/>',
+    cima: '<path d="M6 15l6-6 6 6"/>',
+    facebook: '<path d="M14 21v-8h3l.5-3.5H14V7.6c0-1 .3-1.7 1.8-1.7h1.8V2.8c-.3 0-1.4-.1-2.6-.1-2.6 0-4.3 1.6-4.3 4.4v2.4H8V13h2.7v8"/>',
+    fone: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3.5" y="13.5" width="4" height="6" rx="1.5"/><rect x="16.5" y="13.5" width="4" height="6" rx="1.5"/>',
+    local: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+    desfazer: '<path d="M9 7 4.5 11.5 9 16"/><path d="M4.5 11.5H15a4.5 4.5 0 0 1 0 9h-3"/>',
+    frasco: '<rect x="8" y="3.5" width="8" height="3" rx="1"/><path d="M8.5 6.5h7v13a1.5 1.5 0 0 1-1.5 1.5h-4a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M8.5 11h7"/>',
+    caixa: '<path d="M4 8l8-4.5L20 8v8.5L12 21l-8-4.5z"/><path d="M4 8l8 4.5L20 8M12 12.5V21"/>',
     comunidade: '<circle cx="6.5" cy="9" r="2.3"/><circle cx="17.5" cy="9" r="2.3"/><circle cx="12" cy="7" r="2.6"/><path d="M3 17.5c.4-2.3 1.8-3.7 3.5-3.7M21 17.5c-.4-2.3-1.8-3.7-3.5-3.7M7.5 18c.5-3 2.3-4.8 4.5-4.8s4 1.8 4.5 4.8"/>'
   };
   function ic(nome, classe) {

@@ -69,7 +69,7 @@
   var indice = ['Resumo'].concat(SECOES.map(function (x) { return x[1]; }), ['Itens tirados', 'Prazos e marcos por etapa']);
 
   var h = '<section class="capa">' + A.logo({ tamanho: 120 }) +
-    '<h1>Resumo do escopo</h1><p class="sub">Clínica Evoluir · Dr. André Pontes Gonçalves</p>' +
+    '<h1>Resumo do escopo</h1><p class="sub">AG Melhor Versão · Doutor André Pontes Gonçalves</p>' +
     '<p class="data">' + dataExt + ' · escopo versão ' + esc(D.versao) + '</p>' +
     '<ol class="indice">' + indice.map(function (t, i) { return '<li><a href="#s' + (i + 1) + '">' + esc(t) + '</a></li>'; }).join('') + '</ol>' +
     (PA ? '<p class="pacote-capa">' + esc(C.textoPacote(PA)) + '</p>' : '') +
