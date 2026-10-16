@@ -144,6 +144,8 @@ function nivelDe(acao, d) {
   if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) ? 2 : 1;
   if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
   if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
+  // Públicos (sql/036, DEC-088): tirar um contato é um toque (pôr de volta num público em uso: a página passa o nível 2).
+  if (acao === 'prosp_publico_contato_marcar' && d.valor === 'NAO') return 1;
   if (acao === 'cobranca_teste_definir' && !d.cliente_id) return 2;
   if (acao === 'sair_todos') return 2;
   const n = Number((est.niveis.acoes || {})[acao]);

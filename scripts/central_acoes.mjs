@@ -73,6 +73,8 @@ const C = { cliente_id: 'CLI-001' }, M = 'motivo de teste';
 const P = 'prospeccao', ABORD = 'Olá! Sou a assistente virtual da {marca}. Vi a {nome} no Google Maps: posso te contar como respondemos pacientes à noite?';
 const chave = nome => page.locator('#conteudo').getByRole('switch', { name: nome, exact: true }).first();
 const F = 'clientes/CLI-001';
+// Abre um grupo (details) do editor da camada pelo título.
+const abrirGrupo = titulo => page.locator('#conteudo details.grupo summary', { hasText: titulo }).first().click();
 // Formulário de grupo (details): abre, muda um campo, Salvar.
 const grupo = (titulo, campo, valor) => async () => {
   const g = page.locator('#conteudo details.grupo', { has: page.locator('summary', { hasText: titulo }) }).first();
@@ -156,7 +158,26 @@ const CASOS = [
   { acao: 'prosp_lead_nao_contatar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Não contatar').click(), espera: { id: 'PX-AAAAA' } },
   { acao: 'prosp_anotar', rota: P + '/relatorios', abrirCom: () => botao('Anotar').click(), campos: { texto: 'Liguei o anúncio C' }, espera: { campanha_id: '', dia: hoje, texto: 'Liguei o anúncio C' } },
   { acao: 'prosp_relatorio_salvar', rota: P + '/relatorios', abrirCom: () => botao('Guardar como padrão').click(), espera: { nome: 'Padrão', config: { visao: 'desempenho' } } },
-  { acao: 'prosp_buscar_agora', rota: P + '/buscas', abrirCom: () => botao('Buscar agora').click(), campos: { conjunto_id: 'CJ-0001' }, espera: { conjunto_id: 'CJ-0001' } },
+  { acao: 'prosp_buscar_agora', rota: P + '/buscas', abrirCom: () => botao('Buscar agora').click(), campos: { publico_id: 'PB-0002' }, espera: { publico_id: 'PB-0002' } },
+  // Públicos (sql/036, DEC-088): o conjunto escolhe; o público guarda a busca e os contatos
+  { acao: 'prosp_conjunto_salvar', nivel: 3, rota: P + '/conjunto/CJ-0001', antes: () => page.locator('#conteudo .p-pub[data-id="PB-0002"]').click(), abrirCom: () => botao('Salvar a versão nova').click(), nome: 'Dentistas Curitiba',
+    espera: { id: 'CJ-0001', nome: 'Dentistas Curitiba', config: { ...CFG.conjunto, publicos: ['PB-0001', 'PB-0002'] }, numero_id: '1' } },
+  { acao: 'prosp_conjunto_salvar', nivel: 1, rota: P + '/conjunto/novo/CMP-0002', antes: async () => { await page.fill('#p-nome', 'Joinville novo'); await page.locator('#conteudo .p-pub[data-id="PB-0002"]').click(); },
+    abrirCom: () => botao('Criar').click(), espera: { id: '', nome: 'Joinville novo', config: { ...CFG.conjunto, publicos: ['PB-0001', 'PB-0002'] }, numero_id: '', campanha_id: 'CMP-0002' } },
+  { acao: 'prosp_publico_salvar', nivel: 2, rota: P + '/publico/PB-0001/configuracao', antes: async () => { await abrirGrupo('Fuso, créditos e contatos novos'); await page.fill('#p-creditos_mes', '150'); }, abrirCom: () => botao('Salvar a versão nova').click(),
+    espera: { id: 'PB-0001', nome: 'Dentistas Curitiba', config: { ...CFG.publico, creditos_mes: 150 } } },
+  { acao: 'prosp_publico_salvar', rota: P + '/publico/novo', antes: async () => { await page.fill('#p-nome', 'Dentistas Londrina'); await page.fill('#p-busca-lugares', 'Londrina'); }, abrirCom: () => botao('Criar').click(),
+    espera: { id: '', nome: 'Dentistas Londrina', config: { ...CFG.publico, busca: { ...CFG.publico.busca, lugares: ['Londrina'] } } } },
+  { acao: 'prosp_publico_renomear', rota: P + '/publico/PB-0002/configuracao', antes: () => page.fill('#p-nome', 'Ortodontia Joinville e região'), abrirCom: () => botao('Salvar a versão nova').click(),
+    espera: { id: 'PB-0002', nome: 'Ortodontia Joinville e região' } },
+  { acao: 'prosp_publico_duplicar', rota: P + '/publico/PB-0001', abrirCom: () => botao('Duplicar').click(), espera: { id: 'PB-0001' } },
+  { acao: 'prosp_publico_buscar', rota: P + '/publico/PB-0001', abrirCom: () => botao('Buscar de novo').click(), espera: { id: 'PB-0001' } },
+  { acao: 'prosp_publico_contato_marcar', rota: P + '/publico/PB-0001', abrirCom: () => chave('Tirar Sorriso Batel').click(), espera: { id: 'PB-0001', contato_id: 9101, valor: 'NAO' } },
+  { acao: 'prosp_publico_contato_marcar', nivel: 2, rota: P + '/publico/PB-0001', abrirCom: () => chave('Pôr de volta Clínica Tirada').click(), espera: { id: 'PB-0001', contato_id: 9102, valor: 'SIM' } },
+  { acao: 'prosp_publico_contatos_lote', rota: P + '/publico/PB-0001', abrirCom: () => botao('Selecionar todos').click(), espera: { id: 'PB-0001', valor: 'SIM', todos: true } },
+  { acao: 'prosp_publico_contatos_lote', rota: P + '/publico/PB-0001', abrirCom: () => botao('Tirar todos').click(), espera: { id: 'PB-0001', valor: 'NAO', todos: true } },
+  { acao: 'prosp_publico_arquivar', rota: P + '/publico/PB-0002', abrirCom: () => botao('Arquivar').click(), espera: { id: 'PB-0002', valor: 'SIM' } },
+  { acao: 'prosp_creditos_teto_salvar', rota: P + '/publicos', abrirCom: () => botao('Mudar o teto').click(), campos: { valor: '500' }, espera: { valor: '500' } },
   { acao: 'prosp_regra_salvar', rota: P + '/regras', abrirCom: () => botao('Nova regra').click(), campos: { valor: '20' },
     espera: { nivel: 'anuncio', alvo_id: '', metrica: 'recusa', operador: '>', valor: '20', depois_de: '30', janela_dias: '7', acao: 'avisar' } },
   { acao: 'prosp_regra_ligar', nivel: 2, rota: P + '/regras', abrirCom: () => chave('Desligar a regra 7').click(), espera: { id: 7, valor: 'NAO' } },
@@ -217,6 +238,30 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
 {
   await abrir('seguranca'); const desde = chamadas.length; await botao('Encerrar').click();
   const d = await chamada('encerrar_sessao', desde); ok(d && d.id === 2 && Object.keys(d).length === 1, `encerrar_sessao (${JSON.stringify(d)})`); feitos++;
+}
+// Públicos: a lista do público mostra o telefone só com os 4 últimos dígitos; o conjunto não escolhe público de outro fuso;
+// Leads, Relatórios e Buscas filtram por público.
+{
+  await abrir(P + '/publico/PB-0001');
+  const txt = await page.locator('#conteudo').innerText();
+  ok(/•••• 2001/.test(txt) && !/\d{8,}/.test(txt.replace(/\s/g, '')), 'públicos: telefone só com os 4 últimos dígitos (nenhum número inteiro na tela)');
+  await abrir(P + '/conjunto/CJ-0001');
+  ok(await page.locator('#conteudo .p-pub[data-id="PB-0003"]').isDisabled() && !(await page.locator('#conteudo .p-pub[data-id="PB-0002"]').isDisabled()), 'conjunto: público de outro fuso (Manaus) não dá para escolher');
+  ok(await page.locator('#conteudo .p-pub[data-id="PB-0004"]').count() === 0, 'conjunto: público arquivado não aparece para escolher');
+  await abrirGrupo('Entrega'); await page.selectOption('#p-entrega-fuso', 'America/Manaus');
+  ok(await page.locator('#conteudo .p-pub[data-id="PB-0003"]').isEnabled() && await page.locator('#conteudo .p-pub[data-id="PB-0002"]').isDisabled() && await page.locator('#conteudo .p-pub[data-id="PB-0001"]').isEnabled(),
+    'conjunto: trocar o fuso da entrega troca os públicos que dá para escolher (o já escolhido fica, o servidor recusa)');
+  const filtrou = async (rota, sel, valor, acao, campo) => { await abrir(rota); const desde = chamadas.length; await page.selectOption(sel, valor);
+    for (let i = 0; i < 60; i++) { const c = chamadas.slice(desde).find(x => x.acao === acao); if (c) return c.dados[campo]; await page.waitForTimeout(50); } return null; };
+  ok(await filtrou(P + '/leads', '#conteudo select[aria-label="Público"]', 'PB-0001', 'prosp_leads', 'publico_id') === 'PB-0001', 'leads: filtro por público');
+  ok(await filtrou(P + '/buscas', '#conteudo select[aria-label="Público"]', 'PB-0002', 'prosp_buscas', 'publico_id') === 'PB-0002', 'buscas: filtro por público');
+  await abrir(P + '/relatorios'); const desde = chamadas.length; await page.locator('#conteudo label', { hasText: 'Nível' }).locator('select').selectOption('publico');
+  const d = await chamada('prosp_relatorio', desde);
+  ok(d && d.nivel === 'publico', `relatórios: nível público (${JSON.stringify(d)})`);
+  await page.waitForTimeout(200);
+  ok(await page.locator('#conteudo table th[scope=row]', { hasText: 'Dentistas Curitiba' }).count() === 1 && await page.locator('#conteudo table th[scope=row]', { hasText: '(sem público)' }).count() === 1, 'relatórios: linha por público, com o nome');
+  await page.locator('#conteudo label', { hasText: 'Nível' }).locator('select').selectOption('anuncio');
+  feitos += 5;
 }
 // Prospecção: o QR só na tela. Aparece na janela; nada dele vai para o armazenamento do navegador ou o endereço; some ao
 // fechar a janela e quando a Central vai para o fundo.

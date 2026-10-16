@@ -53,13 +53,15 @@ for (const f of htmls) {
     // Página montada (DEC-068): central/index.html é exatamente o que o central_montar.mjs gera a partir de central/fonte/.
     try { const { montar } = await import('./central_montar.mjs'); if (montar() !== s) erro(`${arq}: diferente do que central/fonte/ monta (rode node scripts/central_montar.mjs e não edite a página à mão)`); }
     catch (e) { erro(`central/fonte: não consegui montar a Central (${e.message})`); }
-    // Toda ação de edição tem nível no servidor (sql/030 e sql/031, rx_central_niveis). Ação nova precisa entrar lá e aqui.
+    // Toda ação de edição tem nível no servidor (sql/030, sql/031 e sql/036, rx_central_niveis). Ação nova precisa entrar lá e aqui.
     // ligar_chave: um toque (DEC-066); as chaves do motor da prospecção sobem para 2 ou 3 ao ligar (rx_central, sql/031).
     const NIVEIS = { 1: ['cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
-        'prosp_campanha_salvar', 'prosp_conjunto_salvar', 'prosp_anuncio_salvar', 'prosp_duplicar', 'prosp_regra_salvar', 'prosp_regra_ligar', 'prosp_anotar', 'prosp_custos_salvar', 'prosp_relatorio_salvar', 'prosp_numero_situacao', 'prosp_lead_aprovar', 'prosp_lead_marcar', 'prosp_lead_assumir'],
+        'prosp_campanha_salvar', 'prosp_conjunto_salvar', 'prosp_anuncio_salvar', 'prosp_duplicar', 'prosp_regra_salvar', 'prosp_regra_ligar', 'prosp_anotar', 'prosp_custos_salvar', 'prosp_relatorio_salvar', 'prosp_numero_situacao', 'prosp_lead_aprovar', 'prosp_lead_marcar', 'prosp_lead_assumir',
+        'prosp_publico_salvar', 'prosp_publico_renomear', 'prosp_publico_duplicar', 'prosp_publico_contato_marcar'],
       2: ['situacao_pausar', 'situacao_retomar', 'situacao_reativar', 'cancelamento_desfazer', 'link_painel_reenviar', 'link_conectar_reenviar', 'reenviar_onboarding', 'recurso_liberar', 'recurso_revogar',
         'cliente_editar_empresa', 'chave_api_criar', 'aviso_destino_definir', 'aviso_destino_desligar', 'desfazer', 'sair_todos',
-        'prosp_ligar', 'prosp_apagar_rascunho', 'prosp_numero_criar', 'prosp_numero_qr', 'prosp_numero_desconectar', 'prosp_numero_webhook', 'prosp_numero_teto', 'prosp_buscar_agora', 'prosp_leads_aprovar_todos', 'prosp_lead_nao_contatar', 'prosp_lead_devolver', 'prosp_exportar'],
+        'prosp_ligar', 'prosp_apagar_rascunho', 'prosp_numero_criar', 'prosp_numero_qr', 'prosp_numero_desconectar', 'prosp_numero_webhook', 'prosp_numero_teto', 'prosp_buscar_agora', 'prosp_leads_aprovar_todos', 'prosp_lead_nao_contatar', 'prosp_lead_devolver', 'prosp_exportar',
+        'prosp_publico_buscar', 'prosp_publico_contatos_lote', 'prosp_publico_arquivar', 'prosp_creditos_teto_salvar'],
       3: ['plano_trocar', 'situacao_suspender', 'cancelamento_agendar', 'preco_especial', 'cobranca_proxima_data', 'cobranca_vencimento', 'implantacao_isentar', 'pagamento_receber_dinheiro',
         'teste_estender', 'link_painel_novo', 'chave_api_revogar', 'cobranca_teste_definir', 'prosp_encerrar', 'prosp_numero_apagar'] };
     const conhecidas = new Set(Object.values(NIVEIS).flat());

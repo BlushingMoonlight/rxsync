@@ -1,27 +1,29 @@
-// ---------------------------------------------------------------- Marketing › Prospecção (sql/031 e sql/032; DEC-069 a DEC-082)
+// ---------------------------------------------------------------- Marketing › Prospecção (sql/031 a sql/036; DEC-069 a DEC-088)
 // Gerenciador no jeito do Meta Ads: Campanha › Conjunto › Anúncio, com interruptor em cada camada (pausar = um toque;
 // ligar pede o nível do servidor). Números de WhatsApp com o QR SÓ na tela (nunca guardado no navegador nem no endereço),
 // leads e conversas (o telefone só com os 4 últimos dígitos), buscas, relatórios com margem de erro, regras e custos.
+// Públicos (sql/036, DEC-088): a busca e os contatos ficam no público; o conjunto escolhe públicos do mesmo fuso.
 // Toda trava é conferida no servidor; a página só mostra (e as travas que ela mostra vêm de "travas" do servidor).
 ICONES.prospeccao = 'M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12';
 ICONES.telefone = 'M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 19V5A1.5 1.5 0 0 1 8 3.5M11 17.5h2';
 ICONES.conversa = 'M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7l-4.5 3.5V17H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1M8 9.5h8M8 12.5h5';
 ICONES.mais_um = 'M12 5v14M5 12h14';
 
-const P_ABAS = [['', 'Campanhas'], ['numeros', 'Números'], ['leads', 'Leads'], ['relatorios', 'Relatórios'], ['buscas', 'Buscas'], ['regras', 'Regras'], ['custos', 'Custos']];
+const P_ABAS = [['', 'Campanhas'], ['publicos', 'Públicos'], ['numeros', 'Números'], ['leads', 'Leads'], ['relatorios', 'Relatórios'], ['buscas', 'Buscas'], ['regras', 'Regras'], ['custos', 'Custos']];
 const P_SIT = { rascunho: ['rascunho', ''], ativa: ['ativa', 'ok'], ativo: ['ativo', 'ok'], pausada: ['pausada', 'atencao'], pausado: ['pausado', 'atencao'], cortado: ['cortado pela regra', 'perigo'],
-  encerrada: ['encerrada', ''], encerrado: ['encerrado', ''] };
+  encerrada: ['encerrada', ''], encerrado: ['encerrado', ''], arquivado: ['arquivado', ''] };
 const etqSit = s => { const [t, tom] = P_SIT[s] || [s || '—', '']; return etq(t, tom); };
 const P_NUM = { novo: ['novo', ''], aguardando_qr: ['esperando o código', 'atencao'], conectado: ['conectado', 'ok'], desconectado: ['desconectado', 'perigo'], banido: ['provável bloqueio', 'perigo'], apagado: ['apagado', ''] };
 const etqNum = s => { const [t, tom] = P_NUM[s] || [s || '—', '']; return etq(t, tom); };
 const P_LEAD = { para_aprovar: ['Para aprovar', 'atencao'], na_fila: ['Na fila', 'info'], enviado: ['Enviado', ''], respondeu: ['Respondeu', 'info'], positivo: ['Positivo', 'ok'], com_voce: ['Com você', 'atencao'],
   cadastrou: ['Cadastrou', 'ok'], cliente: ['Cliente', 'ok'], recusou: ['Recusou', ''], saiu: ['Saiu (não contatar)', 'perigo'], sem_whatsapp: ['Sem WhatsApp', ''], falhou: ['Falhou', 'perigo'], descartado: ['Descartado', ''] };
 const etqLead = s => { const [t, tom] = P_LEAD[s] || [s || '—', '']; return etq(t, tom); };
-const P_NOME = { campanha: 'campanha', conjunto: 'conjunto', anuncio: 'anúncio' };
+const P_NOME = { campanha: 'campanha', conjunto: 'conjunto', anuncio: 'anúncio', publico: 'público' };
 const pct = v => v == null ? '—' : String(v).replace('.', ',') + '%';
 const irP = (...partes) => ir(['prospeccao', ...partes.filter(x => x != null && x !== '').map(x => encodeURIComponent(x))].join('/'));
 const ativo = s => s === 'ativa' || s === 'ativo';
 est.prosp = null; // a última tela inicial (árvore de campanhas e números), só na memória
+est.publicos = null; // a última lista de públicos (sql/036), só na memória
 
 function abasP(atual) {
   return el('div', { class: 'abas abas-p', role: 'tablist', 'aria-label': 'Partes da prospecção' }, P_ABAS.map(([k, n]) => el('button', { role: 'tab', type: 'button', 'aria-selected': String(atual === k), onclick: () => irP(k) }, n)));
@@ -39,6 +41,20 @@ const nomeP = (tipo, id) => {
   if (tipo === 'numero') { const n = (a.numeros || []).find(x => String(x.id) === String(id)); if (n) return n.instancia; }
   return id;
 };
+const nomePub = id => { const p = ((est.publicos && est.publicos.publicos) || []).find(x => x.id === id); return p ? p.nome : id || '(sem público)'; };
+// Lista dos públicos (para o conjunto escolher e para os filtros de leads, relatórios e buscas).
+async function publicosP(forcar) {
+  if (est.publicos && !forcar) return est.publicos;
+  const r = await chamar('prosp_publicos');
+  if (r.ok) est.publicos = r.dados;
+  return r.ok ? est.publicos : { publicos: [] };
+}
+const pubsAtivos = () => ((est.publicos && est.publicos.publicos) || []).filter(p => p.situacao === 'ativo');
+const emUsoPub = p => !!p && (p.conjuntos || []).some(j => j.ativo);
+// Grupo de fuso (a mesma regra de rx_prosp_fuso_grupo): o conjunto só usa públicos do fuso da entrega (DEC-088, opção A).
+const fusoGrupo = f => f === 'America/Rio_Branco' ? '-5' : ['America/Manaus', 'America/Boa_Vista', 'America/Porto_Velho', 'America/Cuiaba', 'America/Campo_Grande'].includes(f) ? '-4' : f === 'America/Noronha' ? '-2' : '-3';
+const NOMES_FUSO = { Sao_Paulo: 'São Paulo', Cuiaba: 'Cuiabá', Belem: 'Belém', Maceio: 'Maceió', Araguaina: 'Araguaína', Noronha: 'Fernando de Noronha' };
+function fusoNome(f) { const k = String(f || 'America/Sao_Paulo').replace('America/', ''); return NOMES_FUSO[k] || k.replace(/_/g, ' '); }
 const conjuntosP = () => (est.prosp && est.prosp.campanhas || []).flatMap(c => (c.conjuntos || []).map(j => ({ ...j, campanha: c })));
 
 // Interruptor de uma camada (ou de um número): pausar é um toque, ligar pede o nível; encerrado não tem interruptor.
@@ -61,7 +77,7 @@ function interruptorP(tipo, o) {
 // ---------------------------------------------------------------- telas
 TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
-  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, numeros: pNumeros, leads: pLeads, lead: pLead, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
+  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
   const fn = telasP[parte] || pInicio;
   if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Marketing'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
@@ -112,11 +128,11 @@ async function pInicio(c) {
     (j.anuncios || []).map(n => el('li', {}, camada('anuncio', n, `${n.id} · versão ${n.versao}${n.pausa_motivo ? ' · ' + n.pausa_motivo : ''}`))),
     editar && !/^encerrad/.test(j.situacao) ? novoBtn('Novo anúncio', 'anuncio', j.id) : null);
   const conjuntos = cp => el('ul', { class: 'lista p-filhos' },
-    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
+    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? fmtNum(j.publicos.length) + ' público(s)' : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
     editar && !/^encerrad/.test(cp.situacao) ? novoBtn('Novo conjunto', 'conjunto', cp.id) : null);
   const arvore = campanhas.length
     ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${fmtNum((cp.conjuntos || []).length)} conjunto(s)`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
-    : [cartao(null, null, vazio('Nenhuma campanha ainda. Crie a primeira: campanha (marca, produto e IA) › conjunto (busca, número, entrega) › anúncios (as mensagens, sorteadas entre os leads).', 'prospeccao'))];
+    : [cartao(null, null, vazio('Nenhuma campanha ainda. Crie a primeira: campanha (marca, produto e IA) › conjunto (públicos, número, entrega) › anúncios (as mensagens, sorteadas entre os leads).', 'prospeccao'))];
   trocar(c, cabecalho('Prospecção', 'campanha › conjunto › anúncio', editar ? btn('Nova campanha', () => irP('campanha', 'novo'), 'pri', 'mais_um') : null),
     el('div', { class: 'pilha' }, abasP(''),
       el('div', { class: 'etqs' }, etq(disparo[0], disparo[1]), etq(ch.prosp_busca === 'SIM' ? 'busca ligada' : 'busca desligada', ch.prosp_busca === 'SIM' ? 'ok' : ''),
@@ -134,14 +150,14 @@ async function pInicio(c) {
 const SIMNAO = [['true', 'Sim'], ['false', 'Não']];
 const DIAS_SEM = [['seg', 'seg'], ['ter', 'ter'], ['qua', 'qua'], ['qui', 'qui'], ['sex', 'sex']];
 const FUSOS = ['America/Sao_Paulo', 'America/Manaus', 'America/Cuiaba', 'America/Campo_Grande', 'America/Porto_Velho', 'America/Boa_Vista', 'America/Rio_Branco', 'America/Belem',
-  'America/Fortaleza', 'America/Recife', 'America/Bahia', 'America/Maceio', 'America/Araguaina', 'America/Noronha'].map(f => [f, f.replace('America/', '').replace('_', ' ')]);
+  'America/Fortaleza', 'America/Recife', 'America/Bahia', 'America/Maceio', 'America/Araguaina', 'America/Noronha'].map(f => [f, fusoNome(f)]);
 const ESQUEMA = {
   campanha: [
     ['Marca e produto', [['marca', 'Marca (vai na mensagem)', 'texto', { ajuda: 'até 40 letras; use {marca} no anúncio' }], ['produto', 'O que a IA conta sobre o produto', 'longo', { ajuda: '20 a 1.500 letras' }],
       ['objetivo', 'Objetivo (decide o vencedor)', 'sel', { op: [['resposta', 'Resposta'], ['positiva', 'Resposta positiva'], ['cadastro', 'Cadastro'], ['pagamento', 'Pagamento']] }],
       ['link_agenda', 'Link da sua agenda (opcional)', 'texto', { ajuda: 'começa com https://' }]]],
     ['Orçamento e datas', [['orcamento_msgs_dia', 'Mensagens por dia (campanha)', 'num', { ajuda: 'o teto de cada número vale por cima' }], ['limite_total', 'Limite total de mensagens', 'num', { ajuda: '0 = sem limite' }],
-      ['creditos_mes', 'Créditos do SerpAPI no mês', 'num'], ['inicio', 'Começa em', 'data'], ['fim', 'Termina em', 'data'], ['atribuicao_dias', 'Janela de atribuição (dias)', 'num', { ajuda: 'cadastro conta até N dias depois da 1ª mensagem' }]]],
+      ['inicio', 'Começa em', 'data'], ['fim', 'Termina em', 'data'], ['atribuicao_dias', 'Janela de atribuição (dias)', 'num', { ajuda: 'cadastro conta até N dias depois da 1ª mensagem' }]]],
     ['IA de resposta', [['ia.ligada', 'IA ligada nesta campanha', 'simnao'], ['ia.tom', 'Tom', 'texto'], ['ia.objetivo_texto', 'Objetivo da conversa', 'texto'], ['ia.objecoes', 'Como responder às objeções', 'lista'],
       ['ia.passar_para_voce', 'Quando passar para você', 'texto'], ['ia.nunca_dizer', 'Nunca dizer (os fixos ficam)', 'lista'], ['ia.regras_escrita', 'Regras de escrita', 'lista'],
       ['ia.tamanho_max', 'Tamanho máximo da resposta (letras)', 'num', { trava: 'resposta_max' }], ['ia.max_mensagens', 'Mensagens da IA antes de passar para você', 'num', { trava: 'ia_mensagens_max' }],
@@ -150,6 +166,16 @@ const ESQUEMA = {
     ['Avisos no Telegram (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
       ['ia.avisar.recusou', 'Recusou', 'simnao'], ['ia.avisar.saiu', 'Pediu para sair', 'simnao']]]],
   conjunto: [
+    ['Públicos', [['publicos', 'Públicos que o conjunto usa (só do fuso da entrega)', 'publicos', { ajuda: 'até 10; pôr um público num conjunto ativo = nível 3' }]]],
+    ['Exclusões', [['exclusoes.outra_campanha_dias', 'Abordado por outra campanha há menos de (dias)', 'num', { trava: 'outra_campanha_dias_min', min: true }]]],
+    ['Entrega', [['entrega.dias', 'Dias', 'dias'], ['entrega.janelas', 'Janelas', 'janelas', { ajuda: 'ex.: 09:00-11:30, 14:00-17:30 (dentro de 8h–18h)' }], ['entrega.fuso', 'Fuso', 'sel', { op: FUSOS }],
+      ['entrega.teto_dia', 'Teto do conjunto por dia', 'num', { trava: 'teto_numero_dia' }], ['entrega.lote', 'Mensagens por lote', 'num', { trava: 'lote_max' }],
+      ['entrega.pausa_min_s', 'Pausa mínima entre lotes (s)', 'num', { trava: 'pausa_min_s', min: true }], ['entrega.pausa_max_s', 'Pausa máxima entre lotes (s)', 'num'],
+      ['entrega.ordem', 'Ordem', 'sel', { op: [['pontuacao', 'Maior pontuação primeiro'], ['sorteio', 'Sorteio']] }], ['entrega.tentativas', 'Tentativas se falhar', 'num', { trava: 'tentativas_max' }],
+      ['entrega.intervalo_tentativa_dias', 'Tentar de novo depois de (dias úteis)', 'num']]],
+    ['Frequência e aprendizado', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
+      ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }], ['aprendizado_min', 'Fase de aprendizado (envios por anúncio)', 'num']]]],
+  publico: [
     ['Busca no Google Maps', [['busca.termos', 'Termos (um por linha)', 'lista', { ajuda: 'ex.: dentista' }], ['busca.lugares', 'Cidades ou bairros (um por linha)', 'lista'], ['busca.coordenadas', 'Coordenadas (opcional)', 'texto', { ajuda: '-25.43,-49.27' }],
       ['busca.zoom', 'Zoom (10 cidade a 18 quarteirão)', 'num'], ['busca.paginas', 'Páginas por busca', 'num', { trava: 'paginas_max' }], ['busca.creditos_busca', 'Créditos por busca', 'num'],
       ['busca.repetir.tipo', 'Repetir', 'sel', { op: [['uma_vez', 'Uma vez'], ['semanal', 'Toda semana']] }], ['busca.repetir.dia_semana', 'Dia da semana', 'sel', { op: DIAS_SEM }], ['busca.repetir.hora', 'A partir das (hora)', 'num'],
@@ -158,18 +184,12 @@ const ESQUEMA = {
       ['busca.avaliacoes_min', 'Avaliações mínimas', 'num'], ['busca.categorias_aceitas', 'Só estas categorias (vazio = todas)', 'lista'], ['busca.categorias_excluidas', 'Nunca estas categorias', 'lista'],
       ['busca.palavras_excluem', 'Palavras que excluem', 'lista'], ['busca.tem_site', 'Tem site', 'sel', { op: [['tanto_faz', 'Tanto faz'], ['sim', 'Sim'], ['nao', 'Não']] }],
       ['busca.so_celular', 'Só celular', 'simnao'], ['busca.aceitar_wame', 'Aceitar o link wa.me do Maps', 'simnao'], ['busca.so_aberto', 'Só negócio aberto', 'simnao']]],
+    ['Fuso, créditos e contatos novos', [['fuso', 'Fuso (o público só junta cidades dele)', 'sel', { op: FUSOS }], ['creditos_mes', 'Créditos do SerpAPI no mês (este público)', 'num', { ajuda: 'o teto geral do mês vale por cima' }],
+      ['novos_entram', 'Contatos novos entram', 'sel', { op: [['selecionados', 'Selecionados'], ['tirados', 'Tirados (eu ponho de volta)']], ajuda: 'com um conjunto ativo usando o público, entram sempre tirados' }]]],
     ['Qualificação', [['qualificacao.pesos.nota', 'Peso da nota', 'num'], ['qualificacao.pesos.avaliacoes', 'Peso das avaliações', 'num'], ['qualificacao.pesos.categoria', 'Peso da categoria', 'num'],
       ['qualificacao.pesos.site', 'Peso do site', 'num'], ['qualificacao.pesos.origem', 'Peso da origem do telefone', 'num'], ['qualificacao.pontos_min', 'Pontuação mínima (0 a 100)', 'num'],
-      ['qualificacao.revisao_manual', 'Aprovar cada lead antes da fila', 'simnao'], ['qualificacao.revisar_numero', 'Número antigo (sem o 9)', 'sel', { op: [['whatsapp', 'Conferir no WhatsApp'], ['manual', 'Eu aprovo'], ['descartar', 'Descartar']] }]]],
-    ['Exclusões', [['exclusoes.outra_campanha_dias', 'Abordado por outra campanha há menos de (dias)', 'num', { trava: 'outra_campanha_dias_min', min: true }], ['exclusoes.redes_palavras', 'Palavras de rede', 'lista'],
-      ['exclusoes.rede_min_enderecos', 'Mesmo nome em N endereços = rede', 'num'], ['exclusoes.concorrentes', 'Concorrentes (nome ou site)', 'lista']]],
-    ['Entrega', [['entrega.dias', 'Dias', 'dias'], ['entrega.janelas', 'Janelas', 'janelas', { ajuda: 'ex.: 09:00-11:30, 14:00-17:30 (dentro de 8h–18h)' }], ['entrega.fuso', 'Fuso', 'sel', { op: FUSOS }],
-      ['entrega.teto_dia', 'Teto do conjunto por dia', 'num', { trava: 'teto_numero_dia' }], ['entrega.lote', 'Mensagens por lote', 'num', { trava: 'lote_max' }],
-      ['entrega.pausa_min_s', 'Pausa mínima entre lotes (s)', 'num', { trava: 'pausa_min_s', min: true }], ['entrega.pausa_max_s', 'Pausa máxima entre lotes (s)', 'num'],
-      ['entrega.ordem', 'Ordem', 'sel', { op: [['pontuacao', 'Maior pontuação primeiro'], ['sorteio', 'Sorteio']] }], ['entrega.tentativas', 'Tentativas se falhar', 'num', { trava: 'tentativas_max' }],
-      ['entrega.intervalo_tentativa_dias', 'Tentar de novo depois de (dias úteis)', 'num']]],
-    ['Frequência e aprendizado', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
-      ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }], ['aprendizado_min', 'Fase de aprendizado (envios por anúncio)', 'num']]]],
+      ['qualificacao.revisar_numero', 'Número antigo (sem o 9)', 'sel', { op: [['whatsapp', 'Conferir no WhatsApp'], ['manual', 'Deixar tirado (eu ponho de volta)'], ['descartar', 'Descartar']] }]]],
+    ['Redes e concorrentes', [['exclusoes.redes_palavras', 'Palavras de rede', 'lista'], ['exclusoes.rede_min_enderecos', 'Mesmo nome em N endereços = rede', 'num'], ['exclusoes.concorrentes', 'Concorrentes (nome ou site)', 'lista']]]],
   anuncio: [
     ['Mensagem', [['abordagem', 'Primeira mensagem', 'longo', { ajuda: 'campos: {nome} {cidade} {bairro} {nicho} {marca}; diga "assistente virtual", a marca e de onde veio o contato (Google Maps)', previa: true }],
       ['tamanho_max', 'Tamanho máximo com o texto de saída', 'num', { trava: 'mensagem_max' }], ['texto_saida', 'Texto de saída (precisa ter SAIR)', 'texto'],
@@ -180,7 +200,7 @@ const ESQUEMA = {
 };
 const pegar = (o, cam) => cam.split('.').reduce((x, k) => x == null ? undefined : x[k], o);
 function colocar(o, cam, v) { const ks = cam.split('.'); let x = o; ks.slice(0, -1).forEach((k, i) => { if (x[k] == null) x[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; x = x[k]; }); x[ks[ks.length - 1]] = v; }
-const paraTexto = (tipo, v) => v == null ? '' : tipo === 'lista' ? (Array.isArray(v) ? v.join('\n') : String(v)) : tipo === 'janelas' ? (Array.isArray(v) ? v.map(j => (j || []).join('-')).join(', ') : '')
+const paraTexto = (tipo, v) => v == null ? '' : tipo === 'publicos' ? (Array.isArray(v) ? v.map(nomePub).join(', ') : '') : tipo === 'lista' ? (Array.isArray(v) ? v.join('\n') : String(v)) : tipo === 'janelas' ? (Array.isArray(v) ? v.map(j => (j || []).join('-')).join(', ') : '')
   : tipo === 'simnao' ? String(v === true || v === 'true') : String(v);
 function deTexto(tipo, t) {
   if (tipo === 'num') { const n = Number(String(t).replace(',', '.')); return t === '' || isNaN(n) ? t : n; }
@@ -207,10 +227,13 @@ async function pObjeto(c, tipo, id, pai) {
   const novo = !id || id === 'novo';
   const r = await chamar('prosp_objeto', { tipo, id: novo ? '' : id });
   const titulo = novo ? 'Nov' + (tipo === 'campanha' ? 'a campanha' : 'o ' + P_NOME[tipo]) : (r.ok && r.dados.objeto ? r.dados.objeto.nome : P_NOME[tipo]);
-  topo(titulo, [['Prospecção', 'prospeccao'], [titulo]], 'prospeccao');
+  if (tipo === 'publico') topo(titulo, [['Prospecção', 'prospeccao'], ['Públicos', 'prospeccao/publicos'], [titulo]], 'prospeccao/publicos');
+  else topo(titulo, [['Prospecção', 'prospeccao'], [titulo]], 'prospeccao');
   if (falhou(c, r, titulo)) return;
   await arvoreP();
-  const d = r.dados, o = d.objeto, cfg = d.config || {}, t = d.travas || {}, editar = ligada('editar_prospeccao') && !(o && /^encerrad/.test(o.situacao));
+  if (tipo === 'conjunto' || tipo === 'publico') await publicosP(true);
+  const d = r.dados, o = d.objeto, cfg = d.config || {}, t = d.travas || {}, editar = ligada('editar_prospeccao') && !(o && /^(encerrad|arquivad)/.test(o.situacao));
+  const pubAqui = tipo === 'publico' && o ? (est.publicos.publicos || []).find(x => x.id === o.id) : null;
   const paiId = o ? o.pai : pai;
   // A marca da campanha entra na prévia do anúncio (a revisão automática do servidor confere de novo).
   let marca = '';
@@ -228,22 +251,36 @@ async function pObjeto(c, tipo, id, pai) {
       i = el('div', { class: 'filtros p-dias', role: 'group', 'aria-label': rot, id: idc }, DIAS_SEM.map(([val, txt]) => el('button', { type: 'button', 'aria-pressed': String(marcados.has(val)), disabled: !editar,
         onclick: e => e.currentTarget.setAttribute('aria-pressed', String(e.currentTarget.getAttribute('aria-pressed') !== 'true')) }, txt)));
       i.lerValor = () => [...i.querySelectorAll('button')].filter(b => b.getAttribute('aria-pressed') === 'true').map((b, k) => b.textContent);
+    } else if (tp === 'publicos') {
+      // Os públicos que o conjunto usa: um botão por público (ativo, ou já escolhido); de outro fuso não dá para escolher.
+      const marcados = new Set(pegar(cfg, cam) || []);
+      const opcoes = (est.publicos.publicos || []).filter(p => p.situacao === 'ativo' || marcados.has(p.id));
+      i = el('div', { class: 'p-publicos', role: 'group', 'aria-label': rot, id: idc }, opcoes.length ? opcoes.map(p => el('button', { type: 'button', class: 'p-pub', 'aria-pressed': String(marcados.has(p.id)), 'data-id': p.id, 'data-fuso': p.fuso || '',
+          onclick: e => e.currentTarget.setAttribute('aria-pressed', String(e.currentTarget.getAttribute('aria-pressed') !== 'true')) },
+        el('span', { class: 't1', text: p.nome }), el('span', { class: 't2', text: `${p.id} · ${fusoNome(p.fuso)} · ${fmtNum((p.numeros || {}).disponiveis)} disponíveis${p.situacao === 'arquivado' ? ' · arquivado' : ''}` }))) : el('p', { class: 'mudo peq', text: 'Nenhum público ainda: crie em Prospecção › Públicos.' }));
+      i.lerValor = () => [...i.querySelectorAll('button[aria-pressed="true"]')].map(b => b.dataset.id);
+      i.conferirFuso = fuso => i.querySelectorAll('button').forEach(b => { const outro = fusoGrupo(b.dataset.fuso) !== fusoGrupo(fuso), marcado = b.getAttribute('aria-pressed') === 'true';
+        b.disabled = !editar || (outro && !marcado); b.classList.toggle('outro-fuso', outro); b.title = outro ? 'Outro fuso: o conjunto só usa públicos do fuso da entrega' : ''; });
     } else i = el('input', { class: 'entrada', id: idc, type: tp === 'data' ? 'date' : 'text', inputmode: tp === 'num' ? 'decimal' : null, autocomplete: 'off', spellcheck: 'false', value: v || null, disabled: !editar });
     ins[cam] = { i, tp, rot };
     const trava = ex.trava && t[ex.trava] != null ? (ex.min ? 'mínimo ' : 'até ') + t[ex.trava] + ' (trava)' : '';
     const ajuda = [ex.ajuda, trava].filter(Boolean).join(' · ');
+    if (tp === 'publicos') return el('div', { class: 'campo largo' }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null);
     return el('label', { class: 'campo' + (tp === 'longo' || tp === 'lista' ? ' largo' : ''), for: tp === 'dias' ? null : idc }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null);
   };
   const blocos = ESQUEMA[tipo].map(([nomeBloco, campos], k) => el('details', { class: 'grupo', open: k === 0 || null }, el('summary', { text: nomeBloco }),
     el('div', { class: 'corpo-grupo' }, el('div', { class: 'form-2' }, campos.map(campo)))));
+  // O fuso da entrega decide quais públicos o conjunto pode escolher (conferido de novo no servidor).
+  if (ins.publicos && ins['entrega.fuso']) { const f = ins['entrega.fuso'].i; ins.publicos.i.conferirFuso(f.value); f.addEventListener('change', () => ins.publicos.i.conferirFuso(f.value)); }
   const prev = tipo === 'anuncio' ? previaAnuncio(ins.abordagem.i, ins.texto_saida.i, ins.tamanho_max.i, marca) : null;
   if (prev) blocos[0].querySelector('.corpo-grupo').append(el('h3', { text: 'Como o lead vai ver' }), prev);
   const ler = () => {
     const nova = JSON.parse(JSON.stringify(cfg)), linhas = [];
     for (const [cam, { i, tp, rot }] of Object.entries(ins)) {
-      const val = tp === 'dias' ? i.lerValor() : deTexto(tp, i.value.trim ? i.value.trim() : i.value);
+      const val = tp === 'dias' || tp === 'publicos' ? i.lerValor() : deTexto(tp, i.value.trim ? i.value.trim() : i.value);
       const antes = pegar(cfg, cam);
-      if (JSON.stringify(val) !== JSON.stringify(antes == null ? (tp === 'lista' || tp === 'dias' ? [] : '') : antes)) { colocar(nova, cam, val); linhas.push([rot, paraTexto(tp, antes), paraTexto(tp, val)]); }
+      if (tp === 'publicos' && JSON.stringify([...val].sort()) === JSON.stringify([...(antes || [])].sort())) continue;
+      if (JSON.stringify(val) !== JSON.stringify(antes == null ? (tp === 'lista' || tp === 'dias' || tp === 'publicos' ? [] : '') : antes)) { colocar(nova, cam, val); linhas.push([rot, paraTexto(tp, antes), paraTexto(tp, val)]); }
     }
     // Follow-up vazio sai da lista (o servidor recusa follow-up sem texto).
     if (Array.isArray(nova.followups)) nova.followups = nova.followups.filter(f => f && String(f.texto || '').trim());
@@ -257,27 +294,37 @@ async function pObjeto(c, tipo, id, pai) {
     const trocaNumero = tipo === 'conjunto' && o && o.numero_id != null && String(o.numero_id) !== numeroSel.value;
     if (tipo === 'conjunto' && o && String(o.numero_id == null ? '' : o.numero_id) !== numeroSel.value) linhas.push(['Número de WhatsApp', nomeP('numero', o.numero_id), numeroSel.value ? nomeP('numero', numeroSel.value) : '(nenhum)']);
     if (o && !linhas.length) { rapida('Nada mudou.'); return; }
+    // Público com só o nome trocado: renomear (não cria versão nova).
+    if (tipo === 'publico' && o && linhas.length === 1 && linhas[0][0] === 'Nome') {
+      await fazer('prosp_publico_renomear', { id: o.id, nome }, { ok: 'Nome trocado.', erro: x => { erro.textContent = x.mensagem || 'Não consegui.'; }, depois: () => { est.publicos = null; rotear(); } }); return;
+    }
+    // Pôr um público num conjunto ativo muda quem recebe mensagem: nível 3 (o nome do conjunto), como trocar o número.
+    const pubNovo = tipo === 'conjunto' && o && ativo(o.situacao) && (nova.publicos || []).some(x => !(cfg.publicos || []).includes(x));
     const dados = { id: o ? o.id : '', nome, config: nova, ...(tipo === 'conjunto' ? { numero_id: numeroSel.value } : {}), ...(o ? {} : tipo === 'conjunto' ? { campanha_id: paiId } : tipo === 'anuncio' ? { conjunto_id: paiId } : {}) };
-    const nivel = trocaNumero ? 3 : o && ativo(o.situacao) ? 2 : 1;
-    const acao = { campanha: 'prosp_campanha_salvar', conjunto: 'prosp_conjunto_salvar', anuncio: 'prosp_anuncio_salvar' }[tipo];
-    const op = { titulo: 'Salvar ' + (o ? o.nome : nome), nivel, linhas, nome: o ? o.nome : nome, rotuloNome: 'o nome do conjunto', rotuloNivel: 'troca o número que envia',
-      texto: nivel >= 2 ? 'Vira a versão nova: os próximos envios usam a configuração nova (os leads já sorteados continuam presos à versão deles).' : null,
+    const nivel = trocaNumero || pubNovo ? 3 : (o && ativo(o.situacao)) || emUsoPub(pubAqui) ? 2 : 1;
+    const acao = { campanha: 'prosp_campanha_salvar', conjunto: 'prosp_conjunto_salvar', anuncio: 'prosp_anuncio_salvar', publico: 'prosp_publico_salvar' }[tipo];
+    const op = { titulo: 'Salvar ' + (o ? o.nome : nome), nivel, linhas, nome: o ? o.nome : nome, rotuloNome: 'o nome do conjunto', rotuloNivel: trocaNumero ? 'troca o número que envia' : pubNovo ? 'muda quem recebe mensagem' : null,
+      texto: tipo === 'publico' && nivel >= 2 ? 'Um conjunto ativo usa este público: as próximas buscas usam a configuração nova (os contatos já achados ficam).'
+        : nivel >= 2 ? 'Vira a versão nova: os próximos envios usam a configuração nova (os leads já sorteados continuam presos à versão deles).' : null,
       erro: x => { erro.textContent = x.mensagem || 'Não consegui salvar.'; },
-      depois: x => { est.prosp = null; if (!o) irP(tipo, x.id); else rotear(); } };
+      depois: x => { est.prosp = null; est.publicos = null; if (!o) irP(tipo, x.id); else rotear(); } };
     if (acao === 'prosp_campanha_salvar') await fazer('prosp_campanha_salvar', dados, op);
     else if (acao === 'prosp_conjunto_salvar') await fazer('prosp_conjunto_salvar', dados, op);
+    else if (acao === 'prosp_publico_salvar') await fazer('prosp_publico_salvar', dados, op);
     else await fazer('prosp_anuncio_salvar', dados, op);
   };
   const versoes = (d.versoes || []);
-  const acoesObj = o && editar ? el('div', { class: 'acoes' },
+  const acoesObj = o && editar && tipo !== 'publico' ? el('div', { class: 'acoes' },
     btn('Duplicar', () => fazer('prosp_duplicar', { tipo, id: o.id }, { ok: 'Cópia criada em rascunho.', depois: x => { est.prosp = null; irP(tipo, x.id); } }), 'sec'),
     o.situacao === 'rascunho' ? btn('Apagar o rascunho', () => fazer('prosp_apagar_rascunho', { tipo, id: o.id }, { titulo: 'Apagar o rascunho ' + o.nome, linhas: [['Rascunho', o.nome, '(apagado)']], botao: 'Apagar', perigo: true, ok: 'Rascunho apagado.', depois: () => { est.prosp = null; ir('prospeccao'); } }), 'perigo-sec') : null,
     btn('Encerrar', () => fazer('prosp_encerrar', { tipo, id: o.id }, { titulo: 'Encerrar ' + o.nome, nome: o.nome, rotuloNome: 'o nome da ' + P_NOME[tipo], rotuloNivel: 'não volta', botao: 'Encerrar',
       texto: tipo === 'campanha' ? 'Encerra a campanha com os conjuntos e anúncios dela. Não volta: para usar de novo, duplique.' : 'Não volta: para usar de novo, duplique.', ok: 'Encerrado.', depois: () => { est.prosp = null; ir('prospeccao'); } }), 'perigo-sec')) : null;
-  trocar(c, cabecalho(titulo, (P_NOME[tipo] || tipo) + (o ? ` · ${o.id} · versão ${o.versao}` : ' nova'), o ? etqSit(o.situacao) : null),
-    el('div', { class: 'pilha' },
+  trocar(c, cabecalho(titulo, (P_NOME[tipo] || tipo) + (o ? ` · ${o.id} · versão ${o.versao}` : tipo === 'publico' ? ' novo' : ' nova'), o ? etqSit(o.situacao) : null),
+    el('div', { class: 'pilha' }, tipo === 'publico' && o ? abasPub(o.id, 'configuracao') : null,
+      tipo === 'publico' && emUsoPub(pubAqui) ? el('div', { class: 'aviso info' }, icone('info'), el('div', { text: 'Um conjunto ativo usa este público: salvar pede confirmação (nível 2), e os contatos novos entram tirados.' })) : null,
+      tipo === 'publico' && !o ? nota('O público guarda a busca no Google Maps e os contatos achados. Depois de criar, escolha o público num conjunto do mesmo fuso.') : null,
       o && o.pausa_motivo ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', { text: 'Pausado sozinho: ' + o.pausa_motivo })) : null,
-      editar ? null : nota(o && /^encerrad/.test(o.situacao) ? 'Encerrado: só leitura. Para usar de novo, duplique.' : 'Editar está desligado (editar_prospeccao).', !o || !/^encerrad/.test(o.situacao)),
+      editar ? null : nota(o && /^(encerrad|arquivad)/.test(o.situacao) ? (o.situacao === 'arquivado' ? 'Arquivado: só leitura. Desarquive para mudar.' : 'Encerrado: só leitura. Para usar de novo, duplique.') : 'Editar está desligado (editar_prospeccao).', !o || !/^(encerrad|arquivad)/.test(o.situacao)),
       el('form', { class: 'cartao', onsubmit: salvar, novalidate: true }, el('div', { class: 'corpo p-topo-form' },
         el('div', { class: 'form-2' }, el('label', { class: 'campo', for: 'p-nome' }, el('span', { class: 'rot', text: 'Nome' }), nomeIn),
           numeroSel ? el('label', { class: 'campo', for: 'p-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), numeroSel, el('span', { class: 'ajuda', text: 'trocar o número de um conjunto = nível 3' })) : null)),
@@ -296,6 +343,114 @@ async function verVersao(tipo, id, versao) {
     el('div', { class: 'corpo' }, m.length ? el('table', { class: 'ad' }, el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: 'Campo' }), el('th', { scope: 'col', text: 'Antes' }), el('th', { scope: 'col', text: 'Depois' }))),
       el('tbody', {}, m.map(([k, a, dpois]) => el('tr', {}, el('th', { scope: 'row', text: k }), el('td', { text: txt(a) || '(vazio)' }), el('td', { class: 'depois', text: txt(dpois) || '(vazio)' }))))) : vazio('Primeira versão (nada antes).', 'info')),
     el('div', { class: 'pe' }, btn('Fechar', () => fechar(), 'sec'))));
+}
+
+// ---------- Públicos (sql/036, DEC-088): a busca e os contatos, independentes da campanha (como no Meta Ads)
+// Contato = um negócio achado na busca (o telefone só com os 4 últimos dígitos). Quem nunca recebeu mensagem sai 90 dias
+// depois de encontrado. Tirar um contato é um toque; pôr de volta num público que um conjunto ativo usa pede o nível 2.
+const SIT_CONTATO = { disponivel: ['disponível', 'ok'], tirado: ['tirado', ''], em_conjunto: ['em conjunto', 'info'], abordado: ['já abordado', ''], nao_contatar: ['não contatar', 'perigo'],
+  cliente: ['já é cliente', 'perigo'], demonstracao: ['pediu demonstração', 'perigo'], orgao_publico: ['órgão público', 'perigo'] };
+const BLOQUEADO = ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico'];
+const FILTROS_PUB = [['', 'Todos', 'tamanho'], ['disponivel', 'Disponíveis', 'disponiveis'], ['tirado', 'Tirados', 'tirados'], ['em_conjunto', 'Em conjuntos', 'em_conjunto'], ['abordado', 'Já abordados', 'abordados'],
+  ['bloqueado', 'Bloqueados', 'bloqueados'], ['expirando', 'Saem em até 7 dias', 'expiram_7d']];
+const etqContato = s => { const [t, tom] = SIT_CONTATO[s] || [s || '—', '']; return etq(t, tom); };
+function abasPub(id, atual) {
+  return el('div', { class: 'abas', role: 'tablist', 'aria-label': 'Partes do público' }, [['', 'Contatos'], ['configuracao', 'Configuração']].map(([k, n]) =>
+    el('button', { role: 'tab', type: 'button', 'aria-selected': String(atual === k), onclick: () => irP('publico', id, k) }, n)));
+}
+const resumoBusca = p => [(p.termos || []).join(', '), (p.lugares || []).length ? 'em ' + p.lugares.join(', ') : ''].filter(Boolean).join(' ') || 'sem busca';
+async function pPublicos(c) {
+  topo('Públicos', [['Prospecção', 'prospeccao'], ['Públicos']], 'prospeccao');
+  await arvoreP();
+  const d = await publicosP(true); if (!est.publicos) { falhou(c, { ok: false, mensagem: 'Não consegui ler os públicos.' }, 'Públicos'); return; }
+  const editar = ligada('editar_prospeccao'), lista = d.publicos || [], cm = d.creditos_mes || {};
+  const linha = p => { const n = p.numeros || {}, cj = p.conjuntos || [];
+    return el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('publico', p.id) }, el('span', { class: 'icone-caixa' }, icone('clientes')),
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: p.nome }),
+        el('div', { class: 't2', text: `${resumoBusca(p)} · ${fusoNome(p.fuso)}` }),
+        el('div', { class: 't2', text: `${fmtNum(n.disponiveis)} disponíveis de ${fmtNum(n.tamanho)}${n.expiram_7d ? ' · ' + fmtNum(n.expiram_7d) + ' saem em até 7 dias' : ''} · ${cj.length ? 'usado por ' + cj.map(j => j.nome).join(', ') : 'nenhum conjunto usa'}` })),
+      el('div', { class: 'direita' }, p.situacao === 'arquivado' ? etqSit('arquivado') : emUsoPub(p) ? etq('em uso', 'ok') : etq('sem conjunto ativo', '')), icone('seta'))); };
+  trocar(c, cabecalho('Públicos', 'quem pode receber mensagem · cada conjunto escolhe os seus', editar ? btn('Novo público', () => irP('publico', 'novo'), 'pri', 'mais_um') : null),
+    el('div', { class: 'pilha' }, abasP('publicos'),
+      d.busca_ligada ? null : el('div', { class: 'aviso info' }, icone('info'), el('div', {}, 'A busca está desligada (chave "Busca no Google Maps" em ', el('a', { href: '#ajustes', text: 'Ajustes' }), '). Os públicos não buscam nem gastam créditos.')),
+      el('div', { class: 'kpis' }, kpiTeto(cm, editar), kpi('Públicos', fmtNum(lista.filter(p => p.situacao === 'ativo').length), 'ativos'),
+        kpi('Contatos disponíveis', fmtNum(lista.reduce((t, p) => t + (Number((p.numeros || {}).disponiveis) || 0), 0)), 'em todos os públicos')),
+      editar ? null : nota('Criar, editar, tirar e pôr contatos de volta estão desligados (editar_prospeccao).', true),
+      cartao(null, null, lista.length ? el('ul', { class: 'lista' }, lista.map(linha))
+        : vazio('Nenhum público ainda. Crie o primeiro: a busca no Google Maps (termos, cidades e filtros) e os contatos achados ficam nele; depois, escolha o público num conjunto do mesmo fuso.', 'clientes')),
+      el('p', { class: 'mudo peq', text: 'O mesmo contato pode estar em vários públicos, mas recebe mensagem de um conjunto só. Quem nunca recebeu mensagem sai 90 dias depois de encontrado (achar de novo não reinicia).' })));
+}
+async function pPublico(c, parte, id, sub) {
+  if (!id || id === 'novo' || sub === 'configuracao') return pObjeto(c, 'publico', id || 'novo');
+  est.pubFiltro = est.pubFiltro && est.pubFiltro.id === id ? est.pubFiltro : { id, filtro: '', busca: '', pagina: 1 };
+  const f = est.pubFiltro;
+  const r = await chamar('prosp_publico', { id, filtro: f.filtro, busca: f.busca, pagina: f.pagina });
+  const o = r.ok ? r.dados.objeto : null, titulo = o ? o.nome : 'Público';
+  topo(titulo, [['Prospecção', 'prospeccao'], ['Públicos', 'prospeccao/publicos'], [titulo]], 'prospeccao/publicos');
+  if (falhou(c, r, titulo)) return;
+  await arvoreP();
+  const d = r.dados, n = d.numeros || {}, emUso = !!d.em_uso, editar = ligada('editar_prospeccao') && o.situacao !== 'arquivado', cr = d.creditos || {};
+  const recarregar = async () => { est.publicos = null; await rotear(); };
+  // Tirar (um toque) e pôr de volta (nível 2 quando um conjunto ativo usa o público) um contato.
+  const marcar = async (ct, valor) => fazer('prosp_publico_contato_marcar', { id: o.id, contato_id: ct.id, valor }, { nivel: valor === 'SIM' && emUso ? 2 : 1,
+    titulo: 'Pôr de volta: ' + ct.nome, rotuloNivel: 'pode receber mensagem', linhas: [['Contato', 'tirado', 'selecionado (pode receber mensagem)']],
+    texto: 'Um conjunto ativo usa este público: o contato pode receber mensagem já no próximo lote.', ok: valor === 'NAO' ? 'Tirado.' : 'Posto de volta.', depois: recarregar });
+  const chave = ct => {
+    if (!editar || BLOQUEADO.includes(ct.situacao) || ct.lead) return null;
+    const sel = !!ct.selecionado;
+    return el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(sel), 'aria-label': (sel ? 'Tirar ' : 'Pôr de volta ') + ct.nome, onclick: async e => {
+      const t = e.currentTarget; t.setAttribute('aria-checked', String(!sel));
+      const x = await marcar(ct, sel ? 'NAO' : 'SIM');
+      if (!x) t.setAttribute('aria-checked', String(sel));
+      else if (sel) rapida('Tirado.', () => marcar(ct, 'SIM'));
+    } });
+  };
+  const sobre = ct => {
+    if (ct.lead) return `virou lead ${ct.lead.id} (${nomeP('conjunto', ct.lead.conjunto_id)})`;
+    const dias = Number(ct.expira_em_dias);
+    return `encontrado em ${fmtData(ct.encontrado_em)} · ${dias <= 0 ? 'sai hoje' : 'sai em ' + fmtNum(dias) + ' dia(s)'}`;
+  };
+  const contatos = d.contatos || [];
+  const total = (FILTROS_PUB.find(x => x[0] === f.filtro) || FILTROS_PUB[0])[2], qtd = Number(n[total]) || 0, paginas = Math.max(1, Math.ceil(qtd / 50));
+  const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Nome, cidade ou bairro', 'aria-label': 'Buscar contato', autocomplete: 'off', enterkeyhint: 'search', value: f.busca || null });
+  busca.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); f.busca = busca.value.trim(); f.pagina = 1; rotear(); } });
+  const lote = valor => fazer('prosp_publico_contatos_lote', { id: o.id, valor, todos: true }, { titulo: valor === 'SIM' ? 'Selecionar todos de ' + o.nome : 'Tirar todos de ' + o.nome,
+    rotuloNivel: valor === 'SIM' ? 'podem receber mensagem' : 'ninguém deste público recebe',
+    linhas: valor === 'SIM' ? [['Tirados', fmtNum(n.tirados), '0 (os bloqueados para sempre continuam de fora)']] : [['Selecionados', fmtNum((Number(n.tamanho) || 0) - (Number(n.tirados) || 0)), '0 (os que já são leads seguem no conjunto)']],
+    ok: 'Pronto.', depois: recarregar });
+  const acoes = editar ? [
+    ligada('prosp_busca') ? btn('Buscar de novo', () => fazer('prosp_publico_buscar', { id: o.id }, { titulo: 'Buscar de novo: ' + o.nome, botao: 'Buscar',
+      texto: 'Cada termo × lugar entra na fila (pula o que foi buscado há menos de "não repetir"). Os contatos novos se juntam aos de agora; gasta créditos do SerpAPI.', depois: recarregar }), 'pri', 'busca') : null,
+    btn('Selecionar todos', () => lote('SIM'), 'sec', 'ok'), btn('Tirar todos', () => lote('NAO'), 'sec'),
+    btn('Duplicar', () => fazer('prosp_publico_duplicar', { id: o.id }, { ok: 'Cópia criada.', depois: x => { est.publicos = null; irP('publico', x.id); } }), 'sec')] : [];
+  const arquivar = ligada('editar_prospeccao') ? btn(o.situacao === 'arquivado' ? 'Desarquivar' : 'Arquivar', () => fazer('prosp_publico_arquivar', { id: o.id, valor: o.situacao === 'arquivado' ? 'NAO' : 'SIM' },
+    { titulo: (o.situacao === 'arquivado' ? 'Desarquivar ' : 'Arquivar ') + o.nome, linhas: [['Situação', o.situacao, o.situacao === 'arquivado' ? 'ativo' : 'arquivado']], botao: o.situacao === 'arquivado' ? 'Desarquivar' : 'Arquivar',
+      texto: o.situacao === 'arquivado' ? 'O público volta a poder ser escolhido num conjunto.' : 'Não busca nem entrega mais. Os contatos seguem o prazo de 90 dias. Só dá para arquivar quando nenhum conjunto usa.', depois: recarregar }), o.situacao === 'arquivado' ? 'sec' : 'perigo-sec') : null;
+  trocar(c, cabecalho(o.nome, `público · ${o.id} · versão ${o.versao}`, etqSit(o.situacao)),
+    el('div', { class: 'pilha' }, abasPub(o.id, ''),
+      emUso ? el('div', { class: 'aviso info' }, icone('info'), el('div', { text: 'Um conjunto ativo usa este público: os contatos novos entram tirados, e pôr um contato de volta pede confirmação (nível 2).' })) : null,
+      el('div', { class: 'etqs' }, (d.conjuntos || []).length ? (d.conjuntos || []).map(j => etq('conjunto ' + j.nome + (j.ativo ? ' (ativo)' : ''), j.ativo ? 'ok' : '', true)) : etq('nenhum conjunto usa', '', true),
+        etq(`${fmtNum(cr.gastos)} de ${fmtNum(cr.limite)} créditos no mês`, '', true)),
+      el('div', { class: 'kpis' }, kpi('Contatos', fmtNum(n.tamanho)), kpi('Disponíveis', fmtNum(n.disponiveis), 'podem receber mensagem'), kpi('Em conjuntos', fmtNum(n.em_conjunto), 'já viraram lead'),
+        kpi('Saem em até 7 dias', fmtNum(n.expiram_7d), n.expira_em_dias != null ? 'o primeiro em ' + fmtNum(n.expira_em_dias) + ' dia(s)' : 'prazo de 90 dias')),
+      acoes.length ? el('div', { class: 'acoes' }, acoes) : null,
+      el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação do contato' }, FILTROS_PUB.map(([k, nome, campo]) => el('button', { type: 'button', 'aria-pressed': String(f.filtro === k),
+        onclick: () => { f.filtro = k; f.pagina = 1; rotear(); } }, nome, el('span', { class: 'n', text: fmtNum(n[campo]) })))),
+      el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca')),
+      cartao(null, null, contatos.length ? el('ul', { class: 'lista' }, contatos.map(ct => el('li', {}, el('div', { class: 'linha' },
+        el('span', { class: 'avatar ' + ((SIT_CONTATO[ct.situacao] || [])[1] || ''), text: iniciais(ct.nome), 'aria-hidden': 'true' }),
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: ct.nome }),
+          el('div', { class: 't2', text: [[ct.cidade, ct.bairro].filter(Boolean).join(' · '), ct.nicho, ct.nota != null ? '★ ' + String(ct.nota).replace('.', ',') : null, fmtNum(ct.pontos) + ' pontos', ct.telefone_fim].filter(Boolean).join(' · ') }),
+          el('div', { class: 't2', text: sobre(ct) })),
+        el('div', { class: 'direita' }, etqContato(ct.situacao), chave(ct)))))) : vazio(f.filtro || f.busca ? 'Nenhum contato com esse filtro.' : 'Nenhum contato ainda. Toque em "Buscar de novo" (com a busca ligada) ou espere a busca agendada.', 'clientes')),
+      paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 1 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina} de ${paginas}` }),
+        f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null,
+      (d.buscas || []).length ? cartao('Últimas buscas deste público', null, el('ul', { class: 'lista' }, d.buscas.slice(0, 5).map(b => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
+          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${fmtNum(b.creditos)} crédito(s)` + (Object.keys(b.contagens || {}).length ? ' · ' + Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') : '') })),
+        el('div', { class: 'direita' }, etq(b.situacao === 'feita' ? 'feita' : b.situacao === 'falhou' ? 'falhou' : b.situacao === 'rodando' ? 'buscando' : 'na fila', b.situacao === 'feita' ? 'ok' : b.situacao === 'falhou' ? 'perigo' : 'info'))))))) : null,
+      arquivar ? cartao('Mais', null, corpo(el('div', { class: 'acoes' }, arquivar))) : null,
+      el('p', { class: 'mudo peq', text: 'O telefone aparece só com os 4 últimos dígitos. No envio, tudo é conferido de novo: "não contatar", clientes, demonstração, órgão público, 60 dias entre campanhas, prazo e fuso.' })));
 }
 
 // ---------- Números de WhatsApp (o QR só na tela)
@@ -363,14 +518,16 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 const SIT_LEADS = ['para_aprovar', 'na_fila', 'enviado', 'respondeu', 'positivo', 'com_voce', 'cadastrou', 'cliente', 'recusou', 'saiu', 'sem_whatsapp', 'falhou', 'descartado'];
 async function pLeads(c, parte, sit) {
   topo('Leads', [['Prospecção', 'prospeccao'], ['Leads']], 'prospeccao');
-  await arvoreP();
+  await arvoreP(); await publicosP();
   sit = SIT_LEADS.includes(sit) ? sit : '';
-  est.leadsFiltro = est.leadsFiltro || { conjunto_id: '', busca: '', pagina: 1 };
+  est.leadsFiltro = est.leadsFiltro || { conjunto_id: '', publico_id: '', busca: '', pagina: 1 };
   const f = est.leadsFiltro;
-  const r = await chamar('prosp_leads', { situacao: sit, conjunto_id: f.conjunto_id, busca: f.busca, pagina: f.pagina }); if (falhou(c, r, 'Leads')) return;
+  const r = await chamar('prosp_leads', { situacao: sit, conjunto_id: f.conjunto_id, publico_id: f.publico_id || '', busca: f.busca, pagina: f.pagina }); if (falhou(c, r, 'Leads')) return;
   const d = r.dados, ps = d.por_situacao || {}, editar = ligada('editar_prospeccao');
   const selCj = el('select', { class: 'entrada', 'aria-label': 'Conjunto', onchange: e => { f.conjunto_id = e.target.value; f.pagina = 1; rotear(); } }, el('option', { value: '', text: 'Todos os conjuntos' }),
     conjuntosP().map(j => el('option', { value: j.id, text: `${j.campanha.nome} › ${j.nome}`, selected: f.conjunto_id === j.id })));
+  const selPb = el('select', { class: 'entrada', 'aria-label': 'Público', onchange: e => { f.publico_id = e.target.value; f.pagina = 1; rotear(); } }, el('option', { value: '', text: 'Todos os públicos' }),
+    (est.publicos.publicos || []).map(p => el('option', { value: p.id, text: p.nome, selected: f.publico_id === p.id })));
   const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Nome, cidade, bairro ou PX-…', 'aria-label': 'Buscar lead', autocomplete: 'off', enterkeyhint: 'search', value: f.busca || null });
   busca.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); f.busca = busca.value.trim(); f.pagina = 1; rotear(); } });
   const total = d.total || 0, paginas = Math.max(1, Math.ceil(total / 50));
@@ -380,7 +537,7 @@ async function pLeads(c, parte, sit) {
     el('div', { class: 'pilha' }, abasP('leads'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação' }, el('button', { type: 'button', 'aria-pressed': String(!sit), onclick: () => { f.pagina = 1; ir('prospeccao/leads'); } }, 'Todos'),
         SIT_LEADS.filter(k => ps[k] || k === sit).map(k => el('button', { type: 'button', 'aria-pressed': String(sit === k), onclick: () => { f.pagina = 1; ir('prospeccao/leads/' + k); } }, P_LEAD[k][0], el('span', { class: 'n', text: ps[k] || 0 })))),
-      el('div', { class: 'form-2' }, selCj, el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca'))),
+      el('div', { class: 'form-2' }, selCj, selPb), el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca')),
       editar && f.conjunto_id && ps.para_aprovar ? el('div', { class: 'acoes' }, btn(`Aprovar os ${fmtNum(ps.para_aprovar)} "para aprovar" deste conjunto`, () => fazer('prosp_leads_aprovar_todos', { conjunto_id: f.conjunto_id },
         { titulo: 'Aprovar todos do conjunto ' + nomeP('conjunto', f.conjunto_id), linhas: [['Para aprovar', fmtNum(ps.para_aprovar), '0 (todos na fila)']], ok: 'Aprovados.' }), 'sec', 'ok')) : null,
       cartao(null, null, (d.leads || []).length ? el('ul', { class: 'lista' }, d.leads.map(l => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('lead', l.id) },
@@ -400,7 +557,7 @@ const FUNIL = [['enviada', 'Enviada'], ['entregue', 'Entregue'], ['lida', 'Lida'
   ['cadastrou', 'Cadastrou'], ['pagou', 'Pagou']];
 const AUTOR = { disparo: 'Abordagem', followup: 'Follow-up', ia: 'IA', voce: 'Você', lead: 'Lead', sistema: 'Confirmação' };
 async function pLead(c, parte, id) {
-  const r = await chamar('prosp_lead', { id });
+  const r = await chamar('prosp_lead', { id }); await publicosP();
   const l = r.ok ? r.dados.lead : null;
   topo(l ? l.nome || l.id : 'Lead', [['Prospecção', 'prospeccao'], ['Leads', 'prospeccao/leads'], [l ? l.id : 'Lead']], 'prospeccao/leads');
   if (falhou(c, r, 'Lead')) return;
@@ -430,7 +587,7 @@ async function pLead(c, parte, id) {
             el('div', {}, el('div', { class: 'forte', text: n }), el('div', { class: 'mudo peq', text: fu[k] ? fmtHora(fu[k]) : '—' }))))),
             fu.saiu || fu.recusou ? el('p', { class: 'mudo peq mt', text: fu.saiu ? 'Pediu para sair em ' + fmtHora(fu.saiu) : 'Recusou em ' + fmtHora(fu.recusou) }) : null)),
           cartao('Dados do Maps', null, corpo(dados([['Cidade', [l.cidade, l.bairro].filter(Boolean).join(' · ')], ['Nicho', l.nicho], ['Categoria', l.categoria], ['Nota', l.nota == null ? '' : String(l.nota).replace('.', ',') + ' (' + fmtNum(l.avaliacoes) + ' avaliações)'],
-            ['Pontos', String(l.pontos)], ['Telefone', l.telefone_fim + (l.numero_revisar ? ' (número antigo, conferido no WhatsApp)' : '')], ['Origem do telefone', l.origem_telefone === 'wame' ? 'link wa.me do Maps' : 'Maps'],
+            ['Público', l.publico_id ? nomePub(l.publico_id) : ''], ['Pontos', String(l.pontos)], ['Telefone', l.telefone_fim + (l.numero_revisar ? ' (número antigo, conferido no WhatsApp)' : '')], ['Origem do telefone', l.origem_telefone === 'wame' ? 'link wa.me do Maps' : 'Maps'],
             ['Número que abordou', l.numero], ['Mensagens enviadas', fmtNum(l.mensagens_enviadas)], ['Mensagens da IA', fmtNum(l.ia_mensagens)], ['Próximo envio', l.proximo_envio_em ? fmtHora(l.proximo_envio_em) : ''],
             ['Cliente', l.cliente_id], ['Achado em', fmtData(l.criado_em)], ['Sai em', fmtData(l.apagar_em)]])))))));
 }
@@ -449,10 +606,10 @@ const ETAPAS = { so_leu: 'só leu', respondeu_curto: 'respondeu curto', converso
 const barraP = (v, max) => { const b = el('div', { class: 'uso', role: 'img', 'aria-label': fmtNum(v) + ' de ' + fmtNum(max) }); const i = el('i'); i.style.width = Math.round(v / Math.max(1, max) * 100) + '%'; b.append(i); return b; };
 async function pRelatorios(c) {
   topo('Relatórios', [['Prospecção', 'prospeccao'], ['Relatórios']], 'prospeccao');
-  await arvoreP();
-  est.relP = est.relP || { dias: 30, nivel: 'anuncio', detalhar: '', conjunto_id: '', visao: '' };
+  await arvoreP(); await publicosP();
+  est.relP = est.relP || { dias: 30, nivel: 'anuncio', detalhar: '', conjunto_id: '', publico_id: '', visao: '' };
   const f = est.relP;
-  const r = await chamar('prosp_relatorio', { de: somaDias(hojeISO(), 1 - f.dias), nivel: f.nivel, detalhar: f.detalhar, conjunto_id: f.conjunto_id });
+  const r = await chamar('prosp_relatorio', { de: somaDias(hojeISO(), 1 - f.dias), nivel: f.nivel, detalhar: f.detalhar, conjunto_id: f.conjunto_id, publico_id: f.publico_id || '' });
   if (falhou(c, r, 'Relatórios')) return;
   const d = r.dados;
   const visao = f.visao || ((d.colunas_salvas || {})['Padrão'] || {}).visao || 'desempenho';
@@ -462,7 +619,7 @@ async function pRelatorios(c) {
     if (k === 'resposta' || k === 'positiva') return t[k] == null ? '—' : pct(t[k]) + (t[k + '_margem'] != null ? ' ± ' + String(t[k + '_margem']).replace('.', ',') : '');
     if (k === 'custo') return fmtReal(cu.total); if (/^por_/.test(k)) return cu[k] == null ? '—' : fmtReal(cu[k]);
     return fmtNum(n[k]); };
-  const nomeLinha = x => { const base = d.nivel === 'numero' ? nomeP('numero', x.chave) : nomeP(d.nivel, x.chave);
+  const nomeLinha = x => { const base = d.nivel === 'numero' ? nomeP('numero', x.chave) : d.nivel === 'publico' ? ((d.publicos || {})[x.chave] || (x.chave ? nomePub(x.chave) : '(sem público)')) : nomeP(d.nivel, x.chave);
     if (!d.detalhar) return base; const v = d.detalhar === 'dia_semana' ? DIAS_NOMES[x.valor] || x.valor : d.detalhar === 'hora' ? x.valor + 'h' : d.detalhar === 'dia' ? fmtData(x.valor) : x.valor; return base + ' · ' + v; };
   const filtro = (rot, atual, opcoes, mudar) => el('label', { class: 'campo' }, el('span', { class: 'rot', text: rot }),
     el('select', { class: 'entrada', onchange: e => { mudar(e.target.value); rotear(); } }, opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(atual) === v }))));
@@ -475,13 +632,14 @@ async function pRelatorios(c) {
       campos: [{ k: 'dia', rot: 'Dia', tipo: 'date', valor: hojeISO(), obrig: true }, { k: 'texto', rot: 'O que aconteceu (ex.: troquei o anúncio B)', longo: true, obrig: true, minimo: 3, max: 500 }], ok: 'Anotado.' }), 'sec')),
     el('div', { class: 'pilha' }, abasP('relatorios'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Período' }, [7, 30, 90].map(n => el('button', { type: 'button', 'aria-pressed': String(f.dias === n), onclick: () => { f.dias = n; rotear(); } }, n + ' dias'))),
-      el('div', { class: 'form-2 p-filtros' }, filtro('Nível', f.nivel, [['campanha', 'Campanha'], ['conjunto', 'Conjunto'], ['anuncio', 'Anúncio'], ['numero', 'Número']], v => { f.nivel = v; }),
+      el('div', { class: 'form-2 p-filtros' }, filtro('Nível', f.nivel, [['campanha', 'Campanha'], ['conjunto', 'Conjunto'], ['anuncio', 'Anúncio'], ['publico', 'Público'], ['numero', 'Número']], v => { f.nivel = v; }),
         filtro('Detalhar por', f.detalhar, DETALHES, v => { f.detalhar = v; }),
-        filtro('Conjunto', f.conjunto_id, [['', 'Todos'], ...conjuntosP().map(j => [j.id, j.campanha.nome + ' › ' + j.nome])], v => { f.conjunto_id = v; })),
+        filtro('Conjunto', f.conjunto_id, [['', 'Todos'], ...conjuntosP().map(j => [j.id, j.campanha.nome + ' › ' + j.nome])], v => { f.conjunto_id = v; }),
+        filtro('Público', f.publico_id || '', [['', 'Todos'], ...(est.publicos.publicos || []).map(p => [p.id, p.nome])], v => { f.publico_id = v; })),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Colunas' }, Object.keys(VISOES).map(v => el('button', { type: 'button', 'aria-pressed': String(visao === v), onclick: () => { f.visao = v; rotear(); } }, { desempenho: 'Desempenho', funil: 'Funil', custos: 'Custos' }[v])),
         btn('Guardar como padrão', () => fazer('prosp_relatorio_salvar', { nome: 'Padrão', config: { visao } }, { ok: 'Visão guardada (no servidor, não no navegador).' }), 'fant')),
       cartao(null, null, (d.linhas || []).length ? el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Tabela do relatório (role para o lado)' }, el('table', { class: 'dados-t' },
-        el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: { campanha: 'Campanha', conjunto: 'Conjunto', anuncio: 'Anúncio', numero: 'Número' }[d.nivel] }), cols.map(k => el('th', { scope: 'col', text: COLUNAS[k] })))),
+        el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: { campanha: 'Campanha', conjunto: 'Conjunto', anuncio: 'Anúncio', publico: 'Público', numero: 'Número' }[d.nivel] }), cols.map(k => el('th', { scope: 'col', text: COLUNAS[k] })))),
         el('tbody', {}, d.linhas.map(x => el('tr', {}, el('th', { scope: 'row', text: nomeLinha(x) }), cols.map(k => el('td', { class: 'num', text: valor(x, k) }))))))) : vazio('Nada no período ainda (nenhuma mensagem saiu).', 'agregados')),
       el('p', { class: 'mudo peq', text: '"12% ± 4" quer dizer: com 95% de confiança, a taxa de verdade está entre 8% e 16%. Com poucos envios, a margem é grande: não decida por ela.' }),
       el('div', { class: 'grade-2 iguais' },
@@ -499,25 +657,40 @@ async function pRelatorios(c) {
 // ---------- Buscas
 async function pBuscas(c) {
   topo('Buscas', [['Prospecção', 'prospeccao'], ['Buscas']], 'prospeccao');
-  await arvoreP();
-  const r = await chamar('prosp_buscas'); if (falhou(c, r, 'Buscas')) return;
-  const d = r.dados, editar = ligada('editar_prospeccao');
-  const cjs = conjuntosP().filter(j => !/^encerrad/.test(j.situacao));
-  const buscar = () => fazer('prosp_buscar_agora', {}, { titulo: 'Buscar agora', texto: 'Uma busca por termo × lugar do conjunto entra na fila; o workflow 50 traz uma página a cada 5 minutos e gasta créditos do SerpAPI.',
-    campos: [{ k: 'conjunto_id', rot: 'Conjunto', opcoes: cjs.map(j => [j.id, j.campanha.nome + ' › ' + j.nome]) }], botao: 'Buscar' });
+  await arvoreP(); await publicosP();
+  est.buscasFiltro = est.buscasFiltro || { publico_id: '' };
+  const f = est.buscasFiltro;
+  const r = await chamar('prosp_buscas', { publico_id: f.publico_id || '' }); if (falhou(c, r, 'Buscas')) return;
+  const d = r.dados, editar = ligada('editar_prospeccao'), pbs = pubsAtivos(), tot = d.creditos_total || null;
+  // sql/036: a busca é de um público (o workflow 50 traz uma página a cada 5 minutos e gasta créditos do SerpAPI).
+  const buscar = () => fazer('prosp_buscar_agora', {}, { titulo: 'Buscar agora', texto: 'Uma busca por termo × lugar do público entra na fila (pula o que foi buscado há menos de "não repetir"); o workflow 50 traz uma página a cada 5 minutos e gasta créditos do SerpAPI.',
+    campos: [{ k: 'publico_id', rot: 'Público', opcoes: pbs.map(p => [p.id, p.nome]) }], botao: 'Buscar' });
   const SITB = { pedida: ['na fila', 'info'], rodando: ['buscando', 'atencao'], feita: ['feita', 'ok'], falhou: ['falhou', 'perigo'] };
-  const MOTIVOS = { achados: 'achados', novos: 'novos', fixo: 'telefone fixo', invalido: 'sem telefone', revisar: 'número antigo', fechado: 'fechado', nota: 'nota', avaliacoes: 'avaliações', categoria: 'categoria',
-    palavra: 'palavra', site: 'site', rede: 'rede', concorrente: 'concorrente', repetido: 'repetido', ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar',
-    abordado: 'outra campanha', pontos: 'pontuação baixa', sem_creditos: 'sem créditos', paginas_com_erro: 'erro' };
-  trocar(c, cabecalho('Buscas', 'Google Maps pelo SerpAPI · uma página por rodada', editar && d.busca_ligada && cjs.length ? btn('Buscar agora', buscar, 'pri', 'busca') : null),
+  const selPb = el('select', { class: 'entrada', 'aria-label': 'Público', onchange: e => { f.publico_id = e.target.value; rotear(); } }, el('option', { value: '', text: 'Todos os públicos' }),
+    (est.publicos.publicos || []).map(p => el('option', { value: p.id, text: p.nome, selected: f.publico_id === p.id })));
+  trocar(c, cabecalho('Buscas', 'Google Maps pelo SerpAPI · uma página por rodada', editar && d.busca_ligada && pbs.length ? btn('Buscar agora', buscar, 'pri', 'busca') : null),
     el('div', { class: 'pilha' }, abasP('buscas'),
       d.busca_ligada ? null : el('div', { class: 'aviso info' }, icone('info'), el('div', {}, 'A busca está desligada (chave "Busca no Google Maps" em ', el('a', { href: '#ajustes', text: 'Ajustes' }), '). Nada gasta créditos.')),
-      (d.creditos_mes || []).length ? el('div', { class: 'kpis' }, d.creditos_mes.map(x => kpi(nomeP('campanha', x.campanha_id), `${fmtNum(x.gastos)} de ${fmtNum(x.limite)}`, 'créditos no mês', barraUso(x.gastos, x.limite)))) : null,
+      tot || (d.creditos_mes || []).length ? el('div', { class: 'kpis' }, tot ? kpiTeto(tot, editar) : null,
+        (d.creditos_mes || []).map(x => kpi(nomePub(x.publico_id), `${fmtNum(x.gastos)} de ${fmtNum(x.limite)}`, 'créditos no mês (este público)', barraUso(x.gastos, x.limite)))) : null,
+      el('div', { class: 'form-2' }, selPb),
       cartao('Últimas buscas', null, (d.buscas || []).length ? el('ul', { class: 'lista' }, d.buscas.map(b => el('li', {}, el('div', { class: 'linha' },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${fmtNum(b.paginas)} página(s) · ${fmtNum(b.creditos)} crédito(s)` }),
-          Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k} ${v}`).join(' · ') }) : null),
+          el('div', { class: 't2', text: `${b.publico_id ? nomePub(b.publico_id) : nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${fmtNum(b.paginas)} página(s) · ${fmtNum(b.creditos)} crédito(s)` }),
+          Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') }) : null),
         el('div', { class: 'direita' }, etq(...(SITB[b.situacao] || [b.situacao, '']))))))) : vazio('Nenhuma busca ainda.', 'busca'))));
+}
+// O que cada número das contagens da busca quer dizer (sql/032, sql/034 e sql/036).
+const MOTIVOS = { achados: 'achados', novos: 'novos', ja_no_publico: 'já no público', de_outro_publico: 'de outro público', outro_fuso: 'outro fuso', fixo: 'telefone fixo', invalido: 'sem telefone',
+  revisar: 'número antigo', fechado: 'fechado', nota: 'nota', avaliacoes: 'avaliações', categoria: 'categoria', palavra: 'palavra', site: 'site', rede: 'rede', concorrente: 'concorrente', repetido: 'repetido',
+  ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar', orgao_publico: 'órgão público', abordado: 'outra campanha', pontos: 'pontuação baixa',
+  sem_creditos: 'sem créditos', paginas_com_erro: 'erro' };
+// Teto geral de créditos do SerpAPI no mês (todos os públicos juntos; nível 2).
+function kpiTeto(tot, editar) {
+  const mudar = () => fazer('prosp_creditos_teto_salvar', {}, { titulo: 'Teto geral de créditos do SerpAPI no mês', texto: 'Vale para todos os públicos juntos, por cima do limite de cada um. De 0 a 20.000. A busca para quando chega no teto.',
+    linhas: [['Teto do mês', fmtNum(tot.teto), '(o que você digitar)']], campos: [{ k: 'valor', rot: 'Créditos por mês', inputmode: 'numeric', valor: String(tot.teto == null ? '' : tot.teto), obrig: true, erro: 'Digite o teto (0 a 20.000).' }],
+    ok: 'Teto mudado.', depois: async () => { est.publicos = null; await rotear(); } });
+  return kpi('Teto geral do mês', `${fmtNum(tot.gastos)} de ${fmtNum(tot.teto)}`, 'créditos do SerpAPI, todos os públicos', el('div', { class: 'p-teto' }, barraUso(tot.gastos, tot.teto), editar ? btn('Mudar o teto', mudar, 'sec') : null));
 }
 
 // ---------- Regras automáticas (nunca aumentam nada; as fixas não mudam)
