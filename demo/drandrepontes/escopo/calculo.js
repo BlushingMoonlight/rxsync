@@ -9,7 +9,8 @@
    Nenhum valor está escrito neste código; eles vêm do precos.js.
    Tirar um item desconta o preço dele do lote, do subprojeto e do total, na hora; a mensalidade do subprojeto só conta
    se algum item dele estiver incluído; desconto por faixa e à vista recalculados; Projeto 1 à parte, fora do desconto.
-   As marcações ficam só no aparelho (localStorage), na chave da versão do escopo. */
+   As marcações ficam só no aparelho (localStorage), na chave da versão do escopo, com o pacote sugerido aplicado (M.pacote).
+   Pacote sugerido (dados.js: pacotes): sugestão aplicada por cima do escopo; não muda itens, lotes nem preços. */
 (function () {
   'use strict';
   var D = window.ESCOPO;
@@ -112,5 +113,17 @@
     var e = etapas.filter(function (x) { return x.etapa === (r.dentro != null ? r.dentro : r.antes); })[0] || {};
     return 'semanas ' + r.ini + ' e ' + r.fim + (r.dentro != null ? ', pausa dentro da etapa ' : ', pausa antes da etapa ') + e.etapa + ' (' + (e.sub === 'APP' ? 'App' : e.sub) + ')';
   }
-  window.CALCULO = { textoRecesso: textoRecesso, CHAVE: CHAVE, ORDEM_SUB: ORDEM_SUB, padrao: padrao, ler: ler, semanas: semanas, num: num, situacao: situacao, conta: conta, pacote: pacote, reais: window.AG.reais };
+  // Pacote sugerido aplicado (dados.js: pacotes, sem valores; M.pacote guarda o código). "Com ajustes" quando alguma
+  // marcação (incluir, dúvida, tirar) ficou diferente da do pacote; caixinhas e anotações não contam.
+  function pacoteAplicado(M) {
+    var p = M.pacote && (D.pacotes || []).filter(function (x) { return x.id === M.pacote; })[0]; if (!p) return null;
+    var motivo = {}; p.tirados.forEach(function (t) { motivo[t.n] = t.motivo; });
+    var ajustado = D.itens.some(function (i) { return (M.status[i.n] || '') !== (motivo[i.n] ? 'tirar' : 'incluir'); });
+    return { id: p.id, nome: p.nome, curto: p.nome.split(' · ')[0], data: p.data, reuniao: p.reuniao, tirados: p.tirados.length, motivo: motivo, ajustado: ajustado };
+  }
+  // Frase do pacote para listas e resumos: "Pacote V1 · pós-reunião (sugestão de 16/10/2026)", com ou sem ajustes.
+  function textoPacote(pa) { return pa ? pa.nome + ' (sugestão de ' + pa.data + ')' + (pa.ajustado ? ', com ajustes' : '') : ''; }
+  var AVISO_MARCOS = 'Os marcos descrevem o projeto com tudo incluído; com o ';
+  function avisoMarcos(pa) { return pa ? AVISO_MARCOS + pa.curto + ', alguns itens citados saíram.' : ''; }
+  window.CALCULO = { pacoteAplicado: pacoteAplicado, textoPacote: textoPacote, avisoMarcos: avisoMarcos, textoRecesso: textoRecesso, CHAVE: CHAVE, ORDEM_SUB: ORDEM_SUB, padrao: padrao, ler: ler, semanas: semanas, num: num, situacao: situacao, conta: conta, pacote: pacote, reais: window.AG.reais };
 })();

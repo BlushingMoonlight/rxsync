@@ -2,11 +2,13 @@
    Capa com a logo, a data real e o índice; subprojetos e lotes incluídos; itens tirados; prazos por etapa (a partir da
    assinatura, com o recesso de fim de ano como pausa), o gráfico de semanas e os marcos de cada etapa (o que funciona e o
    que ainda falta). Valores só para quem vê preços (Dr. André; Admin com os preços liberados): implantação, desconto, à vista,
-   mensalidade, Projeto 1 à parte, valor de cada lote e de cada item, e o gráfico de implantação por subprojeto. */
+   mensalidade, Projeto 1 à parte, valor de cada lote e de cada item, e o gráfico de implantação por subprojeto.
+   Com um pacote sugerido aplicado (Pacote V1 · pós-reunião): o nome na capa e no resumo, o motivo de cada item tirado
+   pelo pacote e um aviso sobre os marcos (eles descrevem o projeto com tudo incluído). */
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, C = window.CALCULO, M = C.ler(), esc = A.esc, DT = A.datas, semanas = C.semanas, num = C.num;
-  var c = C.conta(M), agora = DT.agora(), V = c.valores || null, P = V && A.precos(), reais = A.reais;
+  var PA = C.pacoteAplicado(M), c = C.conta(M), agora = DT.agora(), V = c.valores || null, P = V && A.precos(), reais = A.reais;
   function valor(atual, cheio) { return atual === cheio ? reais(cheio) : reais(atual) + ' de ' + reais(cheio); }
   var tirados = D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; });
   function itensLote(id) { return D.itens.filter(function (i) { return i.lote === id; }); }
@@ -70,19 +72,21 @@
     '<h1>Resumo do escopo</h1><p class="sub">Clínica Evoluir · Dr. André Pontes Gonçalves</p>' +
     '<p class="data">' + dataExt + ' · escopo versão ' + esc(D.versao) + '</p>' +
     '<ol class="indice">' + indice.map(function (t, i) { return '<li><a href="#s' + (i + 1) + '">' + esc(t) + '</a></li>'; }).join('') + '</ol>' +
+    (PA ? '<p class="pacote-capa">' + esc(C.textoPacote(PA)) + '</p>' : '') +
     '<p class="fraco nota-capa">Montado a partir das marcações feitas no escopo deste aparelho.' + (V ? '' : ' Valores sob consulta.') + '</p></section>';
 
   h += secao(1, 'Resumo',
     '<div class="resumo"><div><span class="rotulo">Itens incluídos</span><b class="grande">' + c.incluidos + ' de ' + D.itens.length + '</b><small>' + tirados.length + ' tirado(s) · ' + c.duvidas + ' em dúvida</small></div>' +
     '<div><span class="rotulo">Prazo · a partir da assinatura</span><b class="grande">' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + '</b><small>' + (c.recesso ? 'com 2 semanas de recesso de fim de ano · ' : '') + (c.semanasTotal !== c.semanasCheias ? 'de ' + semanas(c.semanasCheias) + ' com tudo incluído' : 'com tudo incluído') + '</small></div></div>' +
-    '<ul>' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') +
+    '<ul>' + (PA ? '<li><b>Pacote aplicado:</b> ' + esc(C.textoPacote(PA)) + '; ' + PA.tirados + ' itens tirados pelo pacote, com o motivo de cada um em "Itens tirados".</li>' : '') +
+    c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') +
     (c.recalc.length ? '<li><b>Lotes com itens tirados:</b> ' + c.recalc.map(esc).join(', ') + ' (continuam no prazo' + (V ? '; o preço dos itens tirados já foi descontado' : '') + ')</li>' : '') + '</ul>' + valoresHTML());
   SECOES.forEach(function (x, n) {
     var sp = D.subprojetos[x[0]], s = c.subs[x[0]];
     h += secao(n + 2, x[1], '<p>' + esc(sp.desc) + ' <b>' + linhaSub(s) + '.</b></p>' + (lotesDoSub(x[0]) || '<p class="mudo">Nenhum lote incluído.</p>'));
   });
   var nT = SECOES.length + 2;
-  h += secao(nT, 'Itens tirados', tirados.length ? '<ul class="tirados">' + tirados.map(function (i) { return '<li><b>' + i.n + '</b> ' + esc(i.nome) + ' <span class="fraco">(' + esc(nomeLote(i.lote)) + ')</span></li>'; }).join('') + '</ul>' : '<p class="mudo">Nenhum item tirado.</p>');
+  h += secao(nT, 'Itens tirados', tirados.length ? '<ul class="tirados">' + tirados.map(function (i) { return '<li><b>' + i.n + '</b> ' + esc(i.nome) + ' <span class="fraco">(' + esc(nomeLote(i.lote)) + ')</span>' + (PA && PA.motivo[i.n] ? '<br><span class="motivo">Fora do ' + esc(PA.curto) + ': ' + esc(PA.motivo[i.n]) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '<p class="mudo">Nenhum item tirado.</p>');
   // Linhas da tabela de prazos, com o recesso logo depois da etapa em que cai (ou antes da etapa seguinte).
   function linhasPrazo() {
     var r = c.recesso, l = [];
@@ -105,10 +109,11 @@
     '<p class="fraco">Exemplo: assinando até 16/10/2026, o início é em 19/10/2026 e o recesso vai de 21/12 a 01/01.</p>' +
     '<table class="prazos"><tr><th>Etapa</th><th>Subprojeto</th><th>Semanas</th><th>Observação</th></tr>' + linhasPrazo() + '</table>' +
     '<h3>Semanas de cada etapa</h3>' + gantt(c.etapas, c.semanasTotal || 1, c.recesso) +
-    '<h3>Marcos de cada etapa</h3><p class="fraco">O que a clínica vê funcionando ao fim de cada etapa, com tudo incluído, e o que ainda falta porque chega numa etapa seguinte.</p>' + marcos() +
+    '<h3>Marcos de cada etapa</h3><p class="fraco">O que a clínica vê funcionando ao fim de cada etapa, com tudo incluído, e o que ainda falta porque chega numa etapa seguinte.</p>' +
+    (PA ? '<p class="aviso-marcos">' + esc(C.avisoMarcos(PA)) + '</p>' : '') + marcos() +
     '<p class="fraco">Prazos que não dependem da RXSync (certificado, plataforma de receita, lojas e API da balança) podem atrasar o lote ligado a eles. Nesse caso, a etapa é entregue sem esse lote, e ele entra depois, sem cobrança extra.</p>');
   h += '<p class="rodape fraco">Gerado em ' + DT.dma(agora) + ' às ' + DT.hm(agora) + '. Escopo sujeito a confirmação.</p>';
   document.getElementById('doc').innerHTML = h;
-  A.log('resumo-pdf-aberto', { tirados: tirados.length, semanas: c.semanasTotal, precos: !!V });
+  A.log('resumo-pdf-aberto', { tirados: tirados.length, semanas: c.semanasTotal, precos: !!V, pacote: M.pacote || '' });
   document.getElementById('imprimir').addEventListener('click', function () { A.log('resumo-pdf-imprimir', {}); A.enviarLog(true); window.print(); });
 })();

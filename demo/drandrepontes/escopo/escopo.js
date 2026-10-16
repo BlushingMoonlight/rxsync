@@ -8,7 +8,11 @@
    (lotes obrigatórios e o 172) não têm "Tirar".
    Preços (AG.precos()): Dr. André sempre vê; Admin só com os preços liberados (botão "Esconder/Liberar preços" aqui e
    na home); Convidado nunca ("sob consulta"). Com preços, cada item mostra o seu preço, e cada lote e subprojeto mostra o
-   valor atual (sem o que foi tirado) e o cheio; o total recalcula na hora. */
+   valor atual (sem o que foi tirado) e o cheio; o total recalcula na hora.
+   Pacote sugerido (dados.js: pacotes, sem valores): "Aplicar Pacote V1 · pós-reunião" deixa todos os itens em "incluir" e
+   os do pacote em "tirar" (caixinhas e anotações ficam) e guarda o código em M.pacote. Aviso fixo no topo (toque filtra os
+   tirados), "com ajustes" se ele mudar alguma marcação depois, e "Fora do Pacote V1: motivo" em cada item do pacote.
+   "Limpar marcações" volta ao escopo completo, sem pacote. */
 (function () {
   'use strict';
   var A = window.AG, D = window.ESCOPO, TELAS = window.TELAS_ITEM || {};
@@ -54,7 +58,10 @@
 
   // ---------- itens e prazo (a conta fica no calculo.js, usada também pelo resumo em PDF) ----------
   var C = window.CALCULO, semanas = C.semanas, reais = A.reais, V = null; // V: valores (só para quem vê preços)
+  var PA = null; // pacote sugerido aplicado (C.pacoteAplicado)
   function conta() { return C.conta(M); }
+  var PACOTE = (D.pacotes || []).filter(function (p) { return p.id === 'v1'; })[0] || null;
+  function pacote() { return C.pacoteAplicado(M); }
   function valor(atual, cheio) { return atual === cheio ? reais(cheio) : reais(atual) + ' de ' + reais(cheio); }
   function chipsLote(l) {
     if (l.projeto === 1) return '<span class="preco">no plano · obrigatório</span>';
@@ -88,6 +95,7 @@
       '</div>' +
       '<ul class="total-lista">' + c.ordem.map(function (k) { var s = c.subs[k]; return '<li><b>' + esc(s.nome) + ':</b> ' + linhaSub(s) + '</li>'; }).join('') + '</ul>' +
       '<ul class="total-lista">' +
+        (PA ? '<li><b>Pacote aplicado:</b> ' + esc(C.textoPacote(PA)) + '.</li><li class="fraco">' + esc(C.avisoMarcos(PA)) + '</li>' : '') +
         '<li><b>Etapas:</b> ' + c.etapas.map(function (e) { return 'etapa ' + e.etapa + ' · ' + esc(e.nome) + ' (' + e.prazo + ')'; }).join('; ') + '.</li>' +
         (c.recesso ? '<li><b>Recesso de fim de ano:</b> ' + C.textoRecesso(c.recesso, c.etapas) + '. Exemplo: assinando até 16/10/2026, início em 19/10/2026 e recesso de 21/12 a 01/01.</li>' : '') +
         (c.recalc.length ? '<li><b>Lotes com itens tirados (' + c.recalc.length + '):</b> ' + c.recalc.map(esc).join(', ') + '.' + (V ? ' O preço dos itens tirados já foi descontado.' : '') + ' O lote continua no prazo.</li>' : '') +
@@ -111,6 +119,7 @@
         (LOTE[i.lote].proposta ? '<span class="item item-proposta">proposta</span>' : '') + '</span>' +
         (pr ? '<span class="preco-item' + (st === 'tirar' ? ' tirado' : '') + '">' + reais(pr) + '</span>' : '') + '</div>' +
       '<div class="desc">' + esc(i.desc) + '</div>' +
+      (PA && PA.motivo[i.n] ? '<div class="motivo-pacote"><b>Fora do ' + esc(PA.curto) + ':</b> ' + esc(PA.motivo[i.n]) + '</div>' : '') +
       '<div class="ferramentas"><span class="rapida" role="group" aria-label="Marcação rápida">' + opcoes.map(function (k) {
           return '<button type="button" data-acao="status" data-st="' + k + '" aria-pressed="' + (st === k) + '">' + ST_NOME[k] + '</button>';
         }).join('') + '</span>' +
@@ -120,7 +129,7 @@
       '</div>';
   }
   function desenhar() {
-    var h = '', proj = 0, sub = '', total = 0, c = conta(); V = c.valores || null; botaoPrecos();
+    var h = '', proj = 0, sub = '', total = 0, c = conta(); V = c.valores || null; PA = pacote(); botaoPrecos(); avisoPacote();
     D.lotes.forEach(function (l) {
       var its = D.itens.filter(function (i) { return i.lote === l.id && passa(i); }); if (!its.length) return;
       total += its.length;
@@ -153,18 +162,20 @@
 
   // ---------- resumo da reunião ----------
   function linha(i) {
-    var l = LOTE[i.lote], nota = (M.notas[i.n] || '').trim();
-    return '- ' + i.n + ' · ' + i.nome + ' (lote ' + l.nome + ')' + (nota ? '\n  Anotação: ' + nota.replace(/\n+/g, ' ') : '');
+    var l = LOTE[i.lote], nota = (M.notas[i.n] || '').trim(), pa = pacote();
+    return '- ' + i.n + ' · ' + i.nome + ' (lote ' + l.nome + ')' + (pa && pa.motivo[i.n] ? '\n  Fora do ' + pa.curto + ': ' + pa.motivo[i.n] : '') + (nota ? '\n  Anotação: ' + nota.replace(/\n+/g, ' ') : '');
   }
   function resumo() {
     var grupo = function (t, f) { var l = D.itens.filter(f); return t + ' (' + l.length + ')\n' + (l.length ? l.map(linha).join('\n') : '- nenhum') + '\n'; };
     var rec = D.lotes.map(function (l) { var p = l.projeto === 1 ? '' : loteParcial(l.id); return p ? '- ' + l.nome + ': ' + p : ''; }).filter(Boolean);
-    var c = conta(), tot = 'ITENS E PRAZO\n- Itens incluídos: ' + c.incluidos + ' de ' + D.itens.length + ' (' + c.tirados + ' tirados, ' + c.duvidas + ' em dúvida)\n' +
+    var pa = pacote(), c = conta(), tot = 'ITENS E PRAZO\n- Itens incluídos: ' + c.incluidos + ' de ' + D.itens.length + ' (' + c.tirados + ' tirados, ' + c.duvidas + ' em dúvida)\n' +
       c.ordem.map(function (k) { var s = c.subs[k]; return '- ' + s.nome + ': ' + linhaSub(s) + '\n'; }).join('') +
       '- Prazo, a partir da assinatura: ' + (c.semanasTotal ? semanas(c.semanasTotal) : '—') + (c.recesso ? ' (com 2 semanas de recesso de fim de ano)' : '') + (c.semanasTotal !== c.semanasCheias ? ' (de ' + semanas(c.semanasCheias) + ' com tudo incluído)' : '') + '\n' +
       c.etapas.map(function (e) { return '- Etapa ' + e.etapa + ' · ' + e.nome + ': ' + e.prazo + '\n'; }).join('') +
-      (c.recesso ? '- Recesso de fim de ano: ' + C.textoRecesso(c.recesso, c.etapas) + '\n' : '') + '\n';
-    return 'Reunião com o Dr. André · Clínica Evoluir\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n\n' +
+      (c.recesso ? '- Recesso de fim de ano: ' + C.textoRecesso(c.recesso, c.etapas) + '\n' : '') +
+      (pa ? '- ' + C.avisoMarcos(pa) + '\n' : '') + '\n';
+    return 'Reunião com o Dr. André · Clínica Evoluir\nEscopo versão ' + D.versao + ' (' + D.atualizado + ')\n' +
+      'Pacote aplicado: ' + (pa ? C.textoPacote(pa) + ' · ' + pa.tirados + ' itens tirados pelo pacote' : 'nenhum (escopo completo)') + '\n\n' +
       grupo('INCLUIR', function (i) { return M.status[i.n] === 'incluir'; }) + '\n' +
       grupo('DÚVIDAS', function (i) { return M.status[i.n] === 'duvida'; }) + '\n' +
       grupo('TIRAR', function (i) { return M.status[i.n] === 'tirar'; }) + '\n' +
@@ -197,8 +208,31 @@
     else semAPI();
   });
   $('limpar').addEventListener('click', function () {
-    if (!confirm('Voltar ao padrão (todos os itens em "incluir") e apagar as anotações deste aparelho?')) return;
+    if (!confirm('Voltar ao escopo completo (todos os itens em "incluir", sem pacote) e apagar as anotações deste aparelho?')) return;
     M = padrao(); notaAberta = {}; salvar(); desenhar(); A.log('escopo-limpo', {});
+  });
+
+  // ---------- pacote sugerido (Pacote V1 · pós-reunião): todos em "incluir" e os do pacote em "tirar" ----------
+  function avisoPacote() {
+    var b = $('aviso-pacote'); if (!b) return;
+    b.hidden = !PA; if (!PA) { b.textContent = ''; return; }
+    var t = D.itens.filter(function (i) { return M.status[i.n] === 'tirar'; }).length;
+    b.innerHTML = '<span class="aviso-pacote-texto">' + esc(PA.ajustado ? PA.curto + ' com ajustes: ' + t + ' itens tirados' : PA.nome + ' aplicado: ' + PA.tirados + ' itens tirados') + '</span><span class="aviso-pacote-ver">Ver os tirados ›</span>';
+    b.classList.toggle('ajustado', PA.ajustado);
+  }
+  if (PACOTE) { $('pacote').hidden = false; $('pacote').textContent = 'Aplicar ' + PACOTE.nome; }
+  $('pacote').addEventListener('click', function () {
+    if (!PACOTE) return;
+    if (!confirm('Aplicar o ' + PACOTE.nome + '?\n\nAs marcações deste aparelho viram as do pacote: ' + PACOTE.tirados.length + ' itens em "Tirar", cada um com o motivo, e todos os outros em "Incluir". As caixinhas e as anotações continuam como estão.\n\n"Limpar marcações" volta ao escopo completo.')) return;
+    var fora = {}; PACOTE.tirados.forEach(function (t) { fora[t.n] = true; });
+    D.itens.forEach(function (i) { M.status[i.n] = fora[i.n] && !i.obrigatorio ? 'tirar' : 'incluir'; });
+    M.pacote = PACOTE.id; salvar(); desenhar(); A.log('pacote-aplicado', { pacote: PACOTE.id });
+    avisoCurto(PACOTE.nome + ' aplicado: ' + PACOTE.tirados.length + ' itens tirados.');
+  });
+  // Toque no aviso: mostra só os tirados (limpa a busca e os outros filtros).
+  $('aviso-pacote').addEventListener('click', function () {
+    $('busca').value = ''; $('f-projeto').value = ''; opcoesLote(); $('f-lote').value = ''; $('f-situacao').value = 'tirar'; desenhar();
+    $('lista').scrollIntoView({ block: 'start' });
   });
 
   // ---------- Salvar e enviar à RXSync (cada envio vira uma versão nova no banco; nada fica só lá: o aparelho continua com tudo) ----------
@@ -208,7 +242,8 @@
   function mostrarEnvio() { var u = ultimoEnvio(); $('salvo').textContent = u ? 'Salvo e enviado em ' + u : ''; }
   // Os valores só vão no total quando quem salva é o Admin com os preços liberados.
   function totalEnviado(c) {
-    var t = { itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, lotes_com_itens_tirados: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
+    var pa = pacote();
+    var t = { pacote: pa ? { id: pa.id, nome: pa.nome, ajustado: pa.ajustado } : null, itens_incluidos: c.incluidos, itens_tirados: c.tirados, duvidas: c.duvidas, lotes_com_itens_tirados: c.recalc, semanas: c.semanasTotal, semanas_com_tudo: c.semanasCheias,
       recesso: c.recesso ? C.textoRecesso(c.recesso, c.etapas) : '',
       subprojetos: c.ordem.reduce(function (o, k) { var x = c.subs[k]; o[k] = { itens: x.incluidos, de: x.total, tirados: x.tirados, semanas: x.semanas }; return o; }, {}) };
     var v = A.usuario() === 'admin' && c.valores;
@@ -229,13 +264,13 @@
   $('salvar').addEventListener('click', function () {
     var b = $('salvar'), c = conta();
     var corpo = JSON.stringify({ tipo: 'escopo', usuario: A.usuario(), aparelho: A.aparelho(), sessao: A.sessao(), versao: D.versao,
-      marcacoes: { status: M.status, marcados: M.marcados }, anotacoes: M.notas, desligados: desligados(),
+      marcacoes: { status: M.status, marcados: M.marcados, pacote: M.pacote || '' }, anotacoes: M.notas, desligados: desligados(),
       total: totalEnviado(c) });
     b.disabled = true; b.textContent = 'Enviando…';
     function fim(ok) {
       b.disabled = false; b.textContent = 'Salvar e enviar à RXSync';
       var agora = A.datas.agora(), quando = A.datas.dma(agora) + ' às ' + A.datas.hm(agora);
-      A.log('escopo-salvo', { ok: ok, desligados: desligados().length });
+      A.log('escopo-salvo', { ok: ok, desligados: desligados().length, pacote: M.pacote || '' });
       if (ok) { try { localStorage.setItem(CHAVE + '-enviado', quando); } catch (e) { /* idem */ } mostrarEnvio(); avisoCurto('Salvo e enviado à RXSync em ' + quando + '.'); }
       else avisoCurto('Não foi possível enviar agora. As marcações continuam salvas neste aparelho; tente de novo.');
     }
