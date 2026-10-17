@@ -627,9 +627,9 @@
         <button class="voltar" type="button" data-ir="conta"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Conta</button>
         <div class="cab"><h1 class="titulo">WhatsApp da clínica</h1><p class="subtitulo">É o número em que a assistente atende os pacientes.</p></div>
         <div class="bloco"><div class="ro-row"><span class="lbl">Número</span><span class="val num" id="zapNumero">—</span></div></div>
-        <div id="reconectarWrap" class="hidden" style="margin-top:14px">
-          <a id="linkReconectar" href="#" target="_blank" rel="noopener" class="btn sec plena"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Reconectar ou trocar o número</a>
-          <p class="subtitulo" style="font-size:13.5px">Use se a assistente parou de responder ou se a clínica trocou de número. Abre a tela do QR Code.</p>
+        <div id="reconectarWrap" style="margin-top:14px">
+          <button id="btnReconectar" type="button" class="btn sec plena"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Reconectar ou trocar o número</button>
+          <p class="subtitulo" style="font-size:13.5px">Use se a assistente parou de responder ou se a clínica trocou de número. Abre a tela do QR Code com um link novo, que vale 4 horas. O código só aparece com o WhatsApp desconectado.</p>
         </div>
       </div>
 
@@ -760,12 +760,23 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     }).catch(function () { statusCampo(key, "Sem conexão. Não foi salvo.", true); });
   }
 
-  function atualizarLinkReconectar() {
-    var tc = savedValues._token_conexao;
-    if (!tc) return;
-    el("reconectarWrap").classList.remove("hidden");
-    el("linkReconectar").href = CONECTAR_URL + "?t=" + encodeURIComponent(tc);
-  }
+  // Reconectar (DEC-094): pede um link de conexão novo, de 4 horas (o anterior para). A janela abre já no toque,
+  // senão o Safari bloqueia; se não abrir, segue na mesma aba.
+  el("btnReconectar").addEventListener("click", function () {
+    var b = el("btnReconectar"), janela = null;
+    try { janela = window.open("", "_blank"); if (janela) janela.opener = null; } catch (e) { janela = null; }
+    b.disabled = true;
+    chamar("conexao_pedir", {}).then(function (r) {
+      b.disabled = false;
+      if (r && r.ok && r.link && r.link.indexOf(CONECTAR_URL + "?t=") === 0) {
+        if (janela) janela.location.href = r.link; else window.location.href = r.link;
+        toast("Link aberto. Ele vale até " + (r.ate_texto || "daqui a 4 horas") + ".");
+      } else {
+        if (janela) janela.close();
+        toast((r && r.mensagem) || "Não consegui abrir a conexão. Fale com a RXSync.");
+      }
+    }).catch(function () { b.disabled = false; if (janela) janela.close(); toast("Sem conexão. Tente de novo."); });
+  });
 
   // logout
   el("btnSair").addEventListener("click", function () {
@@ -2685,7 +2696,8 @@ function partesTz(ms) {
   // ===== TESTE DA ASSISTENTE =====
   var CONECTAR_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/conectar";
   function chamarConectar(acao, extra) {
-    var body = { token: savedValues._token_conexao || "", acao: acao };
+    // Testar e voltar ao WhatsApp usam o token do painel (DEC-094).
+    var body = { token: token, acao: acao };
     Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
     return fetch(CONECTAR_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
   }
@@ -2702,7 +2714,6 @@ function partesTz(ms) {
   }
   function gerarTeste(confirmar) {
     var b = el("btnTeste"), av = el("testeAviso"), res = el("testeRes");
-    if (!savedValues._token_conexao) { toast("Link de conexão indisponível. Fale com a RXSync."); return; }
     b.disabled = true; b.textContent = "Abrindo…";
     av.classList.add("hidden"); res.classList.add("hidden");
     salvarPendentes().then(function (ok) {
@@ -3577,8 +3588,6 @@ function partesTz(ms) {
     });
 
     aplicarFuso(savedValues.fuso_horario);
-    savedValues._token_conexao = resp.token_conexao || "";
-    atualizarLinkReconectar();
 
     mostrarBannerConta(resp.conta);
 
