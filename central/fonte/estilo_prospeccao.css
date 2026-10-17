@@ -44,3 +44,13 @@
 .p-pub.outro-fuso .t2::after { content: ' · outro fuso'; font-weight: 700; }
 .p-teto { display: grid; gap: var(--e-2); margin-top: var(--e-2); }
 .p-teto .btn { justify-self: start; }
+/* Prompt da IA (DEC-096): o texto exato, com as regras fixas travadas, e a conversa de teste. */
+.p-prompt { border: 1px solid var(--borda); border-radius: var(--r-2); margin: var(--e-3) 0; overflow: hidden; }
+.p-prompt.travado { background: var(--superficie-2); }
+.p-prompt-cab { display: flex; align-items: center; gap: var(--e-2); padding: var(--e-2) var(--e-3); border-bottom: 1px solid var(--borda); font-size: var(--t-14); }
+.p-prompt pre { margin: 0; padding: var(--e-3); white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: var(--t-14); max-height: 40vh; overflow: auto; }
+.p-prompt-campo { font-size: var(--t-14); line-height: 1.5; }
+.p-ver-prompt { background: none; border: 0; padding: 0 var(--e-1); color: var(--primaria-texto); font-size: var(--t-13); text-decoration: underline; cursor: pointer; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; }
+.p-teste { padding: var(--e-3) 0; max-height: 45vh; overflow: auto; }
+.p-barrada { color: var(--perigo-texto); font-weight: 600; }
+.janela.larga { width: min(820px, 100%); }

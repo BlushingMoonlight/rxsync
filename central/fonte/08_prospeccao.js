@@ -163,6 +163,9 @@ const ESQUEMA = {
       ['ia.tamanho_max', 'Tamanho máximo da resposta (letras)', 'num', { trava: 'resposta_max' }], ['ia.max_mensagens', 'Mensagens da IA antes de passar para você', 'num', { trava: 'ia_mensagens_max' }],
       ['ia.hora_inicio', 'IA responde a partir de (hora)', 'num', { trava: 'ia_hora_inicio_min', min: true }], ['ia.hora_fim', 'IA responde até (hora)', 'num', { trava: 'ia_hora_fim_max' }],
       ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]],
+    // Texto inteiro do prompt (sql/041, DEC-096): vazio = o texto montado pelos campos acima. As regras fixas entram sempre.
+    ['Prompt da IA (texto inteiro)', [['ia.prompt_texto', 'Texto do prompt (vazio = o montado pelos campos de "IA de resposta")', 'longo',
+      { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]],
     ['Avisos no Telegram (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
       ['ia.avisar.recusou', 'Recusou', 'simnao'], ['ia.avisar.saiu', 'Pediu para sair', 'simnao']]]],
   conjunto: [
@@ -196,7 +199,7 @@ const ESQUEMA = {
       ['texto_confirmacao', 'Confirmação quando pedem para sair', 'longo'], ['palavras_proibidas', 'Palavras proibidas a mais', 'lista']]],
     ['Follow-ups (no máximo 2)', [['followups.0.dias_uteis', '1º follow-up: depois de (dias úteis)', 'num'], ['followups.0.texto', '1º follow-up: texto', 'longo'],
       ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]],
-    ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; as regras fixas (assistente virtual, preços, SAIR) entram sempre' }]]]]
+    ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; sem preço e sem link de fora; as regras fixas (assistente virtual, preços, SAIR) entram sempre', linhas: 10 }]]]]
 };
 const pegar = (o, cam) => cam.split('.').reduce((x, k) => x == null ? undefined : x[k], o);
 function colocar(o, cam, v) { const ks = cam.split('.'); let x = o; ks.slice(0, -1).forEach((k, i) => { if (x[k] == null) x[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; x = x[k]; }); x[ks[ks.length - 1]] = v; }
@@ -245,7 +248,7 @@ async function pObjeto(c, tipo, id, pai) {
   const campo = ([cam, rot, tp, ex]) => {
     ex = ex || {}; const idc = 'p-' + cam.replace(/\./g, '-'); const v = paraTexto(tp, pegar(cfg, cam)); let i;
     if (tp === 'sel' || tp === 'simnao') i = el('select', { class: 'entrada', id: idc, disabled: !editar }, (tp === 'simnao' ? SIMNAO : ex.op).map(([val, txt]) => el('option', { value: val, text: txt, selected: v === val })));
-    else if (tp === 'longo' || tp === 'lista') i = el('textarea', { class: 'entrada', id: idc, rows: tp === 'lista' ? '3' : '4', autocomplete: 'off', value: v, disabled: !editar });
+    else if (tp === 'longo' || tp === 'lista') i = el('textarea', { class: 'entrada' + (ex.linhas ? ' p-prompt-campo' : ''), id: idc, rows: String(ex.linhas || (tp === 'lista' ? 3 : 4)), maxlength: ex.linhas ? '8000' : null, autocomplete: 'off', value: v, disabled: !editar });
     else if (tp === 'dias') {
       const marcados = new Set(pegar(cfg, cam) || []);
       i = el('div', { class: 'filtros p-dias', role: 'group', 'aria-label': rot, id: idc }, DIAS_SEM.map(([val, txt]) => el('button', { type: 'button', 'aria-pressed': String(marcados.has(val)), disabled: !editar,
@@ -273,6 +276,22 @@ async function pObjeto(c, tipo, id, pai) {
   // O fuso da entrega decide quais públicos o conjunto pode escolher (conferido de novo no servidor).
   if (ins.publicos && ins['entrega.fuso']) { const f = ins['entrega.fuso'].i; ins.publicos.i.conferirFuso(f.value); f.addEventListener('change', () => ins.publicos.i.conferirFuso(f.value)); }
   const prev = tipo === 'anuncio' ? previaAnuncio(ins.abordagem.i, ins.texto_saida.i, ins.tamanho_max.i, marca) : null;
+  // Prompt da IA (DEC-096): o alvo é a campanha (e o anúncio), com o que está na tela por cima do que foi salvo.
+  const campanhaDoAlvo = tipo === 'campanha' ? (o && o.id) : tipo === 'anuncio' ? ((conjuntosP().find(x => x.id === paiId) || {}).campanha || {}).id : null;
+  const alvoPrompt = () => {
+    const { nova } = ler();
+    return { campanha_id: campanhaDoAlvo, anuncio_id: tipo === 'anuncio' && o ? o.id : '',
+      rascunho: tipo === 'campanha' ? { ia: { prompt_texto: (nova.ia || {}).prompt_texto || '' } } : tipo === 'anuncio' && o ? { prompt_proprio: nova.prompt_proprio || '' } : {} };
+  };
+  if (ins['ia.prompt_texto'] && editar && o) {
+    const caixa = ins['ia.prompt_texto'].i;
+    caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
+      if (caixa.value.trim() && !confirm('Trocar o que está no campo pelo texto montado pelos campos de "IA de resposta"?')) return;
+      const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
+      if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
+      caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();
+    }, 'sec')));
+  }
   if (prev) blocos[0].querySelector('.corpo-grupo').append(el('h3', { text: 'Como o lead vai ver' }), prev);
   const ler = () => {
     const nova = JSON.parse(JSON.stringify(cfg)), linhas = [];
@@ -330,6 +349,10 @@ async function pObjeto(c, tipo, id, pai) {
           numeroSel ? el('label', { class: 'campo', for: 'p-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), numeroSel, el('span', { class: 'ajuda', text: 'trocar o número de um conjunto = nível 3' })) : null)),
         ...blocos, el('div', { class: 'corpo' }, erro, editar ? el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: o ? 'Salvar a versão nova' : 'Criar' })) : null)),
       acoesObj ? cartao('Mais', null, corpo(acoesObj)) : null,
+      campanhaDoAlvo && o && (tipo === 'campanha' || tipo === 'anuncio') ? cartao('Prompt da IA', el('span', { class: 'mudo peq', text: 'com o que está na tela, mesmo sem salvar' }),
+        corpo(el('p', { class: 'mudo peq', text: 'O texto exato que vai para a OpenAI (as regras fixas travadas) e uma conversa de teste, sem WhatsApp e sem lead.' }),
+          el('div', { class: 'acoes' }, btn('Ver prompt completo', () => verPrompt(alvoPrompt()), 'sec', 'info'),
+            ligada('editar_prospeccao') ? btn('Testar conversa', () => testarConversa(alvoPrompt(), o.nome), 'sec', 'conversa') : null))) : null,
       versoes.length ? cartao('Versões', el('span', { class: 'mudo peq', text: 'cada salvar cria uma versão (nunca editada)' }), el('ul', { class: 'lista' }, versoes.map(v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => verVersao(tipo, o.id, v.versao) },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Versão ' + v.versao }), el('div', { class: 't2', text: `${fmtHora(v.criada_em)}${v.criada_por ? ' · ' + v.criada_por : ''}${v.motivo ? ' · ' + v.motivo : ''}` })), icone('seta')))))) : null));
 }
@@ -581,7 +604,8 @@ async function pLead(c, parte, id) {
       el('div', { class: 'grade-2' },
         cartao('Conversa', el('span', { class: 'mudo peq', text: fmtNum(ms.length) + ' mensagem(ns)' }), ms.length ? el('ol', { class: 'p-conversa' }, ms.map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
           el('div', { class: 'p-quem', text: (AUTOR[m.autor] || m.autor) + ' · ' + fmtHora(m.criada_em) }), el('p', { text: m.texto == null ? '(texto apagado no prazo de guarda)' : m.texto }),
-          m.direcao === 'saiu' ? el('div', { class: 'p-quem', text: m.situacao === 'falhou' ? 'não saiu' + (m.erro ? ' (' + m.erro + ')' : '') : m.situacao === 'pendente' ? 'saindo…' : m.lida_em ? 'lida' : m.entregue_em ? 'entregue' : 'enviada' }) : null))) : vazio('Nenhuma mensagem ainda.', 'conversa')),
+          m.direcao === 'saiu' ? el('div', { class: 'p-quem', text: m.situacao === 'falhou' ? 'não saiu' + (m.erro ? ' (' + m.erro + ')' : '') : m.situacao === 'pendente' ? 'saindo…' : m.lida_em ? 'lida' : m.entregue_em ? 'entregue' : 'enviada' }) : null,
+          m.prompt_id ? el('button', { class: 'p-ver-prompt', type: 'button', text: 'ver o prompt que ela usou', onclick: () => verPromptUsado(m.prompt_id) }) : null))) : vazio('Nenhuma mensagem ainda.', 'conversa')),
         el('div', { class: 'pilha' },
           cartao('Funil', null, corpo(el('div', { class: 'passos' }, FUNIL.map(([k, n]) => el('div', { class: 'passo' + (fu[k] ? '' : ' depois') }, el('span', { class: 'bola' }, icone(fu[k] ? 'ok' : 'relogio', 'p')),
             el('div', {}, el('div', { class: 'forte', text: n }), el('div', { class: 'mudo peq', text: fu[k] ? fmtHora(fu[k]) : '—' }))))),
@@ -746,4 +770,66 @@ async function pCustos(c) {
     el('div', { class: 'pilha' }, abasP('custos'),
       atuais ? null : nota('Os valores guardados aparecem aqui depois do sql/033 (rxsync-sistema). Salvar já funciona.'),
       el('form', { class: 'cartao', onsubmit: salvar }, el('div', { class: 'corpo p-topo-form' }, campos, erro, editar ? el('button', { class: 'btn pri', type: 'submit', text: 'Salvar' }) : nota('Editar está desligado (editar_prospeccao).', true)))));
+}
+
+// ---------- Prompt da IA: ver inteiro e testar a conversa (sql/041, DEC-096)
+// Ver: a parte editável (do anúncio, da campanha ou montada pelos campos) e as regras fixas, travadas (o servidor sempre
+// põe; a página nunca manda). Sem dado de lead: a 2ª mensagem aparece com marcas no lugar dos dados.
+const ORIGEM_PROMPT = { anuncio: 'prompt próprio do anúncio', campanha: 'texto do prompt da campanha', montado: 'montado pelos campos de "IA de resposta"' };
+const blocoPrompt = (titulo, texto, travado) => el('div', { class: 'p-prompt' + (travado ? ' travado' : '') }, el('div', { class: 'p-prompt-cab' }, travado ? icone('cadeado', 'p') : null, el('b', { text: titulo })), el('pre', { text: texto || '' }));
+async function verPrompt(alvo) {
+  const r = await chamar('prosp_prompt_ver', alvo);
+  if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
+  const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-prompt' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt', text: 'Prompt completo' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' },
+      el('p', { class: 'mudo peq', text: `Modelo ${r.modelo} · até ${fmtNum(r.max_tokens)} tokens na resposta · memória das últimas ${fmtNum(r.memoria)} mensagens da conversa.` }),
+      blocoPrompt('1. Parte editável (' + (ORIGEM_PROMPT[r.editavel.origem] || r.editavel.origem) + ')', r.editavel.texto),
+      blocoPrompt('2. Regras que nunca mudam (Política v10)', r.fixas, true),
+      el('p', { class: 'mudo peq', text: r.aviso || '' }),
+      blocoPrompt('3. Segunda mensagem: dados do contato (os dados de verdade entram no lugar das marcas)', r.contato_modelo, true),
+      el('p', { class: 'mudo peq', text: 'Depois vêm as mensagens da conversa. Nada disso guarda telefone.' })),
+    el('div', { class: 'pe' }, btn('Copiar o prompt', async () => { try { await navigator.clipboard.writeText(r.completo); rapida('Copiado.'); } catch (e) { rapida('Não consegui copiar.'); } }, 'sec'), btn('Fechar', () => fechar(), 'pri'))));
+}
+async function verPromptUsado(promptId) {
+  const r = await chamar('prosp_prompt_texto', { prompt_id: promptId });
+  if (!r.ok || !r.texto) { rapida(r.mensagem || 'Este prompt não está mais guardado.'); return; }
+  const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-prompt-usado' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt-usado', text: 'Prompt que a resposta usou (nº ' + promptId + ')' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' }, blocoPrompt('Texto completo (com as regras fixas no fim)', r.texto)), el('div', { class: 'pe' }, btn('Fechar', () => fechar(), 'pri'))));
+}
+// Testar conversa: a mesma montagem e a mesma limpeza da resposta de verdade, pelo workflow 52; sem WhatsApp, sem lead.
+// A conversa de teste fica só nesta janela (some ao fechar). Até 15 mensagens do contato e 100 respostas por dia.
+const BARRADA = { diz_ser_pessoa: 'seria barrada: diz ser uma pessoa (a conversa passaria para você)', preco: 'seria barrada: preço fora dos oficiais (a conversa passaria para você)' };
+function testarConversa(alvo, nome) {
+  const hist = [];
+  const nomeIn = el('input', { class: 'entrada', id: 't-nome', autocomplete: 'off', maxlength: '80', value: 'Clínica Exemplo' });
+  const nichoIn = el('input', { class: 'entrada', id: 't-nicho', autocomplete: 'off', maxlength: '60', value: 'dentista' });
+  const cidadeIn = el('input', { class: 'entrada', id: 't-cidade', autocomplete: 'off', maxlength: '60', value: 'Curitiba' });
+  const msgIn = el('textarea', { class: 'entrada', id: 't-msg', rows: '2', maxlength: '600', autocomplete: 'off', placeholder: 'Escreva como o contato escreveria' });
+  const lista = el('ol', { class: 'p-conversa p-teste', 'aria-live': 'polite' });
+  const erro = el('p', { class: 'erro', role: 'alert' });
+  const mandar = el('button', { class: 'btn pri', type: 'submit', text: 'Mandar' });
+  const desenhar = () => trocar(lista, ...hist.map(m => el('li', { class: 'p-bolha ' + (m.role === 'user' ? 'entrou' : 'saiu') },
+    el('div', { class: 'p-quem', text: m.role === 'user' ? 'Contato (teste)' : 'IA' + (m.marca ? ' · marca ' + m.marca : '') }), el('p', { text: m.content }),
+    m.barrada ? el('div', { class: 'p-quem p-barrada', text: BARRADA[m.barrada] || 'seria barrada' }) : null)));
+  const enviar = async e => {
+    e.preventDefault(); erro.textContent = '';
+    const t = msgIn.value.trim(); if (!t) { msgIn.focus(); return; }
+    if (hist.filter(m => m.role === 'user').length >= 15) { erro.textContent = 'No máximo 15 mensagens do contato. Feche e comece outra conversa.'; return; }
+    hist.push({ role: 'user', content: t }); msgIn.value = ''; desenhar(); mandar.disabled = true;
+    const r = await chamar('prosp_simular', { ...alvo, contato: { nome: nomeIn.value.trim(), nicho: nichoIn.value.trim(), cidade: cidadeIn.value.trim() },
+      historico: hist.slice(-30).map(m => ({ role: m.role, content: m.content })) });
+    mandar.disabled = false;
+    if (!r.ok) { hist.pop(); msgIn.value = t; desenhar(); erro.textContent = r.mensagem || 'Não consegui.'; return; }
+    hist.push({ role: 'assistant', content: r.texto || '(resposta vazia)', marca: r.marca, barrada: r.barrada }); desenhar(); msgIn.focus();
+  };
+  const fechar = janela(el('form', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-teste', onsubmit: enviar }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-teste', text: 'Testar conversa · ' + nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'Usa o prompt que está na tela (mesmo sem salvar), a mesma montagem e a mesma limpeza das respostas de verdade. Nada vai para o WhatsApp e nada fica guardado além do registro.' }),
+      el('div', { class: 'form-2' }, el('label', { class: 'campo', for: 't-nome' }, el('span', { class: 'rot', text: 'Negócio (de mentira)' }), nomeIn),
+        el('label', { class: 'campo', for: 't-nicho' }, el('span', { class: 'rot', text: 'Nicho' }), nichoIn), el('label', { class: 'campo', for: 't-cidade' }, el('span', { class: 'rot', text: 'Cidade' }), cidadeIn)),
+      lista, el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
+    el('div', { class: 'pe' }, btn('Limpar a conversa', () => { hist.length = 0; desenhar(); }, 'sec'), mandar)));
+  desenhar();
 }

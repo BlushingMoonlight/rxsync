@@ -30,11 +30,22 @@ TELAS.seguranca = async (c, [aba]) => {
     return;
   }
   const r = await chamar('sessoes'); if (falhou(c, r, 'Segurança')) return;
+  // Aberta pela sessão guardada (sem passar pela entrada): pergunta ao servidor se o Face ID está disponível.
+  if (est.faceId === undefined) { const e = await chamar('estado'); est.faceId = !!(e.ok && e.face_id && temFaceId()); }
   const d = r.dados;
   trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas,
     cartao('Aparelhos conectados', null, el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }), el('div', { class: 't2', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
       s.esta ? el('div', { class: 'direita' }, etq('este', 'ok')) : el('div', { class: 'direita' }, btn('Encerrar', async () => { const x = await chamar('encerrar_sessao', { id: s.id }); rapida(x.ok ? 'Sessão encerrada.' : (x.mensagem || 'Não consegui.')); rotear(); }, 'perigo-sec')))))),
+      // Face ID (DEC-095): os aparelhos que entram pelo rosto. "Esquecer" desativa a passkey no servidor; "Sair de todos" também.
+      cartao('Face ID', el('span', { class: 'mudo peq', text: '30 dias sem uso, 90 no máximo' }), (d.aparelhos || []).length ? el('ul', { class: 'lista' }, d.aparelhos.map(a => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: a.nome + (d.face_id_esta === a.id ? ' (esta sessão)' : '') }),
+          el('div', { class: 't2', text: `ativado ${fmtHora(a.criado_em)} · último uso ${fmtHora(a.ultimo_uso_em)} (${a.ultimo_nav || '?'}, IP ${a.ultimo_ip || '?'}) · vence ${fmtHora(a.vence_em)}` })),
+        el('div', { class: 'direita' }, btn('Esquecer', async () => {
+          const v = await pedirAcao('aparelho_esquecer', { id: a.id }, { titulo: 'Esquecer o Face ID de ' + a.nome, texto: 'Este aparelho volta a entrar com a senha e o código. Chega um aviso no Telegram.', botao: 'Esquecer', perigo: true });
+          if (!v) return; const x = await chamar('aparelho_esquecer', v); rapida(x.ok ? 'Face ID esquecido.' : (x.mensagem || 'Não consegui.')); rotear();
+        }, 'perigo-sec')))))) : corpo(el('p', { class: 'mudo', text: 'Nenhum aparelho entra pelo Face ID.' })),
+        est.faceId ? corpo(btn('Ativar o Face ID neste aparelho', async () => { if (await ativarFaceId()) rotear(); }, 'sec', 'seguranca')) : null),
       corpo(el('p', { class: 'mudo peq', text: `A sessão vale 8 horas, ou 30 minutos sem uso.${d.senha_trocada_em ? ' Senha criada ou trocada em ' + fmtHora(d.senha_trocada_em) + '.' : ''} Para trocar a senha, saia e toque em "Esqueci a senha".` }),
         btn('Sair de todos os aparelhos', async () => {
           const v = await pedirAcao('sair_todos', {}, { titulo: 'Sair de todos os aparelhos', texto: 'Todas as sessões, inclusive esta, terminam agora. Chega um aviso no Telegram.', botao: 'Sair de todos', perigo: true });
