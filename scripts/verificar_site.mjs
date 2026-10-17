@@ -59,7 +59,7 @@ for (const f of htmls) {
         'prosp_campanha_salvar', 'prosp_conjunto_salvar', 'prosp_anuncio_salvar', 'prosp_duplicar', 'prosp_regra_salvar', 'prosp_regra_ligar', 'prosp_anotar', 'prosp_custos_salvar', 'prosp_relatorio_salvar', 'prosp_numero_situacao', 'prosp_lead_aprovar', 'prosp_lead_marcar', 'prosp_lead_assumir',
         'prosp_publico_salvar', 'prosp_publico_renomear', 'prosp_publico_duplicar', 'prosp_publico_contato_marcar'],
       2: ['situacao_pausar', 'situacao_retomar', 'situacao_reativar', 'cancelamento_desfazer', 'link_painel_reenviar', 'link_conectar_reenviar', 'reenviar_onboarding', 'recurso_liberar', 'recurso_revogar',
-        'cliente_editar_empresa', 'chave_api_criar', 'aviso_destino_definir', 'aviso_destino_desligar', 'desfazer', 'sair_todos',
+        'cliente_editar_empresa', 'chave_api_criar', 'aviso_destino_definir', 'aviso_destino_desligar', 'desfazer', 'sair_todos', 'aparelho_esquecer',
         'prosp_ligar', 'prosp_apagar_rascunho', 'prosp_numero_criar', 'prosp_numero_qr', 'prosp_numero_desconectar', 'prosp_numero_webhook', 'prosp_numero_teto', 'prosp_buscar_agora', 'prosp_leads_aprovar_todos', 'prosp_lead_nao_contatar', 'prosp_lead_devolver', 'prosp_exportar',
         'prosp_publico_buscar', 'prosp_publico_contatos_lote', 'prosp_publico_arquivar', 'prosp_creditos_teto_salvar'],
       3: ['plano_trocar', 'situacao_suspender', 'cancelamento_agendar', 'preco_especial', 'cobranca_proxima_data', 'cobranca_vencimento', 'implantacao_isentar', 'pagamento_receber_dinheiro',
@@ -69,6 +69,12 @@ for (const f of htmls) {
     for (const m of s.matchAll(/\bformGrupo\([^;]*?, '([a-z_]+)', '/g)) if (!conhecidas.has(m[1])) erro(`${arq}: a ação ${m[1]} não tem nível (sql/030)`);
     for (const m of s.matchAll(/\b(?:fazer|pedirAcao)\(\s*([^'\s][^,)]*)/g)) if (!/^(acao|a|x\.acao|op\.acao)$/.test(m[1].trim())) erro(`${arq}: chame fazer/pedirAcao com o nome da ação escrito ('...'), para o verificar conferir o nível (achei ${m[1].trim()})`);
     if (/\.innerHTML\s*=/.test(s)) erro(`${arq}: use textContent (innerHTML deixa o texto do servidor virar código)`);
+    // Face ID (DEC-095): a passkey pede sempre o rosto (userVerification 'required'), sem atestado do fabricante, e nada
+    // dela fica no navegador (o localStorage e o sessionStorage já são conferidos acima).
+    if (/navigator\.credentials\.(get|create)/.test(s)) {
+      if ((s.match(/userVerification: 'required'/g) || []).length < 2) erro(`${arq}: o Face ID precisa pedir o rosto ao entrar e ao ativar (userVerification: 'required')`);
+      if (!/attestation: 'none'/.test(s)) erro(`${arq}: a ativação do Face ID não pede atestado do fabricante (attestation: 'none')`);
+    }
     // Entrada da Central: e-mail + senha + código no Telegram. Nada de app autenticador, e nenhum endereço de e-mail
     // escrito na página (o e-mail do administrador fica só no servidor).
     if (/otpauth:|totp|base32|app Senhas/i.test(s)) erro(`${arq}: a Central não usa mais app autenticador (otpauth, TOTP ou "app Senhas" na página)`);

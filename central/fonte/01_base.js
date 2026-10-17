@@ -80,7 +80,29 @@ async function chamar(acao, dados) {
   } catch (e) { r = { ok: false, mensagem: 'Sem conexão com a Central. Confira a internet e tente de novo.' }; }
   r = r || { ok: false, mensagem: 'Resposta vazia.' };
   if (r.sair && acao !== 'sair' && acao !== 'sair_todos') { guardarSessao(''); entrada(r.mensagem); }
+  // Nível 3 com a última senha há mais de 12 horas (DEC-095): pede só a senha e repete a ação uma vez.
+  if (r.pedir_senha && acao !== 'senha_reconfirmar' && !(dados && dados._repetido) && await pedirSenha(r.mensagem)) return chamar(acao, { ...(dados || {}), _repetido: true });
   return r;
+}
+// Digitar a senha de novo (só a senha; errada conta para o bloqueio). true = conferiu.
+function pedirSenha(mensagem) {
+  return new Promise(resolver => {
+    const senha = el('input', { class: 'entrada', id: 'c-senha-de-novo', type: 'password', autocomplete: 'current-password', required: true, enterkeyhint: 'go' });
+    const erro = el('p', { class: 'erro', role: 'alert' }); let fechar, feito = false;
+    const fim = v => { if (feito) return; feito = true; fechar(); resolver(v); };
+    const enviar = async e => {
+      e.preventDefault(); erro.textContent = '';
+      const r = await chamar('senha_reconfirmar', { senha: senha.value });
+      if (r.ok) return fim(true);
+      erro.textContent = r.mensagem || 'Não conferiu.'; senha.value = ''; senha.focus();
+    };
+    fechar = janela(el('form', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-senha', onsubmit: enviar }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+      el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-senha', text: 'Digite a senha' }))),
+      el('div', { class: 'corpo' }, el('p', { class: 'mudo', text: mensagem || 'Para esta confirmação, digite a senha da Central.' }),
+        el('label', { class: 'campo', for: 'c-senha-de-novo' }, el('span', { class: 'rot', text: 'Senha' }), senha), erro),
+      el('div', { class: 'pe' }, el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => fim(false) }), el('button', { class: 'btn pri', type: 'submit', text: 'Continuar' }))),
+      { aoFechar: () => { if (!feito) { feito = true; resolver(false); } } });
+  });
 }
 const ligada = k => est.chaves[k] === 'SIM';
 // Teclado aberto no celular: esconde a barra de baixo.

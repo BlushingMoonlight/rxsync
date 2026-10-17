@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ECNDn3LOQqYBbXy7hsoUkN2rnRsYYCBd5grbC0KeWqE='; style-src 'sha256-ZcxBL7b89iut6iCZJvfTKwqkczDBlzd/ixzIxfHJFMk='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IR0Hxxco50uJBdCt677gmlVIFOByipmLJOyYyRs9OZg='; style-src 'sha256-Rtbz6e+3wDNTjt5SmZGAzdv/MTGn90yOnaz+O2JGTkM='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0a1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -384,7 +384,17 @@ table.ad td.depois { font-weight: 700; color: var(--texto); }
 .p-pub:disabled { cursor: not-allowed; opacity: .55; }
 .p-pub.outro-fuso .t2::after { content: ' · outro fuso'; font-weight: 700; }
 .p-teto { display: grid; gap: var(--e-2); margin-top: var(--e-2); }
-.p-teto .btn { justify-self: start; }</style>
+.p-teto .btn { justify-self: start; }
+/* Prompt da IA (DEC-096): o texto exato, com as regras fixas travadas, e a conversa de teste. */
+.p-prompt { border: 1px solid var(--borda); border-radius: var(--r-2); margin: var(--e-3) 0; overflow: hidden; }
+.p-prompt.travado { background: var(--superficie-2); }
+.p-prompt-cab { display: flex; align-items: center; gap: var(--e-2); padding: var(--e-2) var(--e-3); border-bottom: 1px solid var(--borda); font-size: var(--t-14); }
+.p-prompt pre { margin: 0; padding: var(--e-3); white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: var(--t-14); max-height: 40vh; overflow: auto; }
+.p-prompt-campo { font-size: var(--t-14); line-height: 1.5; }
+.p-ver-prompt { background: none; border: 0; padding: 0 var(--e-1); color: var(--primaria-texto); font-size: var(--t-13); text-decoration: underline; cursor: pointer; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; }
+.p-teste { padding: var(--e-3) 0; max-height: 45vh; overflow: auto; }
+.p-barrada { color: var(--perigo-texto); font-weight: 600; }
+.janela.larga { width: min(820px, 100%); }</style>
 </head>
 <body>
 <!-- Página montada por scripts/central_montar.mjs a partir de central/fonte/. Não edite este arquivo à mão. -->
@@ -490,7 +500,29 @@ async function chamar(acao, dados) {
   } catch (e) { r = { ok: false, mensagem: 'Sem conexão com a Central. Confira a internet e tente de novo.' }; }
   r = r || { ok: false, mensagem: 'Resposta vazia.' };
   if (r.sair && acao !== 'sair' && acao !== 'sair_todos') { guardarSessao(''); entrada(r.mensagem); }
+  // Nível 3 com a última senha há mais de 12 horas (DEC-095): pede só a senha e repete a ação uma vez.
+  if (r.pedir_senha && acao !== 'senha_reconfirmar' && !(dados && dados._repetido) && await pedirSenha(r.mensagem)) return chamar(acao, { ...(dados || {}), _repetido: true });
   return r;
+}
+// Digitar a senha de novo (só a senha; errada conta para o bloqueio). true = conferiu.
+function pedirSenha(mensagem) {
+  return new Promise(resolver => {
+    const senha = el('input', { class: 'entrada', id: 'c-senha-de-novo', type: 'password', autocomplete: 'current-password', required: true, enterkeyhint: 'go' });
+    const erro = el('p', { class: 'erro', role: 'alert' }); let fechar, feito = false;
+    const fim = v => { if (feito) return; feito = true; fechar(); resolver(v); };
+    const enviar = async e => {
+      e.preventDefault(); erro.textContent = '';
+      const r = await chamar('senha_reconfirmar', { senha: senha.value });
+      if (r.ok) return fim(true);
+      erro.textContent = r.mensagem || 'Não conferiu.'; senha.value = ''; senha.focus();
+    };
+    fechar = janela(el('form', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-senha', onsubmit: enviar }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+      el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-senha', text: 'Digite a senha' }))),
+      el('div', { class: 'corpo' }, el('p', { class: 'mudo', text: mensagem || 'Para esta confirmação, digite a senha da Central.' }),
+        el('label', { class: 'campo', for: 'c-senha-de-novo' }, el('span', { class: 'rot', text: 'Senha' }), senha), erro),
+      el('div', { class: 'pe' }, el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => fim(false) }), el('button', { class: 'btn pri', type: 'submit', text: 'Continuar' }))),
+      { aoFechar: () => { if (!feito) { feito = true; resolver(false); } } });
+  });
 }
 const ligada = k => est.chaves[k] === 'SIM';
 // Teclado aberto no celular: esconde a barra de baixo.
@@ -638,7 +670,61 @@ const campoCodigo = () => el('input', { class: 'entrada codigo', type: 'text', i
 async function entrada(mensagem) {
   const r = await chamar('estado');
   if (r.ok && r.tem_senha === false) return pedirCodigoSenha(true, mensagem);
+  // Face ID (DEC-095): o servidor diz se dá (o n8n tem o crypto); o aparelho precisa ter passkey. Nada fica guardado aqui.
+  est.faceId = !!(r.ok && r.face_id && temFaceId());
+  if (est.faceId) return telaFaceId(mensagem);
   formEntrada(mensagem || (r.ok ? '' : r.mensagem));
+}
+// ---------------------------------------------------------------- Face ID (passkey; DEC-095)
+// A passkey é do domínio rxsync.com.br e fica no aparelho (e nas Chaves do iCloud); o banco guarda só a chave pública.
+// A assinatura é conferida no servidor (workflow 04). Nada do Face ID vai para o localStorage nem para o sessionStorage.
+const temFaceId = () => !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get && navigator.credentials.create);
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const deB64u = t => Uint8Array.from(atob(String(t).replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((String(t).length + 3) % 4)), c => c.charCodeAt(0));
+function telaFaceId(mensagem) {
+  const erro = msgErro(); erro.textContent = mensagem || '';
+  const botao = el('button', { class: 'btn pri plena', type: 'button', text: 'Entrar com Face ID', onclick: () => entrarFaceId(botao, erro) });
+  telaEntrada(el('div', {}, el('h2', { text: 'Entrar' }), el('p', { class: 'mudo', text: 'Use o Face ID deste aparelho. Ele vale 30 dias sem uso (90 dias no máximo).' }), erro, botao,
+    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Entrar com senha e código', onclick: () => formEntrada('') }))));
+  botao.focus();
+}
+async function entrarFaceId(botao, erro) {
+  botao.disabled = true; erro.textContent = '';
+  try {
+    const d = await chamar('retomar_desafio');
+    if (!d.ok || !d.desafio) { erro.textContent = d.mensagem || 'Não consegui pedir o Face ID.'; return; }
+    let cred;
+    try { cred = await navigator.credentials.get({ publicKey: { challenge: deB64u(d.desafio), rpId: d.rp_id, userVerification: 'required', timeout: 60000 } }); }
+    catch (e) { erro.textContent = 'O Face ID não foi feito. Tente de novo ou entre com a senha e o código.'; return; }
+    const a = cred.response;
+    const r = await chamar('retomar', { credencial_id: b64u(cred.rawId), client_data: b64u(a.clientDataJSON), authenticator_data: b64u(a.authenticatorData), assinatura: b64u(a.signature) });
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); est.entrouFaceId = true; return abrirApp(); }
+    if (r.sem_face_id) return formEntrada(r.mensagem);
+    erro.textContent = r.mensagem || 'Não consegui entrar.';
+  } finally { if (botao.isConnected) botao.disabled = false; }
+}
+// Ativar neste aparelho: logo depois da entrada com senha + código (a senha precisa ser das últimas 12 horas).
+async function ativarFaceId() {
+  const d = await chamar('aparelho_desafio');
+  if (!d.ok || !d.desafio) { if (d.mensagem) rapida(d.mensagem); return false; }
+  let cred;
+  try {
+    cred = await navigator.credentials.create({ publicKey: { challenge: deB64u(d.desafio), rp: { id: d.rp_id, name: d.rp_nome },
+      user: { id: deB64u(d.usuario_id), name: d.usuario_nome, displayName: d.usuario_nome }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      authenticatorSelection: { authenticatorAttachment: 'platform', residentKey: 'required', requireResidentKey: true, userVerification: 'required' }, attestation: 'none', timeout: 60000 } });
+  } catch (e) { rapida('O Face ID não foi ativado.'); return false; }
+  const a = cred.response;
+  if (typeof a.getPublicKey !== 'function' || typeof a.getAuthenticatorData !== 'function' || !a.getPublicKey()) { rapida('Este aparelho não aceita o Face ID aqui. Continue com a senha e o código.'); return false; }
+  const r = await chamar('aparelho_ativar', { credencial_id: b64u(cred.rawId), client_data: b64u(a.clientDataJSON), authenticator_data: b64u(a.getAuthenticatorData()), chave_publica: b64u(a.getPublicKey()) });
+  rapida(r.ok ? 'Face ID ativado neste aparelho. Aviso no Telegram.' : (r.mensagem || 'Não consegui ativar o Face ID.'));
+  return !!r.ok;
+}
+function ofertarFaceId() {
+  if (!est.faceId || est.entrouFaceId) return;
+  const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-faceid' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-faceid', text: 'Entrar pelo Face ID da próxima vez?' }))),
+    el('div', { class: 'corpo' }, el('p', { class: 'mudo', text: 'Da próxima vez, a Central pede só o seu rosto (vale 30 dias sem uso, 90 no máximo). A senha e o código no Telegram continuam para um aparelho novo. As confirmações de nível 3 pedem a senha de novo depois de 12 horas.' })),
+    el('div', { class: 'pe' }, btn('Agora não', () => fechar(), 'sec'), btn('Ativar o Face ID', async () => { fechar(); await ativarFaceId(); }, 'pri'))));
 }
 function formEntrada(mensagem, emailAntes) {
   const email = campoEmail(emailAntes);
@@ -668,7 +754,7 @@ function formCodigo(desafio, aviso, email) {
     e.preventDefault(); const c = soDigitos(codigo.value); if (c.length !== 6) { codigo.focus(); return; }
     botao.disabled = true; erro.textContent = '';
     const r = await chamar('entrar_codigo', { desafio, codigo: c }); botao.disabled = false;
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); return abrirApp(); }
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); est.entrouFaceId = false; await abrirApp(); return ofertarFaceId(); }
     if (r.recomecar) return formEntrada(r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
   };
@@ -708,7 +794,7 @@ function formSenhaNova(desafio, aviso, primeira, email) {
     if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; s1.focus(); return; }
     if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; s2.focus(); return; }
     botao.disabled = true; const r = await chamar('senha_nova', { desafio, codigo: c, senha: s1.value }); botao.disabled = false;
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); rapida(primeira ? 'Senha criada.' : 'Senha trocada. Os outros aparelhos saíram da Central.'); return abrirApp(); }
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); est.entrouFaceId = false; rapida(primeira ? 'Senha criada.' : 'Senha trocada. Os outros aparelhos saíram da Central.'); return abrirApp(); }
     if (r.recomecar) return pedirCodigoSenha(primeira, r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = ''; codigo.focus();
   };
@@ -1463,11 +1549,22 @@ TELAS.seguranca = async (c, [aba]) => {
     return;
   }
   const r = await chamar('sessoes'); if (falhou(c, r, 'Segurança')) return;
+  // Aberta pela sessão guardada (sem passar pela entrada): pergunta ao servidor se o Face ID está disponível.
+  if (est.faceId === undefined) { const e = await chamar('estado'); est.faceId = !!(e.ok && e.face_id && temFaceId()); }
   const d = r.dados;
   trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas,
     cartao('Aparelhos conectados', null, el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }), el('div', { class: 't2', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
       s.esta ? el('div', { class: 'direita' }, etq('este', 'ok')) : el('div', { class: 'direita' }, btn('Encerrar', async () => { const x = await chamar('encerrar_sessao', { id: s.id }); rapida(x.ok ? 'Sessão encerrada.' : (x.mensagem || 'Não consegui.')); rotear(); }, 'perigo-sec')))))),
+      // Face ID (DEC-095): os aparelhos que entram pelo rosto. "Esquecer" desativa a passkey no servidor; "Sair de todos" também.
+      cartao('Face ID', el('span', { class: 'mudo peq', text: '30 dias sem uso, 90 no máximo' }), (d.aparelhos || []).length ? el('ul', { class: 'lista' }, d.aparelhos.map(a => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: a.nome + (d.face_id_esta === a.id ? ' (esta sessão)' : '') }),
+          el('div', { class: 't2', text: `ativado ${fmtHora(a.criado_em)} · último uso ${fmtHora(a.ultimo_uso_em)} (${a.ultimo_nav || '?'}, IP ${a.ultimo_ip || '?'}) · vence ${fmtHora(a.vence_em)}` })),
+        el('div', { class: 'direita' }, btn('Esquecer', async () => {
+          const v = await pedirAcao('aparelho_esquecer', { id: a.id }, { titulo: 'Esquecer o Face ID de ' + a.nome, texto: 'Este aparelho volta a entrar com a senha e o código. Chega um aviso no Telegram.', botao: 'Esquecer', perigo: true });
+          if (!v) return; const x = await chamar('aparelho_esquecer', v); rapida(x.ok ? 'Face ID esquecido.' : (x.mensagem || 'Não consegui.')); rotear();
+        }, 'perigo-sec')))))) : corpo(el('p', { class: 'mudo', text: 'Nenhum aparelho entra pelo Face ID.' })),
+        est.faceId ? corpo(btn('Ativar o Face ID neste aparelho', async () => { if (await ativarFaceId()) rotear(); }, 'sec', 'seguranca')) : null),
       corpo(el('p', { class: 'mudo peq', text: `A sessão vale 8 horas, ou 30 minutos sem uso.${d.senha_trocada_em ? ' Senha criada ou trocada em ' + fmtHora(d.senha_trocada_em) + '.' : ''} Para trocar a senha, saia e toque em "Esqueci a senha".` }),
         btn('Sair de todos os aparelhos', async () => {
           const v = await pedirAcao('sair_todos', {}, { titulo: 'Sair de todos os aparelhos', texto: 'Todas as sessões, inclusive esta, terminam agora. Chega um aviso no Telegram.', botao: 'Sair de todos', perigo: true });
@@ -1738,6 +1835,9 @@ const ESQUEMA = {
       ['ia.tamanho_max', 'Tamanho máximo da resposta (letras)', 'num', { trava: 'resposta_max' }], ['ia.max_mensagens', 'Mensagens da IA antes de passar para você', 'num', { trava: 'ia_mensagens_max' }],
       ['ia.hora_inicio', 'IA responde a partir de (hora)', 'num', { trava: 'ia_hora_inicio_min', min: true }], ['ia.hora_fim', 'IA responde até (hora)', 'num', { trava: 'ia_hora_fim_max' }],
       ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]],
+    // Texto inteiro do prompt (sql/041, DEC-096): vazio = o texto montado pelos campos acima. As regras fixas entram sempre.
+    ['Prompt da IA (texto inteiro)', [['ia.prompt_texto', 'Texto do prompt (vazio = o montado pelos campos de "IA de resposta")', 'longo',
+      { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]],
     ['Avisos no Telegram (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
       ['ia.avisar.recusou', 'Recusou', 'simnao'], ['ia.avisar.saiu', 'Pediu para sair', 'simnao']]]],
   conjunto: [
@@ -1771,7 +1871,7 @@ const ESQUEMA = {
       ['texto_confirmacao', 'Confirmação quando pedem para sair', 'longo'], ['palavras_proibidas', 'Palavras proibidas a mais', 'lista']]],
     ['Follow-ups (no máximo 2)', [['followups.0.dias_uteis', '1º follow-up: depois de (dias úteis)', 'num'], ['followups.0.texto', '1º follow-up: texto', 'longo'],
       ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]],
-    ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; as regras fixas (assistente virtual, preços, SAIR) entram sempre' }]]]]
+    ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; sem preço e sem link de fora; as regras fixas (assistente virtual, preços, SAIR) entram sempre', linhas: 10 }]]]]
 };
 const pegar = (o, cam) => cam.split('.').reduce((x, k) => x == null ? undefined : x[k], o);
 function colocar(o, cam, v) { const ks = cam.split('.'); let x = o; ks.slice(0, -1).forEach((k, i) => { if (x[k] == null) x[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; x = x[k]; }); x[ks[ks.length - 1]] = v; }
@@ -1820,7 +1920,7 @@ async function pObjeto(c, tipo, id, pai) {
   const campo = ([cam, rot, tp, ex]) => {
     ex = ex || {}; const idc = 'p-' + cam.replace(/\./g, '-'); const v = paraTexto(tp, pegar(cfg, cam)); let i;
     if (tp === 'sel' || tp === 'simnao') i = el('select', { class: 'entrada', id: idc, disabled: !editar }, (tp === 'simnao' ? SIMNAO : ex.op).map(([val, txt]) => el('option', { value: val, text: txt, selected: v === val })));
-    else if (tp === 'longo' || tp === 'lista') i = el('textarea', { class: 'entrada', id: idc, rows: tp === 'lista' ? '3' : '4', autocomplete: 'off', value: v, disabled: !editar });
+    else if (tp === 'longo' || tp === 'lista') i = el('textarea', { class: 'entrada' + (ex.linhas ? ' p-prompt-campo' : ''), id: idc, rows: String(ex.linhas || (tp === 'lista' ? 3 : 4)), maxlength: ex.linhas ? '8000' : null, autocomplete: 'off', value: v, disabled: !editar });
     else if (tp === 'dias') {
       const marcados = new Set(pegar(cfg, cam) || []);
       i = el('div', { class: 'filtros p-dias', role: 'group', 'aria-label': rot, id: idc }, DIAS_SEM.map(([val, txt]) => el('button', { type: 'button', 'aria-pressed': String(marcados.has(val)), disabled: !editar,
@@ -1848,6 +1948,22 @@ async function pObjeto(c, tipo, id, pai) {
   // O fuso da entrega decide quais públicos o conjunto pode escolher (conferido de novo no servidor).
   if (ins.publicos && ins['entrega.fuso']) { const f = ins['entrega.fuso'].i; ins.publicos.i.conferirFuso(f.value); f.addEventListener('change', () => ins.publicos.i.conferirFuso(f.value)); }
   const prev = tipo === 'anuncio' ? previaAnuncio(ins.abordagem.i, ins.texto_saida.i, ins.tamanho_max.i, marca) : null;
+  // Prompt da IA (DEC-096): o alvo é a campanha (e o anúncio), com o que está na tela por cima do que foi salvo.
+  const campanhaDoAlvo = tipo === 'campanha' ? (o && o.id) : tipo === 'anuncio' ? ((conjuntosP().find(x => x.id === paiId) || {}).campanha || {}).id : null;
+  const alvoPrompt = () => {
+    const { nova } = ler();
+    return { campanha_id: campanhaDoAlvo, anuncio_id: tipo === 'anuncio' && o ? o.id : '',
+      rascunho: tipo === 'campanha' ? { ia: { prompt_texto: (nova.ia || {}).prompt_texto || '' } } : tipo === 'anuncio' && o ? { prompt_proprio: nova.prompt_proprio || '' } : {} };
+  };
+  if (ins['ia.prompt_texto'] && editar && o) {
+    const caixa = ins['ia.prompt_texto'].i;
+    caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
+      if (caixa.value.trim() && !confirm('Trocar o que está no campo pelo texto montado pelos campos de "IA de resposta"?')) return;
+      const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
+      if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
+      caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();
+    }, 'sec')));
+  }
   if (prev) blocos[0].querySelector('.corpo-grupo').append(el('h3', { text: 'Como o lead vai ver' }), prev);
   const ler = () => {
     const nova = JSON.parse(JSON.stringify(cfg)), linhas = [];
@@ -1905,6 +2021,10 @@ async function pObjeto(c, tipo, id, pai) {
           numeroSel ? el('label', { class: 'campo', for: 'p-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), numeroSel, el('span', { class: 'ajuda', text: 'trocar o número de um conjunto = nível 3' })) : null)),
         ...blocos, el('div', { class: 'corpo' }, erro, editar ? el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: o ? 'Salvar a versão nova' : 'Criar' })) : null)),
       acoesObj ? cartao('Mais', null, corpo(acoesObj)) : null,
+      campanhaDoAlvo && o && (tipo === 'campanha' || tipo === 'anuncio') ? cartao('Prompt da IA', el('span', { class: 'mudo peq', text: 'com o que está na tela, mesmo sem salvar' }),
+        corpo(el('p', { class: 'mudo peq', text: 'O texto exato que vai para a OpenAI (as regras fixas travadas) e uma conversa de teste, sem WhatsApp e sem lead.' }),
+          el('div', { class: 'acoes' }, btn('Ver prompt completo', () => verPrompt(alvoPrompt()), 'sec', 'info'),
+            ligada('editar_prospeccao') ? btn('Testar conversa', () => testarConversa(alvoPrompt(), o.nome), 'sec', 'conversa') : null))) : null,
       versoes.length ? cartao('Versões', el('span', { class: 'mudo peq', text: 'cada salvar cria uma versão (nunca editada)' }), el('ul', { class: 'lista' }, versoes.map(v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => verVersao(tipo, o.id, v.versao) },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Versão ' + v.versao }), el('div', { class: 't2', text: `${fmtHora(v.criada_em)}${v.criada_por ? ' · ' + v.criada_por : ''}${v.motivo ? ' · ' + v.motivo : ''}` })), icone('seta')))))) : null));
 }
@@ -2156,7 +2276,8 @@ async function pLead(c, parte, id) {
       el('div', { class: 'grade-2' },
         cartao('Conversa', el('span', { class: 'mudo peq', text: fmtNum(ms.length) + ' mensagem(ns)' }), ms.length ? el('ol', { class: 'p-conversa' }, ms.map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
           el('div', { class: 'p-quem', text: (AUTOR[m.autor] || m.autor) + ' · ' + fmtHora(m.criada_em) }), el('p', { text: m.texto == null ? '(texto apagado no prazo de guarda)' : m.texto }),
-          m.direcao === 'saiu' ? el('div', { class: 'p-quem', text: m.situacao === 'falhou' ? 'não saiu' + (m.erro ? ' (' + m.erro + ')' : '') : m.situacao === 'pendente' ? 'saindo…' : m.lida_em ? 'lida' : m.entregue_em ? 'entregue' : 'enviada' }) : null))) : vazio('Nenhuma mensagem ainda.', 'conversa')),
+          m.direcao === 'saiu' ? el('div', { class: 'p-quem', text: m.situacao === 'falhou' ? 'não saiu' + (m.erro ? ' (' + m.erro + ')' : '') : m.situacao === 'pendente' ? 'saindo…' : m.lida_em ? 'lida' : m.entregue_em ? 'entregue' : 'enviada' }) : null,
+          m.prompt_id ? el('button', { class: 'p-ver-prompt', type: 'button', text: 'ver o prompt que ela usou', onclick: () => verPromptUsado(m.prompt_id) }) : null))) : vazio('Nenhuma mensagem ainda.', 'conversa')),
         el('div', { class: 'pilha' },
           cartao('Funil', null, corpo(el('div', { class: 'passos' }, FUNIL.map(([k, n]) => el('div', { class: 'passo' + (fu[k] ? '' : ' depois') }, el('span', { class: 'bola' }, icone(fu[k] ? 'ok' : 'relogio', 'p')),
             el('div', {}, el('div', { class: 'forte', text: n }), el('div', { class: 'mudo peq', text: fu[k] ? fmtHora(fu[k]) : '—' }))))),
@@ -2321,6 +2442,68 @@ async function pCustos(c) {
     el('div', { class: 'pilha' }, abasP('custos'),
       atuais ? null : nota('Os valores guardados aparecem aqui depois do sql/033 (rxsync-sistema). Salvar já funciona.'),
       el('form', { class: 'cartao', onsubmit: salvar }, el('div', { class: 'corpo p-topo-form' }, campos, erro, editar ? el('button', { class: 'btn pri', type: 'submit', text: 'Salvar' }) : nota('Editar está desligado (editar_prospeccao).', true)))));
+}
+
+// ---------- Prompt da IA: ver inteiro e testar a conversa (sql/041, DEC-096)
+// Ver: a parte editável (do anúncio, da campanha ou montada pelos campos) e as regras fixas, travadas (o servidor sempre
+// põe; a página nunca manda). Sem dado de lead: a 2ª mensagem aparece com marcas no lugar dos dados.
+const ORIGEM_PROMPT = { anuncio: 'prompt próprio do anúncio', campanha: 'texto do prompt da campanha', montado: 'montado pelos campos de "IA de resposta"' };
+const blocoPrompt = (titulo, texto, travado) => el('div', { class: 'p-prompt' + (travado ? ' travado' : '') }, el('div', { class: 'p-prompt-cab' }, travado ? icone('cadeado', 'p') : null, el('b', { text: titulo })), el('pre', { text: texto || '' }));
+async function verPrompt(alvo) {
+  const r = await chamar('prosp_prompt_ver', alvo);
+  if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
+  const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-prompt' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt', text: 'Prompt completo' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' },
+      el('p', { class: 'mudo peq', text: `Modelo ${r.modelo} · até ${fmtNum(r.max_tokens)} tokens na resposta · memória das últimas ${fmtNum(r.memoria)} mensagens da conversa.` }),
+      blocoPrompt('1. Parte editável (' + (ORIGEM_PROMPT[r.editavel.origem] || r.editavel.origem) + ')', r.editavel.texto),
+      blocoPrompt('2. Regras que nunca mudam (Política v10)', r.fixas, true),
+      el('p', { class: 'mudo peq', text: r.aviso || '' }),
+      blocoPrompt('3. Segunda mensagem: dados do contato (os dados de verdade entram no lugar das marcas)', r.contato_modelo, true),
+      el('p', { class: 'mudo peq', text: 'Depois vêm as mensagens da conversa. Nada disso guarda telefone.' })),
+    el('div', { class: 'pe' }, btn('Copiar o prompt', async () => { try { await navigator.clipboard.writeText(r.completo); rapida('Copiado.'); } catch (e) { rapida('Não consegui copiar.'); } }, 'sec'), btn('Fechar', () => fechar(), 'pri'))));
+}
+async function verPromptUsado(promptId) {
+  const r = await chamar('prosp_prompt_texto', { prompt_id: promptId });
+  if (!r.ok || !r.texto) { rapida(r.mensagem || 'Este prompt não está mais guardado.'); return; }
+  const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-prompt-usado' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt-usado', text: 'Prompt que a resposta usou (nº ' + promptId + ')' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' }, blocoPrompt('Texto completo (com as regras fixas no fim)', r.texto)), el('div', { class: 'pe' }, btn('Fechar', () => fechar(), 'pri'))));
+}
+// Testar conversa: a mesma montagem e a mesma limpeza da resposta de verdade, pelo workflow 52; sem WhatsApp, sem lead.
+// A conversa de teste fica só nesta janela (some ao fechar). Até 15 mensagens do contato e 100 respostas por dia.
+const BARRADA = { diz_ser_pessoa: 'seria barrada: diz ser uma pessoa (a conversa passaria para você)', preco: 'seria barrada: preço fora dos oficiais (a conversa passaria para você)' };
+function testarConversa(alvo, nome) {
+  const hist = [];
+  const nomeIn = el('input', { class: 'entrada', id: 't-nome', autocomplete: 'off', maxlength: '80', value: 'Clínica Exemplo' });
+  const nichoIn = el('input', { class: 'entrada', id: 't-nicho', autocomplete: 'off', maxlength: '60', value: 'dentista' });
+  const cidadeIn = el('input', { class: 'entrada', id: 't-cidade', autocomplete: 'off', maxlength: '60', value: 'Curitiba' });
+  const msgIn = el('textarea', { class: 'entrada', id: 't-msg', rows: '2', maxlength: '600', autocomplete: 'off', placeholder: 'Escreva como o contato escreveria' });
+  const lista = el('ol', { class: 'p-conversa p-teste', 'aria-live': 'polite' });
+  const erro = el('p', { class: 'erro', role: 'alert' });
+  const mandar = el('button', { class: 'btn pri', type: 'submit', text: 'Mandar' });
+  const desenhar = () => trocar(lista, ...hist.map(m => el('li', { class: 'p-bolha ' + (m.role === 'user' ? 'entrou' : 'saiu') },
+    el('div', { class: 'p-quem', text: m.role === 'user' ? 'Contato (teste)' : 'IA' + (m.marca ? ' · marca ' + m.marca : '') }), el('p', { text: m.content }),
+    m.barrada ? el('div', { class: 'p-quem p-barrada', text: BARRADA[m.barrada] || 'seria barrada' }) : null)));
+  const enviar = async e => {
+    e.preventDefault(); erro.textContent = '';
+    const t = msgIn.value.trim(); if (!t) { msgIn.focus(); return; }
+    if (hist.filter(m => m.role === 'user').length >= 15) { erro.textContent = 'No máximo 15 mensagens do contato. Feche e comece outra conversa.'; return; }
+    hist.push({ role: 'user', content: t }); msgIn.value = ''; desenhar(); mandar.disabled = true;
+    const r = await chamar('prosp_simular', { ...alvo, contato: { nome: nomeIn.value.trim(), nicho: nichoIn.value.trim(), cidade: cidadeIn.value.trim() },
+      historico: hist.slice(-30).map(m => ({ role: m.role, content: m.content })) });
+    mandar.disabled = false;
+    if (!r.ok) { hist.pop(); msgIn.value = t; desenhar(); erro.textContent = r.mensagem || 'Não consegui.'; return; }
+    hist.push({ role: 'assistant', content: r.texto || '(resposta vazia)', marca: r.marca, barrada: r.barrada }); desenhar(); msgIn.focus();
+  };
+  const fechar = janela(el('form', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-teste', onsubmit: enviar }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-teste', text: 'Testar conversa · ' + nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'Usa o prompt que está na tela (mesmo sem salvar), a mesma montagem e a mesma limpeza das respostas de verdade. Nada vai para o WhatsApp e nada fica guardado além do registro.' }),
+      el('div', { class: 'form-2' }, el('label', { class: 'campo', for: 't-nome' }, el('span', { class: 'rot', text: 'Negócio (de mentira)' }), nomeIn),
+        el('label', { class: 'campo', for: 't-nicho' }, el('span', { class: 'rot', text: 'Nicho' }), nichoIn), el('label', { class: 'campo', for: 't-cidade' }, el('span', { class: 'rot', text: 'Cidade' }), cidadeIn)),
+      lista, el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
+    el('div', { class: 'pe' }, btn('Limpar a conversa', () => { hist.length = 0; desenhar(); }, 'sec'), mandar)));
+  desenhar();
 }
 
 // ==== 99_inicio.js
