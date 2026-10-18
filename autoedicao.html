@@ -3966,7 +3966,8 @@ function partesTz(ms) {
     if (!p.novos && !p.existentes) { t.appendChild(pacAviso("ambar", "Não há nenhum paciente para importar neste arquivo.")); t.appendChild(pacBtn("Escolher outro arquivo", "sec plena", impInicio)); return; }
     var av = h$("div"); av.style.marginTop = "18px";
     av.appendChild(pacAviso("ambar", "Os pacientes importados não recebem nenhuma mensagem automática (aviso de retorno, convite para voltar, convite do Google, lembretes) até escreverem para a clínica no WhatsApp."));
-    av.appendChild(pacAviso("neutro", "A observação é só administrativa. Se a planilha tiver sintomas, diagnóstico ou tratamento nessa coluna, volte e marque Observação como \"Não usar\"."));
+    // Só quando a coluna de Observação foi escolhida; a opção dela se chama "Não importar" (#76).
+    if (IMP.mapa.observacao >= 0) av.appendChild(pacAviso("neutro", "A observação é só administrativa. Se a planilha tiver sintomas, diagnóstico ou tratamento nessa coluna, volte e marque Observação como \"Não importar\"."));
     av.appendChild(pacAviso("neutro", "Dá para desfazer esta importação em até 7 dias, em Pacientes › Importações."));
     t.appendChild(av);
     var ck = h$("label", "pc-check"); var cb = h$("input"); cb.type = "checkbox"; ck.appendChild(cb);

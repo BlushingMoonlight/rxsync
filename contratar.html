@@ -107,7 +107,7 @@
         </div>
         <div><label class="rotulo" for="nome">Seu nome completo</label><input id="nome" class="campo" autocomplete="name"><p class="msg-erro" data-de="nome">Informe nome e sobrenome.</p></div>
         <div><label class="rotulo" for="clinica">Nome da clínica ou consultório</label><input id="clinica" class="campo" autocomplete="organization"><p class="msg-erro" data-de="clinica">Informe o nome do seu negócio.</p></div>
-        <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p><p id="avisoEmailExiste" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">Esse e-mail já está em nossa base. Se continuar, os dados serão atualizados no cadastro já existente, em vez de criar um novo.</p></div>
+        <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p></div>
         <div><label class="rotulo" for="whatsapp">Seu WhatsApp, com DDD</label><p class="text-xs text-slate-500 mb-2 leading-relaxed">É por aqui que falamos com você durante a implantação. Pode ser o seu pessoal, ou o de quem responde pela contratação.<br><strong class="text-slate-600">Não é o número que a assistente vai atender</strong> — esse você escolhe depois, na configuração.</p><input id="whatsapp" class="campo" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"><p class="msg-erro" data-de="whatsapp">Telefone inválido.</p></div>
       </div>
       <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
@@ -227,26 +227,6 @@
 <script>
 const WEBHOOK = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cadastro';
 
-document.addEventListener('DOMContentLoaded', function () {
-  const emailEl = document.getElementById('email');
-  const aviso = document.getElementById('avisoEmailExiste');
-  if (!emailEl || !aviso) return;
-  emailEl.addEventListener('blur', async function () {
-    const valor = emailEl.value.trim();
-    aviso.classList.add('hidden');
-    if (!valor || !valor.includes('@')) return;
-    try {
-      const r = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': 'rxsync-site-2026' },
-        body: JSON.stringify({ acao: 'checar_email', email: valor })
-      });
-      const d = await r.json();
-      if (d && d.existe) aviso.classList.remove('hidden');
-    } catch (e) { /* checagem é só um aviso; falhar aqui não deve travar o formulário */ }
-  });
-});
-
 const ORIGEM_CHAVE = 'rxsync-site-2026';
 const LINK_PAGAMENTO = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/link-pagamento';
 const COBRAR_AGORA = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cobrar-agora';
@@ -257,7 +237,7 @@ async function aguardarLink(clienteId, email) {
   box.classList.remove('hidden');
   // Pede ao 8/9 para criar a cobrança agora (se falhar, o 8/9 cria sozinho em até 15 minutos e manda por e-mail).
   try {
-    await fetch(COBRAR_AGORA, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cliente_id: clienteId }) });
+    await fetch(COBRAR_AGORA, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE }, body: JSON.stringify({ cliente_id: clienteId }) });
   } catch (e) { /* segue esperando o link */ }
   for (let i = 0; i < 30; i++) {
     await new Promise(res => setTimeout(res, i === 0 ? 2500 : 3000));
@@ -547,19 +527,34 @@ function descricaoPlano() {
   if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$ ' + P.anual12 + ', implantação isenta';
   return P.nome + ' — anual à vista de R$ ' + P.avista + ', implantação isenta';
 }
+// Os termos aparecem preenchidos com os dados de quem contrata, mas os dados NUNCA vão no endereço da página (ficariam
+// nos registros do servidor e no histórico): a página dos termos abre limpa e esta página preenche os campos depois de
+// carregada (é o mesmo site, então dá para mexer no quadro e na aba nova).
+function preencherTermos(doc) {
+  const val = id => document.getElementById(id).value;
+  const posto = (chave, texto) => {
+    const el = doc && doc.querySelector('[data-cli="' + chave + '"]');
+    if (el && texto) { el.textContent = texto; el.classList.remove('pend'); }
+  };
+  if (tipo === 'pj' && val('razao')) posto('ident', val('razao') + ', CNPJ nº ' + val('cnpj') + ', com sede em ' + enderecoCompleto());
+  if (tipo === 'pf' && val('nome')) posto('ident', val('nome') + ', CPF nº ' + val('cpf') + ', residente em ' + enderecoCompleto());
+  posto('rep', val('nome') + ', CPF nº ' + val('cpf'));
+  posto('plano', descricaoPlano());
+}
 function carregarTermos() {
-  const p = new URLSearchParams({
-    tipo,
-    doc: tipo === 'pj' ? document.getElementById('cnpj').value : document.getElementById('cpf').value,
-    razao: document.getElementById('razao').value,
-    nome: document.getElementById('nome').value,
-    end: enderecoCompleto(),
-    rep: document.getElementById('nome').value + ', CPF nº ' + document.getElementById('cpf').value,
-    plano: descricaoPlano()
-  });
-  const url = '/termos/' + VERSAO + '.html?' + p.toString();
-  document.getElementById('frameTermos').src = url;
-  document.getElementById('linkTermos').href = url;
+  const url = '/termos/' + VERSAO + '.html';
+  const frame = document.getElementById('frameTermos');
+  frame.onload = () => { try { preencherTermos(frame.contentDocument); } catch (e) { /* sem os dados, os termos aparecem com os campos em branco */ } };
+  if (frame.getAttribute('src') === url && frame.contentDocument && frame.contentDocument.readyState === 'complete') frame.onload();
+  else frame.src = url;
+  const link = document.getElementById('linkTermos');
+  link.href = url;
+  link.onclick = e => {
+    const aba = window.open(url, '_blank');
+    if (!aba) return;   // bloqueado: o link abre os termos sem os dados
+    e.preventDefault();
+    aba.addEventListener('load', () => { try { preencherTermos(aba.document); } catch (err) { /* idem */ } });
+  };
 }
 
 document.getElementById('form').addEventListener('submit', async evt => {
