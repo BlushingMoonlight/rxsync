@@ -89,6 +89,15 @@ for (const f of htmls) {
     if (!/resp\.recursos/.test(s)) erro(`${arq}: o painel precisa ler "recursos" da resposta do abrir (DEC-063)`);
     if ((s.match(/\/\^essencial\//g) || []).length > 1) erro(`${arq}: o plano só pode ser conferido pelo nome na regra de reserva (servidor sem "recursos")`);
     if (/PLANO_ESSENCIAL/.test(s)) erro(`${arq}: PLANO_ESSENCIAL voltou; use sem("recurso")`);
+    // Entrada com e-mail e senha (DEC-097): no navegador, só a sessão (sessionStorage 'painel_sessao', some ao fechar a aba)
+    // e a lembrança do aparelho (localStorage 'painel_lembranca'); todo pedido ao n8n leva a sessão pelo cabeçalho (cab());
+    // a página não monta mais link com o token nem pede o "reenviar o link".
+    for (const m of s.matchAll(/localStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || m[2].trim() !== "'painel_lembranca'") erro(`${arq}: só a lembrança do aparelho pode ir para o localStorage (achei ${m[0]})`);
+    for (const m of s.matchAll(/sessionStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || m[2].trim() !== "'painel_sessao'") erro(`${arq}: só a sessão pode ir para o sessionStorage (achei ${m[0]})`);
+    if (/indexedDB|document\.cookie|caches\.open|(?:local|session)Storage\s*\[/.test(s)) erro(`${arq}: nada além da sessão e da lembrança fica no navegador`);
+    for (const m of s.matchAll(/fetch\((\w+_?WEBHOOK|WEBHOOK)[^;]*?headers:\s*([^,]+),/g)) if (m[1] !== 'ENTRADA_WEBHOOK' && m[2].trim() !== 'cab()') erro(`${arq}: o pedido ao ${m[1]} precisa levar a sessão do painel (headers: cab())`);
+    if ((s.match(/headers: cab\(\)/g) || []).length < 5) erro(`${arq}: os 5 endpoints do painel (24, 13, 32, 12 e 23) precisam de headers: cab()`);
+    if (/autoedicao\.html\?t=|chamar\("reenviar"/.test(s)) erro(`${arq}: o painel não monta mais link com o token nem pede o "reenviar" (DEC-097)`);
   }
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
