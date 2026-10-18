@@ -54,3 +54,6 @@
 .p-teste { padding: var(--e-3) 0; max-height: 45vh; overflow: auto; }
 .p-barrada { color: var(--perigo-texto); font-weight: 600; }
 .janela.larga { width: min(820px, 100%); }
+/* Sugerir melhorias (DEC-098) */
+.p-sugestao { border-top: 1px solid var(--borda); margin-top: var(--e-3); padding-top: var(--e-3); }
+.p-sugestao h3 { margin: 0 0 var(--e-2); font-size: var(--t-16); }

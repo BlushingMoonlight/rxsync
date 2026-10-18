@@ -88,7 +88,9 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   prosp_lead_devolver: 2, prosp_exportar: 2, prosp_encerrar: 3, prosp_numero_apagar: 3,
   // públicos (sql/036): salvar em uso, pôr de volta em uso e pôr um público num conjunto ativo sobem de nível (rx_central_nivel)
   prosp_publico_salvar: 1, prosp_publico_renomear: 1, prosp_publico_duplicar: 1, prosp_publico_contato_marcar: 1, prosp_publico_buscar: 2, prosp_publico_contatos_lote: 2,
-  prosp_publico_arquivar: 2, prosp_creditos_teto_salvar: 2 };
+  prosp_publico_arquivar: 2, prosp_creditos_teto_salvar: 2,
+  // sugestões da IA para o prompt (sql/043, DEC-098)
+  prosp_sugerir: 2 };
 export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' });
 const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
@@ -210,6 +212,11 @@ export const CONTATOS = () => [
 export const CREDITOS_MES = { gastos: 41, teto: 300 };
 const pubObj = id => PUBS().find(p => p.id === id);
 export const PROSP = {
+  // Revisar conversas (sql/043, DEC-098): resposta direta (sem "dados"), com as sugestões liberadas para o teste do botão.
+  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, sugestoes_liberadas: true, versoes_prompt: [],
+    conversas: [{ lead_id: 'PX-AAAAA', nome: 'Sorriso Batel', nicho: 'dentista', cidade: 'Curitiba', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: 'AN-0001', situacao: 'recusou',
+      resultado: 'recusou', ultimo_contato_em: '2026-10-15T12:00:00Z', ia_mensagens: 0, passou_para_voce: false,
+      mensagens: [{ direcao: 'saiu', autor: 'disparo', texto: 'Oi! Vi a Sorriso Batel no Maps.', quando: '2026-10-15T11:00:00Z', prompt_id: null }, { direcao: 'entrou', autor: 'lead', texto: 'Não, obrigado.', quando: '2026-10-15T12:00:00Z', prompt_id: null }] }] }),
   prosp_inicio: () => okD({ campanhas: ARVORE(), numeros: [N1, N2].map(({ id, instancia, nome, situacao, ligado, teto_hoje }) => ({ id, instancia, nome, situacao, ligado, teto_hoje })),
     chaves: ESTADO.segurado ? { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'SIM', prosp_politica_v10: 'SIM', prosp_balanceamento: 'SIM' }
       : { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' }, nao_contatar: 14, travas: TRAVAS,
