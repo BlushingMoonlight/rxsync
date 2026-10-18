@@ -315,20 +315,66 @@
   .pc-check { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-md); background: #fff; cursor: pointer; margin: 14px 0; font-weight: 600; }
   .pc-check input { width: 22px; height: 22px; accent-color: var(--brand); flex: none; margin-top: 1px; }
   @media (max-width: 400px) { .tabbar button { font-size: 10.5px; } }
+  /* Entrada (DEC-097): e-mail + senha + código, criar e trocar a senha */
+  .ent .campo { display: block; margin: 14px 0 0; font-weight: 600; font-size: 14.5px; }
+  .ent input[type=email], .ent input[type=password], .ent input[type=text] { width: 100%; box-sizing: border-box; min-height: 48px; border: 1px solid #cfd8d5; border-radius: var(--r-sm); background: #fff; color: var(--ink); padding: 11px 12px; font-size: 16px; margin-top: 6px; }
+  .ent input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(5, 150, 105, .15); }
+  .ent .codigo { letter-spacing: .3em; font-size: 22px; text-align: center; font-variant-numeric: tabular-nums; }
+  .ent .marcar { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: 14.5px; line-height: 1.45; cursor: pointer; }
+  .ent .marcar input { width: 22px; height: 22px; flex: none; margin: 0; accent-color: var(--brand); }
+  .ent .marcar a { color: var(--brand-ink); font-weight: 700; }
+  .ent .links { display: flex; flex-wrap: wrap; gap: 0 20px; margin-top: 10px; }
+  .ent .links button { background: none; border: 0; padding: 10px 0; min-height: 44px; color: var(--brand-ink); font-weight: 700; font-size: 14.5px; cursor: pointer; text-decoration: underline; }
+  .ent .msg { margin-top: 12px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+  .ent .msg.erro { color: var(--rose-ink); font-weight: 600; }
+  .faixa-senha { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  .faixa-senha p { margin: 0; flex: 1 1 260px; }
+  #zapQrImg { display: block; width: 100%; max-width: 280px; height: auto; margin: 6px auto 12px; image-rendering: pixelated; }
 </style>
 </head>
 <body>
 
 <div id="carregando" class="boot">Abrindo seu painel…</div>
 
-<div id="semToken" class="porta" hidden>
+<div id="entrada" class="porta ent" hidden>
   <div class="bloco pad" style="padding:28px">
     <div style="width:44px;height:44px;border-radius:13px;background:var(--navy);display:grid;place-items:center;margin-bottom:18px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:20px;height:20px;color:#6ee7b7"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-    <h1 class="titulo" style="font-size:24px">Entrar no painel</h1>
-    <p class="subtitulo" style="margin-bottom:18px">Digite o e-mail cadastrado. Enviamos um link de acesso para ele.</p>
-    <div class="fld" style="padding:0"><input id="emailRecuperar" type="text" inputmode="email" autocomplete="email" placeholder="voce@suaclinica.com.br"></div>
-    <button id="btnRecuperar" class="btn pri plena" style="margin-top:12px">Enviar link de acesso</button>
-    <div id="msgRecuperar" class="subtitulo" style="font-size:14px"></div>
+    <h1 class="titulo" id="entTitulo" style="font-size:24px">Entrar no painel</h1>
+    <p class="subtitulo" id="entSub">Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.</p>
+    <form id="entEntrar" novalidate>
+      <label class="campo" for="entEmail">E-mail</label>
+      <input id="entEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false">
+      <label class="campo" for="entSenha">Senha</label>
+      <input id="entSenha" type="password" autocomplete="current-password">
+      <label class="marcar"><input id="entLembrar" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
+      <button class="btn pri plena" type="submit" style="margin-top:16px">Entrar</button>
+      <div class="links"><button type="button" data-ent="criar">Primeiro acesso: criar senha</button><button type="button" data-ent="esqueci">Esqueci a senha</button></div>
+    </form>
+    <form id="entCodigo" novalidate hidden>
+      <label class="campo" for="entCod">Código de 6 dígitos</label>
+      <input id="entCod" class="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+      <button class="btn pri plena" type="submit" style="margin-top:16px">Confirmar</button>
+      <div class="links"><button type="button" data-ent="voltar">Voltar</button></div>
+    </form>
+    <form id="entPedir" novalidate hidden>
+      <label class="campo" for="entEmailPedir">E-mail da clínica (o do cadastro)</label>
+      <input id="entEmailPedir" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false">
+      <button class="btn pri plena" type="submit" style="margin-top:16px">Mandar o código</button>
+      <div class="links"><button type="button" data-ent="voltar">Voltar</button></div>
+    </form>
+    <form id="entNova" novalidate hidden>
+      <label class="campo" for="entCodNova">Código de 6 dígitos (chegou no e-mail)</label>
+      <input id="entCodNova" class="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7">
+      <label class="campo" for="entSenhaNova">Senha nova (10 caracteres ou mais)</label>
+      <input id="entSenhaNova" type="password" autocomplete="new-password">
+      <label class="campo" for="entSenhaNova2">Repita a senha</label>
+      <input id="entSenhaNova2" type="password" autocomplete="new-password">
+      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a href="/termos/2026-10-v5.html" target="_blank" rel="noopener">Termos de Uso</a>, versão 2026-10-v5.</span></label>
+      <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
+      <button class="btn pri plena" type="submit" style="margin-top:16px">Salvar a senha e entrar</button>
+      <div class="links"><button type="button" data-ent="voltar">Voltar</button></div>
+    </form>
+    <div id="entMsg" class="msg" role="status" aria-live="polite"></div>
   </div>
 </div>
 
@@ -353,6 +399,7 @@
 
     <!-- ================= HOJE ================= -->
     <section data-view="hoje" hidden>
+      <div id="faixaSenha" class="aviso ambar faixa-senha" hidden><p><strong>Crie sua senha.</strong> O painel agora abre com o e-mail e a senha da clínica. Ao criar a senha, este link deixa de funcionar.</p><button type="button" id="btnFaixaSenha" class="btn pri">Criar minha senha</button></div>
       <h1 class="saud" id="hojeSaud">Olá</h1>
       <div class="data-hoje" id="hojeData"></div>
       <div id="hojeEstado"></div>
@@ -610,7 +657,7 @@
           <button type="button" data-ir="conta/contrato"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Dados do contrato</span><span class="t2">Razão social, CNPJ e representante</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
         <div class="lista" style="margin-top:14px">
-          <a href="/termos/2026-10-v4.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span><span class="tx"><span class="t1">Termos de Uso</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
+          <a href="/termos/2026-10-v5.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span><span class="tx"><span class="t1">Termos de Uso</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
           <a href="/privacidade.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Política de Privacidade</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
           <a href="mailto:contato@rxsync.com.br"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg></span><span class="tx"><span class="t1">Falar com a RXSync</span><span class="t2">contato@rxsync.com.br</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
         </div>
@@ -629,7 +676,8 @@
         <div class="bloco"><div class="ro-row"><span class="lbl">Número</span><span class="val num" id="zapNumero">—</span></div></div>
         <div id="reconectarWrap" style="margin-top:14px">
           <button id="btnReconectar" type="button" class="btn sec plena"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Reconectar ou trocar o número</button>
-          <p class="subtitulo" style="font-size:13.5px">Use se a assistente parou de responder ou se a clínica trocou de número. Abre a tela do QR Code com um link novo, que vale 4 horas. O código só aparece com o WhatsApp desconectado.</p>
+          <p class="subtitulo" style="font-size:13.5px">Use se a assistente parou de responder ou se a clínica trocou de número. O código aparece aqui mesmo, só com o WhatsApp desconectado. No celular da clínica, abra o WhatsApp › Aparelhos conectados › Conectar um aparelho e aponte a câmera para o código.</p>
+          <div id="zapQrBox" class="bloco pad" hidden><img id="zapQrImg" alt="Código para conectar o WhatsApp" hidden><p id="zapQrMsg" class="subtitulo" role="status" aria-live="polite" style="margin:0;text-align:center"></p></div>
         </div>
       </div>
 
@@ -715,6 +763,158 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   var token = params.get("t") || "";
   var el = function (id) { return document.getElementById(id); };
 
+  // ===== Entrada (DEC-097): e-mail + senha + código no e-mail. A sessão fica só nesta aba (sessionStorage) e vai no
+  // cabeçalho x-rxsync-painel de todos os pedidos; "Lembrar este aparelho" guarda só a lembrança (localStorage), que muda
+  // a cada uso. O link antigo (?t=) ainda abre o painel, com a faixa "Crie sua senha", até a clínica criar a senha. =====
+  var ENTRADA_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/painel-entrada";
+  var VERSAO_TERMOS = "2026-10-v5";
+  var nav = navigator.userAgent;
+  var APARELHO = /iPad/.test(nav) || (/Macintosh/.test(nav) && navigator.maxTouchPoints > 1) ? "iPad" : /iPhone/.test(nav) ? "iPhone" : /Android/.test(nav) ? "Android" : /Macintosh/.test(nav) ? "Mac" : /Windows/.test(nav) ? "Windows" : "Linux";
+  var EH_APP = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  function sessaoLer() { try { return sessionStorage.getItem('painel_sessao') || ""; } catch (e) { return ""; } }
+  function sessaoGuardar(v) { try { if (v) sessionStorage.setItem('painel_sessao', v); else sessionStorage.removeItem('painel_sessao'); } catch (e) {} }
+  function lembrancaLer() { try { return localStorage.getItem('painel_lembranca') || ""; } catch (e) { return ""; } }
+  function lembrancaGuardar(v) { try { if (v) localStorage.setItem('painel_lembranca', v); else localStorage.removeItem('painel_lembranca'); } catch (e) {} }
+  var sessao = sessaoLer();
+  if (!/^[0-9a-f]{64}$/.test(sessao)) sessao = "";
+  if (sessao && token) { token = ""; try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {} }
+  function cab() {
+    var h = { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM };
+    if (sessao) h["x-rxsync-painel"] = sessao;
+    return h;
+  }
+  // Resposta com "entrar": a sessão venceu ou o link antigo parou: volta para a entrada.
+  function lerJson(r) {
+    return r.json().then(function (j) {
+      if (j && j.entrar === true && !lerJson.saindo) {
+        lerJson.saindo = true; sessaoGuardar("");
+        try { history.replaceState(null, "", location.pathname + (token ? "#link" : "#venceu")); } catch (e) {}
+        location.reload();
+      }
+      return j;
+    });
+  }
+  function entChamar(acao, dados) {
+    var h = { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM, "x-rxsync-aparelho": APARELHO, "x-rxsync-app": EH_APP ? "sim" : "nao" };
+    if (sessao) h["x-rxsync-painel"] = sessao;
+    return fetch(ENTRADA_WEBHOOK, { method: "POST", headers: h, body: JSON.stringify({ acao: acao, dados: dados || {} }), cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" })
+      .then(function (r) { return r.json(); })
+      .catch(function () { return { ok: false, mensagem: "Sem conexão. Confira a internet e tente de novo." }; });
+  }
+  var ENT = { desafio: "", modo: "", lembrar: false };
+  var ENT_TELAS = ["entEntrar", "entCodigo", "entPedir", "entNova"];
+  function entTela(id, titulo, sub, msg, erro) {
+    ENT_TELAS.forEach(function (t) { el(t).hidden = t !== id; });
+    el("entTitulo").textContent = titulo; el("entSub").textContent = sub;
+    entMsg(msg || "", erro);
+    var p = el(id).querySelector("input"); if (p) setTimeout(function () { try { p.focus(); } catch (e) {} }, 30);
+  }
+  function entMsg(t, erro) { var m = el("entMsg"); m.textContent = t || ""; m.className = "msg" + (erro ? " erro" : ""); }
+  function entOcupado(form, sim) { form.querySelectorAll("button, input").forEach(function (x) { x.disabled = sim; }); }
+  function entInicio(msg, erro) { entTela("entEntrar", "Entrar no painel", "Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.", msg, erro); }
+  function entNovaTela(msg, termos) {
+    ["entCodNova", "entSenhaNova", "entSenhaNova2"].forEach(function (k) { el(k).value = ""; });
+    el("entTermosRot").hidden = !termos; el("entTermos").checked = false;
+    entTela("entNova", ENT.modo === "esqueci" ? "Trocar a senha" : "Criar a senha", "Digite o código do e-mail e escolha a senha.", msg);
+  }
+  // Entrou: guarda a sessão (só nesta aba) e a lembrança (se houver) e abre o painel sem o ?t= no endereço.
+  function entEntrou(r) {
+    sessaoGuardar(r.sessao);
+    var fim = function () { location.replace(location.pathname); };
+    if (r.lembranca) { lembrancaGuardar(r.lembranca); sessao = r.sessao; entChamar("lembranca_usada", { lembranca: r.lembranca }).then(fim, fim); }
+    else fim();
+  }
+  function entradaMostrar(msg, erro) {
+    el("carregando").hidden = true; el("app").hidden = true; el("entrada").hidden = false;
+    entInicio(msg, erro);
+  }
+  function entradaAbrir() {
+    var aviso = location.hash === "#venceu" ? "Sua entrada venceu. Entre de novo." : location.hash === "#link" ? "Este link não vale mais. Entre com o e-mail e a senha (no primeiro acesso, toque em \"Criar senha\")." : "";
+    if (location.hash) { try { history.replaceState(null, "", location.pathname); } catch (e) {} }
+    var lem = lembrancaLer();
+    if (!/^[0-9a-f]{64}$/.test(lem)) { if (lem) lembrancaGuardar(""); entradaMostrar(aviso, !!aviso); return; }
+    entChamar("retomar", { lembranca: lem }).then(function (r) {
+      if (r && r.ok && r.sessao) { entEntrou(r); return; }
+      if (r && r.esquecer) lembrancaGuardar("");
+      entradaMostrar((r && r.mensagem) || aviso, true);
+    });
+  }
+  el("entEntrar").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var f = el("entEntrar"), email = el("entEmail").value.trim(), senha = el("entSenha").value;
+    if (!email || !senha) { entMsg("Digite o e-mail e a senha.", true); return; }
+    entOcupado(f, true); entMsg("Conferindo…");
+    entChamar("entrar", { email: email, senha: senha }).then(function (r) {
+      entOcupado(f, false);
+      if (!r.ok || !r.desafio) { entMsg(r.mensagem || "Não consegui entrar.", true); return; }
+      ENT.desafio = r.desafio; ENT.lembrar = el("entLembrar").checked; el("entSenha").value = ""; el("entCod").value = "";
+      entTela("entCodigo", "Código no e-mail", "Para confirmar que é você.", r.mensagem);
+    });
+  });
+  el("entCodigo").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var f = el("entCodigo"), cod = el("entCod").value.replace(/\D/g, "");
+    if (cod.length !== 6) { entMsg("O código tem 6 dígitos.", true); return; }
+    entOcupado(f, true); entMsg("Conferindo…");
+    entChamar("entrar_codigo", { desafio: ENT.desafio, codigo: cod, lembrar: ENT.lembrar }).then(function (r) {
+      entOcupado(f, false);
+      if (r.ok && r.sessao) { entMsg("Pronto! Abrindo o painel…"); entEntrou(r); return; }
+      if (r.recomecar) { entInicio(r.mensagem, true); return; }
+      entMsg(r.mensagem || "O código não conferiu.", true);
+    });
+  });
+  document.querySelectorAll("[data-ent]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var o = b.getAttribute("data-ent");
+      if (o === "voltar") {
+        if (ENT.modo === "link") { el("entrada").hidden = true; el("app").hidden = false; ENT.modo = ""; return; }
+        entInicio(""); return;
+      }
+      ENT.modo = o; el("entEmailPedir").value = el("entEmail").value.trim();
+      entTela("entPedir", o === "criar" ? "Criar a senha" : "Esqueci a senha", "Um código de 6 dígitos vai para o e-mail da clínica.", "");
+    });
+  });
+  el("entPedir").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var f = el("entPedir"), email = el("entEmailPedir").value.trim();
+    if (!email) { entMsg("Digite o e-mail.", true); return; }
+    entOcupado(f, true); entMsg("Mandando…");
+    entChamar("senha_pedir", { email: email }).then(function (r) {
+      entOcupado(f, false);
+      if (!r.ok || !r.desafio) { entMsg(r.mensagem || "Não consegui mandar o código.", true); return; }
+      ENT.desafio = r.desafio;
+      entNovaTela(r.mensagem, ENT.modo === "criar" || r.primeira === true);
+    });
+  });
+  el("entNova").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var f = el("entNova"), cod = el("entCodNova").value.replace(/\D/g, ""), s1 = el("entSenhaNova").value, s2 = el("entSenhaNova2").value;
+    if (cod.length !== 6) { entMsg("O código tem 6 dígitos.", true); return; }
+    if (s1.length < 10) { entMsg("A senha precisa ter pelo menos 10 caracteres.", true); return; }
+    if (s1 !== s2) { entMsg("As duas senhas não são iguais.", true); return; }
+    if (!el("entTermosRot").hidden && !el("entTermos").checked) { entMsg("Marque que leu e aceita os Termos de Uso.", true); return; }
+    entOcupado(f, true); entMsg("Salvando…");
+    entChamar("senha_nova", { desafio: ENT.desafio, codigo: cod, senha: s1, aceite_termos: !el("entTermosRot").hidden && el("entTermos").checked,
+      versao_termos: VERSAO_TERMOS, lembrar: el("entLembrarNova").checked }).then(function (r) {
+      entOcupado(f, false);
+      if (r.ok && r.sessao) { entMsg("Senha salva! Abrindo o painel…"); entEntrou(r); return; }
+      if (r.termos) { el("entTermosRot").hidden = false; entMsg(r.mensagem, true); return; }
+      if (r.recomecar) { if (ENT.modo === "link") { entNovaTela(r.mensagem + " Toque em Voltar e em \"Criar minha senha\" de novo.", true); return; } entInicio(r.mensagem, true); return; }
+      entMsg(r.mensagem || "Não consegui salvar a senha.", true);
+    });
+  });
+  // Faixa "Crie sua senha" (link antigo): o código vai para o e-mail do cadastro da clínica do link.
+  el("btnFaixaSenha").addEventListener("click", function () {
+    var b = el("btnFaixaSenha"); b.disabled = true;
+    entChamar("senha_pedir_link", { token: token }).then(function (r) {
+      b.disabled = false;
+      if (!r.ok || !r.desafio) { toast(r.mensagem || "Não consegui mandar o código."); return; }
+      ENT.desafio = r.desafio; ENT.modo = "link";
+      el("app").hidden = true; el("entrada").hidden = false; window.scrollTo(0, 0);
+      entNovaTela(r.mensagem, true);
+    });
+  });
+
   var savedValues = {};
   var dirty = {};
 
@@ -726,14 +926,13 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     toast._h = setTimeout(function () { t.classList.remove("mostrar"); }, 2200);
   }
 
-  function chamar(acao, dados, email) {
+  function chamar(acao, dados) {
     var body = { acao: acao, token: token, dados: dados || {} };
-    if (email) body.email = email;
     return fetch(WEBHOOK, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM },
+      headers: cab(),
       body: JSON.stringify(body)
-    }).then(function (r) { return r.json(); });
+    }).then(lerJson);
   }
 
   function atualizarBotao() {}
@@ -760,27 +959,42 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     }).catch(function () { statusCampo(key, "Sem conexão. Não foi salvo.", true); });
   }
 
-  // Reconectar (DEC-094): pede um link de conexão novo, de 4 horas (o anterior para). A janela abre já no toque,
-  // senão o Safari bloqueia; se não abrir, segue na mesma aba.
+  // Reconectar (DEC-097): o código aparece aqui mesmo, pela sessão (o 23 só mostra o código com o WhatsApp desconectado);
+  // a página confere a situação a cada 4 segundos, por até 3 minutos. Pelo link antigo, pede para criar a senha antes.
+  var zapEspera = null;
+  function zapQr(r) {
+    var img = el("zapQrImg"), msg = el("zapQrMsg");
+    if (r && r.ok && r.status === "conectado") {
+      clearInterval(zapEspera); zapEspera = null; img.hidden = true; img.removeAttribute("src");
+      msg.textContent = "WhatsApp conectado. A assistente volta a responder em instantes."; el("btnReconectar").disabled = false; return;
+    }
+    if (r && r.ok && r.qr) { img.src = r.qr.indexOf("data:image") === 0 ? r.qr : "data:image/png;base64," + r.qr; img.hidden = false; msg.textContent = "Aponte a câmera do WhatsApp da clínica para o código."; return; }
+    clearInterval(zapEspera); zapEspera = null; img.hidden = true; el("btnReconectar").disabled = false;
+    msg.textContent = (r && r.mensagem) || "Não consegui gerar o código. Tente de novo.";
+  }
   el("btnReconectar").addEventListener("click", function () {
-    var b = el("btnReconectar"), janela = null;
-    try { janela = window.open("", "_blank"); if (janela) janela.opener = null; } catch (e) { janela = null; }
-    b.disabled = true;
-    chamar("conexao_pedir", {}).then(function (r) {
-      b.disabled = false;
-      if (r && r.ok && r.link && r.link.indexOf(CONECTAR_URL + "?t=") === 0) {
-        if (janela) janela.location.href = r.link; else window.location.href = r.link;
-        toast("Link aberto. Ele vale até " + (r.ate_texto || "daqui a 4 horas") + ".");
-      } else {
-        if (janela) janela.close();
-        toast((r && r.mensagem) || "Não consegui abrir a conexão. Fale com a RXSync.");
-      }
-    }).catch(function () { b.disabled = false; if (janela) janela.close(); toast("Sem conexão. Tente de novo."); });
+    if (!sessao) { toast("Para reconectar, crie sua senha primeiro (a faixa no alto da tela Hoje)."); return; }
+    var b = el("btnReconectar"), voltas = 0;
+    b.disabled = true; el("zapQrBox").hidden = false; el("zapQrImg").hidden = true; el("zapQrMsg").textContent = "Gerando o código…";
+    chamarConectar("qr").then(function (r) {
+      zapQr(r);
+      if (!(r && r.ok && r.qr)) return;
+      clearInterval(zapEspera);
+      zapEspera = setInterval(function () {
+        if (++voltas > 45) { zapQr({ ok: false, mensagem: "O código expirou. Toque em Reconectar de novo." }); return; }
+        chamarConectar("status").then(zapQr).catch(function () {});
+      }, 4000);
+    }).catch(function () { zapQr({ ok: false, mensagem: "Sem conexão. Tente de novo." }); });
   });
 
   // logout
+  // Sair: encerra a sessão e esquece este aparelho (na próxima vez, e-mail, senha e código).
   el("btnSair").addEventListener("click", function () {
-    window.location.href = window.location.pathname;
+    var fim = function () { sessaoGuardar(""); lembrancaGuardar(""); location.replace(location.pathname); };
+    var lem = lembrancaLer();
+    el("btnSair").disabled = true;
+    if (!sessao) { fim(); return; }
+    entChamar("sair", { esquecer: true, lembranca: lem }).then(fim, fim);
   });
 
   // ===== Navegação: 6 áreas (Hoje, Agenda, Pacientes, Assistente, Resultados, Conta), com o endereço no #, para o voltar do celular funcionar =====
@@ -1112,23 +1326,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     });
   });
 
-  if (!token) {
-    el("carregando").hidden = true;
-    el("semToken").hidden = false;
-    el("btnRecuperar").addEventListener("click", function () {
-      var email = el("emailRecuperar").value.trim();
-      if (!email) return;
-      el("btnRecuperar").disabled = true;
-      chamar("reenviar", {}, email).then(function (resp) {
-        el("msgRecuperar").textContent = resp.mensagem || "Pronto.";
-        el("btnRecuperar").disabled = false;
-      }).catch(function () {
-        el("msgRecuperar").textContent = "Erro ao enviar. Tenta de novo.";
-        el("btnRecuperar").disabled = false;
-      });
-    });
-    return;
-  }
+  if (!token && !sessao) { entradaAbrir(); return; }
 
   function mostrarErro(msg) {
     el("carregando").hidden = true;
@@ -1137,7 +1335,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     var c = h$("div", "bloco pad"); c.style.padding = "28px";
     c.appendChild(h$("h1", "titulo", "Não foi possível abrir o painel")); c.lastChild.style.fontSize = "22px";
     c.appendChild(h$("p", "subtitulo", msg));
-    var b = h$("a", "btn sec", "Pedir um link novo"); b.href = location.pathname; b.style.marginTop = "16px"; c.appendChild(b);
+    var b = h$("a", "btn sec", "Entrar com e-mail e senha"); b.href = location.pathname; b.style.marginTop = "16px"; c.appendChild(b);
     el("erro").appendChild(c);
   }
 
@@ -1242,8 +1440,8 @@ function partesTz(ms) {
     var espera = chatBolha("assistente", "digitando...");
     var historico = chatHist.slice(-12);
     chatHist.push({ de: "dono", texto: txt });
-    fetch(ASSIST_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify({ token: token, mensagem: txt, historico: historico }) })
-      .then(function (r) { return r.json(); })
+    fetch(ASSIST_WEBHOOK, { method: "POST", headers: cab(), body: JSON.stringify({ token: token, mensagem: txt, historico: historico }) })
+      .then(lerJson)
       .then(function (r) {
         espera.remove();
         var resp = (r && r.resposta) || "Não consegui responder agora. Tente de novo em instantes.";
@@ -1260,9 +1458,9 @@ function partesTz(ms) {
   // ---------- Pagamento › Asaas da clínica (DEC-092, workflow 32) ----------
   // A chave vai uma vez, ao conectar, e nunca volta: a tela só mostra a situação. Conectar exige o "li e concordo" dos
   // Termos v4 (o servidor confere a versão).
-  var PAG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/pagamento-clinica", TERMOS_ASAAS = "2026-10-v4";
+  var PAG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/pagamento-clinica", TERMOS_ASAAS = "2026-10-v5";
   function pagChamar(acao, dados) {
-    return fetch(PAG_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(function (r) { return r.json(); });
+    return fetch(PAG_WEBHOOK, { method: "POST", headers: cab(), body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(lerJson);
   }
   function asaasCarregar() {
     var box = el("asaasBox"); if (!box) return;
@@ -1292,7 +1490,7 @@ function partesTz(ms) {
     var ch = h$("input"); ch.type = "password"; ch.id = "asaasChave"; ch.autocomplete = "off"; ch.maxLength = 300; ch.placeholder = "$aact_prod_..."; box.appendChild(ch);
     var lt = h$("label", "opc"), cb = h$("input"); cb.type = "checkbox";
     lt.appendChild(cb); lt.appendChild(document.createTextNode(" Li e concordo com os "));
-    var a = h$("a", "", "Termos de Uso, versão " + TERMOS_ASAAS); a.href = "/termos/2026-10-v4.html"; a.target = "_blank"; a.rel = "noopener"; lt.appendChild(a);
+    var a = h$("a", "", "Termos de Uso, versão " + TERMOS_ASAAS); a.href = "/termos/2026-10-v5.html"; a.target = "_blank"; a.rel = "noopener"; lt.appendChild(a);
     lt.appendChild(document.createTextNode(" (item 9.2 do Anexo II: a conta de pagamentos da clínica)."));
     box.appendChild(lt);
     var msg = h$("div"); box.appendChild(msg);
@@ -1314,7 +1512,7 @@ function partesTz(ms) {
   // ---------- Aba Integração (agenda externa: Reservio) ----------
   var INTEG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/integracao-agenda";
   function intChamar(acao, dados) {
-    return fetch(INTEG_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(function (r) { return r.json(); });
+    return fetch(INTEG_WEBHOOK, { method: "POST", headers: cab(), body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(lerJson);
   }
   function intCarregar() {
     var box = el("intBox");
@@ -2696,10 +2894,10 @@ function partesTz(ms) {
   // ===== TESTE DA ASSISTENTE =====
   var CONECTAR_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/conectar";
   function chamarConectar(acao, extra) {
-    // Testar e voltar ao WhatsApp usam o token do painel (DEC-094).
+    // Testar, voltar ao WhatsApp e o Reconectar: a sessão do painel (cabeçalho) ou, na transição, o token do link antigo (DEC-094, DEC-097).
     var body = { token: token, acao: acao };
     Object.keys(extra || {}).forEach(function (k) { body[k] = extra[k]; });
-    return fetch(CONECTAR_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json", "x-rxsync-origem": ORIGEM }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+    return fetch(CONECTAR_WEBHOOK, { method: "POST", headers: cab(), body: JSON.stringify(body) }).then(lerJson);
   }
   function salvarPendentes() {
     var sujo = Object.keys(dirty).some(function (k) { return dirty[k]; });
@@ -3561,8 +3759,9 @@ function partesTz(ms) {
 
   chamar("abrir").then(function (resp) {
     el("carregando").hidden = true;
-    if (!resp.ok) { mostrarErro(resp.mensagem || "Este link não abriu. Peça um link novo com o e-mail cadastrado."); return; }
+    if (!resp.ok) { if (!resp.entrar) mostrarErro(resp.mensagem || "O painel não abriu. Entre de novo com o e-mail e a senha."); return; }
     el("app").hidden = false;
+    if (token) el("faixaSenha").hidden = false;   // link antigo: convida a criar a senha (DEC-097)
     el("btnSair").classList.remove("hidden");
     calMostrar(); gradeCarregar(); agCarregar();
 
