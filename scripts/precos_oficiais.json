@@ -1,0 +1,6 @@
+{
+  "_sobre": "Cópia dos preços oficiais da RXSync. A fonte é a tabela precos do banco (rxsync-sistema, sql/046). O verificar_site.mjs confere se o index.html, o contratar.html e o painel (autoedicao.html) mostram estes valores. Mudou o preço: um SQL novo no rxsync-sistema e, no mesmo dia, este arquivo e as páginas.",
+  "essencial": { "mensal": "299", "parcelado": "269,10", "avista": "2.990,00" },
+  "gestao": { "mensal": "599", "parcelado": "539,10", "avista": "5.990,00" },
+  "implantacao": "999"
+}
