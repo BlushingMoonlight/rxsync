@@ -183,6 +183,10 @@ const CASOS = [
   { acao: 'prosp_regra_ligar', nivel: 2, rota: P + '/regras', abrirCom: () => chave('Desligar a regra 7').click(), espera: { id: 7, valor: 'NAO' } },
   { acao: 'prosp_custos_salvar', rota: P + '/custos', antes: () => page.fill('#cu-preco_mil_tokens_entrada', '0,02'), abrirCom: () => botao('Salvar').click(),
     espera: { itens: [{ tipo: 'preco_credito_serpapi', valor: '0.075', descricao: 'plano de 5.000 buscas' }, { tipo: 'preco_mil_tokens_entrada', valor: '0.02', descricao: '' }, { tipo: 'fixo_mensal', valor: '60', descricao: 'chip' }] } },
+  // Sugerir melhorias (sql/043, DEC-098): nível 2, com a quantidade e o filtro da tela
+  { acao: 'prosp_sugerir', rota: P + '/conversas', antes: async () => { await page.selectOption('#conteudo select[aria-label="Campanha"]', 'CMP-0001'); await botao('Sugerir melhorias').waitFor(); },
+    abrirCom: () => botao('Sugerir melhorias').click(), campos: { quantidade: '10' },
+    espera: { resultado: '', campanha_id: 'CMP-0001', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0, quantidade: '10' } },
   { acao: 'sair_todos', nivel: 2, rota: 'seguranca', abrirCom: () => botao('Sair de todos os aparelhos').click(), espera: {} }
 ];
 for (const k of CASOS) {

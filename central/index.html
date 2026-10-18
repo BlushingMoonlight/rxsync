@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IR0Hxxco50uJBdCt677gmlVIFOByipmLJOyYyRs9OZg='; style-src 'sha256-Rtbz6e+3wDNTjt5SmZGAzdv/MTGn90yOnaz+O2JGTkM='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-y77Lj6xkqgmtjs/6bACSC0SDLHh3qWOfCGCSRXx8p48='; style-src 'sha256-LvKhBXklsfFluut0A+arzXB89etSsTflpH/PzoKi3IA='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0a1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -394,7 +394,10 @@ table.ad td.depois { font-weight: 700; color: var(--texto); }
 .p-ver-prompt { background: none; border: 0; padding: 0 var(--e-1); color: var(--primaria-texto); font-size: var(--t-13); text-decoration: underline; cursor: pointer; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; }
 .p-teste { padding: var(--e-3) 0; max-height: 45vh; overflow: auto; }
 .p-barrada { color: var(--perigo-texto); font-weight: 600; }
-.janela.larga { width: min(820px, 100%); }</style>
+.janela.larga { width: min(820px, 100%); }
+/* Sugerir melhorias (DEC-098) */
+.p-sugestao { border-top: 1px solid var(--borda); margin-top: var(--e-3); padding-top: var(--e-3); }
+.p-sugestao h3 { margin: 0 0 var(--e-2); font-size: var(--t-16); }</style>
 </head>
 <body>
 <!-- Página montada por scripts/central_montar.mjs a partir de central/fonte/. Não edite este arquivo à mão. -->
@@ -1681,7 +1684,7 @@ ICONES.telefone = 'M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H8A1.5
 ICONES.conversa = 'M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7l-4.5 3.5V17H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1M8 9.5h8M8 12.5h5';
 ICONES.mais_um = 'M12 5v14M5 12h14';
 
-const P_ABAS = [['', 'Campanhas'], ['publicos', 'Públicos'], ['numeros', 'Números'], ['leads', 'Leads'], ['relatorios', 'Relatórios'], ['buscas', 'Buscas'], ['regras', 'Regras'], ['custos', 'Custos']];
+const P_ABAS = [['', 'Campanhas'], ['publicos', 'Públicos'], ['numeros', 'Números'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['relatorios', 'Relatórios'], ['buscas', 'Buscas'], ['regras', 'Regras'], ['custos', 'Custos']];
 const P_SIT = { rascunho: ['rascunho', ''], ativa: ['ativa', 'ok'], ativo: ['ativo', 'ok'], pausada: ['pausada', 'atencao'], pausado: ['pausado', 'atencao'], cortado: ['cortado pela regra', 'perigo'],
   encerrada: ['encerrada', ''], encerrado: ['encerrado', ''], arquivado: ['arquivado', ''] };
 const etqSit = s => { const [t, tom] = P_SIT[s] || [s || '—', '']; return etq(t, tom); };
@@ -1749,7 +1752,7 @@ function interruptorP(tipo, o) {
 // ---------------------------------------------------------------- telas
 TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
-  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
+  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
   const fn = telasP[parte] || pInicio;
   if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Marketing'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
@@ -1963,6 +1966,12 @@ async function pObjeto(c, tipo, id, pai) {
       if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
       caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();
     }, 'sec')));
+  }
+  // Sugerir melhorias (DEC-098): "Usar este texto" traz o texto novo para o campo; o Jean revisa e salva (vira versão nova).
+  if (ins['ia.prompt_texto'] && editar && o && est.textoSugerido && est.textoSugerido.campanha_id === o.id) {
+    const caixa = ins['ia.prompt_texto'].i, g = caixa.closest('details');
+    caixa.value = est.textoSugerido.texto; est.textoSugerido = null; if (g) g.open = true;
+    setTimeout(() => { caixa.scrollIntoView({ block: 'center' }); rapida('O texto sugerido está no campo "Texto do prompt". Revise e salve a versão nova.'); }, 50);
   }
   if (prev) blocos[0].querySelector('.corpo-grupo').append(el('h3', { text: 'Como o lead vai ver' }), prev);
   const ler = () => {
@@ -2504,6 +2513,65 @@ function testarConversa(alvo, nome) {
       lista, el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
     el('div', { class: 'pe' }, btn('Limpar a conversa', () => { hist.length = 0; desenhar(); }, 'sec'), mandar)));
   desenhar();
+}
+
+// ---------- Conversas (sql/043, DEC-098): revisar as conversas e pedir sugestões de melhoria do prompt
+// "Revisar conversas" só lê (o telefone nunca vem do servidor). "Sugerir melhorias" manda à IA as conversas encerradas do
+// filtro LIMPAS no servidor (sem nome, telefone, código, nicho ou cidade do contato); a resposta só aparece aqui, e nada
+// muda sozinho: "Usar este texto" abre o editor da campanha com o texto novo, e o Jean salva.
+const RESULTADOS = [['', 'Todas'], ['recusou', 'Recusou'], ['saiu', 'Saiu'], ['com_voce', 'Com você'], ['cadastrou', 'Cadastrou'], ['parou', 'Parou (7 dias)']];
+const P_RES = { recusou: ['recusou', ''], saiu: ['saiu', 'perigo'], com_voce: ['com você', 'atencao'], cadastrou: ['cadastrou', 'ok'], parou: ['parou', 'atencao'], em_andamento: ['em andamento', 'info'] };
+const etqRes = s => { const [t, tom] = P_RES[s] || [s || '—', '']; return etq(t, tom); };
+async function pConversas(c) {
+  topo('Conversas', [['Prospecção', 'prospeccao'], ['Conversas']], 'prospeccao');
+  await arvoreP();
+  est.convP = est.convP || { resultado: '', campanha_id: '', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0 };
+  const f = est.convP;
+  const r = await chamar('prosp_conversas', f); if (falhou(c, r, 'Conversas')) return;
+  const mudar = (k, v) => { f[k] = v; if (k === 'campanha_id') { f.conjunto_id = ''; f.anuncio_id = ''; f.prompt_id = ''; } if (k === 'conjunto_id') f.anuncio_id = ''; f.pagina = 0; rotear(); };
+  const camps = (est.prosp && est.prosp.campanhas) || [];
+  const cjs = conjuntosP().filter(j => !f.campanha_id || j.campanha.id === f.campanha_id);
+  const ans = (cjs.find(j => j.id === f.conjunto_id) || {}).anuncios || [];
+  const sel = (rot, k, opcoes) => el('select', { class: 'entrada', 'aria-label': rot, onchange: e => mudar(k, e.target.value) }, opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(f[k]) === String(v) })));
+  const total = r.total || 0, paginas = Math.max(1, Math.ceil(total / 20)), editar = ligada('editar_prospeccao');
+  const sugerir = !f.campanha_id ? nota('Escolha uma campanha para pedir sugestões de melhoria do prompt dela.')
+    : !r.sugestoes_liberadas ? el('div', { class: 'aviso info' }, icone('cadeado'), el('div', { text: '"Sugerir melhorias" está travado até a revisão do teste de balanceamento ser assinada (DEC-098). Revisar as conversas já funciona.' }))
+    : editar ? el('div', { class: 'acoes' }, btn('Sugerir melhorias', () => fazer('prosp_sugerir', { ...f }, { titulo: 'Sugerir melhorias no prompt de ' + nomeP('campanha', f.campanha_id),
+        texto: 'As últimas conversas encerradas deste filtro vão para a IA sem o nome, o telefone, o código, a cidade ou o nicho do contato (nome do negócio, telefones, e-mails e links viram marcas). Nada fica guardado e nada muda sozinho: você revisa e decide.',
+        campos: [{ k: 'quantidade', rot: 'Quantas conversas (1 a 20)', tipo: 'number', inputmode: 'numeric', valor: 10, min: 1, max: 20 }], botao: 'Pedir sugestões', silencioso: true,
+        depois: x => mostrarSugestoes(x, f.campanha_id) }), 'pri', 'info')) : null;
+  trocar(c, cabecalho('Conversas', `${fmtNum(total)} conversa(s) respondida(s) · sem o telefone`),
+    el('div', { class: 'pilha' }, abasP('conversas'),
+      el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Resultado' }, RESULTADOS.map(([k, n]) => el('button', { type: 'button', 'aria-pressed': String(f.resultado === k), onclick: () => mudar('resultado', k) }, n))),
+      el('div', { class: 'form-2' }, sel('Campanha', 'campanha_id', [['', 'Todas as campanhas'], ...camps.map(x => [x.id, x.nome])]),
+        sel('Conjunto', 'conjunto_id', [['', 'Todos os conjuntos'], ...cjs.map(j => [j.id, (f.campanha_id ? '' : j.campanha.nome + ' › ') + j.nome])]),
+        sel('Anúncio', 'anuncio_id', [['', 'Todos os anúncios'], ...ans.map(a => [a.id, a.nome])]),
+        sel('Período', 'dias', [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias']]),
+        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${fmtNum(v.respostas)} resposta(s)`])])),
+      sugerir,
+      (r.conversas || []).length ? r.conversas.map(cv => cartao(cv.nome || cv.lead_id, etqRes(cv.resultado),
+        corpo(el('p', { class: 'mudo peq', text: [cv.lead_id, `${nomeP('campanha', cv.campanha_id)} › ${nomeP('conjunto', cv.conjunto_id)}${cv.anuncio_id ? ' › ' + nomeP('anuncio', cv.anuncio_id) : ''}`,
+            [cv.cidade, cv.nicho].filter(Boolean).join(' · '), 'última mensagem ' + fmtHora(cv.ultimo_contato_em), fmtNum(cv.ia_mensagens) + ' da IA', cv.passou_para_voce ? 'passou para você' : null].filter(Boolean).join(' · ') }),
+          el('ol', { class: 'p-conversa' }, (cv.mensagens || []).map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
+            el('div', { class: 'p-quem', text: (AUTOR[m.autor] || m.autor) + ' · ' + fmtHora(m.quando) }), el('p', { text: m.texto }),
+            m.prompt_id ? el('button', { class: 'p-ver-prompt', type: 'button', text: 'ver o prompt que ela usou', onclick: () => verPromptUsado(m.prompt_id) }) : null))),
+          el('div', { class: 'acoes' }, btn('Abrir o lead', () => irP('lead', cv.lead_id), 'sec'))))) : cartao(null, null, vazio('Nenhuma conversa respondida com esse filtro.', 'conversa')),
+      paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 0 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina + 1} de ${paginas}` }),
+        f.pagina + 1 < paginas ? btn('Próximas', () => { f.pagina++; rotear(); }, 'sec') : null) : null));
+}
+// A resposta da IA só aparece aqui (nada fica guardado no servidor nem no navegador).
+function mostrarSugestoes(r, campanhaId) {
+  const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-sugestoes' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-sugestoes', text: 'Sugestões para o prompt' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' },
+      el('p', { class: 'mudo peq', text: `A partir de ${fmtNum(r.conversas)} conversa(s) encerrada(s), sem os dados dos contatos. Nada mudou: revise antes de usar.` }),
+      r.diagnostico ? blocoPrompt('Diagnóstico', r.diagnostico) : null,
+      (r.sugestoes || []).map((x, k) => el('div', { class: 'p-sugestao' }, el('h3', { text: (k + 1) + '. ' + (x.onde || 'Sugestão') }),
+        x.antes ? blocoPrompt('Antes', x.antes) : null, blocoPrompt('Depois', x.depois), x.porque ? el('p', { class: 'mudo peq', text: 'Por quê: ' + x.porque }) : null)),
+      r.aviso ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', { text: r.aviso + ' O editor vai recusar até você corrigir.' })) : null,
+      r.texto_novo ? blocoPrompt('Texto novo da parte editável (as regras fixas continuam no fim)', r.texto_novo) : null),
+    el('div', { class: 'pe' }, r.texto_novo ? btn('Copiar o texto', async () => { try { await navigator.clipboard.writeText(r.texto_novo); rapida('Copiado.'); } catch (e) { rapida('Não consegui copiar.'); } }, 'sec') : null,
+      r.texto_novo && ligada('editar_prospeccao') ? btn('Usar este texto', () => { est.textoSugerido = { campanha_id: campanhaId, texto: r.texto_novo }; fechar(); irP('campanha', campanhaId); }, 'pri') : btn('Fechar', () => fechar(), 'pri'))));
 }
 
 // ==== 99_inicio.js
