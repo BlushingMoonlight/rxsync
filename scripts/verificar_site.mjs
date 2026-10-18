@@ -100,6 +100,44 @@ for (const f of htmls) {
     if (/autoedicao\.html\?t=|chamar\("reenviar"/.test(s)) erro(`${arq}: o painel não monta mais link com o token nem pede o "reenviar" (DEC-097)`);
   }
 }
+// Preços (BlushingMoonlight/rxsync-sistema#79): o index.html, o contratar.html e o painel mostram os preços da cópia
+// oficial (scripts/precos_oficiais.json, que espelha a tabela precos do banco).
+{
+  const P = JSON.parse(fs.readFileSync('scripts/precos_oficiais.json', 'utf8'));
+  const num = t => Number(String(t).replace(/\./g, '').replace(',', '.'));
+  const br = n => n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const planos = ['essencial', 'gestao'];
+  const ler = f => fs.readFileSync(f, 'utf8');
+  const confere = (f, achou, esperado, oque) => { if (String(achou) !== String(esperado)) erro(`${f}: ${oque} é ${achou}, mas o preço oficial é ${esperado} (scripts/precos_oficiais.json, rxsync-sistema#79)`); };
+  // Taxa de implantação: toda menção "R$ NNN de implantação" e o valor_setup do mensal.
+  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/R\$\s*([\d.]+)\s+de implantação/g)) confere(f, m[1], P.implantacao, 'a implantação');
+  confere('contratar.html', (ler('contratar.html').match(/valor_setup:\s*ciclo === 'mensal' \? '([\d.]+)'/) || [])[1], P.implantacao, 'o valor_setup do mensal');
+  // contratar.html: o objeto PLANOS.
+  const c = ler('contratar.html');
+  for (const k of planos) {
+    const m = c.match(new RegExp(k + ":\\s*\\{[^}]*?mensal:\\s*'?([\\d.,]+)'?,\\s*anual12:\\s*'([\\d.,]+)',\\s*anualTotal:\\s*'([\\d.,]+)',\\s*avista:\\s*'([\\d.,]+)'"));
+    if (!m) { erro(`contratar.html: não achei os preços de ${k} no objeto PLANOS`); continue; }
+    confere('contratar.html', m[1], P[k].mensal, `a mensalidade do ${k}`); confere('contratar.html', m[2], P[k].parcelado, `o anual em 12x do ${k}`);
+    confere('contratar.html', m[3], br(num(P[k].parcelado) * 12), `o total do anual em 12x do ${k}`); confere('contratar.html', m[4], P[k].avista, `o anual à vista do ${k}`);
+  }
+  // autoedicao.html: a tabela da aba Assinatura.
+  const a = ler('autoedicao.html');
+  for (const k of planos) {
+    const m = a.match(new RegExp(k + ':\\s*\\{[^}]*?mensal:\\s*"([\\d.,]+)",\\s*parcelado:\\s*"([\\d.,]+)",\\s*avista:\\s*"([\\d.,]+)"'));
+    if (!m) { erro(`autoedicao.html: não achei os preços de ${k} em ASSIN_PRECOS`); continue; }
+    confere('autoedicao.html', m[1], P[k].mensal, `a mensalidade do ${k}`); confere('autoedicao.html', m[2], P[k].parcelado, `o anual em 12x do ${k}`); confere('autoedicao.html', m[3], P[k].avista, `o anual à vista do ${k}`);
+  }
+  // index.html: os cards (mensal e 12x), o "à vista" do texto e o preço do JSON-LD.
+  const ix = ler('index.html');
+  const pares = [...ix.matchAll(/data-mensal="(\d+)" data-anual="([\d,]+)"/g)].map(m => m[1] + '|' + m[2]);
+  for (const k of planos) if (!pares.includes(P[k].mensal + '|' + P[k].parcelado)) erro(`index.html: o card do ${k} não mostra R$ ${P[k].mensal} e 12x de R$ ${P[k].parcelado} (rxsync-sistema#79)`);
+  for (const p of pares) if (!planos.some(k => p === P[k].mensal + '|' + P[k].parcelado)) erro(`index.html: card com preço que não é oficial (${p.replace('|', ' / ')}; rxsync-sistema#79)`);
+  for (const m of ix.matchAll(/12x de R\$ ([\d,]+) ou R\$ ([\d.]+) à vista/g)) { const k = planos.find(k => P[k].parcelado === m[1]); if (!k) erro(`index.html: 12x de R$ ${m[1]} não é oficial`); else confere('index.html', m[2], P[k].avista.replace(/,00$/, ''), `o à vista do ${k}`); }
+  // Calculadora da página: "O plano Essencial custa R$ NNN por mês" e a conta Math.ceil(NNN / valor).
+  for (const m of ix.matchAll(/Essencial custa R\$ (\d+) por mês/g)) confere('index.html', m[1], P.essencial.mensal, 'o preço da calculadora');
+  for (const m of ix.matchAll(/Math\.ceil\((\d+) \/ val\)/g)) confere('index.html', m[1], P.essencial.mensal, 'a conta da calculadora');
+  for (const m of ix.matchAll(/"price":\s*"([\d.]+)"/g)) if (!planos.some(k => m[1] === P[k].mensal + '.00')) erro(`index.html: o preço ${m[1]} do JSON-LD não é uma mensalidade oficial (rxsync-sistema#79)`);
+}
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
