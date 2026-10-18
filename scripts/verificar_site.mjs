@@ -138,6 +138,24 @@ for (const f of htmls) {
   for (const m of ix.matchAll(/Math\.ceil\((\d+) \/ val\)/g)) confere('index.html', m[1], P.essencial.mensal, 'a conta da calculadora');
   for (const m of ix.matchAll(/"price":\s*"([\d.]+)"/g)) if (!planos.some(k => m[1] === P[k].mensal + '.00')) erro(`index.html: o preço ${m[1]} do JSON-LD não é uma mensalidade oficial (rxsync-sistema#79)`);
 }
+// Termos vigentes (rxsync-sistema#103): a Política e as outras páginas citam a versão mais nova dos Termos (o maior
+// termos/AAAA-MM-vN.html). Só avisa (não bloqueia): dá para publicar os Termos novos antes de trocar os links. O histórico
+// de versões da Política (os <li> que começam com a versão em negrito) fica de fora.
+let avisosTermos = 0;
+{
+  const versoes = fs.existsSync('termos') ? fs.readdirSync('termos').map(f => (f.match(/^(\d{4}-\d{2})-v(\d+)\.html$/) || []).slice(1)).filter(x => x.length) : [];
+  const nova = versoes.sort((a, b) => Number(a[1]) - Number(b[1]) || a[0].localeCompare(b[0])).pop();
+  if (nova) {
+    const vigente = `${nova[0]}-v${nova[1]}`;
+    for (const f of htmls.filter(f => !f.startsWith('termos' + path.sep))) {
+      const s = fs.readFileSync(f, 'utf8').replace(/<li><strong>\d{4}-\d{2}-v\d+<\/strong>[\s\S]*?<\/li>/g, '');
+      const citadas = new Set([...s.matchAll(/termos\/(\d{4}-\d{2}-v\d+)\.html/g)].map(m => m[1]));
+      for (const m of s.matchAll(/\b(?:VERSAO|VERSAO_TERMOS|TERMOS_ASAAS)\s*=\s*["'](\d{4}-\d{2}-v\d+)["']/g)) citadas.add(m[1]);
+      for (const v of citadas) if (v !== vigente) { avisosTermos++; console.log(`::warning title=Termos::${f} cita os Termos ${v}, mas a versão mais nova é ${vigente} (rxsync-sistema#103).`); }
+    }
+  }
+}
+if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos que não são a versão mais nova (só aviso, não bloqueia).`);
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
