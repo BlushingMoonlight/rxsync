@@ -41,9 +41,13 @@ for (const f of htmls) {
     const px = k => Number(((regra.match(new RegExp('(?:^|;)\\s*' + k + '\\s*:\\s*(\\d+)px')) || [])[1]) || 0);
     if (!px('width') || !px('height') || px('width') > 48 || px('height') > 48) erro(`${arq}: os ícones precisam de tamanho fixo de até 48 px (regra svg.icone)`);
     if (!/createElementNS\('http:\/\/www\.w3\.org\/2000\/svg', 'svg'\); s\.setAttribute\('class', 'icone'( \+ [^)]*)?\)/.test(s)) erro(`${arq}: a função icone() precisa pôr a classe "icone" no <svg>`);
-    // localStorage: só a aparência (automática, clara ou escura), pela chave 'central_aparencia' (DEC-067).
-    for (const m of s.matchAll(/localStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || m[2].trim() !== "'central_aparencia'") erro(`${arq}: só a aparência pode ir para o localStorage (achei ${m[0]})`);
-    if (/localStorage\s*\[|localStorage\s*\.\s*(?!getItem|setItem|removeItem)\w/.test(s)) erro(`${arq}: localStorage só com getItem, setItem ou removeItem da aparência`);
+    // localStorage: só a aparência (automática, clara ou escura, 'central_aparencia', DEC-067) e a lembrança do aparelho
+    // ('central_lembranca', DEC-109; o banco guarda só o SHA-256). Nada mais da Central fica no aparelho.
+    for (const m of s.matchAll(/localStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || !["'central_aparencia'", "'central_lembranca'"].includes(m[2].trim())) erro(`${arq}: só a aparência e a lembrança do aparelho podem ir para o localStorage (achei ${m[0]})`);
+    if (/localStorage\s*\[|localStorage\s*\.\s*(?!getItem|setItem|removeItem)\w/.test(s)) erro(`${arq}: localStorage só com getItem, setItem ou removeItem da aparência e da lembrança`);
+    // A lembrança só é gravada se tiver o formato do servidor (64 letras de 0-9a-f) e só sai da página pelo retomar,
+    // pelo lembranca_usada e pelo sair (para ser esquecida).
+    if (!/lembrancaNova\(v\) \{ if \(!\/\^\[0-9a-f\]\{64\}\$\/\.test\(v \|\| ''\)\) return;/.test(s)) erro(`${arq}: a lembrança do aparelho só é guardada com o formato do servidor (64 letras de 0-9a-f)`);
     // Dados sensíveis (CPF, CNPJ, e-mail, telefone) nunca ficam no navegador: só a sessão vai para o sessionStorage.
     for (const m of s.matchAll(/sessionStorage\.setItem\(\s*([^,)]*)/g)) if (m[1].trim() !== "'central_sessao'") erro(`${arq}: só a sessão pode ir para o sessionStorage (achei ${m[1].trim()})`);
     if (/indexedDB|document\.cookie|caches\.open/.test(s)) erro(`${arq}: nada da Central fica no navegador (indexedDB, cookie ou cache)`);
@@ -69,12 +73,8 @@ for (const f of htmls) {
     for (const m of s.matchAll(/\bformGrupo\([^;]*?, '([a-z_]+)', '/g)) if (!conhecidas.has(m[1])) erro(`${arq}: a ação ${m[1]} não tem nível (sql/030)`);
     for (const m of s.matchAll(/\b(?:fazer|pedirAcao)\(\s*([^'\s][^,)]*)/g)) if (!/^(acao|a|x\.acao|op\.acao)$/.test(m[1].trim())) erro(`${arq}: chame fazer/pedirAcao com o nome da ação escrito ('...'), para o verificar conferir o nível (achei ${m[1].trim()})`);
     if (/\.innerHTML\s*=/.test(s)) erro(`${arq}: use textContent (innerHTML deixa o texto do servidor virar código)`);
-    // Face ID (DEC-095): a passkey pede sempre o rosto (userVerification 'required'), sem atestado do fabricante, e nada
-    // dela fica no navegador (o localStorage e o sessionStorage já são conferidos acima).
-    if (/navigator\.credentials\.(get|create)/.test(s)) {
-      if ((s.match(/userVerification: 'required'/g) || []).length < 2) erro(`${arq}: o Face ID precisa pedir o rosto ao entrar e ao ativar (userVerification: 'required')`);
-      if (!/attestation: 'none'/.test(s)) erro(`${arq}: a ativação do Face ID não pede atestado do fabricante (attestation: 'none')`);
-    }
+    // Sem Face ID (DEC-109, substitui a DEC-095): nada de passkey nem das ações dela na página.
+    if (/navigator\.credentials|PublicKeyCredential|retomar_desafio|aparelho_desafio|aparelho_ativar/.test(s)) erro(`${arq}: a Central não usa mais Face ID (passkey); a entrada lembrada é pela lembrança do aparelho (DEC-109)`);
     // Entrada da Central: e-mail + senha + código no Telegram. Nada de app autenticador, e nenhum endereço de e-mail
     // escrito na página (o e-mail do administrador fica só no servidor).
     if (/otpauth:|totp|base32|app Senhas/i.test(s)) erro(`${arq}: a Central não usa mais app autenticador (otpauth, TOTP ou "app Senhas" na página)`);

@@ -109,7 +109,7 @@ const ligada = k => est.chaves[k] === 'SIM';
 document.addEventListener('focusin', e => { if (e.target.matches('input, select, textarea')) document.body.classList.add('teclado'); });
 document.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('input, select, textarea')) document.body.classList.remove('teclado'); }, 50));
 
-// ---------------------------------------------------------------- aparência (o único item no localStorage, DEC-068)
+// ---------------------------------------------------------------- aparência (no localStorage, com a lembrança do aparelho; DEC-068, DEC-109)
 function aplicarAparencia(v) { if (v === 'claro' || v === 'escuro') document.documentElement.dataset.tema = v; else delete document.documentElement.dataset.tema; }
 let aparencia = 'auto';
 try { aparencia = localStorage.getItem('central_aparencia') || 'auto'; } catch (e) {}

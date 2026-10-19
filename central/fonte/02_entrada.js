@@ -7,64 +7,29 @@ const soDigitos = v => String(v || '').replace(/\D/g, '');
 const campoE = (rot, input) => el('label', { class: 'campo' }, el('span', { class: 'rot', text: rot }), input);
 const campoEmail = valor => el('input', { class: 'entrada', type: 'email', inputmode: 'email', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', required: true, enterkeyhint: 'next', value: valor || null });
 const campoCodigo = () => el('input', { class: 'entrada codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', pattern: '[0-9]*', required: true, enterkeyhint: 'go' });
+// ---------------------------------------------------------------- aparelho lembrado (DEC-109, no lugar do Face ID)
+// Depois da senha + código (ou da senha nova), o servidor manda uma lembrança (64 letras) que fica no localStorage deste
+// aparelho ('central_lembranca'); o banco guarda só o SHA-256. Ela muda a cada uso, vale 30 dias sem uso e 90 no
+// máximo. "Sair" e "Sair de todos" a esquecem. No localStorage, só ela e a aparência.
+function lembrancaLer() { try { return localStorage.getItem('central_lembranca') || ''; } catch (e) { return ''; } }
+function lembrancaGuardar(v) { try { if (v) localStorage.setItem('central_lembranca', v); else localStorage.removeItem('central_lembranca'); } catch (e) {} }
+// A página guardou a lembrança nova: avisa o servidor (fim da folga de 24 horas da anterior).
+async function lembrancaNova(v) { if (!/^[0-9a-f]{64}$/.test(v || '')) return; lembrancaGuardar(v); await chamar('lembranca_usada', { lembranca: v }); }
+let ultimaRetomada = 0;
 async function entrada(mensagem) {
   const r = await chamar('estado');
-  if (r.ok && r.tem_senha === false) return pedirCodigoSenha(true, mensagem);
-  // Face ID (DEC-095): o servidor diz se dá (o n8n tem o crypto); o aparelho precisa ter passkey. Nada fica guardado aqui.
-  est.faceId = !!(r.ok && r.face_id && temFaceId());
-  if (est.faceId) return telaFaceId(mensagem);
+  if (r.ok && r.tem_senha === false) { lembrancaGuardar(''); return pedirCodigoSenha(true, mensagem); }
+  // Aparelho lembrado: entra direto (no máximo uma tentativa por minuto, para nunca ficar em volta).
+  const lem = lembrancaLer();
+  if (lem && !/^[0-9a-f]{64}$/.test(lem)) lembrancaGuardar('');
+  if (/^[0-9a-f]{64}$/.test(lem) && Date.now() - ultimaRetomada > 60000) {
+    ultimaRetomada = Date.now();
+    const x = await chamar('retomar', { lembranca: lem });
+    if (x.ok && x.sessao) { guardarSessao(x.sessao); await lembrancaNova(x.lembranca); return abrirApp(); }
+    if (x.esquecer) lembrancaGuardar('');
+    return formEntrada(x.mensagem || mensagem || '');
+  }
   formEntrada(mensagem || (r.ok ? '' : r.mensagem));
-}
-// ---------------------------------------------------------------- Face ID (passkey; DEC-095)
-// A passkey é do domínio rxsync.com.br e fica no aparelho (e nas Chaves do iCloud); o banco guarda só a chave pública.
-// A assinatura é conferida no servidor (workflow 04). Nada do Face ID vai para o localStorage nem para o sessionStorage.
-const temFaceId = () => !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get && navigator.credentials.create);
-const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const deB64u = t => Uint8Array.from(atob(String(t).replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((String(t).length + 3) % 4)), c => c.charCodeAt(0));
-function telaFaceId(mensagem) {
-  const erro = msgErro(); erro.textContent = mensagem || '';
-  const botao = el('button', { class: 'btn pri plena', type: 'button', text: 'Entrar com Face ID', onclick: () => entrarFaceId(botao, erro) });
-  telaEntrada(el('div', {}, el('h2', { text: 'Entrar' }), el('p', { class: 'mudo', text: 'Use o Face ID deste aparelho. Ele vale 30 dias sem uso (90 dias no máximo).' }), erro, botao,
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Entrar com senha e código', onclick: () => formEntrada('') }))));
-  botao.focus();
-}
-async function entrarFaceId(botao, erro) {
-  botao.disabled = true; erro.textContent = '';
-  try {
-    const d = await chamar('retomar_desafio');
-    if (!d.ok || !d.desafio) { erro.textContent = d.mensagem || 'Não consegui pedir o Face ID.'; return; }
-    let cred;
-    try { cred = await navigator.credentials.get({ publicKey: { challenge: deB64u(d.desafio), rpId: d.rp_id, userVerification: 'required', timeout: 60000 } }); }
-    catch (e) { erro.textContent = 'O Face ID não foi feito. Tente de novo ou entre com a senha e o código.'; return; }
-    const a = cred.response;
-    const r = await chamar('retomar', { credencial_id: b64u(cred.rawId), client_data: b64u(a.clientDataJSON), authenticator_data: b64u(a.authenticatorData), assinatura: b64u(a.signature) });
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); est.entrouFaceId = true; return abrirApp(); }
-    if (r.sem_face_id) return formEntrada(r.mensagem);
-    erro.textContent = r.mensagem || 'Não consegui entrar.';
-  } finally { if (botao.isConnected) botao.disabled = false; }
-}
-// Ativar neste aparelho: logo depois da entrada com senha + código (a senha precisa ser das últimas 12 horas).
-async function ativarFaceId() {
-  const d = await chamar('aparelho_desafio');
-  if (!d.ok || !d.desafio) { if (d.mensagem) rapida(d.mensagem); return false; }
-  let cred;
-  try {
-    cred = await navigator.credentials.create({ publicKey: { challenge: deB64u(d.desafio), rp: { id: d.rp_id, name: d.rp_nome },
-      user: { id: deB64u(d.usuario_id), name: d.usuario_nome, displayName: d.usuario_nome }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
-      authenticatorSelection: { authenticatorAttachment: 'platform', residentKey: 'required', requireResidentKey: true, userVerification: 'required' }, attestation: 'none', timeout: 60000 } });
-  } catch (e) { rapida('O Face ID não foi ativado.'); return false; }
-  const a = cred.response;
-  if (typeof a.getPublicKey !== 'function' || typeof a.getAuthenticatorData !== 'function' || !a.getPublicKey()) { rapida('Este aparelho não aceita o Face ID aqui. Continue com a senha e o código.'); return false; }
-  const r = await chamar('aparelho_ativar', { credencial_id: b64u(cred.rawId), client_data: b64u(a.clientDataJSON), authenticator_data: b64u(a.getAuthenticatorData()), chave_publica: b64u(a.getPublicKey()) });
-  rapida(r.ok ? 'Face ID ativado neste aparelho. Aviso no Telegram.' : (r.mensagem || 'Não consegui ativar o Face ID.'));
-  return !!r.ok;
-}
-function ofertarFaceId() {
-  if (!est.faceId || est.entrouFaceId) return;
-  const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-faceid' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
-    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-faceid', text: 'Entrar pelo Face ID da próxima vez?' }))),
-    el('div', { class: 'corpo' }, el('p', { class: 'mudo', text: 'Da próxima vez, a Central pede só o seu rosto (vale 30 dias sem uso, 90 no máximo). A senha e o código no Telegram continuam para um aparelho novo. As confirmações de nível 3 pedem a senha de novo depois de 12 horas.' })),
-    el('div', { class: 'pe' }, btn('Agora não', () => fechar(), 'sec'), btn('Ativar o Face ID', async () => { fechar(); await ativarFaceId(); }, 'pri'))));
 }
 function formEntrada(mensagem, emailAntes) {
   const email = campoEmail(emailAntes);
@@ -94,7 +59,7 @@ function formCodigo(desafio, aviso, email) {
     e.preventDefault(); const c = soDigitos(codigo.value); if (c.length !== 6) { codigo.focus(); return; }
     botao.disabled = true; erro.textContent = '';
     const r = await chamar('entrar_codigo', { desafio, codigo: c }); botao.disabled = false;
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); est.entrouFaceId = false; await abrirApp(); return ofertarFaceId(); }
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); await lembrancaNova(r.lembranca); return abrirApp(); }   // já lembra o aparelho, sem perguntar
     if (r.recomecar) return formEntrada(r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
   };
@@ -134,14 +99,14 @@ function formSenhaNova(desafio, aviso, primeira, email) {
     if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; s1.focus(); return; }
     if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; s2.focus(); return; }
     botao.disabled = true; const r = await chamar('senha_nova', { desafio, codigo: c, senha: s1.value }); botao.disabled = false;
-    if (r.ok && r.sessao) { guardarSessao(r.sessao); est.entrouFaceId = false; rapida(primeira ? 'Senha criada.' : 'Senha trocada. Os outros aparelhos saíram da Central.'); return abrirApp(); }
+    if (r.ok && r.sessao) { guardarSessao(r.sessao); await lembrancaNova(r.lembranca); rapida(primeira ? 'Senha criada.' : 'Senha trocada. Os outros aparelhos saíram da Central.'); return abrirApp(); }
     if (r.recomecar) return pedirCodigoSenha(primeira, r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = ''; codigo.focus();
   };
   telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: primeira ? 'Criar senha' : 'Senha nova' }),
     el('p', { class: 'mudo', text: aviso || 'Se o e-mail estiver certo, o código chega no seu Telegram em instantes. Ele vale 10 minutos.' }),
     campoE('Código de 6 dígitos (no Telegram)', codigo), campoE('Senha nova (12 caracteres ou mais)', s1), campoE('Repita a senha', s2), erro, botao,
-    el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central e chega um aviso no Telegram.' }),
+    el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central (e deixam de ser lembrados) e chega um aviso no Telegram.' }),
     el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => primeira ? pedirCodigoSenha(true, '', email) : formEntrada('', email) }))));
 }
 async function carregarConfig() {
@@ -159,4 +124,5 @@ async function abrirApp() {
   est.clientes = null;
   $('entrada').hidden = true; $('app').hidden = false; montarNav(); rotear();
 }
-async function sair() { await chamar('sair'); guardarSessao(''); est.clientes = null; entrada('Você saiu.'); }
+// Sair esquece também este aparelho: da próxima vez, senha + código.
+async function sair() { await chamar('sair', { esquecer: true, lembranca: lembrancaLer() }); lembrancaGuardar(''); guardarSessao(''); est.clientes = null; entrada('Você saiu.'); }
