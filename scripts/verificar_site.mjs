@@ -136,7 +136,34 @@ for (const f of htmls) {
   // Calculadora da página: "O plano Essencial custa R$ NNN por mês" e a conta Math.ceil(NNN / valor).
   for (const m of ix.matchAll(/Essencial custa R\$ (\d+) por mês/g)) confere('index.html', m[1], P.essencial.mensal, 'o preço da calculadora');
   for (const m of ix.matchAll(/Math\.ceil\((\d+) \/ val\)/g)) confere('index.html', m[1], P.essencial.mensal, 'a conta da calculadora');
-  for (const m of ix.matchAll(/"price":\s*"([\d.]+)"/g)) if (!planos.some(k => m[1] === P[k].mensal + '.00')) erro(`index.html: o preço ${m[1]} do JSON-LD não é uma mensalidade oficial (rxsync-sistema#79)`);
+  // JSON-LD (rxsync-sistema DEC-117): só as mensalidades, o anual à vista e a implantação oficiais.
+  const precoLd = t => num(t).toFixed(2);
+  const oficiaisLd = new Set([...planos.flatMap(k => [precoLd(P[k].mensal), precoLd(P[k].avista)]), precoLd(P.implantacao)]);
+  for (const m of ix.matchAll(/"price":\s*"([\d.]+)"/g)) if (!oficiaisLd.has(m[1])) erro(`index.html: o preço ${m[1]} do JSON-LD não é um preço oficial (rxsync-sistema#79)`);
+  for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { JSON.parse(m[1]); } catch (e) { erro(`index.html: JSON-LD inválido (${e.message})`); } }
+}
+// Fontes no próprio site (rxsync-sistema DEC-117): nenhuma página chama o Google Fonts, e todo arquivo citado no
+// assets/fontes/fontes.css existe.
+{
+  for (const f of todos.filter(f => /\.(html|css|js)$/.test(f))) if (/fonts\.(googleapis|gstatic)\.com/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: carrega fonte do Google; use /assets/fontes/fontes.css (DEC-117)`);
+  const css = 'assets/fontes/fontes.css';
+  if (!fs.existsSync(css)) erro(`${css}: não existe`);
+  else for (const m of fs.readFileSync(css, 'utf8').matchAll(/url\('([^']+)'\)/g)) if (!fs.existsSync(path.join('.', m[1]))) erro(`${css}: a fonte ${m[1]} não existe`);
+}
+// Página da exclusão da conta (rxsync-sistema DEC-114): noindex, nada de fora além do n8n, sem Google Analytics nem
+// chat, e nada guardado no navegador (o link do e-mail fica só na memória da página).
+{
+  const arq = 'conta-excluir.html';
+  if (!fs.existsSync(arq)) erro(`${arq}: não existe`);
+  else {
+    const s = fs.readFileSync(arq, 'utf8');
+    if (!/<meta name="robots" content="noindex, nofollow">/.test(s)) erro(`${arq}: falta noindex`);
+    if (/consentimento\.js|googletagmanager|gtag\(|chatwoot/i.test(s)) erro(`${arq}: sem Google Analytics e sem chat`);
+    for (const m of s.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)) erro(`${arq}: script de fora não pode (${m[1]})`);
+    if (/localStorage|sessionStorage|indexedDB|document\.cookie/.test(s)) erro(`${arq}: nada pode ficar guardado no navegador`);
+    if (!/conta_exclusao_ver/.test(s) || !/conta_exclusao_confirmar/.test(s)) erro(`${arq}: precisa de conta_exclusao_ver (ao abrir) e conta_exclusao_confirmar (no botão)`);
+  }
+  for (const f of ['conectar.html', 'autoedicao.html', 'onboarding.html', 'teste.html']) if (fs.existsSync(f) && !/<meta name="robots" content="noindex/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta noindex (página de cliente, DEC-117)`);
 }
 // Termos vigentes (rxsync-sistema#103): a Política e as outras páginas citam a versão mais nova dos Termos (o maior
 // termos/AAAA-MM-vN.html). Só avisa (não bloqueia): dá para publicar os Termos novos antes de trocar os links. O histórico
