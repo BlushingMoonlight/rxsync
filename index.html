@@ -6,7 +6,7 @@
 
     <!-- ===================== SEO BÁSICO ===================== -->
     <title>RXSync | Assistente virtual com IA no WhatsApp para clínicas</title>
-    <meta name="description" content="Assistente virtual com IA que atende os pacientes da sua clínica em segundos, 24h por dia, e agenda as consultas pelo WhatsApp. Teste 7 dias grátis. Conforme LGPD e CFM. Planos a partir de R$ 299/mês.">
+    <meta name="description" content="Assistente virtual com IA que atende os pacientes da sua clínica em segundos, 24h por dia, e agenda as consultas pelo WhatsApp. Teste 7 dias grátis, sem cartão. Planos a partir de R$ 299/mês.">
     <meta name="keywords" content="chatbot clinica medica, automacao whatsapp medico, inteligencia artificial saude, agendamento automatico, rxsync, secretaria digital">
     <meta name="author" content="RXSync Tecnologia e Automação em Saúde">
     <meta name="robots" content="index, follow">
@@ -41,22 +41,13 @@
     <link rel="icon" type="image/png" href="/assets/favicon-rxsync.png.PNG">
     <link rel="apple-touch-icon" href="/assets/favicon-rxsync.png.PNG">
 
-    <!-- ===================== GOOGLE ANALYTICS (GA4) RASTREIO DIRETO ===================== -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G5ZS8DRHNM"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-
-      // Script limpo e direto: rastreia imediatamente ao carregar a página
-      gtag('js', new Date());
-      gtag('config', 'G-G5ZS8DRHNM');
-    </script>
+    <!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112) -->
+    <script src="/assets/consentimento.js" defer></script>
 
     <!-- Fonte (a mesma do painel) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://app.rxsync.com.br" crossorigin>
 
     <style>
 :root {
@@ -82,6 +73,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 [id] { scroll-margin-top: calc(var(--header-h) + 12px); }
 .ancora { display: block; height: 0; }
 .sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pular:focus { position: fixed !important; top: 8px; left: 8px; z-index: 100; width: auto; height: auto; clip: auto; overflow: visible; padding: 12px 16px; border-radius: 10px; background: #fff; color: var(--ink); font-weight: 700; box-shadow: var(--sh-2); }
 .ic { width: 20px; height: 20px; flex-shrink: 0; }
 .ic-s { width: 16px; height: 16px; flex-shrink: 0; }
 .ic-l { width: 24px; height: 24px; flex-shrink: 0; }
@@ -102,8 +94,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* Botões */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 12px; border: 1px solid transparent; font-weight: 700; font-size: 16px; text-decoration: none; transition: background .15s, box-shadow .15s, transform .15s, border-color .15s; white-space: nowrap; }
 .btn:active { transform: translateY(1px); }
-.btn-prim { background: var(--brand); color: #fff; box-shadow: 0 8px 20px -8px rgba(5,150,105,.7); }
-.btn-prim:hover { background: var(--brand-h); }
+.btn-prim { background: var(--brand-h); color: #fff; box-shadow: 0 8px 20px -8px rgba(5,150,105,.7); }
+.btn-prim:hover { background: var(--brand-ink); }
 .btn-sec { background: #fff; color: var(--ink); border-color: var(--line-2); }
 .btn-sec:hover { border-color: var(--ink); }
 .btn-dark { background: var(--navy); color: #fff; }
@@ -161,11 +153,11 @@ ul { margin: 0; padding: 0; list-style: none; }
 .wa-topo { background: #f0f2f5; padding: 34px 14px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e3e6e8; }
 .wa-av { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
 .wa-nome { font-weight: 700; font-size: 15px; line-height: 1.2; }
-.wa-sub { font-size: 12px; color: #667781; }
+.wa-sub { font-size: 12px; color: #54656f; }
 .wa-corpo { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; background-color: #efeae2; background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 18px 18px; }
 .wa-dia { align-self: center; font-size: 11.5px; background: #fff; color: #54656f; padding: 4px 10px; border-radius: 8px; box-shadow: 0 1px .5px rgba(11,20,26,.13); }
 .b { max-width: 84%; padding: 7px 10px 6px; border-radius: 10px; font-size: 14px; line-height: 1.4; box-shadow: 0 1px .5px rgba(11,20,26,.13); position: relative; }
-.b small { display: block; text-align: right; font-size: 11px; color: #667781; margin-top: 2px; }
+.b small { display: block; text-align: right; font-size: 11px; color: #54656f; margin-top: 2px; }
 .b-in { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
 .b-out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 2px; }
 .b ul { margin: 4px 0; padding-left: 16px; list-style: disc; }
@@ -176,7 +168,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .anima .b { opacity: 0; transform: translateY(8px); transition: opacity .35s, transform .35s; }
 .anima .b.vis { opacity: 1; transform: none; }
 .wa-barra { background: #f0f2f5; padding: 8px 10px 14px; display: flex; gap: 8px; align-items: center; }
-.wa-campo { flex: 1; background: #fff; border-radius: 20px; padding: 9px 14px; font-size: 13.5px; color: #8696a0; }
+.wa-campo { flex: 1; background: #fff; border-radius: 20px; padding: 9px 14px; font-size: 13.5px; color: #667781; }
 .wa-env { width: 38px; height: 38px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; }
 .cartao-flut { position: absolute; background: #fff; border-radius: 14px; box-shadow: var(--sh-2); padding: 12px 14px; display: flex; gap: 10px; align-items: center; font-size: 13.5px; line-height: 1.35; border: 1px solid var(--line); }
 .cartao-flut strong { display: block; font-size: 14px; }
@@ -199,7 +191,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* Problema / números */
 .numeros { display: grid; gap: 16px; }
-@media (min-width: 900px) { .numeros { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+@media (min-width: 900px) { .numeros { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
 .numero { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; display: flex; flex-direction: column; }
 .numero .valor { font-size: 52px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; color: var(--brand); }
 .numero .valor small { font-size: 22px; letter-spacing: -0.02em; }
@@ -274,8 +266,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .zap-dono .wa-corpo { padding: 12px 10px; }
 .zap-dono .b { font-size: 13.5px; max-width: 90%; }
 .acoes-b { display: flex; gap: 6px; margin-top: 8px; }
-.acoes-b span { flex: 1; text-align: center; font-weight: 700; font-size: 13px; padding: 7px 0; border-radius: 8px; background: #f0f2f5; color: #027eb5; }
-.acoes-b span.sim { background: var(--brand); color: #fff; }
+.acoes-b span { flex: 1; text-align: center; font-weight: 700; font-size: 13px; padding: 7px 0; border-radius: 8px; background: #f0f2f5; color: #0369a1; }
+.acoes-b span.sim { background: var(--brand-h); color: #fff; }
 
 /* Equipe no controle */
 .controle { display: grid; gap: 16px; }
@@ -327,7 +319,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 @media (min-width: 1024px) { .planos { grid-template-columns: repeat(3, 1fr); } }
 .plano { background: #fff; border: 1px solid var(--line); border-radius: var(--r-xl); padding: 28px; display: flex; flex-direction: column; position: relative; }
 .plano.dest { border: 2px solid var(--brand); box-shadow: 0 24px 50px -24px rgba(5,150,105,.45); }
-.plano .fita { position: absolute; top: -13px; left: 28px; background: var(--brand); color: #fff; font-size: 12.5px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+.plano .fita { position: absolute; top: -13px; left: 28px; background: var(--brand-h); color: #fff; font-size: 12.5px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
 .plano h3 { font-size: 22px; }
 .plano .para { color: var(--ink-2); font-size: 15px; margin-top: 6px; min-height: 48px; }
 .preco { margin-top: 20px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
@@ -345,7 +337,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .planos-rodape { margin-top: 28px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; font-size: 14.5px; color: var(--ink-2); }
 .planos-rodape span { display: inline-flex; align-items: center; gap: 6px; }
 .planos-rodape .ic-s { color: var(--brand); }
-.nota-msg { max-width: 760px; margin: 24px auto 0; text-align: center; font-size: 14.5px; color: var(--ink-3); }
+.nota-msg { max-width: 760px; margin: 24px auto 0; text-align: center; font-size: 14.5px; color: var(--ink-2); }
 
 /* Depoimentos (escondido até ter depoimentos reais) */
 .depo { display: grid; gap: 20px; }
@@ -416,6 +408,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .rodape ul { display: grid; gap: 10px; }
 .rodape a { text-decoration: none; color: #b6c2d1; }
 .rodape a:hover { color: #fff; text-decoration: underline; }
+.link-rodape { background: none; border: 0; padding: 0; font: inherit; color: #b6c2d1; cursor: pointer; text-align: left; }
+.link-rodape:hover { color: #fff; text-decoration: underline; }
 .rodape-base { margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.1); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13.5px; color: #93a1b3; }
 
 /* Teste ao vivo (mini teste) */
@@ -701,7 +695,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           "name": "Como faço ajustes depois que ela estiver no ar?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pelo painel, que salva cada mudança na hora, ou chamando a nossa equipe pelo WhatsApp, sem limite de ajustes. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”."
+            "text": "Você mesmo ajusta pelo painel, que salva cada mudança na hora. Com a nossa equipe, você tem uma rodada de ajustes no 1º mês; depois, os ajustes são pelo painel. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”."
           }
         },
         {
@@ -717,7 +711,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           "name": "Existe risco de bloqueio do número de WhatsApp?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Existe, como em qualquer número de WhatsApp, automatizado ou não. Por isso nunca fazemos disparo em massa nem para listas frias, e recomendamos que a clínica tenha um número reserva. Se houver bloqueio, reconectamos a operação no número reserva em até 1 dia útil. Para quem quer risco ainda menor, oferecemos a migração para a API oficial da Meta, com o custo por conversa repassado."
+            "text": "Existe. A ligação do número da clínica à RXSync não é a conexão oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números ligados assim, mesmo com as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa nem para listas frias, e as mensagens automáticas (lembretes, retomada de conversa) vão só para quem já conversou com a clínica, em horário comercial e em volume limitado. Recomendamos que a clínica tenha um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho."
           }
         },
         {
@@ -765,7 +759,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           "name": "Onde os dados ficam e por onde eles passam?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Conversas, cadastro e agendamentos ficam em servidor no Brasil, em banco de dados sem exposição à internet, com acesso individual, autenticação em dois fatores e cópias de segurança criptografadas. Todo o tráfego é cifrado. Para gerar cada resposta, o trecho necessário da conversa vai ao provedor do modelo de IA, que fica no exterior, como em qualquer solução de IA hoje. Essa transferência está prevista em contrato, com base no art. 33 da LGPD e nas cláusulas-padrão da Resolução ANPD nº 19/2024, e o provedor não usa esses dados para treinar modelos."
+            "text": "A RXSync guarda conversas, cadastro e agendamentos como operadora, só para prestar o serviço, e apaga os dados da clínica 15 dias depois do fim do contrato ou do teste. Para gerar cada resposta, o provedor do modelo de IA, que fica no exterior, recebe a conversa e as informações da clínica necessárias. Os Termos de Uso (Anexo II) e a Política de Privacidade dizem quem são os fornecedores, o que cada um recebe e onde fica."
           }
         },
         {
@@ -773,7 +767,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           "name": "A assistente segue as regras do CFM?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sim. Ela se identifica como virtual, atua só no atendimento administrativo e passa para a equipe tudo o que exige o profissional, como pede a Resolução CFM nº 2.454/2026. O conteúdo que ela usa é aprovado pelo responsável técnico da clínica antes de entrar no ar."
+            "text": "Sim. Ela se identifica como virtual, atua só no atendimento administrativo e passa para a equipe tudo o que exige o profissional. A Resolução CFM nº 2.454/2026 classifica a IA de agendamento de consultas como de baixo risco e pede que o paciente saiba quando fala com uma IA. Pelos Termos de Uso, o conteúdo que ela usa é aprovado pelo responsável técnico da clínica antes de entrar no ar."
           }
         }
       ]
@@ -783,7 +777,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     </script>
 </head>
 <body>
-<a href="#conteudo" class="sr">Pular para o conteúdo</a>
+<a href="#conteudo" class="sr pular">Pular para o conteúdo</a>
 
 <!-- ===================== CABEÇALHO ===================== -->
 <header class="topo" id="topo">
@@ -870,7 +864,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Responde 24 horas, inclusive fins de semana</li>
     <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>Entende texto e áudio</li>
     <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>Agenda e lembretes inclusos</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>Dados armazenados no Brasil</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Sua equipe assume quando quiser</li>
   </ul>
 </div>
 
@@ -886,20 +880,14 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     <div class="numeros">
       <article class="numero">
         <div class="valor">8 <small>em cada 10</small></div>
-        <h3>brasileiros preferem falar com empresas por mensagem</h3>
+        <h3>consumidores brasileiros preferem falar com empresas por mensagem</h3>
         <p>O WhatsApp virou a porta de entrada da clínica. É ali que o paciente pergunta valor, convênio e horário.</p>
-        <p class="fonte">Fonte: <a href="https://whatsappbusiness.com/pt-br/resources/resource-library/business-messaging-brazil-bcg/" target="_blank" rel="noopener">estudo Meta e BCG sobre mensagens no Brasil</a></p>
-      </article>
-      <article class="numero">
-        <div class="valor">7x</div>
-        <h3>mais chance de avançar quando a resposta vem em até 1 hora</h3>
-        <p>Empresas que respondem um contato dentro da primeira hora têm quase 7 vezes mais chance de levar a conversa adiante do que as que demoram mais.</p>
-        <p class="fonte">Fonte: <a href="https://hbr.org/2011/03/the-short-life-of-online-sales-leads" target="_blank" rel="noopener">Harvard Business Review, 2011</a></p>
+        <p class="fonte">Fonte: <a href="https://whatsappbusiness.com/pt-br/resources/resource-library/business-messaging-brazil-bcg/" target="_blank" rel="noopener">pesquisa da Meta com o Boston Consulting Group</a></p>
       </article>
       <article class="numero">
         <div class="valor">25%</div>
-        <h3>menos faltas com lembrete por mensagem</h3>
-        <p>Pacientes que recebem lembrete da consulta faltam menos. Cada falta evitada é um horário que não fica vazio na sua agenda.</p>
+        <h3>menos faltas com lembrete por mensagem de texto</h3>
+        <p>Numa revisão de 21 estudos, as faltas caíram de 21% para 15% quando o paciente recebeu lembrete por mensagem de texto. Cada falta evitada é um horário que não fica vazio na sua agenda.</p>
         <p class="fonte">Fonte: <a href="https://bmjopen.bmj.com/content/6/10/e012116" target="_blank" rel="noopener">revisão sistemática publicada na BMJ Open, 2016</a></p>
       </article>
     </div>
@@ -1054,7 +1042,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><h3>Urgência vai para a equipe</h3><p>Quando o paciente relata uma situação que você definiu como urgência, ela para, orienta como você cadastrou e avisa a equipe na hora.</p></article>
       <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg></span><h3>Lista de espera <span class="tag tag-g">Gestão</span></h3><p>Quando alguém cancela, ela oferece o horário para quem está esperando uma vaga.</p></article>
       <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span><h3>Lê fotos e PDFs <span class="tag tag-g">Gestão</span></h3><p>Pedido de exame, carteirinha e guia: ela organiza os dados administrativos para a equipe, sem interpretar conteúdo clínico.</p></article>
-      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.17.76a.53.53 0 0 1 .29.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .29-.9l5.17-.76a2.12 2.12 0 0 0 1.6-1.16z"/></svg></span><h3>Pesquisa de satisfação <span class="tag tag-g">Gestão</span></h3><p>Depois da consulta, pergunta como foi. Quem dá nota alta recebe o convite para avaliar a clínica no Google.</p></article>
+      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.17.76a.53.53 0 0 1 .29.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .29-.9l5.17-.76a2.12 2.12 0 0 0 1.6-1.16z"/></svg></span><h3>Pesquisa de satisfação <span class="tag tag-g">Gestão</span></h3><p>Depois da consulta, pergunta como foi e convida o paciente a avaliar a clínica no Google, qualquer que seja a nota. Nota baixa avisa você na hora.</p></article>
     </div>
   </div>
 </section>
@@ -1146,7 +1134,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <div class="calc-res" aria-live="polite">
         <span class="rot">Consultas que podem estar ficando para trás</span>
         <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
-        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês. O plano Essencial custa R$ 299 por mês: <b id="r-paga">uma consulta</b> recuperada já paga a assinatura.</p>
+        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês. O plano Essencial custa R$ 299 por mês: <b id="r-paga">uma consulta recuperada já paga</b> a assinatura.</p>
         <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" onclick="return iniciarTeste('gestao', 'calculadora', event)">Testar 7 dias grátis</a>
         <p class="aviso">Estimativa feita com os números que você informou. Não é promessa de resultado.</p>
       </div>
@@ -1160,13 +1148,13 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     <div class="sec-head">
       <span class="eyebrow">Segurança e regras da saúde</span>
       <h2 class="h2" id="titulo-seg">Feita para a rotina e para as regras de uma clínica.</h2>
-      <p class="lead">Cada decisão técnica existe para proteger os seus pacientes e reduzir o risco para a sua clínica. E explicamos tudo antes de você contratar.</p>
+      <p class="lead">Explicamos tudo antes de você contratar: os Termos de Uso e a Política de Privacidade são públicos.</p>
     </div>
     <div class="seg">
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span><h3>Dados guardados no Brasil</h3><p>Conversas, cadastro e agendamentos ficam em servidor no Brasil, em banco de dados sem exposição à internet, com acesso individual, autenticação em dois fatores e cópias de segurança criptografadas. Todo o tráfego é cifrado.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><h3>IA com transferência prevista em contrato</h3><p>Para gerar cada resposta, só o trecho necessário da conversa vai ao provedor do modelo de IA, que fica no exterior, como em qualquer solução de IA hoje. Isso está previsto em contrato, com base no art. 33 da LGPD e na Resolução ANPD nº 19/2024, e o provedor não usa os dados para treinar modelos.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg></span><h3>Alinhada à Resolução CFM nº 2.454/2026</h3><p>A assistente se apresenta como virtual, atua só no atendimento administrativo e passa para a equipe tudo o que exige o profissional. Não interpreta exames, não orienta tratamento e não responde dúvidas clínicas.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><h3>LGPD e termos claros</h3><p>A clínica é a controladora dos dados e a RXSync, a operadora. Os <a href="/termos/2026-10-v5.html" target="_blank" rel="noopener">Termos de Uso</a> são públicos, com acordo de tratamento de dados, e você tem 7 dias para desistir sem custo. Veja também a <a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span><h3>Os dados são da sua clínica</h3><p>Pela LGPD, a clínica é a controladora dos dados dos pacientes e a RXSync, a operadora: usamos os dados só para prestar o serviço. Quando o contrato ou o teste termina, os dados da clínica são apagados 15 dias depois.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><h3>IA no exterior, com aviso</h3><p>Para responder, o provedor do modelo de IA, que fica no exterior, recebe a conversa e as informações da clínica necessárias para a resposta. Os Termos de Uso e a Política de Privacidade dizem quem são os fornecedores e onde cada um fica.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg></span><h3>Feita para a Resolução CFM nº 2.454/2026</h3><p>A assistente se apresenta como virtual na primeira mensagem, atua só no atendimento administrativo e passa para a equipe tudo o que exige o profissional. Não interpreta exames, não orienta tratamento e não responde dúvidas clínicas.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span><h3>Termos claros</h3><p>Os <a href="/termos/2026-10-v5.html" target="_blank" rel="noopener">Termos de Uso</a> são públicos, com o acordo de tratamento de dados, e você tem 7 dias para desistir, com devolução do que pagou. Veja também a <a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</p></article>
     </div>
   </div>
 </section>
@@ -1245,7 +1233,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>7 dias grátis, sem cartão</span>
       <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>7 dias para desistir sem custo</span>
       <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Muda de plano pelo painel</span>
-      <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Ajustes com a nossa equipe sem limite</span>
+      <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Uma rodada de ajustes no 1º mês; depois, pelo painel</span>
     </div>
     <p class="nota-msg">Contamos cada mensagem trocada entre a assistente e os pacientes. 5.000 por mês dão cerca de 166 por dia e costumam atender com folga um consultório com um ou dois profissionais. Se a clínica chegar perto do limite, avisamos antes, sem cobrança surpresa.</p>
   </div>
@@ -1344,7 +1332,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-2">Como faço ajustes depois que ela estiver no ar?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-2"><div><p>Pelo painel, que salva cada mudança na hora, ou chamando a nossa equipe pelo WhatsApp, sem limite de ajustes. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”.</p></div></div>
+          <div class="faq-content" id="faq-r-2-2"><div><p>Você mesmo ajusta pelo painel, que salva cada mudança na hora. Com a nossa equipe, você tem uma rodada de ajustes no 1º mês; depois, os ajustes são pelo painel. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”.</p></div></div>
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-3">Divido a clínica com outros profissionais. A assistente pode atender só o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1352,7 +1340,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-4">Existe risco de bloqueio do número de WhatsApp?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-4"><div><p>Existe, como em qualquer número de WhatsApp, automatizado ou não. Por isso nunca fazemos disparo em massa nem para listas frias, e recomendamos que a clínica tenha um número reserva. Se houver bloqueio, reconectamos a operação no número reserva em até 1 dia útil. Para quem quer risco ainda menor, oferecemos a migração para a API oficial da Meta, com o custo por conversa repassado.</p></div></div>
+          <div class="faq-content" id="faq-r-2-4"><div><p>Existe. A ligação do número da clínica à RXSync não é a conexão oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números ligados assim, mesmo com as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa nem para listas frias, e as mensagens automáticas (lembretes, retomada de conversa) vão só para quem já conversou com a clínica, em horário comercial e em volume limitado. Recomendamos que a clínica tenha um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-3" role="tabpanel" aria-labelledby="faq-tab-3">
@@ -1380,11 +1368,11 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-4-1">Onde os dados ficam e por onde eles passam?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-1"><div><p>Conversas, cadastro e agendamentos ficam em servidor no Brasil, em banco de dados sem exposição à internet, com acesso individual, autenticação em dois fatores e cópias de segurança criptografadas. Todo o tráfego é cifrado. Para gerar cada resposta, o trecho necessário da conversa vai ao provedor do modelo de IA, que fica no exterior, como em qualquer solução de IA hoje. Essa transferência está prevista em contrato, com base no art. 33 da LGPD e nas cláusulas-padrão da Resolução ANPD nº 19/2024, e o provedor não usa esses dados para treinar modelos.</p></div></div>
+          <div class="faq-content" id="faq-r-4-1"><div><p>A RXSync guarda conversas, cadastro e agendamentos como operadora, só para prestar o serviço, e apaga os dados da clínica 15 dias depois do fim do contrato ou do teste. Para gerar cada resposta, o provedor do modelo de IA, que fica no exterior, recebe a conversa e as informações da clínica necessárias. Os Termos de Uso (Anexo II) e a Política de Privacidade dizem quem são os fornecedores, o que cada um recebe e onde fica.</p></div></div>
         </div>
         <div class="faq-item">
           <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-4-2">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-2"><div><p>Sim. Ela se identifica como virtual, atua só no atendimento administrativo e passa para a equipe tudo o que exige o profissional, como pede a Resolução CFM nº 2.454/2026. O conteúdo que ela usa é aprovado pelo responsável técnico da clínica antes de entrar no ar.</p></div></div>
+          <div class="faq-content" id="faq-r-4-2"><div><p>Sim. Ela se identifica como virtual, atua só no atendimento administrativo e passa para a equipe tudo o que exige o profissional. A Resolução CFM nº 2.454/2026 classifica a IA de agendamento de consultas como de baixo risco e pede que o paciente saiba quando fala com uma IA. Pelos Termos de Uso, o conteúdo que ela usa é aprovado pelo responsável técnico da clínica antes de entrar no ar.</p></div></div>
         </div>
       </div>
       <p class="faq-mais">Não achou sua pergunta? <button type="button" onclick="trackCta('faq_perguntar_chat'); abrirChat()">Pergunte para a assistente no chat</button></p>
@@ -1401,7 +1389,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <ul class="lista-check">
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Sem cartão de crédito</strong> para começar o teste.</span></li>
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Cadastro guiado</strong> de cerca de 10 minutos, ou fazemos junto com você.</span></li>
-        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Suporte pelo WhatsApp</strong> com a nossa equipe, sem limite de ajustes.</span></li>
+        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Uma rodada de ajustes</strong> com a nossa equipe no 1º mês; depois, você mesmo ajusta pelo painel.</span></li>
       </ul>
       <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" onclick="return iniciarTeste('gestao', 'final', event)">Testar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
     </div>
@@ -1467,11 +1455,12 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           <li><a href="mailto:contato@rxsync.com.br">contato@rxsync.com.br</a></li>
           <li><a href="/termos/2026-10-v5.html" target="_blank" rel="noopener">Termos de Uso</a></li>
           <li><a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></li>
+          <li><button type="button" class="link-rodape" onclick="if (window.rxCookies) rxCookies.reabrir()">Preferências de cookies</button></li>
         </ul>
       </div>
     </div>
     <div class="rodape-base">
-      <span>© 2026 RXSync Tecnologia e Automação em Saúde · CNPJ 52.970.673/0001-78</span>
+      <span>© 2026 RXSync Tecnologia e Automação em Saúde · 52.970.673 LUAN DUARTE CAVALHEIRO · CNPJ 52.970.673/0001-78 · contato@rxsync.com.br</span>
       <span>made in floripa 🇧🇷</span>
     </div>
   </div>
@@ -1496,9 +1485,24 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     // Ciclo de pagamento escolhido na tabela de planos (mensal ou anual)
     var cicloAtual = 'mensal';
 
+    // Origem da prospecção (rxsync-sistema DEC-111): o código ?ref=PX-XXXXX do link da assistente fica guardado na aba
+    // (só o código) e volta junto para o contratar.html, para o cadastro continuar contando como prospecção.
+    var REF_PROSP = (function () {
+        var valido = function (r) { r = String(r || '').trim().toUpperCase(); return /^PX-[ACDEFGHJKMNPQRTUVWXY3479]{5}$/.test(r) ? r : ''; };
+        var r = valido(new URLSearchParams(location.search).get('ref'));
+        try { if (r) sessionStorage.setItem('rx_ref', r); else r = valido(sessionStorage.getItem('rx_ref')); } catch (e) { /* aba privada */ }
+        return r;
+    })();
+    function urlContratar(plano) {
+        return '/contratar.html?plano=' + plano + '&ciclo=' + cicloAtual + (REF_PROSP ? '&ref=' + REF_PROSP : '');
+    }
+    if (REF_PROSP) document.querySelectorAll('a[href^="/contratar.html"]').forEach(function (a) {
+        if (!/[?&]ref=/.test(a.getAttribute('href'))) a.href = a.getAttribute('href') + '&ref=' + REF_PROSP;
+    });
+
     // Leva para a contratação com 7 dias grátis. Marque "iniciar_teste" como conversão no Google Ads.
     function iniciarTeste(plano, origem, ev) {
-        var url = '/contratar.html?plano=' + plano + '&ciclo=' + cicloAtual;
+        var url = urlContratar(plano);
         trackCta(origem + '_testar_gratis');
         evento('iniciar_teste', { 'plan_selected': plano, 'ciclo': cicloAtual, 'origem': origem, 'transport_type': 'beacon' });
         if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button === 1)) return true; // abrir em nova aba
@@ -1509,7 +1513,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     function irParaContratacao(plano, rotulo) {
         evento('click_cta_plano', { 'plan_selected': rotulo, 'ciclo': cicloAtual });
         evento('iniciar_teste', { 'plan_selected': plano, 'ciclo': cicloAtual, 'origem': 'planos', 'transport_type': 'beacon' });
-        window.location.href = '/contratar.html?plano=' + plano + '&ciclo=' + cicloAtual;
+        window.location.href = urlContratar(plano);
     }
 
     function setCiclo(ciclo) {
@@ -1540,20 +1544,11 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         setTimeout(function () { var n = document.getElementById('nome'); if (n) n.focus({ preventScroll: true }); }, 600);
     }
 
-    // Link de suporte (rxsync.com.br/?suporte=1, usado na página de teste do cliente): abre o chat da RXSync sozinho
-    window.addEventListener('chatwoot:ready', function () {
-        if (/[?&]suporte=1\b/.test(location.search) && window.$chatwoot) {
-            evento('abrir_suporte', { 'event_category': 'suporte' });
-            window.$chatwoot.toggle('open');
-        }
-    });
-
-    // Abre o widget do Chatwoot
+    // Abre o chat da RXSync. O chat só carrega quando a pessoa pede (assets/consentimento.js, DEC-112); o link de
+    // suporte (rxsync.com.br/?suporte=1, da página de teste do cliente) também abre o chat sozinho, lá.
     function abrirChat() {
         evento('abrir_chat_demo');
-        if (window.$chatwoot && typeof window.$chatwoot.toggle === 'function') {
-            window.$chatwoot.toggle('open');
-        }
+        if (window.rxChat) window.rxChat.abrir();
     }
 
     // ===================== FAQ =====================
@@ -1697,7 +1692,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
             document.getElementById('r-valor').textContent = brl(consultas * val);
             document.getElementById('r-cons').textContent = consultas + (consultas === 1 ? ' consulta' : ' consultas');
             var paga = Math.ceil(299 / val);
-            document.getElementById('r-paga').textContent = paga === 1 ? 'uma consulta' : paga + ' consultas';
+            document.getElementById('r-paga').textContent = paga === 1 ? 'uma consulta recuperada já paga' : paga + ' consultas recuperadas já pagam';
             if (ev && !usou) { usou = true; evento('usar_calculadora', { 'event_category': 'engajamento' }); }
         }
         [msgs, taxa, valor].forEach(function (el) { el.addEventListener('input', calcular); });
@@ -1955,21 +1950,5 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     }
     </script>
 
-    <!-- Chatwoot - widget de atendimento RXSync -->
-    <script>
-        (function (d, t) {
-            var BASE_URL = "https://app.rxsync.com.br";
-            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-            g.src = BASE_URL + "/packs/js/sdk.js";
-            g.async = true;
-            s.parentNode.insertBefore(g, s);
-            g.onload = function () {
-                window.chatwootSDK.run({
-                    websiteToken: 'umo8eLwQSe9QsAzdQAMKAQVu',
-                    baseUrl: BASE_URL
-                });
-            };
-        })(document, "script");
-    </script>
 </body>
 </html>

@@ -49,7 +49,7 @@
 <header class="bg-primary-900 text-white sticky top-0 z-20">
   <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
     <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-    <a href="/#precos" class="text-xs text-white/70 hover:text-white">Voltar aos planos</a>
+    <a href="/#precos" id="voltarPlanos" class="text-xs text-white/70 hover:text-white">Voltar aos planos</a>
   </div>
 </header>
 
@@ -68,7 +68,7 @@
       </div>
       <div id="blocoForma" class="hidden grid-cols-2 gap-2 mb-3">
         <button type="button" data-forma="parcelado" class="btnForma text-xs font-bold py-2.5 rounded-lg border-2">Parcelado em 12x</button>
-        <button type="button" data-forma="avista" class="btnForma text-xs font-bold py-2.5 rounded-lg border-2">À vista <span class="text-emerald-600">(10 pelo preço de 12)</span></button>
+        <button type="button" data-forma="avista" class="btnForma text-xs font-bold py-2.5 rounded-lg border-2">À vista <span class="text-emerald-600">(12 meses pelo preço de 10)</span></button>
       </div>
     </div>
 
@@ -215,14 +215,8 @@
   </section>
 </main>
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G5ZS8DRHNM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-G5ZS8DRHNM');
-</script>
+<!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112) -->
+<script src="/assets/consentimento.js"></script>
 
 <script>
 const WEBHOOK = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cadastro';
@@ -312,10 +306,15 @@ let tipo  = 'pj';
 let etapa = 1;
 const INICIO = Date.now();
 // Prospecção (DEC-082): o link que a assistente da RXSync manda traz ?ref=PX-XXXXX. Só esse código (sem dado pessoal) vai
-// junto do cadastro, para saber que o cadastro veio da prospecção, e o clique avisa o servidor uma vez. Fica só na memória.
-const REF_PROSP = (() => { const r = String(q.get('ref') || '').trim().toUpperCase(); return /^PX-[ACDEFGHJKMNPQRTUVWXY3479]{5}$/.test(r) ? r : ''; })();
+// junto do cadastro, para saber que o cadastro veio da prospecção, e o clique avisa o servidor uma vez.
+// Desde a DEC-111, o código também fica guardado na aba (sessionStorage 'rx_ref', só o código): quem volta à página inicial
+// ("Voltar aos planos") e segue de novo para cá continua contando como prospecção. O clique só é avisado na primeira vez.
+const REF_VALIDO = r => { r = String(r || '').trim().toUpperCase(); return /^PX-[ACDEFGHJKMNPQRTUVWXY3479]{5}$/.test(r) ? r : ''; };
+const REF_GUARDADO = (() => { try { return REF_VALIDO(sessionStorage.getItem('rx_ref')); } catch (e) { return ''; } })();
+const REF_PROSP = REF_VALIDO(q.get('ref')) || REF_GUARDADO;
+if (REF_PROSP) { try { sessionStorage.setItem('rx_ref', REF_PROSP); } catch (e) { /* aba privada */ } document.getElementById('voltarPlanos').href = '/?ref=' + REF_PROSP + '#precos'; }
 const ORIGEM_CADASTRO = REF_PROSP ? 'prospeccao ' + REF_PROSP : (document.referrer || 'direto');
-if (REF_PROSP) fetch('https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/prospeccao-clique', { method: 'POST', keepalive: true,
+if (REF_PROSP && REF_PROSP !== REF_GUARDADO) fetch('https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/prospeccao-clique', { method: 'POST', keepalive: true,
   headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE }, body: JSON.stringify({ ref: REF_PROSP }) }).catch(() => {});
 let CLIENTE_ID = '';
 let LEAD_ENVIADO = false;
