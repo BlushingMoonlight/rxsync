@@ -2,16 +2,17 @@
 //   1. sem sessão: e-mail + senha → código → o painel abre com a sessão no cabeçalho x-rxsync-painel, sem token;
 //   2. "Lembrar este aparelho": a lembrança fica no aparelho e, numa aba nova, o painel abre sem senha (retomar);
 //   3. Sair: encerra a sessão, esquece o aparelho e volta para a entrada;
-//   4. link antigo (?t=): o painel abre com a faixa "Crie sua senha"; criar a senha pede os Termos v5 e tira o ?t=;
+//   4. link antigo (?t=): o painel abre com a faixa "Crie sua senha"; criar a senha pede os Termos v6 e tira o ?t=;
 //   5. Conta › WhatsApp › Reconectar: o código aparece na tela e some quando conecta;
-//   6. sessão vencida (resposta "entrar"): volta para a entrada com o aviso.
+//   6. sessão vencida (resposta "entrar"): volta para a entrada com o aviso;
+//   7. Termos atualizados (rxsync-sistema DEC-113): o painel pergunta (termos_estado) e mostra a faixa; aceitar pede a caixa.
 // No navegador, só 'painel_sessao' (sessionStorage) e 'painel_lembranca' (localStorage).
 // Uso (precisa do Playwright): node scripts/painel_entrada.mjs
 import { abrirNavegador, servirSite, qrDeMentira } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const SESSAO = 'a'.repeat(64), LEMBRANCA = 'c'.repeat(64), LEMBRANCA2 = 'd'.repeat(64), TOKEN = 'PnlAabcdefghijkmnopqrstuvwxy';
-const chamadas = []; const estado = { vencida: false, conectarVoltas: 0 };
+const chamadas = []; const estado = { vencida: false, conectarVoltas: 0, termosPendente: false };
 function responder(url, h, b) {
   const caminho = url.slice(N8N.length);
   chamadas.push({ caminho, acao: b.acao, sessao: h['x-rxsync-painel'] || '', token: b.token || '', dados: b.dados || {} });
@@ -21,7 +22,9 @@ function responder(url, h, b) {
     if (b.acao === 'entrar_codigo') return d.codigo === '123456' ? { ok: true, sessao: SESSAO, lembranca: d.lembrar ? LEMBRANCA : null } : { ok: false, mensagem: 'E-mail, senha ou código não conferem.' };
     if (b.acao === 'retomar') return d.lembranca === LEMBRANCA ? { ok: true, sessao: SESSAO, lembranca: LEMBRANCA2 } : { ok: false, esquecer: true, mensagem: 'Entre com o e-mail e a senha.' };
     if (b.acao === 'senha_pedir_link') return { ok: true, desafio: 'f'.repeat(48), primeira: true, mensagem: 'Mandamos um código para o e-mail do cadastro (n•••@clinica.test).' };
-    if (b.acao === 'senha_nova') return d.aceite_termos === true && d.versao_termos === '2026-10-v5' ? { ok: true, sessao: SESSAO, primeira: true, lembranca: null } : { ok: false, termos: true, mensagem: 'Marque os Termos.' };
+    if (b.acao === 'senha_nova') return d.aceite_termos === true && d.versao_termos === '2026-10-v6' ? { ok: true, sessao: SESSAO, primeira: true, lembranca: null } : { ok: false, termos: true, mensagem: 'Marque os Termos.' };
+    if (b.acao === 'termos_estado') return estado.termosPendente ? { ok: true, pendente: true, versao: '2026-10-v6', clientes_desde_texto: '20 de novembro de 2026' } : { ok: true, pendente: false, versao: '2026-10-v6' };
+    if (b.acao === 'termos_aceitar') { estado.termosPendente = false; return d.aceite_termos === true && d.versao_termos === '2026-10-v6' ? { ok: true, pendente: false } : { ok: false, mensagem: 'Marque.' }; }
     return { ok: true, sair: b.acao === 'sair' };
   }
   if (caminho === 'conectar') {
@@ -106,7 +109,7 @@ ok(!chamadas.some(c => c.caminho === 'conectar' && c.token === TOKEN && c.acao =
 await page.evaluate(() => { location.hash = 'hoje'; });
 await page.click('#btnFaixaSenha');
 await page.locator('#entNova').waitFor({ state: 'visible' });
-ok(await page.locator('#entTermosRot').isVisible(), 'criar a senha: pede o aceite dos Termos v5');
+ok(await page.locator('#entTermosRot').isVisible(), 'criar a senha: pede o aceite dos Termos v6');
 await page.fill('#entCodNova', '654321'); await page.fill('#entSenhaNova', 'uma-senha-boa-1'); await page.fill('#entSenhaNova2', 'uma-senha-boa-1');
 await page.click('#entNova button[type=submit]');
 await page.getByText('Marque que leu e aceita').waitFor();
@@ -115,8 +118,23 @@ await page.check('#entTermos'); await page.click('#entNova button[type=submit]')
 await page.waitForURL(u => !u.search.includes('t='));
 await page.locator('#app').waitFor({ state: 'visible' });
 const sn = chamadas.find(c => c.acao === 'senha_nova');
-ok(sn && sn.dados.aceite_termos === true && sn.dados.versao_termos === '2026-10-v5' && !('_ua' in sn.dados), 'senha criada com o aceite dos Termos v5; o endereço perde o ?t=');
+ok(sn && sn.dados.aceite_termos === true && sn.dados.versao_termos === '2026-10-v6' && !('_ua' in sn.dados), 'senha criada com o aceite dos Termos v6; o endereço perde o ?t=');
 ok(chamadas.filter(c => c.acao === 'abrir').pop().sessao === SESSAO, 'depois de criar a senha, o painel abre pela sessão');
+
+// 7. Termos atualizados
+estado.termosPendente = true;
+await page.reload();
+await page.locator('#faixaTermos').waitFor({ state: 'visible' });
+ok(chamadas.some(c => c.acao === 'termos_estado' && c.sessao === SESSAO), 'Termos atualizados: o painel pergunta com a sessão e mostra a faixa');
+await page.click('#btnTermosAceitar');
+await page.getByText('Marque que leu e aceita os Termos').waitFor();
+ok(!chamadas.some(c => c.acao === 'termos_aceitar'), 'sem marcar a caixa, não manda o aceite');
+await page.check('#termosOk'); await page.click('#btnTermosAceitar');
+await page.locator('#faixaTermos').waitFor({ state: 'hidden' });
+const ta = chamadas.find(c => c.acao === 'termos_aceitar');
+ok(ta && ta.sessao === SESSAO && ta.dados.versao_termos === '2026-10-v6' && ta.dados.aceite_termos === true, 'aceite da v6 mandado com a sessão; a faixa some');
+await page.reload(); await page.locator('#app').waitFor({ state: 'visible' }); await page.waitForTimeout(400);
+ok(await page.locator('#faixaTermos').isHidden(), 'depois do aceite, a faixa não volta');
 
 // 6. sessão vencida
 estado.vencida = true;
@@ -126,5 +144,5 @@ await page.getByText('Sua entrada venceu').waitFor();
 ok(!(await guardado(page)).sessao.length, 'sessão vencida: volta para a entrada com o aviso');
 ok(!erros.length, 'sem erro de script na página' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await browser.close(); site.fechar();
-console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: entrada com e-mail, senha e código, aparelho lembrado, sair, link antigo, Reconectar e sessão vencida.');
+console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: entrada com e-mail, senha e código, aparelho lembrado, sair, link antigo, Reconectar, Termos atualizados e sessão vencida.');
 process.exit(falhas ? 1 : 0);

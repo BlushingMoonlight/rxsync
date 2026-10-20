@@ -329,6 +329,13 @@
   .ent .msg.erro { color: var(--rose-ink); font-weight: 600; }
   .faixa-senha { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
   .faixa-senha p { margin: 0; flex: 1 1 260px; }
+  /* Termos atualizados (rxsync-sistema DEC-113): aceite da versão nova por quem já é cliente */
+  .faixa-termos { display: grid; gap: 10px; }
+  .faixa-termos p { margin: 0; }
+  .faixa-termos a { font-weight: 700; color: inherit; }
+  .faixa-termos .marcar { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 1.45; cursor: pointer; }
+  .faixa-termos .marcar input { width: 22px; height: 22px; flex: none; margin: 0; accent-color: var(--brand); }
+  .faixa-termos .acoes { display: flex; flex-wrap: wrap; gap: 8px; }
   #zapQrImg { display: block; width: 100%; max-width: 280px; height: auto; margin: 6px auto 12px; image-rendering: pixelated; }
 </style>
 </head>
@@ -369,7 +376,7 @@
       <input id="entSenhaNova" type="password" autocomplete="new-password">
       <label class="campo" for="entSenhaNova2">Repita a senha</label>
       <input id="entSenhaNova2" type="password" autocomplete="new-password">
-      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a href="/termos/2026-10-v5.html" target="_blank" rel="noopener">Termos de Uso</a>, versão 2026-10-v5.</span></label>
+      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a href="/termos/2026-10-v6.html" target="_blank" rel="noopener">Termos de Uso</a>, versão 2026-10-v6.</span></label>
       <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit" style="margin-top:16px">Salvar a senha e entrar</button>
       <div class="links"><button type="button" data-ent="voltar">Voltar</button></div>
@@ -400,6 +407,11 @@
     <!-- ================= HOJE ================= -->
     <section data-view="hoje" hidden>
       <div id="faixaSenha" class="aviso ambar faixa-senha" hidden><p><strong>Crie sua senha.</strong> O painel agora abre com o e-mail e a senha da clínica. Ao criar a senha, este link deixa de funcionar.</p><button type="button" id="btnFaixaSenha" class="btn pri">Criar minha senha</button></div>
+      <div id="faixaTermos" class="aviso ambar faixa-termos" role="region" aria-label="Termos de Uso atualizados" hidden>
+        <p><strong>Os Termos de Uso mudaram (versão 2026-10-v6).</strong> A equipe pode responder os pacientes pelo mesmo número (a assistente pausa sozinha naquela conversa), a importação de pacientes por planilha está disponível e o texto dos acessos administrativos foi atualizado. Valem para a sua clínica a partir de <span id="termosData">20 de novembro de 2026</span>, ou antes, se você aceitar agora. <a href="/termos/2026-10-v6.html" target="_blank" rel="noopener">Ler os Termos</a></p>
+        <label class="marcar"><input id="termosOk" type="checkbox"><span>Li e aceito os Termos de Uso, versão 2026-10-v6.</span></label>
+        <div class="acoes"><button type="button" id="btnTermosAceitar" class="btn pri">Aceitar</button><button type="button" id="btnTermosDepois" class="btn">Ver depois</button></div>
+      </div>
       <h1 class="saud" id="hojeSaud">Olá</h1>
       <div class="data-hoje" id="hojeData"></div>
       <div id="hojeEstado"></div>
@@ -666,7 +678,7 @@
           <button type="button" data-ir="conta/contrato"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Dados do contrato</span><span class="t2">Razão social, CNPJ e representante</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
         <div class="lista" style="margin-top:14px">
-          <a href="/termos/2026-10-v5.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span><span class="tx"><span class="t1">Termos de Uso</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
+          <a href="/termos/2026-10-v6.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span><span class="tx"><span class="t1">Termos de Uso</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
           <a href="/privacidade.html" target="_blank" rel="noopener"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Política de Privacidade</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
           <a href="mailto:contato@rxsync.com.br"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg></span><span class="tx"><span class="t1">Falar com a RXSync</span><span class="t2">contato@rxsync.com.br</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></a>
         </div>
@@ -776,7 +788,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   // cabeçalho x-rxsync-painel de todos os pedidos; "Lembrar este aparelho" guarda só a lembrança (localStorage), que muda
   // a cada uso. O link antigo (?t=) ainda abre o painel, com a faixa "Crie sua senha", até a clínica criar a senha. =====
   var ENTRADA_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/painel-entrada";
-  var VERSAO_TERMOS = "2026-10-v5";
+  var VERSAO_TERMOS = "2026-10-v6";
   var nav = navigator.userAgent;
   var APARELHO = /iPad/.test(nav) || (/Macintosh/.test(nav) && navigator.maxTouchPoints > 1) ? "iPad" : /iPhone/.test(nav) ? "iPhone" : /Android/.test(nav) ? "Android" : /Macintosh/.test(nav) ? "Mac" : /Windows/.test(nav) ? "Windows" : "Linux";
   var EH_APP = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
@@ -817,6 +829,24 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     el("entTitulo").textContent = titulo; el("entSub").textContent = sub;
     entMsg(msg || "", erro);
     var p = el(id).querySelector("input"); if (p) setTimeout(function () { try { p.focus(); } catch (e) {} }, 30);
+  }
+  // Termos atualizados (rxsync-sistema DEC-113): o 29 diz se a clínica ainda não aceitou a versão vigente. "Ver depois"
+  // só esconde nesta abertura; depois da vigência, o servidor grava o aceite tácito (cláusula 20.4) e não pergunta mais.
+  function termosConferir() {
+    entChamar("termos_estado").then(function (r) {
+      if (!r || !r.ok || !r.pendente || r.versao !== VERSAO_TERMOS) return;
+      if (r.clientes_desde_texto) el("termosData").textContent = r.clientes_desde_texto;
+      el("faixaTermos").hidden = false;
+    });
+  }
+  function termosAceitar() {
+    if (!el("termosOk").checked) { toast("Marque que leu e aceita os Termos de Uso."); el("termosOk").focus(); return; }
+    var b = el("btnTermosAceitar"); b.disabled = true;
+    entChamar("termos_aceitar", { aceite_termos: true, versao_termos: VERSAO_TERMOS }).then(function (r) {
+      b.disabled = false;
+      if (r && r.ok) { el("faixaTermos").hidden = true; toast("Pronto: aceite dos Termos registrado."); }
+      else toast((r && r.mensagem) || "Não consegui registrar agora. Tente de novo.");
+    });
   }
   function entMsg(t, erro) { var m = el("entMsg"); m.textContent = t || ""; m.className = "msg" + (erro ? " erro" : ""); }
   function entOcupado(form, sim) { form.querySelectorAll("button, input").forEach(function (x) { x.disabled = sim; }); }
@@ -913,6 +943,8 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     });
   });
   // Faixa "Crie sua senha" (link antigo): o código vai para o e-mail do cadastro da clínica do link.
+  el("btnTermosAceitar").addEventListener("click", termosAceitar);
+  el("btnTermosDepois").addEventListener("click", function () { el("faixaTermos").hidden = true; });
   el("btnFaixaSenha").addEventListener("click", function () {
     var b = el("btnFaixaSenha"); b.disabled = true;
     entChamar("senha_pedir_link", { token: token }).then(function (r) {
@@ -1469,7 +1501,7 @@ function partesTz(ms) {
   // ---------- Pagamento › Asaas da clínica (DEC-092, workflow 32) ----------
   // A chave vai uma vez, ao conectar, e nunca volta: a tela só mostra a situação. Conectar exige o "li e concordo" dos
   // Termos vigentes (o servidor confere a versão).
-  var PAG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/pagamento-clinica", TERMOS_ASAAS = "2026-10-v5";
+  var PAG_WEBHOOK = "https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/pagamento-clinica", TERMOS_ASAAS = "2026-10-v6";
   function pagChamar(acao, dados) {
     return fetch(PAG_WEBHOOK, { method: "POST", headers: cab(), body: JSON.stringify({ acao: acao, token: token, dados: dados || {} }) }).then(lerJson);
   }
@@ -1501,7 +1533,7 @@ function partesTz(ms) {
     var ch = h$("input"); ch.type = "password"; ch.id = "asaasChave"; ch.autocomplete = "off"; ch.maxLength = 300; ch.placeholder = "$aact_prod_..."; box.appendChild(ch);
     var lt = h$("label", "opc"), cb = h$("input"); cb.type = "checkbox";
     lt.appendChild(cb); lt.appendChild(document.createTextNode(" Li e concordo com os "));
-    var a = h$("a", "", "Termos de Uso, versão " + TERMOS_ASAAS); a.href = "/termos/2026-10-v5.html"; a.target = "_blank"; a.rel = "noopener"; lt.appendChild(a);
+    var a = h$("a", "", "Termos de Uso, versão " + TERMOS_ASAAS); a.href = "/termos/2026-10-v6.html"; a.target = "_blank"; a.rel = "noopener"; lt.appendChild(a);
     lt.appendChild(document.createTextNode(" (item 9.2 do Anexo II: a conta de pagamentos da clínica)."));
     box.appendChild(lt);
     var msg = h$("div"); box.appendChild(msg);
@@ -4058,6 +4090,7 @@ function partesTz(ms) {
     if (!resp.ok) { if (!resp.entrar) mostrarErro(resp.mensagem || "O painel não abriu. Entre de novo com o e-mail e a senha."); return; }
     el("app").hidden = false;
     if (token) el("faixaSenha").hidden = false;   // link antigo: convida a criar a senha (DEC-097)
+    if (sessao) termosConferir();                  // Termos novos para quem já é cliente (DEC-113)
     el("btnSair").classList.remove("hidden");
     calMostrar(); gradeCarregar(); agCarregar();
 
