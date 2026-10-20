@@ -37,18 +37,9 @@
 <link rel="icon" type="image/png" href="assets/favicon-rxsync.png.PNG">
 <link rel="apple-touch-icon" href="assets/favicon-rxsync.png.PNG">
 
-<!-- Analytics. O endereço é reescrito sem a query porque o ?t= é o token
-     do link mágico: mandá-lo ao Google seria vazar a credencial da cliente. -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G5ZS8DRHNM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-G5ZS8DRHNM', {
-    page_location: location.origin + location.pathname,
-    page_path: location.pathname
-  });
-</script>
+<!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112). data-ga-sem-query: o endereço
+     vai ao Google sem a query, porque o ?t= é o token do link mágico (mandá-lo seria vazar a credencial da cliente). -->
+<script src="/assets/consentimento.js" data-ga-sem-query defer></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -929,23 +920,5 @@ async function abrir() {
 abrir();
 </script>
 
-<!-- Chatwoot — widget da inbox de clínica (CLI-000, inbox 1).
-     Também está no conectar.html. Aqui porque é um formulário de 10 minutos
-     e a cliente pode travar no meio. -->
-<script>
-(function (d, t) {
-  var BASE_URL = "https://app.rxsync.com.br";
-  var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-  g.src = BASE_URL + "/packs/js/sdk.js";
-  g.async = true;
-  s.parentNode.insertBefore(g, s);
-  g.onload = function () {
-    window.chatwootSDK.run({
-      websiteToken: 'umo8eLwQSe9QsAzdQAMKAQVu',
-      baseUrl: BASE_URL
-    });
-  };
-})(document, "script");
-</script>
 </body>
 </html>
