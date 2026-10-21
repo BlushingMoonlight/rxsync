@@ -117,7 +117,7 @@
     const fecharJ = () => { veu.remove(); document.removeEventListener('keydown', tecla); if (origem && origem.isConnected) origem.focus(); };
     const tecla = e => { if (e.key === 'Escape') fecharJ(); };
     const caixa = el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-label': titulo },
-      el('div', { class: 'linha-h' }, el('h2', { class: 'cresce', text: titulo }), el('button', { class: 'botao sec', type: 'button', 'aria-label': 'Fechar', onclick: () => fecharJ() }, '✕')),
+      el('div', { class: 'linha-h' }, el('h2', { class: 'cresce', text: titulo }), el('button', { class: 'botao sec quadrado', type: 'button', 'aria-label': 'Fechar', onclick: () => fecharJ() }, window.DEMO_ICONE('fechar'))),
       ...conteudo);
     veu.append(caixa); veu.addEventListener('click', e => { if (e.target === veu) fecharJ(); });
     document.body.append(veu); document.addEventListener('keydown', tecla);
@@ -213,7 +213,7 @@
   function topo(sub, voltar) {
     const d = est.dados || {};
     return el('header', { class: 'topo' }, el('div', { class: 'dentro' },
-      voltar ? el('a', { class: 'voltar', href: link(voltar), 'aria-label': 'Voltar para a entrada' }, '←') : null,
+      voltar ? el('a', { class: 'voltar', href: link(voltar), 'aria-label': 'Voltar para a entrada' }, window.DEMO_ICONE('voltar')) : null,
       el('div', { class: 'selo', 'aria-hidden': 'true', text: iniciais(d.clinica) }),
       el('div', { class: 'cresce' }, el('div', { class: 'nome', text: d.clinica || '' }), el('div', { class: 'sub', text: sub })),
       est.ver ? el('span', { class: 'etq atencao', text: 'como o médico vê · sem registro' }) : null));

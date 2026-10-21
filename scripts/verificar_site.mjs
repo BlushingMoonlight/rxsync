@@ -195,7 +195,9 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   const PROIBIDOS = [[/R\$\s*\d/, 'valor em reais'], [/\bpreços?\b/i, '"preço"'], [/\bmensalidades?\b/i, '"mensalidade"'], [/\bparcelas?\b/i, '"parcela"'],
     [/\b\d+\s+semanas?\b/i, 'prazo em semanas'], [/prazo de entrega/i, '"prazo de entrega"'], [/dias [úu]teis/i, '"dias úteis"'],
     [/\bAndr[ée](?![a-zà-ÿ])/i, 'André'], [/\bPontes\b/, 'Pontes'], [/Gon[çc]alves/i, 'Gonçalves'], [/Melhor Vers[ãa]o/i, '"Melhor Versão"'], [/Evoluir/i, 'Evoluir'], [/drandre/i, 'drandre'], [/\bAG\./, 'AG.'],
-    [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone']];
+    [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone'],
+    // Rodada de melhoria: nenhum beco sem saída (todo botão mostra um resultado) e ícones em SVG, não emojis.
+    [/nada (é|e) guardado/i, '"nada é guardado" (todo botão mostra um resultado simulado)'], [/\p{Extended_Pictographic}/u, 'emoji (use os ícones de comum/icones.js)']];
   for (const f of arqs) {
     const s = fs.readFileSync(f, 'utf8');
     for (const [re, nome] of PROIBIDOS) { const m = s.match(re); if (m) erro(`${f}: ${nome} não pode aparecer na demonstração (achei "${m[0]}")`); }

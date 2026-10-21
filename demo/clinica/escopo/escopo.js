@@ -26,7 +26,7 @@
     const atual = () => est.escolhas[i.n] || { e: '', n: '' };
     const botoes = el('div', { class: 'opcoes', role: 'group', 'aria-label': 'Escolha para o item ' + i.n });
     const desenharBotoes = () => trocar(botoes, OPCOES.map(([k, rot]) => el('button', { type: 'button', class: 'opcao ' + k, 'aria-pressed': String(atual().e === k), onclick: () => {
-      const e = atual().e === k ? '' : k; est.escolhas[i.n] = { ...atual(), e }; desenharBotoes(); contar(); guardar(i.n); DEMO.evento('marcou', { item: i.n, e: e || 'nada' }); } }, (atual().e === k ? '✓ ' : '') + rot)));
+      const e = atual().e === k ? '' : k; est.escolhas[i.n] = { ...atual(), e }; desenharBotoes(); contar(); guardar(i.n); DEMO.evento('marcou', { item: i.n, e: e || 'nada' }); } }, atual().e === k ? window.DEMO_ICONE('check', 'p') : null, rot)));
     desenharBotoes();
     const nota = el('textarea', { class: 'entrada', id: 'nota-' + i.n, maxlength: '500', rows: '2', value: atual().n || '' });
     nota.addEventListener('change', () => { est.escolhas[i.n] = { ...atual(), n: nota.value.trim() }; guardar(i.n); });
@@ -54,12 +54,12 @@
     const btnEnviar = el('button', { type: 'button', class: 'botao', onclick: e => enviar(e.currentTarget) }, 'Enviar para a RXSync');
     trocar(raiz, DEMO.topo('Escopo · demonstração', 'entrada'),
       el('main', { class: 'pagina' },
-        el('header', { class: 'pilha' }, el('h1', { text: 'Escopo do app · ' + d.clinica }), el('p', { class: 'mudo', text: 'Preparado para ' + DEMO.nomeMedico() + '. Marque o que você quer, o que não precisa e o que tem dúvida. Toque em "Ver na tela" para ver cada item na demonstração.' }),
-          d.escopo_enviado_em ? el('p', { class: 'aviso info peq', text: 'Você já enviou este escopo. Pode mudar e enviar de novo.' }) : null),
+        el('header', { class: 'pilha' }, el('h1', { text: 'Escopo do app · ' + d.clinica }), el('p', { class: 'mudo', text: 'Preparado para ' + DEMO.nomeMedico() + '. Marque cada item e envie para a RXSync. "Ver na tela" mostra o item na demonstração.' }),
+          d.escopo_enviado_em ? el('p', { class: 'aviso info peq', text: 'Você já enviou este escopo. Pode mudar e enviar de novo quando quiser.' }) : null),
         el('div', { class: 'barra-escopo' }, contagem, btnEnviar),
         grupo('App do paciente', itens.filter(i => i.onde[0] === 'app')),
         grupo('Central do médico', itens.filter(i => i.onde[0] === 'central')),
-        el('section', { class: 'cartao fim-escopo' }, el('h2', { text: 'Pronto?' }), el('p', { class: 'mudo', text: 'Envie o escopo para a RXSync. Se preferir falar antes, toque em "Quero conversar".' }),
+        el('section', { class: 'cartao fim-escopo' }, el('h2', { text: 'Pronto?' }), el('p', { class: 'mudo', text: 'Envie o escopo para a RXSync. Prefere falar antes? Toque em "Quero conversar".' }),
           el('div', { class: 'botoes' }, el('button', { type: 'button', class: 'botao', onclick: e => enviar(e.currentTarget) }, 'Enviar para a RXSync'), DEMO.botaoConversar('sec')))));
     contar();
     DEMO.tela('escopo');

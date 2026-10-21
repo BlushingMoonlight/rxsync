@@ -110,3 +110,28 @@ textarea.entrada { min-height: 88px; resize: vertical; }
 .porta-marca { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--marca-suave); font-size: 1.5rem; }
 .porta-ir { color: var(--marca); font-weight: 700; }
 [data-tema="escuro"] .porta-ir { color: var(--texto); }
+
+/* ícones (comum/icones.js): traço simples, na cor do texto; nas caixas, na cor da clínica */
+.ic { width: 20px; height: 20px; flex: none; } .ic.p { width: 16px; height: 16px; } .ic.g { width: 24px; height: 24px; }
+.botao .ic, .chip .ic { margin: 0 -2px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; }
+.caixa-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--marca-suave); color: var(--marca); flex: none; }
+.caixa-ic.peq { width: 32px; height: 32px; border-radius: 10px; } .caixa-ic.grande { width: 64px; height: 64px; border-radius: 18px; } .caixa-ic.grande .ic { width: 32px; height: 32px; }
+[data-tema="escuro"] .caixa-ic { color: var(--texto); }
+.porta-marca { color: var(--marca); }
+.porta-ir { display: inline-flex; align-items: center; gap: 4px; }
+.botao.quadrado { padding: 0; width: var(--alvo); }
+.erro { color: var(--perigo); font-size: .9rem; min-height: 1px; }
+.rot { font-size: .9rem; font-weight: 600; color: var(--texto-2); margin-top: 6px; }
+.feito-hoje { display: flex; align-items: center; gap: 6px; color: var(--ok); font-weight: 600; font-size: .92rem; }
+.travado { display: inline-flex; align-items: center; gap: 6px; color: var(--texto-2); font-weight: 600; }
+.resultado:empty { display: none; }
+
+/* interruptor (lembretes do app e funções da central) */
+.chave { width: 52px; height: 32px; border-radius: 99px; border: 0; background: var(--linha-forte); position: relative; flex: none; }
+.chave::before { content: ''; position: absolute; inset: -6px; }
+.chave::after { content: ''; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.chave[aria-checked="true"] { background: var(--marca); } .chave[aria-checked="true"]::after { transform: translateX(20px); }
+.nutri:has(.travado) { grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr); }
+.travado { align-items: flex-start; font-size: .92rem; font-weight: 600; }
+.travado .ic { margin-top: 3px; }

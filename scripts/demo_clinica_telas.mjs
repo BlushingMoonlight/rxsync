@@ -53,7 +53,7 @@ function medir() {
 
 const TELAS = [['', 'entrada'], ['app/', 'app (boas-vindas)'], ['app/', 'app início', 'tela=inicio'], ['app/', 'app registrar', 'tela=registrar'], ['app/', 'app refeição', 'tela=refeicao'],
   ['app/', 'app picadinha', 'tela=picadinha'], ['app/', 'app evolução', 'tela=evolucao'], ['app/', 'app mais', 'tela=mais'], ['app/', 'app assistente', 'tela=assistente'], ['app/', 'app chat', 'tela=chat-equipe'],
-  ['app/', 'app lembretes', 'tela=lembretes'], ['central/', 'central'], ['central/', 'central alertas', 'tela=alertas'], ['central/', 'central ficha', 'tela=ficha'], ['central/', 'central metas', 'tela=metas'],
+  ['app/', 'app lembretes', 'tela=lembretes'], ['app/', 'app buscar', 'tela=buscar'], ['app/', 'app foto', 'tela=foto'], ['app/', 'app sono', 'tela=sono'], ['central/', 'central'], ['central/', 'central alertas', 'tela=alertas'], ['central/', 'central ficha', 'tela=ficha'], ['central/', 'central metas', 'tela=metas'],
   ['central/', 'central picadinha', 'tela=picadinha'], ['central/', 'central avisos', 'tela=avisos'], ['central/', 'central funções', 'tela=funcoes'], ['escopo/', 'escopo'], ['escopo/', 'escopo item 23', 'item=23']];
 const APARELHOS = [['celular360', { width: 360, height: 740 }, true], ['celular390', { width: 390, height: 844 }, true], ['celular430', { width: 430, height: 932 }, true],
   ['ipad', { width: 820, height: 1180 }, true], ['computador', { width: 1440, height: 900 }, false]];
@@ -147,6 +147,92 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(await page.locator('h1').innerText() === 'Demonstração do app de acompanhamento', 'sem código: o convite');
   await page.goto(`${site.base}/demo/clinica/central/`); await page.waitForURL(/\/demo\/clinica\/$/);
   ok(true, 'sem código fora da entrada: volta para a entrada');
+  // Rodada de melhoria: nenhum beco sem saída. Cada botão mostra um resultado simulado, e tudo fica na memória da página.
+  const telaApp = async (tela) => { await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2, #conteudo h1'); };
+  const textoMain = () => page.locator('#conteudo').innerText();
+  const nPedidos = () => pedidos.filter(p => p.tipo !== 'eventos' && p.tipo !== 'abrir').length;
+  const antesPedidos = nPedidos();
+  // Buscar alimento → detalhe → porção → "Registrar": volta para Refeição com o total, e a meta do dia sobe.
+  await telaApp('inicio');
+  const kcalAntes = await page.locator('.meta', { hasText: 'Calorias' }).innerText();
+  await page.getByRole('button', { name: 'Registrar refeição' }).click();
+  await page.getByRole('button', { name: 'Buscar alimento' }).click();
+  await page.fill('#busca-alimento', 'frango');
+  ok(await page.locator('#conteudo .linha-app').count() === 1, 'buscar: "frango" acha 1 alimento');
+  await page.locator('#conteudo .linha-app', { hasText: 'Peito de frango' }).click();
+  await page.getByRole('radio', { name: '2' }).click();
+  ok(/318 kcal/.test(await textoMain()) && /64 g/.test(await textoMain()), 'alimento: 2 porções dobram os nutrientes (318 kcal, 64 g de proteína)');
+  await page.getByRole('button', { name: /^Registrar no / }).click();
+  ok(/Peito de frango grelhado/.test(await textoMain()) && /Total: 1\.178 kcal/.test(await textoMain()), 'registrar: o alimento entra na lista de hoje e o total sobe');
+  await page.getByRole('button', { name: 'Início' }).click();
+  const kcalDepois = await page.locator('.meta', { hasText: 'Calorias' }).innerText();
+  ok(kcalAntes !== kcalDepois && /1\.178 de 1\.600/.test(kcalDepois), `início: a meta de calorias sobe (${kcalAntes} → ${kcalDepois})`);
+  // Foto do prato: lê em 1 s e mostra os alimentos para confirmar.
+  await page.getByRole('button', { name: 'Registrar refeição' }).click();
+  await page.getByRole('button', { name: 'Foto do prato' }).click();
+  await page.getByRole('button', { name: 'Tirar a foto' }).click();
+  await page.waitForSelector('text=Encontrei no prato', { timeout: 3000 });
+  ok(await page.locator('#conteudo .marcar').count() === 4, 'foto: 4 alimentos identificados para confirmar');
+  await page.locator('#conteudo .marcar', { hasText: 'Salada' }).locator('input').uncheck();
+  await page.getByRole('button', { name: 'Registrar 3 alimentos' }).click();
+  ok(/Feijão carioca/.test(await textoMain()), 'foto: os alimentos confirmados entram na lista');
+  // Código de barras: lê e abre o detalhe do produto.
+  await page.getByRole('button', { name: 'Código de barras' }).click();
+  await page.getByRole('button', { name: 'Ler o código' }).click();
+  await page.waitForSelector('text=Iogurte natural integral', { timeout: 3000 });
+  ok(await page.getByRole('button', { name: /^Registrar no / }).count() === 1, 'código: abre o detalhe com "Registrar"');
+  // Registros simples: confirmam, somam pontos e aparecem na lista.
+  await telaApp('inicio');
+  const pontos = async () => Number((await page.locator('.grande-num').first().innerText()).split(' ')[0]);
+  const p0 = await pontos();
+  await page.getByRole('navigation', { name: 'Partes do app' }).getByRole('button', { name: 'Registrar' }).click();
+  await page.locator('#conteudo .linha-app', { hasText: 'Sono' }).click();
+  await page.locator('#conteudo').getByRole('button', { name: 'Registrar', exact: true }).click();
+  ok(/Escolha uma opção/.test(await textoMain()), 'sono: sem escolher, pede a escolha');
+  await page.getByRole('radio', { name: '7 a 8h' }).click(); await page.getByRole('radio', { name: 'Bem', exact: true }).click();
+  await page.locator('#conteudo').getByRole('button', { name: 'Registrar', exact: true }).click();
+  ok(/7 a 8h · Bem/.test(await page.locator('#conteudo .linha-app', { hasText: 'Sono' }).innerText()), 'sono: aparece na lista de Registrar');
+  await page.getByRole('button', { name: 'Início' }).click();
+  ok(await pontos() === p0 + 5, `sono: +5 pontos na tela inicial (${p0} → ${await pontos()})`);
+  // Água: soma e atualiza.
+  await page.locator('#conteudo').getByRole('button', { name: 'Água' }).click();
+  await page.getByRole('button', { name: '1 garrafa (2 copos)' }).click();
+  ok(/6 de 8 copos/.test(await textoMain()), 'água: 1 garrafa soma 2 copos');
+  // Picadinha: sem número de dose; campos travados; mapa do corpo; registrar muda o último local.
+  await telaApp('picadinha');
+  const pic = await textoMain();
+  ok(/Medicamento cadastrado pela equipe/.test(pic) && (pic.match(/Preenchido pela equipe/g) || []).length === 3, 'picadinha: medicamento e os 3 campos "Preenchido pela equipe"');
+  ok(!/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg)\b/.test(pic), 'picadinha: nenhum número de dose');
+  ok(await page.locator('svg.corpo .local.sugerido').count() === 1 && await page.locator('svg.corpo .local.ultimo').count() === 1, 'rodízio: o mapa marca o último local e o sugerido');
+  ok(await page.getByRole('radio', { name: 'Abdômen direito' }).isDisabled(), 'rodízio: o último local não pode ser escolhido de novo');
+  await page.getByRole('radio', { name: 'Enjoo forte' }).click();
+  await page.getByRole('button', { name: 'Registrar aplicação' }).click();
+  await page.waitForSelector('text=A enfermagem da clínica recebeu um aviso');
+  await page.keyboard.press('Escape');
+  ok(/Última: abdômen esquerdo/.test(await textoMain()) && /Sexta que vem/.test(await textoMain()), 'picadinha: o local e a próxima aplicação mudam');
+  // O que não dá para simular: uma frase explica o app de verdade.
+  await telaApp('exames'); await page.getByRole('button', { name: 'Escolher arquivo' }).click();
+  ok(/No app de verdade, abre os arquivos do celular/.test(await textoMain()), 'exames: explica o que acontece no app de verdade');
+  await telaApp('meus-dados'); await page.getByRole('button', { name: 'Baixar meus dados' }).click();
+  ok(/No app de verdade, você recebe um arquivo/.test(await textoMain()), 'meus dados: explica o que acontece no app de verdade');
+  await telaApp('consultas'); await page.getByRole('button', { name: 'Confirmar presença' }).click();
+  ok(/Presença confirmada/.test(await textoMain()), 'consultas: confirmar presença');
+  // Central: Enviar ao app, Cadastrar prescrição, Conferir, Enviar recado.
+  const telaCentral = async (tela) => { await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2'); };
+  await telaCentral('metas'); await page.selectOption('#metas-paciente', '3'); await page.fill('#m-kcal', '1500');
+  await page.getByRole('button', { name: 'Enviar ao app' }).click();
+  ok(/Enviado ao app de Beatriz Lima/.test(await textoMain()), 'central metas: "Enviado ao app de Beatriz Lima"');
+  await telaCentral('picadinha');
+  await page.getByRole('button', { name: 'Conferir a prescrição de Beatriz Lima' }).click();
+  ok(await page.getByRole('button', { name: /^Conferir a prescrição/ }).count() === 0, 'central picadinha: conferir muda para "Conferida"');
+  await page.selectOption('#presc-paciente', 'Carlos Souza'); await page.getByRole('button', { name: 'Cadastrar prescrição' }).click();
+  ok(await page.getByRole('button', { name: 'Conferir a prescrição de Carlos Souza' }).count() === 1, 'central picadinha: a prescrição nova aparece "esperando a conferência"');
+  ok(!/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg)\b/.test(await textoMain()), 'central picadinha: nenhum número de dose');
+  await telaCentral('avisos'); await page.getByRole('radio', { name: 'Um grupo' }).click(); await page.getByRole('button', { name: 'Enviar recado' }).click();
+  ok(/Grupo "Adaptação"/.test(await page.locator('#conteudo .cartao', { hasText: 'Recados enviados' }).innerText()), 'central avisos: o recado aparece em "Recados enviados"');
+  // Tudo na memória: nenhum pedido novo ao servidor além do registro de uso; e nenhum "nada é guardado".
+  ok(nPedidos() === antesPedidos, `memória: nenhum pedido ao servidor além de abrir e eventos (${nPedidos() - antesPedidos} a mais)`);
+  ok(!/nada é guardado/i.test(await page.content()), 'nenhum "nada é guardado"');
   ok(!erros.length, 'caminhos: erro no console: ' + erros.join(' | '));
   await ctx.close();
 }
