@@ -182,7 +182,7 @@ html.embutido .tela-app { padding-top: calc(var(--e-5) + env(safe-area-inset-top
 .graf-evolucao { display: grid; gap: var(--e-2); }
 .leitura-graf { display: flex; align-items: baseline; gap: var(--e-3); min-height: 48px; }
 .grafico { touch-action: pan-y; cursor: crosshair; }
-.grafico .faixa-meta { fill: var(--ok-fundo); }
+.grafico .faixa-meta { fill: var(--ok); opacity: .22; }
 .grafico .area { fill: var(--acento-suave-2); opacity: .75; }
 .grafico .traco { fill: none; stroke: var(--acento-texto); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .grafico .guia { stroke: var(--linha-forte); stroke-width: 1; stroke-dasharray: 3 4; }

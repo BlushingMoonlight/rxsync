@@ -447,10 +447,10 @@
     const desenhar = i => {
       trocar(leitura, el('span', { class: 'numero' }, fmt(v[i]), el('small', { text: 'kg' })), el('span', { class: 'mudo peq', text: rotulo(i) }));
       s.replaceChildren();
-      s.append(svg('rect', { x: 0, y: y(metaMax), width: W, height: y(metaMin) - y(metaMax), class: 'faixa-meta', rx: 6 }));
-      const t = svg('text', { x: W - 6, y: y(metaMin) - 4, class: 'eixo', 'text-anchor': 'end' }); t.textContent = 'meta'; s.append(t);
       const pts = v.map((val, k) => [x(k), y(val)]);
       s.append(svg('path', { d: 'M' + pts.map(p => p.join(' ')).join(' L') + ' L' + x(v.length - 1) + ' ' + (H - B) + ' L' + x(0) + ' ' + (H - B) + 'Z', class: 'area' }));
+      s.append(svg('rect', { x: 0, y: y(metaMax), width: W, height: y(metaMin) - y(metaMax), class: 'faixa-meta', rx: 6 }));
+      const t = svg('text', { x: 6, y: y(metaMax) - 5, class: 'eixo' }); t.textContent = 'faixa da meta'; s.append(t);
       s.append(svg('polyline', { points: pts.map(p => p.join(',')).join(' '), class: 'traco' }));
       s.append(svg('line', { x1: pts[i][0], x2: pts[i][0], y1: 8, y2: H - B, class: 'guia' }));
       s.append(svg('circle', { cx: pts[i][0], cy: pts[i][1], r: 10, class: 'halo' }), svg('circle', { cx: pts[i][0], cy: pts[i][1], r: 5, class: 'atual' }));

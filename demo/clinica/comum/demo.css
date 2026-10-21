@@ -14,7 +14,7 @@
   --superficie: #ffffff; --superficie-2: #f9f7f4; --superficie-3: #f1eee9;
   --linha: #e6e2db; --linha-forte: #d6d0c6;
   --tinta: #15171b; --tinta-2: #474c56; --tinta-3: #636975;
-  --vidro: rgba(255, 253, 250, .9); --vidro-borda: rgba(20, 18, 14, .08);
+  --vidro: rgba(255, 253, 250, .96); --vidro-borda: rgba(20, 18, 14, .08);
   --ok: #17663f; --ok-fundo: #e5f3ea; --atencao: #8a4a00; --atencao-fundo: #fbefda; --alerta: #b0213d; --alerta-fundo: #fbe6ea;
   --sombra-1: 0 1px 2px rgba(28, 24, 18, .05), 0 1px 1px rgba(28, 24, 18, .03);
   --sombra-2: 0 1px 2px rgba(28, 24, 18, .04), 0 10px 28px -12px rgba(28, 24, 18, .16);
@@ -51,7 +51,7 @@
     color-scheme: dark;
     --fundo: #0d0e11; --fundo-2: #121418; --superficie: #17191e; --superficie-2: #1c1f25; --superficie-3: #23262d;
     --linha: #2a2e36; --linha-forte: #3a3f49; --tinta: #f3f2ef; --tinta-2: #bfc2ca; --tinta-3: #9da2ac;
-    --vidro: rgba(26, 28, 34, .9); --vidro-borda: rgba(255, 255, 255, .08);
+    --vidro: rgba(23, 25, 30, .96); --vidro-borda: rgba(255, 255, 255, .08);
     --ok: #7fd9a8; --ok-fundo: #12301f; --atencao: #f4c06a; --atencao-fundo: #33270f; --alerta: #f59cad; --alerta-fundo: #3b1620;
     --sombra-1: 0 0 0 1px rgba(255, 255, 255, .02); --sombra-2: 0 12px 32px -14px rgba(0, 0, 0, .6); --sombra-3: 0 30px 70px -20px rgba(0, 0, 0, .7); --veu: rgba(0, 0, 0, .5);
     --acento: var(--m-300); --acento-forte: var(--m-200); --sobre-acento: #0d0e11; --acento-texto: var(--m-200);
@@ -63,7 +63,7 @@
   color-scheme: dark;
   --fundo: #0d0e11; --fundo-2: #121418; --superficie: #17191e; --superficie-2: #1c1f25; --superficie-3: #23262d;
   --linha: #2a2e36; --linha-forte: #3a3f49; --tinta: #f3f2ef; --tinta-2: #bfc2ca; --tinta-3: #9da2ac;
-  --vidro: rgba(26, 28, 34, .9); --vidro-borda: rgba(255, 255, 255, .08);
+  --vidro: rgba(23, 25, 30, .96); --vidro-borda: rgba(255, 255, 255, .08);
   --ok: #7fd9a8; --ok-fundo: #12301f; --atencao: #f4c06a; --atencao-fundo: #33270f; --alerta: #f59cad; --alerta-fundo: #3b1620;
   --sombra-1: 0 0 0 1px rgba(255, 255, 255, .02); --sombra-2: 0 12px 32px -14px rgba(0, 0, 0, .6); --sombra-3: 0 30px 70px -20px rgba(0, 0, 0, .7); --veu: rgba(0, 0, 0, .5);
   --acento: var(--m-300); --acento-forte: var(--m-200); --sobre-acento: #0d0e11; --acento-texto: var(--m-200);
