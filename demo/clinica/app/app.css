@@ -1,0 +1,41 @@
+/* App do paciente: no celular ocupa a tela; no iPad e no computador, uma moldura de celular no meio. */
+.celular { max-width: 480px; margin: 0 auto; background: var(--fundo); min-height: 70vh; position: relative; }
+@media (min-width: 600px) { .celular { margin: 16px auto; border: 1px solid var(--linha-forte); border-radius: 28px; overflow: hidden; box-shadow: var(--sombra); } }
+.tela-app { padding: 16px 16px 96px; display: grid; gap: 12px; outline: none; }
+.abas-app { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--superficie); border-top: 1px solid var(--linha); padding-bottom: env(safe-area-inset-bottom); }
+.abas-app button { min-height: 60px; border: 0; background: none; display: grid; justify-items: center; align-content: center; gap: 2px; font-size: .72rem; font-weight: 600; color: var(--texto-2); }
+.abas-app button span { font-size: 1.15rem; }
+.abas-app button[aria-current="page"] { color: var(--texto); background: var(--marca-suave); }
+.cab-sub { display: flex; align-items: center; gap: 12px; }
+.cab-cartao { flex-wrap: wrap; margin-bottom: 8px; }
+.cab-cartao h2 { font-size: 1.05rem; }
+.ola { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .ola p { flex-basis: 100%; }
+.semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.dia { min-height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--superficie); border: 1px solid var(--linha); font-weight: 700; font-size: .85rem; }
+.dia.feito { background: var(--marca-suave); } .dia.hoje { background: var(--marca); color: var(--sobre-marca); border-color: var(--marca); }
+.grande-num { font-family: var(--titulo); font-size: 1.6rem; font-weight: 800; }
+.meta { display: flex; justify-content: space-between; gap: 8px; font-size: .9rem; margin-top: 8px; }
+.barra { height: 10px; border-radius: 99px; background: var(--superficie-2); overflow: hidden; margin-top: 6px; } .barra i { display: block; height: 100%; background: var(--marca); border-radius: 99px; }
+.lista-app { list-style: none; margin: 0; padding: 0; background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); overflow: hidden; }
+.lista-app li + li { border-top: 1px solid var(--linha); }
+.linha-app { width: 100%; min-height: 60px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 0; background: none; text-align: left; }
+.linha-app .ic { font-size: 1.3rem; width: 32px; text-align: center; } .linha-app .t1 { display: block; font-weight: 650; } .linha-app .t2 { display: block; font-size: .82rem; color: var(--texto-2); }
+.item-num { font-size: .72rem; font-weight: 700; color: var(--texto-2); border: 1px dashed var(--linha-forte); border-radius: 99px; padding: 1px 7px; }
+.nutri { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 10px 0; } .nutri dt { color: var(--texto-2); } .nutri dd { margin: 0; font-weight: 650; }
+.plano, .lista-simples { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; }
+.plano li { display: grid; gap: 2px; }
+.lista-simples li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--linha); }
+.grafico { width: 100%; height: auto; color: var(--marca); }
+[data-tema="escuro"] .grafico { color: var(--texto); }
+.fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+.foto { aspect-ratio: 3 / 4; border-radius: 12px; background: var(--superficie-2); border: 1px dashed var(--linha-forte); display: grid; place-items: center; color: var(--texto-2); }
+.conversa { display: grid; gap: 8px; margin: 10px 0; }
+.bolha { max-width: 85%; padding: 10px 12px; border-radius: 16px; font-size: .92rem; }
+.bolha.outro { background: var(--superficie-2); justify-self: start; border-bottom-left-radius: 4px; }
+.bolha.eu { background: var(--marca); color: var(--sobre-marca); justify-self: end; border-bottom-right-radius: 4px; }
+.enviar-msg { display: flex; gap: 8px; } .enviar-msg .entrada { flex: 1; }
+.bv { text-align: center; justify-items: center; padding-top: 16px; }
+.bv .cartao { text-align: left; width: 100%; }
+.selo.grande { width: 72px; height: 72px; border-radius: 22px; font-size: 1.6rem; }
+.aceite { display: flex; align-items: center; gap: 10px; min-height: var(--alvo); font-weight: 600; margin-top: 8px; }
+.aceite input { width: 22px; height: 22px; accent-color: var(--marca); }

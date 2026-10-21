@@ -186,6 +186,31 @@ let avisosTermos = 0;
   }
 }
 if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos que não são a versão mais nova (só aviso, não bloqueia).`);
+// Demonstração por link (demo/clinica/, DEC-125; ajuste C do plano): nenhum preço, prazo de projeto ou valor, nada da
+// demonstração do Dr. André, noindex, nenhum WhatsApp nem telefone, e os 46 itens iguais aos da Central.
+{
+  const pasta = path.join('demo', 'clinica');
+  const arqs = todos.filter(f => f.startsWith(pasta + path.sep) && /\.(html|js|css)$/.test(f));
+  if (fs.existsSync(pasta) && !arqs.length) erro(`${pasta}: sem arquivos`);
+  const PROIBIDOS = [[/R\$\s*\d/, 'valor em reais'], [/\bpreços?\b/i, '"preço"'], [/\bmensalidades?\b/i, '"mensalidade"'], [/\bparcelas?\b/i, '"parcela"'],
+    [/\b\d+\s+semanas?\b/i, 'prazo em semanas'], [/prazo de entrega/i, '"prazo de entrega"'], [/dias [úu]teis/i, '"dias úteis"'],
+    [/\bAndr[ée](?![a-zà-ÿ])/i, 'André'], [/\bPontes\b/, 'Pontes'], [/Gon[çc]alves/i, 'Gonçalves'], [/Melhor Vers[ãa]o/i, '"Melhor Versão"'], [/Evoluir/i, 'Evoluir'], [/drandre/i, 'drandre'], [/\bAG\./, 'AG.'],
+    [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone']];
+  for (const f of arqs) {
+    const s = fs.readFileSync(f, 'utf8');
+    for (const [re, nome] of PROIBIDOS) { const m = s.match(re); if (m) erro(`${f}: ${nome} não pode aparecer na demonstração (achei "${m[0]}")`); }
+    if (f.endsWith('.html') && !/<meta name="robots" content="noindex, nofollow">/.test(s)) erro(`${f}: falta noindex`);
+    if (f.endsWith('.html') && /googletagmanager|gtag\(|chatwoot|consentimento\.js/i.test(s)) erro(`${f}: sem Google Analytics e sem chat na demonstração`);
+  }
+  const itensArq = path.join(pasta, 'escopo', 'itens.js'), centralArq = path.join('central', 'fonte', '09_demonstracoes.js');
+  if (fs.existsSync(itensArq) && fs.existsSync(centralArq)) {
+    const demo = [...fs.readFileSync(itensArq, 'utf8').matchAll(/\{ n: (\d+), t: '((?:[^'\\]|\\.)*)'/g)].map(m => [Number(m[1]), m[2].replace(/\\'/g, "'")]);
+    const central = [...((fs.readFileSync(centralArq, 'utf8').match(/const DEM_ITENS = \[([\s\S]*?)\];/) || [])[1] || '').matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
+    if (demo.length !== 46 || demo.some(([n], i) => n !== i + 1)) erro(`${itensArq}: precisa dos 46 itens, numerados de 1 a 46`);
+    if (JSON.stringify(demo.map(x => x[1])) !== JSON.stringify(central)) erro(`${itensArq}: os títulos não batem com os da Central (${centralArq}, DEM_ITENS)`);
+  }
+  if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');
+}
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
