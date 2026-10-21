@@ -1,0 +1,1 @@
+Fotos do PR de melhoria da demonstração (celular de 390 px). Branch só de fotos: não faça Merge.
