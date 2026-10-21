@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   const { el, trocar, item } = DEMO;
-  const ic = (n, t) => window.DEMO_ICONE(n, t);
+  const ic = (n, t, c) => window.DEMO_ICONE(n, t, c);
   const raiz = document.getElementById('raiz');
   const PACIENTE = 'Mariana';
   const fmt = v => String(Math.round(v * 10) / 10).replace('.', ',');
@@ -20,9 +20,10 @@
     refeicao: 'Almoço', comidas: [{ nome: 'Ovos mexidos e pão integral', refeicao: 'Café da manhã', kcal: 340, prot: 20 }],
     feitos: {},   // registros do dia: { sono: 'Bem', ... }
     pesos: [78.4, 77.9, 77.1, 76.6, 76.2, 75.4], local: 'Abdômen direito', localEscolhido: 'Abdômen esquerdo', proxima: 'Sexta, às 8h', aplicada: false,
-    tomou: {}, lidos: {}, presenca: false, busca: '', alimento: null, porcao: 1, foto: null, lendo: false
+    tomou: {}, lidos: {}, presenca: false, busca: '', alimento: null, porcao: 1, foto: null, lendo: false, sobe: null
   };
-  const ganhar = (pts, texto) => { est.pontos = Math.min(100, est.pontos + pts); DEMO.rapida(texto + ' +' + pts + ' pontos'); };
+  // Cada registro: a confirmação "✓" na tela (com os pontos) e os pontos do dia.
+  const ganhar = (pts, texto) => { est.pontos = Math.min(100, est.pontos + pts); DEMO.confirmar(texto, '+' + pts + ' pontos'); };
 
   // Alimentos de exemplo (valores aproximados, por porção). Só para a demonstração.
   const ALIMENTOS = [
@@ -44,7 +45,36 @@
   const linhaIr = (icone, titulo, sub, tela, n) => el('li', {}, el('button', { type: 'button', class: 'linha-app', onclick: () => abrir(tela) },
     caixaIc(icone), el('span', { class: 'cresce' }, el('span', { class: 't1', text: titulo }), sub ? el('span', { class: 't2', text: sub }) : null),
     n ? el('span', { class: 'item-num', text: 'item ' + n, 'aria-hidden': 'true' }) : null, ic('seta', 'p')));
-  const barra = (valor, max, rotulo) => { const b = el('div', { class: 'barra', role: 'img', 'aria-label': rotulo }); const i = el('i'); i.style.width = Math.min(100, Math.round(valor / max * 100)) + '%'; b.append(i); return b; };
+  const barra = (valor, max, rotulo) => { const b = el('div', { class: 'barra', role: 'img', 'aria-label': rotulo }); const i = el('i'); i.style.transform = 'scaleX(' + Math.min(1, Math.max(0, valor / max)) + ')'; b.append(i); return b; };
+  const svg = (tag, at) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(at || {})) e.setAttribute(k, v); return e; };
+  // Cabeçalho das abas: título grande e o perfil no canto (o "Mais" virou a tela do perfil).
+  const cabAba = (titulo, antes, ...marcadores) => el('header', { class: 'cab-app' },
+    el('div', { class: 'cresce' }, antes ? el('p', { class: 'sobretitulo', text: antes }) : null, el('h1', { text: titulo }), marcadores.length ? el('div', { class: 'marcadores' }, marcadores.map(item)) : null),
+    el('button', { type: 'button', class: 'botao-perfil', 'aria-label': 'Abrir o perfil e mais opções', onclick: () => irAba('mais') }, PACIENTE[0]));
+  // Os 3 anéis do dia (calorias, proteína e água). Movimento só com rotate e opacity; o anel que acabou de mudar "sobe".
+  function aneis() {
+    const v = [[est.kcal, META.kcal, 'kcal'], [est.prot, META.prot, 'prot'], [est.agua, META.agua, 'agua']];
+    const s = svg('svg', { viewBox: '0 0 160 160', class: 'aneis', role: 'img',
+      'aria-label': 'Calorias ' + milhar(est.kcal) + ' de ' + milhar(META.kcal) + ' kcal; proteína ' + Math.round(est.prot) + ' de ' + META.prot + ' g; água ' + est.agua + ' de ' + META.agua + ' copos.' });
+    v.forEach(([val, max, k], i) => {
+      const r = 70 - i * 19;
+      s.append(svg('circle', { cx: 80, cy: 80, r, class: 'trilho' }));
+      const g = svg('g', { class: 'a' + i + (est.sobe === k ? ' sobe' : '') });
+      const pct = Math.min(100, Math.max(0.5, val / max * 100));
+      g.append(svg('circle', { cx: 80, cy: 80, r, class: 'a' + i, pathLength: 100, 'stroke-dasharray': pct + ' 100', 'stroke-linecap': 'round', transform: 'rotate(-90 80 80)' }));
+      s.append(g);
+    });
+    est.sobe = null;
+    return s;
+  }
+  function resumoDia() {
+    const faltaProt = Math.round(META.prot - est.prot), faltaAgua = META.agua - est.agua;
+    if (faltaProt > 0) return 'Faltam ' + faltaProt + ' g de proteína hoje.';
+    if (faltaAgua > 0) return 'Proteína em dia. Faltam ' + faltaAgua + (faltaAgua === 1 ? ' copo' : ' copos') + ' de água.';
+    return 'Metas do dia cumpridas. Muito bem!';
+  }
+  const metrica = (icone, rotulo, conteudo, sub, onclick, extra) => el(onclick ? 'button' : 'div', { type: onclick ? 'button' : null, class: 'metrica' + (extra ? ' ' + extra : ''), onclick },
+    el('span', { class: 'cab-m' }, ic(icone, 'p'), rotulo), conteudo, sub ? el('span', { class: 'sub-m', text: sub }) : null);
   // Grupo de escolha única: devolve { no, valor() }.
   function escolha(opcoes, rotulo, inicial) {
     let valor = inicial || '';
@@ -81,87 +111,51 @@
           el('label', { class: 'aceite' }, el('input', { type: 'checkbox', onchange: e => { est.aceite = e.target.checked; ok.disabled = !est.aceite; } }), 'Li e aceito o termo de uso')),
         ok)];
     },
-    inicio: () => [
-      el('div', { class: 'ola' }, el('p', { class: 'mudo peq', text: 'Bom dia,' }), el('h1', { text: PACIENTE }), item(2), item(6)),
-      el('div', { class: 'semana', role: 'list', 'aria-label': 'Semana: 3 dias completos' }, ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((d, i) => el('span', { role: 'listitem', class: 'dia' + (i < 3 ? ' feito' : i === 3 ? ' hoje' : ''), text: d }))),
-      cartao('Pontos de hoje', null, el('p', { class: 'grande-num', text: est.pontos + ' de 100' }), barra(est.pontos, 100, est.pontos + ' de 100 pontos'),
-        el('p', { class: 'mudo peq', text: 'Cada registro soma pontos.' })),
-      cartao('Metas do dia', 9,
-        meta('Calorias', milhar(est.kcal) + ' de ' + milhar(META.kcal) + ' kcal', est.kcal, META.kcal),
-        meta('Proteína', fmt(est.prot) + ' de ' + META.prot + ' g', est.prot, META.prot),
-        meta('Água', est.agua + ' de ' + META.agua + ' copos', est.agua, META.agua),
-        el('p', { class: 'mudo peq', text: 'Metas definidas pela equipe da clínica.' }),
-        el('div', { class: 'botoes' }, el('button', { type: 'button', class: 'botao', onclick: () => { est.aba = 'registrar'; abrir('refeicao'); } }, ic('mais', 'p'), 'Registrar refeição'),
-          el('button', { type: 'button', class: 'botao sec', onclick: () => { est.aba = 'registrar'; abrir('agua'); } }, ic('gota', 'p'), 'Água'))),
-      cartao('Próxima consulta', 28, el('p', { text: 'Retorno com ' + DEMO.nomeMedico() }), el('p', { class: 'mudo peq', text: 'Terça, às 14h' + (DEMO.dados.cidade ? ' · ' + DEMO.dados.cidade : '') })),
-      cartao('Recado da clínica', 29, el('p', { class: 'peq', text: 'Traga os exames de sangue no retorno.' })),
-      cartao('Conquistas', 35, el('p', { class: 'linha-h peq' }, caixaIc('fogo', 'peq'), '5 dias seguidos registrando'))],
-    registrar: () => [el('h1', { text: 'Registrar' }), el('ul', { class: 'lista-app' },
-      linhaIr('prato', 'Refeição', est.comidas.length + ' registrada(s) hoje', 'refeicao', 7), linhaIr('livro', 'Plano alimentar', 'O cardápio da equipe', 'plano', 10),
-      linhaIr('gota', 'Água', est.agua + ' de ' + META.agua + ' copos', 'agua', 11), linhaIr('lua', 'Sono', est.feitos.sono || null, 'sono', 12),
-      linhaIr('corrida', 'Atividade física', est.feitos.atividade || null, 'atividade', 13), linhaIr('sorriso', 'Humor', est.feitos.humor || null, 'humor', 14),
-      linhaIr('maca', 'Fome e saciedade', est.feitos.fome || null, 'fome', 15), linhaIr('onda', 'Intestino', est.feitos.intestino || null, 'intestino', 16),
-      linhaIr('notas', 'Outros registros', est.feitos.outros || 'Álcool, tabaco e ciclo', 'outros', 17), linhaIr('pilula', 'Remédios e vitaminas', Object.keys(est.tomou).length + ' de 2 tomados', 'remedios', 18))],
+    inicio: () => {
+      const h = new Date().getHours(), saudacao = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+      const data = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+      const SEMANA = [['S', 92], ['T', 88], ['Q', 74], ['Q', est.pontos], ['S', 0], ['S', 0], ['D', 0]];
+      return [
+        cabAba(saudacao + ', ' + PACIENTE, data, 2, 6),
+        el('section', { class: 'cartao heroi elevado', 'aria-label': 'Metas do dia' },
+          el('div', { class: 'cab-cartao' }, el('p', { class: 'sobretitulo cresce', text: 'Metas do dia' }), item(9)),
+          el('div', { class: 'heroi-topo' }, aneis(),
+            el('ul', { class: 'legenda-aneis' },
+              [['Calorias', milhar(est.kcal), ' de ' + milhar(META.kcal) + ' kcal'], ['Proteína', Math.round(est.prot), ' de ' + META.prot + ' g'], ['Água', est.agua, ' de ' + META.agua + ' copos']].map(([r, v, de], i) =>
+                el('li', { class: 'meta' }, el('span', { class: 'ponto a' + i, 'aria-hidden': 'true' }), el('span', { class: 'rotulo', text: r }), el('span', { class: 'valor' }, String(v), el('small', { text: de })))))),
+          el('p', { class: 'resumo-dia' }, ic('info'), resumoDia()),
+          el('div', { class: 'botoes' },
+            el('button', { type: 'button', class: 'botao', onclick: () => abrirRefeicao() }, ic('mais'), 'Registrar refeição'),
+            el('button', { type: 'button', class: 'botao sec', onclick: () => { est.agua = Math.min(12, est.agua + 1); est.sobe = 'agua'; ganhar(2, 'Copo de água registrado'); desenharTela('inicio'); } }, ic('gota'), '1 copo de água')),
+          el('p', { class: 'mudo peq', text: 'Metas definidas pela equipe da clínica.' })),
+        el('div', { class: 'metricas' },
+          metrica('medalha', 'Pontos de hoje', el('span', { class: 'numero grande-num' }, String(est.pontos), el('small', { text: ' de 100' })), null, () => abrir('conquistas')),
+          metrica('lua', 'Sono', est.feitos.sono ? el('span', { class: 'grande-txt', text: est.feitos.sono.split(' · ')[0] }) : el('span', { class: 'acao-m' }, 'Registrar', ic('seta', 'p')), est.feitos.sono ? est.feitos.sono.split(' · ')[1] : 'Como você dormiu?', () => { est.aba = 'registrar'; abrir('sono'); }),
+          metrica('seringa', 'Próxima aplicação', el('span', { class: 'grande-txt', text: est.proxima }), est.aplicada ? 'Registrada nesta semana' : 'Em 3 dias', () => irAba('picadinha')),
+          metrica('balanca', 'Peso', el('span', { class: 'numero' }, fmt(est.pesos[est.pesos.length - 1]), el('small', { text: 'kg' })), fmt(est.pesos[est.pesos.length - 1] - est.pesos[0]).replace('-', '−') + ' kg desde o início', () => irAba('evolucao'))),
+        el('section', { class: 'cartao' }, el('div', { class: 'cab-cartao' }, el('h2', { text: 'Sua semana' }), item(35)),
+          el('div', { class: 'semana-barras', role: 'img', 'aria-label': 'Pontos por dia nesta semana: segunda 92, terça 88, quarta 74, hoje ' + est.pontos + '.' },
+            SEMANA.map(([d, v], i) => { const c = el('i'); c.style.transform = 'scaleY(' + (v / 100) + ')'; return el('div', { class: 'dia-b' + (i === 3 ? ' hoje' : ''), 'aria-hidden': 'true' }, el('span', { class: 'coluna' }, v ? c : null), el('span', { class: 'letra', text: d })); })),
+          el('div', { class: 'tendencias' }, el('div', { class: 'bloco' }, el('strong', { text: '5 dias' }), el('span', { text: 'seguidos registrando' })),
+            el('div', { class: 'bloco' }, el('strong', { text: '92 g' }), el('span', { text: 'de proteína por dia, em média' })))),
+        cartao('Próxima consulta', 28, el('p', { text: 'Retorno com ' + DEMO.nomeMedico() }), el('p', { class: 'mudo peq', text: 'Terça, às 14h' + (DEMO.dados.cidade ? ' · ' + DEMO.dados.cidade : '') })),
+        cartao('Recado da clínica', 29, el('p', { text: 'Traga os exames de sangue no retorno.' }))];
+    },
+    registrar: () => {
+      const lad = (icone, titulo, sub, acao, n, feito) => el('button', { type: 'button', class: 'ladrilho linha-app', onclick: acao },
+        el('span', { class: 'linha-h' }, caixaIc(icone), el('span', { class: 'cresce' }), n ? el('span', { class: 'item-num', text: 'item ' + n, 'aria-hidden': 'true' }) : null),
+        el('span', { class: 't1', text: titulo }), el('span', { class: 't2' + (feito ? ' feito' : ''), text: sub || 'Registrar' }));
+      return [cabAba('Registrar', 'O que aconteceu hoje?'),
+        el('div', { class: 'ladrilhos' },
+          lad('prato', 'Refeição', est.comidas.length + (est.comidas.length === 1 ? ' registrada hoje' : ' registradas hoje'), () => abrirRefeicao(), 7, true),
+          lad('gota', 'Água', est.agua + ' de ' + META.agua + ' copos', () => abrir('agua'), 11, est.agua > 0),
+          lad('lua', 'Sono', est.feitos.sono, () => abrir('sono'), 12, !!est.feitos.sono), lad('corrida', 'Atividade física', est.feitos.atividade, () => abrir('atividade'), 13, !!est.feitos.atividade),
+          lad('sorriso', 'Humor', est.feitos.humor, () => abrir('humor'), 14, !!est.feitos.humor), lad('maca', 'Fome e saciedade', est.feitos.fome, () => abrir('fome'), 15, !!est.feitos.fome),
+          lad('onda', 'Intestino', est.feitos.intestino, () => abrir('intestino'), 16, !!est.feitos.intestino), lad('pilula', 'Remédios e vitaminas', Object.keys(est.tomou).length + ' de 2 tomados', () => abrir('remedios'), 18, Object.keys(est.tomou).length > 0),
+          lad('notas', 'Outros registros', est.feitos.outros || 'Álcool, tabaco e ciclo', () => abrir('outros'), 17, !!est.feitos.outros), lad('livro', 'Plano alimentar', 'O cardápio da equipe', () => abrir('plano'), 10)),
+        el('p', { class: 'mudo peq', text: 'Cada registro soma pontos e aparece na ficha que a equipe acompanha.' })];
+    },
 
-    // ---- refeição: busca, foto e código de barras, com o resultado simulado
-    refeicao: () => {
-      const qual = escolha(['Café da manhã', 'Almoço', 'Lanche', 'Jantar'], 'Refeição', est.refeicao);
-      qual.no.addEventListener('click', () => { est.refeicao = qual.valor(); });
-      return [cartao('Registrar refeição', [7, 8], qual.no,
-          el('div', { class: 'acoes-ref' }, el('button', { type: 'button', class: 'botao sec', onclick: () => abrir('buscar') }, ic('busca', 'p'), 'Buscar alimento'),
-            el('button', { type: 'button', class: 'botao sec', onclick: () => { est.foto = null; abrir('foto'); } }, ic('camera', 'p'), 'Foto do prato'),
-            el('button', { type: 'button', class: 'botao sec', onclick: () => abrir('codigo') }, ic('barras', 'p'), 'Código de barras'))),
-        cartao('Hoje', null, el('ul', { class: 'lista-simples' }, est.comidas.map(c => el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: c.refeicao + ': ' }), c.nome), el('span', { class: 'mudo peq', text: milhar(c.kcal) + ' kcal' })))),
-          el('p', { class: 'mudo peq', text: 'Total: ' + milhar(est.kcal) + ' kcal e ' + fmt(est.prot) + ' g de proteína.' }))];
-    },
-    buscar: () => {
-      const campo = el('input', { class: 'entrada', type: 'search', id: 'busca-alimento', placeholder: 'Ex.: arroz, frango, banana', autocomplete: 'off', value: est.busca, 'aria-label': 'Buscar alimento' });
-      const lista = el('ul', { class: 'lista-app' });
-      const desenhar = () => {
-        const q = campo.value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-        const achados = ALIMENTOS.filter(a => !q || a.nome.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
-        trocar(lista, achados.length ? achados.map(a => el('li', {}, el('button', { type: 'button', class: 'linha-app', onclick: () => { est.busca = campo.value; est.alimento = a; est.porcao = 1; abrir('alimento'); } },
-          caixaIc('prato'), el('span', { class: 'cresce' }, el('span', { class: 't1', text: a.nome }), el('span', { class: 't2', text: a.porcao + ' · ' + a.kcal + ' kcal' })), ic('seta', 'p'))))
-          : el('li', { class: 'vazio', text: 'Nenhum alimento com esse nome na demonstração. Tente "arroz" ou "frango".' }));
-      };
-      campo.addEventListener('input', desenhar); desenhar();
-      return [cartao('Buscar alimento', 7, campo, el('p', { class: 'mudo peq', text: 'Na demonstração, há 8 alimentos de exemplo.' })), lista];
-    },
-    alimento: () => {
-      const a = est.alimento || ALIMENTOS[0];
-      const nums = el('div');
-      const desenhar = () => trocar(nums, dados([['Calorias', milhar(a.kcal * est.porcao) + ' kcal'], ['Proteínas', fmt(a.prot * est.porcao) + ' g'], ['Carboidratos', fmt(a.carb * est.porcao) + ' g'], ['Gorduras', fmt(a.gord * est.porcao) + ' g']]));
-      const porcoes = el('div', { class: 'chips', role: 'radiogroup', 'aria-label': 'Quantas porções' });
-      const desenharP = () => trocar(porcoes, PORCOES.map(([v, t]) => el('button', { type: 'button', class: 'chip', role: 'radio', 'aria-checked': String(est.porcao === v), 'aria-pressed': String(est.porcao === v),
-        onclick: () => { est.porcao = v; desenharP(); desenhar(); } }, est.porcao === v ? ic('check', 'p') : null, t)));
-      desenhar(); desenharP();
-      return [cartao(a.nome, 8, el('p', { class: 'mudo peq', text: 'Porção: ' + a.porcao + '. Valores de exemplo.' }), el('p', { class: 'rot', text: 'Quanto você comeu?' }), porcoes, nums,
-        el('button', { type: 'button', class: 'botao', onclick: () => { registrarComida([{ ...a, kcal: a.kcal * est.porcao, prot: a.prot * est.porcao }]); } }, 'Registrar no ' + est.refeicao.toLowerCase()))];
-    },
-    foto: () => {
-      if (!est.foto) {
-        const area = el('div', { class: 'foto-leitura' }, caixaIc('camera', 'grande'), el('p', { text: 'Aponte a câmera para o prato.' }));
-        const tirar = el('button', { type: 'button', class: 'botao', onclick: () => {
-          tirar.disabled = true; trocar(area, el('div', { class: 'carregando', role: 'status', 'aria-label': 'Lendo a foto' }), el('p', { text: 'Lendo a foto…' }));
-          setTimeout(() => { est.foto = [ALIMENTOS[0], ALIMENTOS[1], ALIMENTOS[2], ALIMENTOS[7]].map(x => ({ ...x, marcado: true })); desenharTela('foto'); }, 1000);
-        } }, ic('camera', 'p'), 'Tirar a foto');
-        return [cartao('Foto do prato', 7, area, tirar, el('p', { class: 'mudo peq', text: 'Na demonstração, a câmera não abre: a leitura é simulada.' }))];
-      }
-      const total = () => est.foto.filter(x => x.marcado);
-      const botao = el('button', { type: 'button', class: 'botao', onclick: () => { if (total().length) registrarComida(total()); } }, 'Registrar ' + total().length + ' alimentos');
-      return [cartao('Encontrei no prato', 7, el('p', { class: 'mudo peq', text: 'Confira e tire o que não comeu.' }),
-        el('ul', { class: 'lista-simples' }, est.foto.map(x => el('li', {}, el('label', { class: 'marcar' }, el('input', { type: 'checkbox', checked: x.marcado, onchange: e => { x.marcado = e.target.checked; botao.textContent = 'Registrar ' + total().length + ' alimentos'; botao.disabled = !total().length; } }),
-          el('span', { class: 'cresce', text: x.nome }), el('span', { class: 'mudo peq', text: x.kcal + ' kcal' }))))), botao,
-        el('button', { type: 'button', class: 'botao leve', onclick: () => { est.foto = null; desenharTela('foto'); } }, 'Tirar outra foto'))];
-    },
-    codigo: () => {
-      const area = el('div', { class: 'foto-leitura' }, caixaIc('barras', 'grande'), el('p', { text: 'Aponte a câmera para o código de barras.' }));
-      const ler = el('button', { type: 'button', class: 'botao', onclick: () => {
-        ler.disabled = true; trocar(area, el('div', { class: 'carregando', role: 'status', 'aria-label': 'Lendo o código' }), el('p', { text: 'Lendo o código…' }));
-        setTimeout(() => { est.alimento = { nome: 'Iogurte natural integral (produto de exemplo)', porcao: '1 pote', kcal: 105, prot: 6.5, carb: 8, gord: 5.4 }; est.porcao = 1; est.pilha.pop(); abrir('alimento'); }, 1000);
-      } }, ic('barras', 'p'), 'Ler o código');
-      return [cartao('Código de barras', 7, area, ler, el('p', { class: 'mudo peq', text: 'Na demonstração, a leitura é simulada.' }))];
-    },
     plano: () => [cartao('Plano alimentar', 10, el('p', { class: 'mudo peq', text: 'Montado pela equipe da clínica.' }),
       el('ul', { class: 'plano' }, [['Café da manhã', 'Ovos mexidos, pão integral e fruta', 'Pode trocar por: iogurte natural com aveia'], ['Almoço', 'Arroz, feijão, frango e salada', 'Pode trocar por: peixe no lugar do frango'],
         ['Lanche', 'Fruta e castanhas', 'Pode trocar por: queijo branco'], ['Jantar', 'Omelete com legumes', 'Pode trocar por: sopa de legumes com frango']].map(([r, c, t]) => el('li', {}, el('strong', { text: r }), el('span', { text: c }), el('span', { class: 'mudo peq', text: t })))))],
@@ -226,7 +220,7 @@
       el('button', { type: 'button', class: 'botao', onclick: () => trocar(r, explica('No app de verdade, abre a câmera ou a galeria. A foto vai para a sua ficha na clínica.')) }, 'Adicionar foto'))]; },
 
     // ---- mais
-    mais: () => [el('h1', { text: 'Mais' }), el('ul', { class: 'lista-app' },
+    mais: () => [el('h1', { text: 'Perfil e mais' }), el('ul', { class: 'lista-app' },
       linhaIr('usuario', 'Perfil e objetivo', null, 'perfil', 5), linhaIr('calendario', 'Minhas consultas', null, 'consultas', 28), linhaIr('megafone', 'Avisos da clínica', null, 'avisos', 29),
       linhaIr('sino', 'Lembretes', null, 'lembretes', 30), linhaIr('livro', 'Conteúdo da clínica', null, 'conteudo', 31), linhaIr('clipe', 'Enviar exames', null, 'exames', 32),
       linhaIr('pessoas', 'Equipe e contatos', null, 'equipe', 33), linhaIr('conversa', 'Chat com a equipe', null, 'chat-equipe', 34), linhaIr('medalha', 'Conquistas', null, 'conquistas', 35),
@@ -266,12 +260,106 @@
     fotos: 'Fotos de progresso', perfil: 'Perfil', consultas: 'Consultas', avisos: 'Avisos', lembretes: 'Lembretes', conteudo: 'Conteúdo', exames: 'Exames', equipe: 'Equipe',
     'chat-equipe': 'Chat com a equipe', assistente: 'Assistente', conquistas: 'Conquistas', 'meus-dados': 'Meus dados', leitura: 'Leitura' };
 
-  function meta(nome, texto, v, max) { return [el('div', { class: 'meta' }, el('span', { text: nome }), el('span', { class: 'mudo', text: texto })), barra(v, max, nome + ': ' + texto)]; }
-  function registrarComida(lista) {
+  // ---------------------------------------------------------------- folha de refeição: buscar, foto e código de barras
+  // Tocar → escolher → "Registrar no …" → a confirmação → o anel sobe na tela Hoje.
+  const sem = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const REFEICOES = ['Café da manhã', 'Almoço', 'Lanche', 'Jantar'];
+  function abrirRefeicao(vista) {
+    const f = DEMO.folha({ titulo: 'Registrar refeição', dentro: document.querySelector('.celular') || undefined, foco: vista === 'foto' || vista === 'codigo' ? '.corpo-folha .botao' : '#busca-alimento',
+      aoFechar: () => DEMO.tela(est.pilha[est.pilha.length - 1] || est.aba) });
+    const ir = { busca: vistaBusca, foto: vistaFoto, codigo: vistaCodigo, alimento: vistaAlimento };
+    function vistaBusca() {
+      DEMO.tela('buscar');
+      const seg = el('div', { class: 'seg largo', role: 'radiogroup', 'aria-label': 'Qual refeição' });
+      const desenharSeg = () => trocar(seg, REFEICOES.map(r => el('button', { type: 'button', role: 'radio', 'aria-checked': String(est.refeicao === r), 'aria-pressed': String(est.refeicao === r),
+        onclick: () => { est.refeicao = r; desenharSeg(); } }, r)));
+      desenharSeg();
+      const campo = el('input', { class: 'entrada', type: 'search', id: 'busca-alimento', placeholder: 'Buscar alimento', autocomplete: 'off', enterkeyhint: 'search', value: est.busca, 'aria-label': 'Buscar alimento' });
+      const lista = el('ul', { class: 'busca-res', 'aria-live': 'polite' });
+      const achar = () => {
+        const q = sem(campo.value.trim()); est.busca = campo.value;
+        const achados = ALIMENTOS.filter(a => !q || sem(a.nome).includes(q));
+        trocar(lista, achados.length ? achados.map(a => el('li', {}, el('button', { type: 'button', class: 'linha-app', onclick: () => { est.alimento = a; est.porcao = 1; f.trocar(a.nome, vistaAlimento(), () => f.trocar('Registrar refeição', vistaBusca())); } },
+          caixaIc('prato'), el('span', { class: 'cresce' }, el('span', { class: 't1', text: a.nome }), el('span', { class: 't2', text: a.porcao })), el('span', { class: 'mudo peq tab', text: a.kcal + ' kcal' }), ic('seta', 'p'))))
+          : el('li', {}, el('div', { class: 'vazio' }, ilustracaoVazia(), el('p', { text: 'Nada com esse nome por aqui.' }), el('p', { class: 'peq', text: 'Na demonstração, tente "arroz" ou "frango".' }))));
+      };
+      campo.addEventListener('input', achar); achar();
+      return [el('div', { class: 'linha-h' }, el('p', { class: 'mudo peq cresce', text: 'Escolha a refeição e o alimento.' }), item(7)), seg,
+        el('div', { class: 'busca-campo' }, ic('busca'), campo),
+        el('div', { class: 'atalhos' }, el('button', { type: 'button', class: 'botao sec', onclick: () => f.trocar('Foto do prato', vistaFoto(), () => f.trocar('Registrar refeição', vistaBusca())) }, ic('camera'), 'Foto do prato'),
+          el('button', { type: 'button', class: 'botao sec', onclick: () => f.trocar('Código de barras', vistaCodigo(), () => f.trocar('Registrar refeição', vistaBusca())) }, ic('barras'), 'Código de barras')),
+        lista,
+        est.comidas.length ? el('section', { class: 'pilha' }, el('p', { class: 'sobretitulo', text: 'Hoje' }), el('ul', { class: 'lista-hoje' }, est.comidas.map(c => el('li', {},
+          el('span', { class: 'cresce' }, el('strong', { text: c.refeicao }), el('br'), el('span', { class: 'peq mudo', text: c.nome })), el('span', { class: 'peq tab', text: milhar(c.kcal) + ' kcal' }))))) : null];
+    }
+    function vistaAlimento() {
+      DEMO.tela('alimento');
+      const a = est.alimento || ALIMENTOS[0];
+      const kcal = el('span', { class: 'numero' }), out = el('output', { 'aria-live': 'polite' });
+      const MAC = [['prot', 'Proteínas', 40, ''], ['carb', 'Carboidratos', 60, ' carb'], ['gord', 'Gorduras', 30, ' gord']];
+      const linhas = MAC.map(([k, n, ref, cls]) => { const v = el('span', { class: 'val-m' }), b = el('div', { class: 'barra', 'aria-hidden': 'true' }, el('i')); return [k, ref, v, b, el('div', { class: 'macro' + cls }, el('span', { class: 'nome-m', text: n }), v, b)]; });
+      const botao = el('button', { type: 'button', class: 'botao grande cheio', onclick: () => registrarComida([{ ...a, kcal: a.kcal * est.porcao, prot: a.prot * est.porcao }], f) });
+      const atualizar = () => {
+        trocar(kcal, milhar(a.kcal * est.porcao), el('small', { text: 'kcal' }));
+        trocar(out, (est.porcao === 0.5 ? 'Meia porção' : fmt(est.porcao) + (est.porcao === 1 ? ' porção' : ' porções')));
+        for (const [k, ref, v, b] of linhas) { v.textContent = fmt(a[k] * est.porcao) + ' g'; b.firstChild.style.transform = 'scaleX(' + Math.min(1, a[k] * est.porcao / ref) + ')'; }
+        menos.disabled = est.porcao <= 0.5; mais.disabled = est.porcao >= 4;
+        botao.textContent = 'Registrar no ' + est.refeicao.toLowerCase();
+      };
+      const passo = d => { est.porcao = Math.min(4, Math.max(0.5, est.porcao + d)); atualizar(); };
+      const menos = el('button', { type: 'button', 'aria-label': 'Menos meia porção', onclick: () => passo(-0.5) }, ic('fechar', 'p'));
+      menos.replaceChildren(svgMenos());
+      const mais = el('button', { type: 'button', 'aria-label': 'Mais meia porção', onclick: () => passo(0.5) }, ic('mais', 'p'));
+      atualizar();
+      return [el('div', { class: 'linha-h' }, el('p', { class: 'mudo peq cresce', text: 'Porção: ' + a.porcao + '. Valores de exemplo.' }), item(8)),
+        el('div', { class: 'det-num' }, kcal),
+        el('div', { class: 'macros', role: 'group', 'aria-label': 'Nutrientes' }, linhas.map(x => x[4])),
+        el('div', { class: 'porcao-linha' }, el('span', { class: 'rot', text: 'Quanto você comeu?' }), el('div', { class: 'passo' }, menos, out, mais)),
+        botao];
+    }
+    function vistaFoto() {
+      DEMO.tela('foto');
+      if (!est.foto) {
+        const area = el('div', { class: 'foto-leitura' }, caixaIc('camera', 'grande'), el('p', { text: 'Aponte a câmera para o prato.' }));
+        const tirar = el('button', { type: 'button', class: 'botao grande cheio', onclick: () => {
+          tirar.disabled = true; trocar(area, el('div', { class: 'esqueleto', role: 'status', 'aria-label': 'Lendo a foto' }, el('i'), el('i', { class: 'curto' }), el('i')), el('p', { text: 'Lendo a foto…' }));
+          setTimeout(() => { est.foto = [ALIMENTOS[0], ALIMENTOS[1], ALIMENTOS[2], ALIMENTOS[7]].map(x => ({ ...x, marcado: true })); f.trocar('Encontrei no prato', vistaFoto(), () => f.trocar('Registrar refeição', vistaBusca())); }, 1000);
+        } }, ic('camera'), 'Tirar a foto');
+        return [el('div', { class: 'linha-h' }, el('p', { class: 'mudo peq cresce', text: 'Na demonstração, a câmera não abre: a leitura é simulada.' }), item(7)), area, tirar];
+      }
+      const total = () => est.foto.filter(x => x.marcado);
+      const rotulo = () => 'Registrar ' + total().length + (total().length === 1 ? ' alimento' : ' alimentos');
+      const botao = el('button', { type: 'button', class: 'botao grande cheio', onclick: () => { if (total().length) registrarComida(total(), f); } }, rotulo());
+      return [el('p', { class: 'mudo peq', text: 'Confira e tire o que não comeu.' }),
+        el('ul', { class: 'lista-simples' }, est.foto.map(x => el('li', {}, el('label', { class: 'marcar' }, el('input', { type: 'checkbox', checked: x.marcado, onchange: e => { x.marcado = e.target.checked; botao.textContent = rotulo(); botao.disabled = !total().length; } }),
+          el('span', { class: 'cresce', text: x.nome }), el('span', { class: 'mudo peq tab', text: x.kcal + ' kcal' }))))), botao,
+        el('button', { type: 'button', class: 'botao leve', onclick: () => { est.foto = null; f.trocar('Foto do prato', vistaFoto(), () => f.trocar('Registrar refeição', vistaBusca())); } }, 'Tirar outra foto')];
+    }
+    function vistaCodigo() {
+      DEMO.tela('codigo');
+      const area = el('div', { class: 'foto-leitura' }, caixaIc('barras', 'grande'), el('p', { text: 'Aponte a câmera para o código de barras.' }));
+      const ler = el('button', { type: 'button', class: 'botao grande cheio', onclick: () => {
+        ler.disabled = true; trocar(area, el('div', { class: 'esqueleto', role: 'status', 'aria-label': 'Lendo o código' }, el('i'), el('i', { class: 'curto' })), el('p', { text: 'Lendo o código…' }));
+        setTimeout(() => { est.alimento = { nome: 'Iogurte natural integral (produto de exemplo)', porcao: '1 pote', kcal: 105, prot: 6.5, carb: 8, gord: 5.4 }; est.porcao = 1;
+          f.trocar('Iogurte natural integral', vistaAlimento(), () => f.trocar('Registrar refeição', vistaBusca())); }, 1000);
+      } }, ic('barras'), 'Ler o código');
+      return [el('p', { class: 'mudo peq', text: 'Na demonstração, a leitura é simulada.' }), area, ler];
+    }
+    const v = ir[vista] ? vista : 'busca';
+    f.trocar(v === 'foto' ? 'Foto do prato' : v === 'codigo' ? 'Código de barras' : 'Registrar refeição', ir[v](), v === 'busca' ? null : () => f.trocar('Registrar refeição', vistaBusca()));
+    return f;
+  }
+  const svgMenos = () => { const s = ic('mais', 'p'); s.firstChild.setAttribute('d', 'M5 12h14'); return s; };
+  // Ilustração simples para os estados vazios (traço na cor da clínica).
+  function ilustracaoVazia() {
+    const s = svg('svg', { viewBox: '0 0 120 80', 'aria-hidden': 'true', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round' });
+    s.append(svg('ellipse', { cx: 60, cy: 52, rx: 40, ry: 12, opacity: '.35' }), svg('path', { d: 'M28 50a32 32 0 0 1 64 0' }), svg('path', { d: 'M52 30l6 6 12-12', 'stroke-width': '2.5' }), svg('circle', { cx: 98, cy: 18, r: 3, opacity: '.5' }), svg('circle', { cx: 18, cy: 26, r: 2, opacity: '.5' }));
+    return s;
+  }
+  function registrarComida(lista, f) {
     for (const c of lista) { est.kcal += c.kcal; est.prot += c.prot; est.comidas.push({ nome: c.nome, refeicao: est.refeicao, kcal: c.kcal, prot: c.prot }); }
-    est.busca = ''; est.foto = null;
-    ganhar(5, (lista.length > 1 ? lista.length + ' alimentos registrados' : 'Registrado') + ' no ' + est.refeicao.toLowerCase() + '.');
-    est.pilha = ['refeicao']; desenhar('refeicao');
+    est.busca = ''; est.foto = null; est.sobe = est.prot < META.prot ? 'prot' : 'kcal';
+    f.fechar(() => { ganhar(5, lista.length > 1 ? lista.length + ' alimentos registrados' : 'Registrado no ' + est.refeicao.toLowerCase()); irAba('inicio'); });
   }
   // Mapa do corpo (frente): abdômen, coxas e braços. A última aplicação aparece riscada; a sugerida, na cor da clínica.
   function mapaCorpo() {
@@ -327,29 +415,49 @@
   const bolha = (quem, texto) => el('div', { class: 'bolha ' + quem, text: texto });
 
   // ---------------------------------------------------------------- navegação (dentro da página; o # guarda o código)
-  const ABAS = [['inicio', 'Início', 'casa'], ['registrar', 'Registrar', 'mais'], ['picadinha', 'Picadinha', 'seringa'], ['evolucao', 'Evolução', 'grafico'], ['mais', 'Mais', 'menu']];
+  // 4 abas na barra de vidro; o perfil fica no canto de cada aba (o antigo "Mais").
+  const ABAS = [['inicio', 'Hoje', 'hoje'], ['registrar', 'Registrar', 'registrar'], ['picadinha', 'Picadinha', 'seringa'], ['evolucao', 'Evolução', 'grafico']];
   function irAba(aba) { est.aba = aba; est.pilha = []; desenhar(aba); }
   function abrir(tela) { est.pilha.push(tela); desenhar(tela); }
   function voltar() { est.pilha.pop(); desenhar(est.pilha[est.pilha.length - 1] || est.aba); }
   function desenharTela(tela) { desenhar(tela, true); }
+  // Troca de tela com transição; a primeira tela e as atualizações da mesma tela, direto.
   function desenhar(tela, mesma) {
+    if (mesma || !document.querySelector('.celular')) montarTela(tela, mesma); else DEMO.transicao(() => montarTela(tela, mesma));
+  }
+  function montarTela(tela, mesma) {
+    const rolagemAntes = document.querySelector('.rolagem');
+    const topoAntes = mesma ? (rolagemAntes ? rolagemAntes.scrollTop : 0) : 0;
     const corpo = TELAS[tela] ? TELAS[tela]() : TELAS.inicio();
     const sub = est.pilha.length > 0;
     const telaApp = el('main', { class: 'tela-app', id: 'conteudo', tabindex: '-1' },
-      sub ? el('div', { class: 'cab-sub' }, el('button', { type: 'button', class: 'botao sec', onclick: voltar }, ic('voltar', 'p'), 'Voltar'), el('strong', { text: NOMES[tela] || '' })) : null, corpo);
-    const abas = tela === 'boas-vindas' ? null : el('nav', { class: 'abas-app', 'aria-label': 'Partes do app' }, ABAS.map(([k, n, i]) =>
-      el('button', { type: 'button', 'aria-current': est.aba === k && !sub ? 'page' : null, onclick: () => irAba(k) }, ic(i), n)));
-    trocar(raiz, DEMO.topo('App do paciente · demonstração', 'entrada'), el('div', { class: 'celular' }, telaApp, abas),
-      el('div', { class: 'rodape-demo' }, el('a', { class: 'botao sec', href: DEMO.link('central') }, 'Ver a central do médico'), el('a', { class: 'botao sec', href: DEMO.link('escopo') }, 'Montar o escopo'), DEMO.botaoConversar('leve')));
+      sub ? el('div', { class: 'cab-sub' }, el('button', { type: 'button', class: 'botao sec quadrado pilula', 'aria-label': 'Voltar', onclick: voltar }, ic('voltar')), el('strong', { class: 'cresce', text: NOMES[tela] || '' })) : null, corpo);
+    const abas = tela === 'boas-vindas' ? null : el('nav', { class: 'abas-app vidro', 'aria-label': 'Partes do app' }, ABAS.map(([k, n, i]) => {
+      const ativa = est.aba === k;
+      return el('button', { type: 'button', 'aria-current': ativa ? 'page' : null, onclick: () => irAba(k) }, ic(i, null, ativa), n);
+    }));
+    const rolagem = el('div', { class: 'rolagem' }, telaApp);
+    const outras = () => [el('a', { class: 'botao sec', href: DEMO.link('central') }, 'Ver a central do médico'), el('a', { class: 'botao sec', href: DEMO.link('escopo') }, 'Montar o escopo'), DEMO.botaoConversar('leve')];
+    const ladoEsq = el('aside', { class: 'lado-app esq', 'aria-label': 'Como usar' }, el('p', { class: 'sobretitulo', text: 'App do paciente' }), el('h2', { text: 'Toque como se fosse a ' + PACIENTE + '.' }),
+      el('p', { class: 'dica' }, caixaIc('prato', 'peq'), 'Registre uma refeição e veja o anel do dia subir.'),
+      el('p', { class: 'dica' }, caixaIc('seringa', 'peq'), 'Na picadinha, o que é da equipe vem travado.'),
+      el('p', { class: 'dica' }, caixaIc('lista', 'peq'), 'Os marcadores "item" levam ao escopo.'));
+    const ladoDir = el('aside', { class: 'lado-app dir', 'aria-label': 'Outras partes' }, el('p', { class: 'sobretitulo', text: 'Continue por aqui' }), el('div', { class: 'pilha' }, outras()));
+    trocar(raiz, DEMO.topo('App do paciente · demonstração', 'entrada'),
+      el('div', { class: 'palco' }, ladoEsq, el('div', { class: 'celular' }, rolagem, abas), ladoDir),
+      DEMO.embed ? null : el('div', { class: 'rodape-demo so-estreito' }, outras()));
     DEMO.tela(tela);
     if (!mesma) window.scrollTo(0, 0);
+    rolagem.scrollTop = topoAntes;
   }
 
   DEMO.iniciar({ pagina: 'app', raiz, montar: d => {
     document.title = 'App do paciente · ' + d.clinica;
     const pedida = DEMO.extra.tela;
-    const REGISTRAR = ['refeicao', 'plano', 'agua', 'sono', 'atividade', 'humor', 'fome', 'intestino', 'outros', 'remedios'];
-    if (pedida && TELAS[pedida] && pedida !== 'boas-vindas') {
+    const REGISTRAR = ['plano', 'agua', 'sono', 'atividade', 'humor', 'fome', 'intestino', 'outros', 'remedios'];
+    const FOLHA = { refeicao: 'busca', buscar: 'busca', alimento: 'busca', foto: 'foto', codigo: 'codigo' };
+    if (FOLHA[pedida]) { irAba('inicio'); abrirRefeicao(FOLHA[pedida]); }
+    else if (pedida && TELAS[pedida] && pedida !== 'boas-vindas') {
       if (['inicio', 'registrar', 'picadinha', 'evolucao', 'mais'].includes(pedida)) irAba(pedida);
       else { est.aba = REGISTRAR.includes(pedida) ? 'registrar' : ['medidas', 'fotos'].includes(pedida) ? 'evolucao' : 'mais'; abrir(pedida); }
     } else desenhar('boas-vindas');

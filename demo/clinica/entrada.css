@@ -1,0 +1,54 @@
+/* Entrada: título editorial, o celular com o app de verdade (iPad e computador) e os caminhos em blocos (bento). */
+.pagina-entrada { gap: var(--e-7); }
+.heroi-e { display: grid; gap: var(--e-6); align-items: center; padding-top: var(--e-4); }
+@media (min-width: 900px) { .heroi-e { grid-template-columns: minmax(0, 1fr) 360px; gap: var(--e-7); padding-top: var(--e-6); } }
+.texto-heroi { display: grid; gap: var(--e-4); justify-items: start; }
+.titulo-display { font-size: var(--t-display); line-height: 1.04; letter-spacing: -.035em; font-weight: 750; max-width: 16ch; text-wrap: balance; }
+.lead { font-size: clamp(1.05rem, 1rem + .3vw, 1.2rem); color: var(--tinta-2); max-width: 46ch; }
+.texto-heroi .botoes { margin-top: var(--e-2); }
+.progresso { display: inline-flex; flex-wrap: wrap; gap: 6px; padding: 4px; border-radius: var(--r-pilula); background: var(--superficie-3); }
+.passo-p { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--r-pilula); font-size: var(--t-peq); font-weight: 650; color: var(--tinta-2); }
+.passo-p.feito { background: var(--superficie); color: var(--ok); box-shadow: var(--sombra-1); }
+.traco-p { width: 10px; height: 2px; border-radius: 2px; background: currentColor; display: inline-block; }
+.conversar-topo { min-height: 44px; padding: 0 var(--e-4); font-size: .9rem; }
+.conversar-topo::before { content: ''; position: absolute; inset: -2px 0; }
+.conversar-topo { position: relative; }
+@media (max-width: 420px) { .conversar-topo { padding: 0 12px; font-size: .82rem; } }
+
+/* o celular na tela, com o app funcionando */
+.aparelho { display: none; }
+@media (min-width: 900px) {
+  .aparelho { display: grid; gap: var(--e-3); justify-items: center; }
+  .tela-aparelho { width: 360px; height: 740px; border-radius: 52px; padding: 10px; background: #111317; box-shadow: var(--sombra-3), inset 0 0 0 1px rgba(255, 255, 255, .08); }
+  .tela-aparelho iframe { width: 100%; height: 100%; border: 0; border-radius: 42px; background: var(--fundo); display: block; }
+  .legenda-aparelho { display: inline-flex; align-items: center; gap: 6px; }
+}
+
+/* bento: o app maior; central, escopo e 3 destaques */
+.bento { display: grid; gap: var(--e-3); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bento .grande { grid-column: 1 / -1; } }
+@media (min-width: 1000px) { .bento { grid-template-columns: repeat(3, minmax(0, 1fr)); } .bento .grande { grid-column: span 2; grid-row: span 2; } }
+.bento-bloco { position: relative; display: grid; gap: var(--e-4); align-content: start; padding: var(--e-5); border-radius: var(--r-cartao); background: var(--superficie); border: 1px solid var(--linha);
+  box-shadow: var(--sombra-1); color: var(--tinta); text-decoration: none; overflow: hidden; min-width: 0; }
+a.bento-bloco { transition: transform .2s var(--suave), box-shadow .2s; }
+a.bento-bloco:hover { box-shadow: var(--sombra-2); }
+a.bento-bloco:active { transform: scale(.985); }
+.bento-txt { display: grid; gap: 6px; }
+.bento-bloco h2 { font-size: var(--t-h2); }
+.bento-bloco .ir { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--superficie-2); color: var(--tinta); transition: transform .2s var(--suave); }
+a.bento-bloco:hover .ir { transform: translateX(3px); }
+.bento .grande { background: linear-gradient(160deg, var(--acento-suave) 0%, var(--superficie) 60%); }
+.bento .grande h2 { font-size: var(--t-h1); }
+.mini-aneis { width: 140px; height: 140px; justify-self: end; margin-top: auto; }
+@media (min-width: 1000px) { .mini-aneis { width: 200px; height: 200px; } }
+.mini-aneis circle { fill: none; stroke-width: 11; } .mini-aneis .trilho { stroke: var(--anel-trilho); }
+.mini-aneis .a0 { stroke: var(--anel-1); } .mini-aneis .a1 { stroke: var(--anel-2); } .mini-aneis .a2 { stroke: var(--anel-3); }
+.mini-lista { display: grid; gap: 6px; }
+.mini-linha { display: flex; align-items: center; gap: var(--e-2); padding: 8px 12px; border-radius: 12px; background: var(--superficie-2); font-size: var(--t-mini); font-weight: 600; color: var(--tinta-2); }
+.pt { width: 8px; height: 8px; border-radius: 50%; flex: none; } .pt.alerta { background: var(--alerta); } .pt.atencao { background: var(--atencao); } .pt.ok { background: var(--ok); }
+.mini-escopo { display: flex; gap: 2px; padding: 3px; border-radius: 99px; background: var(--superficie-3); font-size: var(--t-mini); font-weight: 650; color: var(--tinta-2); justify-self: start; }
+.mini-escopo span { padding: 6px 10px; border-radius: 99px; } .mini-escopo .on { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
+.destaque-b { gap: var(--e-2); padding: var(--e-4) var(--e-5); background: var(--superficie-2); box-shadow: none; }
+.destaque-b h3 { font-size: 1rem; }
+.conversar-topo { white-space: nowrap; }
+@media (max-width: 440px) { .topo:has(.conversar-topo) .sub { display: none; } }
