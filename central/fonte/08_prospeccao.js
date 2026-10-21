@@ -692,8 +692,8 @@ async function pBuscas(c) {
   const f = est.buscasFiltro;
   const r = await chamar('prosp_buscas', { publico_id: f.publico_id || '' }); if (falhou(c, r, 'Buscas')) return;
   const d = r.dados, editar = ligada('editar_prospeccao'), pbs = pubsAtivos(), tot = d.creditos_total || null;
-  // sql/036: a busca é de um público (o workflow 50 traz uma página a cada 5 minutos e gasta créditos do SerpAPI).
-  const buscar = () => fazer('prosp_buscar_agora', {}, { titulo: 'Buscar agora', texto: 'Uma busca por termo × lugar do público entra na fila (pula o que foi buscado há menos de "não repetir"); o workflow 50 traz uma página a cada 5 minutos e gasta créditos do SerpAPI.',
+  // sql/036: a busca é de um público (o workflow 50 traz uma página por rodada e gasta créditos do SerpAPI; DEC-124).
+  const buscar = () => fazer('prosp_buscar_agora', {}, { titulo: 'Buscar agora', texto: 'Uma busca por termo × lugar do público entra na fila (pula o que foi buscado há menos de "não repetir"); o workflow 50 traz uma página por rodada e gasta créditos do SerpAPI.',
     campos: [{ k: 'publico_id', rot: 'Público', opcoes: pbs.map(p => [p.id, p.nome]) }], botao: 'Buscar' });
   const SITB = { pedida: ['na fila', 'info'], rodando: ['buscando', 'atencao'], feita: ['feita', 'ok'], falhou: ['falhou', 'perigo'] };
   const selPb = el('select', { class: 'entrada', 'aria-label': 'Público', onchange: e => { f.publico_id = e.target.value; rotear(); } }, el('option', { value: '', text: 'Todos os públicos' }),
