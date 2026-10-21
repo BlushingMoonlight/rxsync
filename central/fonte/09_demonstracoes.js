@@ -16,10 +16,10 @@ const DEM_APARELHO = { celular: ['celular', 'celulares'], tablet: ['tablet', 'ta
 // Os 46 itens do escopo da demonstração (a mesma numeração de demo/clinica/escopo/itens.js; o verificar_site.mjs confere).
 const DEM_ITENS = ['Entrar pelo link', 'Marca da clínica', 'Ícone na tela do celular', 'Boas-vindas e aceite', 'Perfil e objetivo', 'Tela inicial', 'Registrar refeição',
   'Porção e nutrientes', 'Metas do dia', 'Plano alimentar', 'Água', 'Sono', 'Atividade física', 'Humor', 'Fome e saciedade', 'Intestino', 'Outros registros', 'Remédios e vitaminas',
-  'Peso e medidas', 'Gráficos de evolução', 'Avaliação da consulta', 'Fotos de progresso', 'Picadinha', 'Lembrete da aplicação', 'Rodízio do local', 'Como se sentiu',
+  'Peso e medidas', 'Gráficos de evolução', 'Avaliação da consulta', 'Fotos de progresso', 'Aplicações', 'Lembrete da aplicação', 'Rodízio do local', 'Como se sentiu',
   'Sintomas que avisam a equipe', 'Minhas consultas', 'Avisos da clínica', 'Lembretes', 'Conteúdo da clínica', 'Enviar exames', 'Equipe e contatos', 'Chat com a equipe', 'Conquistas',
   'Assistente de dúvidas', 'Meus dados', 'Leitura confortável', 'Pacientes da semana', 'Alertas', 'Ficha do app', 'Evolução do paciente', 'Metas e plano alimentar',
-  'Prescrição da picadinha', 'Avisos e conteúdo', 'Funções do app'];
+  'Prescrição das aplicações', 'Avisos e conteúdo', 'Funções do app'];
 const nomeItem = n => DEM_ITENS[n - 1] ? `${n}. ${DEM_ITENS[n - 1]}` : 'Item ' + n;
 const irD = (...partes) => ir(['demonstracoes', ...partes.filter(x => x != null && x !== '').map(x => encodeURIComponent(x))].join('/'));
 const minutos = s => { const m = Math.round((Number(s) || 0) / 60); return m < 1 ? 'menos de 1 min' : fmtNum(m) + ' min'; };

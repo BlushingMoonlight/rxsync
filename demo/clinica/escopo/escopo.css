@@ -30,3 +30,17 @@
 .contagem { font-size: .95rem; color: var(--tinta-2); }
 .contagem strong { color: var(--ok); }
 @media (max-width: 480px) { .barra-escopo .botao { flex: 1 1 100%; } }
+/* o escopo é a proposta: uma folha de documento, separada do app e da central */
+.v-doc, .pagina-escopo { width: min(920px, 100%); }
+.documento { background: var(--superficie); border: 1px solid var(--linha); border-radius: 20px; box-shadow: var(--sombra-2); padding: var(--e-5) var(--e-4); display: grid; gap: var(--e-5); }
+@media (min-width: 768px) { .documento { padding: var(--e-7) var(--e-7) var(--e-6); } }
+.cab-doc { display: grid; gap: var(--e-3); padding-bottom: var(--e-5); border-bottom: 2px solid var(--tinta); }
+.cab-doc h1 { font-size: var(--t-h1); }
+.meta-doc { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px var(--e-4); margin: 0; font-size: var(--t-peq); }
+.meta-doc dt { color: var(--tinta-2); } .meta-doc dd { margin: 0; font-weight: 600; }
+.documento .grupos { gap: 0; }
+.documento .grupo-escopo { border-bottom: 1px solid var(--linha); border-radius: 0; box-shadow: none; background: none; }
+.documento .grupo-escopo summary { padding: var(--e-3) 0; }
+.documento .item-escopo { padding: var(--e-4) 0; }
+.documento .itens-grupo { border-top: 0; }
+.documento .fim-escopo { padding-top: var(--e-2); }

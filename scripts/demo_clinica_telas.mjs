@@ -1,8 +1,9 @@
 // Demonstração por link (demo/clinica/, DEC-125): fotos e conferências de todas as telas no celular (360, 390 e 430 px),
 // no iPad e no computador, com o workflow 43 SIMULADO (nada sai para a internet; dados inventados). Confere em cada
 // tela: nenhuma rolagem para o lado, alvos de toque de 44 px, contraste do texto (4,5:1; texto grande 3:1), nenhum
-// "null"/"undefined" na tela e nenhum erro no console. Confere também os caminhos: marcar e enviar o escopo, "Quero
-// conversar", pergunta no chat (vai no lote de eventos), link inativo, fora do ar e sem código.
+// "null"/"undefined" na tela e nenhum erro no console. Confere também os caminhos: marcar e enviar o escopo, pergunta no
+// chat (vai no lote de eventos), a coerência entre o app e a central (mesma fonte de dados, o ciclo nos dois sentidos),
+// link inativo, fora do ar e sem código.
 // Uso (precisa do Playwright): node scripts/demo_clinica_telas.mjs [pasta das fotos]   ·   sem fotos: node scripts/demo_clinica_telas.mjs - sem-fotos
 import fs from 'node:fs';
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
@@ -52,9 +53,9 @@ function medir() {
 }
 
 const TELAS = [['', 'entrada'], ['app/', 'app (boas-vindas)'], ['app/', 'app início', 'tela=inicio'], ['app/', 'app registrar', 'tela=registrar'], ['app/', 'app refeição', 'tela=refeicao'],
-  ['app/', 'app picadinha', 'tela=picadinha'], ['app/', 'app evolução', 'tela=evolucao'], ['app/', 'app mais', 'tela=mais'], ['app/', 'app assistente', 'tela=assistente'], ['app/', 'app chat', 'tela=chat-equipe'],
+  ['app/', 'app aplicações', 'tela=aplicacoes'], ['app/', 'app evolução', 'tela=evolucao'], ['app/', 'app mais', 'tela=mais'], ['app/', 'app assistente', 'tela=assistente'], ['app/', 'app chat', 'tela=chat-equipe'],
   ['app/', 'app lembretes', 'tela=lembretes'], ['app/', 'app buscar', 'tela=buscar'], ['app/', 'app foto', 'tela=foto'], ['app/', 'app sono', 'tela=sono'], ['central/', 'central'], ['central/', 'central alertas', 'tela=alertas'], ['central/', 'central ficha', 'tela=ficha'], ['central/', 'central metas', 'tela=metas'],
-  ['central/', 'central picadinha', 'tela=picadinha'], ['central/', 'central avisos', 'tela=avisos'], ['central/', 'central funções', 'tela=funcoes'], ['escopo/', 'escopo'], ['escopo/', 'escopo item 23', 'item=23']];
+  ['central/', 'central aplicações', 'tela=aplicacoes'], ['central/', 'central avisos', 'tela=avisos'], ['central/', 'central funções', 'tela=funcoes'], ['escopo/', 'escopo'], ['escopo/', 'escopo item 23', 'item=23']];
 const APARELHOS = [['celular360', { width: 360, height: 740 }, true], ['celular390', { width: 390, height: 844 }, true], ['celular430', { width: 430, height: 932 }, true],
   ['ipad', { width: 820, height: 1180 }, true], ['computador', { width: 1440, height: 900 }, false]];
 
@@ -106,19 +107,18 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.getByRole('button', { name: 'Entendi' }).click();
   await page.reload(); await page.waitForSelector('.bento');
   ok(await page.locator('.faixa').count() === 0, 'privacidade: depois do "Entendi", a faixa não volta');
-  // Quero conversar: só avisa (sem WhatsApp, sem telefone) e mostra "Pronto, o Jean vai te chamar".
-  await page.getByRole('button', { name: 'Quero conversar' }).first().click();
-  await page.fill('#recado', 'Pode me chamar à tarde'); await page.getByRole('button', { name: 'Enviar' }).click();
-  const conv = await espera(() => pedidos.find(p => p.tipo === 'conversar'));
-  ok(conv && conv.texto === 'Pode me chamar à tarde', 'conversar: o recado vai no pedido');
-  await page.waitForSelector('text=Pronto, o Jean vai te chamar.');
-  ok(!/wa\.me|whatsapp:\/\/|tel:/.test(await page.content()), 'conversar: nenhum link de WhatsApp nem telefone na página');
+  // Sem "Quero conversar" (só a faixa da demonstração fala da demonstração) e nenhum link de WhatsApp ou telefone.
+  ok(await page.getByRole('button', { name: 'Quero conversar' }).count() === 0 && !/Quero conversar/.test(await page.content()), 'entrada: sem "Quero conversar"');
+  ok(!/wa\.me|whatsapp:\/\/|tel:/.test(await page.content()), 'entrada: nenhum link de WhatsApp nem telefone na página');
+  ok(await page.locator('.faixa-demo [aria-current="page"]').innerText() === 'Início', 'faixa: na entrada, "Início" marcado');
+  await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=inicio`); await page.waitForSelector('#conteudo h1');
+  ok(await page.locator('#chave-itens').getAttribute('aria-checked') === 'false' && await page.locator('.item:visible').count() === 0, 'itens: desligados por padrão (o app abre limpo)');
   // Escopo: marcar "Quero" no item 23 grava em 1,5 s; "Enviar para a RXSync" manda tudo.
   await page.goto(`${site.base}/demo/clinica/escopo/#${ATIVO}`); await page.waitForSelector('.grupo-escopo');
   ok(await page.locator('.grupo-escopo[open]').count() === 1, 'escopo: só o primeiro grupo começa aberto');
-  await page.locator('.grupo-escopo summary', { hasText: 'Picadinha' }).click();
+  await page.locator('.grupo-escopo summary', { hasText: 'Aplicações' }).click();
   await page.locator('#item-23').getByRole('button', { name: 'Quero' }).click();
-  ok(/1 de 5 marcados/.test(await page.locator('.grupo-escopo summary', { hasText: 'Picadinha' }).innerText()), 'escopo: o grupo conta o que foi marcado');
+  ok(/1 de 5 marcados/.test(await page.locator('.grupo-escopo summary', { hasText: 'Aplicações' }).innerText()), 'escopo: o grupo conta o que foi marcado');
   const marc = await espera(() => pedidos.find(p => p.tipo === 'escopo' && !p.enviar), 4000);
   ok(marc && marc.escolhas && marc.escolhas['23'] && marc.escolhas['23'].e === 'quero', `escopo: a escolha do item 23 vai sozinha (${JSON.stringify(marc && marc.escolhas)})`);
   ok(/2 quero/.test(await page.locator('.contagem').innerText()), 'escopo: a contagem sobe para 2 quero');
@@ -131,7 +131,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(await page.locator('.item.destaque').getAttribute('data-item') === '25', 'ver na tela: o item 25 fica destacado no app');
   // Marcador: abre o balão com o item e o "Ver no escopo".
   await page.locator('.item[data-item="23"]').click();
-  ok(/Picadinha/.test(await page.locator('.janela').innerText()) && await page.locator('.janela a', { hasText: 'Ver no escopo' }).getAttribute('href') === `../escopo/#${ATIVO}&item=23`, 'marcador: o balão leva ao item no escopo');
+  ok(/Aplicações/.test(await page.locator('.janela').innerText()) && await page.locator('.janela a', { hasText: 'Ver no escopo' }).getAttribute('href') === `../escopo/#${ATIVO}&item=23`, 'marcador: o balão leva ao item no escopo');
   await page.keyboard.press('Escape');
   // Pergunta no chat do assistente: vai no lote de eventos (a cada 10 s), com o chat e o texto; o resto da tela não.
   await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=assistente`); await page.waitForSelector('#msg-ia');
@@ -158,7 +158,9 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   // Folha de refeição (Hoje → "Registrar refeição"): buscar → detalhe → porção → "Registrar no …" → a confirmação → o anel sobe.
   const folha = () => page.locator('.folha');
   await telaApp('inicio');
-  const kcalAntes = await page.locator('.meta', { hasText: 'Calorias' }).innerText();
+  const num = t => Number(String(t).replace(/\./g, '').replace(',', '.').match(/-?\d+(\.\d+)?/)[0]);
+  const valorMeta = async k => num(await page.locator('.meta[data-meta="' + k + '"] .valor').innerText());
+  const kcalAntes = await valorMeta('kcal');
   await page.locator('#conteudo').getByRole('button', { name: 'Registrar refeição' }).click();
   await page.fill('#busca-alimento', 'frango');
   ok(await folha().locator('.linha-app').count() === 1, 'buscar: "frango" acha 1 alimento, na hora');
@@ -169,8 +171,8 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.waitForSelector('.confirma');
   ok(/Registrado/.test(await page.locator('.confirma').innerText()), 'registrar: a confirmação "Registrado" aparece');
   await page.waitForSelector('.folha', { state: 'detached' });
-  const kcalDepois = await page.locator('.meta', { hasText: 'Calorias' }).innerText();
-  ok(kcalAntes !== kcalDepois && /1\.178/.test(kcalDepois), `hoje: a meta de calorias sobe (${kcalAntes} → ${kcalDepois})`);
+  const kcalDepois = await valorMeta('kcal');
+  ok(kcalDepois === kcalAntes + 318, `hoje: as calorias do dia sobem 318 kcal (${kcalAntes} → ${kcalDepois})`);
   ok(await page.locator('.aneis g.sobe').count() === 1, 'hoje: o anel que mudou sobe');
   // Foto do prato: lê em 1 s e mostra os alimentos para confirmar.
   await page.locator('#conteudo').getByRole('button', { name: 'Registrar refeição' }).click();
@@ -204,53 +206,102 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(/7 a 8h · Bem/.test(await page.locator('#conteudo .linha-app', { hasText: 'Sono' }).innerText()), 'sono: aparece em Registrar');
   await page.getByRole('navigation', { name: 'Partes do app' }).getByRole('button', { name: 'Hoje' }).click();
   ok(await pontos() === p0 + 5, `sono: +5 pontos na tela Hoje (${p0} → ${await pontos()})`);
-  // Água: "1 copo de água" na tela Hoje soma na hora; a tela de água soma a garrafa.
-  await page.locator('#conteudo').getByRole('button', { name: '1 copo de água' }).click();
-  ok(/5\s*de 8 copos/.test(await page.locator('.meta', { hasText: 'Água' }).innerText()), 'água: 1 copo na tela Hoje');
-  await telaApp('agua'); await page.getByRole('button', { name: '1 garrafa (2 copos)' }).click();
+  // Água: "+250 mL de água" na tela Hoje soma na hora; a folha de água soma a garrafa (500 mL).
+  const agua0 = await valorMeta('agua');
+  await page.locator('#conteudo').getByRole('button', { name: '+250 mL de água' }).click();
+  ok(await valorMeta('agua') === agua0 + 250, 'água: +250 mL na tela Hoje');
+  await telaApp('agua'); await page.getByRole('button', { name: '1 garrafa (500 mL)' }).click();
   await page.waitForSelector('.folha', { state: 'detached' });
-  ok(/6 de 8 copos/.test(await page.locator('#conteudo .linha-app', { hasText: 'Água' }).innerText()), 'água: 1 garrafa soma 2 copos');
-  // Itens do escopo: o interruptor esconde os marcadores (o app fica como o paciente vê) e a escolha vale na aba.
+  ok(new RegExp(String(agua0 + 500).replace(/\B(?=(\d{3})+$)/, '.') + ' de 2\\.000 mL').test(await page.locator('#conteudo .linha-app', { hasText: 'Água' }).innerText()), 'água: 1 garrafa soma 500 mL (a página abriu de novo: a memória recomeça)');
+  // Itens do escopo: desligados por padrão (o app abre limpo, como o paciente vê); ligados, aparecem e a escolha vale na aba.
+  const itensLigados = async () => await page.locator('#chave-itens').getAttribute('aria-checked') === 'true';
+  if (await itensLigados()) await page.locator('#chave-itens').click();   // o "Ver na tela" de antes ligou
+  ok(await page.locator('.item:visible').count() === 0, 'itens: desligados, nenhum marcador (o app como o paciente vê)');
   await page.locator('#chave-itens').click();
-  ok(await page.locator('.item:visible').count() === 0, 'itens: desligado, nenhum marcador aparece');
-  await telaApp('inicio'); ok(await page.locator('.item:visible').count() === 0 && await page.locator('#chave-itens').getAttribute('aria-checked') === 'false', 'itens: a escolha vale nas outras telas da aba');
-  await page.locator('#chave-itens').click(); ok(await page.locator('.item:visible').count() > 0, 'itens: ligado de novo, os marcadores voltam');
+  await telaApp('inicio'); ok(await page.locator('.item:visible').count() > 0 && await page.locator('#chave-itens').getAttribute('aria-checked') === 'true', 'itens: ligados, aparecem e a escolha vale nas outras telas da aba');
+  await page.locator('#chave-itens').click(); ok(await page.locator('.item:visible').count() === 0, 'itens: desligados de novo, somem');
   // Evolução: o período muda o gráfico e o controle mostra o valor de cada semana.
   await telaApp('evolucao'); await page.getByRole('radio', { name: '1 mês' }).click();
   await page.locator('.faixa-pontos').fill('0');
-  ok(/76,2/.test(await page.locator('.leitura-graf').innerText()), `evolução: o controle mostra o peso da semana (${await page.locator('.leitura-graf').innerText()})`);
-  // Picadinha: sem número de dose; campos travados; mapa do corpo; registrar muda o último local.
-  await telaApp('picadinha');
+  ok(/77,1/.test(await page.locator('.leitura-graf').innerText()), `evolução: o controle mostra o peso de cada pesagem (${await page.locator('.leitura-graf').innerText()})`);
+  // Aplicações: sem número de dose; campos travados; mapa do corpo; registrar muda o último local.
+  await telaApp('aplicacoes');
   const pic = await textoMain();
-  ok(/Medicamento cadastrado pela equipe/.test(pic) && (pic.match(/Preenchido pela equipe/g) || []).length === 3, 'picadinha: medicamento e os 3 campos "Preenchido pela equipe"');
-  ok(!/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg)\b/.test(pic), 'picadinha: nenhum número de dose');
-  ok(await page.locator('svg.corpo .local.sugerido').count() === 1 && await page.locator('svg.corpo .local.ultimo').count() === 1, 'rodízio: o mapa marca o último local e o sugerido');
-  ok(await page.getByRole('radio', { name: 'Abdômen direito' }).isDisabled(), 'rodízio: o último local não pode ser escolhido de novo');
-  await page.getByRole('radio', { name: 'Enjoo forte' }).click();
+  ok(/Medicamento cadastrado pela equipe/.test(pic) && (pic.match(/Preenchido pela equipe/g) || []).length === 3, 'aplicações: medicamento e os 3 campos "Preenchido pela equipe"');
+  ok(!/\d+(,\d+)?\s*(mg|UI|mcg)\b/.test(pic) && !/\d+(,\d+)?\s*mL/.test(pic), 'aplicações: nenhum número de dose');
+  ok(!/picadinha/i.test(pic), 'aplicações: o nome é "Aplicações"');
+  ok(await page.locator('svg.corpo .local.sugerido').count() === 1 && await page.locator('svg.corpo .local.ultimo').count() === 1, 'rodízio: o mapa marca o último local e o escolhido');
+  ok(await page.locator('.mapa .chip[disabled]').count() === 1, 'rodízio: o último local não pode ser escolhido de novo');
+  const escolhido = (await page.locator('.mapa .chip[aria-pressed="true"]').innerText()).trim().toLowerCase();
+  await page.getByRole('radio', { name: 'Bem', exact: true }).click();
   await page.getByRole('button', { name: 'Registrar aplicação' }).click();
-  await page.waitForSelector('text=A enfermagem da clínica recebeu um aviso');
-  await page.keyboard.press('Escape');
-  ok(/Última: abdômen esquerdo/.test(await textoMain()) && /Sexta que vem/.test(await textoMain()), 'picadinha: o local e a próxima aplicação mudam');
+  ok(new RegExp('Última: ' + escolhido).test(await textoMain()) && /Faltam [67] dias/.test(await textoMain()), 'aplicações: o local e a próxima aplicação mudam (7 dias depois)');
   // O que não dá para simular: uma frase explica o app de verdade.
   await telaApp('exames'); await page.getByRole('button', { name: 'Escolher arquivo' }).click();
   ok(/No app de verdade, abre os arquivos do celular/.test(await textoMain()), 'exames: explica o que acontece no app de verdade');
   await telaApp('meus-dados'); await page.getByRole('button', { name: 'Baixar meus dados' }).click();
   ok(/No app de verdade, você recebe um arquivo/.test(await textoMain()), 'meus dados: explica o que acontece no app de verdade');
-  await telaApp('consultas'); await page.getByRole('button', { name: 'Confirmar presença' }).click();
+  await telaApp('consultas'); await page.getByRole('button', { name: 'Confirmar presença' }).first().click();
   ok(/Presença confirmada/.test(await textoMain()), 'consultas: confirmar presença');
   // Central: Enviar ao app, Cadastrar prescrição, Conferir, Enviar recado.
   const telaCentral = async (tela) => { await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2'); };
   await telaCentral('metas'); await page.selectOption('#metas-paciente', '3'); await page.fill('#m-kcal', '1500');
   await page.getByRole('button', { name: 'Enviar ao app' }).click();
   ok(/Enviado ao app de Beatriz Lima/.test(await textoMain()), 'central metas: "Enviado ao app de Beatriz Lima"');
-  await telaCentral('picadinha');
+  await telaCentral('aplicacoes');
   await page.getByRole('button', { name: 'Conferir a prescrição de Beatriz Lima' }).click();
-  ok(await page.getByRole('button', { name: /^Conferir a prescrição/ }).count() === 0, 'central picadinha: conferir muda para "Conferida"');
+  ok(await page.getByRole('button', { name: 'Conferir a prescrição de Beatriz Lima' }).count() === 0, 'central aplicações: conferir muda para "Conferida"');
   await page.selectOption('#presc-paciente', 'Carlos Souza'); await page.getByRole('button', { name: 'Cadastrar prescrição' }).click();
-  ok(await page.getByRole('button', { name: 'Conferir a prescrição de Carlos Souza' }).count() === 1, 'central picadinha: a prescrição nova aparece "esperando a conferência"');
-  ok(!/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg)\b/.test(await textoMain()), 'central picadinha: nenhum número de dose');
+  ok(await page.getByRole('button', { name: 'Conferir a prescrição de Carlos Souza' }).count() === 1, 'central aplicações: a prescrição nova aparece "esperando a conferência"');
+  ok(!/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg)\b/.test(await textoMain()), 'central aplicações: nenhum número de dose');
   await telaCentral('avisos'); await page.getByRole('radio', { name: 'Um grupo' }).click(); await page.getByRole('button', { name: 'Enviar recado' }).click();
-  ok(/Grupo "Adaptação"/.test(await page.locator('#conteudo .cartao', { hasText: 'Recados enviados' }).innerText()), 'central avisos: o recado aparece em "Recados enviados"');
+  ok(/Grupo "Perda de peso"/.test(await page.locator('#conteudo .cartao', { hasText: 'Recados enviados' }).innerText()), 'central avisos: o recado aparece em "Recados enviados"');
+  // Coerência (uma fonte só): a Mariana tem o mesmo peso, as mesmas metas e o mesmo consumo do dia no app e na central;
+  // e o ciclo fecha na mesma página (app → central e central → app), sem recarregar e sem guardar nada no aparelho.
+  await telaApp('inicio');
+  const lerApp = async () => ({ kcal: await valorMeta('kcal'), prot: await valorMeta('prot'), agua: await valorMeta('agua'),
+    metaProt: num(await page.locator('.meta[data-meta="prot"] small').innerText()), peso: num(await page.locator('.metrica', { hasText: 'Peso' }).locator('.numero').innerText()) });
+  const lerCentral = async () => { const b = k => page.locator('.hoje-ficha [data-bloco="' + k + '"]');
+    return { kcal: num(await b('kcal').locator('.numero').innerText()), prot: num(await b('prot').locator('.numero').innerText()), agua: num(await b('agua').locator('.numero').innerText()),
+      metaProt: num(await b('prot').locator('.mini').innerText()), peso: num(await page.locator('[data-bloco="peso"] .numero').innerText()) }; };
+  const irCentral = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2'); };
+  const irApp = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'App' }).click(); await page.waitForSelector('.v-app #conteudo h1, .v-app #conteudo h2'); };
+  // A central lembra onde estava (a ficha continua aberta ao voltar); se não estiver na ficha da Mariana, abre pela lista.
+  const abaCentral = async nome => { await page.locator('.barra-abas').getByRole('button', { name: nome }).click(); await page.waitForSelector('.barra-abas [aria-current="page"]:text-is("' + nome + '")'); };
+  const fichaMariana = async () => { if (!await page.locator('.hoje-ficha[data-paciente="1"]').count()) { await abaCentral('Hoje'); await page.locator('.linha-pac[data-paciente="1"]').click(); } await page.waitForSelector('.hoje-ficha[data-paciente="1"]'); };
+  const SAUDACAO = (new Date().getHours() < 12 ? 'Bom dia' : new Date().getHours() < 18 ? 'Boa tarde' : 'Boa noite') + ', Mariana';
+  const abaApp = async (nome, titulo) => { await page.locator('.abas-app').getByRole('button', { name: nome }).click(); await page.waitForSelector('#conteudo h1:text-is("' + titulo + '")'); };
+  const a1 = await lerApp(); await irCentral(); await fichaMariana(); const c1 = await lerCentral();
+  ok(JSON.stringify(a1) === JSON.stringify(c1), `coerência: Mariana igual no app e na central (app ${JSON.stringify(a1)} · central ${JSON.stringify(c1)})`);
+  ok(/\/central\/#/.test(page.url()), 'coerência: a faixa troca para a central sem recarregar e o endereço acompanha');
+  await irApp(); await page.locator('#conteudo').getByRole('button', { name: 'Registrar refeição' }).click();
+  await page.fill('#busca-alimento', 'ovo'); await folha().locator('.linha-app', { hasText: 'Ovo cozido' }).click(); await page.getByRole('button', { name: /^Registrar no / }).click();
+  await page.waitForSelector('.folha', { state: 'detached' });
+  await irCentral(); await fichaMariana(); const c2 = await lerCentral();
+  ok(Math.abs(c2.prot - (c1.prot + 6.3)) < 0.05 && c2.kcal === c1.kcal + 73, `ciclo: a refeição do app soma na ficha da central (${c1.prot} → ${c2.prot} g)`);
+  ok(/Ovo cozido/.test(await page.locator('.v-central').innerText()), 'ciclo: a refeição aparece na linha do tempo da ficha');
+  await page.getByRole('button', { name: 'Editar metas' }).first().click(); await page.fill('#f-prot', '115'); await page.getByRole('button', { name: 'Salvar e enviar ao app' }).click();
+  await page.waitForSelector('.folha', { state: 'detached' });
+  await irApp(); await abaApp('Hoje', SAUDACAO);
+  ok(/de 115 g/.test(await page.locator('.meta[data-meta="prot"]').innerText()) && /Metas definidas por Dra\. Helena Prado hoje/.test(await textoMain()), 'ciclo: a meta mudada na central aparece no app, com quem e quando');
+  await abaApp('Aplicações', 'Aplicações');
+  ok(/Ela aparece aqui depois que a enfermagem conferir/.test(await textoMain()), 'ciclo: a renovação esperando a conferência aparece no app');
+  await page.getByRole('radio', { name: 'Enjoo forte' }).click(); await page.getByRole('button', { name: 'Registrar aplicação' }).click();
+  await page.waitForSelector('text=A enfermagem da clínica recebeu um aviso'); await page.keyboard.press('Escape');
+  await irCentral(); await abaCentral('Hoje');
+  ok(await page.locator('.alerta-card[data-paciente="1"]').count() === 1 && /Relatou enjoo forte/.test(await page.locator('.alerta-card[data-paciente="1"]').innerText()), 'ciclo: o enjoo forte do app aparece na triagem da central');
+  await abaCentral('Aplicações');
+  await page.getByRole('button', { name: 'Conferir a prescrição de Mariana Alves' }).click();
+  await abaCentral('Avisos e conteúdo');
+  await page.getByRole('radio', { name: 'Um paciente' }).click(); await page.fill('#recado-texto', 'Lembre de beber água antes do almoço.'); await page.getByRole('button', { name: 'Enviar recado' }).click();
+  await irApp(); await abaApp('Aplicações', 'Aplicações');
+  ok(/conferida pela enfermeira .* hoje/.test(await textoMain()), 'ciclo: a prescrição conferida na central aparece no app');
+  await abaApp('Hoje', SAUDACAO);
+  ok(/Lembre de beber água antes do almoço\./.test(await textoMain()), 'ciclo: o recado enviado na central aparece no app');
+  // Datas relativas: a consulta da Mariana é a mesma no app e na central.
+  const consApp = (await page.locator('.cartao', { hasText: 'Próxima consulta' }).locator('.grande-txt').innerText()).trim();
+  await irCentral(); await fichaMariana();
+  ok((await page.locator('.v-central').innerText()).includes(consApp), `datas: a próxima consulta é a mesma nos dois lados (${consApp})`);
   // Tudo na memória: nenhum pedido novo ao servidor além do registro de uso; e nenhum "nada é guardado".
   ok(nPedidos() === antesPedidos, `memória: nenhum pedido ao servidor além de abrir e eventos (${nPedidos() - antesPedidos} a mais)`);
   ok(!/nada é guardado/i.test(await page.content()), 'nenhum "nada é guardado"');
@@ -258,5 +309,5 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await ctx.close();
 }
 await browser.close(); site.fechar();
-console.log(`${fotos} fotos. ` + (falhas ? falhas + ' falha(s).' : 'Tudo certo: celular de 360 a 430 px, iPad e computador; caminhos do escopo, conversar, chat, inativo e fora do ar.'));
+console.log(`${fotos} fotos. ` + (falhas ? falhas + ' falha(s).' : 'Tudo certo: celular de 360 a 430 px, iPad e computador; escopo, chat, coerência entre o app e a central, inativo e fora do ar.'));
 process.exit(falhas ? 1 : 0);
