@@ -187,7 +187,8 @@ let avisosTermos = 0;
 }
 if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos que não são a versão mais nova (só aviso, não bloqueia).`);
 // Demonstração por link (demo/clinica/, DEC-125; ajuste C do plano): nenhum preço, prazo de projeto ou valor, nada da
-// demonstração do Dr. André, noindex, nenhum WhatsApp nem telefone, e os 46 itens iguais aos da Central.
+// demonstração do Dr. André, noindex, nenhum WhatsApp nem telefone, e os itens iguais aos da Central (numerados de 1 em diante, sem buraco, até 99:
+// o workflow 43 aceita itens de 1 a 99).
 {
   const pasta = path.join('demo', 'clinica');
   const arqs = todos.filter(f => f.startsWith(pasta + path.sep) && /\.(html|js|css)$/.test(f));
@@ -208,7 +209,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   if (fs.existsSync(itensArq) && fs.existsSync(centralArq)) {
     const demo = [...fs.readFileSync(itensArq, 'utf8').matchAll(/\{ n: (\d+), t: '((?:[^'\\]|\\.)*)'/g)].map(m => [Number(m[1]), m[2].replace(/\\'/g, "'")]);
     const central = [...((fs.readFileSync(centralArq, 'utf8').match(/const DEM_ITENS = \[([\s\S]*?)\];/) || [])[1] || '').matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
-    if (demo.length !== 46 || demo.some(([n], i) => n !== i + 1)) erro(`${itensArq}: precisa dos 46 itens, numerados de 1 a 46`);
+    if (demo.length < 46 || demo.length > 99 || demo.some(([n], i) => n !== i + 1)) erro(`${itensArq}: os itens são numerados de 1 em diante, sem buraco (de 46 a 99 itens; achei ${demo.length})`);
     if (JSON.stringify(demo.map(x => x[1])) !== JSON.stringify(central)) erro(`${itensArq}: os títulos não batem com os da Central (${centralArq}, DEM_ITENS)`);
   }
   if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');

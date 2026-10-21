@@ -333,11 +333,11 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .faixa-demo .chave[aria-checked="true"] { background: #e9eaee; } .faixa-demo .chave[aria-checked="true"]::after { background: var(--fd-fundo); }
 .faixa-demo .botao-tema { background: transparent; border-color: var(--fd-linha); color: var(--fd-texto); }
 @media (max-width: 719px) {
-  .faixa-demo .dentro { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "marca tema" "nav itens"; column-gap: var(--e-2); }
+  /* celular: a marca, os itens e o tema em cima; as 5 partes embaixo, na largura toda */
+  .faixa-demo .dentro { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "marca itens tema" "nav nav nav"; column-gap: var(--e-2); }
   .fd-marca { grid-area: marca; } .fd-tema { grid-area: tema; } .fd-itens { grid-area: itens; } .fd-ver { display: none; }
-  .fd-nav { grid-area: nav; border-top: 1px solid var(--fd-linha); }
-  .faixa-demo .fd-itens { border-top: 1px solid var(--fd-linha); }
-  .fd-link { padding: 0 var(--e-2); } .fd-link[aria-current="page"]::after { left: var(--e-2); right: var(--e-2); }
+  .fd-nav { grid-area: nav; border-top: 1px solid var(--fd-linha); justify-content: space-between; }
+  .fd-link { padding: 0 var(--e-2); flex: 1 1 auto; justify-content: center; } .fd-link[aria-current="page"]::after { left: var(--e-2); right: var(--e-2); }
 }
 .fd-tema { display: inline-flex; flex: none; }
 
@@ -350,3 +350,29 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .tabela-bio th[scope="row"], .tabela-bio thead th:first-child { text-align: left; font-weight: 500; color: var(--tinta-2); }
 .tabela-bio thead th { font-size: var(--t-mini); color: var(--tinta-2); font-weight: 650; }
 .grafico .ponto-clinica { fill: var(--superficie); stroke: var(--acento-texto); stroke-width: 2; }
+
+/* ---------------------------------------------------------------- tutorial de primeiro acesso (comum/tutorial.js)
+   O "?" no topo do produto; o destaque recorta o elemento (sombra enorme em volta) e o balão fica embaixo ou em cima dele. */
+.botao-ajuda { flex: none; width: var(--alvo); height: var(--alvo); border-radius: 50%; border: 1px solid var(--linha-forte); background: var(--superficie); color: var(--tinta);
+  font: 750 1.05rem var(--fonte-titulo); cursor: pointer; display: grid; place-items: center; padding: 0; }
+.botao-ajuda:hover { border-color: var(--acento); color: var(--acento-texto); }
+.tutorial { position: fixed; inset: 0; z-index: 90; }
+.tut-veu { position: absolute; inset: 0; }
+.tut-foco { position: fixed; border-radius: 16px; box-shadow: 0 0 0 3px var(--acento), 0 0 0 200vmax rgba(10, 12, 16, .58); pointer-events: none; }
+.tut-balao { position: fixed; display: grid; gap: var(--e-2); padding: var(--e-4) var(--e-4) var(--e-3); background: var(--superficie); color: var(--tinta); border: 1px solid var(--linha-forte);
+  border-radius: 20px; box-shadow: var(--sombra-3); max-height: calc(100vh - 24px); overflow: auto; }
+.tut-balao:focus { outline: none; }
+.tut-balao:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.tut-balao h2 { font-size: 1.1rem; }
+.tut-balao p { margin: 0; }
+.tut-cab { display: flex; align-items: center; justify-content: space-between; gap: var(--e-2); }
+.tut-conta { color: var(--tinta-2); font-weight: 650; letter-spacing: .02em; }
+.tut-pular { padding: 0 var(--e-2); min-width: var(--alvo); color: var(--tinta-2); }
+.tut-botoes { display: flex; gap: var(--e-2); justify-content: flex-end; margin-top: var(--e-2); }
+.tut-botoes .botao { flex: 1 1 0; padding: 0 var(--e-3); }
+.tut-botoes .botao[disabled] { opacity: .45; cursor: default; }
+@media (prefers-reduced-motion: no-preference) {
+  .tut-foco { transition: left .28s var(--suave), top .28s var(--suave), width .28s var(--suave), height .28s var(--suave); }
+  .tut-balao { transition: top .28s var(--suave), left .28s var(--suave); animation: tut-entra .22s var(--suave); }
+  @keyframes tut-entra { from { opacity: 0; transform: translateY(6px); } }
+}

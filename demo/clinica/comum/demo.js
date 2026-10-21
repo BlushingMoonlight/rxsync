@@ -107,7 +107,8 @@
   // Fila de eventos: um lote a cada 10 segundos e, ao sair da página, pelo sendBeacon (chega como texto, sem cabeçalho).
   function evento(acao, detalhe, tela) {
     if (!est.dados || est.ver || est.quieto) return;
-    est.fila.push({ pagina: est.pagina, tela: tela == null ? est.tela : tela, acao, t: String(Date.now()), ...(detalhe ? { detalhe } : {}) });
+    // O manual vai como parte da proposta ("escopo"): o servidor só conhece entrada, app, central e escopo.
+    est.fila.push({ pagina: est.pagina === 'manual' ? 'escopo' : est.pagina, tela: tela == null ? est.tela : tela, acao, t: String(Date.now()), ...(detalhe ? { detalhe } : {}) });
     if (est.fila.length >= 50) enviarFila();
   }
   function enviarFila(saindo) {
@@ -238,7 +239,7 @@
   const pedirDemo = () => el('a', { class: 'botao', href: raizSite() + '#contato' }, 'Pedir uma demonstração');
 
   // ---------------------------------------------------------------- começo de cada página
-  // opcoes: { pagina: 'entrada' | 'app' | 'central' | 'escopo', raiz, montar(dados) }
+  // opcoes: { pagina: 'entrada' | 'app' | 'central' | 'escopo' | 'manual', raiz, montar(dados) }
   async function iniciar(op) {
     est.pagina = op.pagina;
     const raiz = op.raiz;
@@ -273,7 +274,7 @@
   }
   // Topo de cada página: as iniciais na cor e o nome da clínica.
   // A faixa da demonstração: a ÚNICA parte "da demonstração" nas páginas (escura e separada do produto).
-  // atual: 'inicio' | 'app' | 'central' | 'escopo'. trocarVista: troca entre o app e a central na mesma página (sem recarregar).
+  // atual: 'inicio' | 'app' | 'central' | 'escopo' | 'manual'. trocarVista: troca entre o app e a central na mesma página (sem recarregar).
   function faixaDemo(atual, trocarVista, opcoes) {
     if (est.embed) return null;
     const d = est.dados || {};
@@ -285,7 +286,7 @@
     return el('div', { class: 'faixa-demo', role: 'region', 'aria-label': 'Demonstração' }, el('div', { class: 'dentro' },
       el('p', { class: 'fd-marca' }, el('span', { class: 'fd-tag', text: 'Demonstração' }), el('span', { class: 'fd-clinica', text: d.clinica || '' })),
       est.ver ? el('span', { class: 'fd-ver', text: 'como o médico vê · sem registro' }) : null,
-      el('nav', { class: 'fd-nav', 'aria-label': 'Partes da demonstração' }, ir('inicio', 'Início'), ir('app', 'App'), ir('central', 'Central'), ir('escopo', 'Escopo')),
+      el('nav', { class: 'fd-nav', 'aria-label': 'Partes da demonstração' }, ir('inicio', 'Início'), ir('app', 'App'), ir('central', 'Central'), ir('escopo', 'Escopo'), ir('manual', 'Manual')),
       opcoes && opcoes.semItens ? null : chaveItens(), el('span', { class: 'fd-tema' }, botaoTema())));
   }
   // App e central na mesma página: o registro de uso passa a dizer de qual parte é cada tela.

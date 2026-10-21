@@ -64,6 +64,7 @@ a.bento-bloco:hover .ir { transform: translateX(3px); }
 .documento-b .cresce { display: grid; gap: 6px; }
 .titulo-doc { font-family: var(--fonte-titulo); font-size: var(--t-h2); }
 .folha-doc { flex: none; width: 64px; height: 84px; border-radius: 6px; background: var(--superficie-2); border: 1px solid var(--linha-forte); padding: 12px 10px; display: grid; gap: 6px; align-content: start; box-shadow: var(--sombra-1); }
+.manual-doc b { height: 22px; border-radius: 4px; border: 1.5px solid var(--acento); }
 .folha-doc i { height: 4px; border-radius: 2px; background: var(--linha-forte); } .folha-doc i.curta { width: 60%; }
 .documento-b .ir { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--superficie-2); flex: none; }
 @media (max-width: 520px) { .documento-b { flex-wrap: wrap; } .folha-doc { width: 48px; height: 62px; padding: 8px; } }
