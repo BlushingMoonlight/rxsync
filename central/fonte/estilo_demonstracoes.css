@@ -1,0 +1,14 @@
+/* ---------- Marketing › Demonstrações (central/fonte/09_demonstracoes.js) ---------- */
+/* As 6 cores prontas da demonstração (sql/056): texto branco em cima, contraste acima de 4,5:1 nos dois temas. */
+.dem-cor-verde { background: #1e6b47; } .dem-cor-azul { background: #1f5fa8; } .dem-cor-petroleo { background: #0f5e68; }
+.dem-cor-vinho { background: #8a2440; } .dem-cor-roxo { background: #5b3a9e; } .dem-cor-grafite { background: #3d4451; }
+.avatar[class*="dem-cor-"] { color: #ffffff; }
+.dem-cores { display: flex; flex-wrap: wrap; gap: var(--e-2); }
+.dem-cor { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); padding: 0 var(--e-3); border: 1px solid var(--borda-forte); border-radius: var(--r-cheio);
+  background: var(--superficie); color: var(--texto); font: inherit; font-size: var(--t-14); cursor: pointer; }
+.dem-cor[aria-checked="true"] { border-color: var(--primaria); box-shadow: 0 0 0 2px var(--primaria); font-weight: 700; }
+.dem-cor:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.dem-amostra { width: 20px; height: 20px; border-radius: 50%; flex: none; }
+.dem-endereco { font-size: 15px; letter-spacing: 0; margin-bottom: var(--e-3); }
+.dem-mensagem { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--superficie-2); border-radius: var(--r-2); padding: var(--e-3); margin: 0 0 var(--e-3); }
+.rot-mensagem { margin: var(--e-3) 0 var(--e-1); }
