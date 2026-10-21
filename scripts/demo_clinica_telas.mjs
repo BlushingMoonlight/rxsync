@@ -148,7 +148,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.goto(`${site.base}/demo/clinica/central/`); await page.waitForURL(/\/demo\/clinica\/$/);
   ok(true, 'sem código fora da entrada: volta para a entrada');
   // Rodada de melhoria: nenhum beco sem saída. Cada botão mostra um resultado simulado, e tudo fica na memória da página.
-  const telaApp = async (tela) => { await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2, #conteudo h1'); };
+  const telaApp = async (tela) => { await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2, #conteudo h1'); };
   const textoMain = () => page.locator('#conteudo').innerText();
   const nPedidos = () => pedidos.filter(p => p.tipo !== 'eventos' && p.tipo !== 'abrir').length;
   const antesPedidos = nPedidos();
@@ -185,9 +185,9 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await telaApp('inicio');
   const pontos = async () => Number((await page.locator('.grande-num').first().innerText()).split(' ')[0]);
   const p0 = await pontos();
-  await page.getByRole('button', { name: 'Registrar', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Partes do app' }).getByRole('button', { name: 'Registrar' }).click();
   await page.locator('#conteudo .linha-app', { hasText: 'Sono' }).click();
-  await page.getByRole('button', { name: 'Registrar', exact: true }).last().click();
+  await page.locator('#conteudo').getByRole('button', { name: 'Registrar', exact: true }).click();
   ok(/Escolha uma opção/.test(await textoMain()), 'sono: sem escolher, pede a escolha');
   await page.getByRole('radio', { name: '7 a 8h' }).click(); await page.getByRole('radio', { name: 'Bem', exact: true }).click();
   await page.locator('#conteudo').getByRole('button', { name: 'Registrar', exact: true }).click();
@@ -218,7 +218,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await telaApp('consultas'); await page.getByRole('button', { name: 'Confirmar presença' }).click();
   ok(/Presença confirmada/.test(await textoMain()), 'consultas: confirmar presença');
   // Central: Enviar ao app, Cadastrar prescrição, Conferir, Enviar recado.
-  const telaCentral = async (tela) => { await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2'); };
+  const telaCentral = async (tela) => { await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=${tela}`); await page.waitForSelector('#conteudo h2'); };
   await telaCentral('metas'); await page.selectOption('#metas-paciente', '3'); await page.fill('#m-kcal', '1500');
   await page.getByRole('button', { name: 'Enviar ao app' }).click();
   ok(/Enviado ao app de Beatriz Lima/.test(await textoMain()), 'central metas: "Enviado ao app de Beatriz Lima"');

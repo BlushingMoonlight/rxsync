@@ -66,7 +66,7 @@
       const travado = t => el('span', { class: 'travado' }, ic('cadeado', 'p'), t);
       return [cartao('Prescrição da picadinha', 44, el('p', { class: 'mudo peq', text: 'A equipe cadastra o que o médico prescreveu. A enfermagem confere antes de aparecer no app. O app não calcula nem muda dose.' }),
         el('ul', { class: 'lista-pac' }, mem.prescricoes.map(x => el('li', {}, el('div', { class: 'linha-pac' }, el('span', { class: 'avatar', 'aria-hidden': 'true', text: DEMO.iniciais(x.nome) }),
-          el('span', { class: 'cresce' }, el('span', { class: 't1', text: x.nome }), el('span', { class: 't2', text: 'Medicamento cadastrado pela equipe · 1 vez por semana' })),
+          el('span', { class: 'cresce' }, el('span', { class: 't1', text: x.nome }), el('span', { class: 't2', text: 'Medicamento cadastrado pela equipe · 1\u00a0vez por semana' })),
           x.conferida ? el('span', { class: 'etq ok' }, ic('check', 'p'), 'Conferida') : [el('span', { class: 'etq atencao', text: 'Esperando a conferência' }),
             el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Conferir a prescrição de ' + x.nome, onclick: () => { x.conferida = true; desenhar(true); DEMO.rapida('Conferida. Agora aparece no app de ' + x.nome + '.'); } }, 'Conferir')]))))),
       cartao('Cadastrar prescrição', null, el('label', { class: 'campo', for: 'presc-paciente' }, el('span', { text: 'Paciente' }), pac),
@@ -131,6 +131,7 @@
         el('main', { class: 'pilha conteudo-central', id: 'conteudo', tabindex: '-1' }, corpo)),
       el('div', { class: 'rodape-demo' }, el('a', { class: 'botao sec', href: DEMO.link('app') }, 'Ver o app do paciente'), el('a', { class: 'botao sec', href: DEMO.link('escopo') }, 'Montar o escopo'), DEMO.botaoConversar('leve')));
     DEMO.tela(p ? 'ficha' : est.aba);
+    const ativa = raiz.querySelector('.abas-central [aria-current="page"]'); if (ativa) ativa.scrollIntoView({ block: 'nearest', inline: 'center' });
     if (!mesma) window.scrollTo(0, 0);
   }
   DEMO.iniciar({ pagina: 'central', raiz, montar: d => {

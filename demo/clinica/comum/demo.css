@@ -126,3 +126,12 @@ textarea.entrada { min-height: 88px; resize: vertical; }
 .feito-hoje { display: flex; align-items: center; gap: 6px; color: var(--ok); font-weight: 600; font-size: .92rem; }
 .travado { display: inline-flex; align-items: center; gap: 6px; color: var(--texto-2); font-weight: 600; }
 .resultado:empty { display: none; }
+
+/* interruptor (lembretes do app e funções da central) */
+.chave { width: 52px; height: 32px; border-radius: 99px; border: 0; background: var(--linha-forte); position: relative; flex: none; }
+.chave::before { content: ''; position: absolute; inset: -6px; }
+.chave::after { content: ''; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.chave[aria-checked="true"] { background: var(--marca); } .chave[aria-checked="true"]::after { transform: translateX(20px); }
+.nutri:has(.travado) { grid-template-columns: minmax(0, 7.5em) minmax(0, 1fr); }
+.travado { align-items: flex-start; font-size: .92rem; font-weight: 600; }
+.travado .ic { margin-top: 3px; }
