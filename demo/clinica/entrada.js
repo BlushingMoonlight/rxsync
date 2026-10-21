@@ -9,8 +9,10 @@
   function progresso() {
     const v = DEMO.vistos();
     const feitas = PARTES.filter(([k]) => v[k]).length;
-    return el('div', { class: 'progresso', role: 'group', 'aria-label': 'Seu caminho na demonstração: ' + feitas + ' de 3 partes vistas' },
-      PARTES.map(([k, n]) => el('span', { class: 'passo-p' + (v[k] ? ' feito' : '') }, v[k] ? ic('check', 'p') : el('span', { class: 'traco-p', 'aria-hidden': 'true' }), n, el('span', { class: 'sr', text: v[k] ? ': visto' : ': ainda não' }))));
+    return el('div', { class: 'progresso', role: 'group', 'aria-label': 'Você já viu ' + feitas + ' de 3 partes' },
+      el('span', { class: 'prog-txt', text: 'Você já viu ' + feitas + ' de 3' }),
+      el('span', { class: 'prog-partes' }, PARTES.map(([k, n]) => el('span', { class: 'passo-p' + (v[k] ? ' feito' : '') },
+        v[k] ? ic('check', 'p') : el('span', { class: 'bolinha', 'aria-hidden': 'true' }), n, el('span', { class: 'sr', text: v[k] ? ': visto' : ': ainda não' })))));
   }
   // Mini ilustrações dos blocos (só desenho; o texto ao lado diz o que é).
   const svg = (tag, at) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const [k, v] of Object.entries(at || {})) e.setAttribute(k, v); return e; };
@@ -43,7 +45,8 @@
         el('section', { class: 'heroi-e' },
           el('div', { class: 'texto-heroi' },
             el('p', { class: 'sobretitulo', text: 'Demonstração preparada para você' }),
-            el('h1', { class: 'titulo-display' }, nome + ', este é o app ', el('span', { class: 'marca-texto', text: d.clinica }), '.'),
+            el('h1', { class: 'titulo-display', text: nome + ', este app já está com a sua marca.' }),
+            el('p', { class: 'marca-clinica' }, el('span', { class: 'selo', 'aria-hidden': 'true', text: DEMO.iniciais(d.clinica) }), el('span', { class: 'cresce', text: d.clinica })),
             el('p', { class: 'lead', text: 'O app que seus pacientes usam no dia a dia e a central onde você acompanha cada um, com o nome e a cor da sua clínica.' }),
             el('div', { class: 'botoes' }, el('a', { class: 'botao grande', href: DEMO.link('app') }, 'Abrir o app do paciente', ic('seta', 'p')),
               el('a', { class: 'botao sec grande', href: DEMO.link('central') }, 'Ver a central')),

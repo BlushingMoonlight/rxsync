@@ -1,13 +1,32 @@
-.barra-escopo { position: sticky; top: 61px; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px;
-  background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio); box-shadow: var(--sombra); }
-.contagem { display: flex; flex-wrap: wrap; gap: 6px; }
-.item-escopo { display: grid; gap: 10px; scroll-margin-top: 140px; }
-.item-escopo.destaque { box-shadow: 0 0 0 3px var(--marca); }
-.num { min-width: 32px; height: 32px; padding: 0 6px; border-radius: 10px; background: var(--marca); color: var(--sobre-marca); display: grid; place-items: center; font-weight: 800; font-size: .85rem; }
-.opcoes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.opcao { min-height: var(--alvo); border-radius: var(--raio-p); border: 1px solid var(--linha-forte); background: var(--superficie); font-weight: 600; font-size: .9rem; padding: 4px 6px; }
-.opcao.quero[aria-pressed="true"] { background: var(--ok-fundo); color: var(--ok); border-color: var(--ok); }
-.opcao.nao_preciso[aria-pressed="true"] { background: var(--superficie-2); color: var(--texto); border-color: var(--texto-2); }
-.opcao.duvida[aria-pressed="true"] { background: var(--atencao-fundo); color: var(--atencao); border-color: var(--atencao); }
-.item-escopo .botoes { gap: 4px; }
-.fim-escopo { display: grid; gap: 10px; }
+/* Escopo: grupos dobráveis com a contagem, 3 escolhas por item e a barra fixa embaixo com o resumo e o "Enviar". */
+.pagina-escopo { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
+.cab-escopo h1 { font-size: var(--t-h1); max-width: 22ch; }
+.grupos { display: grid; gap: var(--e-3); }
+.grupo-escopo { padding: 0; overflow: hidden; }
+.grupo-escopo summary { list-style: none; display: flex; align-items: center; gap: var(--e-3); min-height: 64px; padding: var(--e-3) var(--e-5); cursor: pointer; }
+.grupo-escopo summary::-webkit-details-marker { display: none; }
+.grupo-escopo summary h2 { font-size: 1.08rem; }
+.grupo-escopo summary .cresce { display: grid; gap: 2px; }
+.seta-g { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--superficie-2); transition: transform .25s var(--mola); }
+.grupo-escopo[open] .seta-g { transform: rotate(90deg); }
+.itens-grupo { display: grid; border-top: 1px solid var(--linha); }
+.item-escopo { display: grid; gap: var(--e-3); padding: var(--e-4) var(--e-5); scroll-margin-top: 140px; }
+.item-escopo + .item-escopo { border-top: 1px solid var(--linha); }
+.item-escopo.destaque { box-shadow: inset 3px 0 0 var(--acento); background: var(--acento-suave); }
+.cab-item { align-items: flex-start; }
+.item-escopo h3 { font-size: 1rem; margin-bottom: 2px; }
+.num { min-width: 32px; height: 32px; padding: 0 6px; border-radius: 10px; background: var(--superficie-3); color: var(--tinta); display: grid; place-items: center; font-weight: 750; font-size: .82rem; flex: none; }
+.opcoes { width: 100%; }
+.opcoes > button { flex: 1 1 0; justify-content: center; padding: 0 var(--e-2); font-size: .88rem; }
+.opcoes > .quero[aria-pressed="true"] { background: var(--ok-fundo); color: var(--ok); box-shadow: 0 0 0 1px currentColor; }
+.opcoes > .duvida[aria-pressed="true"] { background: var(--atencao-fundo); color: var(--atencao); box-shadow: 0 0 0 1px currentColor; }
+.opcoes > .nao_preciso[aria-pressed="true"] { background: var(--superficie); color: var(--tinta); }
+.acoes-item { display: flex; flex-wrap: wrap; gap: 0 var(--e-4); }
+.acoes-item .botao { padding: 0; text-decoration: none; color: var(--acento-texto); font-weight: 600; font-size: .92rem; }
+.fim-escopo { display: grid; gap: var(--e-3); }
+.barra-escopo { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; border-width: 1px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+.barra-escopo .dentro { width: min(1120px, 100%); margin: 0 auto; padding: var(--e-3) var(--e-4); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--e-2) var(--e-4); }
+@media (min-width: 768px) { .barra-escopo .dentro { padding: var(--e-3) var(--e-6); } }
+.contagem { font-size: .95rem; color: var(--tinta-2); }
+.contagem strong { color: var(--ok); }
+@media (max-width: 480px) { .barra-escopo .botao { flex: 1 1 100%; } }

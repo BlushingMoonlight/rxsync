@@ -91,54 +91,70 @@
       const pac = el('select', { class: 'entrada', id: 'metas-paciente', onchange: e => { mem.metasPac = Number(e.target.value); desenhar(true); } }, PACIENTES.map(p => el('option', { value: p.id, text: p.nome, selected: p.id === mem.metasPac })));
       const kcal = campo('Calorias por dia (kcal)', m.kcal, 'm-kcal'), prot = campo('Proteína por dia (g)', m.prot, 'm-prot'), agua = campo('Água (copos)', m.agua, 'm-agua');
       const nome = () => PACIENTES.find(p => p.id === mem.metasPac).nome;
-      return [cartao('Metas e plano alimentar', 43, el('p', { class: 'mudo peq', text: 'A equipe define. O paciente vê no app.' }),
-        el('label', { class: 'campo', for: 'metas-paciente' }, el('span', { text: 'Paciente' }), pac),
-        el('div', { class: 'form-2' }, kcal[0], prot[0], agua[0]),
-        el('label', { class: 'campo' }, el('span', { text: 'Plano alimentar' }), el('textarea', { class: 'entrada', rows: '4' }, 'Café: ovos mexidos, pão integral e fruta.\nAlmoço: arroz, feijão, frango e salada.')),
-        r, el('button', { type: 'button', class: 'botao', onclick: () => {
-          mem.metas[mem.metasPac] = { kcal: kcal[1].value, prot: prot[1].value, agua: agua[1].value };
-          ok(r, 'Enviado ao app de ' + nome() + '. As metas novas já aparecem na tela inicial dela.');
-        } }, ic('enviar', 'p'), 'Enviar ao app'))];
+      return [el('div', { class: 'duas-colunas' },
+        cartao('Metas e plano alimentar', 43, el('p', { class: 'mudo peq', text: 'A equipe define. O paciente vê no app, na tela Hoje.' }),
+          el('label', { class: 'campo', for: 'metas-paciente' }, el('span', { text: 'Paciente' }), pac),
+          el('div', { class: 'form-2' }, kcal[0], prot[0], agua[0]),
+          el('label', { class: 'campo', for: 'm-plano' }, el('span', { text: 'Plano alimentar' }), el('textarea', { class: 'entrada', id: 'm-plano', rows: '4' }, 'Café: ovos mexidos, pão integral e fruta.\nAlmoço: arroz, feijão, frango e salada.')),
+          r, el('button', { type: 'button', class: 'botao', onclick: () => {
+            mem.metas[mem.metasPac] = { kcal: kcal[1].value, prot: prot[1].value, agua: agua[1].value };
+            ok(r, 'Enviado ao app de ' + nome() + '. As metas novas já aparecem na tela Hoje.'); DEMO.confirmar('Metas enviadas');
+          } }, ic('enviar', 'p'), 'Enviar ao app')),
+        el('aside', { class: 'cartao como-ve' }, el('p', { class: 'sobretitulo', text: 'Como aparece no app' }),
+          el('ul', { class: 'lista-simples' }, [['fogo', 'Calorias', m.kcal + ' kcal'], ['prato', 'Proteína', m.prot + ' g'], ['gota', 'Água', m.agua + ' copos']].map(([i, t, v]) =>
+            el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic(i, 'p')), el('span', { class: 'cresce', text: t }), el('strong', { class: 'tab', text: v })))),
+          el('p', { class: 'mudo peq', text: 'Os anéis da tela Hoje do paciente usam estas metas.' })))];
     },
     picadinha: () => {
       const r = status();
       const pac = el('select', { class: 'entrada', id: 'presc-paciente' }, PACIENTES.map(p => el('option', { value: p.nome, text: p.nome })));
-      const travado = t => el('span', { class: 'travado' }, ic('cadeado', 'p'), t);
-      return [cartao('Prescrição da picadinha', 44, el('p', { class: 'mudo peq', text: 'A equipe cadastra o que o médico prescreveu. A enfermagem confere antes de aparecer no app. O app não calcula nem muda dose.' }),
-        el('ul', { class: 'lista-pac' }, mem.prescricoes.map(x => el('li', {}, el('div', { class: 'linha-pac' }, el('span', { class: 'avatar', 'aria-hidden': 'true', text: DEMO.iniciais(x.nome) }),
-          el('span', { class: 'cresce' }, el('span', { class: 't1', text: x.nome }), el('span', { class: 't2', text: 'Medicamento cadastrado pela equipe · 1\u00a0vez por semana' })),
-          x.conferida ? el('span', { class: 'etq ok' }, ic('check', 'p'), 'Conferida') : [el('span', { class: 'etq atencao', text: 'Esperando a conferência' }),
-            el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Conferir a prescrição de ' + x.nome, onclick: () => { x.conferida = true; desenhar(true); DEMO.rapida('Conferida. Agora aparece no app de ' + x.nome + '.'); } }, 'Conferir')]))))),
-      cartao('Cadastrar prescrição', null, el('label', { class: 'campo', for: 'presc-paciente' }, el('span', { text: 'Paciente' }), pac),
-        dados([['Medicamento', travado('Escolhido pela equipe')], ['Dose', travado('A equipe preenche')], ['Concentração', travado('A equipe preenche')], ['Volume', travado('A equipe preenche')], ['Frequência', '1 vez por semana']]),
-        el('p', { class: 'mudo peq', text: 'Na demonstração, estes campos ficam travados.' }), r,
-        el('button', { type: 'button', class: 'botao', onclick: () => {
-          mem.prescricoes.push({ id: Date.now(), nome: pac.value, conferida: false }); desenhar(true);
-          DEMO.rapida('Prescrição de ' + pac.value + ' cadastrada. Agora a enfermagem confere.');
-        } }, 'Cadastrar prescrição'))];
+      const travado = (rot, t) => el('li', { class: 'campo-travado' }, el('span', { class: 'rot', text: rot }), el('span', { class: 'travado' }, ic('cadeado', 'p'), t));
+      return [el('div', { class: 'duas-colunas' },
+        cartao('Prescrição da picadinha', 44, el('p', { class: 'mudo peq', text: 'A equipe cadastra o que o médico prescreveu. A enfermagem confere antes de aparecer no app. O app não calcula nem muda dose.' }),
+          el('ul', { class: 'lista-pac' }, mem.prescricoes.map(x => el('li', {}, el('div', { class: 'linha-pac' }, el('span', { class: 'avatar', 'aria-hidden': 'true', text: DEMO.iniciais(x.nome) }),
+            el('span', { class: 'cresce' }, el('span', { class: 't1', text: x.nome }), el('span', { class: 't2', text: 'Medicamento cadastrado pela equipe · 1 vez por semana' })),
+            x.conferida ? el('span', { class: 'estado-tag ok' }, ic('check', 'p'), 'Conferida') : el('span', { class: 'linha-h acoes-presc' }, el('span', { class: 'estado-tag atencao' }, ic('relogio', 'p'), 'Esperando a conferência'),
+              el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Conferir a prescrição de ' + x.nome, onclick: () => { x.conferida = true; desenhar(true); DEMO.confirmar('Conferida', 'Agora aparece no app de ' + x.nome.split(' ')[0]); } }, 'Conferir'))))))),
+        cartao('Cadastrar prescrição', null, el('label', { class: 'campo', for: 'presc-paciente' }, el('span', { text: 'Paciente' }), pac),
+          el('ul', { class: 'travados' }, travado('Medicamento', 'Escolhido pela equipe'), travado('Dose', 'A equipe preenche'), travado('Concentração', 'A equipe preenche'), travado('Volume', 'A equipe preenche'),
+            el('li', { class: 'campo-travado' }, el('span', { class: 'rot', text: 'Frequência' }), el('strong', { text: '1 vez por semana' }))),
+          el('p', { class: 'mudo peq', text: 'Na demonstração, estes campos ficam travados.' }), r,
+          el('button', { type: 'button', class: 'botao', onclick: () => {
+            mem.prescricoes.push({ id: Date.now(), nome: pac.value, conferida: false }); desenhar(true);
+            DEMO.rapida('Prescrição de ' + pac.value + ' cadastrada. Agora a enfermagem confere.');
+          } }, 'Cadastrar prescrição')))];
     },
     avisos: () => {
       const para = chips(['Um paciente', 'Um grupo', 'Todos os pacientes']), texto = el('textarea', { class: 'entrada', id: 'recado-texto', rows: '3', maxlength: '300' }, 'Traga os exames de sangue no retorno.');
       const erro = el('p', { class: 'erro', role: 'alert' });
-      return [cartao('Avisos e conteúdo', 45, el('p', { class: 'rot', text: 'Para quem?' }), para.no,
-        el('label', { class: 'campo', for: 'recado-texto' }, el('span', { text: 'Recado' }), texto), erro,
-        el('button', { type: 'button', class: 'botao', onclick: () => {
-          if (!texto.value.trim()) { erro.textContent = 'Escreva o recado.'; return; }
-          const quem = para.valor() === 'Um paciente' ? 'Mariana Alves' : para.valor() === 'Um grupo' ? 'Grupo "Adaptação" (4 pacientes)' : 'Todos os pacientes (8)';
-          mem.recados.unshift({ para: quem, texto: texto.value.trim().slice(0, 300), quando: 'agora' }); desenhar(true); DEMO.rapida('Recado enviado: ' + quem + '.');
-        } }, ic('enviar', 'p'), 'Enviar recado')),
-      cartao('Recados enviados', null, el('ul', { class: 'lista-simples' }, mem.recados.map(x => el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: x.para }), el('br'), el('span', { class: 'peq', text: x.texto })), el('span', { class: 'mudo peq', text: x.quando }))))),
-      cartao('Conteúdo da clínica', null, el('ul', { class: 'lista-simples' }, ['Vídeo: como montar o prato', 'Artigo: proteína em cada refeição', 'Receita: omelete de forno com legumes'].map(t => el('li', { text: t }))))];
+      return [el('div', { class: 'duas-colunas' },
+        cartao('Avisos e conteúdo', 45, el('p', { class: 'rot', text: 'Para quem?' }), para.no,
+          el('label', { class: 'campo', for: 'recado-texto' }, el('span', { text: 'Recado' }), texto), erro,
+          el('button', { type: 'button', class: 'botao', onclick: () => {
+            if (!texto.value.trim()) { erro.textContent = 'Escreva o recado.'; return; }
+            const quem = para.valor() === 'Um paciente' ? 'Mariana Alves' : para.valor() === 'Um grupo' ? 'Grupo "Adaptação" (4 pacientes)' : 'Todos os pacientes (8)';
+            mem.recados.unshift({ para: quem, texto: texto.value.trim().slice(0, 300), quando: 'agora' }); desenhar(true); DEMO.confirmar('Recado enviado', quem);
+          } }, ic('enviar', 'p'), 'Enviar recado')),
+        el('div', { class: 'pilha-g' },
+          cartao('Recados enviados', null, el('ul', { class: 'lista-simples' }, mem.recados.map(x => el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic('megafone', 'p')),
+            el('span', { class: 'cresce' }, el('strong', { text: x.para }), el('br'), el('span', { class: 'peq mudo', text: x.texto })), el('span', { class: 'mudo peq', text: x.quando }))))),
+          cartao('Conteúdo da clínica', null, el('ul', { class: 'lista-simples' }, [['camera', 'Vídeo', 'Como montar o prato'], ['livro', 'Artigo', 'Proteína em cada refeição'], ['prato', 'Receita', 'Omelete de forno com legumes']].map(([i, t, d]) =>
+            el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic(i, 'p')), el('span', { class: 'cresce' }, el('strong', { text: d }), el('br'), el('span', { class: 'peq mudo', text: t }))))))))];
     },
-    funcoes: () => [cartao('Funções do app', 46, el('p', { class: 'mudo peq', text: 'A clínica liga e desliga cada parte do app.' }),
-      el('ul', { class: 'lista-simples' }, Object.entries(mem.funcoes).map(([n, lig]) => el('li', {}, el('span', { class: 'cresce', text: n }),
-        el('button', { type: 'button', class: 'chave', role: 'switch', 'aria-checked': String(lig), 'aria-label': n, onclick: e => { mem.funcoes[n] = !mem.funcoes[n]; e.currentTarget.setAttribute('aria-checked', String(mem.funcoes[n]));
-          DEMO.rapida(n + (mem.funcoes[n] ? ': aparece no app.' : ': some do app.')); } })))))]
+    funcoes: () => {
+      const ICONES = { 'Refeições e plano alimentar': 'prato', 'Água, sono e atividade': 'gota', 'Humor, fome e intestino': 'sorriso', 'Outros registros (álcool, tabaco e ciclo)': 'notas', 'Picadinha': 'seringa',
+        'Fotos de progresso': 'camera', 'Chat com a equipe': 'conversa', 'Assistente de dúvidas': 'pergunta', 'Conquistas': 'medalha' };
+      const ligadas = Object.values(mem.funcoes).filter(Boolean).length;
+      return [cartao('Funções do app', 46, el('p', { class: 'mudo peq', text: 'A clínica liga e desliga cada parte do app. ' + ligadas + ' de ' + Object.keys(mem.funcoes).length + ' ligadas.' }),
+        el('ul', { class: 'lista-simples funcoes' }, Object.entries(mem.funcoes).map(([n, lig]) => el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic(ICONES[n] || 'info', 'p')), el('span', { class: 'cresce', text: n }),
+          el('button', { type: 'button', class: 'chave', role: 'switch', 'aria-checked': String(lig), 'aria-label': n, onclick: () => { mem.funcoes[n] = !mem.funcoes[n]; desenhar(true);
+            DEMO.rapida(n + (mem.funcoes[n] ? ': aparece no app.' : ': some do app.')); } })))))];
+    }
   };
   function kpi(r, v, sub) { return el('div', { class: 'kpi' }, el('span', { class: 'rot', text: r }), el('strong', { class: 'numero', text: v }), sub ? el('span', { class: 'mini mudo', text: sub }) : null); }
   function campo(r, v, id) { const i = el('input', { class: 'entrada', id, inputmode: 'numeric', value: v }); return [el('label', { class: 'campo', for: id }, el('span', { text: r }), i), i]; }
   function chips(op) { let valor = op[op.length - 1]; const g = el('div', { class: 'chips', role: 'radiogroup', 'aria-label': 'Para quem' });
-    const d = () => trocar(g, op.map(o => el('button', { type: 'button', class: 'chip', role: 'radio', 'aria-checked': String(o === valor), 'aria-pressed': String(o === valor), onclick: () => { valor = o; d(); } }, o === valor ? ic('check', 'p') : null, o)));
+    g.className = 'seg'; const d = () => trocar(g, op.map(o => el('button', { type: 'button', role: 'radio', 'aria-checked': String(o === valor), 'aria-pressed': String(o === valor), onclick: () => { valor = o; d(); } }, o === valor ? ic('check', 'p') : null, o)));
     d(); return { no: g, valor: () => valor }; }
   function dados(pares) { return el('dl', { class: 'nutri' }, pares.map(([k, v]) => [el('dt', { text: k }), el('dd', {}, v)])); }
 

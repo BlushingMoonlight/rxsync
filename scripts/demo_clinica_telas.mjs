@@ -114,8 +114,11 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.waitForSelector('text=Pronto, o Jean vai te chamar.');
   ok(!/wa\.me|whatsapp:\/\/|tel:/.test(await page.content()), 'conversar: nenhum link de WhatsApp nem telefone na página');
   // Escopo: marcar "Quero" no item 23 grava em 1,5 s; "Enviar para a RXSync" manda tudo.
-  await page.goto(`${site.base}/demo/clinica/escopo/#${ATIVO}`); await page.waitForSelector('#item-23');
+  await page.goto(`${site.base}/demo/clinica/escopo/#${ATIVO}`); await page.waitForSelector('.grupo-escopo');
+  ok(await page.locator('.grupo-escopo[open]').count() === 1, 'escopo: só o primeiro grupo começa aberto');
+  await page.locator('.grupo-escopo summary', { hasText: 'Picadinha' }).click();
   await page.locator('#item-23').getByRole('button', { name: 'Quero' }).click();
+  ok(/1 de 5 marcados/.test(await page.locator('.grupo-escopo summary', { hasText: 'Picadinha' }).innerText()), 'escopo: o grupo conta o que foi marcado');
   const marc = await espera(() => pedidos.find(p => p.tipo === 'escopo' && !p.enviar), 4000);
   ok(marc && marc.escolhas && marc.escolhas['23'] && marc.escolhas['23'].e === 'quero', `escopo: a escolha do item 23 vai sozinha (${JSON.stringify(marc && marc.escolhas)})`);
   ok(/2 quero/.test(await page.locator('.contagem').innerText()), 'escopo: a contagem sobe para 2 quero');
@@ -193,10 +196,11 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   const p0 = await pontos();
   await page.getByRole('navigation', { name: 'Partes do app' }).getByRole('button', { name: 'Registrar' }).click();
   await page.locator('#conteudo .linha-app', { hasText: 'Sono' }).click();
-  await page.locator('#conteudo').getByRole('button', { name: 'Registrar', exact: true }).click();
-  ok(/Escolha uma opção/.test(await textoMain()), 'sono: sem escolher, pede a escolha');
+  await folha().getByRole('button', { name: 'Registrar', exact: true }).click();
+  ok(/Escolha uma opção/.test(await folha().innerText()), 'sono: sem escolher, pede a escolha (na folha)');
   await page.getByRole('radio', { name: '7 a 8h' }).click(); await page.getByRole('radio', { name: 'Bem', exact: true }).click();
-  await page.locator('#conteudo').getByRole('button', { name: 'Registrar', exact: true }).click();
+  await folha().getByRole('button', { name: 'Registrar', exact: true }).click();
+  await page.waitForSelector('.folha', { state: 'detached' });
   ok(/7 a 8h · Bem/.test(await page.locator('#conteudo .linha-app', { hasText: 'Sono' }).innerText()), 'sono: aparece em Registrar');
   await page.getByRole('navigation', { name: 'Partes do app' }).getByRole('button', { name: 'Hoje' }).click();
   ok(await pontos() === p0 + 5, `sono: +5 pontos na tela Hoje (${p0} → ${await pontos()})`);
@@ -204,7 +208,17 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.locator('#conteudo').getByRole('button', { name: '1 copo de água' }).click();
   ok(/5\s*de 8 copos/.test(await page.locator('.meta', { hasText: 'Água' }).innerText()), 'água: 1 copo na tela Hoje');
   await telaApp('agua'); await page.getByRole('button', { name: '1 garrafa (2 copos)' }).click();
-  ok(/6 de 8 copos/.test(await textoMain()), 'água: 1 garrafa soma 2 copos');
+  await page.waitForSelector('.folha', { state: 'detached' });
+  ok(/6 de 8 copos/.test(await page.locator('#conteudo .linha-app', { hasText: 'Água' }).innerText()), 'água: 1 garrafa soma 2 copos');
+  // Itens do escopo: o interruptor esconde os marcadores (o app fica como o paciente vê) e a escolha vale na aba.
+  await page.locator('#chave-itens').click();
+  ok(await page.locator('.item:visible').count() === 0, 'itens: desligado, nenhum marcador aparece');
+  await telaApp('inicio'); ok(await page.locator('.item:visible').count() === 0 && await page.locator('#chave-itens').getAttribute('aria-checked') === 'false', 'itens: a escolha vale nas outras telas da aba');
+  await page.locator('#chave-itens').click(); ok(await page.locator('.item:visible').count() > 0, 'itens: ligado de novo, os marcadores voltam');
+  // Evolução: o período muda o gráfico e o controle mostra o valor de cada semana.
+  await telaApp('evolucao'); await page.getByRole('radio', { name: '1 mês' }).click();
+  await page.locator('.faixa-pontos').fill('0');
+  ok(/76,2/.test(await page.locator('.leitura-graf').innerText()), `evolução: o controle mostra o peso da semana (${await page.locator('.leitura-graf').innerText()})`);
   // Picadinha: sem número de dose; campos travados; mapa do corpo; registrar muda o último local.
   await telaApp('picadinha');
   const pic = await textoMain();

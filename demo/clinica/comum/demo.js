@@ -60,6 +60,17 @@
     b.setAttribute('aria-label', e ? 'Usar o tema claro' : 'Usar o tema escuro');
     b.replaceChildren(window.DEMO_ICONE(e ? 'sol' : 'lua'));
   }
+  // "Mostrar itens do escopo": ligado por padrão, guardado na aba. Desligado, some todo marcador "item N".
+  const itensLigados = () => ler('sessionStorage', 'demo_itens') !== '0';
+  if (extra.item) gravar('sessionStorage', 'demo_itens', '1');
+  const aplicarItens = () => document.documentElement.classList.toggle('sem-itens', !itensLigados());
+  aplicarItens();
+  addEventListener('storage', e => { if (e.key === 'demo_itens') { aplicarItens(); document.querySelectorAll('.chave-itens').forEach(b => b.setAttribute('aria-checked', String(itensLigados()))); } });
+  function linhaItens() {
+    const b = el('button', { type: 'button', class: 'chave chave-itens', role: 'switch', id: 'chave-itens', 'aria-checked': String(itensLigados()), onclick: () => {
+      const novo = !itensLigados(); gravar('sessionStorage', 'demo_itens', novo ? '1' : '0'); b.setAttribute('aria-checked', String(novo)); aplicarItens(); } });
+    return el('div', { class: 'linha-itens' }, el('div', { class: 'dentro' }, el('label', { for: 'chave-itens', text: 'Mostrar itens do escopo' }), b));
+  }
   const botaoTema = () => { const b = el('button', { type: 'button', class: 'botao-tema', onclick: trocarTema }); desenharBotaoTema(b); return b; };
 
   // Movimento: troca de tela com a View Transitions API (sem ela, ou com "reduzir movimento", a troca é direta).
@@ -237,9 +248,12 @@
     if (r && r.limite) return 'Muitas tentativas deste aparelho. Tente de novo daqui a pouco.';
     return 'Não consegui enviar. Tente de novo daqui a pouco.';
   }
-  function telaEstado(raiz, titulo, texto, botoes) {
+  function telaEstado(raiz, titulo, texto, botoes, icone) {
     document.title = titulo + ' · Demonstração RXSync';
-    trocar(raiz, el('div', { class: 'estado' }, el('div', { class: 'caixa' }, el('h1', { text: titulo }), el('p', { class: 'mudo', text: texto }), el('div', { class: 'botoes' }, botoes))));
+    trocar(raiz, el('main', { class: 'estado' }, el('div', { class: 'caixa cartao elevado' },
+      el('span', { class: 'caixa-ic grande', 'aria-hidden': 'true' }, window.DEMO_ICONE(icone || 'info')),
+      el('h1', { text: titulo }), el('p', { class: 'mudo', text: texto }), el('div', { class: 'botoes' }, botoes),
+      el('p', { class: 'mini mudo' }, 'RXSync · ', el('a', { href: raizSite() + 'privacidade.html#demonstracao' }, 'Privacidade')))));
   }
   const pedirDemo = () => el('a', { class: 'botao', href: raizSite() + '#contato' }, 'Pedir uma demonstração');
 
@@ -251,7 +265,7 @@
     if (!temCodigo) {
       // Sem código: na entrada, o convite; nas outras páginas, volta para a entrada.
       if (op.pagina !== 'entrada') { location.replace('../'); return; }
-      telaEstado(raiz, 'Demonstração do app de acompanhamento', 'Esta página abre com o link que a RXSync manda para cada clínica. Quer ver o app do paciente e a central do médico com o nome da sua clínica?', [pedirDemo()]);
+      telaEstado(raiz, 'Demonstração do app de acompanhamento', 'Esta página abre com o link que a RXSync manda para cada clínica. Quer ver o app do paciente e a central do médico com o nome da sua clínica?', [pedirDemo()], 'celular');
       return;
     }
     trocar(raiz, el('div', { class: 'estado' }, el('div', { class: 'esqueleto', role: 'status', 'aria-label': 'Carregando' }, el('i', { class: 'curto' }), el('i'), el('i', { class: 'alto' }), el('i'), el('i', { class: 'curto' }))));
@@ -266,7 +280,7 @@
     }
     const r = pai ? { ok: true, dados: pai.dados, ver: pai.ver } : await pedir({ tipo: 'abrir', largura: String(Math.round(innerWidth)) });
     if (!r.ok) {
-      if (r.inativo) return telaEstado(raiz, 'Este link não está mais ativo', 'A demonstração deste link foi encerrada. Se quiser ver de novo, peça uma demonstração.', [pedirDemo()]);
+      if (r.inativo) return telaEstado(raiz, 'Este link não está mais ativo', 'A demonstração deste link foi encerrada. Se quiser ver de novo, peça uma demonstração.', [pedirDemo()], 'relogio');
       return telaEstado(raiz, r.limite ? 'Muitas tentativas' : 'Fora do ar por alguns minutos', mensagemErro(r),
         [el('button', { class: 'botao', type: 'button', onclick: () => location.reload() }, 'Tentar de novo')]);
     }
@@ -279,7 +293,8 @@
   }
   // Topo de cada página: as iniciais na cor e o nome da clínica.
   // Topo de cada página (vidro): as iniciais na cor, o nome da clínica, o tema e o que a página pedir (mais).
-  function topo(sub, voltar, mais) {
+  // opcoes: { semItens } (o escopo não tem o interruptor: lá os itens são a página).
+  function topo(sub, voltar, mais, opcoes) {
     const d = est.dados || {};
     if (est.embed) return null;
     const t = el('header', { class: 'topo vidro' }, el('div', { class: 'dentro' },
@@ -287,11 +302,11 @@
       el('div', { class: 'selo', 'aria-hidden': 'true', text: iniciais(d.clinica) }),
       el('div', { class: 'cresce' }, el('div', { class: 'nome', text: d.clinica || '' }), el('div', { class: 'sub', text: sub })),
       est.ver ? el('span', { class: 'etq atencao', text: 'como o médico vê · sem registro' }) : null, mais || null, botaoTema()));
-    return t;
+    return (opcoes && opcoes.semItens) ? t : [t, linhaItens()];
   }
   const nomeMedico = () => { const d = est.dados || {}; return (d.tratamento || '') + ' ' + (d.medico || ''); };
 
   window.DEMO = { raizSite, el, trocar, iniciar, topo, link, evento, tela, item, balao, rapida, janela, folha, confirmar, transicao, semMovimento, conversar, botaoConversar, botaoTema,
     pedir, mensagemErro, nomeMedico, iniciais, vistos, escuro,
-    get dados() { return est.dados; }, get ver() { return est.ver; }, get embed() { return est.embed; }, extra };
+    trocarTema, get dados() { return est.dados; }, get ver() { return est.ver; }, get embed() { return est.embed; }, extra };
 })();

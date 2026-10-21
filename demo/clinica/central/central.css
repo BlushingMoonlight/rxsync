@@ -83,3 +83,10 @@ h1.nome-ficha { font-size: var(--t-h1); }
 .lista-pac .linha-pac .botao { min-height: var(--alvo); }
 div.linha-pac { grid-template-columns: 40px minmax(0, 1fr); } div.linha-pac > :nth-child(n+3) { grid-column: 2; justify-self: start; }
 .cartao .chips { margin-top: 6px; }
+
+.duas-colunas { display: grid; gap: var(--e-4); align-items: start; }
+@media (min-width: 1000px) { .duas-colunas { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--e-5); } }
+.como-ve { display: grid; gap: var(--e-3); background: var(--superficie-2); box-shadow: none; }
+.acoes-presc { flex-wrap: wrap; justify-content: flex-start; gap: var(--e-2); }
+.funcoes li { min-height: 60px; }
+.cartao > .seg { margin-top: 6px; }
