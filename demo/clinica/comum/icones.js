@@ -1,5 +1,5 @@
-// Ícones da demonstração (DEC-125): um conjunto só, de traço simples (1,8 numa grade de 24), na cor do texto ou da
-// clínica (currentColor). Usados no lugar dos emojis.
+// Ícones da demonstração (DEC-125): um conjunto só, de traço arredondado (1,75 numa grade de 24), na cor do texto ou da
+// clínica (currentColor). As abas do app têm a versão cheia, para a aba ativa.
 (function () {
   'use strict';
   const P = {
@@ -44,13 +44,36 @@
     enviar: 'M4 12 20 4l-6 16-3-7z',
     chave: 'M3.5 12a3.5 3.5 0 0 1 3.5-3.5h10a3.5 3.5 0 0 1 0 7H7A3.5 3.5 0 0 1 3.5 12M7 12h.01',
     fechar: 'M6 6l12 12M18 6 6 18',
-    info: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 11v5M12 8h.01'
+    info: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 11v5M12 8h.01',
+    hoje: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7',
+    registrar: 'M8.5 3.5h7a5 5 0 0 1 5 5v7a5 5 0 0 1-5 5h-7a5 5 0 0 1-5-5v-7a5 5 0 0 1 5-5M12 8.5v7M8.5 12h7',
+    sol: 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4',
+    telefone: 'M6.5 3.5h3l1.5 4-2 1.5a10 10 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2',
+    olho: 'M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6',
+    ficha: 'M7 3.5h10a1.5 1.5 0 0 1 1.5 1.5v14.5a1.5 1.5 0 0 1-1.5 1.5H7a1.5 1.5 0 0 1-1.5-1.5V5A1.5 1.5 0 0 1 7 3.5M9 3.5v2h6v-2M9 11h6M9 15h4',
+    editar: 'M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4',
+    paleta: 'M12 20.5a8.5 8.5 0 1 1 8.5-8.5c0 2.2-1.8 3.5-3.6 3.5h-1.6a1.8 1.8 0 0 0-1.3 3c.5.6.1 2-2 2M7.5 12h.01M9.5 8h.01M14.5 8h.01',
+    relogio: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 7.5V12l3 2'
   };
-  // icone('gota', 'g') → <svg class="ic g"> (p = 16, normal = 20, g = 24 px).
-  window.DEMO_ICONE = function (nome, tam) {
+  // Versão cheia (aba ativa): a forma preenchida e o detalhe vazado na cor do fundo.
+  const CHEIO = {
+    hoje: ['M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17', 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7'],
+    registrar: ['M8.5 3.5h7a5 5 0 0 1 5 5v7a5 5 0 0 1-5 5h-7a5 5 0 0 1-5-5v-7a5 5 0 0 1 5-5', 'M12 8.5v7M8.5 12h7'],
+    seringa: ['M15.5 3.5 18 6l-9.5 9.5-3 .5.5-3z', 'M9.5 10.5l1.5 1.5', 'M17 3l4 4M5 19l-2 2'],
+    grafico: ['M6 16l4-5 3 3 5-7v13H6z', null, 'M4 20h16'],
+    usuario: ['M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M5 20a7 7 0 0 1 14 0z']
+  };
+  // icone('gota', 'g') → <svg class="ic g"> (p = 16, normal = 20, g = 24 px); icone('hoje', 'g', true) → versão cheia.
+  window.DEMO_ICONE = function (nome, tam, cheio) {
     const ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
     s.setAttribute('class', 'ic' + (tam ? ' ' + tam : '')); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor');
-    s.setAttribute('stroke-width', '1.8'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true');
-    const p = document.createElementNS(ns, 'path'); p.setAttribute('d', P[nome] || P.info); s.append(p); return s;
+    s.setAttribute('stroke-width', '1.75'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true');
+    const caminho = (d, extra) => { const p = document.createElementNS(ns, 'path'); p.setAttribute('d', d); for (const [k, v] of Object.entries(extra || {})) p.setAttribute(k, v); s.append(p); };
+    const c = cheio && CHEIO[nome];
+    if (!c) { caminho(P[nome] || P.info); return s; }
+    caminho(c[0], { fill: 'currentColor' });
+    if (c[1]) caminho(c[1], { class: 'vazado' });
+    if (c[2]) caminho(c[2]);
+    return s;
   };
 })();
