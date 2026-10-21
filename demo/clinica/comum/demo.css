@@ -302,3 +302,51 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .campo-travado .rot { font-size: var(--t-peq); }
 .campo-travado .travado { background: var(--superficie-2); border-radius: 10px; padding: 6px 10px; justify-self: start; }
 
+
+/* ---------------------------------------------------------------- faixa da demonstração: a única parte "da demonstração" nas páginas.
+   Escura nos dois temas, fina e separada do produto (o app e a central abaixo dela são o produto, sem marcas de demonstração). */
+.faixa-demo { --fd-fundo: #15171b; --fd-texto: #f1f1f3; --fd-texto-2: #c4c7ce; --fd-linha: rgba(255, 255, 255, .14);
+  background: var(--fd-fundo); color: var(--fd-texto); border-bottom: 1px solid #000; font-size: .88rem; position: relative; z-index: 40; }
+:root[data-tema="escuro"] .faixa-demo { --fd-fundo: #22252c; border-bottom-color: #33373f; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .faixa-demo { --fd-fundo: #22252c; border-bottom-color: #33373f; } }
+.faixa-demo .dentro { width: min(1240px, 100%); margin: 0 auto; padding: 0 var(--e-4); display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--e-4); min-height: 48px; }
+@media (min-width: 768px) { .faixa-demo .dentro { padding: 0 var(--e-6); } }
+.fd-marca { display: flex; align-items: center; gap: var(--e-2); min-width: 0; flex: 1 1 0; margin: 0; }
+.fd-tag { flex: none; padding: 2px 8px; border: 1px solid var(--fd-linha); border-radius: 99px; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--fd-texto-2); }
+.fd-clinica { min-width: 0; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fd-ver { font-size: var(--t-mini); color: #f4c06a; }
+.fd-nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.fd-nav::-webkit-scrollbar { display: none; }
+.fd-link { min-height: var(--alvo); display: inline-flex; align-items: center; padding: 0 var(--e-3); border: 0; background: none; color: var(--fd-texto-2); font: inherit; font-weight: 600;
+  text-decoration: none; white-space: nowrap; cursor: pointer; position: relative; }
+.fd-link:hover { color: var(--fd-texto); }
+.fd-link[aria-current="page"] { color: var(--fd-texto); }
+.fd-link[aria-current="page"]::after { content: ''; position: absolute; left: var(--e-3); right: var(--e-3); bottom: 8px; height: 2px; border-radius: 2px; background: currentColor; }
+.fd-link:focus-visible, .faixa-demo .botao-tema:focus-visible, .faixa-demo .chave:focus-visible { outline-color: #fff; }
+.fd-itens { display: inline-flex; align-items: center; gap: var(--e-2); flex: none; min-height: var(--alvo); }
+.fd-itens label { color: var(--fd-texto-2); font-weight: 600; cursor: pointer; }
+.fd-longo { display: none; }
+@media (min-width: 1100px) { .fd-longo { display: inline; } .fd-curto { display: none; } }
+.fd-marca .fd-clinica { min-width: 4em; }
+.faixa-demo .chave { width: 44px; height: 28px; background: #4a4f59; } .faixa-demo .chave::after { width: 22px; height: 22px; } .faixa-demo .chave[aria-checked="true"]::after { transform: translateX(16px); }
+.faixa-demo .chave::before { inset: -8px -2px; }
+.faixa-demo .chave[aria-checked="true"] { background: #e9eaee; } .faixa-demo .chave[aria-checked="true"]::after { background: var(--fd-fundo); }
+.faixa-demo .botao-tema { background: transparent; border-color: var(--fd-linha); color: var(--fd-texto); }
+@media (max-width: 719px) {
+  .faixa-demo .dentro { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "marca tema" "nav itens"; column-gap: var(--e-2); }
+  .fd-marca { grid-area: marca; } .fd-tema { grid-area: tema; } .fd-itens { grid-area: itens; } .fd-ver { display: none; }
+  .fd-nav { grid-area: nav; border-top: 1px solid var(--fd-linha); }
+  .faixa-demo .fd-itens { border-top: 1px solid var(--fd-linha); }
+  .fd-link { padding: 0 var(--e-2); } .fd-link[aria-current="page"]::after { left: var(--e-2); right: var(--e-2); }
+}
+.fd-tema { display: inline-flex; flex: none; }
+
+/* origem da informação ("medido na clínica", "definida pela nutricionista em…") */
+.origem { display: flex; align-items: flex-start; gap: 6px; font-size: var(--t-mini); color: var(--tinta-2); line-height: 1.45; }
+.origem .ic { margin-top: 1px; flex: none; color: var(--tinta-3); }
+.tabela-bio { width: 100%; border-collapse: collapse; font-size: .94rem; margin-top: var(--e-2); }
+.tabela-bio caption { text-align: left; font-size: var(--t-mini); color: var(--tinta-2); padding-bottom: var(--e-2); }
+.tabela-bio th, .tabela-bio td { padding: 10px 4px; border-bottom: 1px solid var(--linha); text-align: right; font-weight: 600; }
+.tabela-bio th[scope="row"], .tabela-bio thead th:first-child { text-align: left; font-weight: 500; color: var(--tinta-2); }
+.tabela-bio thead th { font-size: var(--t-mini); color: var(--tinta-2); font-weight: 650; }
+.grafico .ponto-clinica { fill: var(--superficie); stroke: var(--acento-texto); stroke-width: 2; }

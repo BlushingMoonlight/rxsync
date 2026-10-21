@@ -3,7 +3,7 @@
 // - o servidor (workflow 43) devolve só o que aparece na tela: clínica, Dr./Dra., médico, especialidade, cidade, cor e o
 //   escopo marcado. Nada disso fica guardado no aparelho;
 // - o uso (telas, toques, perguntas nos chats) vai em lotes; nada do que é digitado nos campos de exemplo é enviado,
-//   só as perguntas dos chats e o recado do "Quero conversar";
+//   só as perguntas dos chats;
 // - os pacientes são de mentira; o app não calcula dose e nenhuma resposta diagnostica ou prescreve.
 (function () {
   'use strict';
@@ -60,16 +60,17 @@
     b.setAttribute('aria-label', e ? 'Usar o tema claro' : 'Usar o tema escuro');
     b.replaceChildren(window.DEMO_ICONE(e ? 'sol' : 'lua'));
   }
-  // "Mostrar itens do escopo": ligado por padrão, guardado na aba. Desligado, some todo marcador "item N".
-  const itensLigados = () => ler('sessionStorage', 'demo_itens') !== '0';
+  // "Mostrar itens do escopo": desligado por padrão (o app e a central abrem limpos, como no produto), guardado na aba.
+  // Ligado, aparecem os marcadores "item N". Um link com &item=N liga sozinho.
+  const itensLigados = () => ler('sessionStorage', 'demo_itens') === '1';
   if (extra.item) gravar('sessionStorage', 'demo_itens', '1');
   const aplicarItens = () => document.documentElement.classList.toggle('sem-itens', !itensLigados());
   aplicarItens();
   addEventListener('storage', e => { if (e.key === 'demo_itens') { aplicarItens(); document.querySelectorAll('.chave-itens').forEach(b => b.setAttribute('aria-checked', String(itensLigados()))); } });
-  function linhaItens() {
-    const b = el('button', { type: 'button', class: 'chave chave-itens', role: 'switch', id: 'chave-itens', 'aria-checked': String(itensLigados()), onclick: () => {
+  function chaveItens() {
+    const b = el('button', { type: 'button', class: 'chave chave-itens', role: 'switch', id: 'chave-itens', 'aria-label': 'Mostrar itens do escopo', 'aria-checked': String(itensLigados()), onclick: () => {
       const novo = !itensLigados(); gravar('sessionStorage', 'demo_itens', novo ? '1' : '0'); b.setAttribute('aria-checked', String(novo)); aplicarItens(); } });
-    return el('div', { class: 'linha-itens' }, el('div', { class: 'dentro' }, el('label', { for: 'chave-itens', text: 'Mostrar itens do escopo' }), b));
+    return el('span', { class: 'fd-itens' }, el('label', { for: 'chave-itens' }, el('span', { class: 'fd-longo', text: 'Mostrar itens do escopo' }), el('span', { class: 'fd-curto', text: 'Itens' })), b);
   }
   const botaoTema = () => { const b = el('button', { type: 'button', class: 'botao-tema', onclick: trocarTema }); desenharBotaoTema(b); return b; };
 
@@ -211,27 +212,6 @@
     if (m) { m.classList.add('destaque'); m.scrollIntoView({ block: 'center' }); }
   }
 
-  // ---------------------------------------------------------------- "Quero conversar": só avisa o Jean (sem WhatsApp, sem telefone)
-  function conversar() {
-    if (est.ver) { rapida('Modo "ver como o médico vê": nada é enviado.'); return; }
-    const texto = el('textarea', { class: 'entrada', id: 'recado', maxlength: '500', rows: '3', placeholder: 'Ex.: pode me chamar à tarde.' });
-    const erro = el('p', { class: 'peq', role: 'alert' });
-    let fecharJ;
-    const enviar = async b => {
-      b.disabled = true; erro.textContent = '';
-      const r = await pedir({ tipo: 'conversar', texto: texto.value.trim() });
-      b.disabled = false;
-      if (!r.ok) { erro.textContent = mensagemErro(r); return; }
-      fecharJ();
-      janela('Pronto', el('p', { text: 'Pronto, o Jean vai te chamar.' }), el('p', { class: 'mudo peq', text: 'Ele fala com você pelo contato que vocês já usam.' }));
-    };
-    fecharJ = janela('Quero conversar', el('p', { class: 'mudo', text: 'O Jean, da RXSync, recebe o seu pedido e te chama. Se quiser, deixe um recado.' }),
-      el('label', { class: 'campo', for: 'recado' }, el('span', { text: 'Recado (opcional)' }), texto),
-      el('p', { class: 'mudo peq', text: 'Não escreva dados de pacientes.' }), erro,
-      el('div', { class: 'botoes' }, el('button', { class: 'botao', type: 'button', onclick: e => enviar(e.currentTarget) }, 'Enviar')));
-  }
-  const botaoConversar = cls => el('button', { type: 'button', class: 'botao ' + (cls || ''), onclick: conversar }, 'Quero conversar');
-
   // ---------------------------------------------------------------- aviso de privacidade (1º acesso neste aparelho; não bloqueia)
   function faixaPrivacidade() {
     if (ler('localStorage', 'demo_aviso_visto') === '1' || est.ver || est.embed) return;
@@ -292,21 +272,27 @@
     destacar();
   }
   // Topo de cada página: as iniciais na cor e o nome da clínica.
-  // Topo de cada página (vidro): as iniciais na cor, o nome da clínica, o tema e o que a página pedir (mais).
-  // opcoes: { semItens } (o escopo não tem o interruptor: lá os itens são a página).
-  function topo(sub, voltar, mais, opcoes) {
-    const d = est.dados || {};
+  // A faixa da demonstração: a ÚNICA parte "da demonstração" nas páginas (escura e separada do produto).
+  // atual: 'inicio' | 'app' | 'central' | 'escopo'. trocarVista: troca entre o app e a central na mesma página (sem recarregar).
+  function faixaDemo(atual, trocarVista, opcoes) {
     if (est.embed) return null;
-    const t = el('header', { class: 'topo vidro' }, el('div', { class: 'dentro' },
-      voltar ? el('a', { class: 'voltar', href: link(voltar), 'aria-label': 'Voltar para a entrada' }, window.DEMO_ICONE('voltar')) : null,
-      el('div', { class: 'selo', 'aria-hidden': 'true', text: iniciais(d.clinica) }),
-      el('div', { class: 'cresce' }, el('div', { class: 'nome', text: d.clinica || '' }), el('div', { class: 'sub', text: sub })),
-      est.ver ? el('span', { class: 'etq atencao', text: 'como o médico vê · sem registro' }) : null, mais || null, botaoTema()));
-    return (opcoes && opcoes.semItens) ? t : [t, linhaItens()];
+    const d = est.dados || {};
+    const ir = (k, rot) => {
+      const atr = { class: 'fd-link', 'aria-current': k === atual ? 'page' : null };
+      if (trocarVista && (k === 'app' || k === 'central')) return el('button', { type: 'button', ...atr, onclick: () => trocarVista(k) }, rot);
+      return el('a', { ...atr, href: link(k === 'inicio' ? 'entrada' : k) }, rot);
+    };
+    return el('div', { class: 'faixa-demo', role: 'region', 'aria-label': 'Demonstração' }, el('div', { class: 'dentro' },
+      el('p', { class: 'fd-marca' }, el('span', { class: 'fd-tag', text: 'Demonstração' }), el('span', { class: 'fd-clinica', text: d.clinica || '' })),
+      est.ver ? el('span', { class: 'fd-ver', text: 'como o médico vê · sem registro' }) : null,
+      el('nav', { class: 'fd-nav', 'aria-label': 'Partes da demonstração' }, ir('inicio', 'Início'), ir('app', 'App'), ir('central', 'Central'), ir('escopo', 'Escopo')),
+      opcoes && opcoes.semItens ? null : chaveItens(), el('span', { class: 'fd-tema' }, botaoTema())));
   }
+  // App e central na mesma página: o registro de uso passa a dizer de qual parte é cada tela.
+  function mudarPagina(p) { telaSair(); est.tela = ''; est.pagina = p; }
   const nomeMedico = () => { const d = est.dados || {}; return (d.tratamento || '') + ' ' + (d.medico || ''); };
 
-  window.DEMO = { raizSite, el, trocar, iniciar, topo, link, evento, tela, item, balao, rapida, janela, folha, confirmar, transicao, semMovimento, conversar, botaoConversar, botaoTema,
+  window.DEMO = { raizSite, el, trocar, iniciar, faixaDemo, mudarPagina, marcarVisto, link, evento, tela, item, balao, rapida, janela, folha, confirmar, transicao, semMovimento, botaoTema,
     pedir, mensagemErro, nomeMedico, iniciais, vistos, escuro,
     trocarTema, get dados() { return est.dados; }, get ver() { return est.ver; }, get embed() { return est.embed; }, extra };
 })();

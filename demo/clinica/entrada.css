@@ -16,11 +16,6 @@
 .marca-clinica { display: flex; align-items: center; gap: var(--e-3); font-family: var(--fonte-titulo); font-weight: 750; font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); color: var(--acento-texto); letter-spacing: -.02em; line-height: 1.2; }
 .marca-clinica .selo { width: 48px; height: 48px; border-radius: 14px; font-size: 1rem; }
 @media (max-width: 599px) { .texto-heroi .botoes { display: grid; width: 100%; } .texto-heroi .botoes .botao { width: 100%; } }
-.conversar-topo { min-height: 44px; padding: 0 var(--e-4); font-size: .9rem; }
-.conversar-topo::before { content: ''; position: absolute; inset: -2px 0; }
-.conversar-topo { position: relative; }
-@media (max-width: 420px) { .conversar-topo { padding: 0 12px; font-size: .82rem; } }
-
 /* o celular na tela, com o app funcionando */
 .aparelho { display: none; }
 @media (min-width: 900px) {
@@ -56,5 +51,19 @@ a.bento-bloco:hover .ir { transform: translateX(3px); }
 .mini-escopo span { padding: 6px 10px; border-radius: 99px; } .mini-escopo .on { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
 .destaque-b { gap: var(--e-2); padding: var(--e-4) var(--e-5); background: var(--superficie-2); box-shadow: none; }
 .destaque-b h3 { font-size: 1rem; }
-.conversar-topo { white-space: nowrap; }
-@media (max-width: 440px) { .topo:has(.conversar-topo) .sub { display: none; } }
+/* os três caminhos: o produto (app e central, lado a lado) e, separada, a proposta (o escopo, com cara de documento) */
+.caminhos, .caminho-escopo { display: grid; gap: var(--e-3); }
+.bento .produto-b { min-height: 240px; }
+@media (min-width: 640px) { .bento:has(.produto-b) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .bento:has(.produto-b) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.produto-b .mini-aneis, .produto-b .mini-lista { margin-top: auto; }
+.produto-b .mini-aneis { width: 120px; height: 120px; justify-self: end; }
+.documento-b { display: flex; align-items: center; gap: var(--e-5); padding: var(--e-5); border-radius: var(--r-cartao); border: 1px solid var(--linha-forte); border-style: dashed;
+  background: var(--superficie); color: var(--tinta); text-decoration: none; transition: transform .2s var(--suave); }
+.documento-b:active { transform: scale(.985); }
+.documento-b .cresce { display: grid; gap: 6px; }
+.titulo-doc { font-family: var(--fonte-titulo); font-size: var(--t-h2); }
+.folha-doc { flex: none; width: 64px; height: 84px; border-radius: 6px; background: var(--superficie-2); border: 1px solid var(--linha-forte); padding: 12px 10px; display: grid; gap: 6px; align-content: start; box-shadow: var(--sombra-1); }
+.folha-doc i { height: 4px; border-radius: 2px; background: var(--linha-forte); } .folha-doc i.curta { width: 60%; }
+.documento-b .ir { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--superficie-2); flex: none; }
+@media (max-width: 520px) { .documento-b { flex-wrap: wrap; } .folha-doc { width: 48px; height: 62px; padding: 8px; } }

@@ -25,7 +25,7 @@
     }, 1500);
   }
   // Grupos (dobráveis), com a contagem do que já foi marcado em cada um.
-  const GRUPOS = [['Entrada e tela Hoje', 1, 6], ['Registros do dia', 7, 19], ['Evolução', 20, 22], ['Picadinha', 23, 27], ['Clínica e contato', 28, 34], ['Extras do app', 35, 38], ['Central do médico', 39, 46]];
+  const GRUPOS = [['Entrada e tela Hoje', 1, 6], ['Registros do dia', 7, 19], ['Evolução', 20, 22], ['Aplicações', 23, 27], ['Clínica e contato', 28, 34], ['Extras do app', 35, 38], ['Central do médico', 39, 46]];
   const contadores = {};
   function contarGrupo(g) {
     const [, a, b] = g, total = b - a + 1, feitos = Object.entries(est.escolhas).filter(([n, v]) => +n >= a && +n <= b && v.e).length;
@@ -64,20 +64,24 @@
       const [titulo, a, b] = g;
       contadores[a] = el('span', { class: 'mini mudo tab' });
       const aberto = pedido ? pedido >= a && pedido <= b : k === 0;
-      const det = el('details', { class: 'grupo-escopo cartao', open: aberto },
-        el('summary', {}, el('span', { class: 'cresce' }, el('h2', { text: titulo }), contadores[a]), el('span', { class: 'seta-g', 'aria-hidden': 'true' }, window.DEMO_ICONE('seta', 'p'))),
+      const det = el('details', { class: 'grupo-escopo', open: aberto },
+        el('summary', {}, el('span', { class: 'cresce' }, el('h2', { text: (k + 1) + '. ' + titulo }), contadores[a]), el('span', { class: 'seta-g', 'aria-hidden': 'true' }, window.DEMO_ICONE('seta', 'p'))),
         el('div', { class: 'itens-grupo' }, itens.filter(i => i.n >= a && i.n <= b).map(cartaoItem)));
       return det;
     };
     const btnEnviar = el('button', { type: 'button', class: 'botao', onclick: e => enviar(e.currentTarget) }, window.DEMO_ICONE('enviar', 'p'), 'Enviar para a RXSync');
-    trocar(raiz, DEMO.topo('Escopo · demonstração', 'entrada', null, { semItens: true }),
+    const hoje = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+    trocar(raiz, DEMO.faixaDemo('escopo', null, { semItens: true }),
       el('main', { class: 'pagina pagina-escopo' },
-        el('header', { class: 'pilha cab-escopo' }, el('p', { class: 'sobretitulo', text: 'Escopo do app' }), el('h1', { text: 'Marque o que entra no app da sua clínica.' }),
-          el('p', { class: 'mudo', text: 'Para cada item: Quero, Não preciso ou Tenho dúvida. "Ver na tela" mostra o item na demonstração. As escolhas ficam guardadas sozinhas.' }),
-          d.escopo_enviado_em ? el('p', { class: 'aviso info peq' }, window.DEMO_ICONE('check', 'p'), 'Você já enviou este escopo. Pode mudar e enviar de novo quando quiser.') : null),
-        el('div', { class: 'grupos' }, GRUPOS.map(grupo)),
-        el('section', { class: 'cartao fim-escopo' }, el('h2', { text: 'Pronto?' }), el('p', { class: 'mudo', text: 'Envie o escopo para a RXSync. Prefere falar antes? Toque em "Quero conversar".' }),
-          el('div', { class: 'botoes' }, el('button', { type: 'button', class: 'botao', onclick: e => enviar(e.currentTarget) }, 'Enviar para a RXSync'), DEMO.botaoConversar('sec')))),
+        el('article', { class: 'documento' },
+          el('header', { class: 'cab-doc' }, el('p', { class: 'sobretitulo', text: 'Proposta de escopo' }), el('h1', { text: 'App de acompanhamento · ' + d.clinica }),
+            el('dl', { class: 'meta-doc' }, el('dt', { text: 'Preparada para' }), el('dd', { text: DEMO.nomeMedico().trim() }), el('dt', { text: 'Clínica' }), el('dd', { text: d.clinica }),
+              el('dt', { text: 'Data' }), el('dd', { text: hoje }), el('dt', { text: 'Itens' }), el('dd', { text: itens.length + ' (app do paciente e central do médico)' })),
+            el('p', { class: 'mudo', text: 'Para cada item, marque Quero, Não preciso ou Tenho dúvida. "Ver na tela" abre o item na demonstração. As escolhas ficam guardadas sozinhas; envie para a RXSync quando terminar.' }),
+            d.escopo_enviado_em ? el('p', { class: 'aviso info peq' }, window.DEMO_ICONE('check', 'p'), 'Você já enviou este escopo. Pode mudar e enviar de novo quando quiser.') : null),
+          el('div', { class: 'grupos' }, GRUPOS.map(grupo)),
+          el('section', { class: 'fim-escopo' }, el('h2', { text: 'Resumo' }), el('p', { class: 'mudo', text: 'Confira a contagem na barra de baixo e envie. Você pode mudar as escolhas e enviar de novo.' }),
+            el('div', { class: 'botoes' }, el('button', { type: 'button', class: 'botao', onclick: e => enviar(e.currentTarget) }, 'Enviar para a RXSync'))))),
       el('div', { class: 'barra-escopo vidro' }, el('div', { class: 'dentro' }, contagem, btnEnviar)));
     contar();
     DEMO.tela('escopo');
