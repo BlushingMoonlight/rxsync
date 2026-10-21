@@ -68,7 +68,7 @@
   aplicarItens();
   addEventListener('storage', e => { if (e.key === 'demo_itens') { aplicarItens(); document.querySelectorAll('.chave-itens').forEach(b => b.setAttribute('aria-checked', String(itensLigados()))); } });
   function chaveItens() {
-    const b = el('button', { type: 'button', class: 'chave chave-itens', role: 'switch', id: 'chave-itens', 'aria-checked': String(itensLigados()), onclick: () => {
+    const b = el('button', { type: 'button', class: 'chave chave-itens', role: 'switch', id: 'chave-itens', 'aria-label': 'Mostrar itens do escopo', 'aria-checked': String(itensLigados()), onclick: () => {
       const novo = !itensLigados(); gravar('sessionStorage', 'demo_itens', novo ? '1' : '0'); b.setAttribute('aria-checked', String(novo)); aplicarItens(); } });
     return el('span', { class: 'fd-itens' }, el('label', { for: 'chave-itens' }, el('span', { class: 'fd-longo', text: 'Mostrar itens do escopo' }), el('span', { class: 'fd-curto', text: 'Itens' })), b);
   }

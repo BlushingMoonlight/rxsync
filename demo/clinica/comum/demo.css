@@ -325,7 +325,9 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .fd-link:focus-visible, .faixa-demo .botao-tema:focus-visible, .faixa-demo .chave:focus-visible { outline-color: #fff; }
 .fd-itens { display: inline-flex; align-items: center; gap: var(--e-2); flex: none; min-height: var(--alvo); }
 .fd-itens label { color: var(--fd-texto-2); font-weight: 600; cursor: pointer; }
-.fd-curto { display: none; }
+.fd-longo { display: none; }
+@media (min-width: 1100px) { .fd-longo { display: inline; } .fd-curto { display: none; } }
+.fd-marca .fd-clinica { min-width: 4em; }
 .faixa-demo .chave { width: 44px; height: 28px; background: #4a4f59; } .faixa-demo .chave::after { width: 22px; height: 22px; } .faixa-demo .chave[aria-checked="true"]::after { transform: translateX(16px); }
 .faixa-demo .chave::before { inset: -8px -2px; }
 .faixa-demo .chave[aria-checked="true"] { background: #e9eaee; } .faixa-demo .chave[aria-checked="true"]::after { background: var(--fd-fundo); }
@@ -336,7 +338,6 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
   .fd-nav { grid-area: nav; border-top: 1px solid var(--fd-linha); }
   .faixa-demo .fd-itens { border-top: 1px solid var(--fd-linha); }
   .fd-link { padding: 0 var(--e-2); } .fd-link[aria-current="page"]::after { left: var(--e-2); right: var(--e-2); }
-  .fd-longo { display: none; } .fd-curto { display: inline; }
 }
 .fd-tema { display: inline-flex; flex: none; }
 

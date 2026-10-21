@@ -540,7 +540,8 @@
   window.DEMO_APP = {
     montar(onde, pedida) {
       raiz = onde;
-      if (pedida == null) { desenhar(est.pilha.length ? est.pilha[est.pilha.length - 1] : est.aba === 'inicio' && !est.aceite && !est.visto ? 'boas-vindas' : est.aba, true); est.visto = true; return; }
+      // Vindo da central pela faixa: volta para onde estava (ou Hoje); a tela de primeiro acesso só abre pelo link do app.
+      if (pedida == null) { montarTela(est.pilha.length ? est.pilha[est.pilha.length - 1] : est.aba); est.visto = true; return; }
       est.visto = true;
       const FOLHA = { refeicao: 'busca', buscar: 'busca', alimento: 'busca', foto: 'foto', codigo: 'codigo' };
       if (FOLHA[pedida]) { irAba('inicio'); abrirRefeicao(FOLHA[pedida]); }
