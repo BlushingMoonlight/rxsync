@@ -67,7 +67,6 @@
       const det = el('details', { class: 'grupo-escopo cartao', open: aberto },
         el('summary', {}, el('span', { class: 'cresce' }, el('h2', { text: titulo }), contadores[a]), el('span', { class: 'seta-g', 'aria-hidden': 'true' }, window.DEMO_ICONE('seta', 'p'))),
         el('div', { class: 'itens-grupo' }, itens.filter(i => i.n >= a && i.n <= b).map(cartaoItem)));
-      det.addEventListener('toggle', () => { if (det.open) DEMO.evento('abriu-grupo', { grupo: titulo }); });
       return det;
     };
     const btnEnviar = el('button', { type: 'button', class: 'botao', onclick: e => enviar(e.currentTarget) }, window.DEMO_ICONE('enviar', 'p'), 'Enviar para a RXSync');
