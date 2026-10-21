@@ -187,6 +187,17 @@ const CASOS = [
   { acao: 'prosp_sugerir', rota: P + '/conversas', antes: async () => { await page.selectOption('#conteudo select[aria-label="Campanha"]', 'CMP-0001'); await botao('Sugerir melhorias').waitFor(); },
     abrirCom: () => botao('Sugerir melhorias').click(), campos: { quantidade: '10' },
     espera: { resultado: '', campanha_id: 'CMP-0001', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0, quantidade: '10' } },
+  // Demonstrações por link (sql/056, DEC-125): criar (1), editar (2, antes e depois), desativar e reativar (1), ver (1), apagar (3, o nome da clínica do link)
+  { acao: 'dem_criar', rota: 'demonstracoes/novo', antes: async () => { await page.fill('#d-clinica', 'Clínica Nova'); await page.selectOption('#d-tratamento', 'Dra.'); await page.fill('#d-medico', 'Ana Costa');
+      await page.getByRole('radio', { name: 'Roxo' }).click(); await page.fill('#d-lead_codigo', 'px-acde3'); }, abrirCom: () => botao('Criar o link').click(),
+    espera: { campos: { clinica: 'Clínica Nova', tratamento: 'Dra.', medico: 'Ana Costa', especialidade: 'Endocrinologia', cidade: '', cor: 'roxo', lead_codigo: 'PX-ACDE3', anotacao: '', mensagem: '', dias: '60' } } },
+  { acao: 'dem_editar', rota: 'demonstracoes/link/904/editar', antes: () => page.fill('#d-cidade', 'Olinda'), abrirCom: () => botao('Salvar').click(),
+    espera: { id: 904, campos: { clinica: 'Instituto Bem Estar', tratamento: 'Dr.', medico: 'Marcos Lima', especialidade: 'Medicina do esporte', cidade: 'Olinda', cor: 'petroleo', lead_codigo: 'PX-ACDE3',
+      anotacao: 'Conheci no congresso de Recife; quer começar em dezembro.', mensagem: '', valida_ate: daqui(10) } } },
+  { acao: 'dem_desativar', rota: 'demonstracoes/link/904', abrirCom: () => botao('Desativar').click(), espera: { id: 904 } },
+  { acao: 'dem_reativar', rota: 'demonstracoes/link/902', abrirCom: () => botao('Reativar').click(), espera: { id: 902 } },
+  { acao: 'dem_ver', rota: 'demonstracoes/link/904', abrirCom: () => botao('Ver como o médico vê').click(), espera: { id: 904 } },
+  { acao: 'dem_apagar', rota: 'demonstracoes/link/904', abrirCom: () => botao('Apagar').click(), nome: 'Instituto Bem Estar', espera: { id: 904 } },
   { acao: 'sair_todos', nivel: 2, rota: 'seguranca', abrirCom: () => botao('Sair de todos os aparelhos').click(), espera: {} }
 ];
 for (const k of CASOS) {
@@ -298,6 +309,28 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   ok(d && d.chave === 'prosp_ia' && d.valor === 'SIM' && d.confirmacao === 'CONFIRMAR', `prosp_ia: ligar pede o nível 2 (${JSON.stringify(d)})`);
   ok(await page.getByRole('switch', { name: 'Disparo de prospecção' }).count() === 0 && await page.locator('#conteudo').getByText('Travado até a Política v10').count() === 1, 'prosp_disparo: travado, sem interruptor');
   feitos += 2;
+}
+// Demonstrações (DEC-125): depois do "Ver como o médico vê" (caso acima), a tela mostra o link de 15 minutos; os links (demo_links) ficam travados
+// sem a Política v17 e, com ela, ligar pede o nível 2; criar sem o nome da clínica não sai da página.
+{
+  await abrir('demonstracoes/link/904');   // o caso dem_ver acima já pediu o link
+  const a = page.locator('#conteudo a', { hasText: 'Abrir como o médico vê' });
+  await a.waitFor().catch(() => {});
+  ok(/^https:\/\/rxsync\.com\.br\/demo\/clinica\/#CDEFGHJKMNPQRTUV&ver=/.test(await a.getAttribute('href').catch(() => '') || '') && await a.getAttribute('target') === '_blank', 'dem_ver: a tela mostra o link de 15 minutos');
+  await abrir('demonstracoes/novo'); let desde = chamadas.length;
+  await page.fill('#d-medico', 'Ana Costa'); await botao('Criar o link').click(); await page.waitForTimeout(200);
+  ok(!chamadas.slice(desde).some(x => x.acao === 'dem_criar') && await page.locator('#conteudo .erro', { hasText: 'nome da clínica' }).count() === 1, 'dem_criar: sem o nome da clínica, não manda');
+  chaves.demo_links = 'NAO'; chaves.demo_politica_v17 = 'NAO'; await abrir('ajustes');
+  ok(await page.getByRole('switch', { name: 'Links de demonstração' }).count() === 0 && await page.locator('#conteudo').getByText('Travado até a Política v17').count() === 1, 'demo_links: travado sem a Política v17');
+  chaves.demo_politica_v17 = 'SIM'; await abrir('ajustes'); desde = chamadas.length;
+  await page.getByRole('switch', { name: 'Links de demonstração', exact: true }).click();
+  await page.waitForSelector(janela); await page.locator(janela + ' button[type=submit]').click();
+  const d = await chamada('ligar_chave', desde);
+  ok(d && d.chave === 'demo_links' && d.valor === 'SIM' && d.confirmacao === 'CONFIRMAR', `demo_links: ligar pede o nível 2 (${JSON.stringify(d)})`);
+  await abrir('demonstracoes');
+  ok(await page.locator('#conteudo .aviso', { hasText: 'Os links estão desligados' }).count() === 0, 'demo_links ligada: sem o aviso de links desligados');
+  chaves.demo_links = 'NAO'; chaves.demo_politica_v17 = 'NAO';
+  feitos += 4;
 }
 // Sinal de vida do 52 e do 53 (DEC-087): sem disparo, o cartão mostra quem rodou, sem aviso; com o disparo ligado e o 52
 // parado, a tela inicial e os Ajustes dizem "Disparo parado: o workflow 52 … não roda desde …".

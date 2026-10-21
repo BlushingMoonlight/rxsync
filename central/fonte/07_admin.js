@@ -10,7 +10,8 @@ const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', b
   cancelamento_agendar: 'Cancelamento agendado', cancelamento_desfazer: 'Cancelamento desfeito', link_reenviado: 'Link reenviado', token_painel_novo: 'Link novo do painel',
   cobranca_teste_cliente: 'Clínica de teste da cobrança', chave_api_limites: 'Limites da chave da API',
   prosp_salvar: 'Prospecção: camada salva', prosp_duplicar: 'Prospecção: cópia', prosp_ligar: 'Prospecção: ligou ou pausou', prosp_encerrar: 'Prospecção: encerrada', prosp_apagar: 'Prospecção: rascunho apagado',
-  prosp_numero: 'Prospecção: número de WhatsApp', prosp_regra: 'Prospecção: regra', prosp_custos: 'Prospecção: custos', prosp_lead: 'Prospecção: lead', prosp_buscar: 'Prospecção: busca pedida', prosp_exportar: 'Prospecção: exportação' };
+  prosp_numero: 'Prospecção: número de WhatsApp', prosp_regra: 'Prospecção: regra', prosp_custos: 'Prospecção: custos', prosp_lead: 'Prospecção: lead', prosp_buscar: 'Prospecção: busca pedida', prosp_exportar: 'Prospecção: exportação',
+  dem_criar: 'Demonstração: link criado', dem_editar: 'Demonstração: link editado', dem_desativar: 'Demonstração: link desativado', dem_reativar: 'Demonstração: link reativado', dem_apagar: 'Demonstração: link apagado' };
 const DESFAZIVEIS = ['edicao_limites', 'chave_api_criada', 'edicao_assistente', 'edicao_configuracoes', 'edicao_recursos', 'recurso_liberado'];
 const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como);
   if (d.finalidade) p.push(d.finalidade === 'senha' ? 'troca de senha' : 'entrada'); if (d.prefixo) p.push(d.prefixo + '…');
@@ -79,23 +80,26 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   editar_assistente: 'Assistente', editar_configuracoes: 'Configurações', editar_recursos: 'Botões dos recursos', liberar_recursos: 'Liberar recursos', editar_plano: 'Plano', editar_preco: 'Preço especial',
   editar_cobranca: 'Cobrança', editar_teste: 'Estender o teste', editar_situacao: 'Situação (suspender, pausar, cancelar)', editar_links: 'Links da clínica', cobranca_teste_cliente: 'Clínica de teste da cobrança', asaas_ambiente: 'Ambiente do Asaas',
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
-  prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento' };
+  prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
+  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && k.chave !== 'tela_cliente_sensivel'],
   ['Dados protegidos', k => k.chave === 'tela_cliente_sensivel'],
   ['Edições de baixo risco', k => ['editar_assistente', 'editar_configuracoes', 'editar_recursos', 'editar_limites', 'editar_onboarding', 'editar_links', 'liberar_recursos'].includes(k.chave)],
   ['Dinheiro, situação e empresa', k => ['editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste', 'editar_situacao', 'editar_empresa'].includes(k.chave)],
   ['Enterprise', k => ['editar_chaves_api', 'editar_avisos_eventos'].includes(k.chave)],
-  ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)]];
+  ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)],
+  ['Demonstrações', k => ['tela_demonstracoes', 'editar_demonstracoes', 'demo_links'].includes(k.chave)]];
 // As chaves do motor da prospecção pedem nível para LIGAR (busca e IA: 2; disparo: 3, com o nome "Disparo de prospecção");
 // desligar continua num toque (DEC-078).
 async function mudarChave(chave, valor, desfazendo) {
   let d = { chave, valor };
   if (nivelDe('ligar_chave', d) > 1) {
-    d = await pedirAcao('ligar_chave', d, { titulo: 'Ligar: ' + (NOME_CHAVE[chave] || chave), nome: 'Disparo de prospecção', rotuloNome: 'o nome da chave', rotuloNivel: 'manda ou gasta de verdade',
+    d = await pedirAcao('ligar_chave', d, { titulo: 'Ligar: ' + (NOME_CHAVE[chave] || chave), nome: 'Disparo de prospecção', rotuloNome: 'o nome da chave', rotuloNivel: chave === 'demo_links' ? 'os médicos passam a ver' : 'manda ou gasta de verdade',
       linhas: [[NOME_CHAVE[chave] || chave, 'desligada', 'ligada']], botao: 'Ligar',
       texto: chave === 'prosp_disparo' ? 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.'
-        : chave === 'prosp_busca' ? 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.' : 'A IA passa a responder os leads das campanhas com a IA ligada.' });
+        : chave === 'prosp_busca' ? 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.'
+        : chave === 'demo_links' ? 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos no Telegram.' : 'A IA passa a responder os leads das campanhas com a IA ligada.' });
     if (!d) { await rotear(); return; }
   }
   const r = await chamar('ligar_chave', d);
@@ -115,6 +119,10 @@ TELAS.ajustes = async c => {
     // O disparo fica travado (sem interruptor) até as duas chaves que só um PR liga (DEC-072).
     if (k.chave === 'prosp_disparo' && k.valor !== 'SIM' && !(ligada('prosp_politica_v10') && ligada('prosp_balanceamento')))
       return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v10 publicada e o teste de balanceamento (chaves só por PR) · ' + k.chave })),
+        el('div', { class: 'direita' }, etq('travado', 'atencao'))));
+    // Os links de demonstração ficam travados até a Política v17 publicada (chave só por PR, DEC-125).
+    if (k.chave === 'demo_links' && k.valor !== 'SIM' && !ligada('demo_politica_v17'))
+      return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v17 publicada (chave só por PR) · ' + k.chave })),
         el('div', { class: 'direita' }, etq('travado', 'atencao'))));
     const controle = k.so_por_sql || !['SIM', 'NAO'].includes(k.valor)
       ? etq((k.valor === 'SIM' ? 'ligada' : k.valor === 'NAO' ? 'desligada' : (k.valor || 'vazio')) + ' · só por PR', '', true)

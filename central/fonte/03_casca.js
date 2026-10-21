@@ -10,6 +10,7 @@ const SECOES = [
   { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'O que passou pelo Telegram, sem o texto' },
   { id: 'agregados', nome: 'Agregados de pacientes', ic: 'agregados', grupo: 'Análise', chave: 'tela_agregados_pacientes', escondeDesligada: true, desc: 'Contagens e médias por clínica' },
   { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Marketing', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
+  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Marketing', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Administração', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
   { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Administração', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
   { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Administração', desc: 'Liga e desliga telas e edições, aparência' }

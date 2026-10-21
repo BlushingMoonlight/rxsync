@@ -20,7 +20,10 @@ const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', 
   ['prospeccao', 'Prospecção', 'segurado'], ['ajustes', 'Ajustes da Central', 'segurado'],
   // Públicos (sql/036, DEC-088)
   ['prospeccao/publicos', 'Públicos'], ['prospeccao/publico/PB-0001', 'Dentistas Curitiba'], ['prospeccao/publico/PB-0001/configuracao', 'Dentistas Curitiba'], ['prospeccao/publico/novo', 'Novo público'],
-  ['prospeccao/publico/PB-0002', 'Ortodontia Joinville']];
+  ['prospeccao/publico/PB-0002', 'Ortodontia Joinville'],
+  // Demonstrações por link (sql/056, DEC-125)
+  ['demonstracoes', 'Demonstrações'], ['demonstracoes/novo', 'Novo link'], ['demonstracoes/link/904', 'Instituto Bem Estar'], ['demonstracoes/link/901', 'Clínica Vida Leve'],
+  ['demonstracoes/link/902', 'Clínica Desativada'], ['demonstracoes/link/904/editar', 'Editar'], ['demonstracoes/visita/904/9001', 'Visita']];
 const APARELHOS = [['celular', { width: 390, height: 844 }, true], ['ipad_em_pe', { width: 820, height: 1180 }, true], ['ipad_deitado', { width: 1180, height: 820 }, true], ['computador', { width: 1440, height: 900 }, false]];
 const TEMAS = ['claro', 'escuro'];
 

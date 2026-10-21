@@ -22,7 +22,8 @@ const dias = (n, f) => Array.from({ length: n }, (_, i) => f(dia(n - 1 - i), i))
 export const CHAVES = ['tela_inicio', 'tela_clientes', 'tela_dinheiro', 'tela_uso', 'tela_sistema', 'tela_avisos', 'tela_funil', 'tela_sessoes', 'tela_funil_completo', 'tela_sistema_github',
   'tela_registro', 'tela_chaves_api', 'tela_agregados_pacientes', 'editar_limites', 'editar_onboarding', 'editar_chaves_api', 'editar_avisos_eventos', 'tela_cliente_completa', 'tela_cliente_sensivel',
   'tela_cliente_asaas', 'editar_empresa', 'editar_assistente', 'editar_configuracoes', 'editar_recursos', 'liberar_recursos', 'editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste',
-  'editar_situacao', 'editar_links', 'tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia'];
+  'editar_situacao', 'editar_links', 'tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia',
+  'tela_demonstracoes', 'editar_demonstracoes'];
 export const cli = (id, nome, plano, status, extra) => ({ cliente_id: id, nome, plano, status, ativo: status === 'Ativo', modalidade: 'contratado', mensagens_mes: 1800, franquia: 5000, whatsapp: 'open', interna: false, ...extra });
 export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', razao_social: 'Sorriso Ltda', representante: 'Ana', email: 'ana@exemplo.com', telefone: '48999990001',
   plano: 'Essencial', status: 'Ativo', modalidade: 'teste', ativo: true, interna: false, valor_mensal: 299, valor_setup: 999, ciclo: 'mensal', forma_pagamento: 'boleto', aceite: '2026-10-01',
@@ -90,9 +91,11 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   prosp_publico_salvar: 1, prosp_publico_renomear: 1, prosp_publico_duplicar: 1, prosp_publico_contato_marcar: 1, prosp_publico_buscar: 2, prosp_publico_contatos_lote: 2,
   prosp_publico_arquivar: 2, prosp_creditos_teto_salvar: 2,
   // sugestões da IA para o prompt (sql/043, DEC-098)
-  prosp_sugerir: 2 };
-export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' });
-const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento'];
+  prosp_sugerir: 2,
+  // demonstrações por link (sql/056, DEC-125)
+  dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3 };
+export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO' });
+const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
   aceite: { data_aceite: '01/10/2026, 10:00:00', versao_termos: '2026-10-v3', ip_aceite: '10.0.0.9', aceite_dpa: 'SIM' }, copia_do_aceite: null } };
 // Sinal de vida do 52 e do 53 (sql/035, DEC-087). ESTADO.segurado = true: disparo ligado e o 52 parado (para as fotos e
@@ -119,6 +122,7 @@ export function servidor(chaves, chamadas = [], respostas = {}) {
     if (b.acao === 'cliente') return r({ ok: true, cliente: ficha() });
     if (b.acao === 'cliente_sensivel') return r(SENSIVEL);
     if (PROSP[b.acao]) return r(PROSP[b.acao](b.dados || {}));
+    if (DEM[b.acao]) return r(DEM[b.acao](b.dados || {}));
     if (DADOS[b.acao]) return r({ ok: true, ...DADOS[b.acao] });
     if (NIVEIS[b.acao]) return r({ ok: true, mensagem: 'Feito (simulado).', pode_desfazer: NIVEIS[b.acao] === 1, registro_id: 99, chave: b.acao === 'chave_api_criar' ? 'rx_teste_' + 'x'.repeat(20) : undefined, segredo: b.acao === 'aviso_destino_definir' ? 'segredo-de-teste' : undefined });
     return r({ ok: true });
@@ -264,4 +268,43 @@ export const PROSP = {
   prosp_conjunto_salvar: d => ({ ok: true, id: d.id || 'CJ-0003', versao: 3, mudancas: [], mensagem: 'Salvo (versão 3).' }),
   prosp_anuncio_salvar: d => ({ ok: true, id: d.id || 'AN-0005', versao: 2, mudancas: [], mensagem: 'Salvo (versão 2).' }),
   prosp_duplicar: d => ({ ok: true, id: d.tipo === 'campanha' ? 'CMP-0003' : d.tipo === 'conjunto' ? 'CJ-0003' : 'AN-0005', mensagem: 'Cópia criada em rascunho.' })
+};
+// ---------------------------------------------------------------- demonstrações por link (sql/056, DEC-125): dados inventados
+const agoraMenos = h => new Date(Date.now() - h * 3600e3).toISOString();
+const DEM_LINKS = () => [
+  { id: 904, clinica: 'Instituto Bem Estar', tratamento: 'Dr.', medico: 'Marcos Lima', especialidade: 'Medicina do esporte', cidade: 'Recife', cor: 'petroleo', situacao: 'ativo_hoje', criada_em: agoraMenos(72),
+    primeiro_acesso: agoraMenos(48), ultimo_acesso: agoraMenos(1), visitas: 3, valida_ate: dia(-10), lead_codigo: 'PX-ACDE3', escopo_enviado_em: agoraMenos(2), conversar_em: agoraMenos(1) },
+  { id: 901, clinica: 'Clínica Vida Leve', tratamento: 'Dra.', medico: 'Helena Prado', especialidade: 'Endocrinologia', cidade: 'Curitiba', cor: 'verde', situacao: 'nunca_abriu', criada_em: agoraMenos(5),
+    primeiro_acesso: null, ultimo_acesso: null, visitas: 0, valida_ate: dia(-60), lead_codigo: null, escopo_enviado_em: null, conversar_em: null },
+  { id: 902, clinica: 'Clínica Desativada', tratamento: 'Dr.', medico: 'Paulo Reis', especialidade: 'Nutrologia', cidade: '', cor: 'vinho', situacao: 'desativado', criada_em: agoraMenos(400),
+    primeiro_acesso: agoraMenos(390), ultimo_acesso: agoraMenos(380), visitas: 1, valida_ate: dia(-5), lead_codigo: null, escopo_enviado_em: null, conversar_em: null }];
+const demLink = id => { const l = DEM_LINKS().find(x => String(x.id) === String(id)); if (!l) return null;
+  const endereco = 'https://rxsync.com.br/demo/clinica/#' + (l.id === 904 ? 'CDEFGHJKMNPQRTUV' : 'ACDEFGHJKMNPQRTU');
+  return { ...l, codigo: endereco.slice(-16), endereco, anotacao: l.id === 904 ? 'Conheci no congresso de Recife; quer começar em dezembro.' : '', mensagem_editada: false, desativada_em: l.situacao === 'desativado' ? agoraMenos(380) : null,
+    tentou_inativo_em: l.situacao === 'desativado' ? agoraMenos(30) : null,
+    mensagem: `Olá, ${l.tratamento} ${l.medico.split(' ')[0]}! Preparei uma demonstração do app de acompanhamento com a marca ${l.clinica}: o app que o paciente usa e a central onde ${l.tratamento === 'Dra.' ? 'a senhora' : 'o senhor'} acompanha cada um. É só tocar: ${endereco}` }; };
+export const DEM = {
+  dem_lista: d => { const todos = DEM_LINKS(); const f = d.filtro || 'todos';
+    const links = todos.filter(l => f === 'todos' || (f === 'abriu' ? ['abriu', 'ativo_hoje'].includes(l.situacao) : f === 'inativos' ? ['desativado', 'vencido'].includes(l.situacao) : l.situacao === f));
+    return { ok: true, total: links.length, pagina: d.pagina || 1, links, contagem: { todos: 3, nunca_abriu: 1, abriu: 1, ativo_hoje: 1, inativos: 1 } }; },
+  dem_link: d => { const l = demLink(d.id); if (!l) return { ok: false, mensagem: 'Link não encontrado.' };
+    const comUso = l.id === 904;
+    return { ok: true, link: l, uso: comUso ? { segundos: 1460, aparelhos: { celular: 2, computador: 1 },
+      telas: [{ pagina: 'app', tela: 'picadinha', vezes: 4, segundos: 380 }, { pagina: 'central', tela: 'pacientes', vezes: 2, segundos: 210 }, { pagina: 'escopo', tela: '', vezes: 1, segundos: 300 }],
+      toques: [{ pagina: 'app', alvo: 'Registrar refeição', vezes: 6 }, { pagina: 'central', alvo: 'Ficha do paciente', vezes: 3 }],
+      perguntas: [{ quando: agoraMenos(30), chat: 'ia', texto: 'Como funciona o lembrete da aplicação?' }, { quando: agoraMenos(29), chat: 'equipe', texto: 'A nutricionista consegue mandar o cardápio por aqui?' }],
+      escopo: [{ item: 7, escolha: 'quero', nota: '', atualizado_em: agoraMenos(2) }, { item: 23, escolha: 'quero', nota: 'Essencial para nós', atualizado_em: agoraMenos(2) },
+        { item: 36, escolha: 'duvida', nota: 'Funciona no Android?', atualizado_em: agoraMenos(2) }, { item: 35, escolha: 'nao_preciso', nota: '', atualizado_em: agoraMenos(2) }],
+      envios: [{ id: 3, tipo: 'conversar', quando: agoraMenos(1), conteudo: { texto: 'Pode me chamar à tarde, depois das 15h.' } }, { id: 2, tipo: 'escopo', quando: agoraMenos(2), conteudo: { quero: 2, duvida: 1, nao_preciso: 1 } }],
+      visitas: [{ id: 9003, inicio: agoraMenos(2), fim: agoraMenos(1.8), segundos: 720, eventos: 41, tipo_aparelho: 'celular', navegador: 'Safari', aparelho: 'bbbbbb' },
+        { id: 9001, inicio: agoraMenos(48), fim: agoraMenos(47.9), segundos: 420, eventos: 18, tipo_aparelho: 'computador', navegador: 'Chrome', aparelho: '0a1b2c' }] }
+      : { segundos: 0, aparelhos: {}, telas: [], toques: [], perguntas: [], escopo: [], envios: [], visitas: [] } }; },
+  dem_visita: () => ({ ok: true, eventos: [{ quando: agoraMenos(48), pagina: 'entrada', tela: '', acao: 'entrou', detalhe: {} }, { quando: agoraMenos(47.99), pagina: 'app', tela: 'picadinha', acao: 'abriu-tela', detalhe: {} },
+    { quando: agoraMenos(47.98), pagina: 'app', tela: 'picadinha', acao: 'tocou', detalhe: { alvo: 'item 23' } }, { quando: agoraMenos(47.95), pagina: 'app', tela: 'picadinha', acao: 'saiu-tela', detalhe: { s: 95 } }] }),
+  dem_criar: () => ({ ok: true, id: 905, endereco: 'https://rxsync.com.br/demo/clinica/#KMNPQRTUVWXY3479', mensagem: 'Olá!' }),
+  dem_editar: d => ({ ok: true, id: Number(d.id), endereco: 'https://rxsync.com.br/demo/clinica/#CDEFGHJKMNPQRTUV', mensagem: 'Olá!' }),
+  dem_desativar: () => ({ ok: true, mensagem: 'Link desativado: quem abrir vê que ele não está mais ativo.' }),
+  dem_reativar: () => ({ ok: true, mensagem: 'Link ativo de novo.' }),
+  dem_ver: d => ({ ok: true, endereco: demLink(d.id).endereco + '&ver=' + 'd1'.repeat(16) }),
+  dem_apagar: () => ({ ok: true, mensagem: 'Link e todo o registro dele apagados.' })
 };

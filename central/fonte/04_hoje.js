@@ -19,7 +19,8 @@ const TIPOS = {
   prosp_token_recusado: 'Prospecção: token recusado', prosp_busca: 'Prospecção: busca', prosp_conjunto_pausado: 'Prospecção: conjunto pausado', prosp_regra: 'Prospecção: regra automática',
   prosp_saiu: 'Prospecção: pediu para sair', prosp_interesse: 'Prospecção: mostrou interesse', prosp_quer_contratar: 'Prospecção: quer contratar', prosp_recusou: 'Prospecção: recusou',
   prosp_respondeu: 'Prospecção: respondeu', prosp_cliente: 'Prospecção: virou cliente', prosp_cadastro: 'Prospecção: fez o cadastro', prosp_com_voce: 'Prospecção: conversa com você',
-  prosp_resumo_do_dia: 'Prospecção: resumo do dia'
+  prosp_resumo_do_dia: 'Prospecção: resumo do dia',
+  demo_aberta: 'Demonstração aberta', demo_conversar: 'Demonstração: quer conversar', demo_escopo: 'Demonstração: escopo enviado'
 };
 const CATEGORIAS = ['vendas', 'clientes', 'financeiro', 'alertas', 'suporte', 'painel', 'sistema'];
 const rotuloTipo = t => TIPOS[t] || t || 'Aviso';

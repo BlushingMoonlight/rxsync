@@ -163,7 +163,8 @@ function nivelDe(acao, d) {
   d = d || {};
   if (acao === 'editar_limites' && String((d.campos || {}).limitar_franquia || '').toUpperCase() === 'SIM') return 2;
   // Prospecção (sql/031, DEC-078): as mesmas regras de rx_central_nivel. Desligar ou pausar é um toque.
-  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) ? 2 : 1;
+  // Demonstrações (sql/056, DEC-125): ligar os links (demo_links) é nível 2.
+  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) || d.chave === 'demo_links' ? 2 : 1;
   if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
   if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
   // Públicos (sql/036, DEC-088): tirar um contato é um toque (pôr de volta num público em uso: a página passa o nível 2).
