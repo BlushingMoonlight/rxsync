@@ -157,6 +157,7 @@
       const ok = el('button', { type: 'button', class: 'botao grande cheio', disabled: true, onclick: () => irAba('inicio') }, 'Começar');
       return [el('div', { class: 'bv pilha' },
         el('div', { class: 'selo grande', 'aria-hidden': 'true', text: DEMO.iniciais(DEMO.dados.clinica) }),
+        el('p', { class: 'sobretitulo', text: 'Primeiro acesso · ' + M.ddmm(m.inicio) }),
         el('h1', { text: 'Bem-vinda, ' + PACIENTE + '!' }),
         el('p', {}, 'Você entrou pelo link que a clínica mandou no WhatsApp. Sem senha. ', item(1)),
         cartao('Antes de começar', 4, el('p', { class: 'peq', text: 'Aqui você registra o seu dia para a equipe acompanhar. Algumas respostas vêm de uma inteligência artificial que segue as orientações da equipe. Ela não diagnostica nem receita.' }),

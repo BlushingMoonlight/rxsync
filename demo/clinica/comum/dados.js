@@ -89,7 +89,10 @@
   const RUIDO = [0, 0.2, -0.1, 0.1, -0.2, 0.1, 0, -0.1];
   const pacientes = [mariana].concat(OUTROS.map(o => {
     const n = Math.floor(o.inicioDias / 7), pes = [];
-    for (let k = 0; k <= n; k++) pes.push({ quando: em(-o.inicioDias + 7 * k, 8), kg: +(o.p0 - o.perda * k + (k && k < n ? RUIDO[k % 8] : 0)).toFixed(1), origem: k ? 'paciente' : 'clinica' });
+    // A última pesagem é de manhã (7h), no dia do último registro ou antes; as outras, de 7 em 7 dias para trás; a primeira, na clínica.
+    const ultimo = horasAtras(o.ultimoH), ultPes = new Date(ultimo); ultPes.setHours(7, 0, 0, 0); if (ultPes > ultimo) ultPes.setDate(ultPes.getDate() - 1);
+    const quandoPes = k => k ? new Date(ultPes.getTime() - (n - k) * 7 * DIA) : em(-o.inicioDias, 9);
+    for (let k = 0; k <= n; k++) pes.push({ quando: quandoPes(k), kg: +(o.p0 - o.perda * k + (k && k < n ? RUIDO[k % 8] : 0)).toFixed(1), origem: k ? 'paciente' : 'clinica' });
     if (o.ultimaSemana != null && n) pes[n].kg = +(pes[n - 1].kg + o.ultimaSemana).toFixed(1);
     return { id: o.id, nome: o.nome, primeiro: o.nome.split(' ')[0], inicio: em(-o.inicioDias, 9), fase: o.fase, faseEm: em(-Math.min(o.inicioDias, 30), 9), pesagens: pes,
       metas: { kcal: o.metas[0], prot: o.metas[1], agua: o.metas[2], por: EQUIPE.nutri, cargo: EQUIPE.nutriCargo, em: em(-Math.min(o.inicioDias, 30), 9) },

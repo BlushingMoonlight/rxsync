@@ -16,7 +16,6 @@
 .marca-clinica { display: flex; align-items: center; gap: var(--e-3); font-family: var(--fonte-titulo); font-weight: 750; font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); color: var(--acento-texto); letter-spacing: -.02em; line-height: 1.2; }
 .marca-clinica .selo { width: 48px; height: 48px; border-radius: 14px; font-size: 1rem; }
 @media (max-width: 599px) { .texto-heroi .botoes { display: grid; width: 100%; } .texto-heroi .botoes .botao { width: 100%; } }
-@media (max-width: 420px) { 
 /* o celular na tela, com o app funcionando */
 .aparelho { display: none; }
 @media (min-width: 900px) {
@@ -52,7 +51,6 @@ a.bento-bloco:hover .ir { transform: translateX(3px); }
 .mini-escopo span { padding: 6px 10px; border-radius: 99px; } .mini-escopo .on { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
 .destaque-b { gap: var(--e-2); padding: var(--e-4) var(--e-5); background: var(--superficie-2); box-shadow: none; }
 .destaque-b h3 { font-size: 1rem; }
-@media (max-width: 440px) { .topo:has(
 /* os três caminhos: o produto (app e central, lado a lado) e, separada, a proposta (o escopo, com cara de documento) */
 .caminhos, .caminho-escopo { display: grid; gap: var(--e-3); }
 .bento .produto-b { min-height: 240px; }
