@@ -389,6 +389,22 @@
 
 <div id="erro" class="porta" hidden></div>
 
+<!-- Fim do contrato (rxsync-sistema DEC-131, N-05): nos 15 dias até os dados serem apagados, o painel só baixa os dados e sai. -->
+<div id="fimContrato" class="porta" hidden>
+  <div class="bloco pad" style="padding:28px">
+    <h1 class="titulo" style="font-size:22px">O contrato terminou</h1>
+    <p class="subtitulo">Até os dados serem apagados (15 dias depois do fim), dá para baixar a agenda e os pacientes da clínica em planilha (CSV). Abrem no Numbers, no Excel e no Google Planilhas. Nada fica guardado no navegador.</p>
+    <div id="fimBaixar">
+      <button id="btnFimAgenda" type="button" class="btn pri plena">Baixar a agenda (todas as consultas)</button>
+      <button id="btnFimPacientes" type="button" class="btn sec plena" style="margin-top:10px">Baixar os pacientes</button>
+      <p id="fimMsg" class="fld-hint" role="status" aria-live="polite"></p>
+      <p class="fld-hint">O histórico das conversas vai por e-mail, a pedido: responda um e-mail nosso ou escreva para contato@rxsync.com.br. O arquivo chega direto no e-mail do cadastro.</p>
+    </div>
+    <div id="fimEquipe" class="aviso neutro" hidden>Só o dono da conta baixa os dados da clínica.</div>
+    <button id="btnFimSair" type="button" class="btn sec plena" style="margin-top:14px">Sair</button>
+  </div>
+</div>
+
 <div id="app" class="app" hidden>
   <aside class="rail">
     <div class="marca-l"><div class="marca"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:19px;height:19px;color:#fff"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div><div style="font-weight:800">RXSync</div><div style="font-size:12px;color:#a7b3c2">Painel da clínica</div></div></div>
@@ -742,7 +758,7 @@
           <button id="btnBaixarAgenda" type="button" class="btn sec plena">Agenda (todas as consultas)</button>
           <button id="btnBaixarPacientes" type="button" class="btn sec plena" style="margin-top:10px">Pacientes</button>
           <p id="dadosMsg" class="fld-hint" role="status" aria-live="polite"></p>
-          <p class="fld-hint">O histórico das conversas não entra aqui: se precisar, peça em contato@rxsync.com.br (até 15 dias depois do encerramento, cláusula 19.2 dos Termos).</p>
+          <p class="fld-hint">O histórico das conversas não entra aqui: ele vai por e-mail, a pedido (responda um e-mail nosso ou escreva para contato@rxsync.com.br). O arquivo chega direto no e-mail do cadastro, até 15 dias depois do encerramento (cláusula 19.2 dos Termos).</p>
         </div>
       </div>
 
@@ -861,8 +877,9 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   }
   // Termos atualizados (rxsync-sistema DEC-113): o 29 diz se a clínica ainda não aceitou a versão vigente. "Ver depois"
   // só esconde nesta abertura; depois da vigência, o servidor grava o aceite tácito (cláusula 20.4) e não pergunta mais.
-  function termosConferir() {
-    entChamar("termos_estado").then(function (r) {
+  // "ja" = a resposta do termos_estado que a abertura do painel já pediu (para não perguntar duas vezes).
+  function termosConferir(ja) {
+    (ja ? Promise.resolve(ja) : entChamar("termos_estado")).then(function (r) {
       if (!r || !r.ok || !r.pendente || r.versao !== VERSAO_TERMOS) return;
       if (r.clientes_desde_texto) el("termosData").textContent = r.clientes_desde_texto;
       el("faixaTermos").hidden = false;
@@ -1061,13 +1078,14 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
 
   // logout
   // Sair: encerra a sessão e esquece este aparelho (na próxima vez, e-mail, senha e código).
-  el("btnSair").addEventListener("click", function () {
+  function sairPainel(btn) {
     var fim = function () { sessaoGuardar(""); lembrancaGuardar(""); location.replace(location.pathname); };
     var lem = lembrancaLer();
-    el("btnSair").disabled = true;
+    btn.disabled = true;
     if (!sessao) { fim(); return; }
     entChamar("sair", { esquecer: true, lembranca: lem }).then(fim, fim);
-  });
+  }
+  el("btnSair").addEventListener("click", function () { sairPainel(el("btnSair")); });
 
   // ===== Navegação: 6 áreas (Hoje, Agenda, Pacientes, Assistente, Resultados, Conta), com o endereço no #, para o voltar do celular funcionar =====
   ICONES.pacientes = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
@@ -2606,8 +2624,9 @@ function partesTz(ms) {
     if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;   // a planilha não executa fórmula vinda de um campo
     return /[",;\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
   }
-  function dadosBaixar(parte, btn) {
-    var linhas = [], pagina = 0, msg = el("dadosMsg");
+  function dadosBaixar(parte, btn, msg) {
+    var linhas = [], pagina = 0;
+    msg = msg || el("dadosMsg");
     btn.disabled = true; msg.textContent = "Preparando a planilha…";
     function proxima() {
       return entChamar("dados_exportar", { parte: parte, pagina: pagina }).then(function (r) {
@@ -4214,12 +4233,28 @@ function partesTz(ms) {
     }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
   }
 
+  // Fim do contrato (rxsync-sistema DEC-131, N-05): o 29 avisa (so_baixar) e o painel mostra só "Baixar meus dados" e
+  // "Sair", sem chamar o 24 (que recusa: o token interno já foi apagado). A equipe só sai: baixar é do dono.
+  function fimContratoMostrar(papel) {
+    el("carregando").hidden = true; el("app").hidden = true; el("fimContrato").hidden = false;
+    var equipe = papel === "equipe";
+    el("fimBaixar").hidden = equipe; el("fimEquipe").hidden = !equipe;
+  }
+  el("btnFimAgenda").addEventListener("click", function () { dadosBaixar("agenda", el("btnFimAgenda"), el("fimMsg")); });
+  el("btnFimPacientes").addEventListener("click", function () { dadosBaixar("pacientes", el("btnFimPacientes"), el("fimMsg")); });
+  el("btnFimSair").addEventListener("click", function () { sairPainel(el("btnFimSair")); });
+
+  // Com a sessão, pergunta antes ao 29 (termos_estado): no fim do contrato, só a tela de baixar; senão, abre o painel.
+  if (sessao) entChamar("termos_estado").then(function (r) { if (r && r.so_baixar === true) fimContratoMostrar(r.papel); else abrirPainel(r); });
+  else abrirPainel(null);
+
+  function abrirPainel(termos) {
   chamar("abrir").then(function (resp) {
     el("carregando").hidden = true;
     if (!resp.ok) { if (!resp.entrar) mostrarErro(resp.mensagem || "O painel não abriu. Entre de novo com o e-mail e a senha."); return; }
     el("app").hidden = false;
     if (token) el("faixaSenha").hidden = false;   // link antigo: convida a criar a senha (DEC-097)
-    if (sessao) termosConferir();                  // Termos novos para quem já é cliente (DEC-113)
+    if (sessao) termosConferir(termos);            // Termos novos para quem já é cliente (DEC-113)
     el("btnSair").classList.remove("hidden");
     // Equipe (rxsync-sistema DEC-115): esconde o que é só do dono e trava os campos de contato e do assistente de gestão.
     // Quem recusa de verdade é o banco; aqui é só para não oferecer o que não vai funcionar.
@@ -4301,6 +4336,7 @@ function partesTz(ms) {
   }).catch(function () {
     mostrarErro("Não consegui falar com o servidor. Tenta de novo em instantes.");
   });
+  }
 
 })();
 
