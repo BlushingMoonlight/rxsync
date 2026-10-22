@@ -161,6 +161,17 @@ for (const f of htmls) {
     for (const m of t.matchAll(/https?:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|unpkg\.com)[^"'\s]*/g)) erro(`${f}: carrega ${m[0]} de fora; guarde a biblioteca em assets/vendor/ (rxsync-sistema#104)`);
   }
 }
+// Política de Privacidade (rxsync-sistema DEC-143): a versão do selo, a do texto e a primeira do histórico são a mesma; e
+// as promessas sem prova (N-07, #101) não voltam ao texto antes de existirem (o histórico de versões fica de fora).
+{
+  const pol = fs.readFileSync('privacidade.html', 'utf8');
+  const selo = (pol.match(/>Versão (\d{4}-\d{2}-v\d+)<\/span>/) || [])[1], texto = (pol.match(/<p><strong>Versão (\d{4}-\d{2}-v\d+)<\/strong>/) || [])[1],
+    hist = (pol.match(/<li><strong>(\d{4}-\d{2}-v\d+)<\/strong>, vigente/) || [])[1];
+  if (!selo || selo !== texto || texto !== hist) erro(`privacidade.html: a versão do selo (${selo}), a do texto (${texto}) e a primeira do histórico (${hist}) têm de ser a mesma`);
+  const corpoPol = pol.replace(/<li><strong>\d{4}-\d{2}-v\d+<\/strong>, vigente[\s\S]*?<\/li>/g, '');
+  for (const frase of ['cópias de segurança criptografadas', 'sem exposição à rede pública', 'separado do de testes', 'termo de confidencialidade', 'Cópias de segurança (backup)', 'Quero conversar'])
+    if (corpoPol.includes(frase)) erro(`privacidade.html: "${frase}" voltou ao texto (sem prova ou fora do produto; rxsync-sistema#101, DEC-143)`);
+}
 // Página da exclusão da conta (rxsync-sistema DEC-114): noindex, nada de fora além do n8n, sem Google Analytics nem
 // chat, e nada guardado no navegador (o link do e-mail fica só na memória da página).
 {
