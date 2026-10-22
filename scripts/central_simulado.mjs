@@ -64,7 +64,14 @@ export const DADOS = {
     github: { recebido_em: '2026-10-15T12:00:00Z', dados: { actions: [{ nome: 'Publicar no n8n', quando: '2026-10-15T12:00:00Z', evento: 'push', resultado: 'success' }], issues: { abertas: 14, por_prioridade: { P1: 1, P2: 5 }, p1: [{ numero: 66, titulo: 'Sair do sandbox do Asaas' }] }, prs_abertos: 1 } } } },
   avisos: { dados: { por_categoria_7d: { vendas: 9, financeiro: 14 }, avisos: [{ recebido_em: '2026-10-15T10:00:00Z', categoria: 'vendas', tipo: 'pedido_demonstracao' }, { recebido_em: '2026-10-15T09:00:00Z', categoria: 'financeiro', tipo: 'mensalidade_recebida', cliente_id: 'CLI-001', nome: 'Clínica Sorriso' }] } },
   funil: { dados: { totais: { pedidos_demonstracao: 9, mini_testes: 41, mini_testes_com_consulta: 12, cadastros_teste: 7, cadastros_contratacao: 3, go_lives: 4 }, por_dia: dias(30, (d, i) => ({ dia: d, pedidos: i % 3, mini_testes: i % 5, cadastros: i % 2 })),
-    pedidos: [{ criado_em: '2026-10-15T10:00:00Z', nome: 'Maria Teste', clinica: 'Clínica Exemplo', email: 'maria@exemplo.com', telefone: '48999990000', sistema_atual: 'planilha', plano_interesse: 'gestao' }] } },
+    pedidos: [{ criado_em: '2026-10-15T10:00:00Z', nome: 'Maria Teste', clinica: 'Clínica Exemplo', email: 'maria@exemplo.com', telefone: '48999990000', sistema_atual: 'planilha', plano_interesse: 'gestao' }],
+    // sql/059 (DEC-134): os mini testes saem do Telegram e ficam aqui
+    mini_testes: [{ id: 'mt-1', criado_em: '2026-10-15T11:00:00Z', clinica: 'Clínica Exemplo', especialidade: 'Odontologia', profissionais: ['Dra. Ana'], telefone: '48999990002', origem: 'https://rxsync.com.br/',
+      mensagens: 3, agendamento: { dia: '2026-10-20', hora: '10:00' }, conversa: [{ r: 'u', t: 'Quero marcar uma limpeza.' }, { r: 'a', t: 'Claro! Tenho terça às 10h. Pode ser?' }] },
+      { id: 'mt-2', criado_em: '2026-10-14T09:00:00Z', clinica: 'Consultório Teste', especialidade: 'Dermatologia', profissionais: [], telefone: '48999990003', origem: '', mensagens: 0, agendamento: null, conversa: [] }] } },
+  // sql/060 (DEC-136): ficha › Histórico do painel, com o IP e o e-mail
+  cliente_painel_historico: { dados: { acessos: [{ quando: '2026-10-15T12:00:00Z', evento: 'assistente_pausada', o_que: 'Pausou a assistente', quem: 'equipe · s•••@exemplo.com', quem_email: 'sec@exemplo.com', aparelho: 'iPad · Safari', ip: '10.0.0.5' },
+    { quando: '2026-10-15T09:00:00Z', evento: 'entrada', o_que: 'Entrou', quem: 'dono · a•••@exemplo.com', quem_email: 'ana@exemplo.com', aparelho: 'iPhone · Safari', ip: '10.0.0.4' }] } },
   funil_completo: { dados: { funil_90d: { totais: { pedidos_demonstracao: 20, mini_testes: 90, mini_testes_com_consulta: 30 }, por_dia: dias(90, (d, i) => ({ dia: d, pedidos: i % 3, mini_testes: i % 4, cadastros: i % 2 })) },
     testes_que_viraram_contrato: 5, dias_ate_go_live_media: 6.5, mini_teste_por_origem_90d: [{ origem: 'instagram', testes: 40, com_consulta: 12 }], mini_teste_por_especialidade_90d: { odontologia: 50, dermatologia: 20 },
     cadastros_por_origem: [{ origem: 'site', cadastros: 8 }], cadastros_parados: [{ cliente_id: 'CLI-004', nome: 'Derma Sul', status: 'Aguardando dados', dias: 20 }], onboarding_vencido: [], testes_encerrados_sem_contrato: 3 } },
@@ -93,8 +100,10 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   // sugestões da IA para o prompt (sql/043, DEC-098)
   prosp_sugerir: 2,
   // demonstrações por link (sql/056, DEC-125)
-  dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3 };
-export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO' });
+  dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3,
+  // histórico das conversas ao e-mail do cadastro (sql/059, DEC-131)
+  conversas_enviar: 2 };
+export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', painel_link_antigo: 'SIM' });
 const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
   aceite: { data_aceite: '01/10/2026, 10:00:00', versao_termos: '2026-10-v3', ip_aceite: '10.0.0.9', aceite_dpa: 'SIM' }, copia_do_aceite: null } };
@@ -212,7 +221,8 @@ export const CONTATOS = () => [
   CT(9103, 'Odonto Água Verde', 'Água Verde', 4.6, 74, '2003', 'em_conjunto', true, 70, { lead: { id: 'PX-AAAAA', conjunto_id: 'CJ-0001', situacao: 'enviado', enviada_em: '2026-10-13T12:40:00Z' } }),
   CT(9104, 'Expira Logo', 'Portão', 4.2, 52, '2004', 'disponivel', true, 2),
   CT(9105, 'Pediu para Sair', 'Centro', 4.8, 90, '2005', 'nao_contatar', false, 60),
-  CT(9106, 'Prefeitura de Curitiba', 'Centro', 4.0, 55, '2006', 'orgao_publico', false, 60)];
+  CT(9106, 'Prefeitura de Curitiba', 'Centro', 4.0, 55, '2006', 'orgao_publico', false, 60),
+  CT(9107, 'Salão Bela Vista', 'Centro', 4.5, 58, '2007', 'fora_da_saude', false, 60)];
 export const CREDITOS_MES = { gastos: 41, teto: 300 };
 const pubObj = id => PUBS().find(p => p.id === id);
 export const PROSP = {
@@ -237,7 +247,7 @@ export const PROSP = {
   prosp_historico: d => okD({ versao: d.versao, mudancas: d.tipo === 'publico' ? [['busca.lugares', ['Curitiba'], ['Curitiba', 'São José dos Pinhais']]] : [['entrega.teto_dia', 15, 20], ['publicos', [], ['PB-0001']]] }),
   prosp_publicos: () => okD({ publicos: PUBS(), creditos_mes: CREDITOS_MES, busca_ligada: true, fusos: ['America/Sao_Paulo', 'America/Manaus'] }),
   prosp_publico: d => { const p = pubObj(d.id); if (!p) return { ok: false, mensagem: 'Público não encontrado.' };
-    const cts = CONTATOS().filter(x => !d.filtro || x.situacao === d.filtro || (d.filtro === 'bloqueado' && ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico'].includes(x.situacao)) || (d.filtro === 'expirando' && x.expira_em_dias <= 7 && !x.lead));
+    const cts = CONTATOS().filter(x => !d.filtro || x.situacao === d.filtro || (d.filtro === 'bloqueado' && ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico', 'fora_da_saude'].includes(x.situacao)) || (d.filtro === 'expirando' && x.expira_em_dias <= 7 && !x.lead));
     return okD({ objeto: { tipo: 'publico', id: p.id, nome: p.nome, situacao: p.situacao, versao: p.versao, pai: '' }, config: CFG.publico, travas: TRAVAS, versoes: [], numeros: p.numeros, conjuntos: p.conjuntos,
       em_uso: p.conjuntos.some(j => j.ativo), creditos: { ...p.creditos, total_gastos: CREDITOS_MES.gastos, teto: CREDITOS_MES.teto }, pagina: d.pagina || 1, contatos: p.id === 'PB-0001' ? cts : [],
       buscas: p.id === 'PB-0001' ? [{ id: 12, termo: 'dentista', lugar: 'Curitiba', paginas: 3, paginas_feitas: 2, creditos: 2, situacao: 'feita', pedida_por: 'agenda', pedida_em: '2026-10-13T11:00:00Z', feita_em: '2026-10-13T11:10:00Z',

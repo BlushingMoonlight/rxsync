@@ -91,7 +91,14 @@ TELAS.crescimento = async (c, [periodo]) => {
     cartao('Pedidos de demonstração', el('span', { class: 'mudo peq', text: 'guardados por 180 dias (Política v9)' }), d.pedidos.length ? el('ul', { class: 'lista' }, d.pedidos.map(p => el('li', {}, el('div', { class: 'linha' },
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${p.nome} · ${p.clinica}` }),
         el('div', { class: 't2', text: `${fmtHora(p.criado_em)} · ${p.email} · ${p.telefone}${p.sistema_atual ? ' · usa ' + p.sistema_atual : ''} · plano: ${p.plano_interesse || 'indeciso'}` })),
-      wa(p.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(p.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum pedido nos últimos 180 dias.', 'crescimento'))));
+      wa(p.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(p.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum pedido nos últimos 180 dias.', 'crescimento')),
+    // Mini testes do site (sql/059, DEC-134): os dados que antes iam ao Telegram ficam só aqui, por 90 dias.
+    cartao('Mini testes do site', el('span', { class: 'mudo peq', text: 'os 50 mais novos · guardados por 90 dias' }), (d.mini_testes || []).length ? el('ul', { class: 'lista' }, d.mini_testes.map(m => el('li', {}, el('div', { class: 'linha' },
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: [m.clinica, m.especialidade].filter(Boolean).join(' · ') || 'Mini teste' }),
+        el('div', { class: 't2', text: [fmtHora(m.criado_em), m.telefone, fmtNum(m.mensagens || 0) + ' mensagem(ns)', m.agendamento ? 'marcou consulta' : 'não marcou', m.origem ? 'origem: ' + m.origem : ''].filter(Boolean).join(' · ') }),
+        Array.isArray(m.conversa) && m.conversa.length ? el('details', { class: 'mt' }, el('summary', { text: 'Ver a conversa' }),
+          el('ul', { class: 'lista' }, m.conversa.map(t => el('li', {}, el('div', { class: 't2', text: (t.r === 'a' ? 'Assistente: ' : 'Pessoa: ') + String(t.t || '') }))))) : null),
+      wa(m.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(m.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum mini teste nos últimos 90 dias.', 'crescimento'))));
 };
 
 TELAS.uso = async c => {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0OV84eQZ5W9tlyU+xOoeU18dt+Gsa/OP15O0ZECxGqI='; style-src 'sha256-G9t8PGLlvpm6GPllXvcLPs0oLTdM4sVfkHwsPG2HiN4='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mD1PBa/VXjemsoG1D7zUnAAc/Dz64cEhTX7lG4O39lY='; style-src 'sha256-G9t8PGLlvpm6GPllXvcLPs0oLTdM4sVfkHwsPG2HiN4='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#0a1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1329,6 +1329,18 @@ function abaHistorico(c, x) {
     return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: txt }), el('div', { class: 't2', text: String(t.quando || '').length > 10 ? fmtHora(t.quando) : fmtData(t.quando) }))));
   })) : vazio('Nada na linha do tempo.', 'relogio')) : corpo(nota('Ligue a ficha completa para ver a linha do tempo.', true))),
   cartao('Últimos avisos desta clínica', null, listaAvisos(x.ultimos_avisos, false)));
+  // Histórico do painel (sql/060, DEC-136, #184): quem entrou e o que fez no painel da clínica, com o IP e o e-mail (o dono
+  // vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.
+  if (!comp) return;
+  const area = el('div', {}, corpo(el('p', { class: 'mudo', text: 'Carregando…' })));
+  anexar(c, cartao('Histórico do painel', el('span', { class: 'mudo peq', text: 'os 100 mais recentes · 12 meses' }), area));
+  chamar('cliente_painel_historico', { cliente_id: x.cliente_id }).then(r => {
+    if (!r.ok) { trocar(area, corpo(nota(r.mensagem || 'Não consegui carregar o histórico do painel.', true))); return; }
+    const l = (r.dados && r.dados.acessos) || [];
+    trocar(area, l.length ? el('ul', { class: 'lista' }, l.map(a => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
+      el('div', { class: 't1', text: a.o_que || a.evento || '' }),
+      el('div', { class: 't2', text: [fmtHora(a.quando), a.quem_email ? (String(a.quem || '').split(' · ')[0] + ' · ' + a.quem_email) : a.quem, a.aparelho, a.ip ? 'IP ' + a.ip : ''].filter(Boolean).join(' · ') })))))) : vazio('Ninguém entrou no painel ainda.', 'relogio'));
+  });
 }
 
 // ---------- menu Ações (situação, links, onboarding, teste da cobrança)
@@ -1353,6 +1365,11 @@ function menuAcoes(x) {
     item('Gerar um link novo do painel', 'Nível 3. O link antigo para de funcionar.', () => fazer('link_painel_novo', { cliente_id: x.cliente_id }, { titulo: 'Gerar um link novo do painel', nome: x.nome, botao: 'Gerar o link novo',
       linhas: [['Link atual', 'vale', 'deixa de valer']], texto: 'Use se o link vazou. O novo vai para o e-mail do cadastro.' }), true);
   }
+  // Histórico das conversas a pedido da clínica (sql/059, DEC-131, #67; cláusula 19.2): o 31 monta o CSV e manda direto
+  // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.
+  if (st !== 'Dados apagados') item('Enviar as conversas ao e-mail do cadastro', 'Nível 2. Só a pedido da clínica; o arquivo não passa pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
+    titulo: 'Enviar as conversas de ' + x.nome, ok: 'Pedido na fila.',
+    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central, pelo banco nem pelo Telegram; o Telegram avisa quando sair ou se falhar.' }));
   if (ligada('editar_onboarding') && x.pode_reenviar_onboarding) item('Reenviar o onboarding', 'O workflow 21 manda o link novo em até 10 minutos.', () => fazer('reenviar_onboarding', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o onboarding de ' + x.nome, linhas: [['Link atual', 'vale', 'deixa de valer']] }));
   if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
     if (ehTesteCobranca(x)) item('Deixar de ser a clínica de teste da cobrança', 'As edições de dinheiro voltam a depender das chaves.', async () => {
@@ -1462,7 +1479,14 @@ TELAS.crescimento = async (c, [periodo]) => {
     cartao('Pedidos de demonstração', el('span', { class: 'mudo peq', text: 'guardados por 180 dias (Política v9)' }), d.pedidos.length ? el('ul', { class: 'lista' }, d.pedidos.map(p => el('li', {}, el('div', { class: 'linha' },
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${p.nome} · ${p.clinica}` }),
         el('div', { class: 't2', text: `${fmtHora(p.criado_em)} · ${p.email} · ${p.telefone}${p.sistema_atual ? ' · usa ' + p.sistema_atual : ''} · plano: ${p.plano_interesse || 'indeciso'}` })),
-      wa(p.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(p.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum pedido nos últimos 180 dias.', 'crescimento'))));
+      wa(p.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(p.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum pedido nos últimos 180 dias.', 'crescimento')),
+    // Mini testes do site (sql/059, DEC-134): os dados que antes iam ao Telegram ficam só aqui, por 90 dias.
+    cartao('Mini testes do site', el('span', { class: 'mudo peq', text: 'os 50 mais novos · guardados por 90 dias' }), (d.mini_testes || []).length ? el('ul', { class: 'lista' }, d.mini_testes.map(m => el('li', {}, el('div', { class: 'linha' },
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: [m.clinica, m.especialidade].filter(Boolean).join(' · ') || 'Mini teste' }),
+        el('div', { class: 't2', text: [fmtHora(m.criado_em), m.telefone, fmtNum(m.mensagens || 0) + ' mensagem(ns)', m.agendamento ? 'marcou consulta' : 'não marcou', m.origem ? 'origem: ' + m.origem : ''].filter(Boolean).join(' · ') }),
+        Array.isArray(m.conversa) && m.conversa.length ? el('details', { class: 'mt' }, el('summary', { text: 'Ver a conversa' }),
+          el('ul', { class: 'lista' }, m.conversa.map(t => el('li', {}, el('div', { class: 't2', text: (t.r === 'a' ? 'Assistente: ' : 'Pessoa: ') + String(t.t || '') }))))) : null),
+      wa(m.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(m.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum mini teste nos últimos 90 dias.', 'crescimento'))));
 };
 
 TELAS.uso = async c => {
@@ -1586,7 +1610,8 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   editar_cobranca: 'Cobrança', editar_teste: 'Estender o teste', editar_situacao: 'Situação (suspender, pausar, cancelar)', editar_links: 'Links da clínica', cobranca_teste_cliente: 'Clínica de teste da cobrança', asaas_ambiente: 'Ambiente do Asaas',
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
-  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada' };
+  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
+  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && k.chave !== 'tela_cliente_sensivel'],
   ['Dados protegidos', k => k.chave === 'tela_cliente_sensivel'],
@@ -2043,8 +2068,9 @@ async function verVersao(tipo, id, versao) {
 // Contato = um negócio achado na busca (o telefone só com os 4 últimos dígitos). Quem nunca recebeu mensagem sai 90 dias
 // depois de encontrado. Tirar um contato é um toque; pôr de volta num público que um conjunto ativo usa pede o nível 2.
 const SIT_CONTATO = { disponivel: ['disponível', 'ok'], tirado: ['tirado', ''], em_conjunto: ['em conjunto', 'info'], abordado: ['já abordado', ''], nao_contatar: ['não contatar', 'perigo'],
-  cliente: ['já é cliente', 'perigo'], demonstracao: ['pediu demonstração', 'perigo'], orgao_publico: ['órgão público', 'perigo'] };
-const BLOQUEADO = ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico'];
+  cliente: ['já é cliente', 'perigo'], demonstracao: ['pediu demonstração', 'perigo'], orgao_publico: ['órgão público', 'perigo'], fora_da_saude: ['fora da saúde', 'perigo'] };
+// fora_da_saude: sql/058 (DEC-133), a prospecção só procura clínicas, consultórios e profissionais de saúde.
+const BLOQUEADO = ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico', 'fora_da_saude'];
 const FILTROS_PUB = [['', 'Todos', 'tamanho'], ['disponivel', 'Disponíveis', 'disponiveis'], ['tirado', 'Tirados', 'tirados'], ['em_conjunto', 'Em conjuntos', 'em_conjunto'], ['abordado', 'Já abordados', 'abordados'],
   ['bloqueado', 'Bloqueados', 'bloqueados'], ['expirando', 'Saem em até 7 dias', 'expiram_7d']];
 const etqContato = s => { const [t, tom] = SIT_CONTATO[s] || [s || '—', '']; return etq(t, tom); };
@@ -2378,7 +2404,7 @@ async function pBuscas(c) {
 // O que cada número das contagens da busca quer dizer (sql/032, sql/034 e sql/036).
 const MOTIVOS = { achados: 'achados', novos: 'novos', ja_no_publico: 'já no público', de_outro_publico: 'de outro público', outro_fuso: 'outro fuso', fixo: 'telefone fixo', invalido: 'sem telefone',
   revisar: 'número antigo', fechado: 'fechado', nota: 'nota', avaliacoes: 'avaliações', categoria: 'categoria', palavra: 'palavra', site: 'site', rede: 'rede', concorrente: 'concorrente', repetido: 'repetido',
-  ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar', orgao_publico: 'órgão público', abordado: 'outra campanha', pontos: 'pontuação baixa',
+  ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar', orgao_publico: 'órgão público', fora_da_saude: 'fora da saúde', abordado: 'outra campanha', pontos: 'pontuação baixa',
   sem_creditos: 'sem créditos', paginas_com_erro: 'erro' };
 // Teto geral de créditos do SerpAPI no mês (todos os públicos juntos; nível 2).
 function kpiTeto(tot, editar) {
