@@ -256,7 +256,8 @@
       est.copiloto.push(['eu', t]); conversa.append(el('div', { class: 'bolha eu', text: t }));
       DEMO.evento('pergunta', { chat: 'central', texto: t.slice(0, 300) });
       const r = I.responderCentral(t); est.copiloto.push(['ia', r]); conversa.append(resposta(r)); medir();
-      setTimeout(() => conversa.lastChild && conversa.lastChild.scrollIntoView({ block: 'nearest' }), 30);
+      // Rola só a folha (nunca a página), até a pergunta e o começo da resposta: a resposta longa é lida de cima, e o campo e os créditos ficam no lugar.
+      setTimeout(() => { const u = conversa.lastChild && (conversa.lastChild.previousSibling || conversa.lastChild), c = conversa.closest('.corpo-folha'); if (u && c) c.scrollTop += u.getBoundingClientRect().top - c.getBoundingClientRect().top - 12; }, 30);
     };
     est.copiloto.forEach(([q, x]) => conversa.append(q === 'eu' ? el('div', { class: 'bolha eu', text: x }) : resposta(x)));
     const campo = el('input', { class: 'entrada', id: 'msg-central', maxlength: '300', autocomplete: 'off', placeholder: 'Pergunte ou peça', 'aria-label': 'Pergunta para o assistente' });
