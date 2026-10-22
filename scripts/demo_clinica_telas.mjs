@@ -56,7 +56,9 @@ const TELAS = [['', 'entrada'], ['app/', 'app (boas-vindas)'], ['app/', 'app in�
   ['app/', 'app aplicações', 'tela=aplicacoes'], ['app/', 'app evolução', 'tela=evolucao'], ['app/', 'app mais', 'tela=mais'], ['app/', 'app assistente', 'tela=assistente'], ['app/', 'app chat', 'tela=chat-equipe'],
   ['app/', 'app lembretes', 'tela=lembretes'], ['app/', 'app buscar', 'tela=buscar'], ['app/', 'app foto', 'tela=foto'], ['app/', 'app sono', 'tela=sono'], ['central/', 'central'], ['central/', 'central alertas', 'tela=alertas'], ['central/', 'central ficha', 'tela=ficha'], ['central/', 'central metas', 'tela=metas'],
   ['central/', 'central aplicações', 'tela=aplicacoes'], ['central/', 'central avisos', 'tela=avisos'], ['central/', 'central funções', 'tela=funcoes'], ['escopo/', 'escopo'], ['escopo/', 'escopo item 23', 'item=23'],
-  ['manual/', 'manual app'], ['manual/', 'manual central', 'tela=central'], ['manual/', 'manual fluxos', 'tela=fluxos'], ['app/', 'app tutorial', 'tela=tutorial'], ['central/', 'central tutorial', 'tela=tutorial']];
+  ['manual/', 'manual app'], ['manual/', 'manual central', 'tela=central'], ['manual/', 'manual fluxos', 'tela=fluxos'], ['app/', 'app tutorial', 'tela=tutorial'], ['central/', 'central tutorial', 'tela=tutorial'],
+  ['app/', 'app personal', 'tela=personal'], ['app/', 'app whatsapp', 'tela=whatsapp'], ['central/', 'central ia', 'tela=ia'], ['central/', 'central consumo', 'tela=consumo'],
+  ['central/', 'central registro ia', 'tela=registro-ia'], ['central/', 'central assistente', 'tela=assistente-central']];
 const APARELHOS = [['celular360', { width: 360, height: 740 }, true], ['celular390', { width: 390, height: 844 }, true], ['celular430', { width: 430, height: 932 }, true],
   ['ipad', { width: 820, height: 1180 }, true], ['computador', { width: 1440, height: 900 }, false]];
 
@@ -349,6 +351,10 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(await page.locator('.tutorial').count() === 0, 'tutorial: o link que já leva a uma tela não abre o tutorial');
   // Manual: cada tela do manual, cada etapa dos fluxogramas e cada "onde" dos itens apontam para uma tela que existe;
   // e cada "Ver na tela" abre mesmo a tela (título ou folha na tela).
+  // A página do app carrega a central só na primeira troca pela faixa: troca, para as duas listas de telas existirem.
+  ok(await page.evaluate(() => !window.DEMO_CENTRAL), 'peso: a página do app não carrega a central antes da troca');
+  await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2');
+  if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); }
   const mapa = await page.evaluate(() => {
     const val = { app: window.DEMO_APP.telas(), central: window.DEMO_CENTRAL.telas(), manual: ['app', 'central', 'fluxos'] };
     const M = window.DEMO_MANUAL, ruins = [];
@@ -368,7 +374,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   for (const [p, t] of mapa.telas) {
     await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/${p}/#${ATIVO}&tela=${t}`);
     const achou = await page.waitForFunction(t => document.querySelector('.folha h2') || (t === 'boas-vindas' ? document.querySelector('.aceite') : document.querySelector('#conteudo h1, #conteudo h2')), t, { timeout: 5000 }).then(() => true).catch(() => false);
-    const naBoasVindas = t !== 'boas-vindas' && await page.locator('.aceite').count() > 0;
+    const naBoasVindas = t !== 'boas-vindas' && await page.locator('.bv').count() > 0;
     ok(achou && !naBoasVindas, `manual: "Ver na tela" de ${p}/${t} abre a tela`);
   }
   // Página do manual: abas, busca, "Ver na tela", fluxogramas em SVG e o registro de uso como "escopo".
@@ -400,9 +406,107 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   }
   ok(respostas.every(r => !/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg|unidades)\b/i.test(r)), 'assistente: nenhuma resposta tem número de dose');
   ok(/decisões da sua equipe/.test(respostas[0]) && /decisões da sua equipe/.test(respostas[1]) && /decisões da sua equipe/.test(respostas[3]), 'assistente: dose e diagnóstico vão para a equipe');
-  ok(/precisa da equipe agora/.test(respostas[2]), 'assistente: sintoma forte manda falar com a equipe agora');
+  ok(/Avisei a enfermagem/.test(respostas[2]), 'assistente: sintoma forte avisa a enfermagem');
   ok(/Minhas consultas/.test(respostas[4]), 'assistente: "onde vejo minhas consultas?" responde pelo manual');
-
+  // ---------------------------------------------------------------- IA do paciente, IA da central e consumo de IA (PR da IA)
+  const DOSE_RE = /\d+(,\d+)?\s*(mg|mcg|UI|unidades?)\b|\d+(,\d+)?\s*mL de (rem[eé]dio|medicamento|caneta)/i;
+  const respostasIa = [];
+  const perguntarCentral = async q => { const n = await page.locator('.resposta-ia').count(); await page.fill('#msg-central', q); await page.keyboard.press('Enter');
+    await page.waitForFunction(n => document.querySelectorAll('.resposta-ia').length > n, n); const r = page.locator('.resposta-ia').last(); respostasIa.push(await r.innerText()); return r; };
+  const modelo = fn => page.evaluate(fn);
+  // IA da central: cada mudança mostra o antes e o depois e só acontece depois do "Confirmar"; aparece no app e no registro.
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=assistente-central`); await page.waitForSelector('#msg-central');
+  const total0 = await modelo(() => window.DEMO_IA.total());
+  let r = await perguntarCentral('Quem não registrou há 3 dias?');
+  ok(/João Pereira/.test(await r.innerText()) && /De onde veio/.test(await r.innerText()) && await r.getByRole('button', { name: /Abrir a ficha de João Pereira/ }).count() === 1, 'IA da central: responde com a origem e o link para a ficha');
+  ok(await modelo(() => window.DEMO_IA.total()) === total0 + 4, 'consumo: uma pergunta à IA da central soma 4 créditos');
+  r = await perguntarCentral('Como está a Mariana?');
+  ok(/Mariana Alves/.test(await r.innerText()) && /De onde veio: ficha do paciente/.test(await r.innerText()), 'IA da central: "como está a Mariana?" com a origem');
+  r = await perguntarCentral('Média de perda de peso do mês');
+  ok(/Variação média de peso nos últimos 30 dias/.test(await r.innerText()), 'IA da central: média de perda de peso do mês');
+  r = await perguntarCentral('Quem está abaixo da meta de proteína?');
+  ok(/Carlos Souza/.test(await r.innerText()), 'IA da central: quem está abaixo da meta de proteína');
+  const ACOES = [
+    ['Mude a meta de proteína da Mariana para 110', () => window.DEMO_MODELO.mariana.metas.prot, 100, 110],
+    ['Mande um recado para a Mariana: Traga os exames de sangue no retorno', () => window.DEMO_MODELO.recados[0].texto, 'Traga os exames de sangue no retorno.', 'Traga os exames de sangue no retorno'],
+    ['Desligue as conquistas do app', () => window.DEMO_MODELO.funcoes.conquistas[1], true, false],
+    ['Deixe o tom da IA da Mariana direto', () => window.DEMO_IA.configDe(1).tom, 'acolhedor', 'direto'],
+    ['Desligue o lembrete de água da IA da Mariana', () => window.DEMO_IA.configDe(1).temas.agua, true, false],
+    ['Marque a Beatriz como vista', () => !!window.DEMO_MODELO.vistos[3], false, true]];
+  for (const [q, ler, antes, depois] of ACOES) {
+    r = await perguntarCentral(q);
+    const confirmar = r.getByRole('button', { name: 'Confirmar' });
+    ok(await confirmar.count() === 1 && /Antes/.test(await r.innerText()) && /Depois/.test(await r.innerText()), `IA da central: "${q}" mostra o antes e o depois e pede "Confirmar"`);
+    ok(await page.evaluate(ler) === antes, `IA da central: "${q}" não muda nada antes do "Confirmar"`);
+    if (await confirmar.count()) await confirmar.click();
+    ok(await page.evaluate(ler) === depois, `IA da central: "${q}" muda depois do "Confirmar"`);
+  }
+  r = await perguntarCentral('Mude a meta de água da Mariana para 2500');
+  await r.getByRole('button', { name: 'Cancelar' }).click();
+  ok(await modelo(() => window.DEMO_MODELO.mariana.metas.agua) === 2000, 'IA da central: "Cancelar" não muda nada');
+  for (const q of ['Qual a dose da Mariana?', 'Aumente a dose do João para 5 mg', 'Mude a medicação da Beatriz', 'Quantos mg a Mariana aplica?', 'Diminua a dose do Carlos']) {
+    r = await perguntarCentral(q);
+    ok(/Isso é decisão sua; abra a prescrição/.test(await r.innerText()) && await r.getByRole('button', { name: 'Abrir Aplicações' }).count() === 1 && await r.getByRole('button', { name: 'Confirmar' }).count() === 0, `IA da central: "${q}" recusa e leva à prescrição`);
+  }
+  r = await perguntarCentral('Como envio um recado?');
+  ok(/Avisos e conteúdo/.test(await r.innerText()), 'IA da central: explica como usar a central pelo manual');
+  await page.keyboard.press('Escape'); await page.waitForSelector('.folha', { state: 'detached' });
+  ok(await page.locator('.alerta-card[data-paciente="3"]').count() === 0, 'IA da central: "marcar como vista" tira a Beatriz da triagem');
+  await page.locator('.barra-abas').getByRole('button', { name: 'IA' }).click(); await page.getByRole('button', { name: 'Registro da IA' }).click();
+  const reg = await page.locator('.registro-ia').innerText();
+  ok((reg.match(/Confirmado/g) || []).length >= ACOES.length && /Mudança cancelada/.test(reg) && /pedido de Dra\. Helena Prado/.test(reg), 'Registro da IA: as mudanças confirmadas (com quem pediu) e a cancelada');
+  // Reflete no app (mesma página): meta nova, recado, conquistas desligadas e o personal com o tom e o lembrete de água da clínica.
+  await page.locator('.faixa-demo').getByRole('button', { name: 'App' }).click(); await page.waitForSelector('.v-app #conteudo h1');
+  if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); }
+  const hoje = await textoMain();
+  ok(/de 110 g/.test(await page.locator('.meta[data-meta="prot"]').innerText()) && /Traga os exames de sangue no retorno/.test(hoje) && !/Pontos de hoje/.test(hoje), 'IA da central: meta, recado e função aparecem no app');
+  await page.getByRole('button', { name: 'Abrir o personal' }).click(); await page.waitForSelector('#msg-personal');
+  ok(/Tom\s*Direto/.test(await textoMain()) && /A clínica desligou: água/.test(await textoMain()), 'IA da central: a configuração da IA do paciente aparece no personal do app');
+  // IA do paciente: escolhas do paciente, canal com consentimento e SAIR, alerta para a triagem; nenhuma resposta com dose.
+  const planoN = () => page.locator('.plano-ia li').count();
+  const n0 = await planoN(); await page.getByRole('radio', { name: 'Leve' }).click();
+  ok(await planoN() < n0, `personal: intensidade leve manda menos mensagens (${n0} → ${await planoN()})`);
+  await page.getByRole('radio', { name: 'Pausar hoje' }).click();
+  ok(await planoN() === 0 && /Pausado/.test(await textoMain()), 'personal: "Pausar hoje" para as mensagens');
+  await page.getByRole('radio', { name: 'Sem pausa' }).click(); await page.getByRole('radio', { name: 'Moderada' }).click();
+  await page.selectOption('#sil-de', '20');
+  ok(/das 20h às 7h/.test(await textoMain()), 'personal: o horário de silêncio muda');
+  await page.getByRole('radio', { name: 'No WhatsApp' }).click(); await page.waitForSelector('text=Receber o personal no WhatsApp');
+  ok(await page.getByRole('button', { name: 'Autorizar e ativar' }).isDisabled(), 'WhatsApp: sem o consentimento, não ativa');
+  await page.locator('.aceite input').check(); await page.getByRole('button', { name: 'Autorizar e ativar' }).click(); await page.waitForSelector('.mensageiro');
+  const msgTxt = await page.locator('.mensageiro').innerText();
+  ok(/Responda SAIR para parar/.test(msgTxt) && /Você autorizou/.test(msgTxt) && !/\(?\d{2}\)?\s?\d{4,5}-?\d{4}/.test(msgTxt) && await page.locator('.mensageiro img').count() === 0, 'WhatsApp: consentimento e "Responda SAIR", sem número e sem logo');
+  const wa0 = await modelo(() => window.DEMO_IA.consumo.porFuncao.whatsapp);
+  await page.fill('#msg-whatsapp', 'O que como para bater a proteína?'); await page.keyboard.press('Enter'); await page.waitForTimeout(900);
+  ok(await modelo(() => window.DEMO_IA.consumo.porFuncao.whatsapp) === wa0 + 3, 'consumo: mensagem no WhatsApp soma 3 créditos');
+  await page.fill('#msg-whatsapp', 'SAIR'); await page.keyboard.press('Enter'); await page.waitForSelector('text=Pronto: você não recebe mais mensagens aqui');
+  ok(await modelo(() => window.DEMO_IA.pref.canal) === 'app', 'WhatsApp: SAIR para as mensagens e volta para o app');
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=personal`); await page.waitForSelector('#msg-personal');
+  for (const q of ['Qual a dose que eu tomo?', 'Posso aumentar a dose?', 'Quantos mg devo aplicar?', 'Posso trocar o remédio por outro?', 'Me receite algo para dormir', 'Estou com enjoo forte e vomitando']) {
+    const n = await page.locator('.bolha.outro').count(); await page.fill('#msg-personal', q); await page.keyboard.press('Enter');
+    await page.waitForFunction(n => document.querySelectorAll('.bolha.outro').length > n, n); respostasIa.push(await page.locator('.bolha.outro').last().innerText());
+  }
+  ok(respostasIa.slice(-6, -1).every(t => /decisões da sua equipe/.test(t)), `personal: dose e receita vão para a equipe (${respostasIa.slice(-6, -1).filter(t => !/decisões da sua equipe/.test(t)).join(' | ')})`);
+  ok(/Avisei a enfermagem/.test(respostasIa[respostasIa.length - 1]), 'personal: enjoo forte avisa a enfermagem');
+  ok(respostasIa.every(t => !DOSE_RE.test(t)), `IA: nenhuma resposta tem dose (${respostasIa.filter(t => DOSE_RE.test(t)).join(' | ')})`);
+  await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2');
+  if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); }
+  ok(await page.locator('.alerta-card[data-paciente="1"]').count() === 1 && /Relatou enjoo forte/.test(await page.locator('.alerta-card[data-paciente="1"]').innerText()), 'personal: o alerta da conversa aparece na triagem da central');
+  // Consumo: 80% avisa; com teto menor e "pausar", as IAs param; "Continuar" volta.
+  await page.locator('.barra-abas').getByRole('button', { name: 'IA' }).click(); await page.getByRole('button', { name: 'Consumo' }).click();
+  ok(/cobrados à parte, pelo uso, junto com a mensalidade/.test(await textoMain()) && !/R\$/.test(await textoMain()), 'consumo: em créditos, cobrados à parte, nunca em reais');
+  for (let k = 0; k < 6 && !await modelo(() => window.DEMO_IA.pct() >= 80); k++) await modelo(() => window.DEMO_IA.responderCentral('Como está a Mariana?'));
+  await page.getByRole('button', { name: 'Consumo' }).click();
+  ok(/Aviso de 80%/.test(await textoMain()), 'consumo: aviso de 80% do teto');
+  await page.selectOption('#ia-teto', '8000');
+  ok(/as IAs estão pausadas/.test(await textoMain()) && /pausadas/.test((await modelo(() => window.DEMO_IA.responderCentral('Como está a Mariana?'))).texto), 'consumo: no teto, com "pausar", as IAs param');
+  await page.getByRole('radio', { name: 'Continuar' }).click();
+  ok(!/pausadas/.test((await modelo(() => window.DEMO_IA.responderCentral('Como está a Mariana?'))).texto) && /as IAs continuam/.test(await textoMain()), 'consumo: "Continuar" volta a responder');
+  // Médico configura a IA do paciente pela tela (para todos): fica salva e entra no registro.
+  await page.getByRole('button', { name: 'IA do paciente' }).click();
+  await page.getByRole('switch', { name: 'Check-in da manhã' }).click(); await page.getByRole('radio', { name: 'Animado' }).click(); await page.getByRole('button', { name: 'Salvar e enviar ao app' }).click();
+  ok(await modelo(() => window.DEMO_IA.config.todos.tom === 'animado' && !window.DEMO_IA.config.todos.temas.checkin), 'IA do paciente: a configuração da central é salva');
+  // Tudo na memória: nenhum pedido novo ao servidor além do registro de uso; e nenhum "nada é guardado".
   ok(nPedidos() === antesPedidos, `memória: nenhum pedido ao servidor além de abrir e eventos (${nPedidos() - antesPedidos} a mais)`);
   ok(!/nada é guardado/i.test(await page.content()), 'nenhum "nada é guardado"');
   ok(!erros.length, 'caminhos: erro no console: ' + erros.join(' | '));

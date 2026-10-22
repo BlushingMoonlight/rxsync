@@ -189,6 +189,7 @@
           M.funcaoLigada('basicos') ? metrica('lua', 'Sono', sono ? el('span', { class: 'grande-txt', text: sono.valor.split(' · ')[0] }) : el('span', { class: 'acao-m' }, 'Registrar', ic('seta', 'p')), sono ? sono.valor.split(' · ')[1] + ' · ' + M.quando(sono.quando) : 'Como você dormiu?', () => abrirRegistro('sono')) : null,
           M.funcaoLigada('aplicacoes') ? metrica('seringa', 'Próxima aplicação', el('span', { class: 'grande-txt', text: maiuscula(M.quando(ap.proxima)) }), ap.falta, () => irAba('aplicacoes')) : null,
           metrica('balanca', 'Peso', el('span', { class: 'numero' }, fmt(pe.kg, 1), el('small', { text: 'kg' })), M.sinal(M.variacaoTotal(m), 1) + ' kg desde ' + M.ddmm(m.inicio), () => irAba('evolucao'))),
+        M.funcaoLigada('personal') ? cartaoPersonal() : null,
         el('section', { class: 'cartao' }, el('div', { class: 'cab-cartao' }, el('h2', { text: 'Proteína nos 7 dias anteriores' }), item(35)),
           el('div', { class: 'semana-barras', role: 'img', 'aria-label': 'Proteína por dia: ' + m.semana.prot.map((v, i) => M.DIAS[dias[i].getDay()] + ' ' + v + ' g').join(', ') + '. Meta: ' + m.metas.prot + ' g.' },
             m.semana.prot.map((v, i) => { const col = el('i'); col.style.transform = 'scaleY(' + Math.min(1, v / (m.metas.prot * 1.2)) + ')'; return el('div', { class: 'dia-b' + (v >= m.metas.prot * 0.9 ? ' hoje' : ''), 'aria-hidden': 'true' }, el('span', { class: 'coluna' }, col), el('span', { class: 'letra', text: M.DIAS[dias[i].getDay()].charAt(0).toUpperCase() })); })),
@@ -283,7 +284,8 @@
           el('p', { class: 'peq' }, el('strong', { text: 'Fase: ' }), m.fase.toLowerCase() + ' (definida por ' + M.medico() + ' em ' + M.ddmm(m.faseEm) + ').')),
         grupoLista('Com a clínica', [['calendario', 'Minhas consultas', cons ? maiuscula(M.quando(cons.quando)) : null, 'consultas', 28], ['megafone', 'Avisos da clínica', recs.length + (recs.length === 1 ? ' aviso' : ' avisos'), 'avisos', 29],
           M.funcaoLigada('chat') ? ['conversa', 'Chat com a equipe', null, 'chat-equipe', 34] : null, ['pessoas', 'Equipe e contatos', null, 'equipe', 33], ['livro', 'Conteúdo da clínica', null, 'conteudo', 31], ['clipe', 'Enviar exames', null, 'exames', 32]]),
-        grupoLista('Para você', [['sino', 'Lembretes', null, 'lembretes', 30], M.funcaoLigada('conquistas') ? ['medalha', 'Conquistas', M.pontos(m) + ' pontos hoje', 'conquistas', 35] : null, M.funcaoLigada('assistente') ? ['pergunta', 'Assistente de dúvidas', null, 'assistente', 36] : null]),
+        grupoLista('Para você', [['sino', 'Lembretes', null, 'lembretes', 30], M.funcaoLigada('conquistas') ? ['medalha', 'Conquistas', M.pontos(m) + ' pontos hoje', 'conquistas', 35] : null, M.funcaoLigada('assistente') ? ['pergunta', 'Assistente de dúvidas', null, 'assistente', 36] : null,
+          M.funcaoLigada('personal') ? ['conversa', 'Seu personal', window.DEMO_IA.pref.canal === 'whatsapp' ? 'No WhatsApp' : 'No app', 'personal', 52] : null]),
         grupoLista('Sua conta', [['texto', 'Leitura confortável', 'Tema escuro e letra grande', 'leitura', 38], ['cadeado', 'Meus dados', null, 'meus-dados', 37]]),
         cartao('Ícone na tela do celular', 3, el('p', { class: 'peq', text: 'No navegador, toque em Compartilhar e depois em "Adicionar à Tela de Início". O app vira um ícone com a marca da clínica.' }))];
     },
@@ -310,6 +312,49 @@
     equipe: () => [cartao('Equipe e contatos', 33, el('ul', { class: 'lista-simples' }, [[M.medico(), DEMO.dados.especialidade || 'Médico'], [M.EQUIPE.nutri, 'Nutricionista · plano alimentar e metas'], [M.EQUIPE.enf, 'Enfermeira · aplicações e sintomas'], [M.EQUIPE.recepcao, 'Consultas e horários']].map(([n, f]) =>
       el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: n }), el('br'), el('span', { class: 'mudo peq', text: f })), M.funcaoLigada('chat') ? el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Escrever para ' + n, onclick: () => abrir('chat-equipe') }, 'Escrever') : null))))],
     'chat-equipe': () => chat('equipe', 34, 'Chat com a equipe', 'Escreva para a equipe da clínica.'),
+    // IA do paciente ("personal"): o que ela vai mandar hoje, a conversa e as escolhas do paciente (silêncio,
+    // intensidade, pausa e canal). O que ela cobra e o tom vêm da clínica (central › IA).
+    personal: () => {
+      const I = window.DEMO_IA, pr = I.pref, c = I.configDe(m.id), plano = I.planoHoje();
+      const desligados = I.TEMAS.filter(([k]) => !c.temas[k]).map(t => t[1].toLowerCase());
+      const exemplos = el('div', { class: 'sugestoes', role: 'group', 'aria-label': 'Ver um exemplo de lembrete' }, el('span', { class: 'mini mudo', text: 'Ver um exemplo:' }),
+        I.TEMAS.filter(([k]) => c.temas[k]).map(([k, n]) => el('button', { type: 'button', class: 'botao sec pilula', onclick: () => {
+          const t = I.lembrete(k); if (!t) { DEMO.rapida('As IAs estão pausadas: o teto de créditos do mês foi atingido.'); return; }
+          if (pr.canal === 'whatsapp') { conversas.whatsapp.push(['outro', t]); abrir('whatsapp'); } else { conversas.personal.push(['outro', t, null, n]); desenharTela('personal'); } } }, n)));
+      const tom = I.TONS.find(x => x[0] === c.tom)[1];
+      return [
+        cartao('Seu personal', 52, el('p', { class: 'peq', text: 'A IA da clínica acompanha o seu dia: lembra, pergunta como você está e tira dúvidas pelas orientações da equipe. Não diagnostica, não receita e não fala de dose. Um sinal de alerta vai para a enfermagem.' }),
+          juridico(),
+          dados([['Onde', pr.canal === 'whatsapp' ? 'No WhatsApp (você autorizou ' + M.quando(pr.consentimento) + ')' : 'Aqui no app (avisos e conversa)'], ['Silêncio', I.rotPref('silencio')], ['Intensidade', maiuscula(pr.intensidade)],
+            ['Pausa', maiuscula(I.rotPref('pausa'))], ['Tom', tom]]),
+          origem('O que o personal cobra e o tom: definidos ' + (c.por ? 'por ' + c.por + ' ' + M.dia(c.em) : 'pela clínica') + '.' + (desligados.length ? ' A clínica desligou: ' + desligados.join(', ') + '.' : ''))),
+        cartao('Hoje', null, plano.length ? el('ul', { class: 'lista-simples plano-ia' }, plano.map(x => el('li', {}, el('strong', { class: 'tab hora-ag', text: x.h + 'h' }),
+          el('span', { class: 'cresce' }, el('span', { class: 't1', text: x.titulo + (x.adiada ? ' (depois do silêncio)' : '') }), el('br'), el('span', { class: 'mudo peq', text: x.texto })))))
+          : el('p', { class: 'mudo', text: pr.pausa ? 'Pausado: nenhuma mensagem até a pausa acabar.' : 'Nenhum lembrete ligado pela clínica.' })),
+        chat('personal', 52, 'Conversa', pr.canal === 'whatsapp' ? 'As mensagens estão indo para o WhatsApp; aqui você também pode conversar.' : 'Pergunte ou conte como você está.', exemplos),
+        cartao('Como o personal fala com você', [52, 53],
+          el('div', { class: 'duas-selecoes' }, selecao('Silêncio a partir de', 'sil-de', [20, 21, 22, 23], pr.silencio[0], v => I.mudarPref('silencio', [v, pr.silencio[1]])),
+            selecao('Até', 'sil-ate', [5, 6, 7, 8, 9], pr.silencio[1], v => I.mudarPref('silencio', [pr.silencio[0], v]))),
+          segImediato('Intensidade', [['leve', 'Leve'], ['moderada', 'Moderada'], ['intensa', 'Intensa']], pr.intensidade, v => I.mudarPref('intensidade', v)),
+          el('p', { class: 'mini mudo', text: 'Leve: só o essencial (manhã, aplicação e parabéns). Moderada: todos os lembretes ligados pela clínica. Intensa: com reforço de água.' }),
+          segImediato('Pausa', [['', 'Sem pausa'], ['hoje', 'Pausar hoje'], ['semana', 'Pausar 7 dias']], pr.pausa, v => I.mudarPref('pausa', v)),
+          segImediato('Onde receber', [['app', 'No app'], ['whatsapp', 'No WhatsApp']], pr.canal, v => { if (v === 'whatsapp' && !pr.consentimento) abrir('whatsapp'); else I.mudarPref('canal', v); }))];
+    },
+    // Canal de mensagens simulado (estilo mensageiro, sem logo, sem marca e sem número): consentimento e o SAIR.
+    whatsapp: () => {
+      const I = window.DEMO_IA, pr = I.pref;
+      if (!pr.consentimento) {
+        const ok = el('button', { type: 'button', class: 'botao', disabled: true, onclick: () => {
+          I.mudarPref('canal', 'whatsapp'); conversas.whatsapp.push(['sistema', 'Você autorizou ' + M.quando(pr.consentimento) + '.']); desenharTela('whatsapp'); } }, 'Autorizar e ativar');
+        return [conversas.whatsapp.length ? mensageiro(false) : null,
+          cartao('Receber o personal no WhatsApp', 53, juridico(),
+            el('p', { class: 'peq', text: 'Os lembretes e as respostas do personal passam a chegar no seu WhatsApp, no horário que você escolheu, pelo número do seu cadastro na clínica.' }),
+            el('label', { class: 'aceite' }, el('input', { type: 'checkbox', onchange: e => { ok.disabled = !e.target.checked; } }), 'Autorizo a clínica a me mandar as mensagens do personal pelo WhatsApp'),
+            el('p', { class: 'mudo peq', text: 'Para parar, responda SAIR a qualquer momento ou escolha "No app" no personal.' }),
+            el('div', { class: 'botoes' }, ok, el('button', { type: 'button', class: 'botao sec', onclick: voltar }, 'Agora não')))];
+      }
+      return [mensageiro(true), el('p', { class: 'mudo peq', text: 'Simulação: é assim que as mensagens chegam no WhatsApp do paciente (sem número e sem a marca do aplicativo).' })];
+    },
     assistente: () => chat('ia', 36, 'Assistente de dúvidas', 'Pergunte como usar o app ou sobre as orientações da sua equipe.'),
     conquistas: () => [cartao('Conquistas', 35, el('ul', { class: 'lista-simples' }, [['fogo', m.semana.comRegistro + ' de 7 dias com registro'], ['gota', 'Meta de água em ' + m.semana.agua.filter(v => v >= m.metas.agua).length + ' dos 7 dias anteriores'], ['medalha', 'Todas as aplicações registradas desde ' + M.ddmm(m.inicio)]].map(([i, t]) =>
       el('li', {}, caixaIc(i, 'peq'), el('span', { class: 'cresce', text: t })))), origem('Pontos de hoje: ' + M.pontos(m) + ' de 100. Refeição vale 5, cada copo de água 2, cada outro registro 5, cada remédio 2.'))],
@@ -327,7 +372,7 @@
   };
   TELAS.picadinha = TELAS.aplicacoes;   // links antigos (…&tela=picadinha)
   const NOMES = { plano: 'Plano alimentar', perfil: 'Perfil', consultas: 'Consultas', avisos: 'Avisos', lembretes: 'Lembretes', conteudo: 'Conteúdo', exames: 'Exames', equipe: 'Equipe',
-    'chat-equipe': 'Chat com a equipe', assistente: 'Assistente', conquistas: 'Conquistas', 'meus-dados': 'Meus dados', leitura: 'Leitura' };
+    'chat-equipe': 'Chat com a equipe', assistente: 'Assistente', conquistas: 'Conquistas', 'meus-dados': 'Meus dados', leitura: 'Leitura', personal: 'Seu personal', whatsapp: 'Mensagens' };
 
   // ---------------------------------------------------------------- folha de refeição: buscar, foto e código de barras
   // Tocar → escolher → "Registrar no …" → a confirmação → o anel sobe na tela Hoje (e a refeição entra na ficha da central).
@@ -392,6 +437,7 @@
         const area = el('div', { class: 'foto-leitura' }, caixaIc('camera', 'grande'), el('p', { text: 'Aponte a câmera para o prato.' }));
         const tirar = el('button', { type: 'button', class: 'botao grande cheio', onclick: () => {
           tirar.disabled = true; trocar(area, el('div', { class: 'esqueleto', role: 'status', 'aria-label': 'Lendo a foto' }, el('i'), el('i', { class: 'curto' }), el('i')), el('p', { text: 'Lendo a foto…' }));
+          window.DEMO_IA.gastar('foto', m.id);   // a leitura da foto usa créditos de IA (central › IA › Consumo)
           setTimeout(() => { est.foto = [ALIMENTOS[0], ALIMENTOS[1], ALIMENTOS[2], ALIMENTOS[7]].map(x => ({ ...x, marcado: true })); f.trocar('Encontrei no prato', vistaFoto(), () => f.trocar('Registrar refeição', vistaBusca())); }, 1000);
         } }, ic('camera'), 'Tirar a foto');
         return [el('div', { class: 'linha-h' }, el('p', { class: 'mudo peq cresce', text: 'Na demonstração, a câmera não abre: a leitura é simulada.' }), item(7)), area, tirar];
@@ -482,40 +528,76 @@
     desenhar(sel);
     return el('div', { class: 'graf-evolucao' }, leitura, s, faixa);
   }
-  // Chats de exemplo: nenhuma IA de verdade. O assistente responde dúvidas de uso pelo manual (comum/manual.js: os passos
-  // da tela e um botão para abrir) e o resto com uma orientação pronta; dose, diagnóstico e mudança no tratamento vão
-  // para a equipe. A pergunta vai para o registro da demonstração (evento "pergunta").
-  const conversas = { ia: [], equipe: [] };
+  // Chats de exemplo: nenhuma IA de verdade. O assistente e o personal respondem pela IA simulada (comum/ia.js): dúvidas de
+  // uso pelo manual, orientações da equipe com a origem, e dose, diagnóstico e mudança no tratamento vão para a equipe; um
+  // sinal de alerta avisa a enfermagem. A pergunta vai para o registro da demonstração (evento "pergunta").
+  const conversas = { ia: [], equipe: [], personal: [], whatsapp: [] };
   const SUGESTOES = ['Como registro a água?', 'Onde vejo minhas consultas?', 'Como escolho o local da aplicação?'];
-  const PROIBIDO = /\bdos[ea]s?\b|\bmg\b|\bml de (remedio|medicamento|caneta)|quanto (devo )?(aplicar|tomar)|aumentar|diminuir|trocar (o|de) remedio|diagnost|receit|prescrev/;
-  const URGENTE = /falta de ar|desmai|dor (muito )?forte|dor no peito|vomit|sangr|alergia|incha/;
-  function responderIa(t) {
-    const sem = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-    if (URGENTE.test(sem)) return { texto: 'Isso precisa da equipe agora. Se for forte ou piorar, procure atendimento de urgência. Escreva no chat com a equipe para a enfermagem saber.', ir: ['chat-equipe', 'Abrir o chat com a equipe'] };
-    if (PROIBIDO.test(sem)) return { texto: 'Dose, diagnóstico e mudança no tratamento são decisões da sua equipe, e eu não respondo sobre isso. Leve a dúvida ao chat com a equipe ou ao retorno.', ir: ['chat-equipe', 'Abrir o chat com a equipe'] };
-    const [t1] = window.DEMO_MANUAL.buscar(t, 'app').filter(x => x.tela !== 'boas-vindas' && x.tela !== 'assistente');
-    if (t1) { const nome = t1.titulo.replace(/ \(folha\)$/, ''); return { texto: nome + ': ' + t1.passos.map((p, i) => (i + 1) + '. ' + p).join(' '), ir: [t1.tela, 'Abrir ' + nome], manual: true }; }
-    return { texto: 'Pela orientação da sua equipe: mantenha os registros do dia e leve essa dúvida ao retorno. Se algo mudou no tratamento ou você sentiu algo diferente, fale com a equipe no chat.' };
-  }
-  function chat(qual, n, titulo, ajuda) {
-    const inicio = qual === 'ia' ? 'Oi, ' + PACIENTE + '! Respondo dúvidas sobre o app e sobre as orientações da sua equipe. Não faço diagnóstico nem receito.' : 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0] + ': “Oi, ' + PACIENTE + '! Pode escrever aqui suas dúvidas sobre a aplicação.”';
-    const lista = el('div', { class: 'conversa', 'aria-live': 'polite' }, bolha('outro', inicio), conversas[qual].map(([q, t, ir]) => bolha(q, t, ir)));
+  function chat(qual, n, titulo, ajuda, extra) {
+    const enf = 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0];
+    const inicio = qual === 'equipe' ? enf + ': “Oi, ' + PACIENTE + '! Pode escrever aqui suas dúvidas sobre a aplicação.”'
+      : qual === 'personal' ? 'Oi, ' + PACIENTE + '! Sou o personal da clínica. Pode me perguntar ou me contar como você está.'
+        : 'Oi, ' + PACIENTE + '! Respondo dúvidas sobre o app e sobre as orientações da sua equipe. Não faço diagnóstico nem receito.';
+    const lista = el('div', { class: 'conversa', 'aria-live': 'polite' }, bolha('outro', inicio), conversas[qual].map(([q, t, ir, o]) => bolha(q, t, ir, o)));
     const campo = el('input', { class: 'entrada', id: 'msg-' + qual, maxlength: '300', autocomplete: 'off', placeholder: 'Escreva sua mensagem', 'aria-label': 'Mensagem' });
     const mandar = t => {
       conversas[qual].push(['eu', t]); lista.append(bolha('eu', t)); campo.value = '';
       DEMO.evento('pergunta', { chat: qual, texto: t.slice(0, 300) });
       if (qual === 'equipe') naFicha('conversa', 'Mensagem no chat', 'Para a equipe');
-      const r = qual === 'ia' ? responderIa(t) : { texto: 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0] + ': “Recebi, ' + PACIENTE + '. Vejo com a equipe e te respondo hoje.”' };
-      setTimeout(() => { conversas[qual].push(['outro', r.texto, r.ir]); lista.append(bolha('outro', r.texto, r.ir)); }, 700);
+      const r = qual === 'equipe' ? { texto: enf + ': “Recebi, ' + PACIENTE + '. Vejo com a equipe e te respondo hoje.”' } : window.DEMO_IA.responderPaciente(t, 'app');
+      setTimeout(() => { conversas[qual].push(['outro', r.texto, r.ir, r.origem]); lista.append(bolha('outro', r.texto, r.ir, r.origem)); }, 700);
     };
     const enviar = e => { e.preventDefault(); const t = campo.value.trim(); if (t) mandar(t); };
+    const prontas = qual === 'ia' ? SUGESTOES : qual === 'personal' ? window.DEMO_IA.SUGESTOES_PACIENTE : [];
     return [cartao(titulo, n, el('p', { class: 'mudo peq', text: ajuda }), lista,
-      qual === 'ia' ? el('div', { class: 'sugestoes', role: 'group', 'aria-label': 'Perguntas prontas' }, SUGESTOES.map(q => el('button', { type: 'button', class: 'botao sec pilula', onclick: () => mandar(q) }, q)), item(49)) : null,
-      el('p', { class: 'mudo peq', text: qual === 'ia' ? 'Na demonstração, as respostas vêm do manual de uso e de exemplos prontos. Não escreva dados de pacientes.' : 'A resposta da equipe chega igual, entre aspas, sem alteração. Na demonstração, ela é um exemplo pronto.' }),
+      prontas.length ? el('div', { class: 'sugestoes', role: 'group', 'aria-label': 'Perguntas prontas' }, prontas.map(q => el('button', { type: 'button', class: 'botao sec pilula', onclick: () => mandar(q) }, q)), qual === 'ia' ? item(49) : null) : null,
+      extra || null,
+      el('p', { class: 'mudo peq', text: qual === 'equipe' ? 'A resposta da equipe chega igual, entre aspas, sem alteração. Na demonstração, ela é um exemplo pronto.' : 'Na demonstração, as respostas vêm do manual de uso e das orientações da equipe. Não escreva dados de pacientes.' }),
       el('form', { class: 'enviar-msg', onsubmit: enviar }, campo, el('button', { class: 'botao', type: 'submit', 'aria-label': 'Enviar mensagem' }, ic('enviar', 'p'), 'Enviar')))];
   }
+  // A tela de mensagens (estilo mensageiro): os lembretes de hoje que já passaram, a conversa e o "Responda SAIR".
+  function mensageiro(ativo) {
+    const I = window.DEMO_IA, h = new Date().getHours();
+    const msg = (quem, texto, hora) => el('div', { class: 'msg ' + quem }, el('span', { text: texto }), hora ? el('small', { text: hora }) : null);
+    const corpo = el('div', { class: 'msg-corpo', 'aria-live': 'polite' },
+      ativo ? I.planoHoje().filter(x => x.h <= h && !x.adiada).map(x => msg('outro', x.texto, x.h + 'h')) : null,
+      conversas.whatsapp.map(([q, t]) => q === 'sistema' ? el('p', { class: 'msg-sistema', text: t }) : msg(q, t)));
+    const campo = el('input', { class: 'entrada', id: 'msg-whatsapp', maxlength: '300', autocomplete: 'off', placeholder: ativo ? 'Mensagem (ou SAIR)' : 'Mensagens paradas', 'aria-label': 'Mensagem', disabled: !ativo });
+    const enviar = e => {
+      e.preventDefault(); const t = campo.value.trim(); if (!t) return;
+      conversas.whatsapp.push(['eu', t]); campo.value = '';
+      DEMO.evento('pergunta', { chat: 'whatsapp', texto: t.slice(0, 300) });
+      if (/^sair$/i.test(t)) { I.sair(); conversas.whatsapp.push(['sistema', 'Pronto: você não recebe mais mensagens aqui. O personal continua no app.']); desenharTela('whatsapp'); return; }
+      corpo.append(msg('eu', t));
+      const r = I.responderPaciente(t, 'whatsapp');
+      setTimeout(() => { conversas.whatsapp.push(['outro', r.texto]); corpo.append(msg('outro', r.texto)); corpo.scrollTop = corpo.scrollHeight; }, 700);
+    };
+    return el('section', { class: 'mensageiro', 'aria-label': 'Mensagens do personal' },
+      el('div', { class: 'msg-topo' }, el('span', { class: 'selo peq-selo', 'aria-hidden': 'true', text: DEMO.iniciais(DEMO.dados.clinica) }),
+        el('span', { class: 'cresce' }, el('strong', { text: DEMO.dados.clinica }), el('br'), el('span', { class: 'mini', text: 'Personal · mensagens automáticas' })), item(53)),
+      el('p', { class: 'msg-sistema', text: 'Mensagens automáticas da clínica, no horário que você escolheu. Responda SAIR para parar.' }), corpo,
+      el('form', { class: 'msg-enviar', onsubmit: enviar }, campo, el('button', { class: 'botao', type: 'submit', disabled: !ativo }, ic('enviar', 'p'), 'Enviar')));
+  }
+  // "Seu personal" na tela Hoje: a próxima mensagem planejada.
+  function cartaoPersonal() {
+    const I = window.DEMO_IA, pl = I.planoHoje(), h = new Date().getHours(), prox = pl.find(x => x.h >= h) || pl[pl.length - 1];
+    return el('section', { class: 'cartao personal-hoje' }, el('div', { class: 'linha-h cab-cartao' }, caixaIc('conversa'), el('h2', { class: 'cresce', text: 'Seu personal' }), item(52)),
+      prox ? el('p', {}, el('strong', { text: (prox.h >= h ? 'Às ' + prox.h + 'h: ' : 'Hoje: ') }), prox.texto) : el('p', { class: 'mudo', text: I.pref.pausa ? 'Pausado.' : 'Nenhum lembrete hoje.' }),
+      el('button', { type: 'button', class: 'botao sec', onclick: () => irParaTela('personal') }, 'Abrir o personal', ic('seta', 'p')));
+  }
+  const juridico = () => el('p', { class: 'etq-juridico' }, ic('info', 'p'), 'Depende de parecer jurídico');
+  // Escolha com efeito na hora (sem "Salvar"): grava pela IA e redesenha.
+  function segImediato(rotulo, opcoes, valor, fn) {
+    return el('div', { class: 'campo' }, el('span', { text: rotulo }), el('div', { class: 'seg largo', role: 'radiogroup', 'aria-label': rotulo }, opcoes.map(([k, n]) =>
+      el('button', { type: 'button', role: 'radio', 'aria-checked': String(valor === k), 'aria-pressed': String(valor === k), onclick: () => { if (valor !== k) { fn(k); desenharTela(atual()); } } }, n))));
+  }
+  function selecao(rotulo, id, horas, valor, fn) {
+    const s = el('select', { class: 'entrada', id, onchange: e => { fn(Number(e.target.value)); desenharTela(atual()); } }, horas.map(h => el('option', { value: h, selected: h === valor }, h + 'h')));
+    return el('label', { class: 'campo', for: id }, el('span', { text: rotulo }), s);
+  }
   // ir: [tela, rótulo]: um botão embaixo da resposta que abre a tela (a mesma navegação dos links …&tela=…).
-  const bolha = (quem, texto, ir) => el('div', { class: 'bolha ' + quem }, el('span', { text: texto }),
+  const bolha = (quem, texto, ir, de) => el('div', { class: 'bolha ' + quem }, el('span', { text: texto }),
+    de && quem === 'outro' ? el('span', { class: 'de-onde mini', text: 'De onde veio: ' + de + '.' }) : null,
     ir ? el('button', { type: 'button', class: 'botao suave pilula ir-tela', onclick: () => irParaTela(ir[0]) }, ir[1], ic('seta', 'p')) : null);
 
   // ---------------------------------------------------------------- navegação (dentro da página; o # guarda o código)

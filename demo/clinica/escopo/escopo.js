@@ -25,7 +25,7 @@
     }, 1500);
   }
   // Grupos (dobráveis), com a contagem do que já foi marcado em cada um.
-  const GRUPOS = [['Entrada e tela Hoje', 1, 6], ['Registros do dia', 7, 19], ['Evolução', 20, 22], ['Aplicações', 23, 27], ['Clínica e contato', 28, 34], ['Extras do app', 35, 38], ['Central do médico', 39, 46], ['Manual e ajuda', 47, 51]];
+  const GRUPOS = [['Entrada e tela Hoje', 1, 6], ['Registros do dia', 7, 19], ['Evolução', 20, 22], ['Aplicações', 23, 27], ['Clínica e contato', 28, 34], ['Extras do app', 35, 38], ['Central do médico', 39, 46], ['Manual e ajuda', 47, 51], ['Inteligência artificial', 52, 57]];
   const contadores = {};
   function contarGrupo(g) {
     const [, a, b] = g, total = b - a + 1, feitos = Object.entries(est.escolhas).filter(([n, v]) => +n >= a && +n <= b && v.e).length;
@@ -42,7 +42,7 @@
     nota.addEventListener('change', () => { est.escolhas[i.n] = { ...atual(), n: nota.value.trim() }; guardar(i.n); });
     const campoNota = el('label', { class: 'campo', for: 'nota-' + i.n, hidden: !atual().n }, el('span', { text: 'Anotação (opcional)' }), nota);
     return el('article', { class: 'item-escopo', id: 'item-' + i.n },
-      el('div', { class: 'linha-h cab-item' }, el('span', { class: 'num tab', text: i.n }), el('div', { class: 'cresce' }, el('h3', { text: i.t }), el('p', { class: 'mudo peq', text: i.d }))),
+      el('div', { class: 'linha-h cab-item' }, el('span', { class: 'num tab', text: i.n }), el('div', { class: 'cresce' }, el('h3', { text: i.t }), i.juridico ? el('p', { class: 'etq-juridico' }, window.DEMO_ICONE('info', 'p'), 'Depende de parecer jurídico') : null, el('p', { class: 'mudo peq', text: i.d }))),
       botoes, campoNota,
       el('div', { class: 'acoes-item' }, el('button', { type: 'button', class: 'botao leve', 'aria-expanded': String(!campoNota.hidden), onclick: e => { campoNota.hidden = !campoNota.hidden; e.currentTarget.setAttribute('aria-expanded', String(!campoNota.hidden)); if (!campoNota.hidden) nota.focus(); } }, window.DEMO_ICONE('editar', 'p'), 'Anotação'),
         el('a', { class: 'botao leve', href: DEMO.link(i.onde[0], { tela: i.onde[1], item: i.n }) }, window.DEMO_ICONE('olho', 'p'), 'Ver na tela')));

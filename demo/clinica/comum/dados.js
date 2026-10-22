@@ -119,7 +119,9 @@
   // Funções do app que a clínica liga e desliga na central (desligada, some do app).
   const funcoes = { refeicoes: ['Refeições e plano alimentar', true], basicos: ['Água, sono e atividade', true], bemestar: ['Humor, fome e intestino', true],
     outros: ['Outros registros (álcool, tabaco e ciclo)', true], aplicacoes: ['Aplicações', true], fotos: ['Fotos de progresso', true], chat: ['Chat com a equipe', true],
-    assistente: ['Assistente de dúvidas', true], conquistas: ['Conquistas', true] };
+    assistente: ['Assistente de dúvidas', true], conquistas: ['Conquistas', true], personal: ['Personal (IA do paciente)', true] };
+  // Pacientes que a equipe marcou como vistos hoje (saem da triagem; o estado continua). A central e a IA da central usam.
+  const vistos = {};
 
   // ---------------------------------------------------------------- contas (as duas telas usam as mesmas)
   const pesoAtual = p => p.pesagens[p.pesagens.length - 1];
@@ -211,7 +213,7 @@
 
   window.DEMO_MODELO = {
     agora, em, quando, hora, ddmm, dataLonga, fmt, inteiro, sinal, DIAS,
-    EQUIPE, LOCAIS, pacientes, pac, mariana, agenda, prescricoes, recados, CONTEUDO, funcoes, REGRAS,
+    EQUIPE, LOCAIS, pacientes, pac, mariana, agenda, prescricoes, recados, CONTEUDO, funcoes, vistos, REGRAS,
     media7, dia, autorMetas, pesoAtual, variacaoSemana, variacaoTotal, consumoHoje, media, ultimoRegistro, dias7, estado, pontos, aplicacao, proximaConsulta, recadosDe, linhaDoTempo,
     medico: () => { const d = (window.DEMO && DEMO.dados) || {}; return ((d.tratamento || '') + ' ' + (d.medico || '')).trim(); },
     funcaoLigada: k => !funcoes[k] || funcoes[k][1],

@@ -1,4 +1,4 @@
-// Os itens do escopo da demonstração (numeração própria, escrita à mão; DEC-125). "onde" leva ao lugar do item na
+// Os itens do escopo da demonstração (numeração própria, escrita à mão; DEC-125). juridico: depende de parecer jurídico. "onde" leva ao lugar do item na
 // demonstração ("Ver na tela"). A Central (central/fonte/09_demonstracoes.js) tem a mesma lista de títulos: o
 // verificar_site.mjs confere que as duas batem.
 window.DEMO_ITENS = [
@@ -52,5 +52,11 @@ window.DEMO_ITENS = [
   { n: 48, t: 'Fluxogramas', d: 'Os caminhos da informação desenhados: do registro à ação, aplicação, metas, consultas e recados.', onde: ['manual', 'fluxos'] },
   { n: 49, t: 'Ajuda pela IA', d: 'O assistente do app responde dúvidas de uso a partir do manual, com o passo a passo e o botão para abrir a tela.', onde: ['app', 'assistente'] },
   { n: 50, t: 'Primeiro acesso guiado no app', d: 'Na primeira vez, balões mostram as partes do app. O "?" no topo mostra de novo.', onde: ['app', 'tutorial'] },
-  { n: 51, t: 'Primeiro acesso guiado na central', d: 'Na primeira vez, balões mostram as partes da central. O "?" no topo mostra de novo.', onde: ['central', 'tutorial'] }
+  { n: 51, t: 'Primeiro acesso guiado na central', d: 'Na primeira vez, balões mostram as partes da central. O "?" no topo mostra de novo.', onde: ['central', 'tutorial'] },
+  { n: 52, t: 'IA do paciente (personal)', d: 'Cobra com tato (manhã, proteína, água, aplicação, dias sem registro, parabéns), no horário e na intensidade que o paciente escolhe, e tira dúvidas pelas orientações da equipe. Nunca diagnostica, prescreve ou fala de dose; um sinal de alerta vai para a enfermagem.', onde: ['app', 'personal'], juridico: true },
+  { n: 53, t: 'Personal no WhatsApp', d: 'O paciente escolhe receber o personal no WhatsApp, com consentimento, e para quando quiser respondendo SAIR.', onde: ['app', 'whatsapp'], juridico: true },
+  { n: 54, t: 'IA da central', d: 'Um assistente ao lado, em qualquer tela, que responde sobre um paciente ou todos, sempre com de onde veio e o link para a ficha. Dose e prescrição ficam com o médico.', onde: ['central', 'assistente-central'] },
+  { n: 55, t: 'Ações pela IA com confirmação', d: 'A IA da central muda metas, manda recado, marca como visto, liga e desliga funções e configura a IA do paciente, sempre mostrando o antes e o depois e pedindo "Confirmar".', onde: ['central', 'assistente-central'] },
+  { n: 56, t: 'Registro da IA', d: 'Tudo o que as IAs responderam e fizeram, com quem pediu e o antes e o depois.', onde: ['central', 'registro-ia'] },
+  { n: 57, t: 'Consumo de IA', d: 'Créditos de IA por mês, por função, equipe e pacientes, quem mais usa e os meses anteriores; teto com avisos em 80% e 100%. Cobrado à parte, pelo uso.', onde: ['central', 'consumo'] }
 ];
