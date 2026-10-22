@@ -142,7 +142,7 @@
       passos: ['Escreva a mensagem.', 'Toque em "Enviar".'], dados: ['Mensagens do paciente e da equipe.'], outroLado: 'A mensagem vira um item na ficha (sem o texto).',
       porque: 'Dúvida resolvida com quem acompanha.', itens: [34], palavras: 'chat conversa mensagem enfermagem equipe falar', elementos: [e('campo', 'Mensagem', ''), e('botão', 'Enviar', '')], estados: [] },
     { tela: 'assistente', titulo: 'Assistente de dúvidas', para: 'Paciente', oque: 'Responde dúvidas de uso do app (a partir deste manual) e orienta a partir das orientações da equipe. Não diagnostica nem receita.',
-      passos: ['Escreva a dúvida (ex.: "como registro a água?").', 'Toque em "Enviar": a resposta traz os passos e a tela.'], dados: ['Este manual e as orientações da equipe.'], outroLado: 'A pergunta entra no registro de uso da demonstração.',
+      passos: ['Escreva a dúvida (ex.: "como registro a água?").', 'Toque em "Enviar": a resposta traz os passos e a tela.'], dados: ['Este manual e as orientações da equipe.'], outroLado: 'A pergunta e a resposta entram no Registro da IA, na central, e gastam créditos de IA (Consumo de IA).',
       porque: 'Ajuda na hora, sem esperar a equipe.', itens: [36, 49], palavras: 'assistente dúvida ajuda pergunta ia', elementos: [e('campo', 'Mensagem', ''), e('botão', 'Enviar', '')], estados: [] },
     { tela: 'conquistas', titulo: 'Conquistas', para: 'Paciente', oque: 'Os dias com registro, a meta de água e as aplicações, com a regra dos pontos.',
       passos: ['Abra pelo cartão "Pontos de hoje".'], dados: ['Calculado dos registros.'], outroLado: 'Os pontos não vão para a central.', porque: 'Motivação.', itens: [35], palavras: 'conquista pontos medalha',
@@ -201,7 +201,7 @@
       elementos: [e('campo', 'Paciente', ''), e('campo', 'Calorias, Proteína, Água', 'Números inteiros.'), e('campo', 'Plano alimentar', ''), e('botão', 'Enviar ao app', ''), e('cartão', 'Como aparece no app', '')], estados: [s('erro', 'Metas fora do plausível: "Confira as metas".')] },
     { tela: 'aplicacoes', titulo: 'Aplicações (prescrições)', para: 'Médico e enfermagem', oque: 'As prescrições cadastradas e a conferência da enfermagem antes de aparecer no app. Nenhum número de dose na demonstração.',
       passos: ['Veja as prescrições esperando a conferência.', 'Toque em "Conferir".', 'Para cadastrar, escolha o paciente e toque em "Cadastrar prescrição" (os campos ficam travados na demonstração).'],
-      dados: ['Prescrições cadastradas pela equipe.'], outroLado: 'Conferida, a prescrição aparece no app como "conferida pela enfermeira … hoje".', porque: 'Dupla checagem antes de chegar ao paciente.', itens: [44], palavras: 'prescrição conferir enfermagem aplicação cadastrar',
+      dados: ['Prescrições cadastradas pelo médico.'], outroLado: 'Conferida, a prescrição aparece no app como "conferida pela enfermeira … hoje".', porque: 'Dupla checagem antes de chegar ao paciente.', itens: [44], palavras: 'prescrição conferir enfermagem aplicação cadastrar',
       elementos: [e('lista', 'Prescrições', 'Paciente, tipo, quando e o estado.'), e('botão', 'Conferir', ''), e('campo', 'Cadastrar prescrição', 'Paciente e campos travados.')], estados: [s('pronto', '"Conferida hoje, às …".')] },
     { tela: 'avisos', titulo: 'Avisos e conteúdo', para: 'Recepção e equipe', oque: 'Recados para um paciente, um grupo ou todos, e o conteúdo da clínica.',
       passos: ['Escolha para quem.', 'Escreva o recado.', 'Toque em "Enviar recado".'], dados: ['Recados enviados e o conteúdo da clínica.'],
@@ -218,7 +218,7 @@
       outroLado: 'A mudança confirmada aparece no app na hora (metas, recado, funções, personal) e entra no Registro da IA. Cada pergunta gasta créditos de "IA da central".',
       porque: 'Achar quem precisa de atenção e fazer o de rotina sem procurar tela por tela, sem perder o controle (nada muda sem confirmar).',
       itens: [54, 55], palavras: 'assistente ia central copiloto pergunta confirmar mudar meta recado visto funcao',
-      elementos: [e('botão', 'Assistente', 'No topo da central, em qualquer tela.'), e('lista', 'Perguntas prontas', ''), e('cartão', 'Resposta', 'Texto, pacientes com "Ficha" e "De onde veio".'), e('cartão', 'Mudança proposta', 'Antes, depois, o que acontece no app, Confirmar e Cancelar.'), e('aviso', 'Créditos de IA no mês', 'Sobe a cada pergunta.')],
+      elementos: [e('botão', 'Assistente', 'No topo da central, em qualquer tela.'), e('lista', 'Perguntas prontas', ''), e('cartão', 'Resposta', 'Texto, pacientes com "Ficha" e "De onde veio".'), e('cartão', 'Mudança proposta', 'Antes, depois, o que acontece no app, Confirmar e Cancelar.'), e('aviso', 'Créditos de IA no mês', 'Logo acima do campo de digitar; sobe a cada pergunta.')],
       estados: [s('vazio', 'Sem pergunta: só as perguntas prontas.'), s('erro', 'Pedido de dose: "Isso é decisão sua; abra a prescrição".'), s('erro', 'Teto atingido com "pausar": avisa que está pausada.')] },
     { tela: 'ia', titulo: 'IA do paciente (configuração)', para: 'Médico',
       oque: 'O que a IA do paciente cobra (7 assuntos) e o tom (acolhedor, direto ou animado), para todos ou para um paciente, com um exemplo de como a mensagem chega. Depende de parecer jurídico.',
@@ -228,7 +228,7 @@
       elementos: [e('campo', 'Para quem', 'Todos ou um paciente (os com configuração própria aparecem marcados).'), e('interruptor', 'Assuntos', '7, um por lembrete.'), e('campo', 'Tom', ''), e('aviso', 'Exemplo', 'A mensagem de proteína no tom escolhido.'), e('botão', 'Salvar e enviar ao app', '')],
       estados: [] },
     { tela: 'consumo', titulo: 'Consumo de IA', para: 'Médico e gestão da clínica',
-      oque: 'Quanto as IAs usaram, em créditos de IA (nunca em reais): o mês atual contra o teto, por função, equipe e pacientes, quem mais usa e os meses anteriores. Avisos em 80% e 100%; ao chegar no teto, pausar ou continuar. Os créditos são cobrados à parte, pelo uso, junto com a mensalidade.',
+      oque: 'Quanto as IAs usaram, em créditos de IA: o mês atual contra o teto, por função, equipe e pacientes, quem mais usa e os meses anteriores. Avisos em 80% e 100%; ao chegar no teto, pausar ou continuar. Os créditos são cobrados à parte, pelo uso, junto com a mensalidade.',
       passos: ['Abra a aba IA › Consumo.', 'Veja o mês contra o teto (a marca é o aviso de 80%).', 'Escolha o teto mensal e o que fazer ao chegar nele.'],
       dados: ['Cada uso das IAs: pergunta no app (2), mensagem no WhatsApp (3), foto do prato (5), pergunta à IA da central (4), resumo (6).'],
       outroLado: 'Os números sobem quando alguém usa as IAs, no app ou na central. Os avisos entram no Registro da IA.',
@@ -265,8 +265,8 @@
       { lado: 'pessoa', texto: 'A enfermagem confere', parte: 'central', tela: 'aplicacoes', seta: 'antes de ir ao app' },
       { lado: 'app', texto: 'O app mostra a prescrição travada, com quem conferiu e quando', parte: 'app', tela: 'aplicacoes' },
       { lado: 'app', texto: 'O paciente registra a aplicação: local (rodízio) e como se sentiu', parte: 'app', tela: 'aplicacoes' },
-      { lado: 'regra', texto: 'Sintoma marcado pela clínica (enjoo forte)?', parte: 'central', tela: 'hoje', seta: 'se sim' },
-      { lado: 'central', texto: 'Alerta na triagem e aviso à enfermagem', parte: 'central', tela: 'hoje' },
+      { lado: 'regra', texto: 'Sintoma marcado pela clínica (enjoo forte)?', parte: 'central', tela: 'hoje', seta: 'na hora' },
+      { lado: 'central', texto: 'Alerta na triagem e aviso à enfermagem', parte: 'central', tela: 'hoje', seta: 'se sim' },
       { lado: 'pessoa', texto: 'A enfermagem liga para o paciente', parte: 'central', tela: 'ficha' }] },
     { id: 'metas', titulo: 'Metas e plano', resumo: 'A meta da equipe vira o anel do paciente e volta como dado.', etapas: [
       { lado: 'central', texto: 'A nutricionista (ou o médico) define as metas e o plano', parte: 'central', tela: 'metas' },
@@ -287,8 +287,8 @@
       { lado: 'central', texto: 'O médico escolhe o que a IA cobra e o tom (todos ou um paciente)', parte: 'central', tela: 'ia' },
       { lado: 'app', texto: 'O paciente escolhe silêncio, intensidade, pausa e canal (app ou WhatsApp, com consentimento)', parte: 'app', tela: 'personal' },
       { lado: 'ia', texto: 'A IA manda o lembrete na hora certa e responde dúvidas, com a origem', parte: 'app', tela: 'personal', seta: 'fora do silêncio' },
-      { lado: 'regra', texto: 'Sinal de alerta na conversa?', parte: 'app', tela: 'personal', seta: 'se sim' },
-      { lado: 'central', texto: 'Enfermagem avisada e o paciente na triagem, com o porquê', parte: 'central', tela: 'hoje' },
+      { lado: 'regra', texto: 'Sinal de alerta na conversa?', parte: 'app', tela: 'personal' },
+      { lado: 'central', texto: 'Enfermagem avisada e o paciente na triagem, com o porquê', parte: 'central', tela: 'hoje', seta: 'se sim, na hora' },
       { lado: 'central', texto: 'Tudo no Registro da IA e no Consumo', parte: 'central', tela: 'registro-ia' }] },
     { id: 'ia-central', titulo: 'IA da central com confirmação', resumo: 'Pergunta, resposta com a origem e mudança só depois do "Confirmar".', etapas: [
       { lado: 'pessoa', texto: 'O médico pergunta ou pede uma mudança no Assistente', parte: 'central', tela: 'assistente-central' },
@@ -302,7 +302,7 @@
       { lado: 'central', texto: 'Uso pela equipe: assistente da central e resumos', parte: 'central', tela: 'assistente-central' },
       { lado: 'ia', texto: 'Cada uso soma créditos por função, por paciente e no mês', parte: 'central', tela: 'consumo' },
       { lado: 'regra', texto: '80% do teto: aviso. 100%: pausa ou continua, como a clínica escolheu', parte: 'central', tela: 'consumo' },
-      { lado: 'pessoa', texto: 'Cobrado à parte, pelo uso, junto com a mensalidade', parte: 'central', tela: 'consumo' }] }
+      { lado: 'pessoa', texto: 'A clínica acompanha o mês e muda o teto quando quiser', parte: 'central', tela: 'consumo' }] }
   ];
 
   // Tutorial de primeiro acesso (balões). alvo: seletor dentro do produto; o primeiro que existir na tela.

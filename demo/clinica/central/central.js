@@ -109,7 +109,7 @@
       const pac = el('select', { class: 'entrada', id: 'presc-paciente' }, M.pacientes.map(p => el('option', { value: p.nome, text: p.nome })));
       const travado = (rot, t) => el('li', { class: 'campo-travado' }, el('span', { class: 'rot', text: rot }), el('span', { class: 'travado' }, ic('cadeado', 'p'), t));
       return [el('div', { class: 'duas-colunas' },
-        cartao('Prescrição das aplicações', 44, el('p', { class: 'mudo peq', text: 'A equipe cadastra o que o médico prescreveu. A enfermagem confere antes de aparecer no app. O app não calcula nem muda dose.' }),
+        cartao('Prescrição das aplicações', 44, el('p', { class: 'mudo peq', text: 'O médico cadastra a prescrição. A enfermagem confere antes de aparecer no app. O app não calcula nem muda dose.' }),
           el('ul', { class: 'lista-pac' }, M.prescricoes.map(x => el('li', {}, el('div', { class: 'linha-pac' }, el('span', { class: 'avatar', 'aria-hidden': 'true', text: DEMO.iniciais(nomeDe(x.paciente)) }),
             el('span', { class: 'cresce' }, el('span', { class: 't1', text: nomeDe(x.paciente) }), el('span', { class: 't2', text: x.tipo + ' · cadastrada ' + M.quando(x.cadastrada) + ' · 1 vez por semana' })),
             x.conferida ? el('span', { class: 'estado-tag ok' }, ic('check', 'p'), 'Conferida ' + M.quando(x.conferida)) : el('span', { class: 'linha-h acoes-presc' }, el('span', { class: 'estado-tag atencao' }, ic('relogio', 'p'), 'Esperando a conferência'),
@@ -205,7 +205,7 @@
       cartao('Consumo de IA', 57, el('p', { class: 'mudo peq', text: 'Em créditos de IA. Cada uso gasta créditos: uma pergunta ao app 2, uma mensagem no WhatsApp 3, uma foto do prato 5, uma pergunta à IA da central 4, um resumo 6.' }),
         el('div', { class: 'consumo-mes ' + nivel }, el('span', { class: 'rot', text: 'Este mês' }), el('strong', { class: 'numero', text: M.inteiro(t) }), el('span', { class: 'mudo', text: ' de ' + cred(c.teto) + ' (' + M.fmt(pct, 1) + '%)' }),
           el('span', { class: 'mini-barra larga teto', role: 'img', 'aria-label': M.fmt(pct, 1) + '% do teto' }, prog, el('b', { class: 'marca-80', 'aria-hidden': 'true' }))),
-        nivel !== 'ok' ? el('p', { class: 'aviso ' + (nivel === 'alerta' ? 'alerta' : 'atencao') + ' peq', role: 'status' }, ic('alerta', 'p'), nivel === 'alerta' ? (c.pausada ? 'Teto do mês atingido: as IAs estão pausadas. Escolha "Continuar" ou aumente o teto.' : 'Teto do mês atingido: as IAs continuam e o excedente entra na cobrança do mês.') : 'Aviso de 80%: o consumo passou de 80% do teto do mês.') : null,
+        nivel !== 'ok' ? el('p', { class: 'aviso ' + (nivel === 'alerta' ? 'alerta' : 'atencao') + ' peq', role: 'status' }, ic('alerta', 'p'), nivel === 'alerta' ? (c.pausada ? 'Teto do mês atingido: as IAs estão pausadas. Escolha "Continuar" ou aumente o teto.' : 'Teto do mês atingido: as IAs continuam, e o uso acima do teto também conta no mês.') : 'Aviso de 80%: o consumo passou de 80% do teto do mês.') : null,
         el('p', { class: 'peq', text: 'Os créditos de IA são cobrados à parte, pelo uso, junto com a mensalidade.' })),
       cartao('Por função', null, el('ul', { class: 'lista-barras' }, f.map(([k, n, quem]) => barraH(n, c.porFuncao[k], max, quem === 'equipe' ? 'equipe' : 'pacientes')))),
       cartao('Equipe e pacientes', null, el('div', { class: 'kpis' }, kpi('Pacientes', M.inteiro(pac), 'app, WhatsApp e foto'), kpi('Equipe', M.inteiro(equipe), 'IA da central e resumos'))),
@@ -234,7 +234,8 @@
     const medir = () => { medidor.textContent = 'Créditos de IA no mês: ' + M.inteiro(I.total()) + ' de ' + M.inteiro(I.consumo.teto) + (I.consumo.pausada ? ' · pausadas no teto' : ''); };
     const ir = (tela, parte) => { f.fechar(() => { if (parte === 'app') { location.href = DEMO.link('app', { tela }); return; } if (tela === 'ficha') abrirFicha(1); else irAba(tela); }); };
     function resposta(r) {
-      const b = el('div', { class: 'bolha outro resposta-ia' }, el('span', { text: r.texto }), r.passos ? el('ol', { class: 'passos-ia' }, r.passos.map(x => el('li', { text: x }))) : null);
+      const b = el('div', { class: 'bolha outro resposta-ia' }, el('span', { text: r.texto }), r.passos ? el('ol', { class: 'passos-ia' }, r.passos.map(x => el('li', { text: x }))) : null,
+        r.topicos ? el('dl', { class: 'topicos-ia' }, r.topicos.map(([k, v]) => el('div', {}, el('dt', { text: k }), el('dd', { text: v })))) : null);
       if (r.lista && r.lista.length) b.append(el('ul', { class: 'lista-ia' }, r.lista.map(x => el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: x.nome }), el('br'), el('span', { class: 'mini mudo', text: x.detalhe })),
         el('button', { type: 'button', class: 'botao sec pilula', 'aria-label': 'Abrir a ficha de ' + x.nome, onclick: () => f.fechar(() => abrirFicha(x.id)) }, 'Ficha')))));
       if (r.acao) {
@@ -255,16 +256,19 @@
       est.copiloto.push(['eu', t]); conversa.append(el('div', { class: 'bolha eu', text: t }));
       DEMO.evento('pergunta', { chat: 'central', texto: t.slice(0, 300) });
       const r = I.responderCentral(t); est.copiloto.push(['ia', r]); conversa.append(resposta(r)); medir();
-      setTimeout(() => conversa.lastChild && conversa.lastChild.scrollIntoView({ block: 'nearest' }), 30);
+      // Rola só a folha (nunca a página), até a pergunta e o começo da resposta: a resposta longa é lida de cima, e o campo e os créditos ficam no lugar.
+      setTimeout(() => { const u = conversa.lastChild && (conversa.lastChild.previousSibling || conversa.lastChild), c = conversa.closest('.corpo-folha'); if (u && c) c.scrollTop += u.getBoundingClientRect().top - c.getBoundingClientRect().top - 12; }, 30);
     };
     est.copiloto.forEach(([q, x]) => conversa.append(q === 'eu' ? el('div', { class: 'bolha eu', text: x }) : resposta(x)));
-    const campo = el('input', { class: 'entrada', id: 'msg-central', maxlength: '300', autocomplete: 'off', placeholder: 'Pergunte ou peça uma mudança', 'aria-label': 'Pergunta para o assistente' });
+    const campo = el('input', { class: 'entrada', id: 'msg-central', maxlength: '300', autocomplete: 'off', placeholder: 'Pergunte ou peça', 'aria-label': 'Pergunta para o assistente' });
     medir();
     const f = DEMO.folha({ titulo: 'Assistente da central', lateral: true, foco: '#msg-central', conteudo: [
       el('p', { class: 'mudo peq', text: 'Responde sobre um paciente ou todos, sempre com de onde veio. Mudanças só depois do "Confirmar". Não decide dose nem tratamento.' }), item(54),
       el('div', { class: 'sugestoes', role: 'group', 'aria-label': 'Perguntas prontas' }, I.SUGESTOES_CENTRAL.map(q => el('button', { type: 'button', class: 'botao sec pilula', onclick: () => perguntar(q) }, q))),
-      conversa, medidor,
-      el('form', { class: 'enviar-msg', onsubmit: e => { e.preventDefault(); const t = campo.value.trim(); if (t) { campo.value = ''; perguntar(t); } } }, campo, el('button', { class: 'botao', type: 'submit' }, ic('enviar', 'p'), 'Enviar'))] });
+      conversa,
+      // A linha dos créditos fica presa ao campo de digitar (acima dele), para nunca ficar escondida atrás dele.
+      el('div', { class: 'rodape-ia' }, medidor,
+        el('form', { class: 'enviar-msg', onsubmit: e => { e.preventDefault(); const t = campo.value.trim(); if (t) { campo.value = ''; perguntar(t); } } }, campo, el('button', { class: 'botao', type: 'submit' }, ic('enviar', 'p'), 'Enviar')))] });
     DEMO.tela('assistente-central');
   }
   function kpi(r, v, sub) { return el('div', { class: 'kpi' }, el('span', { class: 'rot', text: r }), el('strong', { class: 'numero', text: v }), sub ? el('span', { class: 'mini mudo', text: sub }) : null); }
@@ -317,7 +321,7 @@
           p.id === 1 ? [el('dt', { text: 'Aplicação' }), el('dd', { text: 'Última ' + M.quando(M.aplicacao(p).ultima.quando) + ' (' + M.aplicacao(p).ultima.local.toLowerCase() + '); próxima ' + M.quando(M.aplicacao(p).proxima) })] : null,
           el('dt', { text: 'Próxima consulta' }), el('dd', { text: cons ? maiuscula(M.quando(cons.quando)) + ' · ' + cons.tipo.toLowerCase() + ' · ' + cons.modo + (cons.presenca && p.id === 1 ? ' · presença confirmada pelo app' : '') : 'Sem consulta marcada' }))),
       cartao('Evolução do peso', 42, grafico(p), p.bio ? tabelaBio(p) : null,
-        origem(p.faixaPeso ? 'Faixa da meta: ' + p.faixaPeso[0] + ' a ' + p.faixaPeso[1] + ' kg (definida ' + M.dia(p.faixaEm) + '). Pontos com borda: medidos na clínica.' : 'Pesagens semanais registradas pelo paciente; a primeira foi medida na clínica.')),
+        origem(p.faixaPeso ? 'Faixa da meta: ' + p.faixaPeso[0] + ' a ' + p.faixaPeso[1] + ' kg (definida por ' + M.medico() + ' ' + M.dia(p.faixaEm) + '). Pontos com borda: medidos na clínica.' : 'Pesagens semanais registradas pelo paciente; a primeira foi medida na clínica.')),
       cartao('Ficha do app', 41, Object.entries(dias).map(([dia, itens]) => el('div', { class: 'dia-tempo' }, el('p', { class: 'sobretitulo', text: dia }),
         el('ol', { class: 'tempo' }, itens.map(x => el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic(x.icone, 'p')),
           el('span', { class: 'cresce' }, el('span', { class: 't1', text: x.titulo }), el('span', { class: 't2', text: x.detalhe + ' · ' + (ORIGEM[x.origem] || x.origem) })), el('time', { class: 'mudo peq tab', text: M.hora(x.quando) })))))))];

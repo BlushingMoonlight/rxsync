@@ -252,8 +252,8 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.getByRole('button', { name: 'Enviar ao app' }).click();
   ok(/Enviado ao app de Beatriz Lima/.test(await textoMain()), 'central metas: "Enviado ao app de Beatriz Lima"');
   await telaCentral('aplicacoes');
-  await page.getByRole('button', { name: 'Conferir a prescrição de Beatriz Lima' }).click();
-  ok(await page.getByRole('button', { name: 'Conferir a prescrição de Beatriz Lima' }).count() === 0, 'central aplicações: conferir muda para "Conferida"');
+  await page.getByRole('button', { name: 'Conferir a prescrição de Paulo Henrique' }).click();
+  ok(await page.getByRole('button', { name: 'Conferir a prescrição de Paulo Henrique' }).count() === 0, 'central aplicações: conferir muda para "Conferida"');
   await page.selectOption('#presc-paciente', 'Carlos Souza'); await page.getByRole('button', { name: 'Cadastrar prescrição' }).click();
   ok(await page.getByRole('button', { name: 'Conferir a prescrição de Carlos Souza' }).count() === 1, 'central aplicações: a prescrição nova aparece "esperando a conferência"');
   ok(!/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg)\b/.test(await textoMain()), 'central aplicações: nenhum número de dose');
@@ -429,6 +429,18 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(await modelo(() => window.DEMO_IA.total()) === total0 + 4, 'consumo: uma pergunta à IA da central soma 4 créditos');
   r = await perguntarCentral('Como está a Mariana?');
   ok(/Mariana Alves/.test(await r.innerText()) && /De onde veio: ficha do paciente/.test(await r.innerText()), 'IA da central: "como está a Mariana?" com a origem');
+  // Revisão: sobre um paciente, a resposta vem em tópicos curtos (não num parágrafo), com os números da ficha.
+  const topicos = await r.locator('.topicos-ia dt').allInnerTexts();
+  ok(JSON.stringify(topicos) === JSON.stringify(['Estado', 'Peso', 'Adesão', 'Hoje', 'Próximos']), `IA da central: "como está a Mariana?" em tópicos (${topicos.join(', ')})`);
+  const fichaM = await modelo(() => { const M = window.DEMO_MODELO, m = M.mariana; return { kg: M.fmt(M.pesoAtual(m).kg, 1), d7: M.dias7(m), prot: M.media7(m, 'prot') }; });
+  const txtM = await r.innerText();
+  ok(txtM.includes(fichaM.kg + ' kg') && txtM.includes(fichaM.d7 + ' de 7 dias') && txtM.includes('média de ' + fichaM.prot), 'IA da central: os números da resposta são os da ficha');
+  // Revisão: a linha dos créditos fica inteira à vista, acima do campo de digitar (nunca atrás dele), mesmo com a conversa longa.
+  for (let k = 0; k < 3; k++) await perguntarCentral('Como está a Beatriz?');
+  await page.waitForFunction(() => !document.getAnimations().some(a => a.playState === 'running'));   // a folha termina de subir
+  const caixas = await page.evaluate(() => { const b = e => e.getBoundingClientRect(), m = b(document.querySelector('.medidor-ia')), f = b(document.querySelector('.folha .enviar-msg'));
+    return { m: [m.top, m.bottom], f: [f.top, f.bottom], alto: innerHeight, texto: document.querySelector('.medidor-ia').textContent }; });
+  ok(caixas.m[1] <= caixas.f[0] + 0.5 && caixas.m[0] >= 0 && caixas.m[1] <= caixas.alto && /Créditos de IA no mês: [\d.]+ de [\d.]+/.test(caixas.texto), `assistente: a linha dos créditos aparece inteira, acima do campo (${JSON.stringify(caixas)})`);
   r = await perguntarCentral('Média de perda de peso do mês');
   ok(/Variação média de peso nos últimos 30 dias/.test(await r.innerText()), 'IA da central: média de perda de peso do mês');
   r = await perguntarCentral('Quem está abaixo da meta de proteína?');
@@ -521,7 +533,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
 }
 // Horários relativos: a demonstração aberta às 0h30, às 7h e às 23h. Nada de madrugada (antes das 6h) nem no futuro, e o
 // texto bate com a hora (a Beatriz relatou o enjoo forte ontem às 14h, depois da aplicação de ontem às 8h).
-for (const [h, m] of [[0, 30], [7, 0], [23, 0]]) {
+for (const [h, m] of [[0, 30], [7, 0], [7, 50], [13, 0], [23, 0]]) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); const page = await ctx.newPage(); const erros = [];
   page.on('pageerror', e => erros.push(String(e)));
   const agora = new Date(); agora.setHours(h, m, 0, 0);
@@ -545,6 +557,18 @@ for (const [h, m] of [[0, 30], [7, 0], [23, 0]]) {
     M.recados.forEach(x => conferir('recado', x.quando)); M.prescricoes.forEach(x => { conferir('prescrição', x.cadastrada); conferir('conferência', x.conferida); });
     M.mariana.aplicacoes.forEach(a => { conferir('aplicação da Mariana', a.quando); if (a.quando.getHours() !== 8) ruins.push('aplicação da Mariana fora das 8h'); });
     window.DEMO_IA.registro.forEach(x => conferir('registro da IA', x.quando));
+    // Revisão: cada lembrete do registro na hora do tema (check-in às 8h, água às 15h), como no personal.
+    window.DEMO_IA.registro.forEach(x => { const hr = new Date(x.quando).getHours(); if (/Check-in/.test(x.texto) && hr !== 8) ruins.push('check-in da manhã às ' + hr + 'h'); if (/água/.test(x.texto) && x.tipo === 'lembrete' && hr !== 15) ruins.push('lembrete de água às ' + hr + 'h'); });
+    // O plano do personal: véspera só se a aplicação é amanhã; "como se sentiu" só até o dia seguinte à aplicação.
+    const ap = M.aplicacao(M.mariana), plano = window.DEMO_IA.planoHoje().map(x => x.tema);
+    if (plano.includes('vespera') !== (M.diasAtras(ap.proxima) === -1)) ruins.push('véspera da aplicação fora da véspera');
+    if (plano.includes('posAplicacao') && M.diasAtras(ap.ultima.quando) > 1) ruins.push('"como se sentiu depois da aplicação" ' + M.diasAtras(ap.ultima.quando) + ' dias depois');
+    // O consumo de hoje dos outros pacientes cabe na hora do último registro (ninguém com o dia inteiro comido às 7h40).
+    for (const p of M.pacientes) { const c = M.consumoHoje(p), u = M.ultimoRegistro(p), h = u.getHours() + u.getMinutes() / 60;
+      if (u >= new Date(new Date(agora).setHours(0, 0, 0, 0)) && h < 10 && c.kcal > p.metas.kcal * 0.4) ruins.push(p.nome + ': ' + c.kcal + ' kcal até as ' + M.hora(u)); }
+    // A primeira prescrição é de quem ainda não aplica; o título da triagem diz os mesmos dias do texto.
+    M.prescricoes.filter(x => /Primeira/.test(x.tipo)).forEach(x => { const p = M.pac(x.paciente); if (p.aplicacoes || (p.sintoma && p.sintoma.aplicacao)) ruins.push(p.nome + ': primeira prescrição de quem já aplica'); });
+    for (const p of M.pacientes) { const e = M.estado(p), t = (e.titulo.match(/há (\d+) dias/) || [])[1], q = (e.porque.match(/Último registro há (\d+) dias/) || [])[1]; if (t && q && t !== q) ruins.push(p.nome + ': "' + e.titulo + '" e "há ' + q + ' dias"'); }
     const bea = M.estado(M.pac(3)).porque;
     return { ruins, bea };
   });
@@ -554,8 +578,33 @@ for (const [h, m] of [[0, 30], [7, 0], [23, 0]]) {
   const txt = await page.locator('#conteudo').innerText();
   const madrugada = (txt.match(/\b\d{1,2}h\d{0,2}\b/g) || []).filter(x => parseInt(x, 10) < 6);
   ok(!madrugada.length, `horários ${onde}: a central não mostra horário de madrugada (${madrugada.join(', ')})`);
+  // Revisão: o manual e os fluxogramas. "se sim" fica na seta que sai da pergunta (nunca na que chega nela); nenhum texto
+  // repetido ("com a nutricionista com a nutricionista").
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=consultas`); await page.waitForSelector('#conteudo h1, #conteudo h2');
+  const pal = (await page.locator('#conteudo').innerText()).toLowerCase().split(/\s+/), rep = [];
+  for (const n of [2, 3]) for (let i = 0; i + 2 * n <= pal.length; i++) if (pal.slice(i, i + n).join(' ') === pal.slice(i + n, i + 2 * n).join(' ')) rep.push(pal.slice(i, i + n).join(' '));
+  ok(!rep.length, `horários ${onde}: texto repetido nas consultas (${rep.join('; ')})`);
   ok(!erros.length, `horários ${onde}: erro: ${erros.join(' | ')}`);
   await ctx.close();
+}
+// Assistente no iPad e no computador (folha ao lado): a folha cabe na tela, e a linha dos créditos e o campo ficam à vista.
+for (const vp of [{ width: 820, height: 1180 }, { width: 1440, height: 900 }]) {
+  const ctx = await browser.newContext({ viewport: vp }); const page = await ctx.newPage();
+  await page.addInitScript(() => { try { localStorage.setItem('demo_aviso_visto', '1'); } catch (e) {} });
+  await page.route(N8N, simular([])); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.request().url().startsWith(N8N) ? r.fallback() : r.abort());
+  await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=assistente-central`); await page.waitForSelector('#msg-central');
+  for (const q of ['Quem não registrou há 3 dias?', 'Como está a Mariana?', 'Como está a Beatriz?', 'Como está o João?']) {
+    const n = await page.locator('.resposta-ia').count(); await page.fill('#msg-central', q); await page.keyboard.press('Enter'); await page.waitForFunction(n => document.querySelectorAll('.resposta-ia').length > n, n); }
+  await page.waitForFunction(() => !document.getAnimations().some(a => a.playState === 'running'));
+  const c = await page.evaluate(() => { const b = s => document.querySelector(s).getBoundingClientRect(), m = b('.medidor-ia'), f = b('.folha .enviar-msg'), fo = b('.folha'); return { m: m.top, mb: m.bottom, f: f.top, fb: f.bottom, folha: fo.bottom, alto: innerHeight }; });
+  ok(c.mb <= c.f + 0.5 && c.fb <= c.alto && c.folha <= c.alto + 1, `assistente ${vp.width} px: a folha cabe na tela, com os créditos acima do campo (${JSON.stringify(c)})`);
+  await ctx.close();
+}
+// Fluxogramas: "se sim" fica na seta que sai da pergunta (a etapa seguinte), nunca na que chega nela.
+{
+  const janela = {}; new Function('window', fs.readFileSync('demo/clinica/comum/manual.js', 'utf8'))(janela);
+  const ruinsF = janela.DEMO_MANUAL.FLUXOS.flatMap(f => f.etapas.filter(e => /\?$/.test(e.texto) && /^se /.test(e.seta || '')).map(e => f.titulo + ': ' + e.texto));
+  ok(!ruinsF.length, `fluxogramas: "se sim" na seta que chega na pergunta (${ruinsF.join('; ')})`);
 }
 await browser.close(); site.fechar();
 console.log(`${fotos} fotos. ` + (falhas ? falhas + ' falha(s).' : 'Tudo certo: celular de 360 a 430 px, iPad e computador; escopo, chat, coerência entre o app e a central, inativo e fora do ar.'));

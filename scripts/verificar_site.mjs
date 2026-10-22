@@ -198,7 +198,9 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     [/\bAndr[ée](?![a-zà-ÿ])/i, 'André'], [/\bPontes\b/, 'Pontes'], [/Gon[çc]alves/i, 'Gonçalves'], [/Melhor Vers[ãa]o/i, '"Melhor Versão"'], [/Evoluir/i, 'Evoluir'], [/drandre/i, 'drandre'], [/\bAG\./, 'AG.'],
     [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone'],
     // Rodada de melhoria: nenhum beco sem saída (todo botão mostra um resultado) e ícones em SVG, não emojis.
-    [/nada (é|e) guardado/i, '"nada é guardado" (todo botão mostra um resultado simulado)'], [/\p{Extended_Pictographic}/u, 'emoji (use os ícones de comum/icones.js)']];
+    [/nada (é|e) guardado/i, '"nada é guardado" (todo botão mostra um resultado simulado)'],
+    // Revisão da demonstração: cobrança dita de um jeito estranho para o médico (o consumo fala só em créditos de IA).
+    [/nunca em reais|\bexcedente\b|entra na cobran[çc]a/i, 'texto de cobrança estranho para o médico (fale só em créditos de IA)'], [/\p{Extended_Pictographic}/u, 'emoji (use os ícones de comum/icones.js)']];
   // Única exceção: a frase do consumo de IA, sem valor ("cobrados à parte, pelo uso, junto com a mensalidade"; PR da IA).
   const FRASE_CONSUMO = /cobrad[oa]s? à parte, pelo uso, junto com a mensalidade/gi;
   for (const f of arqs) {

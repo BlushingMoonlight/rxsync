@@ -356,7 +356,7 @@
       return [mensageiro(true), el('p', { class: 'mudo peq', text: 'Simulação: é assim que as mensagens chegam no WhatsApp do paciente (sem número e sem a marca do aplicativo).' })];
     },
     assistente: () => chat('ia', 36, 'Assistente de dúvidas', 'Pergunte como usar o app ou sobre as orientações da sua equipe.'),
-    conquistas: () => [cartao('Conquistas', 35, el('ul', { class: 'lista-simples' }, [['fogo', m.semana.comRegistro + ' de 7 dias com registro'], ['gota', 'Meta de água em ' + m.semana.agua.filter(v => v >= m.metas.agua).length + ' dos 7 dias anteriores'], ['medalha', 'Todas as aplicações registradas desde ' + M.ddmm(m.inicio)]].map(([i, t]) =>
+    conquistas: () => [cartao('Conquistas', 35, el('ul', { class: 'lista-simples' }, [['fogo', m.semana.comRegistro + ' de 7 dias com registro'], ['gota', 'Meta de água em ' + m.semana.agua.filter(v => v >= m.metas.agua).length + ' dos 7 dias anteriores'], ['medalha', 'Todas as aplicações registradas desde ' + M.ddmm(m.aplicacoes[0].quando)]].map(([i, t]) =>
       el('li', {}, caixaIc(i, 'peq'), el('span', { class: 'cresce', text: t })))), origem('Pontos de hoje: ' + M.pontos(m) + ' de 100. Refeição vale 5, cada copo de água 2, cada outro registro 5, cada remédio 2.'))],
     'meus-dados': () => { const r = el('div'); return [cartao('Meus dados', 37, el('p', { class: 'peq', text: 'Baixe o que você registrou ou peça a exclusão dos seus dados (LGPD).' }), r,
       el('div', { class: 'botoes' }, el('button', { type: 'button', class: 'botao', onclick: () => trocar(r, explica('No app de verdade, você recebe um arquivo com tudo o que registrou.')) }, 'Baixar meus dados'),

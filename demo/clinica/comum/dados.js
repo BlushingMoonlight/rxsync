@@ -39,6 +39,7 @@
   // fmt(76, 1) → "76,0" (kg sempre com uma casa); fmt(6.5) → "6,5"; fmt(20) → "20".
   const fmt = (v, casas) => (Math.round(v * 10) / 10).toLocaleString('pt-BR', { minimumFractionDigits: casas === 1 ? 1 : 0, maximumFractionDigits: 1 });
   const inteiro = v => Math.round(v).toLocaleString('pt-BR');
+  const maiuscula = t => t.charAt(0).toUpperCase() + t.slice(1);
   const sinal = (v, casas) => (v > 0 ? '+' : v < 0 ? '−' : '') + fmt(Math.abs(v), casas);
 
   // ---------------------------------------------------------------- equipe da clínica (o médico vem do link)
@@ -77,7 +78,7 @@
     semana: { prot: [96, 88, 102, 94, 85, 99, 91], kcal: [1480, 1390, 1550, 1460, 1320, 1510, 1430], agua: [2000, 1750, 2250, 1750, 2000, 1500, 2000], comRegistro: 7 },
     aplicacoes, proximoLocal: LOCAIS[aplicacoes.length % 6],
     prescricao: { cadastrada: CONSULTA_3, por: 'medico', conferida: em(INICIO + 85, 10), conferidaPor: EQUIPE.enf, renovacao: { cadastrada: hojeOuOntem(8, 0, 17, 30), conferida: null } },
-    consultas: [{ quando: RETORNO, com: 'medico', tipo: 'Retorno', modo: 'presencial', presenca: false }, { quando: em(34, 10), com: 'nutri', tipo: 'Avaliação com a nutricionista', modo: 'presencial', presenca: false }],
+    consultas: [{ quando: RETORNO, com: 'medico', tipo: 'Retorno', modo: 'presencial', presenca: false }, { quando: em(34, 10), com: 'nutri', tipo: 'Avaliação', modo: 'presencial', presenca: false }],
     sintoma: null, intestino3: false, protBaixa3: false, ultimo: null, linha: []
   };
   if (ja(6, 50)) mariana.registros.push({ chave: 'sono', titulo: 'Sono', valor: '7 a 8h · Bem', quando: em(0, 6, 50) });
@@ -87,27 +88,38 @@
   // dias7: dias com registro nos 7 dias anteriores a hoje. ultimo: o último registro (sempre de dia; ver recente()).
   // sintoma: o relato (horas depois da aplicação, que é sempre às 8h).
   // perda: kg por semana (positivo = perdeu); ultimaSemana: a variação da última semana, quando foge da média.
+  // perdaAntes: na manutenção, a perda por semana antes dela (a fase começou há 30 dias; desde então, perda pequena).
+  // ritmo: o consumo em relação às metas (calorias, proteína, água); o de hoje é proporcional à hora do último registro.
   const OUTROS = [
-    { id: 2, nome: 'João Pereira', fase: 'Manutenção', inicioDias: 203, p0: 96.2, perda: 0.2, dias7: 3, ultimo: em(-4, 19, 40), metas: [1800, 120, 2500], hoje: [0, 0, 0] },
-    { id: 3, nome: 'Beatriz Lima', fase: 'Perda de peso', inicioDias: 70, p0: 88.5, perda: 0.6, dias7: 6, ultimo: em(-1, 14, 5), metas: [1500, 100, 2000], hoje: [0, 0, 0], sintoma: { nome: 'Enjoo forte', quando: em(-1, 14, 0), aplicacao: em(-1, 8) } },
-    { id: 4, nome: 'Carlos Souza', fase: 'Início', inicioDias: 25, p0: 102.4, perda: 0.3, ultimaSemana: 0.2, dias7: 5, ultimo: recente(3), metas: [1800, 130, 2500], hoje: [620, 31, 750], protBaixa3: true },
-    { id: 5, nome: 'Fernanda Rocha', fase: 'Manutenção', inicioDias: 260, p0: 79.0, perda: 0.1, dias7: 7, ultimo: recente(2), metas: [1600, 100, 2000], hoje: [910, 58, 1250] },
-    { id: 6, nome: 'Ricardo Nunes', fase: 'Perda de peso', inicioDias: 98, p0: 110.0, perda: 0.7, dias7: 6, ultimo: em(-1, 19, 30), metas: [1900, 140, 2500], hoje: [0, 0, 0] },
-    { id: 7, nome: 'Luana Martins', fase: 'Perda de peso', inicioDias: 133, p0: 91.0, perda: 0.5, dias7: 7, ultimo: recente(4), metas: [1500, 105, 2000], hoje: [720, 47, 1000] },
-    { id: 8, nome: 'Paulo Henrique', fase: 'Início', inicioDias: 18, p0: 99.0, perda: 0.5, dias7: 4, ultimo: em(-2, 20, 10), metas: [1800, 120, 2500], hoje: [0, 0, 0], intestino3: true }
+    { id: 2, nome: 'João Pereira', fase: 'Manutenção', inicioDias: 203, p0: 96.2, perdaAntes: 0.5, perda: 0.1, dias7: 3, ultimo: em(-4, 19, 40), metas: [1800, 120, 2500] },
+    { id: 3, nome: 'Beatriz Lima', fase: 'Perda de peso', inicioDias: 70, p0: 88.5, perda: 0.6, dias7: 6, ultimo: em(-1, 14, 5), metas: [1500, 100, 2000], sintoma: { nome: 'Enjoo forte', quando: em(-1, 14, 0), aplicacao: em(-1, 8) } },
+    { id: 4, nome: 'Carlos Souza', fase: 'Início', inicioDias: 25, p0: 102.4, perda: 0.3, ultimaSemana: 0.2, dias7: 5, ultimo: recente(3), metas: [1800, 130, 2500], ritmo: [0.9, 0.6, 0.8], protBaixa3: true },
+    { id: 5, nome: 'Fernanda Rocha', fase: 'Manutenção', inicioDias: 260, p0: 79.0, perdaAntes: 0.35, perda: 0.05, dias7: 7, ultimo: recente(2), metas: [1600, 100, 2000] },
+    { id: 6, nome: 'Ricardo Nunes', fase: 'Perda de peso', inicioDias: 98, p0: 110.0, perda: 0.7, dias7: 6, ultimo: em(-1, 19, 30), metas: [1900, 140, 2500] },
+    { id: 7, nome: 'Luana Martins', fase: 'Perda de peso', inicioDias: 133, p0: 91.0, perda: 0.5, dias7: 7, ultimo: recente(4), metas: [1500, 105, 2000] },
+    { id: 8, nome: 'Paulo Henrique', fase: 'Início', inicioDias: 18, p0: 99.0, perda: 0.5, dias7: 4, ultimo: em(-2, 20, 10), metas: [1800, 120, 2500], intestino3: true }
   ];
   const RUIDO = [0, 0.2, -0.1, 0.1, -0.2, 0.1, 0, -0.1];
+  // O consumo de hoje até o último registro: o café vale cerca de 25% do dia, até o almoço 35%, depois do almoço 65%,
+  // o lanche da tarde 75% e o jantar o dia todo; a água vai somando das 7h às 21h. Sem registro hoje, é zero.
+  function consumoAte(o) {
+    if (o.ultimo < em(0)) return { kcal: 0, prot: 0, agua: 0 };
+    const h = o.ultimo.getHours() + o.ultimo.getMinutes() / 60, f = h < 10 ? 0.25 : h < 12.5 ? 0.35 : h < 16 ? 0.65 : h < 19 ? 0.75 : 1;
+    const r = o.ritmo || [0.92, 0.92, 0.85], fa = Math.min(1, Math.max(0.1, (h - 7) / 14));
+    return { kcal: Math.round(o.metas[0] * r[0] * f / 10) * 10, prot: Math.round(o.metas[1] * r[1] * f), agua: Math.round(o.metas[2] * r[2] * fa / 250) * 250 };
+  }
   const pacientes = [mariana].concat(OUTROS.map(o => {
     const n = Math.floor(o.inicioDias / 7), pes = [];
     // A última pesagem é de manhã (7h), no dia do último registro ou antes; as outras, de 7 em 7 dias para trás; a primeira, na clínica.
     const ultimo = o.ultimo, ultPes = new Date(ultimo); ultPes.setHours(7, 0, 0, 0); if (ultPes > ultimo) ultPes.setDate(ultPes.getDate() - 1);
     const quandoPes = k => k ? new Date(ultPes.getTime() - (n - k) * 7 * DIA) : em(-o.inicioDias, 9);
-    for (let k = 0; k <= n; k++) pes.push({ quando: quandoPes(k), kg: +(o.p0 - o.perda * k + (k && k < n ? RUIDO[k % 8] : 0)).toFixed(1), origem: k ? 'paciente' : 'clinica' });
+    // Na manutenção, os últimos 28 dias (desde a mudança de fase) perdem pouco; antes, perdaAntes por semana.
+    const antes = o.perdaAntes ? n - 4 : n, perdeu = k => (o.perdaAntes || o.perda) * Math.min(k, antes) + o.perda * Math.max(0, k - antes);
+    for (let k = 0; k <= n; k++) pes.push({ quando: quandoPes(k), kg: +(o.p0 - perdeu(k) + (k && k < n ? RUIDO[k % 8] : 0)).toFixed(1), origem: k ? 'paciente' : 'clinica' });
     if (o.ultimaSemana != null && n) pes[n].kg = +(pes[n - 1].kg + o.ultimaSemana).toFixed(1);
-    return { id: o.id, nome: o.nome, primeiro: o.nome.split(' ')[0], inicio: em(-o.inicioDias, 9), fase: o.fase, faseEm: em(-Math.min(o.inicioDias, 30), 9), pesagens: pes,
-      metas: { kcal: o.metas[0], prot: o.metas[1], agua: o.metas[2], por: EQUIPE.nutri, cargo: EQUIPE.nutriCargo, em: em(-Math.min(o.inicioDias, 30), 9) },
-      // Sem registro hoje (o último foi antes de hoje): o consumo do dia é zero.
-      hojeFixo: o.ultimo >= em(0) ? { kcal: o.hoje[0], prot: o.hoje[1], agua: o.hoje[2] } : { kcal: 0, prot: 0, agua: 0 }, dias7: o.dias7, ultimo: o.ultimo,
+    return { id: o.id, nome: o.nome, primeiro: o.nome.split(' ')[0], inicio: em(-o.inicioDias, 9), fase: o.fase, faseEm: em(-Math.min(o.inicioDias, 28), 9), pesagens: pes,
+      metas: { kcal: o.metas[0], prot: o.metas[1], agua: o.metas[2], por: EQUIPE.nutri, cargo: EQUIPE.nutriCargo, em: em(-Math.min(o.inicioDias, 28), 9) },
+      hojeFixo: consumoAte(o), dias7: o.dias7, ultimo: o.ultimo,
       sintoma: o.sintoma || null, protBaixa3: !!o.protBaixa3, intestino3: !!o.intestino3, linha: [], consultas: [] };
   }));
   const pac = id => pacientes.find(p => p.id === id);
@@ -119,7 +131,7 @@
   for (const a of agenda) if (a.paciente !== 1) pac(a.paciente).consultas.push({ quando: a.quando, com: 'medico', tipo: a.tipo, modo: a.modo, presenca: true });
   const prescricoes = [
     { paciente: 1, tipo: 'Renovação', cadastrada: mariana.prescricao.renovacao.cadastrada, conferida: null },
-    { paciente: 3, tipo: 'Primeira prescrição', cadastrada: em(-1, 16), conferida: null },
+    { paciente: 8, tipo: 'Primeira prescrição', cadastrada: em(-1, 16), conferida: null },
     { paciente: 7, tipo: 'Renovação', cadastrada: em(-11, 11), conferida: em(-10, 9, 30) }];
   const recados = [
     { ids: [1], para: 'Mariana Alves', de: EQUIPE.recepcao, texto: 'Traga os exames de sangue no retorno.', quando: em(-1, 17, 20), lido: false },
@@ -167,7 +179,7 @@
     ['atencao', 'Intestino registrado como "preso" 3 dias seguidos.'],
     ['atencao', 'Registros em 4 dias ou menos, dos 7 dias anteriores.']];
   function estado(p) {
-    const motivos = [], d7 = dias7(p), ult = ultimoRegistro(p), semReg = Math.floor((agora - ult) / DIA);
+    const motivos = [], d7 = dias7(p), ult = ultimoRegistro(p), semReg = diasAtras(ult);   // dias de calendário, como o "há 4 dias" do texto
     if (p.sintoma && agora - p.sintoma.quando <= 48 * H) motivos.push(['alerta', 'Relatou ' + p.sintoma.nome.toLowerCase(), 'Relatado ' + (p.sintoma.onde ? p.sintoma.onde + ' ' : '') + quando(p.sintoma.quando) + (p.sintoma.aplicacao ? ', depois da aplicação de ' + quando(p.sintoma.aplicacao) : '') + '. ' + REGRAS[0][1]]);
     if (semReg >= 3) motivos.push(['alerta', 'Sem registro há ' + semReg + ' dias', 'Último registro ' + quando(ult) + '. ' + REGRAS[1][1]]);
     if (p.protBaixa3) motivos.push(['atencao', 'Proteína abaixo da meta', 'Abaixo de 70% da meta de ' + p.metas.prot + ' g nos 3 dias anteriores.']);
@@ -224,7 +236,7 @@
   const mudou = () => ouvintes.forEach(f => { try { f(); } catch (e) { /* a outra tela não está montada */ } });
 
   window.DEMO_MODELO = {
-    agora, em, quando, hora, hojeOuOntem, recente, ddmm, dataLonga, fmt, inteiro, sinal, DIAS,
+    agora, em, quando, hora, diasAtras, maiuscula, hojeOuOntem, recente, ddmm, dataLonga, fmt, inteiro, sinal, DIAS,
     EQUIPE, LOCAIS, pacientes, pac, mariana, agenda, prescricoes, recados, CONTEUDO, funcoes, vistos, REGRAS,
     media7, dia, autorMetas, pesoAtual, variacaoSemana, variacaoTotal, consumoHoje, media, ultimoRegistro, dias7, estado, pontos, aplicacao, proximaConsulta, recadosDe, linhaDoTempo,
     medico: () => { const d = (window.DEMO && DEMO.dados) || {}; return ((d.tratamento || '') + ' ' + (d.medico || '')).trim(); },

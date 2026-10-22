@@ -8,7 +8,7 @@
 //    simulado (com o consentimento e o SAIR); o médico escolhe o que ela cobra e o tom, por paciente ou para todos;
 // 2. IA da central: responde sobre um paciente ou todos, sempre com "de onde veio", e faz mudanças (metas, recado,
 //    marcar visto, funções do app, a IA do paciente) só depois do "Confirmar", com o antes e o depois;
-// 3. consumo em créditos de IA (nunca em reais): sobe quando o médico usa as IAs na demonstração.
+// 3. consumo em créditos de IA: sobe quando o médico usa as IAs na demonstração.
 // Tudo fica na memória da página (some ao recarregar).
 (function () {
   'use strict';
@@ -52,7 +52,10 @@
   function planoHoje() {
     if (pref.pausa) return [];
     const temas = INTENSIDADE[pref.intensidade].filter(k => configDe(mariana.id).temas[k]);
-    const lista = temas.filter(k => k !== 'semRegistro').map(k => {
+    // Véspera só quando a aplicação é amanhã; "como se sentiu" só no dia seguinte à aplicação (ou no mesmo dia, depois dela).
+    const ap = M.aplicacao(mariana), dia = d => M.diasAtras(d);
+    const cabe = k => k === 'semRegistro' ? false : k === 'vespera' ? dia(ap.proxima) === -1 : k === 'posAplicacao' ? dia(ap.ultima.quando) <= 1 : true;
+    const lista = temas.filter(cabe).map(k => {
       let h = HORA_TEMA[k]; const adiada = noSilencio(h); if (adiada) h = pref.silencio[1];
       return { tema: k, titulo: TEMAS.find(t => t[0] === k)[1], h, adiada, texto: mensagem(k) };
     });
@@ -63,11 +66,13 @@
   // ---------------------------------------------------------------- registro da IA e consumo (créditos)
   const registro = [];
   function registrar(ia, tipo, texto, extra) { registro.unshift({ quando: agoraReal(), ia, tipo, texto, ...(extra || {}) }); }
-  // Alguns registros de antes de hoje, para a lista não começar vazia.
-  // Em horário de dia, sem futuro (M.hojeOuOntem): do mais novo para o mais antigo.
-  [[M.hojeOuOntem(15, 0, 20, 0), 'paciente', 'lembrete', 'Lembrete de água enviado no app.', 7], [M.hojeOuOntem(8, 0, 15, 0), 'paciente', 'lembrete', 'Check-in da manhã no app.', 5],
-    [M.em(-1, 9, 40), 'central', 'resposta', 'Respondeu "quem está abaixo da meta de proteína?" (1 paciente).', null], [M.em(-1, 8, 0), 'paciente', 'lembrete', 'Check-in da manhã no app.', 1]]
-    .sort((a, b) => b[0] - a[0]).forEach(([quando, ia, tipo, texto, pid]) => registro.push({ quando, ia, tipo, texto, paciente: pid ? M.pac(pid).nome : '', quem: ia === 'central' ? 'equipe' : '' }));
+  // Alguns registros de ontem e de hoje, para a lista não começar vazia: cada lembrete na hora do tema (check-in às 8h,
+  // água às 15h, como no personal); os de hoje só se a hora já passou. Do mais novo para o mais antigo.
+  const jaPassou = d => d <= M.agora;
+  [[M.em(0, 15, 0), 'paciente', 'lembrete', 'Lembrete de água enviado no app.', 1], [M.em(0, 8, 0), 'paciente', 'lembrete', 'Check-in da manhã enviado no app.', 1],
+    [M.em(-1, 15, 0), 'paciente', 'lembrete', 'Lembrete de água enviado no app.', 7], [M.em(-1, 9, 40), 'central', 'resposta', 'Respondeu "quem está abaixo da meta de proteína?" (1 paciente).', null],
+    [M.em(-1, 8, 0), 'paciente', 'lembrete', 'Check-in da manhã enviado no app.', 1]]
+    .filter(x => jaPassou(x[0])).sort((a, b) => b[0] - a[0]).forEach(([quando, ia, tipo, texto, pid]) => registro.push({ quando, ia, tipo, texto, paciente: pid ? M.pac(pid).nome : '', quem: ia === 'central' ? 'equipe' : '' }));
 
   const FUNCOES_IA = [['app', 'IA do paciente no app', 'pacientes', 2], ['whatsapp', 'IA do paciente no WhatsApp', 'pacientes', 3], ['foto', 'Foto do prato', 'pacientes', 5],
     ['central', 'IA da central', 'equipe', 4], ['resumo', 'Resumos', 'equipe', 6]];
@@ -95,7 +100,7 @@
     if (t >= consumo.teto && !consumo.avisou[100]) {
       consumo.avisou[100] = true;
       if (consumo.aoAtingir === 'pausar') consumo.pausada = true;
-      registrar('central', 'consumo', 'Teto do mês atingido: ' + (consumo.aoAtingir === 'pausar' ? 'as IAs foram pausadas.' : 'as IAs continuam (o excedente entra na cobrança do mês).'));
+      registrar('central', 'consumo', 'Teto do mês atingido: ' + (consumo.aoAtingir === 'pausar' ? 'as IAs foram pausadas.' : 'as IAs continuam, e o uso acima do teto também conta no mês.'));
     }
     if (t < consumo.teto) { consumo.pausada = false; consumo.avisou[100] = false; }
     if (t < consumo.teto * 0.8) consumo.avisou[80] = false;
@@ -187,7 +192,7 @@
     const ant = [...p.pesagens].reverse().find(x => x.quando <= lim) || p.pesagens[0];
     return +(u.kg - ant.kg).toFixed(1);
   }
-  // Devolve { texto, origem, lista: [{ id, nome, detalhe }], acao, ir: [tela, rótulo], parte }.
+  // Devolve { texto, topicos: [[rótulo, texto]], origem, lista: [{ id, nome, detalhe }], acao, ir: [tela, rótulo], parte }.
   function responderCentral(texto) {
     const t = sem(texto), p = pacienteNo(t), medico = M.medico();
     const resumo = /resum/.test(t);
@@ -201,7 +206,7 @@
       // proposta: só muda depois do "Confirmar"
     } else if (/(nao|sem) (registr|anot)|parou de registrar|sem registro/.test(t)) {
       const n = Number((t.match(/(\d+)\s*dias?/) || [])[1]) || 3;
-      const lista = M.pacientes.filter(x => (M.agora - M.ultimoRegistro(x)) / 864e5 >= n);
+      const lista = M.pacientes.filter(x => M.diasAtras(M.ultimoRegistro(x)) >= n);   // dias de calendário, como a regra do estado
       r = { texto: lista.length ? lista.length + (lista.length === 1 ? ' paciente sem registro' : ' pacientes sem registro') + ' há ' + n + ' dias ou mais.' : 'Ninguém está sem registro há ' + n + ' dias ou mais.',
         lista: lista.map(x => linhaPac(x, 'último registro ' + M.quando(M.ultimoRegistro(x)))), origem: 'registros do app (último registro de cada paciente)' };
     } else if (/abaixo da meta|meta de proteina|pouca proteina|proteina baixa/.test(t)) {
@@ -216,13 +221,16 @@
       const lista = M.pacientes.filter(x => M.estado(x).nivel !== 'ok');
       r = { texto: lista.length + ' pacientes pedem atenção hoje.', lista: lista.map(x => linhaPac(x, M.estado(x).titulo)), origem: 'regra do estado (Como o estado é calculado)' };
     } else if (p) {
-      const e = M.estado(p), c = M.consumoHoje(p), cons = M.proximaConsulta(p), ap = p.aplicacoes ? M.aplicacao(p) : null;
-      const partes = [(e.nivel === 'ok' ? 'Em dia' : e.nivel === 'alerta' ? 'Alerta' : 'Atenção') + ': ' + e.porque,
-        'Peso ' + M.fmt(M.pesoAtual(p).kg, 1) + ' kg (' + M.sinal(M.variacaoTotal(p), 1) + ' kg desde o início, ' + M.sinal(perda30(p), 1) + ' kg em 30 dias).',
-        'Registrou em ' + M.dias7(p) + ' dos 7 dias anteriores; proteína média de ' + M.media7(p, 'prot') + ' de ' + p.metas.prot + ' g.',
-        'Hoje: ' + M.inteiro(c.kcal) + ' kcal, ' + M.fmt(c.prot) + ' g de proteína e ' + M.inteiro(c.agua) + ' mL de água.',
-        ap ? 'Próxima aplicação ' + M.quando(ap.proxima) + '.' : '', cons ? 'Próxima consulta ' + M.quando(cons.quando) + '.' : ''];
-      r = { texto: (resumo ? 'Resumo da semana de ' + p.nome + '. ' : p.nome + '. ') + partes.filter(Boolean).join(' '), lista: [linhaPac(p, 'abrir a ficha')],
+      // Em tópicos curtos, na ordem em que o médico lê: estado (com o porquê), peso, adesão, hoje, próximos e de onde veio.
+      const e = M.estado(p), c = M.consumoHoje(p), cons = M.proximaConsulta(p), ap = p.aplicacoes ? M.aplicacao(p) : null, pe = M.pesoAtual(p);
+      const proximos = [ap ? 'aplicação ' + M.quando(ap.proxima) : '', cons ? 'consulta ' + M.quando(cons.quando) : ''].filter(Boolean);
+      const topicos = [
+        ['Estado', e.nivel === 'ok' ? 'Em dia. Nenhuma regra de atenção ou alerta disparou.' : (e.nivel === 'alerta' ? 'Alerta. ' : 'Atenção. ') + e.porque],
+        ['Peso', M.fmt(pe.kg, 1) + ' kg (' + (pe.origem === 'clinica' ? 'medido na clínica ' : 'registrado ') + M.quando(pe.quando) + '); ' + M.sinal(M.variacaoTotal(p), 1) + ' kg desde o início, ' + M.sinal(perda30(p), 1) + ' kg em 30 dias.'],
+        ['Adesão', M.dias7(p) + ' de 7 dias com registro; proteína média de ' + M.media7(p, 'prot') + ' de ' + p.metas.prot + ' g.'],
+        ['Hoje', c.kcal || c.prot || c.agua ? M.inteiro(c.kcal) + ' kcal, ' + M.fmt(c.prot) + ' g de proteína e ' + M.inteiro(c.agua) + ' mL de água, até as ' + M.hora(M.ultimoRegistro(p)) + '.' : 'Nada registrado ainda.'],
+        ['Próximos', proximos.length ? M.maiuscula(proximos.join('; ')) + '.' : 'Nenhuma consulta marcada.']];
+      r = { texto: resumo ? 'Resumo da semana de ' + p.nome + ':' : p.nome + ':', topicos, lista: [linhaPac(p, 'ficha completa')],
         origem: 'ficha do paciente: registros do app, pesagens, metas da equipe, agenda e prescrição' };
     } else {
       // A central pergunta mais sobre a central: o manual dela primeiro, depois o do app.
