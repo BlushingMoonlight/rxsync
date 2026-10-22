@@ -907,7 +907,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 
 <!-- ===================== TESTE AO VIVO (mini teste) =====================
      Conversa de verdade com a IA, com dados de exemplo da especialidade escolhida.
-     Backend: workflow n8n "11 - Mini teste do site" (/webhook/mini-teste-iniciar e /webhook/mini-teste-mensagem). -->
+     Backend: workflow 40 do n8n (/webhook/mini-teste-iniciar e /webhook/mini-teste-mensagem). -->
 <section class="sec mt-sec" id="teste-ao-vivo" aria-labelledby="titulo-mt">
   <div class="wrap">
     <div class="sec-head centro">
@@ -1686,7 +1686,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         return true;
     }
 
-    // Formulário de demonstração: vai para o n8n (workflow "Email e formulário no Telegram"), que avisa no Telegram.
+    // Formulário de demonstração: vai para o workflow 41 do n8n, que guarda o pedido e avisa a equipe.
+    // O cabeçalho x-rxsync-origem só filtra robôs simples (ele está neste código público); a proteção são os limites no servidor.
     async function enviarFormDemo(ev) {
         ev.preventDefault();
         var form = document.getElementById('formDemo');
@@ -1841,7 +1842,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     })();
 
     // ===================== TESTE AO VIVO (mini teste) =====================
-    // Conversa de verdade com a IA, limitada a 5 mensagens. Backend: workflow n8n "11 - Mini teste do site".
+    // Conversa de verdade com a IA, limitada a 5 mensagens. Backend: workflow 40 do n8n.
+    // O cabeçalho x-rxsync-origem só filtra robôs simples (ele está neste código público); a proteção são os limites no servidor.
     var MT_API = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
     var mt = { sessao: null, restantes: 5, agenda: null, profs: [], agendamento: null, dia: 'd1', enviando: false };
 
