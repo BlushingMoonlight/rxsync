@@ -393,7 +393,7 @@
 <div id="fimContrato" class="porta" hidden>
   <div class="bloco pad" style="padding:28px">
     <h1 class="titulo" style="font-size:22px">O contrato terminou</h1>
-    <p class="subtitulo">Até os dados serem apagados (15 dias depois do fim), dá para baixar a agenda e os pacientes da clínica em planilha (CSV). Abrem no Numbers, no Excel e no Google Planilhas. Nada fica guardado no navegador.</p>
+    <p class="subtitulo" style="margin-bottom:18px">Até os dados serem apagados (15 dias depois do fim), dá para baixar a agenda e os pacientes da clínica em planilha (CSV). Abrem no Numbers, no Excel e no Google Planilhas. Nada fica guardado no navegador.</p>
     <div id="fimBaixar">
       <button id="btnFimAgenda" type="button" class="btn pri plena">Baixar a agenda (todas as consultas)</button>
       <button id="btnFimPacientes" type="button" class="btn sec plena" style="margin-top:10px">Baixar os pacientes</button>
@@ -421,6 +421,8 @@
   </header>
 
   <main class="main" id="principal">
+    <!-- Assistente pausada (rxsync-sistema DEC-136, #183): aparece no alto de todas as telas. -->
+    <div id="faixaPausa" class="aviso ambar faixa-senha" role="status" hidden><p id="faixaPausaTxt"></p><button type="button" id="btnFaixaRetomar" class="btn pri" hidden>Retomar a assistente</button></div>
 
     <!-- ================= HOJE ================= -->
     <section data-view="hoje" hidden>
@@ -577,6 +579,11 @@
             </div>
           </div>
         </div>
+        <div id="cardPausa" class="bloco pad" style="margin-bottom:18px">
+          <div style="font-weight:700">Pausar a assistente</div>
+          <p id="pausaTxt" class="subtitulo" style="margin:2px 0 12px;font-size:14px">Carregando…</p>
+          <button id="btnPausa" type="button" class="btn sec" hidden>Pausar a assistente</button>
+        </div>
         <div class="lista" id="listaAssistente"></div>
       </div>
       <div id="panesAssistente"></div>
@@ -694,6 +701,7 @@
           <button type="button" data-ir="conta/gestao"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 3v4M17 5h4M5 17v4M3 19h4"/></svg></span><span class="tx"><span class="t1">Assistente de gestão <span id="pillGestao"></span></span><span class="t2">Seu assistente pessoal e o resumo do dia</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
           <button type="button" data-ir="conta/contato"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="tx"><span class="t1">Contato e responsável técnico</span><span class="t2">E-mail, telefones e quem responde pelo conteúdo</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
           <button type="button" class="so-dono" data-ir="conta/equipe"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-5-6.7"/></svg></span><span class="tx"><span class="t1">Equipe</span><span class="t2">Quem mais entra no painel, cada um com o próprio e-mail</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button type="button" class="so-dono" data-ir="conta/acessos"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><span class="tx"><span class="t1">Acessos recentes</span><span class="t2">Quem entrou no painel e o que fez</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
           <button type="button" class="so-dono" data-ir="conta/dados"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></span><span class="tx"><span class="t1">Baixar meus dados</span><span class="t2">A agenda e os pacientes em planilha</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
           <button type="button" data-ir="conta/contrato"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="tx"><span class="t1">Dados do contrato</span><span class="t2">Razão social, CNPJ e representante</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="seta"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
@@ -749,6 +757,12 @@
           <p class="fld-hint">Ela recebe um convite por e-mail e cria a senha em “Criar senha”, com esse e-mail. O convite vale 7 dias. Um e-mail só entra no painel de uma clínica.</p>
           <button id="btnEquipeConvidar" type="button" class="btn pri plena" style="margin-top:10px">Convidar</button>
         </div>
+      </div>
+
+      <div data-sub-pane="acessos" hidden>
+        <button class="voltar" type="button" data-ir="conta"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Conta</button>
+        <div class="cab"><h1 class="titulo">Acessos recentes</h1><p class="subtitulo">As 100 entradas e ações mais recentes no painel: quando, o quê, quem (o dono ou uma pessoa da equipe) e o aparelho. Ficam guardadas por 12 meses. Se aparecer algo que ninguém da clínica fez, troque a senha em “Esqueci a senha” e responda um e-mail nosso.</p></div>
+        <div id="acessosLista"><div class="vazio">Carregando…</div></div>
       </div>
 
       <div data-sub-pane="dados" hidden>
@@ -1142,6 +1156,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     if (area === "resultados" && !abertas.resultados) { abertas.resultados = true; resultadosCarregar(); }
     if (area === "conta" && sub === "assinatura") assinCarregar();
     if (area === "conta" && sub === "equipe") equipeCarregar();
+    if (area === "conta" && sub === "acessos") acessosCarregar();
     if (area === "assistente" || area === "conta") listasAtualizar();
     if (area === "pacientes") pacRotear(temSub ? sub : "", partes[2] || "");
     window.scrollTo(0, 0);
@@ -1367,6 +1382,7 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
   // Estado da assistente: aparece na tela Hoje e no topo de todas as telas.
   function estadoAssistente(conta) {
     var c = conta || {}, s = c.situacao;
+    if (pausada()) return { cor: "ambar", ponto: "off", curto: "Assistente pausada", t1: "A assistente está pausada", t2: "As mensagens dos pacientes chegam para a equipe responder; lembretes e avisos automáticos também param.", acao: ["Ver", "assistente"] };
     if (s === "em_teste") { var d = c.dias_restantes; return { cor: d !== null && d <= 2 ? "ambar" : "", ponto: "on", curto: "Em teste grátis", t1: "Teste grátis: " + (d === 0 ? "termina hoje" : d === 1 ? "termina amanhã" : "faltam " + d + " dias"), t2: "A assistente está atendendo no WhatsApp até " + (c.trial_fim_br || "o fim do teste") + ".", acao: ["Continuar depois do teste", "conta/assinatura"] }; }
     if (s === "teste_aguardando") return { cor: "ambar", ponto: "alerta", curto: "Falta conectar o WhatsApp", t1: "Falta conectar o WhatsApp", t2: "Os 7 dias de teste só começam a contar quando a assistente entrar no ar.", acao: ["Conectar", "conta/whatsapp"] };
     if (s === "teste_encerrado") return { cor: "rosa", ponto: "off", curto: "Assistente pausada", t1: "O teste terminou e a assistente está pausada", t2: "As mensagens chegam para a sua equipe. Seus dados ficam guardados por 15 dias.", acao: ["Continuar com a RXSync", "conta/assinatura"] };
@@ -1386,6 +1402,57 @@ var CONECTAR_URL = "https://rxsync.com.br/conectar.html"; // ajuste se o link fi
     var a = h$("button", "acao", e.acao[0]); a.type = "button"; a.setAttribute("data-ir", e.acao[1]); c.appendChild(a);
     box.appendChild(c);
   }
+
+  // ===== Pausar a assistente (rxsync-sistema DEC-136, #183): dono e equipe, pelo 29, com a sessão. Pausar é o mesmo que
+  // a pausa da Central (cláusula 8.4): a IA, os lembretes e o relacionamento param; as mensagens chegam à equipe e a
+  // mensalidade continua. O painel só retoma a pausa que ele mesmo fez; a da RXSync, só a RXSync desfaz (o banco confere).
+  var PAUSA = null;
+  function pausada() { return !!(PAUSA && PAUSA.ativo === false && PAUSA.status === "Ativo"); }
+  function pausaQuando(t) { var m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/.exec(t || ""); return m ? m[3] + "/" + m[2] + " às " + m[4] : ""; }
+  function pausaRender() {
+    var txt = el("pausaTxt"), b = el("btnPausa"), fx = el("faixaPausa");
+    b.hidden = true; b.disabled = false;
+    if (!sessao) { txt.textContent = "Para pausar pelo painel, crie sua senha (a faixa no alto da tela Hoje)."; fx.hidden = true; return; }
+    if (!PAUSA) { txt.textContent = "Não consegui ver a situação da assistente agora. Abra o painel de novo em instantes."; fx.hidden = true; return; }
+    var desde = pausaQuando(PAUSA.pausada_em);
+    if (PAUSA.pode_pausar) {
+      txt.textContent = "A assistente está atendendo. Ao pausar, ela para de responder os pacientes no WhatsApp: as mensagens continuam chegando para a equipe responder, e os lembretes e avisos automáticos também param. A mensalidade continua (cláusula 8.4 dos Termos). Dá para retomar aqui a qualquer momento.";
+      b.textContent = "Pausar a assistente"; b.dataset.acao = "assistente_pausar"; b.hidden = false;
+    } else if (PAUSA.pode_retomar) {
+      txt.textContent = "Pausada pelo painel" + (desde ? " desde " + desde : "") + ". As mensagens chegam para a equipe responder.";
+      b.textContent = "Retomar a assistente"; b.dataset.acao = "assistente_retomar"; b.hidden = false;
+    } else if (pausada()) {
+      txt.textContent = "Pausada pela RXSync. Para ela voltar, fale com a RXSync respondendo um e-mail nosso.";
+    } else {
+      txt.textContent = "A pausa pelo painel vale quando a assistente está no ar com o plano contratado. Para pausar agora, fale com a RXSync respondendo um e-mail nosso.";
+    }
+    fx.hidden = !pausada();
+    el("faixaPausaTxt").innerHTML = "";
+    el("faixaPausaTxt").appendChild(h$("strong", null, "Assistente pausada. "));
+    el("faixaPausaTxt").appendChild(document.createTextNode(PAUSA.pode_retomar
+      ? "Ela não está respondendo os pacientes no WhatsApp" + (desde ? " desde " + desde : "") + "; as mensagens chegam para a equipe."
+      : "Pausada pela RXSync: as mensagens chegam para a equipe. Para ela voltar, fale com a RXSync respondendo um e-mail nosso."));
+    el("btnFaixaRetomar").hidden = !PAUSA.pode_retomar;
+    if (ESTADO.conta) mostrarEstado(ESTADO.conta);
+  }
+  function pausaCarregar() {
+    if (!sessao) { pausaRender(); return; }
+    entChamar("assistente_estado").then(function (r) { if (r && r.sair) { location.reload(); return; } PAUSA = r && r.ok ? r : null; pausaRender(); });
+  }
+  function pausaAgir(acao, btn) {
+    if (acao === "assistente_pausar" && !confirm("Pausar a assistente? Ela para de responder os pacientes até alguém tocar em Retomar. As mensagens chegam para a equipe; lembretes e avisos automáticos param. A mensalidade continua.")) return;
+    btn.disabled = true;
+    entChamar(acao).then(function (r) {
+      btn.disabled = false;
+      if (r && r.sair) { location.reload(); return; }
+      if (r && r.so_baixar) { location.reload(); return; }
+      if (r && (r.ok || r.status !== undefined)) PAUSA = Object.assign({}, PAUSA || {}, r);
+      toast((r && r.mensagem) || "Não consegui agora. Tente de novo.", 6000);
+      pausaRender();
+    });
+  }
+  el("btnPausa").addEventListener("click", function () { pausaAgir(el("btnPausa").dataset.acao, el("btnPausa")); });
+  el("btnFaixaRetomar").addEventListener("click", function () { pausaAgir("assistente_retomar", el("btnFaixaRetomar")); });
 
   // ===== Chat do assistente de gestão (folha que abre por cima de qualquer tela) =====
   function abrirChat() {
@@ -2611,6 +2678,27 @@ function partesTz(ms) {
       if (r && r.ok) { i.value = ""; equipeCarregar(); }
     });
   });
+  // Conta › Acessos recentes (rxsync-sistema DEC-136, #184): só o dono, pelo 29, sem o IP.
+  function acessosQuando(t) { var d = new Date(t); return isNaN(d) ? String(t || "") : d.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }); }
+  function acessosCarregar() {
+    var box = el("acessosLista");
+    box.innerHTML = '<div class="vazio">Carregando…</div>';
+    entChamar("acessos_recentes").then(function (r) {
+      if (r && r.sair) { location.reload(); return; }
+      box.innerHTML = "";
+      if (!r || !r.ok) { box.appendChild(h$("div", "aviso rosa", (r && r.mensagem) || "Não consegui carregar os acessos agora.")); return; }
+      var l = r.acessos || [];
+      if (!l.length) { box.appendChild(h$("div", "vazio", "Nenhum acesso registrado ainda.")); return; }
+      var bl = h$("div", "bloco");
+      l.forEach(function (a) {
+        var ln = h$("div", "eq-linha"), tx = h$("div");
+        tx.appendChild(h$("div", "eq-mail", a.o_que || a.evento || ""));
+        tx.appendChild(h$("div", "fld-hint", [acessosQuando(a.quando), a.quem, a.aparelho].filter(function (x) { return x; }).join(" · ")));
+        ln.appendChild(tx); bl.appendChild(ln);
+      });
+      box.appendChild(bl);
+    });
+  }
   // CSV montado no aparelho, em páginas de 2.000 linhas; nada fica guardado no navegador.
   var DADOS_COLUNAS = {
     agenda: [["codigo", "Código"], ["inicio", "Início"], ["fim", "Fim"], ["situacao", "Situação"], ["paciente", "Paciente"], ["telefone", "Telefone"],
@@ -4291,6 +4379,7 @@ function partesTz(ms) {
       .forEach(function (k) { var x = el("campo_" + k); if (!x) return; x.disabled = true; if (x.desabilitar) x.desabilitar(); });
 
     mostrarBannerConta(resp.conta);
+    pausaCarregar();
 
     // Recursos do Gestão Inteligente (DEC-063): cada um vale pelo que o servidor devolve em "recursos" (o plano ou uma
     // liberação da equipe RXSync). O que não vale fica visível, travado, com o convite para mudar de plano.
