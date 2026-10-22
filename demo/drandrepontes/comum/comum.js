@@ -92,7 +92,11 @@
     try {
       if (saindo && navigator.sendBeacon) { if (!navigator.sendBeacon(URL_LOG, corpo)) fila = lote.concat(fila); }
       else if (window.fetch) fetch(URL_LOG, { method: 'POST', body: corpo, keepalive: corpo.length < 60000, mode: 'cors', credentials: 'omit' })
-        .then(function (r) { if (!r.ok) throw new Error(); }).catch(function () { fila = lote.concat(fila).slice(-500); });
+        .then(function (r) { if (!r.ok) throw new Error(); return r.json().catch(function () { return {}; }); })
+        // O servidor responde { ok: false, motivo } (rxsync-sistema DEC-135, W-03): com falha interna, o lote volta para a
+        // fila e vai de novo na próxima rodada; com limite ou formato, tentar de novo não adianta, e o lote é descartado.
+        .then(function (j) { if (j && j.ok === false && (!j.motivo || j.motivo === 'interno')) fila = lote.concat(fila).slice(-500); })
+        .catch(function () { fila = lote.concat(fila).slice(-500); });
     } catch (e) { fila = lote.concat(fila).slice(-500); }
     if (saindo && fila.length) enviarLog(true);
   }
@@ -498,10 +502,29 @@
     horaAntes: function (min) { return hm(new Date(agora().getTime() - min * 6e4)); }
   };
 
+  // Aviso curto de privacidade na entrada (rxsync-sistema DEC-134, #99), uma vez por aparelho. A marca guardada no
+  // navegador ('ag-aviso-privacidade' = '1') diz só que o aviso já foi visto: nenhum dado pessoal.
+  var CHAVE_AVISO = 'ag-aviso-privacidade';
+  function montarAvisoPrivacidade() {
+    if (PAGINA !== 'home' || dentroDeQuadro || lerArmazenado('localStorage', CHAVE_AVISO) || memoria.aviso || document.getElementById('aviso-privacidade')) return;
+    var a = document.createElement('div');
+    a.id = 'aviso-privacidade'; a.setAttribute('role', 'region'); a.setAttribute('aria-label', 'Aviso de privacidade');
+    a.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;max-width:560px;margin:0 auto;padding:14px 16px;border-radius:14px;'
+      + 'background:#14171c;color:#f5f5f4;font:14px/1.5 system-ui,-apple-system,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.25)';
+    var p = document.createElement('p'); p.style.margin = '0 0 10px';
+    p.appendChild(document.createTextNode('Esta demonstração registra como ela é usada (telas abertas e toques) para a RXSync preparar a conversa sobre o projeto. O endereço IP fica só resumido, e o registro é apagado 90 dias depois do último uso. '));
+    var l = document.createElement('a'); l.href = '/privacidade.html'; l.target = '_blank'; l.rel = 'noopener'; l.textContent = 'Política de Privacidade'; l.style.color = '#7dd3c0';
+    p.appendChild(l); p.appendChild(document.createTextNode('.'));
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = 'Entendi';
+    b.style.cssText = 'min-height:44px;padding:0 18px;border:0;border-radius:10px;background:#f5f5f4;color:#14171c;font:600 15px system-ui,-apple-system,sans-serif;cursor:pointer';
+    b.addEventListener('click', function () { memoria.aviso = '1'; gravarArmazenado('localStorage', CHAVE_AVISO, '1'); a.remove(); });
+    a.appendChild(p); a.appendChild(b); document.body.appendChild(a);
+  }
+
   function iniciar() {
     if (!document.body) return; // página sendo trocada (sem usuário, indo para a escolha)
     trocarEm(document.body); marcarDesligados(document.body);
-    montarSelo(); montarTroca(); montarVoltar();
+    montarSelo(); montarTroca(); montarVoltar(); montarAvisoPrivacidade();
     aplicarEstilo(html.dataset.estilo, false);
     // links internos já saem com o estilo atual
     var id = html.dataset.estilo;

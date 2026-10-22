@@ -81,7 +81,8 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   editar_cobranca: 'Cobrança', editar_teste: 'Estender o teste', editar_situacao: 'Situação (suspender, pausar, cancelar)', editar_links: 'Links da clínica', cobranca_teste_cliente: 'Clínica de teste da cobrança', asaas_ambiente: 'Ambiente do Asaas',
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
-  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada' };
+  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
+  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && k.chave !== 'tela_cliente_sensivel'],
   ['Dados protegidos', k => k.chave === 'tela_cliente_sensivel'],

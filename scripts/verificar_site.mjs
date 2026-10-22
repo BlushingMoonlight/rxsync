@@ -67,7 +67,7 @@ for (const f of htmls) {
         'cliente_editar_empresa', 'chave_api_criar', 'aviso_destino_definir', 'aviso_destino_desligar', 'desfazer', 'sair_todos', 'aparelho_esquecer',
         'prosp_ligar', 'prosp_apagar_rascunho', 'prosp_numero_criar', 'prosp_numero_qr', 'prosp_numero_desconectar', 'prosp_numero_webhook', 'prosp_numero_teto', 'prosp_buscar_agora', 'prosp_leads_aprovar_todos', 'prosp_lead_nao_contatar', 'prosp_lead_devolver', 'prosp_exportar',
         'prosp_publico_buscar', 'prosp_publico_contatos_lote', 'prosp_publico_arquivar', 'prosp_creditos_teto_salvar', 'prosp_sugerir',
-        'dem_editar'],
+        'dem_editar', 'conversas_enviar'],
       3: ['plano_trocar', 'situacao_suspender', 'cancelamento_agendar', 'preco_especial', 'cobranca_proxima_data', 'cobranca_vencimento', 'implantacao_isentar', 'pagamento_receber_dinheiro',
         'teste_estender', 'link_painel_novo', 'chave_api_revogar', 'cobranca_teste_definir', 'prosp_encerrar', 'prosp_numero_apagar',
         'dem_apagar'] };
@@ -152,6 +152,25 @@ for (const f of htmls) {
   const css = 'assets/fontes/fontes.css';
   if (!fs.existsSync(css)) erro(`${css}: não existe`);
   else for (const m of fs.readFileSync(css, 'utf8').matchAll(/url\('([^']+)'\)/g)) if (!fs.existsSync(path.join('.', m[1]))) erro(`${css}: a fonte ${m[1]} não existe`);
+}
+// Bibliotecas no próprio site (rxsync-sistema#104; Política, seção 9): nenhuma página fora da demo/ carrega script de
+// CDN (cdnjs, jsDelivr, unpkg). O Chart.js do painel fica em assets/vendor/.
+{
+  for (const f of todos.filter(f => /\.(html|js)$/.test(f) && !f.startsWith('demo' + path.sep) && !f.startsWith('demo/') && !f.startsWith('scripts'))) {
+    const t = fs.readFileSync(f, 'utf8');
+    for (const m of t.matchAll(/https?:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|unpkg\.com)[^"'\s]*/g)) erro(`${f}: carrega ${m[0]} de fora; guarde a biblioteca em assets/vendor/ (rxsync-sistema#104)`);
+  }
+}
+// Política de Privacidade (rxsync-sistema DEC-143): a versão do selo, a do texto e a primeira do histórico são a mesma; e
+// as promessas sem prova (N-07, #101) não voltam ao texto antes de existirem (o histórico de versões fica de fora).
+{
+  const pol = fs.readFileSync('privacidade.html', 'utf8');
+  const selo = (pol.match(/>Versão (\d{4}-\d{2}-v\d+)<\/span>/) || [])[1], texto = (pol.match(/<p><strong>Versão (\d{4}-\d{2}-v\d+)<\/strong>/) || [])[1],
+    hist = (pol.match(/<li><strong>(\d{4}-\d{2}-v\d+)<\/strong>, vigente/) || [])[1];
+  if (!selo || selo !== texto || texto !== hist) erro(`privacidade.html: a versão do selo (${selo}), a do texto (${texto}) e a primeira do histórico (${hist}) têm de ser a mesma`);
+  const corpoPol = pol.replace(/<li><strong>\d{4}-\d{2}-v\d+<\/strong>, vigente[\s\S]*?<\/li>/g, '');
+  for (const frase of ['cópias de segurança criptografadas', 'sem exposição à rede pública', 'separado do de testes', 'termo de confidencialidade', 'Cópias de segurança (backup)', 'Quero conversar'])
+    if (corpoPol.includes(frase)) erro(`privacidade.html: "${frase}" voltou ao texto (sem prova ou fora do produto; rxsync-sistema#101, DEC-143)`);
 }
 // Página da exclusão da conta (rxsync-sistema DEC-114): noindex, nada de fora além do n8n, sem Google Analytics nem
 // chat, e nada guardado no navegador (o link do e-mail fica só na memória da página).

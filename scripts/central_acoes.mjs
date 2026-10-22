@@ -117,6 +117,7 @@ const CASOS = [
   { acao: 'cancelamento_desfazer', rota: F, extra: { cancelar_em: daqui(15) }, abrirCom: () => menu('Desfazer o cancelamento'), espera: C },
   { acao: 'link_painel_reenviar', rota: F, abrirCom: () => menu('Reenviar o link do painel'), espera: C },
   { acao: 'link_conectar_reenviar', rota: F, abrirCom: () => menu('Reenviar o link de conexão'), espera: C },
+  { acao: 'conversas_enviar', rota: F, abrirCom: () => menu('Enviar as conversas ao e-mail do cadastro'), espera: C },
   { acao: 'link_painel_novo', rota: F, abrirCom: () => menu('Gerar um link novo do painel'), nome: NOME, espera: C },
   { acao: 'cobranca_teste_definir', rota: F, abrirCom: () => menu('Usar como clínica de teste'), nome: NOME, espera: C },
   { acao: 'cobranca_teste_definir', nivel: 2, rota: F, antes: async () => { chaves.cobranca_teste_cliente = 'CLI-001'; await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await page.waitForTimeout(300); await abrir(F); },
@@ -347,6 +348,27 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   ok(await motor().count() === 1 && await page.locator('#conteudo [role=alert]', { hasText: 'Disparo parado: o workflow 52' }).count() === 1, 'sinal de vida: o mesmo aviso nos Ajustes, abaixo das chaves da prospecção');
   ESTADO.segurado = false;
   feitos += 3;
+}
+// PR 2 de 22/10/2026 (DEC-131, DEC-133, DEC-134, DEC-136): Histórico do painel na ficha (com IP), mini testes no
+// Funil, "fora da saúde" nos públicos (sem "pôr de volta") e o nome da chave painel_link_antigo nos Ajustes.
+{
+  await abrir('clientes/CLI-001/historico');
+  const hist = page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Histórico do painel' }) });
+  await hist.getByText('Pausou a assistente').waitFor().catch(() => {});
+  ok(await hist.getByText('Pausou a assistente').count() === 1 && /equipe · sec@exemplo\.com/.test(await hist.innerText()) && /IP 10\.0\.0\.5/.test(await hist.innerText()), 'histórico do painel: o quê, quem (e-mail) e o IP');
+  ok(chamadas.some(x => x.acao === 'cliente_painel_historico' && x.dados.cliente_id === 'CLI-001'), 'histórico do painel: lê cliente_painel_historico da clínica');
+  await abrir('crescimento');
+  const mt = page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Mini testes do site' }) });
+  ok(await mt.getByText('Clínica Exemplo · Odontologia').count() === 1 && /marcou consulta/.test(await mt.innerText()), 'mini testes: a clínica, a especialidade e se marcou');
+  await mt.getByText('Ver a conversa').click();
+  ok(await mt.getByText('Assistente: Claro! Tenho terça às 10h. Pode ser?').isVisible(), 'mini testes: a conversa abre ao tocar');
+  await abrir('prospeccao/publico/PB-0001');
+  const linha = page.locator('#conteudo li', { hasText: 'Salão Bela Vista' });
+  ok(await linha.getByText('fora da saúde').count() >= 1, 'públicos: a situação "fora da saúde" com nome');
+  ok(await linha.getByRole('button', { name: /Pôr de volta|Tirar/ }).count() === 0, 'públicos: "fora da saúde" sem botão de tirar ou pôr de volta');
+  await abrir('ajustes');
+  ok(await page.getByRole('switch', { name: 'Painel: o link antigo (?t=) ainda abre', exact: true }).count() === 1, 'ajustes: a chave painel_link_antigo com nome legível');
+  feitos += 4;
 }
 // Nenhuma chamada saiu sem a origem certa: o simulado só responde ao n8n da Central (o resto é bloqueado).
 ok(!erros.length, 'erro no console: ' + erros.join(' | '));

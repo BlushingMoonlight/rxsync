@@ -378,8 +378,9 @@ async function verVersao(tipo, id, versao) {
 // Contato = um negócio achado na busca (o telefone só com os 4 últimos dígitos). Quem nunca recebeu mensagem sai 90 dias
 // depois de encontrado. Tirar um contato é um toque; pôr de volta num público que um conjunto ativo usa pede o nível 2.
 const SIT_CONTATO = { disponivel: ['disponível', 'ok'], tirado: ['tirado', ''], em_conjunto: ['em conjunto', 'info'], abordado: ['já abordado', ''], nao_contatar: ['não contatar', 'perigo'],
-  cliente: ['já é cliente', 'perigo'], demonstracao: ['pediu demonstração', 'perigo'], orgao_publico: ['órgão público', 'perigo'] };
-const BLOQUEADO = ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico'];
+  cliente: ['já é cliente', 'perigo'], demonstracao: ['pediu demonstração', 'perigo'], orgao_publico: ['órgão público', 'perigo'], fora_da_saude: ['fora da saúde', 'perigo'] };
+// fora_da_saude: sql/058 (DEC-133), a prospecção só procura clínicas, consultórios e profissionais de saúde.
+const BLOQUEADO = ['nao_contatar', 'cliente', 'demonstracao', 'orgao_publico', 'fora_da_saude'];
 const FILTROS_PUB = [['', 'Todos', 'tamanho'], ['disponivel', 'Disponíveis', 'disponiveis'], ['tirado', 'Tirados', 'tirados'], ['em_conjunto', 'Em conjuntos', 'em_conjunto'], ['abordado', 'Já abordados', 'abordados'],
   ['bloqueado', 'Bloqueados', 'bloqueados'], ['expirando', 'Saem em até 7 dias', 'expiram_7d']];
 const etqContato = s => { const [t, tom] = SIT_CONTATO[s] || [s || '—', '']; return etq(t, tom); };
@@ -713,7 +714,7 @@ async function pBuscas(c) {
 // O que cada número das contagens da busca quer dizer (sql/032, sql/034 e sql/036).
 const MOTIVOS = { achados: 'achados', novos: 'novos', ja_no_publico: 'já no público', de_outro_publico: 'de outro público', outro_fuso: 'outro fuso', fixo: 'telefone fixo', invalido: 'sem telefone',
   revisar: 'número antigo', fechado: 'fechado', nota: 'nota', avaliacoes: 'avaliações', categoria: 'categoria', palavra: 'palavra', site: 'site', rede: 'rede', concorrente: 'concorrente', repetido: 'repetido',
-  ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar', orgao_publico: 'órgão público', abordado: 'outra campanha', pontos: 'pontuação baixa',
+  ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar', orgao_publico: 'órgão público', fora_da_saude: 'fora da saúde', abordado: 'outra campanha', pontos: 'pontuação baixa',
   sem_creditos: 'sem créditos', paginas_com_erro: 'erro' };
 // Teto geral de créditos do SerpAPI no mês (todos os públicos juntos; nível 2).
 function kpiTeto(tot, editar) {

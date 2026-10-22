@@ -322,6 +322,18 @@ function abaHistorico(c, x) {
     return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: txt }), el('div', { class: 't2', text: String(t.quando || '').length > 10 ? fmtHora(t.quando) : fmtData(t.quando) }))));
   })) : vazio('Nada na linha do tempo.', 'relogio')) : corpo(nota('Ligue a ficha completa para ver a linha do tempo.', true))),
   cartao('Últimos avisos desta clínica', null, listaAvisos(x.ultimos_avisos, false)));
+  // Histórico do painel (sql/060, DEC-136, #184): quem entrou e o que fez no painel da clínica, com o IP e o e-mail (o dono
+  // vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.
+  if (!comp) return;
+  const area = el('div', {}, corpo(el('p', { class: 'mudo', text: 'Carregando…' })));
+  anexar(c, cartao('Histórico do painel', el('span', { class: 'mudo peq', text: 'os 100 mais recentes · 12 meses' }), area));
+  chamar('cliente_painel_historico', { cliente_id: x.cliente_id }).then(r => {
+    if (!r.ok) { trocar(area, corpo(nota(r.mensagem || 'Não consegui carregar o histórico do painel.', true))); return; }
+    const l = (r.dados && r.dados.acessos) || [];
+    trocar(area, l.length ? el('ul', { class: 'lista' }, l.map(a => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
+      el('div', { class: 't1', text: a.o_que || a.evento || '' }),
+      el('div', { class: 't2', text: [fmtHora(a.quando), a.quem_email ? (String(a.quem || '').split(' · ')[0] + ' · ' + a.quem_email) : a.quem, a.aparelho, a.ip ? 'IP ' + a.ip : ''].filter(Boolean).join(' · ') })))))) : vazio('Ninguém entrou no painel ainda.', 'relogio'));
+  });
 }
 
 // ---------- menu Ações (situação, links, onboarding, teste da cobrança)
@@ -346,6 +358,11 @@ function menuAcoes(x) {
     item('Gerar um link novo do painel', 'Nível 3. O link antigo para de funcionar.', () => fazer('link_painel_novo', { cliente_id: x.cliente_id }, { titulo: 'Gerar um link novo do painel', nome: x.nome, botao: 'Gerar o link novo',
       linhas: [['Link atual', 'vale', 'deixa de valer']], texto: 'Use se o link vazou. O novo vai para o e-mail do cadastro.' }), true);
   }
+  // Histórico das conversas a pedido da clínica (sql/059, DEC-131, #67; cláusula 19.2): o 31 monta o CSV e manda direto
+  // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.
+  if (st !== 'Dados apagados') item('Enviar as conversas ao e-mail do cadastro', 'Nível 2. Só a pedido da clínica; o arquivo não passa pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
+    titulo: 'Enviar as conversas de ' + x.nome, ok: 'Pedido na fila.',
+    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central, pelo banco nem pelo Telegram; o Telegram avisa quando sair ou se falhar.' }));
   if (ligada('editar_onboarding') && x.pode_reenviar_onboarding) item('Reenviar o onboarding', 'O workflow 21 manda o link novo em até 10 minutos.', () => fazer('reenviar_onboarding', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o onboarding de ' + x.nome, linhas: [['Link atual', 'vale', 'deixa de valer']] }));
   if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
     if (ehTesteCobranca(x)) item('Deixar de ser a clínica de teste da cobrança', 'As edições de dinheiro voltam a depender das chaves.', async () => {
