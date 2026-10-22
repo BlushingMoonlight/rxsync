@@ -396,6 +396,14 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .antes-depois { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px var(--e-3); margin: 0; font-size: var(--t-peq); }
 .antes-depois dt { color: var(--tinta-2); font-weight: 600; } .antes-depois dd { margin: 0; font-weight: 650; }
 .medidor-ia { margin: 0; }
+/* assistente da central: créditos e campo de digitar presos juntos embaixo (a linha dos créditos sempre visível) */
+.folha .rodape-ia { position: sticky; bottom: 0; z-index: 1; display: grid; gap: 4px; padding-top: var(--e-2); background: var(--superficie); border-top: 1px solid var(--linha); }
+.folha .rodape-ia .enviar-msg { position: static; padding-top: 0; }
+/* respostas sobre um paciente: tópicos curtos (rótulo e texto) */
+.topicos-ia { margin: 0; display: grid; gap: 6px; width: 100%; }
+.topicos-ia div { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: var(--e-2); }
+.topicos-ia dt { color: var(--tinta-2); font-weight: 650; font-size: var(--t-peq); padding-top: 1px; }
+.topicos-ia dd { margin: 0; }
 .botao-ia { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: var(--alvo); min-width: var(--alvo); justify-content: center; padding: 0 var(--e-3); border-radius: var(--r-pilula);
   border: 1px solid var(--acento-borda); background: var(--acento-suave); color: var(--acento-texto); font: 650 .9rem var(--fonte); cursor: pointer; }
 .so-largo { display: none; } @media (min-width: 600px) { .so-largo { display: inline; } }
