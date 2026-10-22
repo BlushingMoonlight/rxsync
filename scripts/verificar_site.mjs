@@ -153,6 +153,14 @@ for (const f of htmls) {
   if (!fs.existsSync(css)) erro(`${css}: não existe`);
   else for (const m of fs.readFileSync(css, 'utf8').matchAll(/url\('([^']+)'\)/g)) if (!fs.existsSync(path.join('.', m[1]))) erro(`${css}: a fonte ${m[1]} não existe`);
 }
+// Bibliotecas no próprio site (rxsync-sistema#104; Política, seção 9): nenhuma página fora da demo/ carrega script de
+// CDN (cdnjs, jsDelivr, unpkg). O Chart.js do painel fica em assets/vendor/.
+{
+  for (const f of todos.filter(f => /\.(html|js)$/.test(f) && !f.startsWith('demo' + path.sep) && !f.startsWith('demo/') && !f.startsWith('scripts'))) {
+    const t = fs.readFileSync(f, 'utf8');
+    for (const m of t.matchAll(/https?:\/\/(cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|unpkg\.com)[^"'\s]*/g)) erro(`${f}: carrega ${m[0]} de fora; guarde a biblioteca em assets/vendor/ (rxsync-sistema#104)`);
+  }
+}
 // Página da exclusão da conta (rxsync-sistema DEC-114): noindex, nada de fora além do n8n, sem Google Analytics nem
 // chat, e nada guardado no navegador (o link do e-mail fica só na memória da página).
 {

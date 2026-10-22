@@ -2233,7 +2233,7 @@ function partesTz(ms) {
     if (window.Chart) return Promise.resolve();
     if (!chartPromessa) chartPromessa = new Promise(function (ok, falha) {
       var sc = document.createElement("script");
-      sc.src = "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js";
+      sc.src = "/assets/vendor/chart-4.4.1.umd.js";   // no próprio site, sem o cdnjs (rxsync-sistema#104)
       sc.onload = ok; sc.onerror = function () { chartPromessa = null; falha(); };
       document.head.appendChild(sc);
     });

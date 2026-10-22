@@ -17,6 +17,8 @@ const situacao = () => ({ ok: true, ativo: estado.ativo, pausada_pelo_painel: es
 function responder(url, h, b) {
   const caminho = url.slice(N8N.length);
   chamadas.push({ caminho, acao: b.acao, sessao: h['x-rxsync-painel'] || '', dados: b.dados || {} });
+  if (caminho === 'autoedicao' && b.acao === 'indicadores') return { ok: true, data: { atual: { conversas: 10, agendadas_ia: 4, agendadas_manual: 2 },
+    serie: [{ dia: '2026-10-20', ia: 2, manual: 1, conversas: 5 }, { dia: '2026-10-21', ia: 2, manual: 1, conversas: 5 }] } };
   if (caminho === 'autoedicao' && b.acao === 'abrir') return { ok: true, papel: estado.papel, editaveis: { nome_exibicao: 'Clínica Painel A', fuso_horario: 'America/Sao_Paulo' }, somenteLeitura: { plano: 'Essencial' },
     recursos: {}, limite_catalogo: 500, conta: { situacao: 'ativo', no_ar: true } };
   if (caminho === 'painel-entrada') {
@@ -97,6 +99,11 @@ const lista = await p.locator('#acessosLista').textContent();
 ok(/equipe · s•••@clinica-a\.test/.test(lista) && /iPad · Safari/.test(lista), 'Acessos recentes: o quê, quem e o aparelho');
 ok(!/\d+\.\d+\.\d+\.\d+/.test(lista), 'Acessos recentes: sem IP');
 ok(chamadas.some(c => c.acao === 'acessos_recentes' && c.sessao === SESSAO), 'Acessos recentes: vai ao 29 com a sessão');
+// Resultados: o Chart.js vem do próprio site (rxsync-sistema#104); qualquer endereço de fora é bloqueado neste teste.
+const libs = []; p.on('request', q => { if (/chart/i.test(q.url())) libs.push(q.url()); });
+await p.goto(site.base + '/autoedicao.html#resultados');
+await p.waitForFunction(() => !!window.Chart, null, { timeout: 8000 }).catch(() => {});
+ok(await p.evaluate(() => !!window.Chart) && libs.length && libs.every(u => u.startsWith(site.base + '/assets/vendor/')), 'Resultados: o Chart.js carrega do próprio site (' + libs.join(', ') + ')');
 await ctx.close();
 
 // 5. link antigo, sem sessão
