@@ -586,6 +586,19 @@ for (const [h, m] of [[0, 30], [7, 0], [7, 50], [13, 0], [23, 0]]) {
   ok(!erros.length, `horários ${onde}: erro: ${erros.join(' | ')}`);
   await ctx.close();
 }
+// Assistente no iPad e no computador (folha ao lado): a folha cabe na tela, e a linha dos créditos e o campo ficam à vista.
+for (const vp of [{ width: 820, height: 1180 }, { width: 1440, height: 900 }]) {
+  const ctx = await browser.newContext({ viewport: vp }); const page = await ctx.newPage();
+  await page.addInitScript(() => { try { localStorage.setItem('demo_aviso_visto', '1'); } catch (e) {} });
+  await page.route(N8N, simular([])); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.request().url().startsWith(N8N) ? r.fallback() : r.abort());
+  await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=assistente-central`); await page.waitForSelector('#msg-central');
+  for (const q of ['Quem não registrou há 3 dias?', 'Como está a Mariana?', 'Como está a Beatriz?', 'Como está o João?']) {
+    const n = await page.locator('.resposta-ia').count(); await page.fill('#msg-central', q); await page.keyboard.press('Enter'); await page.waitForFunction(n => document.querySelectorAll('.resposta-ia').length > n, n); }
+  await page.waitForTimeout(600);
+  const c = await page.evaluate(() => { const b = s => document.querySelector(s).getBoundingClientRect(), m = b('.medidor-ia'), f = b('.folha .enviar-msg'), fo = b('.folha'); return { m: m.top, mb: m.bottom, f: f.top, fb: f.bottom, folha: fo.bottom, alto: innerHeight }; });
+  ok(c.mb <= c.f + 0.5 && c.fb <= c.alto && c.folha <= c.alto + 1, `assistente ${vp.width} px: a folha cabe na tela, com os créditos acima do campo (${JSON.stringify(c)})`);
+  await ctx.close();
+}
 // Fluxogramas: "se sim" fica na seta que sai da pergunta (a etapa seguinte), nunca na que chega nela.
 {
   const janela = {}; new Function('window', fs.readFileSync('demo/clinica/comum/manual.js', 'utf8'))(janela);

@@ -229,7 +229,7 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 @media (min-width: 768px) {
   .veu { align-items: center; padding: var(--e-5); }
   .folha { border-radius: 28px; border-bottom: 1px solid var(--vidro-borda); animation-name: subir-centro; }
-  .veu.lateral { justify-items: end; align-items: stretch; padding: var(--e-3); }
+  .veu.lateral { justify-items: end; align-items: stretch; padding: var(--e-3); grid-template-rows: minmax(0, 1fr); }   /* a folha cabe na tela: o corpo rola e o rodapé fica à vista */
   .veu.lateral .folha { max-height: none; height: 100%; width: min(440px, 100%); animation-name: entrar-lado; }
   .veu.lateral .pegador { display: none; } .veu.lateral .cab-folha { padding-top: var(--e-5); }
 }
@@ -392,6 +392,7 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .folha .ir-tela { min-height: var(--alvo); padding: 0 var(--e-4); font-size: .9rem; }
 .lista-ia { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; }
 .lista-ia li { display: flex; align-items: center; gap: var(--e-2); padding: 6px 0; border-top: 1px solid var(--linha); }
+.lista-ia .botao { flex: none; white-space: nowrap; }
 .proposta-ia { width: 100%; display: grid; gap: var(--e-2); padding: var(--e-3); border-radius: 14px; background: var(--superficie); border: 1px solid var(--linha-forte); }
 .antes-depois { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px var(--e-3); margin: 0; font-size: var(--t-peq); }
 .antes-depois dt { color: var(--tinta-2); font-weight: 600; } .antes-depois dd { margin: 0; font-weight: 650; }

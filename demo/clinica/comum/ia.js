@@ -230,7 +230,7 @@
         ['Adesão', M.dias7(p) + ' de 7 dias com registro; proteína média de ' + M.media7(p, 'prot') + ' de ' + p.metas.prot + ' g.'],
         ['Hoje', c.kcal || c.prot || c.agua ? M.inteiro(c.kcal) + ' kcal, ' + M.fmt(c.prot) + ' g de proteína e ' + M.inteiro(c.agua) + ' mL de água, até as ' + M.hora(M.ultimoRegistro(p)) + '.' : 'Nada registrado ainda.'],
         ['Próximos', proximos.length ? M.maiuscula(proximos.join('; ')) + '.' : 'Nenhuma consulta marcada.']];
-      r = { texto: resumo ? 'Resumo da semana de ' + p.nome + ':' : p.nome + ':', topicos, lista: [linhaPac(p, 'a ficha completa, com a linha do tempo')],
+      r = { texto: resumo ? 'Resumo da semana de ' + p.nome + ':' : p.nome + ':', topicos, lista: [linhaPac(p, 'ficha completa')],
         origem: 'ficha do paciente: registros do app, pesagens, metas da equipe, agenda e prescrição' };
     } else {
       // A central pergunta mais sobre a central: o manual dela primeiro, depois o do app.
