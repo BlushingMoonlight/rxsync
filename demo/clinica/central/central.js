@@ -227,13 +227,14 @@
   }
   // ---------------------------------------------------------------- assistente da central (lateral, em qualquer tela; só responde quando chamado)
   function copiloto() {
+    if (!window.DEMO_IA) { DEMO.comIA().then(copiloto, DEMO.semRede); return; }
     const I = window.DEMO_IA;
     const conversa = el('div', { class: 'conversa copiloto-conversa', 'aria-live': 'polite' });
     const medidor = el('p', { class: 'mini mudo medidor-ia' });
     const medir = () => { medidor.textContent = 'Créditos de IA no mês: ' + M.inteiro(I.total()) + ' de ' + M.inteiro(I.consumo.teto) + (I.consumo.pausada ? ' · pausadas no teto' : ''); };
     const ir = (tela, parte) => { f.fechar(() => { if (parte === 'app') { location.href = DEMO.link('app', { tela }); return; } if (tela === 'ficha') abrirFicha(1); else irAba(tela); }); };
     function resposta(r) {
-      const b = el('div', { class: 'bolha outro resposta-ia' }, el('span', { text: r.texto }));
+      const b = el('div', { class: 'bolha outro resposta-ia' }, el('span', { text: r.texto }), r.passos ? el('ol', { class: 'passos-ia' }, r.passos.map(x => el('li', { text: x }))) : null);
       if (r.lista && r.lista.length) b.append(el('ul', { class: 'lista-ia' }, r.lista.map(x => el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: x.nome }), el('br'), el('span', { class: 'mini mudo', text: x.detalhe })),
         el('button', { type: 'button', class: 'botao sec pilula', 'aria-label': 'Abrir a ficha de ' + x.nome, onclick: () => f.fechar(() => abrirFicha(x.id)) }, 'Ficha')))));
       if (r.acao) {
@@ -362,6 +363,8 @@
   let largura = innerWidth;
   addEventListener('resize', () => { if ((innerWidth >= 768) !== (largura >= 768) && raiz && raiz.isConnected) desenhar(true); largura = innerWidth; });
   function desenhar(mesma) {
+    // A aba IA usa comum/ia.js: o arquivo vem na primeira vez que ela abre.
+    if (est.aba === 'ia' && !est.ficha && !window.DEMO_IA) { DEMO.comIA().then(() => desenhar(mesma), DEMO.semRede); return; }
     const p = M.pac(est.paciente);
     const soFicha = est.ficha && p && !dividido();
     const corpo = soFicha ? ficha(p) : TELAS[est.aba]();

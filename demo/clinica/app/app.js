@@ -242,7 +242,7 @@
             const s = sint.valor() || 'Bem', local = est.localEscolhido;
             m.aplicacoes.push({ quando: agoraReal(), local, sintoma: s });
             m.proximoLocal = M.LOCAIS[(M.LOCAIS.indexOf(local) + 1) % M.LOCAIS.length]; est.localEscolhido = null;
-            if (s === 'Enjoo forte') m.sintoma = { nome: 'Enjoo forte', quando: agoraReal() };
+            if (s === 'Enjoo forte') m.sintoma = { nome: 'Enjoo forte', quando: agoraReal(), aplicacao: agoraReal() };
             m.linha.push({ quando: agoraReal(), icone: 'seringa', titulo: 'Aplicação', detalhe: local + ' · ' + (s === 'Bem' ? 'sem sintomas' : s.toLowerCase()), origem: 'paciente', pontos: 5, oculto: true });
             confirmar('Aplicação registrada', 5);
             desenharTela('aplicacoes');
@@ -285,7 +285,7 @@
         grupoLista('Com a clínica', [['calendario', 'Minhas consultas', cons ? maiuscula(M.quando(cons.quando)) : null, 'consultas', 28], ['megafone', 'Avisos da clínica', recs.length + (recs.length === 1 ? ' aviso' : ' avisos'), 'avisos', 29],
           M.funcaoLigada('chat') ? ['conversa', 'Chat com a equipe', null, 'chat-equipe', 34] : null, ['pessoas', 'Equipe e contatos', null, 'equipe', 33], ['livro', 'Conteúdo da clínica', null, 'conteudo', 31], ['clipe', 'Enviar exames', null, 'exames', 32]]),
         grupoLista('Para você', [['sino', 'Lembretes', null, 'lembretes', 30], M.funcaoLigada('conquistas') ? ['medalha', 'Conquistas', M.pontos(m) + ' pontos hoje', 'conquistas', 35] : null, M.funcaoLigada('assistente') ? ['pergunta', 'Assistente de dúvidas', null, 'assistente', 36] : null,
-          M.funcaoLigada('personal') ? ['conversa', 'Seu personal', window.DEMO_IA.pref.canal === 'whatsapp' ? 'No WhatsApp' : 'No app', 'personal', 52] : null]),
+          M.funcaoLigada('personal') ? ['conversa', 'Seu personal', window.DEMO_IA && window.DEMO_IA.pref.canal === 'whatsapp' ? 'No WhatsApp' : 'No app', 'personal', 52] : null]),
         grupoLista('Sua conta', [['texto', 'Leitura confortável', 'Tema escuro e letra grande', 'leitura', 38], ['cadeado', 'Meus dados', null, 'meus-dados', 37]]),
         cartao('Ícone na tela do celular', 3, el('p', { class: 'peq', text: 'No navegador, toque em Compartilhar e depois em "Adicionar à Tela de Início". O app vira um ícone com a marca da clínica.' }))];
     },
@@ -437,7 +437,7 @@
         const area = el('div', { class: 'foto-leitura' }, caixaIc('camera', 'grande'), el('p', { text: 'Aponte a câmera para o prato.' }));
         const tirar = el('button', { type: 'button', class: 'botao grande cheio', onclick: () => {
           tirar.disabled = true; trocar(area, el('div', { class: 'esqueleto', role: 'status', 'aria-label': 'Lendo a foto' }, el('i'), el('i', { class: 'curto' }), el('i')), el('p', { text: 'Lendo a foto…' }));
-          window.DEMO_IA.gastar('foto', m.id);   // a leitura da foto usa créditos de IA (central › IA › Consumo)
+          DEMO.comIA().then(() => window.DEMO_IA.gastar('foto', m.id), () => {});   // a leitura da foto usa créditos de IA (central › IA › Consumo)
           setTimeout(() => { est.foto = [ALIMENTOS[0], ALIMENTOS[1], ALIMENTOS[2], ALIMENTOS[7]].map(x => ({ ...x, marcado: true })); f.trocar('Encontrei no prato', vistaFoto(), () => f.trocar('Registrar refeição', vistaBusca())); }, 1000);
         } }, ic('camera'), 'Tirar a foto');
         return [el('div', { class: 'linha-h' }, el('p', { class: 'mudo peq cresce', text: 'Na demonstração, a câmera não abre: a leitura é simulada.' }), item(7)), area, tirar];
@@ -538,14 +538,14 @@
     const inicio = qual === 'equipe' ? enf + ': “Oi, ' + PACIENTE + '! Pode escrever aqui suas dúvidas sobre a aplicação.”'
       : qual === 'personal' ? 'Oi, ' + PACIENTE + '! Sou o personal da clínica. Pode me perguntar ou me contar como você está.'
         : 'Oi, ' + PACIENTE + '! Respondo dúvidas sobre o app e sobre as orientações da sua equipe. Não faço diagnóstico nem receito.';
-    const lista = el('div', { class: 'conversa', 'aria-live': 'polite' }, bolha('outro', inicio), conversas[qual].map(([q, t, ir, o]) => bolha(q, t, ir, o)));
+    const lista = el('div', { class: 'conversa', 'aria-live': 'polite' }, bolha('outro', inicio), conversas[qual].map(([q, t, ir, o, ps]) => bolha(q, t, ir, o, ps)));
     const campo = el('input', { class: 'entrada', id: 'msg-' + qual, maxlength: '300', autocomplete: 'off', placeholder: 'Escreva sua mensagem', 'aria-label': 'Mensagem' });
     const mandar = t => {
       conversas[qual].push(['eu', t]); lista.append(bolha('eu', t)); campo.value = '';
       DEMO.evento('pergunta', { chat: qual, texto: t.slice(0, 300) });
       if (qual === 'equipe') naFicha('conversa', 'Mensagem no chat', 'Para a equipe');
       const r = qual === 'equipe' ? { texto: enf + ': “Recebi, ' + PACIENTE + '. Vejo com a equipe e te respondo hoje.”' } : window.DEMO_IA.responderPaciente(t, 'app');
-      setTimeout(() => { conversas[qual].push(['outro', r.texto, r.ir, r.origem]); lista.append(bolha('outro', r.texto, r.ir, r.origem)); }, 700);
+      setTimeout(() => { conversas[qual].push(['outro', r.texto, r.ir, r.origem, r.passos]); lista.append(bolha('outro', r.texto, r.ir, r.origem, r.passos)); }, 700);
     };
     const enviar = e => { e.preventDefault(); const t = campo.value.trim(); if (t) mandar(t); };
     const prontas = qual === 'ia' ? SUGESTOES : qual === 'personal' ? window.DEMO_IA.SUGESTOES_PACIENTE : [];
@@ -558,10 +558,10 @@
   // A tela de mensagens (estilo mensageiro): os lembretes de hoje que já passaram, a conversa e o "Responda SAIR".
   function mensageiro(ativo) {
     const I = window.DEMO_IA, h = new Date().getHours();
-    const msg = (quem, texto, hora) => el('div', { class: 'msg ' + quem }, el('span', { text: texto }), hora ? el('small', { text: hora }) : null);
+    const msg = (quem, texto, hora, passos) => el('div', { class: 'msg ' + quem }, el('span', { text: texto }), passos ? el('ol', { class: 'passos-ia' }, passos.map(x => el('li', { text: x }))) : null, hora ? el('small', { text: hora }) : null);
     const corpo = el('div', { class: 'msg-corpo', 'aria-live': 'polite' },
       ativo ? I.planoHoje().filter(x => x.h <= h && !x.adiada).map(x => msg('outro', x.texto, x.h + 'h')) : null,
-      conversas.whatsapp.map(([q, t]) => q === 'sistema' ? el('p', { class: 'msg-sistema', text: t }) : msg(q, t)));
+      conversas.whatsapp.map(([q, t, ps]) => q === 'sistema' ? el('p', { class: 'msg-sistema', text: t }) : msg(q, t, null, ps)));
     const campo = el('input', { class: 'entrada', id: 'msg-whatsapp', maxlength: '300', autocomplete: 'off', placeholder: ativo ? 'Mensagem (ou SAIR)' : 'Mensagens paradas', 'aria-label': 'Mensagem', disabled: !ativo });
     const enviar = e => {
       e.preventDefault(); const t = campo.value.trim(); if (!t) return;
@@ -570,7 +570,7 @@
       if (/^sair$/i.test(t)) { I.sair(); conversas.whatsapp.push(['sistema', 'Pronto: você não recebe mais mensagens aqui. O personal continua no app.']); desenharTela('whatsapp'); return; }
       corpo.append(msg('eu', t));
       const r = I.responderPaciente(t, 'whatsapp');
-      setTimeout(() => { conversas.whatsapp.push(['outro', r.texto]); corpo.append(msg('outro', r.texto)); corpo.scrollTop = corpo.scrollHeight; }, 700);
+      setTimeout(() => { conversas.whatsapp.push(['outro', r.texto, r.passos]); corpo.append(msg('outro', r.texto, null, r.passos)); corpo.scrollTop = corpo.scrollHeight; }, 700);
     };
     return el('section', { class: 'mensageiro', 'aria-label': 'Mensagens do personal' },
       el('div', { class: 'msg-topo' }, el('span', { class: 'selo peq-selo', 'aria-hidden': 'true', text: DEMO.iniciais(DEMO.dados.clinica) }),
@@ -579,10 +579,12 @@
       el('form', { class: 'msg-enviar', onsubmit: enviar }, campo, el('button', { class: 'botao', type: 'submit', disabled: !ativo }, ic('enviar', 'p'), 'Enviar')));
   }
   // "Seu personal" na tela Hoje: a próxima mensagem planejada.
+  // Sem a IA carregada (ainda não aberta), o cartão só apresenta o personal; depois, mostra a próxima mensagem.
   function cartaoPersonal() {
-    const I = window.DEMO_IA, pl = I.planoHoje(), h = new Date().getHours(), prox = pl.find(x => x.h >= h) || pl[pl.length - 1];
+    const I = window.DEMO_IA, pl = I ? I.planoHoje() : [], h = new Date().getHours(), prox = pl.find(x => x.h >= h) || pl[pl.length - 1];
     return el('section', { class: 'cartao personal-hoje' }, el('div', { class: 'linha-h cab-cartao' }, caixaIc('conversa'), el('h2', { class: 'cresce', text: 'Seu personal' }), item(52)),
-      prox ? el('p', {}, el('strong', { text: (prox.h >= h ? 'Às ' + prox.h + 'h: ' : 'Hoje: ') }), prox.texto) : el('p', { class: 'mudo', text: I.pref.pausa ? 'Pausado.' : 'Nenhum lembrete hoje.' }),
+      !I ? el('p', { class: 'peq', text: 'Lembra das suas metas no horário que você escolher e tira dúvidas pelas orientações da equipe.' })
+        : prox ? el('p', {}, el('strong', { text: (prox.h >= h ? 'Às ' + prox.h + 'h: ' : 'Hoje: ') }), prox.texto) : el('p', { class: 'mudo', text: I.pref.pausa ? 'Pausado.' : 'Nenhum lembrete hoje.' }),
       el('button', { type: 'button', class: 'botao sec', onclick: () => irParaTela('personal') }, 'Abrir o personal', ic('seta', 'p')));
   }
   const juridico = () => el('p', { class: 'etq-juridico' }, ic('info', 'p'), 'Depende de parecer jurídico');
@@ -596,7 +598,9 @@
     return el('label', { class: 'campo', for: id }, el('span', { text: rotulo }), s);
   }
   // ir: [tela, rótulo]: um botão embaixo da resposta que abre a tela (a mesma navegação dos links …&tela=…).
-  const bolha = (quem, texto, ir, de) => el('div', { class: 'bolha ' + quem }, el('span', { text: texto }),
+  // passos: a lista numerada do manual (as respostas de "como faço…").
+  const bolha = (quem, texto, ir, de, passos) => el('div', { class: 'bolha ' + quem }, el('span', { text: texto }),
+    passos && passos.length ? el('ol', { class: 'passos-ia' }, passos.map(x => el('li', { text: x }))) : null,
     de && quem === 'outro' ? el('span', { class: 'de-onde mini', text: 'De onde veio: ' + de + '.' }) : null,
     ir ? el('button', { type: 'button', class: 'botao suave pilula ir-tela', onclick: () => irParaTela(ir[0]) }, ir[1], ic('seta', 'p')) : null);
 
@@ -608,7 +612,10 @@
   function voltar() { est.pilha.pop(); desenhar(est.pilha[est.pilha.length - 1] || est.aba); }
   function desenharTela(tela) { desenhar(tela, true); }
   // Troca de tela com transição; a primeira tela e as atualizações da mesma tela, direto.
+  // Telas que usam a IA (comum/ia.js, com o manual): o arquivo vem na primeira vez que uma delas abre.
+  const COM_IA = ['personal', 'whatsapp', 'assistente'];
   function desenhar(tela, mesma) {
+    if (COM_IA.includes(tela) && !window.DEMO_IA) { DEMO.comIA().then(() => desenhar(tela, mesma), DEMO.semRede); return; }
     if (mesma || !raiz.querySelector('.celular')) montarTela(tela, mesma); else DEMO.transicao(() => montarTela(tela, mesma));
   }
   function montarTela(tela, mesma) {
@@ -651,7 +658,7 @@
     montar(onde, pedida) {
       raiz = onde;
       // Vindo da central pela faixa: volta para onde estava (ou Hoje); a tela de primeiro acesso só abre pelo link do app.
-      if (pedida == null) { montarTela(est.pilha.length ? est.pilha[est.pilha.length - 1] : est.aba); est.visto = true; return; }
+      if (pedida == null) { desenhar(est.pilha.length ? est.pilha[est.pilha.length - 1] : est.aba); est.visto = true; return; }
       est.visto = true;
       // "tutorial" (o "Ver na tela" dos itens do primeiro acesso): abre na tela Hoje, com o tutorial.
       if (!irParaTela(pedida === 'tutorial' ? 'inicio' : pedida)) montarTela('boas-vindas');

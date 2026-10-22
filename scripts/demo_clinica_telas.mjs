@@ -268,7 +268,10 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
     return { kcal: num(await b('kcal').locator('.numero').innerText()), prot: num(await b('prot').locator('.numero').innerText()), agua: num(await b('agua').locator('.numero').innerText()),
       metaProt: num(await b('prot').locator('.mini').innerText()), peso: num(await page.locator('[data-bloco="peso"] .numero').innerText()) }; };
   // Na 1ª vez na central, o tutorial abre: Esc fecha (Pular).
-  const irCentral = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2'); if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); } };
+  // O tutorial carrega o manual antes de abrir ("pendente"): espera, e fecha com Esc se abriu.
+  const semTutorial = async () => { await page.waitForFunction(() => !window.DEMO_TUTORIAL || !window.DEMO_TUTORIAL.pendente);
+    if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); } };
+  const irCentral = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2'); await semTutorial(); };
   const irApp = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'App' }).click(); await page.waitForSelector('.v-app #conteudo h1, .v-app #conteudo h2'); };
   // A central lembra onde estava (a ficha continua aberta ao voltar); se não estiver na ficha da Mariana, abre pela lista.
   const abaCentral = async nome => { await page.locator('.barra-abas').getByRole('button', { name: nome }).click(); await page.waitForSelector('.barra-abas [aria-current="page"]:text-is("' + nome + '")'); };
@@ -352,10 +355,11 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   // Manual: cada tela do manual, cada etapa dos fluxogramas e cada "onde" dos itens apontam para uma tela que existe;
   // e cada "Ver na tela" abre mesmo a tela (título ou folha na tela).
   // A página do app carrega a central só na primeira troca pela faixa: troca, para as duas listas de telas existirem.
-  ok(await page.evaluate(() => !window.DEMO_CENTRAL), 'peso: a página do app não carrega a central antes da troca');
+  ok(await page.evaluate(() => !window.DEMO_CENTRAL && !window.DEMO_IA && !window.DEMO_MANUAL), 'peso: a página do app não carrega a central, a IA nem o manual antes de abrir');
   await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2');
-  if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); }
-  const mapa = await page.evaluate(() => {
+  await semTutorial();
+  const mapa = await page.evaluate(async () => {
+    await window.DEMO.comManual();
     const val = { app: window.DEMO_APP.telas(), central: window.DEMO_CENTRAL.telas(), manual: ['app', 'central', 'fluxos'] };
     const M = window.DEMO_MANUAL, ruins = [];
     for (const p of ['app', 'central']) for (const t of M.partes[p].telas) {
@@ -380,6 +384,8 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   // Página do manual: abas, busca, "Ver na tela", fluxogramas em SVG e o registro de uso como "escopo".
   await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/manual/#${ATIVO}`); await page.waitForSelector('.man-tela');
   ok(await page.locator('.faixa-demo [aria-current="page"]').innerText() === 'Manual', 'manual: "Manual" marcado na faixa');
+  const nApp = mapa.telas.filter(x => x[0] === 'app').length, nCentral = mapa.telas.filter(x => x[0] === 'central').length;
+  ok((await page.locator('.meta-doc').innerText()).includes(nApp + ' do app · ' + nCentral + ' da central') && (await page.locator('.sumario summary').textContent()).includes(nApp + ' telas do app'), `manual: os números do topo e do sumário batem (${nApp} do app, ${nCentral} da central)`);
   ok(await page.locator('.man-tela[data-parte="app"]').count() === mapa.telas.filter(x => x[0] === 'app').length, 'manual: todas as telas do app na aba "App do paciente"');
   await page.getByRole('button', { name: 'Central da equipe' }).click();
   ok(await page.locator('.man-tela[data-parte="central"]').count() === mapa.telas.filter(x => x[0] === 'central').length, 'manual: todas as telas da central na aba "Central da equipe"');
@@ -394,6 +400,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await telaApp('assistente');
   await page.getByRole('button', { name: 'Como registro a água?' }).click(); await page.waitForSelector('.bolha.outro .ir-tela');
   ok(/1 copo \(250 mL\)/.test(await page.locator('.bolha.outro').last().innerText()), 'assistente: "como registro a água?" responde com o passo a passo do manual');
+  ok(await page.locator('.bolha.outro').last().locator('ol.passos-ia li').count() >= 2, 'assistente: os passos vêm numa lista numerada');
   await page.locator('.bolha.outro .ir-tela').last().click(); await page.waitForSelector('.folha h2:text-is("Água")');
   ok(true, 'assistente: "Abrir Água" abre a folha de água'); await page.keyboard.press('Escape');
   await telaApp('assistente');
@@ -457,7 +464,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok((reg.match(/Confirmado/g) || []).length >= ACOES.length && /Mudança cancelada/.test(reg) && /pedido de Dra\. Helena Prado/.test(reg), 'Registro da IA: as mudanças confirmadas (com quem pediu) e a cancelada');
   // Reflete no app (mesma página): meta nova, recado, conquistas desligadas e o personal com o tom e o lembrete de água da clínica.
   await page.locator('.faixa-demo').getByRole('button', { name: 'App' }).click(); await page.waitForSelector('.v-app #conteudo h1');
-  if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); }
+  await semTutorial();
   const hoje = await textoMain();
   ok(/de 110 g/.test(await page.locator('.meta[data-meta="prot"]').innerText()) && /Traga os exames de sangue no retorno/.test(hoje) && !/Pontos de hoje/.test(hoje), 'IA da central: meta, recado e função aparecem no app');
   await page.getByRole('button', { name: 'Abrir o personal' }).click(); await page.waitForSelector('#msg-personal');
@@ -490,7 +497,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(/Avisei a enfermagem/.test(respostasIa[respostasIa.length - 1]), 'personal: enjoo forte avisa a enfermagem');
   ok(respostasIa.every(t => !DOSE_RE.test(t)), `IA: nenhuma resposta tem dose (${respostasIa.filter(t => DOSE_RE.test(t)).join(' | ')})`);
   await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2');
-  if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); }
+  await semTutorial();
   ok(await page.locator('.alerta-card[data-paciente="1"]').count() === 1 && /Relatou enjoo forte/.test(await page.locator('.alerta-card[data-paciente="1"]').innerText()), 'personal: o alerta da conversa aparece na triagem da central');
   // Consumo: 80% avisa; com teto menor e "pausar", as IAs param; "Continuar" volta.
   await page.locator('.barra-abas').getByRole('button', { name: 'IA' }).click(); await page.getByRole('button', { name: 'Consumo' }).click();
@@ -510,6 +517,44 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(nPedidos() === antesPedidos, `memória: nenhum pedido ao servidor além de abrir e eventos (${nPedidos() - antesPedidos} a mais)`);
   ok(!/nada é guardado/i.test(await page.content()), 'nenhum "nada é guardado"');
   ok(!erros.length, 'caminhos: erro no console: ' + erros.join(' | '));
+  await ctx.close();
+}
+// Horários relativos: a demonstração aberta às 0h30, às 7h e às 23h. Nada de madrugada (antes das 6h) nem no futuro, e o
+// texto bate com a hora (a Beatriz relatou o enjoo forte ontem às 14h, depois da aplicação de ontem às 8h).
+for (const [h, m] of [[0, 30], [7, 0], [23, 0]]) {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); const page = await ctx.newPage(); const erros = [];
+  page.on('pageerror', e => erros.push(String(e)));
+  const agora = new Date(); agora.setHours(h, m, 0, 0);
+  await page.clock.setFixedTime(agora);
+  await page.addInitScript(() => { try { localStorage.setItem('demo_aviso_visto', '1'); } catch (e) {} });
+  await page.route(N8N, simular([]));
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.request().url().startsWith(N8N) ? r.fallback() : r.abort());
+  await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=registro-ia`); await page.waitForSelector('.registro-ia');
+  const onde = `às ${h}h${m ? m : ''}`;
+  const r = await page.evaluate(() => {
+    const M = window.DEMO_MODELO, agora = new Date(), ruins = [];
+    const conferir = (nome, d, futuro) => { if (!d) return; const x = new Date(d); if (!futuro && x > agora) ruins.push(nome + ' no futuro (' + x.toLocaleString('pt-BR') + ')'); if (x.getHours() < 6) ruins.push(nome + ' de madrugada (' + x.toLocaleString('pt-BR') + ')'); };
+    for (const p of M.pacientes) {
+      conferir(p.nome + ': último registro', M.ultimoRegistro(p));
+      if (p.sintoma) { conferir(p.nome + ': sintoma', p.sintoma.quando); conferir(p.nome + ': aplicação do sintoma', p.sintoma.aplicacao); if (p.sintoma.aplicacao && (p.sintoma.aplicacao > p.sintoma.quando || p.sintoma.aplicacao.getHours() !== 8)) ruins.push(p.nome + ': aplicação depois do sintoma ou fora das 8h'); }
+      conferir(p.nome + ': última pesagem', M.pesoAtual(p).quando);
+      M.linhaDoTempo(p).forEach(x => conferir(p.nome + ': ' + x.titulo, x.quando));
+      (p.consultas || []).forEach(c => conferir(p.nome + ': consulta', c.quando, true));
+      if (p.id !== 1 && M.ultimoRegistro(p) < new Date(new Date(agora).setHours(0, 0, 0, 0)) && M.consumoHoje(p).kcal > 0) ruins.push(p.nome + ': consumo hoje sem registro hoje');
+    }
+    M.recados.forEach(x => conferir('recado', x.quando)); M.prescricoes.forEach(x => { conferir('prescrição', x.cadastrada); conferir('conferência', x.conferida); });
+    M.mariana.aplicacoes.forEach(a => { conferir('aplicação da Mariana', a.quando); if (a.quando.getHours() !== 8) ruins.push('aplicação da Mariana fora das 8h'); });
+    window.DEMO_IA.registro.forEach(x => conferir('registro da IA', x.quando));
+    const bea = M.estado(M.pac(3)).porque;
+    return { ruins, bea };
+  });
+  ok(!r.ruins.length, `horários ${onde}: ${r.ruins.slice(0, 6).join('; ')}`);
+  ok(/Relatado ontem, 14h, depois da aplicação de ontem, 8h/.test(r.bea), `horários ${onde}: o sintoma da Beatriz bate com o texto (${r.bea.slice(0, 90)})`);
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=hoje`); await page.waitForSelector('#conteudo h2');
+  const txt = await page.locator('#conteudo').innerText();
+  const madrugada = (txt.match(/\b\d{1,2}h\d{0,2}\b/g) || []).filter(x => parseInt(x, 10) < 6);
+  ok(!madrugada.length, `horários ${onde}: a central não mostra horário de madrugada (${madrugada.join(', ')})`);
+  ok(!erros.length, `horários ${onde}: erro: ${erros.join(' | ')}`);
   await ctx.close();
 }
 await browser.close(); site.fechar();

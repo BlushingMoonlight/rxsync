@@ -64,9 +64,10 @@
   const registro = [];
   function registrar(ia, tipo, texto, extra) { registro.unshift({ quando: agoraReal(), ia, tipo, texto, ...(extra || {}) }); }
   // Alguns registros de antes de hoje, para a lista não começar vazia.
-  [[2, 'paciente', 'lembrete', 'Lembrete de água enviado no app.', 7], [5, 'paciente', 'lembrete', 'Parabéns pelos 7 de 7 dias com registro.', 5], [26, 'paciente', 'lembrete', 'Check-in da manhã no app.', 1],
-    [27, 'central', 'resposta', 'Respondeu "quem está abaixo da meta de proteína?" (1 paciente).', null]].forEach(([h, ia, tipo, texto, pid]) =>
-    registro.push({ quando: new Date(M.agora.getTime() - h * 36e5), ia, tipo, texto, paciente: pid ? M.pac(pid).nome : '', quem: ia === 'central' ? 'equipe' : '' }));
+  // Em horário de dia, sem futuro (M.hojeOuOntem): do mais novo para o mais antigo.
+  [[M.hojeOuOntem(15, 0, 20, 0), 'paciente', 'lembrete', 'Lembrete de água enviado no app.', 7], [M.hojeOuOntem(8, 0, 15, 0), 'paciente', 'lembrete', 'Check-in da manhã no app.', 5],
+    [M.em(-1, 9, 40), 'central', 'resposta', 'Respondeu "quem está abaixo da meta de proteína?" (1 paciente).', null], [M.em(-1, 8, 0), 'paciente', 'lembrete', 'Check-in da manhã no app.', 1]]
+    .sort((a, b) => b[0] - a[0]).forEach(([quando, ia, tipo, texto, pid]) => registro.push({ quando, ia, tipo, texto, paciente: pid ? M.pac(pid).nome : '', quem: ia === 'central' ? 'equipe' : '' }));
 
   const FUNCOES_IA = [['app', 'IA do paciente no app', 'pacientes', 2], ['whatsapp', 'IA do paciente no WhatsApp', 'pacientes', 3], ['foto', 'Foto do prato', 'pacientes', 5],
     ['central', 'IA da central', 'equipe', 4], ['resumo', 'Resumos', 'equipe', 6]];
@@ -121,14 +122,14 @@
   const semDose = 'Dose, diagnóstico e mudança no tratamento são decisões da sua equipe, e eu não respondo sobre isso. Leve a dúvida ao chat com a equipe ou ao retorno.';
 
   // ---------------------------------------------------------------- 1. IA do paciente (app ou mensagens)
-  // Devolve { texto, origem, ir: [tela, rótulo], alerta }.
+  // Devolve { texto, passos (lista numerada, quando vem do manual), origem, ir: [tela, rótulo], alerta }.
   function responderPaciente(texto, canal) {
     canal = canal === 'whatsapp' ? 'whatsapp' : 'app';
     const t = sem(texto), p = mariana;
     if (!gastar(canal, p.id)) return { texto: PAUSADA };
     let r;
     if (URGENTE.test(t)) {
-      p.sintoma = { nome: /enjoo|vomit/.test(t) ? 'Enjoo forte' : 'Sintoma de alerta', quando: agoraReal() };
+      p.sintoma = { nome: /enjoo|vomit/.test(t) ? 'Enjoo forte' : 'Sintoma de alerta', quando: agoraReal(), onde: 'na conversa com o personal' };
       r = { texto: 'Avisei a enfermagem agora. Se for forte ou piorar, procure atendimento de urgência. A equipe vai falar com você.', origem: 'regra da clínica: sintoma de alerta avisa a enfermagem', ir: ['chat-equipe', 'Abrir o chat com a equipe'], alerta: true };
       registrar('paciente', 'alerta', 'Sinal de alerta na conversa: avisou a enfermagem e colocou na triagem.', { paciente: p.nome, canal });
     } else if (DOSE.test(t)) {
@@ -139,9 +140,9 @@
       // "Como registro…", "onde vejo…": o manual vem antes das orientações ("o que como…" é orientação).
       if (/\b(como|onde)\b.*\b(registr|abr|mud|escolh|ver|vejo|acho|uso|confirm|envi|marc|lig)/.test(t) && m) {
         const nome = m.titulo.replace(/ \(folha\)$/, '');
-        r = { texto: nome + ': ' + m.passos.map((x, i) => (i + 1) + '. ' + x).join(' '), origem: 'manual do app', ir: [m.tela, 'Abrir ' + nome] };
+        r = { texto: nome + ':', passos: m.passos, origem: 'manual do app', ir: [m.tela, 'Abrir ' + nome] };
       } else if (o) r = { texto: o[1], origem: o[2] };
-      else if (m) { const nome = m.titulo.replace(/ \(folha\)$/, ''); r = { texto: nome + ': ' + m.passos.map((x, i) => (i + 1) + '. ' + x).join(' '), origem: 'manual do app', ir: [m.tela, 'Abrir ' + nome] }; }
+      else if (m) { const nome = m.titulo.replace(/ \(folha\)$/, ''); r = { texto: nome + ':', passos: m.passos, origem: 'manual do app', ir: [m.tela, 'Abrir ' + nome] }; }
       else r = { texto: 'Pela orientação da sua equipe: mantenha os registros do dia e leve essa dúvida ao retorno. Se algo mudou no tratamento ou você sentiu algo diferente, fale com a equipe no chat.', origem: 'orientação geral da equipe' };
     }
     if (!r.alerta) registrar('paciente', 'resposta', 'Respondeu uma dúvida (' + r.origem + ').', { paciente: p.nome, canal });
@@ -226,7 +227,7 @@
     } else {
       // A central pergunta mais sobre a central: o manual dela primeiro, depois o do app.
       const [m] = window.DEMO_MANUAL.buscar(texto, 'central').concat(window.DEMO_MANUAL.buscar(texto, 'app'));
-      if (m) { const nome = m.titulo.replace(/ \(folha\)$/, ''); r = { texto: nome + ' (' + (m.parte === 'app' ? 'app do paciente' : 'central') + '): ' + m.passos.map((x, i) => (i + 1) + '. ' + x).join(' '), origem: 'manual de uso', ir: [m.tela, 'Abrir ' + nome], parte: m.parte }; }
+      if (m) { const nome = m.titulo.replace(/ \(folha\)$/, ''); r = { texto: nome + ' (' + (m.parte === 'app' ? 'app do paciente' : 'central') + '):', passos: m.passos, origem: 'manual de uso', ir: [m.tela, 'Abrir ' + nome], parte: m.parte }; }
       else r = { texto: 'Não entendi. Tente: "quem não registrou há 3 dias?", "como está a Mariana?", "mude a meta de proteína da Mariana para 110" ou "como envio um recado?".', origem: '' };
     }
     if (!r.acao) registrar('central', 'resposta', 'Respondeu "' + texto.trim().slice(0, 80) + '"' + (r.origem ? ' (de: ' + r.origem + ')' : '') + '.', { quem: medico, paciente: p ? p.nome : '' });

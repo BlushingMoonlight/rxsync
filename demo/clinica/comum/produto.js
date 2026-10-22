@@ -13,14 +13,11 @@
   let atual = null;
   const ARQUIVOS = { app: ['../app/app.css', '../app/app.js'], central: ['../central/central.css', '../central/central.js'] };
   const pronto = v => v === 'app' ? window.DEMO_APP : window.DEMO_CENTRAL;
-  const carregar = v => Promise.all(ARQUIVOS[v].map(src => new Promise((ok, erro) => {
-    const e = src.endsWith('.css') ? el('link', { rel: 'stylesheet', href: src }) : el('script', { src });
-    e.onload = ok; e.onerror = erro; document.head.append(e);
-  })));
+  const carregar = v => DEMO.carregar(ARQUIVOS[v]);
   async function trocarVista(v, primeira) {
     if (v === atual) return;
     // Só espera quando precisa carregar (a primeira montagem é na hora: o destaque do &item=N vem logo depois).
-    if (!pronto(v)) { try { await carregar(v); } catch (e) { DEMO.rapida('Não consegui abrir agora. Confira a internet e tente de novo.'); return; } if (v === atual) return; }
+    if (!pronto(v)) { try { await carregar(v); } catch (e) { DEMO.semRede(); return; } if (v === atual) return; }
     atual = v;
     DEMO.mudarPagina(v);
     if (!primeira) { DEMO.marcarVisto(v); try { history.replaceState(null, '', DEMO.link(v)); } catch (e) { /* segue sem trocar o endereço */ } }
