@@ -1,4 +1,4 @@
-// Os 46 itens do escopo da demonstração (numeração própria, escrita à mão; DEC-125). "onde" leva ao lugar do item na
+// Os itens do escopo da demonstração (numeração própria, escrita à mão; DEC-125). "onde" leva ao lugar do item na
 // demonstração ("Ver na tela"). A Central (central/fonte/09_demonstracoes.js) tem a mesma lista de títulos: o
 // verificar_site.mjs confere que as duas batem.
 window.DEMO_ITENS = [
@@ -47,5 +47,10 @@ window.DEMO_ITENS = [
   { n: 43, t: 'Metas e plano alimentar', d: 'A equipe define as metas e monta o plano, que chega ao app.', onde: ['central', 'metas'] },
   { n: 44, t: 'Prescrição das aplicações', d: 'A equipe cadastra; a enfermagem confere antes de aparecer no app.', onde: ['central', 'aplicacoes'] },
   { n: 45, t: 'Avisos e conteúdo', d: 'Recado para um paciente, um grupo ou todos, e o conteúdo da clínica.', onde: ['central', 'avisos'] },
-  { n: 46, t: 'Funções do app', d: 'A clínica liga e desliga cada parte do app.', onde: ['central', 'funcoes'] }
+  { n: 46, t: 'Funções do app', d: 'A clínica liga e desliga cada parte do app.', onde: ['central', 'funcoes'] },
+  { n: 47, t: 'Manual de uso', d: 'O manual do app do paciente e o da central da equipe, sempre atualizados: o passo a passo de cada tela, de onde vem cada dado e o que acontece do outro lado.', onde: ['manual', 'app'] },
+  { n: 48, t: 'Fluxogramas', d: 'Os caminhos da informação desenhados: do registro à ação, aplicação, metas, consultas e recados.', onde: ['manual', 'fluxos'] },
+  { n: 49, t: 'Ajuda pela IA', d: 'O assistente do app responde dúvidas de uso a partir do manual, com o passo a passo e o botão para abrir a tela.', onde: ['app', 'assistente'] },
+  { n: 50, t: 'Primeiro acesso guiado no app', d: 'Na primeira vez, balões mostram as partes do app. O "?" no topo mostra de novo.', onde: ['app', 'tutorial'] },
+  { n: 51, t: 'Primeiro acesso guiado na central', d: 'Na primeira vez, balões mostram as partes da central. O "?" no topo mostra de novo.', onde: ['central', 'tutorial'] }
 ];

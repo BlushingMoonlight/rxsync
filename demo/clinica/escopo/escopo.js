@@ -1,4 +1,4 @@
-// Escopo da demonstração (DEC-125): o médico marca Quero, Não preciso ou Tenho dúvida em cada um dos 46 itens e envia
+// Escopo da demonstração (DEC-125): o médico marca Quero, Não preciso ou Tenho dúvida em cada item e envia
 // para a RXSync. As escolhas ficam no servidor (vale a última, de qualquer aparelho); sem valores e sem datas de entrega.
 (function () {
   'use strict';
@@ -25,7 +25,7 @@
     }, 1500);
   }
   // Grupos (dobráveis), com a contagem do que já foi marcado em cada um.
-  const GRUPOS = [['Entrada e tela Hoje', 1, 6], ['Registros do dia', 7, 19], ['Evolução', 20, 22], ['Aplicações', 23, 27], ['Clínica e contato', 28, 34], ['Extras do app', 35, 38], ['Central do médico', 39, 46]];
+  const GRUPOS = [['Entrada e tela Hoje', 1, 6], ['Registros do dia', 7, 19], ['Evolução', 20, 22], ['Aplicações', 23, 27], ['Clínica e contato', 28, 34], ['Extras do app', 35, 38], ['Central do médico', 39, 46], ['Manual e ajuda', 47, 51]];
   const contadores = {};
   function contarGrupo(g) {
     const [, a, b] = g, total = b - a + 1, feitos = Object.entries(est.escolhas).filter(([n, v]) => +n >= a && +n <= b && v.e).length;

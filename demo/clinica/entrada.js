@@ -1,5 +1,5 @@
 // Entrada da demonstração (DEC-125): o título com o nome do médico e da clínica e os três caminhos: o app do paciente e a
-// central do médico (o produto) e, separado, o escopo (a proposta). No iPad e no computador, o app roda num celular na
+// central do médico (o produto) e, separados, o escopo e o manual (a proposta). No iPad e no computador, o app roda num celular na
 // tela. O progresso ("Você já viu 1 de 3") fica só na memória da aba.
 (function () {
   'use strict';
@@ -59,8 +59,13 @@
           el('h2', { class: 'sobretitulo', id: 'tit-escopo', text: 'A proposta' }),
           el('a', { class: 'documento-b', href: DEMO.link('escopo') },
             el('span', { class: 'folha-doc', 'aria-hidden': 'true' }, el('i'), el('i'), el('i', { class: 'curta' }), el('i'), el('i', { class: 'curta' })),
-            el('span', { class: 'cresce' }, el('span', { class: 'sobretitulo', text: 'Escopo · 46 itens' }), el('strong', { class: 'titulo-doc', text: 'Monte o escopo do app da sua clínica' }),
+            el('span', { class: 'cresce' }, el('span', { class: 'sobretitulo', text: 'Escopo · ' + (window.DEMO_ITENS || []).length + ' itens' }), el('strong', { class: 'titulo-doc', text: 'Monte o escopo do app da sua clínica' }),
               el('span', { class: 'mudo', text: 'Para cada item: Quero, Não preciso ou Tenho dúvida. As escolhas ficam guardadas e você envia para a RXSync quando quiser.' })),
+            el('span', { class: 'ir', 'aria-hidden': 'true' }, ic('seta', 'p'))),
+          el('a', { class: 'documento-b', href: DEMO.link('manual') },
+            el('span', { class: 'folha-doc manual-doc', 'aria-hidden': 'true' }, el('i'), el('i', { class: 'curta' }), el('b'), el('i'), el('i', { class: 'curta' })),
+            el('span', { class: 'cresce' }, el('span', { class: 'sobretitulo', text: 'Manual · app e central' }), el('strong', { class: 'titulo-doc', text: 'Como cada tela funciona' }),
+              el('span', { class: 'mudo', text: 'O passo a passo de cada tela, de onde vem cada dado, o que acontece do outro lado e os fluxogramas.' })),
             el('span', { class: 'ir', 'aria-hidden': 'true' }, ic('seta', 'p')))),
         el('footer', { class: 'rodape-demo' }, el('p', { class: 'mudo peq' }, 'RXSync · ', el('a', { href: DEMO.raizSite() + 'privacidade.html#demonstracao' }, 'Privacidade')))));
     DEMO.tela('inicio');

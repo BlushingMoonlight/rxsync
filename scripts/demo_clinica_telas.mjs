@@ -55,7 +55,8 @@ function medir() {
 const TELAS = [['', 'entrada'], ['app/', 'app (boas-vindas)'], ['app/', 'app início', 'tela=inicio'], ['app/', 'app registrar', 'tela=registrar'], ['app/', 'app refeição', 'tela=refeicao'],
   ['app/', 'app aplicações', 'tela=aplicacoes'], ['app/', 'app evolução', 'tela=evolucao'], ['app/', 'app mais', 'tela=mais'], ['app/', 'app assistente', 'tela=assistente'], ['app/', 'app chat', 'tela=chat-equipe'],
   ['app/', 'app lembretes', 'tela=lembretes'], ['app/', 'app buscar', 'tela=buscar'], ['app/', 'app foto', 'tela=foto'], ['app/', 'app sono', 'tela=sono'], ['central/', 'central'], ['central/', 'central alertas', 'tela=alertas'], ['central/', 'central ficha', 'tela=ficha'], ['central/', 'central metas', 'tela=metas'],
-  ['central/', 'central aplicações', 'tela=aplicacoes'], ['central/', 'central avisos', 'tela=avisos'], ['central/', 'central funções', 'tela=funcoes'], ['escopo/', 'escopo'], ['escopo/', 'escopo item 23', 'item=23']];
+  ['central/', 'central aplicações', 'tela=aplicacoes'], ['central/', 'central avisos', 'tela=avisos'], ['central/', 'central funções', 'tela=funcoes'], ['escopo/', 'escopo'], ['escopo/', 'escopo item 23', 'item=23'],
+  ['manual/', 'manual app'], ['manual/', 'manual central', 'tela=central'], ['manual/', 'manual fluxos', 'tela=fluxos'], ['app/', 'app tutorial', 'tela=tutorial'], ['central/', 'central tutorial', 'tela=tutorial']];
 const APARELHOS = [['celular360', { width: 360, height: 740 }, true], ['celular390', { width: 390, height: 844 }, true], ['celular430', { width: 430, height: 932 }, true],
   ['ipad', { width: 820, height: 1180 }, true], ['computador', { width: 1440, height: 900 }, false]];
 
@@ -135,11 +136,11 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   await page.keyboard.press('Escape');
   // Pergunta no chat do assistente: vai no lote de eventos (a cada 10 s), com o chat e o texto; o resto da tela não.
   await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=assistente`); await page.waitForSelector('#msg-ia');
-  await page.fill('#msg-ia', 'Posso tomar café?'); await page.getByRole('button', { name: 'Enviar' }).click();
+  await page.fill('#msg-ia', 'Posso viajar no feriado?'); await page.getByRole('button', { name: 'Enviar' }).click();
   await page.waitForSelector('text=Pela orientação da sua equipe');
   const ev = await espera(() => pedidos.find(p => p.tipo === 'eventos' && (p.eventos || []).some(e => e.acao === 'pergunta')), 12000);
   const perg = ev && ev.eventos.find(e => e.acao === 'pergunta');
-  ok(perg && perg.detalhe.chat === 'ia' && perg.detalhe.texto === 'Posso tomar café?' && perg.pagina === 'app' && perg.tela === 'assistente', `chat: a pergunta vai no lote de eventos (${JSON.stringify(perg)})`);
+  ok(perg && perg.detalhe.chat === 'ia' && perg.detalhe.texto === 'Posso viajar no feriado?' && perg.pagina === 'app' && perg.tela === 'assistente', `chat: a pergunta vai no lote de eventos (${JSON.stringify(perg)})`);
   ok(ev && ev.eventos.some(e => e.acao === 'abriu-tela') && ev.eventos.every(e => /^[a-z][a-z0-9-]{1,30}$/.test(e.acao) && ['entrada', 'app', 'central', 'escopo'].includes(e.pagina)), 'eventos: formato que o servidor aceita');
   // Estados: inativo, fora do ar e sem código.
   await page.goto(`${site.base}/demo/clinica/app/#${INATIVO}`); await page.waitForSelector('text=Este link não está mais ativo');
@@ -264,7 +265,8 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   const lerCentral = async () => { const b = k => page.locator('.hoje-ficha [data-bloco="' + k + '"]');
     return { kcal: num(await b('kcal').locator('.numero').innerText()), prot: num(await b('prot').locator('.numero').innerText()), agua: num(await b('agua').locator('.numero').innerText()),
       metaProt: num(await b('prot').locator('.mini').innerText()), peso: num(await page.locator('[data-bloco="peso"] .numero').innerText()) }; };
-  const irCentral = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2'); };
+  // Na 1ª vez na central, o tutorial abre: Esc fecha (Pular).
+  const irCentral = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2'); if (await page.locator('.tutorial').count()) { await page.keyboard.press('Escape'); await page.waitForSelector('.tutorial', { state: 'detached' }); } };
   const irApp = async () => { await page.locator('.faixa-demo').getByRole('button', { name: 'App' }).click(); await page.waitForSelector('.v-app #conteudo h1, .v-app #conteudo h2'); };
   // A central lembra onde estava (a ficha continua aberta ao voltar); se não estiver na ficha da Mariana, abre pela lista.
   const abaCentral = async nome => { await page.locator('.barra-abas').getByRole('button', { name: nome }).click(); await page.waitForSelector('.barra-abas [aria-current="page"]:text-is("' + nome + '")'); };
@@ -302,7 +304,105 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   const consApp = (await page.locator('.cartao', { hasText: 'Próxima consulta' }).locator('.grande-txt').innerText()).trim();
   await irCentral(); await fichaMariana();
   ok((await page.locator('.v-central').innerText()).includes(consApp), `datas: a próxima consulta é a mesma nos dois lados (${consApp})`);
-  // Tudo na memória: nenhum pedido novo ao servidor além do registro de uso; e nenhum "nada é guardado".
+  // ---------------------------------------------------------------- manual, fluxogramas, tutorial e ajuda pela IA
+  // Tutorial do app: abre sozinho depois do "Começar"; percorre todos os passos ("N de M"), o destaque cobre o elemento de
+  // cada passo, o foco fica preso no balão; "Concluir" fecha e devolve o foco ao "?"; o "?" abre de novo; Esc = Pular.
+  const percorrer = async (parte) => {
+    await page.waitForSelector('.tut-balao');
+    const total = Number((await page.locator('.tut-conta').innerText()).split(' de ')[1]);
+    const esperado = await page.evaluate(p => window.DEMO_MANUAL.TUTORIAL[p].length, parte);
+    ok(total === esperado, `tutorial ${parte}: ${total} passos (o manual tem ${esperado})`);
+    for (let k = 1; k <= total; k++) {
+      ok(await page.locator('.tut-conta').innerText() === k + ' de ' + total, `tutorial ${parte}: passo ${k} mostra "${k} de ${total}"`);
+      await page.waitForTimeout(350);   // o destaque desliza até o elemento (0,28 s)
+      const cobre = await page.evaluate(k => { const p = window.DEMO_MANUAL.TUTORIAL[document.querySelector('.tutorial').dataset.parte][k - 1];
+        const alvo = [...document.querySelectorAll(p.alvo)].find(x => x.getBoundingClientRect().width > 0), f = document.querySelector('.tut-foco').getBoundingClientRect(), r = alvo && alvo.getBoundingClientRect();
+        return !!r && f.left <= r.left + 1 && f.top <= r.top + 1 && f.right >= r.right - 1 && f.bottom >= r.bottom - 1 && document.querySelector('.tut-titulo, #tut-titulo').textContent === p.titulo; }, k);
+      ok(cobre, `tutorial ${parte}: o destaque do passo ${k} cobre o elemento certo`);
+      for (let t = 0; t < 4; t++) await page.keyboard.press('Tab');
+      ok(await page.evaluate(() => !!document.activeElement.closest('.tut-balao')), `tutorial ${parte}: o foco fica preso no balão (passo ${k})`);
+      await page.locator('.tut-balao').getByRole('button', { name: k === total ? 'Concluir' : 'Próximo' }).click();
+    }
+    ok(await page.locator('.tutorial').count() === 0, `tutorial ${parte}: "Concluir" fecha`);
+    ok(await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('botao-ajuda')), `tutorial ${parte}: o foco volta para o "?"`);
+  };
+  const armazenamento = () => page.evaluate(() => JSON.stringify([Object.keys(localStorage).sort(), Object.keys(sessionStorage).sort()]));
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}`); await page.waitForSelector('text=Li e aceito o termo de uso');
+  ok(await page.locator('.tutorial').count() === 0, 'tutorial app: não abre na tela de boas-vindas');
+  const guardadoAntes = await armazenamento();
+  await page.locator('.aceite input').check(); await page.getByRole('button', { name: 'Começar' }).click();
+  await percorrer('app');
+  await page.locator('.v-app .botao-ajuda').click(); await page.waitForSelector('.tut-balao');
+  ok(await page.locator('.tut-conta').innerText() === '1 de ' + await page.evaluate(() => window.DEMO_MANUAL.TUTORIAL.app.length), 'tutorial app: o "?" abre de novo, do começo');
+  await page.locator('.tut-balao').getByRole('button', { name: 'Próximo' }).click(); await page.locator('.tut-balao').getByRole('button', { name: 'Anterior' }).click();
+  ok(/^1 de /.test(await page.locator('.tut-conta').innerText()), 'tutorial app: "Anterior" volta um passo');
+  ok(await page.locator('.tut-balao').getAttribute('role') === 'dialog' && await page.locator('.tut-balao').getAttribute('aria-modal') === 'true', 'tutorial: o balão é uma janela para o leitor de tela');
+  await page.keyboard.press('Escape');
+  ok(await page.locator('.tutorial').count() === 0, 'tutorial app: Esc fecha (Pular)');
+  await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2');
+  await percorrer('central');
+  await page.locator('.faixa-demo').getByRole('button', { name: 'App' }).click(); await page.waitForSelector('.v-app #conteudo h1');
+  await page.locator('.faixa-demo').getByRole('button', { name: 'Central' }).click(); await page.waitForSelector('.v-central #conteudo h2');
+  ok(await page.locator('.tutorial').count() === 0, 'tutorial: "já viu" vale na página (não abre de novo ao voltar)');
+  ok(await armazenamento() === guardadoAntes, `tutorial: nada novo no armazenamento do navegador (${await armazenamento()})`);
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/app/#${ATIVO}&tela=inicio`); await page.waitForSelector('#conteudo h1');
+  ok(await page.locator('.tutorial').count() === 0, 'tutorial: o link que já leva a uma tela não abre o tutorial');
+  // Manual: cada tela do manual, cada etapa dos fluxogramas e cada "onde" dos itens apontam para uma tela que existe;
+  // e cada "Ver na tela" abre mesmo a tela (título ou folha na tela).
+  const mapa = await page.evaluate(() => {
+    const val = { app: window.DEMO_APP.telas(), central: window.DEMO_CENTRAL.telas(), manual: ['app', 'central', 'fluxos'] };
+    const M = window.DEMO_MANUAL, ruins = [];
+    for (const p of ['app', 'central']) for (const t of M.partes[p].telas) {
+      if (!val[p].includes(t.tela)) ruins.push(p + ':' + t.tela);
+      if (!t.passos.length || !t.oque || !t.para || !t.porque || !t.outroLado || !t.dados.length || !t.itens.length) ruins.push(p + ':' + t.tela + ' incompleta');
+      for (const n of t.itens) if (!window.DEMO_ITENS.some(i => i.n === n)) ruins.push(p + ':' + t.tela + ' item ' + n);
+    }
+    for (const f of M.FLUXOS) for (const e of f.etapas) if (!(val[e.parte] || []).includes(e.tela)) ruins.push('fluxo ' + f.id + ':' + e.parte + ':' + e.tela);
+    for (const i of window.DEMO_ITENS) if (!(val[i.onde[0]] || []).includes(i.onde[1])) ruins.push('item ' + i.n + ':' + i.onde.join(':'));
+    const semManual = window.DEMO_ITENS.filter(i => !M.partes.app.telas.concat(M.partes.central.telas).some(t => t.itens.includes(i.n)) && i.onde[0] !== 'manual').map(i => i.n);
+    return { ruins, semManual, telas: ['app', 'central'].flatMap(p => M.partes[p].telas.map(t => [p, t.tela])) };
+  });
+  ok(!mapa.ruins.length, `manual: tudo aponta para telas que existem (${mapa.ruins.join(', ')})`);
+  ok(!mapa.semManual.length, `manual: todo item do escopo aparece em alguma tela do manual (faltam ${mapa.semManual.join(', ')})`);
+  ok(await page.evaluate(() => window.DEMO_MANUAL.FLUXOS.length) >= 5, 'manual: os 5 fluxogramas do PR 1');
+  for (const [p, t] of mapa.telas) {
+    await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/${p}/#${ATIVO}&tela=${t}`);
+    const achou = await page.waitForFunction(t => document.querySelector('.folha h2') || (t === 'boas-vindas' ? document.querySelector('.aceite') : document.querySelector('#conteudo h1, #conteudo h2')), t, { timeout: 5000 }).then(() => true).catch(() => false);
+    const naBoasVindas = t !== 'boas-vindas' && await page.locator('.aceite').count() > 0;
+    ok(achou && !naBoasVindas, `manual: "Ver na tela" de ${p}/${t} abre a tela`);
+  }
+  // Página do manual: abas, busca, "Ver na tela", fluxogramas em SVG e o registro de uso como "escopo".
+  await page.goto('about:blank'); await page.goto(`${site.base}/demo/clinica/manual/#${ATIVO}`); await page.waitForSelector('.man-tela');
+  ok(await page.locator('.faixa-demo [aria-current="page"]').innerText() === 'Manual', 'manual: "Manual" marcado na faixa');
+  ok(await page.locator('.man-tela[data-parte="app"]').count() === mapa.telas.filter(x => x[0] === 'app').length, 'manual: todas as telas do app na aba "App do paciente"');
+  await page.getByRole('button', { name: 'Central da equipe' }).click();
+  ok(await page.locator('.man-tela[data-parte="central"]').count() === mapa.telas.filter(x => x[0] === 'central').length, 'manual: todas as telas da central na aba "Central da equipe"');
+  await page.fill('#busca-manual', 'água'); await page.waitForSelector('text=para "água"');
+  ok(await page.locator('.man-tela[data-tela="agua"] a', { hasText: 'Ver na tela' }).getAttribute('href') === `../app/#${ATIVO}&tela=agua`, 'manual: a busca acha "Água" e o "Ver na tela" leva à folha de água');
+  await page.fill('#busca-manual', ''); await page.getByRole('button', { name: 'Fluxogramas' }).click(); await page.waitForSelector('svg.fluxograma');
+  ok(await page.locator('figure.fluxo').count() === await page.evaluate(() => window.DEMO_MANUAL.FLUXOS.length) && await page.locator('svg.fluxograma a.fx-no').count() > 15, 'manual: os fluxogramas em SVG, cada etapa um link');
+  const evM = await espera(() => pedidos.filter(p => p.tipo === 'eventos').flatMap(p => p.eventos || []).find(e => /^manual-/.test(e.tela)), 12000);
+  ok(evM && evM.pagina === 'escopo', `manual: o registro de uso vai como "escopo" (o servidor não muda) (${JSON.stringify(evM)})`);
+  // Ajuda pela IA: o assistente responde dúvidas de uso pelo manual, com o botão que abre a tela; dose e diagnóstico vão
+  // para a equipe; nenhuma resposta tem número de dose.
+  await telaApp('assistente');
+  await page.getByRole('button', { name: 'Como registro a água?' }).click(); await page.waitForSelector('.bolha.outro .ir-tela');
+  ok(/1 copo \(250 mL\)/.test(await page.locator('.bolha.outro').last().innerText()), 'assistente: "como registro a água?" responde com o passo a passo do manual');
+  await page.locator('.bolha.outro .ir-tela').last().click(); await page.waitForSelector('.folha h2:text-is("Água")');
+  ok(true, 'assistente: "Abrir Água" abre a folha de água'); await page.keyboard.press('Escape');
+  await telaApp('assistente');
+  const respostas = [];
+  for (const q of ['Posso aumentar a dose?', 'Quantos mg eu aplico?', 'Estou com dor no peito', 'Será que tenho diabetes? Me dá um diagnóstico', 'Onde vejo minhas consultas?']) {
+    const n = await page.locator('.bolha.outro').count();
+    await page.fill('#msg-ia', q); await page.getByRole('button', { name: 'Enviar' }).click();
+    await page.waitForFunction(n => document.querySelectorAll('.bolha.outro').length > n, n);
+    respostas.push(await page.locator('.bolha.outro').last().innerText());
+  }
+  ok(respostas.every(r => !/\d+(,\d+)?\s*(mg|ml|mL|UI|mcg|unidades)\b/i.test(r)), 'assistente: nenhuma resposta tem número de dose');
+  ok(/decisões da sua equipe/.test(respostas[0]) && /decisões da sua equipe/.test(respostas[1]) && /decisões da sua equipe/.test(respostas[3]), 'assistente: dose e diagnóstico vão para a equipe');
+  ok(/precisa da equipe agora/.test(respostas[2]), 'assistente: sintoma forte manda falar com a equipe agora');
+  ok(/Minhas consultas/.test(respostas[4]), 'assistente: "onde vejo minhas consultas?" responde pelo manual');
+
   ok(nPedidos() === antesPedidos, `memória: nenhum pedido ao servidor além de abrir e eventos (${nPedidos() - antesPedidos} a mais)`);
   ok(!/nada é guardado/i.test(await page.content()), 'nenhum "nada é guardado"');
   ok(!erros.length, 'caminhos: erro no console: ' + erros.join(' | '));

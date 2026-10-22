@@ -262,7 +262,7 @@
     trocar(raiz,
       el('header', { class: 'barra-central vidro' }, el('div', { class: 'dentro' }, el('span', { class: 'selo', 'aria-hidden': 'true', text: DEMO.iniciais(DEMO.dados.clinica) }),
         el('div', { class: 'cresce' }, el('div', { class: 'nome', text: DEMO.dados.clinica }), el('div', { class: 'sub', text: 'Central da equipe' })),
-        el('span', { class: 'avatar', title: nome, 'aria-label': 'Conectado como ' + nome, role: 'img', text: DEMO.iniciais(DEMO.dados.medico) }))),
+        window.DEMO_TUTORIAL.botao('central'), el('span', { class: 'avatar', title: nome, 'aria-label': 'Conectado como ' + nome, role: 'img', text: DEMO.iniciais(DEMO.dados.medico) }))),
       el('div', { class: 'central' },
         soFicha ? null : el('div', { class: 'saudacao' }, el('p', { class: 'sobretitulo', text: dataHoje }), el('h1', { text: saud + ', ' + nome + '.' }), el('p', { class: 'mudo', text: resumoAgenda() })),
         el('nav', { class: 'barra-abas vidro', 'aria-label': 'Partes da central' }, el('div', { class: 'seg' }, ABAS.map(([k, n]) => el('button', { type: 'button', 'aria-current': !soFicha && est.aba === k ? 'page' : null, onclick: () => irAba(k) }, n)))),
@@ -270,6 +270,8 @@
     DEMO.tela(soFicha || (est.ficha && dividido()) ? 'ficha' : est.aba);
     const ativa = raiz.querySelector('.barra-abas [aria-current="page"]'); if (ativa) ativa.scrollIntoView({ block: 'nearest', inline: 'center' });
     if (!mesma) window.scrollTo(0, 0);
+    // Tutorial de primeiro acesso: na 1ª vez que a aba Hoje aparece nesta página.
+    if (!soFicha && est.aba === 'hoje') window.DEMO_TUTORIAL.talvez('central');
   }
 
   // Montado pela página do produto (comum/produto.js). pedida: a tela do link (…&tela=…), só na primeira vez.
@@ -283,6 +285,8 @@
       desenhar();
     },
     // Para o caminho "abrir a ficha da Mariana" vindo de outro lugar da demonstração.
-    abrirFicha
+    abrirFicha,
+    // As telas que um link (…&tela=…) abre: o manual e o teste conferem que cada tela do manual está aqui.
+    telas: () => [...Object.keys(TELAS), 'ficha', 'alertas', 'pacientes', 'tutorial']
   };
 })();

@@ -211,3 +211,8 @@ html.embutido .v-app .tela-app { padding-top: calc(var(--e-5) + env(safe-area-in
 .v-app .botao-perfil[aria-current="page"] { box-shadow: 0 0 0 2px var(--acento); }
 .v-app .tela-app { padding-top: var(--e-3); }
 html.embutido .v-app .tela-app { padding-top: var(--e-3); }
+/* assistente: perguntas prontas e o botão "Abrir …" embaixo da resposta (vinda do manual) */
+.v-app .bolha { display: grid; gap: var(--e-2); justify-items: start; }
+.v-app .bolha .ir-tela { min-height: var(--alvo); padding: 0 var(--e-4); font-size: .9rem; }
+.v-app .sugestoes { display: flex; flex-wrap: wrap; gap: var(--e-2); align-items: center; margin-bottom: var(--e-3); }
+.v-app .sugestoes .botao { font-size: .88rem; padding: 0 var(--e-4); }

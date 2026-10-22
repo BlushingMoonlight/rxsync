@@ -310,7 +310,7 @@
     equipe: () => [cartao('Equipe e contatos', 33, el('ul', { class: 'lista-simples' }, [[M.medico(), DEMO.dados.especialidade || 'Médico'], [M.EQUIPE.nutri, 'Nutricionista · plano alimentar e metas'], [M.EQUIPE.enf, 'Enfermeira · aplicações e sintomas'], [M.EQUIPE.recepcao, 'Consultas e horários']].map(([n, f]) =>
       el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: n }), el('br'), el('span', { class: 'mudo peq', text: f })), M.funcaoLigada('chat') ? el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Escrever para ' + n, onclick: () => abrir('chat-equipe') }, 'Escrever') : null))))],
     'chat-equipe': () => chat('equipe', 34, 'Chat com a equipe', 'Escreva para a equipe da clínica.'),
-    assistente: () => chat('ia', 36, 'Assistente de dúvidas', 'Pergunte sobre as orientações da sua equipe.'),
+    assistente: () => chat('ia', 36, 'Assistente de dúvidas', 'Pergunte como usar o app ou sobre as orientações da sua equipe.'),
     conquistas: () => [cartao('Conquistas', 35, el('ul', { class: 'lista-simples' }, [['fogo', m.semana.comRegistro + ' de 7 dias com registro'], ['gota', 'Meta de água em ' + m.semana.agua.filter(v => v >= m.metas.agua).length + ' dos 7 dias anteriores'], ['medalha', 'Todas as aplicações registradas desde ' + M.ddmm(m.inicio)]].map(([i, t]) =>
       el('li', {}, caixaIc(i, 'peq'), el('span', { class: 'cresce', text: t })))), origem('Pontos de hoje: ' + M.pontos(m) + ' de 100. Refeição vale 5, cada copo de água 2, cada outro registro 5, cada remédio 2.'))],
     'meus-dados': () => { const r = el('div'); return [cartao('Meus dados', 37, el('p', { class: 'peq', text: 'Baixe o que você registrou ou peça a exclusão dos seus dados (LGPD).' }), r,
@@ -482,27 +482,41 @@
     desenhar(sel);
     return el('div', { class: 'graf-evolucao' }, leitura, s, faixa);
   }
-  // Chats de exemplo: nenhuma IA de verdade; a resposta é pronta. A pergunta vai para o registro da demonstração.
+  // Chats de exemplo: nenhuma IA de verdade. O assistente responde dúvidas de uso pelo manual (comum/manual.js: os passos
+  // da tela e um botão para abrir) e o resto com uma orientação pronta; dose, diagnóstico e mudança no tratamento vão
+  // para a equipe. A pergunta vai para o registro da demonstração (evento "pergunta").
   const conversas = { ia: [], equipe: [] };
+  const SUGESTOES = ['Como registro a água?', 'Onde vejo minhas consultas?', 'Como escolho o local da aplicação?'];
+  const PROIBIDO = /\bdos[ea]s?\b|\bmg\b|\bml de (remedio|medicamento|caneta)|quanto (devo )?(aplicar|tomar)|aumentar|diminuir|trocar (o|de) remedio|diagnost|receit|prescrev/;
+  const URGENTE = /falta de ar|desmai|dor (muito )?forte|dor no peito|vomit|sangr|alergia|incha/;
+  function responderIa(t) {
+    const sem = t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (URGENTE.test(sem)) return { texto: 'Isso precisa da equipe agora. Se for forte ou piorar, procure atendimento de urgência. Escreva no chat com a equipe para a enfermagem saber.', ir: ['chat-equipe', 'Abrir o chat com a equipe'] };
+    if (PROIBIDO.test(sem)) return { texto: 'Dose, diagnóstico e mudança no tratamento são decisões da sua equipe, e eu não respondo sobre isso. Leve a dúvida ao chat com a equipe ou ao retorno.', ir: ['chat-equipe', 'Abrir o chat com a equipe'] };
+    const [t1] = window.DEMO_MANUAL.buscar(t, 'app').filter(x => x.tela !== 'boas-vindas' && x.tela !== 'assistente');
+    if (t1) { const nome = t1.titulo.replace(/ \(folha\)$/, ''); return { texto: nome + ': ' + t1.passos.map((p, i) => (i + 1) + '. ' + p).join(' '), ir: [t1.tela, 'Abrir ' + nome], manual: true }; }
+    return { texto: 'Pela orientação da sua equipe: mantenha os registros do dia e leve essa dúvida ao retorno. Se algo mudou no tratamento ou você sentiu algo diferente, fale com a equipe no chat.' };
+  }
   function chat(qual, n, titulo, ajuda) {
-    const inicio = qual === 'ia' ? 'Oi, ' + PACIENTE + '! Respondo com base nas orientações da sua equipe. Não faço diagnóstico nem receito.' : 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0] + ': “Oi, ' + PACIENTE + '! Pode escrever aqui suas dúvidas sobre a aplicação.”';
-    const lista = el('div', { class: 'conversa', 'aria-live': 'polite' }, bolha('outro', inicio), conversas[qual].map(([q, t]) => bolha(q, t)));
+    const inicio = qual === 'ia' ? 'Oi, ' + PACIENTE + '! Respondo dúvidas sobre o app e sobre as orientações da sua equipe. Não faço diagnóstico nem receito.' : 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0] + ': “Oi, ' + PACIENTE + '! Pode escrever aqui suas dúvidas sobre a aplicação.”';
+    const lista = el('div', { class: 'conversa', 'aria-live': 'polite' }, bolha('outro', inicio), conversas[qual].map(([q, t, ir]) => bolha(q, t, ir)));
     const campo = el('input', { class: 'entrada', id: 'msg-' + qual, maxlength: '300', autocomplete: 'off', placeholder: 'Escreva sua mensagem', 'aria-label': 'Mensagem' });
-    const enviar = e => {
-      e.preventDefault(); const t = campo.value.trim(); if (!t) return;
+    const mandar = t => {
       conversas[qual].push(['eu', t]); lista.append(bolha('eu', t)); campo.value = '';
       DEMO.evento('pergunta', { chat: qual, texto: t.slice(0, 300) });
       if (qual === 'equipe') naFicha('conversa', 'Mensagem no chat', 'Para a equipe');
-      const resp = qual === 'ia'
-        ? 'Pela orientação da sua equipe: mantenha os registros do dia e leve essa dúvida ao retorno. Se algo mudou no tratamento ou você sentiu algo diferente, fale com a equipe no chat.'
-        : 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0] + ': “Recebi, ' + PACIENTE + '. Vejo com a equipe e te respondo hoje.”';
-      setTimeout(() => { conversas[qual].push(['outro', resp]); lista.append(bolha('outro', resp)); }, 700);
+      const r = qual === 'ia' ? responderIa(t) : { texto: 'Enfermeira ' + M.EQUIPE.enf.split(' ')[0] + ': “Recebi, ' + PACIENTE + '. Vejo com a equipe e te respondo hoje.”' };
+      setTimeout(() => { conversas[qual].push(['outro', r.texto, r.ir]); lista.append(bolha('outro', r.texto, r.ir)); }, 700);
     };
+    const enviar = e => { e.preventDefault(); const t = campo.value.trim(); if (t) mandar(t); };
     return [cartao(titulo, n, el('p', { class: 'mudo peq', text: ajuda }), lista,
-      el('p', { class: 'mudo peq', text: qual === 'ia' ? 'Na demonstração, as respostas são exemplos prontos. Não escreva dados de pacientes.' : 'A resposta da equipe chega igual, entre aspas, sem alteração. Na demonstração, ela é um exemplo pronto.' }),
+      qual === 'ia' ? el('div', { class: 'sugestoes', role: 'group', 'aria-label': 'Perguntas prontas' }, SUGESTOES.map(q => el('button', { type: 'button', class: 'botao sec pilula', onclick: () => mandar(q) }, q)), item(49)) : null,
+      el('p', { class: 'mudo peq', text: qual === 'ia' ? 'Na demonstração, as respostas vêm do manual de uso e de exemplos prontos. Não escreva dados de pacientes.' : 'A resposta da equipe chega igual, entre aspas, sem alteração. Na demonstração, ela é um exemplo pronto.' }),
       el('form', { class: 'enviar-msg', onsubmit: enviar }, campo, el('button', { class: 'botao', type: 'submit', 'aria-label': 'Enviar mensagem' }, ic('enviar', 'p'), 'Enviar')))];
   }
-  const bolha = (quem, texto) => el('div', { class: 'bolha ' + quem, text: texto });
+  // ir: [tela, rótulo]: um botão embaixo da resposta que abre a tela (a mesma navegação dos links …&tela=…).
+  const bolha = (quem, texto, ir) => el('div', { class: 'bolha ' + quem }, el('span', { text: texto }),
+    ir ? el('button', { type: 'button', class: 'botao suave pilula ir-tela', onclick: () => irParaTela(ir[0]) }, ir[1], ic('seta', 'p')) : null);
 
   // ---------------------------------------------------------------- navegação (dentro da página; o # guarda o código)
   // Barra de cima do app (a marca da clínica e o perfil) e 4 abas na barra de vidro embaixo.
@@ -521,7 +535,7 @@
     const corpo = TELAS[tela] ? TELAS[tela]() : TELAS.inicio();
     const sub = est.pilha.length > 0;
     const barraApp = tela === 'boas-vindas' ? null : el('div', { class: 'barra-app' }, el('span', { class: 'selo peq-selo', 'aria-hidden': 'true', text: DEMO.iniciais(DEMO.dados.clinica) }),
-      el('span', { class: 'cresce nome-app', text: DEMO.dados.clinica }),
+      el('span', { class: 'cresce nome-app', text: DEMO.dados.clinica }), window.DEMO_TUTORIAL.botao('app'),
       el('button', { type: 'button', class: 'botao-perfil', 'aria-label': 'Abrir o perfil e mais opções', 'aria-current': est.aba === 'mais' && !sub ? 'page' : null, onclick: () => irAba('mais') }, DEMO.iniciais(m.nome)));
     const telaApp = el('main', { class: 'tela-app', id: 'conteudo', tabindex: '-1' },
       sub ? el('div', { class: 'cab-sub' }, el('button', { type: 'button', class: 'botao sec quadrado pilula', 'aria-label': 'Voltar', onclick: voltar }, ic('voltar')), el('strong', { class: 'cresce', text: NOMES[tela] || '' })) : null, corpo);
@@ -534,6 +548,20 @@
     DEMO.tela(tela === 'picadinha' ? 'aplicacoes' : tela);
     if (!mesma) window.scrollTo(0, 0);
     rolagem.scrollTop = topoAntes;
+    // Tutorial de primeiro acesso: na 1ª vez que a tela Hoje aparece nesta página.
+    if (tela === 'inicio' && !mesma) window.DEMO_TUTORIAL.talvez('app');
+  }
+
+  // Abre uma tela pelo nome (link …&tela=…, manual e respostas do assistente). Devolve false se o nome não existe.
+  const FOLHA_REFEICAO = { refeicao: 'busca', buscar: 'busca', alimento: 'busca', foto: 'foto', codigo: 'codigo' };
+  function irParaTela(pedida) {
+    if (FOLHA_REFEICAO[pedida]) { irAba('inicio'); abrirRefeicao(FOLHA_REFEICAO[pedida]); }
+    else if (REGISTROS[pedida] || FOLHAS[pedida]) { irAba(['medidas', 'fotos'].includes(pedida) ? 'evolucao' : 'registrar'); abrirFolha(pedida); }
+    else if (pedida && TELAS[pedida] && pedida !== 'boas-vindas') {
+      if (['inicio', 'registrar', 'aplicacoes', 'picadinha', 'evolucao', 'mais'].includes(pedida)) irAba(pedida);
+      else { est.aba = 'mais'; est.pilha = []; abrir(pedida); }
+    } else return false;
+    return true;
   }
 
   // Montado pela página do produto (comum/produto.js). pedida: a tela do link (…&tela=…), só na primeira vez.
@@ -543,13 +571,10 @@
       // Vindo da central pela faixa: volta para onde estava (ou Hoje); a tela de primeiro acesso só abre pelo link do app.
       if (pedida == null) { montarTela(est.pilha.length ? est.pilha[est.pilha.length - 1] : est.aba); est.visto = true; return; }
       est.visto = true;
-      const FOLHA = { refeicao: 'busca', buscar: 'busca', alimento: 'busca', foto: 'foto', codigo: 'codigo' };
-      if (FOLHA[pedida]) { irAba('inicio'); abrirRefeicao(FOLHA[pedida]); }
-      else if (REGISTROS[pedida] || FOLHAS[pedida]) { irAba(['medidas', 'fotos'].includes(pedida) ? 'evolucao' : 'registrar'); abrirFolha(pedida); }
-      else if (pedida && TELAS[pedida] && pedida !== 'boas-vindas') {
-        if (['inicio', 'registrar', 'aplicacoes', 'picadinha', 'evolucao', 'mais'].includes(pedida)) irAba(pedida);
-        else { est.aba = 'mais'; abrir(pedida); }
-      } else montarTela('boas-vindas');
-    }
+      // "tutorial" (o "Ver na tela" dos itens do primeiro acesso): abre na tela Hoje, com o tutorial.
+      if (!irParaTela(pedida === 'tutorial' ? 'inicio' : pedida)) montarTela('boas-vindas');
+    },
+    // As telas que um link (…&tela=…) abre: o manual e o teste conferem que cada tela do manual está aqui.
+    telas: () => [...Object.keys(TELAS), ...Object.keys(FOLHAS), ...Object.keys(REGISTROS), ...Object.keys(FOLHA_REFEICAO), 'tutorial']
   };
 })();
