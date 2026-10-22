@@ -199,8 +199,10 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone'],
     // Rodada de melhoria: nenhum beco sem saída (todo botão mostra um resultado) e ícones em SVG, não emojis.
     [/nada (é|e) guardado/i, '"nada é guardado" (todo botão mostra um resultado simulado)'], [/\p{Extended_Pictographic}/u, 'emoji (use os ícones de comum/icones.js)']];
+  // Única exceção: a frase do consumo de IA, sem valor ("cobrados à parte, pelo uso, junto com a mensalidade"; PR da IA).
+  const FRASE_CONSUMO = /cobrad[oa]s? à parte, pelo uso, junto com a mensalidade/gi;
   for (const f of arqs) {
-    const s = fs.readFileSync(f, 'utf8');
+    const s = fs.readFileSync(f, 'utf8').replace(FRASE_CONSUMO, '');
     for (const [re, nome] of PROIBIDOS) { const m = s.match(re); if (m) erro(`${f}: ${nome} não pode aparecer na demonstração (achei "${m[0]}")`); }
     if (f.endsWith('.html') && !/<meta name="robots" content="noindex, nofollow">/.test(s)) erro(`${f}: falta noindex`);
     if (f.endsWith('.html') && /googletagmanager|gtag\(|chatwoot|consentimento\.js/i.test(s)) erro(`${f}: sem Google Analytics e sem chat na demonstração`);

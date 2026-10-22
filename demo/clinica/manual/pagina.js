@@ -35,7 +35,7 @@
     const regras = MAN.REGRAS.filter(r => r.onde === parte);
     return [
       // Sumário: aberto no computador (coluna fixa ao lado); fechado no celular e no iPad, para não empurrar o manual.
-      el('details', { class: 'sumario cartao', open: innerWidth >= 1000 }, el('summary', {}, el('span', { class: 'sobretitulo', text: 'Sumário · ' + telas.length + ' telas' })),
+      el('details', { class: 'sumario cartao', open: innerWidth >= 1000 }, el('summary', {}, el('span', { class: 'sobretitulo', text: 'Sumário · ' + telas.length + (parte === 'app' ? ' telas do app' : ' telas da central') })),
         el('ol', {}, telas.map(t => el('li', {}, el('button', { type: 'button', class: 'link-sumario', onclick: () => irPara(ancora(parte, t.tela)) }, t.titulo))),
           regras.length ? el('li', {}, el('button', { type: 'button', class: 'link-sumario', onclick: () => irPara('man-regras-' + parte) }, 'Regras')) : null)),
       el('div', { class: 'man-telas' }, telas.map(t => secaoTela(t, parte)),
@@ -66,12 +66,11 @@
     document.title = 'Manual · ' + d.clinica;
     conteudo = el('div', { class: 'man-conteudo' });
     abas = el('div', { class: 'seg largo abas-manual', role: 'group', 'aria-label': 'Parte do manual' });
-    const total = MAN.partes.app.telas.length + MAN.partes.central.telas.length;
     trocar(raiz, DEMO.faixaDemo('manual', null, { semItens: true }),
       el('main', { class: 'pagina pagina-escopo pagina-manual' },
         el('article', { class: 'documento' },
           el('header', { class: 'cab-doc' }, el('p', { class: 'sobretitulo', text: 'Manual de uso' }), el('h1', { text: 'Como usar o app e a central · ' + d.clinica }),
-            el('dl', { class: 'meta-doc' }, el('dt', { text: 'Telas' }), el('dd', { text: total + ' (app do paciente e central da equipe)' }), el('dt', { text: 'Fluxogramas' }), el('dd', { text: String(MAN.FLUXOS.length) })),
+            el('dl', { class: 'meta-doc' }, el('dt', { text: 'Telas' }), el('dd', { text: MAN.partes.app.telas.length + ' do app · ' + MAN.partes.central.telas.length + ' da central (contando as folhas)' }), el('dt', { text: 'Fluxogramas' }), el('dd', { text: String(MAN.FLUXOS.length) })),
             el('p', { class: 'mudo', text: 'Cada tela: o que é, para quem, o passo a passo, de onde vêm os dados, o que acontece do outro lado e por quê. "Ver na tela" abre a tela na demonstração. O mesmo manual responde às dúvidas no assistente do app.' })),
           el('div', { class: 'man-ferramentas' }, el('label', { class: 'campo', for: 'busca-manual' }, el('span', { text: 'Buscar no manual' }), el('div', { class: 'busca-campo' }, ic('busca', null), campo)), abas),
           conteudo)));

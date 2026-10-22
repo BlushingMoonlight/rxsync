@@ -13,7 +13,10 @@
   if (DEMO.embed || ((DEMO.extra.tela || DEMO.extra.item) && DEMO.extra.tela !== 'tutorial')) visto[document.body.dataset.inicio === 'central' ? 'central' : 'app'] = true;
   let aberto = null;
 
+  // Os passos vêm do manual, que só carrega agora (peso da página): enquanto carrega, "pendente".
+  let pendente = false;
   function abrir(parte) {
+    if (!window.DEMO_MANUAL) { pendente = true; DEMO.comManual().then(() => { pendente = false; abrir(parte); }, () => { pendente = false; DEMO.semRede(); }); return; }
     if (aberto) aberto.fechar();
     visto[parte] = true;
     const passos = (window.DEMO_MANUAL.TUTORIAL[parte] || []).filter(p => achar(p.alvo));
@@ -92,6 +95,7 @@
     abrir,
     // O botão "?" no topo do produto.
     botao(parte) { return el('button', { type: 'button', class: 'botao-ajuda', 'aria-label': 'Ver o tutorial de novo', title: 'Tutorial', onclick: () => abrir(parte) }, '?'); },
-    get aberto() { return !!aberto; }
+    get aberto() { return !!aberto; },
+    get pendente() { return pendente; }
   };
 })();

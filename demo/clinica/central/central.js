@@ -10,8 +10,8 @@
   const ic = (n, t) => window.DEMO_ICONE(n, t);
   const fmt = M.fmt, inteiro = M.inteiro;
   let raiz = null;
-  const ABAS = [['hoje', 'Hoje'], ['metas', 'Metas e plano'], ['aplicacoes', 'Aplicações'], ['avisos', 'Avisos e conteúdo'], ['funcoes', 'Funções do app']];
-  const est = { aba: 'hoje', paciente: null, ficha: false, vistos: {}, metasPac: 1 };
+  const ABAS = [['hoje', 'Hoje'], ['metas', 'Metas e plano'], ['aplicacoes', 'Aplicações'], ['avisos', 'Avisos e conteúdo'], ['funcoes', 'Funções do app'], ['ia', 'IA']];
+  const est = { aba: 'hoje', paciente: null, ficha: false, metasPac: 1, iaParte: 'personal', iaPac: 0, regFiltro: '', copiloto: [] };
   const nomeDe = id => M.pac(id).nome;
   const cartao = (titulo, itens, ...filhos) => el('section', { class: 'cartao' },
     titulo ? el('div', { class: 'cab-cartao' }, el('h2', { text: titulo }), [].concat(itens || []).map(item)) : null, ...filhos);
@@ -40,7 +40,7 @@
   };
 
   // Triagem: o motivo (com a regra) e as ações de um toque (Ligar é simulado: nenhum número aparece).
-  const naTriagem = () => M.pacientes.filter(p => M.estado(p).nivel !== 'ok' && !est.vistos[p.id]).sort((a, b) => (M.estado(a).nivel === 'alerta' ? 0 : 1) - (M.estado(b).nivel === 'alerta' ? 0 : 1));
+  const naTriagem = () => M.pacientes.filter(p => M.estado(p).nivel !== 'ok' && !M.vistos[p.id]).sort((a, b) => (M.estado(a).nivel === 'alerta' ? 0 : 1) - (M.estado(b).nivel === 'alerta' ? 0 : 1));
   function triagem() {
     const lista = naTriagem();
     return el('section', { class: 'cartao triagem', 'aria-labelledby': 'tit-triagem' },
@@ -52,7 +52,7 @@
         el('div', { class: 'acoes' },
           el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Ligar para ' + p.nome, onclick: () => DEMO.rapida('Na demonstração, a ligação para ' + p.primeiro + ' é simulada.') }, ic('telefone', 'p'), 'Ligar'),
           el('button', { type: 'button', class: 'botao sec', 'aria-label': 'Ver a ficha de ' + p.nome, onclick: () => abrirFicha(p.id) }, ic('ficha', 'p'), 'Ver ficha'),
-          el('button', { type: 'button', class: 'botao leve', 'aria-label': 'Marcar ' + p.nome + ' como visto', onclick: () => { est.vistos[p.id] = true; DEMO.rapida(p.primeiro + ': marcado como visto. O estado continua na lista.'); desenhar(true); } }, ic('check', 'p'), 'Marcar como visto'))); }))
+          el('button', { type: 'button', class: 'botao leve', 'aria-label': 'Marcar ' + p.nome + ' como visto', onclick: () => { M.vistos[p.id] = true; DEMO.rapida(p.primeiro + ': marcado como visto. O estado continua na lista.'); desenhar(true); } }, ic('check', 'p'), 'Marcar como visto'))); }))
         : el('div', { class: 'vazio' }, ilustracao(), el('p', { class: 't1', text: 'Tudo visto por hoje.' }), el('p', { class: 'peq', text: 'Quando algo pedir sua atenção, aparece aqui.' })));
   }
   function ilustracao() {
@@ -147,8 +147,15 @@
           cartao('Conteúdo da clínica', null, el('ul', { class: 'lista-simples' }, M.CONTEUDO.map(([i, t, d]) =>
             el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic(i, 'p')), el('span', { class: 'cresce' }, el('strong', { text: d }), el('br'), el('span', { class: 'peq mudo', text: t + ' · aparece no app, em Conteúdo da clínica' }))))))))];
     },
+    // IA (itens 52 a 57): o que a IA do paciente cobra e o tom, o consumo em créditos e o registro de tudo o que as IAs fizeram.
+    ia: () => {
+      const I = window.DEMO_IA;
+      const partes = [['personal', 'IA do paciente'], ['consumo', 'Consumo'], ['registro', 'Registro da IA']];
+      return [el('div', { class: 'seg largo', role: 'group', 'aria-label': 'Parte da IA' }, partes.map(([k, n]) => el('button', { type: 'button', 'aria-pressed': String(est.iaParte === k), onclick: () => { est.iaParte = k; desenhar(true); } }, n))),
+        est.iaParte === 'consumo' ? telaConsumo(I) : est.iaParte === 'registro' ? telaRegistro(I) : telaPersonal(I)];
+    },
     funcoes: () => {
-      const ICONES = { refeicoes: 'prato', basicos: 'gota', bemestar: 'sorriso', outros: 'notas', aplicacoes: 'seringa', fotos: 'camera', chat: 'conversa', assistente: 'pergunta', conquistas: 'medalha' };
+      const ICONES = { refeicoes: 'prato', basicos: 'gota', bemestar: 'sorriso', outros: 'notas', aplicacoes: 'seringa', fotos: 'camera', chat: 'conversa', assistente: 'pergunta', conquistas: 'medalha', personal: 'conversa' };
       const ligadas = Object.values(M.funcoes).filter(f => f[1]).length;
       return [cartao('Funções do app', 46, el('p', { class: 'mudo peq', text: 'A clínica liga e desliga cada parte do app. ' + ligadas + ' de ' + Object.keys(M.funcoes).length + ' ligadas. Desligada, a parte some do app na hora.' }),
         el('ul', { class: 'lista-simples funcoes' }, Object.entries(M.funcoes).map(([k, [n, lig]]) => el('li', {}, el('span', { class: 'caixa-ic peq', 'aria-hidden': 'true' }, ic(ICONES[k] || 'info', 'p')), el('span', { class: 'cresce', text: n }),
@@ -157,6 +164,109 @@
     }
   };
   TELAS.picadinha = TELAS.aplicacoes;   // links antigos (…&tela=picadinha)
+  // ---------------------------------------------------------------- IA: configurar a IA do paciente, consumo e registro
+  const juridico = () => el('p', { class: 'etq-juridico' }, ic('info', 'p'), 'Depende de parecer jurídico');
+  function telaPersonal(I) {
+    const pid = est.iaPac, base = I.configDe(pid), proprio = pid && I.config.porPaciente[pid];
+    const rasc = { temas: { ...base.temas }, tom: base.tom };
+    const exemplo = el('p', { class: 'aviso info peq' });
+    const prev = () => { const salvo = I.config.porPaciente[pid || 1]; I.config.porPaciente[pid || 1] = { ...rasc }; exemplo.textContent = 'Exemplo para ' + M.pac(pid || 1).primeiro + ': "' + I.mensagem('proteina', M.pac(pid || 1)) + '"'; if (salvo) I.config.porPaciente[pid || 1] = salvo; else delete I.config.porPaciente[pid || 1]; };
+    const tons = el('div', { class: 'seg largo', role: 'radiogroup', 'aria-label': 'Tom' });
+    const desTons = () => trocar(tons, I.TONS.map(([k, n]) => el('button', { type: 'button', role: 'radio', 'aria-checked': String(rasc.tom === k), 'aria-pressed': String(rasc.tom === k), onclick: () => { rasc.tom = k; desTons(); prev(); } }, n)));
+    desTons(); prev();
+    const sel = el('select', { class: 'entrada', id: 'ia-para', onchange: e => { est.iaPac = Number(e.target.value); desenhar(true); } },
+      el('option', { value: 0, selected: !pid }, 'Todos os pacientes'), M.pacientes.map(p => el('option', { value: p.id, selected: pid === p.id }, p.nome + (I.config.porPaciente[p.id] ? ' (própria)' : ''))));
+    return [cartao('IA do paciente (personal)', [52, 53], juridico(),
+      el('p', { class: 'mudo peq', text: 'O que a IA cobra no app (e no WhatsApp, para quem autorizar) e o tom. O paciente escolhe o horário de silêncio, a intensidade, a pausa e o canal.' }),
+      el('label', { class: 'campo', for: 'ia-para' }, el('span', { text: 'Para quem' }), sel),
+      pid ? el('p', { class: 'mini mudo', text: proprio ? 'Configuração própria deste paciente.' : 'Segue a configuração de todos; salvar cria uma própria.' }) : null,
+      el('ul', { class: 'lista-simples funcoes' }, I.TEMAS.map(([k, n]) => el('li', {}, el('span', { class: 'cresce', text: n }),
+        el('button', { type: 'button', class: 'chave', role: 'switch', 'aria-checked': String(rasc.temas[k]), 'aria-label': n, onclick: e => { rasc.temas[k] = !rasc.temas[k]; e.currentTarget.setAttribute('aria-checked', String(rasc.temas[k])); } })))),
+      el('div', { class: 'campo' }, el('span', { text: 'Tom' }), tons), exemplo,
+      el('div', { class: 'botoes' }, el('button', { type: 'button', class: 'botao', onclick: () => { I.configurar(pid, rasc); desenhar(true); DEMO.confirmar('IA do paciente salva', pid ? M.pac(pid).nome : 'Todos os pacientes'); } }, 'Salvar e enviar ao app'),
+        proprio ? el('button', { type: 'button', class: 'botao sec', onclick: () => { I.voltarParaTodos(pid); desenhar(true); } }, 'Voltar a seguir a de todos') : null),
+      origem((base.por ? 'Última mudança por ' + base.por + ' ' + M.dia(base.em) + '. ' : '') + 'Cada mudança entra no Registro da IA.'))];
+  }
+  const cred = v => M.inteiro(v) + ' créditos';
+  function barraH(rot, v, max, sub) { const i = el('i'); i.style.transform = 'scaleX(' + Math.min(1, v / (max || 1)) + ')';
+    return el('li', { class: 'barra-h' }, el('span', { class: 'linha-h' }, el('span', { class: 'cresce', text: rot }), el('strong', { class: 'tab', text: M.inteiro(v) })), el('span', { class: 'mini-barra larga', 'aria-hidden': 'true' }, i), sub ? el('span', { class: 'mini mudo', text: sub }) : null); }
+  function telaConsumo(I) {
+    const c = I.consumo, t = I.total(), pct = I.pct(), f = I.FUNCOES_IA, max = Math.max(...Object.values(c.porFuncao));
+    const equipe = f.filter(x => x[2] === 'equipe').reduce((s, x) => s + c.porFuncao[x[0]], 0), pac = t - equipe;
+    const top = Object.entries(c.porPaciente).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const mes = k => new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(M.agora.getFullYear(), M.agora.getMonth() - k, 1));
+    const meses = c.meses.map((v, i) => [mes(c.meses.length - i), v]).concat([[mes(0) + ' (até hoje)', t]]), maxM = Math.max(...meses.map(x => x[1]), c.teto);
+    const nivel = pct >= 100 ? 'alerta' : pct >= 80 ? 'atencao' : 'ok';
+    const prog = el('i'); prog.style.transform = 'scaleX(' + Math.min(1, t / c.teto) + ')';
+    const tetos = el('select', { class: 'entrada', id: 'ia-teto', onchange: e => { I.mudarTeto(Number(e.target.value)); desenhar(true); } }, [8000, 10000, 15000, 20000].map(v => el('option', { value: v, selected: v === c.teto }, M.inteiro(v) + ' créditos')));
+    const ao = el('div', { class: 'seg largo', role: 'radiogroup', 'aria-label': 'Ao chegar no teto' }, [['pausar', 'Pausar as IAs'], ['continuar', 'Continuar']].map(([k, n]) =>
+      el('button', { type: 'button', role: 'radio', 'aria-checked': String(c.aoAtingir === k), 'aria-pressed': String(c.aoAtingir === k), onclick: () => { I.mudarTeto(null, k); desenhar(true); } }, n)));
+    return [
+      cartao('Consumo de IA', 57, el('p', { class: 'mudo peq', text: 'Em créditos de IA. Cada uso gasta créditos: uma pergunta ao app 2, uma mensagem no WhatsApp 3, uma foto do prato 5, uma pergunta à IA da central 4, um resumo 6.' }),
+        el('div', { class: 'consumo-mes ' + nivel }, el('span', { class: 'rot', text: 'Este mês' }), el('strong', { class: 'numero', text: M.inteiro(t) }), el('span', { class: 'mudo', text: ' de ' + cred(c.teto) + ' (' + M.fmt(pct, 1) + '%)' }),
+          el('span', { class: 'mini-barra larga teto', role: 'img', 'aria-label': M.fmt(pct, 1) + '% do teto' }, prog, el('b', { class: 'marca-80', 'aria-hidden': 'true' }))),
+        nivel !== 'ok' ? el('p', { class: 'aviso ' + (nivel === 'alerta' ? 'alerta' : 'atencao') + ' peq', role: 'status' }, ic('alerta', 'p'), nivel === 'alerta' ? (c.pausada ? 'Teto do mês atingido: as IAs estão pausadas. Escolha "Continuar" ou aumente o teto.' : 'Teto do mês atingido: as IAs continuam e o excedente entra na cobrança do mês.') : 'Aviso de 80%: o consumo passou de 80% do teto do mês.') : null,
+        el('p', { class: 'peq', text: 'Os créditos de IA são cobrados à parte, pelo uso, junto com a mensalidade.' })),
+      cartao('Por função', null, el('ul', { class: 'lista-barras' }, f.map(([k, n, quem]) => barraH(n, c.porFuncao[k], max, quem === 'equipe' ? 'equipe' : 'pacientes')))),
+      cartao('Equipe e pacientes', null, el('div', { class: 'kpis' }, kpi('Pacientes', M.inteiro(pac), 'app, WhatsApp e foto'), kpi('Equipe', M.inteiro(equipe), 'IA da central e resumos'))),
+      cartao('Quem mais usa', null, el('ul', { class: 'lista-barras' }, top.map(([id, v]) => barraH(M.pac(Number(id)).nome, v, top[0][1])))),
+      cartao('Meses anteriores', null, el('ul', { class: 'lista-barras' }, meses.map(([n, v]) => barraH(n.charAt(0).toUpperCase() + n.slice(1), v, maxM)))),
+      cartao('Teto do mês', 57, el('div', { class: 'duas-selecoes' }, el('label', { class: 'campo', for: 'ia-teto' }, el('span', { text: 'Teto mensal' }), tetos)),
+        el('div', { class: 'campo' }, el('span', { text: 'Ao chegar no teto' }), ao),
+        origem('Avisos em 80% e em 100% do teto, aqui e no Registro da IA.'))];
+  }
+  function telaRegistro(I) {
+    const nomes = { paciente: 'IA do paciente', central: 'IA da central' }, f = est.regFiltro;
+    const lista = I.registro.filter(r => !f || r.ia === f);
+    return [cartao('Registro da IA', 56, el('p', { class: 'mudo peq', text: 'Tudo o que as IAs responderam e fizeram, com quem pediu e o antes e o depois de cada mudança.' }),
+      el('div', { class: 'seg', role: 'group', 'aria-label': 'Filtro' }, [['', 'Todas'], ['paciente', 'IA do paciente'], ['central', 'IA da central']].map(([k, n]) =>
+        el('button', { type: 'button', 'aria-pressed': String(f === k), onclick: () => { est.regFiltro = k; desenhar(true); } }, n))),
+      el('ul', { class: 'lista-simples registro-ia' }, lista.map(r => el('li', { 'data-tipo': r.tipo }, el('span', { class: 'cresce' },
+        el('span', { class: 'mini mudo', text: maiuscula(M.quando(r.quando)) + ' · ' + nomes[r.ia] + (r.canal === 'whatsapp' ? ' (WhatsApp)' : '') + (r.paciente ? ' · ' + r.paciente : '') + (r.quem && r.quem !== 'equipe' ? ' · pedido de ' + r.quem : '') }), el('br'),
+        el('span', { text: r.texto }), r.confirmado ? el('span', { class: 'estado-tag ok' }, ic('check', 'p'), 'Confirmado') : null)))))];
+  }
+  // ---------------------------------------------------------------- assistente da central (lateral, em qualquer tela; só responde quando chamado)
+  function copiloto() {
+    if (!window.DEMO_IA) { DEMO.comIA().then(copiloto, DEMO.semRede); return; }
+    const I = window.DEMO_IA;
+    const conversa = el('div', { class: 'conversa copiloto-conversa', 'aria-live': 'polite' });
+    const medidor = el('p', { class: 'mini mudo medidor-ia' });
+    const medir = () => { medidor.textContent = 'Créditos de IA no mês: ' + M.inteiro(I.total()) + ' de ' + M.inteiro(I.consumo.teto) + (I.consumo.pausada ? ' · pausadas no teto' : ''); };
+    const ir = (tela, parte) => { f.fechar(() => { if (parte === 'app') { location.href = DEMO.link('app', { tela }); return; } if (tela === 'ficha') abrirFicha(1); else irAba(tela); }); };
+    function resposta(r) {
+      const b = el('div', { class: 'bolha outro resposta-ia' }, el('span', { text: r.texto }), r.passos ? el('ol', { class: 'passos-ia' }, r.passos.map(x => el('li', { text: x }))) : null);
+      if (r.lista && r.lista.length) b.append(el('ul', { class: 'lista-ia' }, r.lista.map(x => el('li', {}, el('span', { class: 'cresce' }, el('strong', { text: x.nome }), el('br'), el('span', { class: 'mini mudo', text: x.detalhe })),
+        el('button', { type: 'button', class: 'botao sec pilula', 'aria-label': 'Abrir a ficha de ' + x.nome, onclick: () => f.fechar(() => abrirFicha(x.id)) }, 'Ficha')))));
+      if (r.acao) {
+        const a = r.acao, conf = el('div', { class: 'botoes' });
+        // a.feito: a proposta já foi confirmada ou cancelada (ao abrir de novo, não pede outra vez).
+        const fim = (txt, ok) => { a.feito = [txt, ok]; trocar(conf, el('p', { class: 'aviso ' + (ok ? 'ok' : 'info') + ' peq', role: 'status', text: txt })); };
+        if (a.feito) fim(...a.feito);
+        else trocar(conf, el('button', { type: 'button', class: 'botao', onclick: () => { const t = I.aplicar(a); fim(t, true); desenhar(true); medir(); } }, ic('check', 'p'), 'Confirmar'),
+          el('button', { type: 'button', class: 'botao sec', onclick: () => { I.registrar('central', 'cancelada', 'Mudança cancelada: ' + a.oque + '.', { quem: M.medico() }); fim('Cancelado. Nada mudou.'); } }, 'Cancelar'));
+        b.append(el('div', { class: 'proposta-ia' }, el('strong', { text: a.oque }), el('dl', { class: 'antes-depois' }, el('dt', { text: 'Antes' }), el('dd', { text: a.antes }), el('dt', { text: 'Depois' }), el('dd', { text: a.depois })),
+          el('p', { class: 'mini mudo', text: a.outroLado }), conf));
+      }
+      if (r.ir) b.append(el('button', { type: 'button', class: 'botao suave pilula ir-tela', onclick: () => ir(r.ir[0], r.parte) }, r.ir[1], ic('seta', 'p')));
+      if (r.origem) b.append(el('span', { class: 'de-onde mini', text: 'De onde veio: ' + r.origem + '.' }));
+      return b;
+    }
+    const perguntar = t => {
+      est.copiloto.push(['eu', t]); conversa.append(el('div', { class: 'bolha eu', text: t }));
+      DEMO.evento('pergunta', { chat: 'central', texto: t.slice(0, 300) });
+      const r = I.responderCentral(t); est.copiloto.push(['ia', r]); conversa.append(resposta(r)); medir();
+      setTimeout(() => conversa.lastChild && conversa.lastChild.scrollIntoView({ block: 'nearest' }), 30);
+    };
+    est.copiloto.forEach(([q, x]) => conversa.append(q === 'eu' ? el('div', { class: 'bolha eu', text: x }) : resposta(x)));
+    const campo = el('input', { class: 'entrada', id: 'msg-central', maxlength: '300', autocomplete: 'off', placeholder: 'Pergunte ou peça uma mudança', 'aria-label': 'Pergunta para o assistente' });
+    medir();
+    const f = DEMO.folha({ titulo: 'Assistente da central', lateral: true, foco: '#msg-central', conteudo: [
+      el('p', { class: 'mudo peq', text: 'Responde sobre um paciente ou todos, sempre com de onde veio. Mudanças só depois do "Confirmar". Não decide dose nem tratamento.' }), item(54),
+      el('div', { class: 'sugestoes', role: 'group', 'aria-label': 'Perguntas prontas' }, I.SUGESTOES_CENTRAL.map(q => el('button', { type: 'button', class: 'botao sec pilula', onclick: () => perguntar(q) }, q))),
+      conversa, medidor,
+      el('form', { class: 'enviar-msg', onsubmit: e => { e.preventDefault(); const t = campo.value.trim(); if (t) { campo.value = ''; perguntar(t); } } }, campo, el('button', { class: 'botao', type: 'submit' }, ic('enviar', 'p'), 'Enviar'))] });
+    DEMO.tela('assistente-central');
+  }
   function kpi(r, v, sub) { return el('div', { class: 'kpi' }, el('span', { class: 'rot', text: r }), el('strong', { class: 'numero', text: v }), sub ? el('span', { class: 'mini mudo', text: sub }) : null); }
   function campo(r, v, id) { const i = el('input', { class: 'entrada', id, inputmode: 'numeric', value: String(v) }); return [el('label', { class: 'campo', for: id }, el('span', { text: r }), i), i]; }
   function chips(op) { let valor = op[op.length - 1]; const g = el('div', { class: 'seg', role: 'radiogroup', 'aria-label': 'Para quem' });
@@ -253,6 +363,8 @@
   let largura = innerWidth;
   addEventListener('resize', () => { if ((innerWidth >= 768) !== (largura >= 768) && raiz && raiz.isConnected) desenhar(true); largura = innerWidth; });
   function desenhar(mesma) {
+    // A aba IA usa comum/ia.js: o arquivo vem na primeira vez que ela abre.
+    if (est.aba === 'ia' && !est.ficha && !window.DEMO_IA) { DEMO.comIA().then(() => desenhar(mesma), DEMO.semRede); return; }
     const p = M.pac(est.paciente);
     const soFicha = est.ficha && p && !dividido();
     const corpo = soFicha ? ficha(p) : TELAS[est.aba]();
@@ -262,12 +374,13 @@
     trocar(raiz,
       el('header', { class: 'barra-central vidro' }, el('div', { class: 'dentro' }, el('span', { class: 'selo', 'aria-hidden': 'true', text: DEMO.iniciais(DEMO.dados.clinica) }),
         el('div', { class: 'cresce' }, el('div', { class: 'nome', text: DEMO.dados.clinica }), el('div', { class: 'sub', text: 'Central da equipe' })),
+        el('button', { type: 'button', class: 'botao-ia', 'aria-label': 'Abrir o assistente da central', onclick: copiloto }, ic('conversa', 'p'), el('span', { class: 'so-largo', text: 'Assistente' })),
         window.DEMO_TUTORIAL.botao('central'), el('span', { class: 'avatar', title: nome, 'aria-label': 'Conectado como ' + nome, role: 'img', text: DEMO.iniciais(DEMO.dados.medico) }))),
       el('div', { class: 'central' },
         soFicha ? null : el('div', { class: 'saudacao' }, el('p', { class: 'sobretitulo', text: dataHoje }), el('h1', { text: saud + ', ' + nome + '.' }), el('p', { class: 'mudo', text: resumoAgenda() })),
         el('nav', { class: 'barra-abas vidro', 'aria-label': 'Partes da central' }, el('div', { class: 'seg' }, ABAS.map(([k, n]) => el('button', { type: 'button', 'aria-current': !soFicha && est.aba === k ? 'page' : null, onclick: () => irAba(k) }, n)))),
         el('main', { class: 'pilha-g conteudo-central', id: 'conteudo', tabindex: '-1' }, corpo)));
-    DEMO.tela(soFicha || (est.ficha && dividido()) ? 'ficha' : est.aba);
+    DEMO.tela(soFicha || (est.ficha && dividido()) ? 'ficha' : est.aba === 'ia' ? { personal: 'ia', consumo: 'consumo', registro: 'registro-ia' }[est.iaParte] : est.aba);
     const ativa = raiz.querySelector('.barra-abas [aria-current="page"]'); if (ativa) ativa.scrollIntoView({ block: 'nearest', inline: 'center' });
     if (!mesma) window.scrollTo(0, 0);
     // Tutorial de primeiro acesso: na 1ª vez que a aba Hoje aparece nesta página.
@@ -281,12 +394,16 @@
       if (pedida != null) {
         est.paciente = (naTriagem()[0] || M.pacientes[0]).id;
         if (pedida === 'ficha') { est.paciente = 1; est.ficha = true; } else if (pedida === 'alertas' || pedida === 'pacientes') est.aba = 'hoje'; else if (TELAS[pedida]) est.aba = pedida === 'picadinha' ? 'aplicacoes' : pedida;
+        const IA = { ia: 'personal', consumo: 'consumo', 'registro-ia': 'registro' };
+        if (IA[pedida]) { est.aba = 'ia'; est.iaParte = IA[pedida]; }
       } else if (est.paciente == null) est.paciente = (naTriagem()[0] || M.pacientes[0]).id;
       desenhar();
+      if (pedida === 'assistente-central') copiloto();
     },
     // Para o caminho "abrir a ficha da Mariana" vindo de outro lugar da demonstração.
     abrirFicha,
     // As telas que um link (…&tela=…) abre: o manual e o teste conferem que cada tela do manual está aqui.
-    telas: () => [...Object.keys(TELAS), 'ficha', 'alertas', 'pacientes', 'tutorial']
+    telas: () => [...Object.keys(TELAS), 'ficha', 'alertas', 'pacientes', 'tutorial', 'consumo', 'registro-ia', 'assistente-central'],
+    copiloto
   };
 })();

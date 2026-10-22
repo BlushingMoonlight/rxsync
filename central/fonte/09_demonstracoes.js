@@ -20,7 +20,8 @@ const DEM_ITENS = ['Entrar pelo link', 'Marca da clínica', 'Ícone na tela do c
   'Sintomas que avisam a equipe', 'Minhas consultas', 'Avisos da clínica', 'Lembretes', 'Conteúdo da clínica', 'Enviar exames', 'Equipe e contatos', 'Chat com a equipe', 'Conquistas',
   'Assistente de dúvidas', 'Meus dados', 'Leitura confortável', 'Pacientes da semana', 'Alertas', 'Ficha do app', 'Evolução do paciente', 'Metas e plano alimentar',
   'Prescrição das aplicações', 'Avisos e conteúdo', 'Funções do app', 'Manual de uso', 'Fluxogramas', 'Ajuda pela IA', 'Primeiro acesso guiado no app',
-  'Primeiro acesso guiado na central'];
+  'Primeiro acesso guiado na central', 'IA do paciente (personal)',
+  'Personal no WhatsApp', 'IA da central', 'Ações pela IA com confirmação', 'Registro da IA', 'Consumo de IA'];
 const nomeItem = n => DEM_ITENS[n - 1] ? `${n}. ${DEM_ITENS[n - 1]}` : 'Item ' + n;
 const irD = (...partes) => ir(['demonstracoes', ...partes.filter(x => x != null && x !== '').map(x => encodeURIComponent(x))].join('/'));
 const minutos = s => { const m = Math.round((Number(s) || 0) / 60); return m < 1 ? 'menos de 1 min' : fmtNum(m) + ' min'; };
@@ -198,7 +199,7 @@ async function dLink(c, id) {
           x.escolha ? etq((DEM_ESCOLHA[x.escolha] || [x.escolha])[0], (DEM_ESCOLHA[x.escolha] || [])[1]) : null))),
       cartao('Telas mais vistas', null, listaOu(u.telas || [], 'Nenhuma tela vista ainda.', t => linhaSimples((DEM_PAGINA[t.pagina] || t.pagina) + (t.tela ? ' › ' + t.tela : ''), fmtNum(t.vezes) + ' vez(es) · ' + minutos(t.segundos)))),
       cartao('O que mais tocou', null, listaOu(u.toques || [], 'Nenhum toque registrado ainda.', t => linhaSimples(t.alvo, (DEM_PAGINA[t.pagina] || t.pagina) + ' · ' + fmtNum(t.vezes) + ' vez(es)'))),
-      cartao('Perguntas nos chats', null, listaOu(u.perguntas || [], 'Nenhuma pergunta nos chats de exemplo.', p => linhaSimples(p.texto || '', (p.chat === 'equipe' ? 'chat com a equipe' : 'assistente do app') + ' · ' + fmtHora(p.quando)))),
+      cartao('Perguntas nos chats', null, listaOu(u.perguntas || [], 'Nenhuma pergunta nos chats de exemplo.', p => linhaSimples(p.texto || '', ({ equipe: 'chat com a equipe', personal: 'personal do app', whatsapp: 'personal no WhatsApp', central: 'assistente da central' }[p.chat] || 'assistente do app') + ' · ' + fmtHora(p.quando)))),
       cartao('Visitas', null, listaOu(u.visitas || [], 'Nenhuma visita ainda.', v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('visita', l.id, v.id) },
         el('span', { class: 'icone-caixa' }, icone(v.tipo_aparelho === 'computador' ? 'demonstracao' : 'telefone')),
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: fmtHora(v.inicio) + ' · ' + minutos(v.segundos) }),

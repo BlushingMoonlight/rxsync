@@ -96,6 +96,19 @@
     return base + '#' + p.join('&');
   }
 
+  // ---------------------------------------------------------------- arquivos sob demanda (peso da página)
+  // O app e a central abrem sem a IA, sem o manual e sem o outro produto: cada um vem quando é aberto, uma vez só.
+  const carregados = {};
+  function carregar(arquivos) {
+    return Promise.all([].concat(arquivos).map(src => carregados[src] || (carregados[src] = new Promise((ok, erro) => {
+      const e = src.endsWith('.css') ? el('link', { rel: 'stylesheet', href: src }) : el('script', { src });
+      e.onload = ok; e.onerror = () => { delete carregados[src]; erro(new Error(src)); }; document.head.append(e);
+    }))));
+  }
+  const comManual = () => window.DEMO_MANUAL ? Promise.resolve() : carregar(raizDemo() + 'comum/manual.js');
+  const comIA = () => Promise.all([comManual(), window.DEMO_IA ? null : carregar(raizDemo() + 'comum/ia.js')]);
+  const semRede = () => rapida('Não consegui abrir agora. Confira a internet e tente de novo.');
+
   // ---------------------------------------------------------------- servidor (workflow 43)
   async function pedir(corpo) {
     try {
@@ -293,7 +306,7 @@
   function mudarPagina(p) { telaSair(); est.tela = ''; est.pagina = p; }
   const nomeMedico = () => { const d = est.dados || {}; return (d.tratamento || '') + ' ' + (d.medico || ''); };
 
-  window.DEMO = { raizSite, el, trocar, iniciar, faixaDemo, mudarPagina, marcarVisto, link, evento, tela, item, balao, rapida, janela, folha, confirmar, transicao, semMovimento, botaoTema,
+  window.DEMO = { raizSite, el, trocar, iniciar, carregar, comManual, comIA, semRede, faixaDemo, mudarPagina, marcarVisto, link, evento, tela, item, balao, rapida, janela, folha, confirmar, transicao, semMovimento, botaoTema,
     pedir, mensagemErro, nomeMedico, iniciais, vistos, escuro,
     trocarTema, get dados() { return est.dados; }, get ver() { return est.ver; }, get embed() { return est.embed; }, extra };
 })();
