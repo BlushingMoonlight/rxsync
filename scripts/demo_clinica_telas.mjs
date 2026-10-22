@@ -437,6 +437,7 @@ for (const [nomeAp, vp, toque] of APARELHOS) {
   ok(txtM.includes(fichaM.kg + ' kg') && txtM.includes(fichaM.d7 + ' de 7 dias') && txtM.includes('média de ' + fichaM.prot), 'IA da central: os números da resposta são os da ficha');
   // Revisão: a linha dos créditos fica inteira à vista, acima do campo de digitar (nunca atrás dele), mesmo com a conversa longa.
   for (let k = 0; k < 3; k++) await perguntarCentral('Como está a Beatriz?');
+  await page.waitForFunction(() => !document.getAnimations().some(a => a.playState === 'running'));   // a folha termina de subir
   const caixas = await page.evaluate(() => { const b = e => e.getBoundingClientRect(), m = b(document.querySelector('.medidor-ia')), f = b(document.querySelector('.folha .enviar-msg'));
     return { m: [m.top, m.bottom], f: [f.top, f.bottom], alto: innerHeight, texto: document.querySelector('.medidor-ia').textContent }; });
   ok(caixas.m[1] <= caixas.f[0] + 0.5 && caixas.m[0] >= 0 && caixas.m[1] <= caixas.alto && /Créditos de IA no mês: [\d.]+ de [\d.]+/.test(caixas.texto), `assistente: a linha dos créditos aparece inteira, acima do campo (${JSON.stringify(caixas)})`);
@@ -594,7 +595,7 @@ for (const vp of [{ width: 820, height: 1180 }, { width: 1440, height: 900 }]) {
   await page.goto(`${site.base}/demo/clinica/central/#${ATIVO}&tela=assistente-central`); await page.waitForSelector('#msg-central');
   for (const q of ['Quem não registrou há 3 dias?', 'Como está a Mariana?', 'Como está a Beatriz?', 'Como está o João?']) {
     const n = await page.locator('.resposta-ia').count(); await page.fill('#msg-central', q); await page.keyboard.press('Enter'); await page.waitForFunction(n => document.querySelectorAll('.resposta-ia').length > n, n); }
-  await page.waitForTimeout(600);
+  await page.waitForFunction(() => !document.getAnimations().some(a => a.playState === 'running'));
   const c = await page.evaluate(() => { const b = s => document.querySelector(s).getBoundingClientRect(), m = b('.medidor-ia'), f = b('.folha .enviar-msg'), fo = b('.folha'); return { m: m.top, mb: m.bottom, f: f.top, fb: f.bottom, folha: fo.bottom, alto: innerHeight }; });
   ok(c.mb <= c.f + 0.5 && c.fb <= c.alto && c.folha <= c.alto + 1, `assistente ${vp.width} px: a folha cabe na tela, com os créditos acima do campo (${JSON.stringify(c)})`);
   await ctx.close();
