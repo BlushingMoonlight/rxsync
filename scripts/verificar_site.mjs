@@ -89,6 +89,23 @@ for (const f of htmls) {
     for (const m of s.matchAll(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi)) erro(`${arq}: tem um endereço de e-mail escrito na página (${m[0]}); ele fica só no servidor`);
   }
 }
+// Páginas com a regra de segurança do navegador (CSP) gravada pelo scripts/csp.mjs: a regra bate com o script e o
+// estilo da página, e nada que a regra bloquearia (atributo style= ou on…= no HTML ou nas marcas montadas pelo código).
+{
+  const { PAGINAS, cspPagina, META_CSP, N8N: N8N_CSP } = await import('./csp.mjs');
+  if (N8N_CSP !== N8N) erro('scripts/csp.mjs: endereço do n8n diferente do verificar_site.mjs');
+  for (const [arq, p] of Object.entries(PAGINAS)) {
+    const s = fs.readFileSync(arq, 'utf8');
+    const csp = (s.match(META_CSP) || [])[1];
+    if (!csp) erro(`${arq}: falta a regra de segurança (rode node scripts/csp.mjs)`);
+    else if (csp !== cspPagina(s, p)) erro(`${arq}: a regra de segurança não bate com o script ou o estilo da página (rode node scripts/csp.mjs)`);
+    if (s.search(META_CSP) > s.search(/<(script|style|link)\b/)) erro(`${arq}: a regra de segurança precisa vir antes de qualquer <script>, <style> ou <link>`);
+    if ((s.match(/<script\b/g) || []).length !== (s.match(/<script>/g) || []).length) erro(`${arq}: <script> com src ou atributos; o código fica dentro da página`);
+    if (/\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
+    if (/<[a-z][^<>]*\son[a-z]+\s*=\s*["']/i.test(s)) erro(`${arq}: atributo on…= (onclick etc.) é bloqueado pela regra de segurança; use addEventListener`);
+    if (/javascript:/i.test(s)) erro(`${arq}: link javascript: é bloqueado pela regra de segurança`);
+  }
+}
 // Painel (autoedicao.html): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
 {
   const arq = 'autoedicao.html';
