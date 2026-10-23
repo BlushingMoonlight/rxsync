@@ -23,7 +23,7 @@ export const CHAVES = ['tela_inicio', 'tela_clientes', 'tela_dinheiro', 'tela_us
   'tela_registro', 'tela_chaves_api', 'tela_agregados_pacientes', 'editar_limites', 'editar_onboarding', 'editar_chaves_api', 'editar_avisos_eventos', 'tela_cliente_completa', 'tela_cliente_sensivel',
   'tela_cliente_asaas', 'editar_empresa', 'editar_assistente', 'editar_configuracoes', 'editar_recursos', 'liberar_recursos', 'editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste',
   'editar_situacao', 'editar_links', 'tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia',
-  'tela_demonstracoes', 'editar_demonstracoes'];
+  'tela_demonstracoes', 'editar_demonstracoes', 'tela_assistente', 'tela_metricas'];
 export const cli = (id, nome, plano, status, extra) => ({ cliente_id: id, nome, plano, status, ativo: status === 'Ativo', modalidade: 'contratado', mensagens_mes: 1800, franquia: 5000, whatsapp: 'open', interna: false, ...extra });
 export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', razao_social: 'Sorriso Ltda', representante: 'Ana', email: 'ana@exemplo.com', telefone: '48999990001',
   plano: 'Essencial', status: 'Ativo', modalidade: 'teste', ativo: true, interna: false, valor_mensal: 299, valor_setup: 999, ciclo: 'mensal', forma_pagamento: 'boleto', aceite: '2026-10-01',
@@ -32,6 +32,8 @@ export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odo
   mensagens_mes: 1200, uso_30d: dias(30, (d, i) => ({ dia: d, recebidas: 10 + i, enviadas: 12 + i })), medicos_ativos: 2, whatsapp: { estado: 'open', desde: '2026-10-05T10:00:00Z' },
   integracao: { plataforma: 'reservio', ativo: true, ultimo_erro: '' }, chaves_api_ativas: 0, avisos_eventos: { ativo: true, servidor: 'api.exemplo.com' },
   ultimos_avisos: [{ recebido_em: '2026-10-15T10:00:00Z', categoria: 'clientes', tipo: 'no_ar' }], pode_reenviar_onboarding: true, suspensao_motivo: '',
+  pausa_painel: null, conversas_envios: [{ pedido_em: '2026-10-22 10:00', situacao: 'enviado', enviado_em: '2026-10-22 10:12', mensagens: 1840, erro: null },
+    { pedido_em: '2026-10-20 15:30', situacao: 'falhou', enviado_em: null, mensagens: null, erro: 'O e-mail do cadastro recusou o anexo.' }],
   completa: { campos: { nome_exibicao: 'Clínica Sorriso', servicos: 'Limpeza e clareamento', fuso_horario: 'America/Sao_Paulo', func_fila: 'SIM', pesquisa_ativa: '', franquia_mensagens: '', limitar_franquia: '',
       dono_limite_dia: '', relac_limite_dia: '', limite_info_extra: '', envio_limite_dia: '' },
     recursos: { documentos: false, fila: true, pesquisa: false, reconhecer: false, tipo_visita: false, empilhamento: false, preconsulta: false, medicos: false, relacionamento: false, assistente_dono: false, pacientes: false, info_extra: 500, liberados: ['fila'] },
@@ -42,7 +44,24 @@ export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odo
     pedidos_asaas: [{ id: 3, tipo: 'foto', status: 'feito', criado_em: '2026-10-15T11:00:00Z', feito_em: '2026-10-15T11:15:00Z', resposta: 'ok' }],
     situacao: { teste_dias_estendidos: 5, cobranca_teste: false },
     asaas: { tirada_em: '2026-10-15T11:10:00Z', cobrancas: [{ id: 'pay_abc123', status: 'PENDING', valor: 299, vencimento: '2026-11-05', forma: 'BOLETO', descricao: 'RXSync — Plano Essencial' }] } } });
+// IA da Central (sql/061, DEC-145): o que o 04 devolve depois do 06 (texto já mascarado e as propostas, uma de cada nível).
+const daquiMin = n => new Date(Date.now() + n * 60000).toISOString();
+export const IA_RESPOSTA = () => ({ ok: true, tokens_entrada: 3200, tokens_saida: 140,
+  texto: 'Pela tela Clientes, 12 clínicas estão no ar.\n- A Clínica Sorriso está em teste até 20/10.\n- O e-mail dela é a•••@exemplo.com e o telefone [número oculto].\nDeixei três propostas para você confirmar.',
+  propostas: [
+    { id: 11, acao: 'editar_limites', resumo: 'Subir a franquia da Clínica Sorriso para 6.000', nivel: 1, nome_nivel3: '', vence_em: daquiMin(30),
+      antes: { clinica: 'Clínica Sorriso Odontologia Integrada', situacao: 'Ativo', plano: 'Essencial', ativo: true, campos: { franquia_mensagens: '' } }, depois: { campos: { franquia_mensagens: '6000' }, cliente_id: 'CLI-001' } },
+    { id: 12, acao: 'situacao_pausar', resumo: 'Pausar a assistente da Clínica Vida a pedido', nivel: 2, nome_nivel3: '', vence_em: daquiMin(30),
+      antes: { clinica: 'Clínica Vida', situacao: 'Ativo', plano: 'Gestao', ativo: true }, depois: { cliente_id: 'CLI-002' } },
+    { id: 13, acao: 'teste_estender', resumo: 'Estender o teste da Clínica Sorriso em 7 dias', nivel: 3, nome_nivel3: 'Clínica Sorriso Odontologia Integrada', vence_em: daquiMin(30),
+      antes: { clinica: 'Clínica Sorriso Odontologia Integrada', situacao: 'Ativo', plano: 'Essencial', ativo: true }, depois: { cliente_id: 'CLI-001', dias: 7, motivo: 'pedido da clínica' } }] });
 export const DADOS = {
+  metricas: { dados: { mrr: { total: 5388, mensal: 4190, anual_parcelado: 599, anual_a_vista_mes: 599, regra: 'Clínicas contratadas e no ar; o anual à vista entra dividido por 12.' },
+    pagantes_no_ar: 12, ticket_medio: 449, cancelamentos_mes: { clinicas: 1, receita_perdida: 299, regra: 'Clínicas contratadas com o cancelamento neste mês (o valor é o que ainda está no cadastro).' },
+    conversao_teste_90d: { testes: 9, viraram_contrato: 4, percentual: 44.4, regra: 'Testes grátis começados nos últimos 90 dias e quantos viraram contrato.' }, dias_ate_go_live_90d: 6.5,
+    custo_ia_mes: { nome: 'Custo de IA (Central e prospecção)', central: { tokens_entrada: 182000, tokens_saida: 9400, reais: 1.42 }, prospeccao: { tokens_entrada: 940000, tokens_saida: 61000, reais: 8.13 },
+      total_reais: 9.55, preco_preenchido: true, aviso: 'O atendimento das clínicas não entra: o banco só conta as mensagens, não os tokens.', mensagens_atendimento_mes: 24830 },
+    uso_ia_central_mes: { perguntas: 37, propostas: 9, confirmadas: 6 } } },
   inicio: { dados: { pendencias: { whatsapp_fora: [{ cliente_id: 'CLI-002', nome: 'Clínica Vida', desde: '2026-10-15T08:00:00Z' }], suspensos: [{ cliente_id: 'CLI-003', nome: 'Odonto Mais' }], aviso_atraso: [],
       cancelamentos_agendados: [{ cliente_id: 'CLI-004', nome: 'Derma Sul', em: '2026-11-01' }], onboarding_vencido: [], franquia_80: [{ cliente_id: 'CLI-001', nome: 'Clínica Sorriso', usadas: 4100, franquia: 5000 }],
       falhas_24h: 2, integracoes_com_erro: 1, avisos_eventos_desistidos_7d: 0, pedidos_demonstracao_7d: 3 },
@@ -103,8 +122,8 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3,
   // histórico das conversas ao e-mail do cadastro (sql/059, DEC-131)
   conversas_enviar: 2 };
-export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', painel_link_antigo: 'SIM' });
-const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17'];
+export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', painel_link_antigo: 'SIM', assistente_politica: 'SIM' });
+const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17', 'assistente_politica'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
   aceite: { data_aceite: '01/10/2026, 10:00:00', versao_termos: '2026-10-v3', ip_aceite: '10.0.0.9', aceite_dpa: 'SIM' }, copia_do_aceite: null } };
 // Sinal de vida do 52 e do 53 (sql/035, DEC-087). ESTADO.segurado = true: disparo ligado e o 52 parado (para as fotos e
@@ -130,6 +149,9 @@ export function servidor(chaves, chamadas = [], respostas = {}) {
     if (b.acao === 'ligar_chave') { const antes = chaves[b.dados.chave]; chaves[b.dados.chave] = b.dados.valor; return r({ ok: true, antes, depois: b.dados.valor }); }
     if (b.acao === 'cliente') return r({ ok: true, cliente: ficha() });
     if (b.acao === 'cliente_sensivel') return r(SENSIVEL);
+    if (b.acao === 'assistente_perguntar') return r(IA_RESPOSTA());
+    if (b.acao === 'proposta_confirmar') return r({ ok: true, mensagem: 'Feito (simulado).', pode_desfazer: true, registro_id: 99 });
+    if (b.acao === 'proposta_descartar') return r({ ok: true, mensagem: 'Proposta descartada.' });
     if (PROSP[b.acao]) return r(PROSP[b.acao](b.dados || {}));
     if (DEM[b.acao]) return r(DEM[b.acao](b.dados || {}));
     if (DADOS[b.acao]) return r({ ok: true, ...DADOS[b.acao] });

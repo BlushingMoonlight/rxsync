@@ -71,7 +71,12 @@ for (const f of htmls) {
       3: ['plano_trocar', 'situacao_suspender', 'cancelamento_agendar', 'preco_especial', 'cobranca_proxima_data', 'cobranca_vencimento', 'implantacao_isentar', 'pagamento_receber_dinheiro',
         'teste_estender', 'link_painel_novo', 'chave_api_revogar', 'cobranca_teste_definir', 'prosp_encerrar', 'prosp_numero_apagar',
         'dem_apagar'] };
-    const conhecidas = new Set(Object.values(NIVEIS).flat());
+    // proposta_confirmar (IA da Central, sql/061, DEC-145): o nível é o da ação proposta, que o servidor manda com a proposta.
+    const conhecidas = new Set([...Object.values(NIVEIS).flat(), 'proposta_confirmar']);
+    // O assistente espera as 4 rodadas do 06 (até 60 segundos cada) com folga, e só então diz que não respondeu.
+    const espera = Number((s.match(/const ESPERA_ASSISTENTE = (\d+);/) || [])[1]);
+    if (!(espera >= 240000 && espera <= 300000)) erro(`${arq}: ESPERA_ASSISTENTE precisa ficar entre 4 e 5 minutos (o 06 faz até 4 rodadas de 60 segundos)`);
+    if (!/limite: ESPERA_ASSISTENTE/.test(s) || !s.includes("'O assistente não respondeu agora. Tente de novo.'")) erro(`${arq}: a pergunta ao assistente precisa usar o limite ESPERA_ASSISTENTE e a mensagem de "não respondeu"`);
     for (const m of s.matchAll(/\b(?:fazer|pedirAcao)\(\s*'([a-z_]+)'/g)) if (!conhecidas.has(m[1])) erro(`${arq}: a ação ${m[1]} não tem nível (sql/030); ponha em rx_central_niveis() e na lista do verificar_site.mjs`);
     for (const m of s.matchAll(/\bformGrupo\([^;]*?, '([a-z_]+)', '/g)) if (!conhecidas.has(m[1])) erro(`${arq}: a ação ${m[1]} não tem nível (sql/030)`);
     for (const m of s.matchAll(/\b(?:fazer|pedirAcao)\(\s*([^'\s][^,)]*)/g)) if (!/^(acao|a|x\.acao|op\.acao)$/.test(m[1].trim())) erro(`${arq}: chame fazer/pedirAcao com o nome da ação escrito ('...'), para o verificar conferir o nível (achei ${m[1].trim()})`);

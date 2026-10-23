@@ -82,9 +82,10 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
   tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
-  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre' };
+  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
 const GRUPOS_CHAVE = [
-  ['Telas', k => /^tela_/.test(k.chave) && k.chave !== 'tela_cliente_sensivel'],
+  ['Telas', k => /^tela_/.test(k.chave) && !['tela_cliente_sensivel', 'tela_assistente'].includes(k.chave)],
+  ['IA da Central', k => k.chave === 'tela_assistente'],
   ['Dados protegidos', k => k.chave === 'tela_cliente_sensivel'],
   ['Edições de baixo risco', k => ['editar_assistente', 'editar_configuracoes', 'editar_recursos', 'editar_limites', 'editar_onboarding', 'editar_links', 'liberar_recursos'].includes(k.chave)],
   ['Dinheiro, situação e empresa', k => ['editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste', 'editar_situacao', 'editar_empresa'].includes(k.chave)],
@@ -96,11 +97,14 @@ const GRUPOS_CHAVE = [
 async function mudarChave(chave, valor, desfazendo) {
   let d = { chave, valor };
   if (nivelDe('ligar_chave', d) > 1) {
-    d = await pedirAcao('ligar_chave', d, { titulo: 'Ligar: ' + (NOME_CHAVE[chave] || chave), nome: 'Disparo de prospecção', rotuloNome: 'o nome da chave', rotuloNivel: chave === 'demo_links' ? 'os médicos passam a ver' : 'manda ou gasta de verdade',
+    d = await pedirAcao('ligar_chave', d, { titulo: 'Ligar: ' + (NOME_CHAVE[chave] || chave), nome: 'Disparo de prospecção', rotuloNome: 'o nome da chave',
+      rotuloNivel: chave === 'demo_links' ? 'os médicos passam a ver' : chave === 'tela_assistente' ? 'dados de clientes vão à OpenAI' : 'manda ou gasta de verdade',
       linhas: [[NOME_CHAVE[chave] || chave, 'desligada', 'ligada']], botao: 'Ligar',
       texto: chave === 'prosp_disparo' ? 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.'
         : chave === 'prosp_busca' ? 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.'
-        : chave === 'demo_links' ? 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos no Telegram.' : 'A IA passa a responder os leads das campanhas com a IA ligada.' });
+        : chave === 'demo_links' ? 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos no Telegram.'
+        : chave === 'tela_assistente' ? 'As perguntas e o que as telas da Central mostram vão à OpenAI, sem o "nunca" (CPF, CNPJ, senhas, chaves, dados de pacientes e o texto das conversas; e-mails e telefones mascarados). Nada muda sem o seu Confirmar.'
+        : 'A IA passa a responder os leads das campanhas com a IA ligada.' });
     if (!d) { await rotear(); return; }
   }
   const r = await chamar('ligar_chave', d);
@@ -120,6 +124,10 @@ TELAS.ajustes = async c => {
     // O disparo fica travado (sem interruptor) até as duas chaves que só um PR liga (DEC-072).
     if (k.chave === 'prosp_disparo' && k.valor !== 'SIM' && !(ligada('prosp_politica_v10') && ligada('prosp_balanceamento')))
       return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v10 publicada e o teste de balanceamento (chaves só por PR) · ' + k.chave })),
+        el('div', { class: 'direita' }, etq('travado', 'atencao'))));
+    // O assistente fica travado até a Política v18 publicada (assistente_politica, chave só por PR, DEC-145).
+    if (k.chave === 'tela_assistente' && k.valor !== 'SIM' && !ligada('assistente_politica'))
+      return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v18 publicada (chave só por PR) · ' + k.chave })),
         el('div', { class: 'direita' }, etq('travado', 'atencao'))));
     // Os links de demonstração ficam travados até a Política v17 publicada (chave só por PR, DEC-125).
     if (k.chave === 'demo_links' && k.valor !== 'SIM' && !ligada('demo_politica_v17'))

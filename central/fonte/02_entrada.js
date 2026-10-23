@@ -17,6 +17,7 @@ function lembrancaGuardar(v) { try { if (v) localStorage.setItem('central_lembra
 async function lembrancaNova(v) { if (!/^[0-9a-f]{64}$/.test(v || '')) return; lembrancaGuardar(v); await chamar('lembranca_usada', { lembranca: v }); }
 let ultimaRetomada = 0;
 async function entrada(mensagem) {
+  esquecerAssistente();   // a conversa com o assistente some ao sair (DEC-145)
   const r = await chamar('estado');
   if (r.ok && r.tem_senha === false) { lembrancaGuardar(''); return pedirCodigoSenha(true, mensagem); }
   // Aparelho lembrado: entra direto (no máximo uma tentativa por minuto, para nunca ficar em volta).
@@ -116,6 +117,7 @@ async function carregarConfig() {
   est.listaChaves = r.chaves || [];
   est.niveis = r.niveis || { acoes: {} };
   est.prospMotor = r.prosp_motor || null;   // sinal de vida do 52 e do 53 (DEC-087)
+  if (!ligada('tela_assistente')) fecharAssistente();
   return r;
 }
 async function abrirApp() {

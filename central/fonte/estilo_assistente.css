@@ -1,0 +1,55 @@
+/* ---------- IA da Central (DEC-145): o assistente ao lado (1180 px ou mais) ou em tela cheia (iPad em pé e celular) ---------- */
+.painel-ia { display: none; }
+.casca.com-assistente .painel-ia { display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 60; background: var(--superficie); min-width: 0;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+@media (min-width: 1180px) {
+  .casca.com-assistente { grid-template-columns: var(--lateral-recolhida) minmax(0, 1fr) 380px; }
+  /* Preso à direita (fora do fluxo); a 3ª coluna da grade guarda o lugar dele, então a tela não fica por baixo. */
+  .casca.com-assistente .painel-ia { inset: 0 0 0 auto; width: 380px; z-index: 35; border-left: 1px solid var(--borda); padding: 0 env(safe-area-inset-right, 0px) 0 0; }
+  /* Com o painel aberto, a ficha da clínica ocupa o lugar da lista (a lista volta ao fechar). */
+  .casca.com-assistente .mestre-detalhe { grid-template-columns: minmax(0, 1fr); }
+  .casca.com-assistente .mestre-detalhe > .mestre { display: none; }
+  /* A busca vira só o ícone, para o caminho no topo caber ao lado do painel. */
+  .casca.com-assistente .busca-campo { display: none; }
+  .casca.com-assistente .topo .btn-busca { display: grid; }
+  /* A mensagem rápida sai do canto do painel (cobriria o Enviar). */
+  .casca.com-assistente ~ .rapida { right: calc(380px + var(--e-6)); }
+}
+/* Em tela cheia, a mensagem rápida sobe acima do campo da pergunta. */
+@media (max-width: 1179px) { .casca.com-assistente ~ .rapida { bottom: calc(190px + env(safe-area-inset-bottom, 0px)); } }
+.ia-cab { display: flex; align-items: center; gap: var(--e-3); padding: var(--e-3) var(--e-3) var(--e-3) var(--e-4); border-bottom: 1px solid var(--borda); }
+.ia-cab .texto { flex: 1; min-width: 0; }
+.ia-cab h2 { font-size: var(--t-18); line-height: 1.2; }
+.ia-cab p { margin: 0; }
+.ia-aviso { display: flex; gap: var(--e-2); align-items: flex-start; margin: 0; padding: var(--e-2) var(--e-4); font-size: var(--t-12); line-height: 1.45; color: var(--info-texto); background: var(--info-fundo); }
+.ia-aviso .icone { flex: none; margin-top: 2px; }
+.ia-falas { flex: 1; min-height: 0; overflow-y: auto; padding: var(--e-4); display: flex; flex-direction: column; gap: var(--e-4); }
+.ia-vazio ul { list-style: none; margin: var(--e-2) 0 0; padding: 0; display: grid; gap: var(--e-2); }
+.ia-exemplo { width: 100%; min-height: var(--alvo); text-align: left; padding: var(--e-2) var(--e-3); border-radius: var(--r-2); border: 1px solid var(--borda-forte); background: var(--superficie-2); color: var(--texto); font: inherit; font-size: var(--t-14); cursor: pointer; }
+.ia-exemplo:hover { border-color: var(--primaria); }
+.ia-fala { display: flex; flex-direction: column; gap: var(--e-2); max-width: 100%; min-width: 0; }
+.ia-fala.jean { align-self: flex-end; max-width: 88%; }
+.ia-fala.jean .ia-texto { background: var(--primaria-suave); color: var(--texto); border-radius: var(--r-3) var(--r-3) var(--r-1) var(--r-3); padding: var(--e-2) var(--e-3); }
+.ia-fala.jean .ia-quem { text-align: right; }
+.ia-texto { font-size: var(--t-14); line-height: 1.55; overflow-wrap: anywhere; }
+.ia-texto p { margin: 0 0 var(--e-2); } .ia-texto p:last-child { margin-bottom: 0; }
+.ia-texto ul { margin: 0 0 var(--e-2); padding-left: var(--e-5); } .ia-texto li { margin: 2px 0; }
+.ia-proposta { border: 1px solid var(--borda-forte); border-radius: var(--r-3); padding: var(--e-3); background: var(--superficie-2); min-width: 0; }
+.ia-proposta.fechada { opacity: .85; }
+.ia-proposta p { margin: var(--e-1) 0; overflow-wrap: anywhere; }
+.ia-proposta-cab { display: flex; align-items: center; justify-content: space-between; gap: var(--e-2); flex-wrap: wrap; }
+.ia-proposta table.ad { font-size: var(--t-13); margin: var(--e-2) 0; }
+.ia-proposta table.ad td, .ia-proposta table.ad tbody th { overflow-wrap: anywhere; }
+.ia-proposta table.ad thead th { white-space: nowrap; }
+.ia-proposta .acoes { justify-content: flex-end; }
+.ia-pensando { display: flex; align-items: center; gap: var(--e-2); padding: 0 var(--e-4); font-size: var(--t-13); color: var(--texto-2); }
+.ia-pensando:not(:empty) { padding-top: var(--e-2); padding-bottom: var(--e-2); border-top: 1px solid var(--borda); }
+.ia-pensando #ia-tempo { margin-left: auto; }
+.ia-ponto { width: 10px; height: 10px; border-radius: 50%; background: var(--primaria); flex: none; animation: ia-pulso 1.2s ease-in-out infinite; }
+@keyframes ia-pulso { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ia-ponto { animation: none; } }
+.ia-form { padding: var(--e-3) var(--e-4) var(--e-4); border-top: 1px solid var(--borda); background: var(--superficie); }
+.ia-form .campo { margin-bottom: var(--e-2); }
+.ia-form textarea { resize: vertical; min-height: 72px; }
+.ia-form .acoes { justify-content: flex-end; }
+.ia-mensagens { box-shadow: none; border: 1px solid var(--borda); }
