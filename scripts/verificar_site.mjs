@@ -89,6 +89,23 @@ for (const f of htmls) {
     for (const m of s.matchAll(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi)) erro(`${arq}: tem um endereço de e-mail escrito na página (${m[0]}); ele fica só no servidor`);
   }
 }
+// Páginas com a regra de segurança do navegador (CSP) gravada pelo scripts/csp.mjs: a regra bate com o script e o
+// estilo da página, e nada que a regra bloquearia (atributo style= ou on…= no HTML ou nas marcas montadas pelo código).
+{
+  const { PAGINAS, cspPagina, META_CSP, N8N: N8N_CSP } = await import('./csp.mjs');
+  if (N8N_CSP !== N8N) erro('scripts/csp.mjs: endereço do n8n diferente do verificar_site.mjs');
+  for (const [arq, p] of Object.entries(PAGINAS)) {
+    const s = fs.readFileSync(arq, 'utf8');
+    const csp = (s.match(META_CSP) || [])[1];
+    if (!csp) erro(`${arq}: falta a regra de segurança (rode node scripts/csp.mjs)`);
+    else if (csp !== cspPagina(s, p)) erro(`${arq}: a regra de segurança não bate com o script ou o estilo da página (rode node scripts/csp.mjs)`);
+    if (s.search(META_CSP) > s.search(/<(script|style|link)\b/)) erro(`${arq}: a regra de segurança precisa vir antes de qualquer <script>, <style> ou <link>`);
+    if ((s.match(/<script\b/g) || []).length !== (s.match(/<script>/g) || []).length) erro(`${arq}: <script> com src ou atributos; o código fica dentro da página`);
+    if (/\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
+    if (/<[a-z][^<>]*\son[a-z]+\s*=\s*["']/i.test(s)) erro(`${arq}: atributo on…= (onclick etc.) é bloqueado pela regra de segurança; use addEventListener`);
+    if (/javascript:/i.test(s)) erro(`${arq}: link javascript: é bloqueado pela regra de segurança`);
+  }
+}
 // Painel (autoedicao.html): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
 {
   const arq = 'autoedicao.html';
@@ -167,7 +184,7 @@ for (const f of htmls) {
   }
 }
 // Política de Privacidade (rxsync-sistema DEC-143): a versão do selo, a do texto e a primeira do histórico são a mesma; e
-// as promessas sem prova (N-07, #101) não voltam ao texto antes de existirem (o histórico de versões fica de fora).
+// as promessas sem prova não voltam ao texto antes de existirem (o histórico de versões fica de fora).
 {
   const pol = fs.readFileSync('privacidade.html', 'utf8');
   const selo = (pol.match(/>Versão (\d{4}-\d{2}-v\d+)<\/span>/) || [])[1], texto = (pol.match(/<p><strong>Versão (\d{4}-\d{2}-v\d+)<\/strong>/) || [])[1],
@@ -241,6 +258,12 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     if (JSON.stringify(demo.map(x => x[1])) !== JSON.stringify(central)) erro(`${itensArq}: os títulos não batem com os da Central (${centralArq}, DEM_ITENS)`);
   }
   if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');
+}
+// O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
+// repositório privado).
+for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f)), ...fs.readdirSync('scripts').map(f => path.join('scripts', f))]) {
+  const m = fs.readFileSync(f, 'utf8').match(/\bN-[0-9]{2,3}\b/);
+  if (m) erro(`${f}: cita um número de achado (${m[0]}); o site é público, deixe os detalhes no PR do sistema`);
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);

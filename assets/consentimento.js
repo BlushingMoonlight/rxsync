@@ -5,7 +5,8 @@
 // - Chat da RXSync (Chatwoot): não carrega sozinho. Um botão leve carrega o chat quando a pessoa toca nele (o toque é o
 //   pedido do chat) ou quando a página abre com ?suporte=1 (link de suporte). window.rxChat.abrir() faz o mesmo.
 // Na tag <script>: data-ga-sem-query manda ao Google o endereço sem a query (o onboarding tem o token no ?t=);
-// data-sem-ga é para página sem Google Analytics (só o chat).
+// data-sem-ga é para página sem Google Analytics (só o chat). Em todas as páginas, o código de origem (?ref=) nunca vai
+// ao Google, nem no endereço da página nem no da página anterior; o resto da query (plano, ciclo) continua.
 (function () {
   var GA_ID = 'G-G5ZS8DRHNM';
   var CHAT_URL = 'https://app.rxsync.com.br';
@@ -22,11 +23,22 @@
   function ler() { try { return localStorage.getItem('rx_cookies'); } catch (e) { return null; } }
   function gravar(v) { try { localStorage.setItem('rx_cookies', v); } catch (e) { /* aba privada: vale só nesta página */ } }
 
+  // Endereço sem o ?ref= (e sem o #): o que sobra da query fica na mesma ordem.
+  function semRef(u) {
+    if (!u) return '';
+    try {
+      var url = new URL(u);
+      url.searchParams.delete('ref'); url.hash = '';
+      return url.toString();
+    } catch (e) { return ''; }
+  }
+
   function ligarGA() {
     if (gaLigado || !temGA) return;
     gaLigado = true;
     window.gtag('js', new Date());
-    window.gtag('config', GA_ID, semQuery ? { page_location: location.origin + location.pathname, page_path: location.pathname } : {});
+    window.gtag('config', GA_ID, semQuery ? { page_location: location.origin + location.pathname, page_path: location.pathname, page_referrer: semRef(document.referrer) }
+      : { page_location: semRef(location.href), page_referrer: semRef(document.referrer) });
     var s = document.createElement('script');
     s.async = true;
     s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;

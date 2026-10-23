@@ -607,16 +607,18 @@
   // ---------------------------------------------------------------- navegação (dentro da página; o # guarda o código)
   // Barra de cima do app (a marca da clínica e o perfil) e 4 abas na barra de vidro embaixo.
   const abas = () => [['inicio', 'Hoje', 'hoje'], ['registrar', 'Registrar', 'registrar'], M.funcaoLigada('aplicacoes') ? ['aplicacoes', 'Aplicações', 'seringa'] : null, ['evolucao', 'Evolução', 'grafico']].filter(Boolean);
-  function irAba(aba) { est.aba = aba === 'picadinha' ? 'aplicacoes' : aba; est.pilha = []; desenhar(est.aba); }
+  function irAba(aba) { est.aba = aba === 'picadinha' ? 'aplicacoes' : aba; est.pilha = []; return desenhar(est.aba); }
   function abrir(tela) { est.pilha.push(tela); desenhar(tela); }
   function voltar() { est.pilha.pop(); desenhar(est.pilha[est.pilha.length - 1] || est.aba); }
   function desenharTela(tela) { desenhar(tela, true); }
   // Troca de tela com transição; a primeira tela e as atualizações da mesma tela, direto.
   // Telas que usam a IA (comum/ia.js, com o manual): o arquivo vem na primeira vez que uma delas abre.
   const COM_IA = ['personal', 'whatsapp', 'assistente'];
+  // Devolve uma promessa que se cumpre quando a tela já está montada.
   function desenhar(tela, mesma) {
-    if (COM_IA.includes(tela) && !window.DEMO_IA) { DEMO.comIA().then(() => desenhar(tela, mesma), DEMO.semRede); return; }
-    if (mesma || !raiz.querySelector('.celular')) montarTela(tela, mesma); else DEMO.transicao(() => montarTela(tela, mesma));
+    if (COM_IA.includes(tela) && !window.DEMO_IA) return DEMO.comIA().then(() => desenhar(tela, mesma), DEMO.semRede);
+    if (mesma || !raiz.querySelector('.celular')) { montarTela(tela, mesma); return Promise.resolve(); }
+    return DEMO.transicao(() => montarTela(tela, mesma));
   }
   function montarTela(tela, mesma) {
     const rolagemAntes = raiz.querySelector('.rolagem');
@@ -644,8 +646,9 @@
   // Abre uma tela pelo nome (link …&tela=…, manual e respostas do assistente). Devolve false se o nome não existe.
   const FOLHA_REFEICAO = { refeicao: 'busca', buscar: 'busca', alimento: 'busca', foto: 'foto', codigo: 'codigo' };
   function irParaTela(pedida) {
-    if (FOLHA_REFEICAO[pedida]) { irAba('inicio'); abrirRefeicao(FOLHA_REFEICAO[pedida]); }
-    else if (REGISTROS[pedida] || FOLHAS[pedida]) { irAba(['medidas', 'fotos'].includes(pedida) ? 'evolucao' : 'registrar'); abrirFolha(pedida); }
+    // A folha abre por cima da aba só depois que a aba nova está montada (senão a troca de tela a apaga).
+    if (FOLHA_REFEICAO[pedida]) irAba('inicio').then(() => abrirRefeicao(FOLHA_REFEICAO[pedida]));
+    else if (REGISTROS[pedida] || FOLHAS[pedida]) irAba(['medidas', 'fotos'].includes(pedida) ? 'evolucao' : 'registrar').then(() => abrirFolha(pedida));
     else if (pedida && TELAS[pedida] && pedida !== 'boas-vindas') {
       if (['inicio', 'registrar', 'aplicacoes', 'picadinha', 'evolucao', 'mais'].includes(pedida)) irAba(pedida);
       else { est.aba = 'mais'; est.pilha = []; abrir(pedida); }

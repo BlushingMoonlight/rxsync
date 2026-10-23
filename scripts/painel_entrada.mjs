@@ -47,7 +47,11 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
   let b = {}; try { b = JSON.parse(q.postData() || '{}'); } catch {}
   return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(responder(q.url(), q.headers(), b)) });
 });
-const nova = async () => { const p = await ctx.newPage(); p.setDefaultTimeout(8000); p.on('pageerror', e => erros.push(String(e))); return p; };
+// Cada passo espera uma condição (a tela mudar ou o pedido chegar ao servidor simulado), nunca um tempo fixo; o LIMITE
+// é só o teto de cada espera, para um computador ocupado não virar falha.
+const LIMITE = 30000;
+const chegou = async f => { for (const fim = Date.now() + LIMITE; Date.now() < fim; await new Promise(r => setTimeout(r, 50))) if (chamadas.some(f)) return true; return false; };
+const nova = async () => { const p = await ctx.newPage(); p.setDefaultTimeout(LIMITE); p.on('pageerror', e => erros.push(String(e))); return p; };
 const guardado = p => p.evaluate(() => ({ local: Object.keys(localStorage), sessao: Object.keys(sessionStorage) }));
 const PAINEL = site.base + '/autoedicao.html';
 
@@ -65,7 +69,7 @@ await page.fill('#entCod', '123456'); await page.click('#entCodigo button[type=s
 await page.locator('#app').waitFor({ state: 'visible' });
 const abrir1 = chamadas.filter(c => c.acao === 'abrir').pop();
 ok(abrir1 && abrir1.sessao === SESSAO && abrir1.token === '', 'o painel abre com a sessão no cabeçalho, sem token');
-ok(chamadas.some(c => c.acao === 'lembranca_usada' && c.dados.lembranca === LEMBRANCA), 'a página confirma que guardou a lembrança');
+ok(await chegou(c => c.acao === 'lembranca_usada' && c.dados.lembranca === LEMBRANCA), 'a página confirma que guardou a lembrança');
 let g = await guardado(page);
 ok(g.local.join() === 'painel_lembranca' && g.sessao.join() === 'painel_sessao', 'no navegador, só a lembrança e a sessão: ' + JSON.stringify(g));
 ok(await page.locator('#faixaSenha').isHidden(), 'com sessão, sem a faixa "Crie sua senha"');
@@ -77,7 +81,7 @@ await page.evaluate(() => { location.hash = 'conta/whatsapp'; });
 await page.click('#btnReconectar');
 await page.locator('#zapQrImg').waitFor({ state: 'visible' });
 ok(true, 'Reconectar: o código aparece na própria tela');
-await page.getByText('WhatsApp conectado').waitFor({ timeout: 15000 });
+await page.getByText('WhatsApp conectado').waitFor();
 ok(await page.locator('#zapQrImg').isHidden() && chamadas.some(c => c.caminho === 'conectar' && c.acao === 'status' && c.sessao === SESSAO), 'Reconectar: confere a situação pela sessão e o código some ao conectar');
 await page.close();
 
@@ -85,7 +89,7 @@ await page.close();
 page = await nova();
 await page.goto(PAINEL);
 await page.locator('#app').waitFor({ state: 'visible' });
-ok(chamadas.some(c => c.acao === 'retomar' && c.dados.lembranca === LEMBRANCA), 'aparelho lembrado: entra sem senha (retomar)');
+ok(await chegou(c => c.acao === 'retomar' && c.dados.lembranca === LEMBRANCA), 'aparelho lembrado: entra sem senha (retomar)');
 ok(await page.evaluate(() => localStorage.getItem('painel_lembranca')) === LEMBRANCA2, 'a lembrança muda a cada uso');
 
 // 3. Sair
@@ -93,7 +97,7 @@ await page.evaluate(() => { location.hash = 'conta'; });
 await page.click('#btnSair');
 await page.locator('#entrada').waitFor({ state: 'visible' });
 g = await guardado(page);
-ok(chamadas.some(c => c.acao === 'sair' && c.dados.esquecer === true) && !g.local.length && !g.sessao.length, 'Sair: encerra a sessão, esquece o aparelho e volta para a entrada');
+ok(await chegou(c => c.acao === 'sair' && c.dados.esquecer === true) && !g.local.length && !g.sessao.length, 'Sair: encerra a sessão, esquece o aparelho e volta para a entrada');
 await page.close();
 
 // 4. link antigo: faixa "Crie sua senha"
@@ -133,7 +137,7 @@ await page.check('#termosOk'); await page.click('#btnTermosAceitar');
 await page.locator('#faixaTermos').waitFor({ state: 'hidden' });
 const ta = chamadas.find(c => c.acao === 'termos_aceitar');
 ok(ta && ta.sessao === SESSAO && ta.dados.versao_termos === '2026-10-v6' && ta.dados.aceite_termos === true, 'aceite da v6 mandado com a sessão; a faixa some');
-await page.reload(); await page.locator('#app').waitFor({ state: 'visible' }); await page.waitForTimeout(400);
+await page.reload(); await page.locator('#app').waitFor({ state: 'visible' }); await page.waitForLoadState('networkidle');
 ok(await page.locator('#faixaTermos').isHidden(), 'depois do aceite, a faixa não volta');
 
 // 6. sessão vencida

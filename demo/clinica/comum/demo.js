@@ -76,9 +76,10 @@
 
   // Movimento: troca de tela com a View Transitions API (sem ela, ou com "reduzir movimento", a troca é direta).
   const semMovimento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Devolve uma promessa que se cumpre quando a tela nova já está montada (com a animação, isso acontece depois).
   function transicao(fn) {
-    if (!document.startViewTransition || semMovimento() || document.visibilityState !== 'visible') { fn(); return; }
-    try { document.startViewTransition(fn); } catch (e) { fn(); }
+    if (!document.startViewTransition || semMovimento() || document.visibilityState !== 'visible') { fn(); return Promise.resolve(); }
+    try { return document.startViewTransition(fn).updateCallbackDone.catch(() => {}); } catch (e) { fn(); return Promise.resolve(); }
   }
 
   // O que a pessoa já viu nesta aba (a entrada mostra "App ✓ · Central ✓ · Escopo —"); só na memória da aba.
