@@ -131,7 +131,8 @@ async function ficha(alvo, id, aba, embutida) {
     el('div', { class: 'ficha-cab' }, el('span', { class: 'avatar ' + tomStatus(x.status), text: iniciais(x.nome), 'aria-hidden': 'true' }),
       el('div', { class: 'texto' }, el(embutida ? 'h2' : 'h1', { class: 'nome-ficha', text: x.nome }),
         el('div', { class: 'etqs' }, etq(x.status || '—', tomStatus(x.status)), etq(x.plano || '—', 'info', true), etq(x.cliente_id, '', true), x.interna ? etq('clínica interna', '', true) : null, ehTesteCobranca(x) ? etq('teste da cobrança', 'atencao') : null)),
-      el('div', { class: 'acoes' }, btn('Ações', () => menuAcoes(x), 'sec', 'mais'))),
+      el('div', { class: 'acoes' }, ligada('tela_assistente') ? btn('Perguntar ao assistente', () => abrirAssistente('Sobre a ' + x.cliente_id + ' (' + x.nome + '): '), 'sec', 'assistente') : null,
+        btn('Ações', () => menuAcoes(x), 'sec', 'mais'))),
     el('div', { class: 'abas', role: 'tablist', 'aria-label': 'Partes da ficha' }, ABAS.map(([k, n]) => el('button', { role: 'tab', type: 'button', 'aria-selected': String(aba === k), onclick: () => irCliente(x.cliente_id, k) }, n)))));
   const conteudo = el('div', { class: 'pilha', role: 'tabpanel', 'aria-label': nomeAba });
   trocar(alvo, el('div', { class: 'pilha ficha' }, cab, conteudo));
@@ -146,6 +147,9 @@ function abaGeral(c, x) {
     x.suspensao_motivo === 'equipe' ? 'Pela equipe: só volta pela Central.' : 'Por inadimplência: volta sozinha quando pagar.')));
   if (x.aviso_atraso_em) avisos.push(el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, el('b', { text: 'Aviso de atraso em ' + fmtData(x.aviso_atraso_em) + '. ' }), 'O 31 suspende no 10º dia de atraso (cláusula 11.7).')));
   if (x.cancelar_em) avisos.push(el('div', { class: 'aviso atencao' }, icone('relogio'), el('div', {}, el('b', { text: 'Cancelamento agendado para ' + fmtData(x.cancelar_em) + '.' }))));
+  // Pausa feita pelo painel da clínica (sql/061, DEC-147): quando e o papel de quem pausou, nunca o nome nem o e-mail.
+  if (x.pausa_painel && !x.ativo) avisos.push(el('div', { class: 'aviso atencao' }, icone('info'), el('div', {}, el('b', { text: 'Assistente pausada pelo painel em ' + fmtHora(x.pausa_painel.em) + ' (' + (x.pausa_painel.por === 'dono' ? 'dono' : x.pausa_painel.por === 'equipe' ? 'equipe' : 'quem pausou não está mais na equipe') + '). ' }),
+    'A clínica retoma pelo painel; a Central também pode retomar em Ações.')));
   const passos = [['Aceite dos Termos', x.aceite ? fmtData(x.aceite) + ' · ' + (x.versao_termos || '') : 'ainda não', !!x.aceite],
     ['Onboarding', x.onboarding || '—', /conclu/i.test(String(x.onboarding || '')) || !!x.go_live], ['No ar', x.go_live ? fmtData(x.go_live) : 'ainda não', !!x.go_live],
     x.modalidade === 'teste' ? ['Fim do teste', fmtData(x.fim_teste), false] : ['Último pagamento', fmtData(x.ultimo_pagamento), !!x.ultimo_pagamento],
@@ -314,6 +318,7 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // ---------- Histórico
+const SIT_ENVIO = { na_fila: ['na fila', 'atencao'], montando: ['montando', 'info'], enviado: ['enviado', 'ok'], falhou: ['falhou', 'perigo'] };
 function abaHistorico(c, x) {
   const comp = x.completa || null;
   const lt = (comp && comp.linha_do_tempo) || [];
@@ -321,7 +326,13 @@ function abaHistorico(c, x) {
     const o = String(t.o_que || ''); const txt = o.startsWith('Aviso: ') ? 'Aviso: ' + rotuloTipo(o.slice(7)) : o.startsWith('Central: ') ? 'Central: ' + (NOMES_EVENTO[o.slice(9)] || o.slice(9)) : o;
     return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: txt }), el('div', { class: 't2', text: String(t.quando || '').length > 10 ? fmtHora(t.quando) : fmtData(t.quando) }))));
   })) : vazio('Nada na linha do tempo.', 'relogio')) : corpo(nota('Ligue a ficha completa para ver a linha do tempo.', true))),
-  cartao('Últimos avisos desta clínica', null, listaAvisos(x.ultimos_avisos, false)));
+  cartao('Últimos avisos desta clínica', null, listaAvisos(x.ultimos_avisos, false)),
+  // Envios das conversas ao e-mail do cadastro (sql/059 e sql/061, DEC-131 e DEC-147): só a situação e a contagem.
+  cartao('Envios das conversas', el('span', { class: 'mudo peq', text: 'os 5 mais recentes · o arquivo não passa pela Central' }), (x.conversas_envios || []).length
+    ? el('ul', { class: 'lista' }, x.conversas_envios.map(e => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
+      el('div', { class: 't1', text: 'Pedido em ' + fmtHora(e.pedido_em) }),
+      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? fmtNum(e.mensagens) + ' mensagem(ns)' : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
+      el('div', { class: 'direita' }, etq(SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][0] : (e.situacao || '—'), SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][1] : '')))))) : vazio('Nenhum envio das conversas pedido.', 'relogio')));
   // Histórico do painel (sql/060, DEC-136, #184): quem entrou e o que fez no painel da clínica, com o IP e o e-mail (o dono
   // vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.
   if (!comp) return;

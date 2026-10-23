@@ -70,18 +70,23 @@ function guardarSessao(s) { est.sessao = s || ''; try { if (s) sessionStorage.se
 const ua = navigator.userAgent;
 const aparelho = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
 const ehApp = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
-async function chamar(acao, dados) {
+// op.limite (ms): espera no máximo isso pela resposta (o assistente, DEC-145); passou, ou a conexão caiu no meio, a
+// resposta é { ok: false, tempo_esgotado: true } com op.mensagemLimite.
+async function chamar(acao, dados, op) {
   const cab = { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM, 'x-rxsync-aparelho': aparelho, 'x-rxsync-app': ehApp ? 'sim' : 'nao' };
   if (est.sessao) cab['x-rxsync-sessao'] = est.sessao;
+  const limite = op && op.limite, corte = limite ? new AbortController() : null;
+  const relogio = corte ? setTimeout(() => corte.abort(), limite) : null;
   let r;
   try {
-    const resp = await fetch(N8N, { method: 'POST', headers: cab, body: JSON.stringify({ acao, dados: dados || {} }), cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer' });
+    const resp = await fetch(N8N, { method: 'POST', headers: cab, body: JSON.stringify({ acao, dados: dados || {} }), cache: 'no-store', credentials: 'omit', referrerPolicy: 'no-referrer', signal: corte ? corte.signal : undefined });
     r = await resp.json();
-  } catch (e) { r = { ok: false, mensagem: 'Sem conexão com a Central. Confira a internet e tente de novo.' }; }
+  } catch (e) { r = limite ? { ok: false, tempo_esgotado: true, mensagem: op.mensagemLimite || 'Não respondeu a tempo. Tente de novo.' } : { ok: false, mensagem: 'Sem conexão com a Central. Confira a internet e tente de novo.' }; }
+  finally { if (relogio) clearTimeout(relogio); }
   r = r || { ok: false, mensagem: 'Resposta vazia.' };
   if (r.sair && acao !== 'sair' && acao !== 'sair_todos') { guardarSessao(''); entrada(r.mensagem); }
   // Nível 3 com a última senha há mais de 12 horas (DEC-095): pede só a senha e repete a ação uma vez.
-  if (r.pedir_senha && acao !== 'senha_reconfirmar' && !(dados && dados._repetido) && await pedirSenha(r.mensagem)) return chamar(acao, { ...(dados || {}), _repetido: true });
+  if (r.pedir_senha && acao !== 'senha_reconfirmar' && !(dados && dados._repetido) && await pedirSenha(r.mensagem)) return chamar(acao, { ...(dados || {}), _repetido: true }, op);
   return r;
 }
 // Digitar a senha de novo (só a senha; errada conta para o bloqueio). true = conferiu.
@@ -164,7 +169,8 @@ function nivelDe(acao, d) {
   if (acao === 'editar_limites' && String((d.campos || {}).limitar_franquia || '').toUpperCase() === 'SIM') return 2;
   // Prospecção (sql/031, DEC-078): as mesmas regras de rx_central_nivel. Desligar ou pausar é um toque.
   // Demonstrações (sql/056, DEC-125): ligar os links (demo_links) é nível 2.
-  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) || d.chave === 'demo_links' ? 2 : 1;
+  // IA da Central (sql/061, DEC-145): ligar o assistente (tela_assistente) é nível 2.
+  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) || d.chave === 'demo_links' || d.chave === 'tela_assistente' ? 2 : 1;
   if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
   if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
   // Públicos (sql/036, DEC-088): tirar um contato é um toque (pôr de volta num público em uso: a página passa o nível 2).

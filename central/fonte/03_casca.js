@@ -6,6 +6,7 @@ const SECOES = [
   { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', aba: 1, chave: 'tela_dinheiro' },
   { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Operação', aba: 1, chave: 'tela_sistema' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
+  { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
   { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'O que passou pelo Telegram, sem o texto' },
   { id: 'agregados', nome: 'Agregados de pacientes', ic: 'agregados', grupo: 'Análise', chave: 'tela_agregados_pacientes', escondeDesligada: true, desc: 'Contagens e médias por clínica' },
@@ -52,6 +53,8 @@ function topo(titulo, caminho, voltar) {
       rota ? el('a', { href: '#' + rota, text: nome }) : el('span', { 'aria-current': 'page', text: nome }))))),
     el('button', { class: 'busca-campo', type: 'button', onclick: abrirBusca }, icone('busca', 'p'), 'Buscar clínica, código ou tela', el('kbd', { text: '⌘K' })),
     el('button', { class: 'btn-ic btn-busca', type: 'button', 'aria-label': 'Buscar clínica ou tela', onclick: abrirBusca }, icone('busca')),
+    // IA da Central (DEC-145): o assistente ao lado, só com a chave tela_assistente ligada.
+    ligada('tela_assistente') ? el('button', { class: 'btn-ic', id: 'btn-assistente', type: 'button', 'aria-label': 'Assistente', title: 'Assistente', 'aria-expanded': String(ia.aberto), 'aria-controls': 'assistente', onclick: alternarAssistente }, icone('assistente')) : null,
     el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Atualizar', title: 'Atualizar', onclick: () => { est.clientes = null; rotear(); } }, icone('atualizar')));
 }
 async function rotear() {

@@ -23,7 +23,10 @@ const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', 
   ['prospeccao/publico/PB-0002', 'Ortodontia Joinville'],
   // Demonstrações por link (sql/056, DEC-125)
   ['demonstracoes', 'Demonstrações'], ['demonstracoes/novo', 'Novo link'], ['demonstracoes/link/904', 'Instituto Bem Estar'], ['demonstracoes/link/901', 'Clínica Vida Leve'],
-  ['demonstracoes/link/902', 'Clínica Desativada'], ['demonstracoes/link/904/editar', 'Editar'], ['demonstracoes/visita/904/9001', 'Visita']];
+  ['demonstracoes/link/902', 'Clínica Desativada'], ['demonstracoes/link/904/editar', 'Editar'], ['demonstracoes/visita/904/9001', 'Visita'],
+  // IA da Central e Métricas (rxsync-sistema sql/061, DEC-145 e DEC-146): a tela Métricas e o assistente aberto, com uma
+  // resposta e as 3 propostas (níveis 1, 2 e 3), em cima da ficha da clínica.
+  ['metricas', 'Métricas'], ['clientes/CLI-001', FICHA, 'assistente']];
 const APARELHOS = [['celular', { width: 390, height: 844 }, true], ['ipad_em_pe', { width: 820, height: 1180 }, true], ['ipad_deitado', { width: 1180, height: 820 }, true], ['computador', { width: 1440, height: 900 }, false]];
 const TEMAS = ['claro', 'escuro'];
 
@@ -79,11 +82,14 @@ for (const tema of TEMAS) for (const [nomeAp, vp, toque] of APARELHOS) {
     n++;
     if (rota === 'mais' && nomeAp !== 'celular') continue;
     await page.evaluate(() => { const j = document.querySelector('#camada .janela'); if (j) document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); });
+    await page.evaluate(() => { const f = document.querySelector('#assistente [aria-label="Fechar o assistente"]'); if (f) f.click(); });
     ESTADO.segurado = extra === 'segurado';   // sinal de vida: disparo ligado e o 52 parado
     await page.evaluate(r => { location.hash = r; }, rota);
     await page.waitForFunction(t => document.title.startsWith(t) && !document.querySelector('#conteudo .esq'), titulo, { timeout: 8000 }).catch(() => {});
     await page.waitForTimeout(200);
     if (extra === 'protegidos') { await page.getByRole('button', { name: 'Mostrar os dados protegidos' }).click(); await page.waitForSelector('[data-sensivel]'); }
+    if (extra === 'assistente') { await page.locator('#btn-assistente').click(); await page.fill('#ia-texto', 'Quantas clínicas estão no ar?'); await page.click('#ia-enviar');
+      await page.waitForSelector('#assistente .ia-proposta'); await page.waitForTimeout(250); }
     if (extra === 'janela') { await page.getByRole('button', { name: 'Trocar o plano' }).first().click(); await page.waitForSelector('#camada .janela'); await page.waitForTimeout(250); }
     if (extra === 'qr') { await page.getByRole('button', { name: 'Mostrar o código' }).first().click(); await page.waitForSelector('#camada .janela button[type=submit]'); await page.locator('#camada .janela button[type=submit]').click();
       await page.waitForSelector('#camada img.p-qr'); await page.waitForTimeout(250); }
@@ -101,7 +107,7 @@ for (const tema of TEMAS) for (const [nomeAp, vp, toque] of APARELHOS) {
     if (FOTOS) {
       // Foto da página inteira: a janela do navegador cresce até a altura da página (assim a barra de baixo e o menu
       // lateral ficam no lugar certo, em vez de aparecerem no meio da foto). A janela de confirmação sai do tamanho da tela.
-      const alto = extra === 'janela' || extra === 'qr' ? vp.height : Math.max(vp.height, await page.evaluate(() => document.documentElement.scrollHeight));
+      const alto = extra === 'janela' || extra === 'qr' || extra === 'assistente' ? vp.height : Math.max(vp.height, await page.evaluate(() => document.documentElement.scrollHeight));
       if (alto !== vp.height) { await page.setViewportSize({ width: vp.width, height: alto }); await page.waitForTimeout(150); }
       await page.screenshot({ path: `${OUT}/${pre}_${String(n).padStart(2, '0')}_${rota.replace(/\//g, '-')}${extra ? '_' + extra : ''}.png` }); fotos++;
       if (alto !== vp.height) await page.setViewportSize(vp);
