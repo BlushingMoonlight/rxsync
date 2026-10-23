@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela o fim do contrato (rxsync-sistema DEC-131, N-05), com o n8n SIMULADO aqui
+// Painel (autoedicao.html): testa pela tela o fim do contrato, com o n8n SIMULADO aqui
 // (nada sai para a internet):
 //   1. dono, contrato encerrado (termos_estado com so_baixar): a tela só tem "Baixar meus dados" e "Sair"; o 24 nunca é
 //      chamado; a agenda baixa pelo 29 (dados_exportar) com a sessão; "Sair" encerra a sessão e volta para a entrada;

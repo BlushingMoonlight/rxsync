@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NLte4gx/nn7f4vo6ZnNptZN4TuPv+4pavZaRzKR7/RA=' 'self'; style-src 'sha256-AiJjkrRrxOiYF7T8r46vCVLV9RjgWwARHeV3m+WFgdQ=' 'sha256-0swTvn8LhKB8nSBIYKb3s5YewpAiXwmJben9Cl9Vu2w=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gdBzsmGBYl2HIE6oYFnEMqpmiKNkiwx/AiOT90Npkuc=' 'self'; style-src 'sha256-AiJjkrRrxOiYF7T8r46vCVLV9RjgWwARHeV3m+WFgdQ=' 'sha256-0swTvn8LhKB8nSBIYKb3s5YewpAiXwmJben9Cl9Vu2w=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0f172a">
@@ -454,7 +454,7 @@
 
 <div id="erro" class="porta" hidden></div>
 
-<!-- Fim do contrato (rxsync-sistema DEC-131, N-05): nos 15 dias até os dados serem apagados, o painel só baixa os dados e sai. -->
+<!-- Fim do contrato: nos 15 dias até os dados serem apagados, o painel só baixa os dados e sai. -->
 <div id="fimContrato" class="porta" hidden>
   <div class="bloco pad ex-p-28">
     <h1 class="titulo ex-fs-22">O contrato terminou</h1>
@@ -4386,7 +4386,7 @@ function partesTz(ms) {
     }).catch(function () { box.innerHTML = ""; box.appendChild(pacAviso("rosa", PAC_ERROS.interno)); });
   }
 
-  // Fim do contrato (rxsync-sistema DEC-131, N-05): o 29 avisa (so_baixar) e o painel mostra só "Baixar meus dados" e
+  // Fim do contrato: o servidor avisa (so_baixar) e o painel mostra só "Baixar meus dados" e
   // "Sair", sem chamar o 24 (que recusa: o token interno já foi apagado). A equipe só sai: baixar é do dono.
   function fimContratoMostrar(papel) {
     el("carregando").hidden = true; el("app").hidden = true; el("fimContrato").hidden = false;
