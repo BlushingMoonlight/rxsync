@@ -94,14 +94,28 @@ for (const f of htmls) {
 {
   const { PAGINAS, cspPagina, META_CSP, N8N: N8N_CSP } = await import('./csp.mjs');
   if (N8N_CSP !== N8N) erro('scripts/csp.mjs: endereço do n8n diferente do verificar_site.mjs');
+  const ESTILO_LIVRE = /^(index\.html|teste\.html|termos\/2026-10-v[1-6]\.html)$/;
   for (const [arq, p] of Object.entries(PAGINAS)) {
     const s = fs.readFileSync(arq, 'utf8');
     const csp = (s.match(META_CSP) || [])[1];
     if (!csp) erro(`${arq}: falta a regra de segurança (rode node scripts/csp.mjs)`);
     else if (csp !== cspPagina(s, p)) erro(`${arq}: a regra de segurança não bate com o script ou o estilo da página (rode node scripts/csp.mjs)`);
     if (s.search(META_CSP) > s.search(/<(script|style|link)\b/)) erro(`${arq}: a regra de segurança precisa vir antes de qualquer <script>, <style> ou <link>`);
-    if ((s.match(/<script\b/g) || []).length !== (s.match(/<script>/g) || []).length) erro(`${arq}: <script> com src ou atributos; o código fica dentro da página`);
-    if (/\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
+    // <script>: dentro da página, um arquivo do próprio site ou os dados estruturados (application/ld+json, que não rodam).
+    for (const m of s.matchAll(/<script\b([^>]*)>/g)) {
+      const at = m[1].trim(), src = (at.match(/\bsrc="([^"]*)"/) || [])[1];
+      if (!at || at === 'type="application/ld+json"') continue;
+      if (!src || /^(https?:)?\/\//i.test(src)) erro(`${arq}: <script ${at}>: só um arquivo do próprio site (ou o código dentro da página)`);
+      else if (!/vendor\//.test(src)) {
+        const js = fs.readFileSync(src.startsWith('/') ? '.' + src : path.join(path.dirname(arq), src), 'utf8');
+        if (/\sstyle\s*=\s*\\?["']/.test(js)) erro(`${src} (usado em ${arq}): monta marca com style=, que a regra de segurança bloqueia; use uma classe`);
+        if (/<[a-z][^<>]*\son[a-z]+\s*=\s*\\?["']/i.test(js)) erro(`${src} (usado em ${arq}): monta marca com on…=, que a regra de segurança bloqueia; use addEventListener`);
+      }
+    }
+    // Estilo livre ('unsafe-inline'): só nas páginas com o chat dentro e nos Termos antigos (v1 a v6), que não mudam.
+    if (p.estiloLivre && !ESTILO_LIVRE.test(arq)) erro(`${arq}: estilo livre ('unsafe-inline') só no index.html, no teste.html e nos Termos v1 a v6`);
+    if (/script-src[^;]*'unsafe-(inline|eval)'/.test(csp || '')) erro(`${arq}: script nunca com 'unsafe-inline' nem 'unsafe-eval'`);
+    if (!p.atributoEstilo && /\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
     if (/<[a-z][^<>]*\son[a-z]+\s*=\s*["']/i.test(s)) erro(`${arq}: atributo on…= (onclick etc.) é bloqueado pela regra de segurança; use addEventListener`);
     if (/javascript:/i.test(s)) erro(`${arq}: link javascript: é bloqueado pela regra de segurança`);
   }

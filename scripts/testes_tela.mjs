@@ -3,8 +3,8 @@
 // quiser rodar todos aqui. Uso (precisa do Playwright): node scripts/testes_tela.mjs
 import fs from 'node:fs'; import path from 'node:path'; import { spawn } from 'node:child_process'; import { fileURLToPath } from 'node:url';
 const PASTA = path.dirname(fileURLToPath(import.meta.url));
-// Ferramentas (não são testes): o servidor simulado, as regras de segurança, a montagem da Central e as conferências.
-const FERRAMENTAS = ['central_simulado.mjs', 'central_csp.mjs', 'central_montar.mjs', 'csp.mjs', 'verificar_site.mjs', 'testes_tela.mjs'];
+// Ferramentas (não são testes): o servidor simulado, as regras de segurança (e o que os testes delas fazem igual), a montagem da Central e as conferências.
+const FERRAMENTAS = ['central_simulado.mjs', 'central_csp.mjs', 'csp_teste.mjs', 'central_montar.mjs', 'csp.mjs', 'verificar_site.mjs', 'testes_tela.mjs'];
 const SEM_FOTOS = ['central_telas.mjs', 'demo_clinica_telas.mjs'];
 const testes = fs.readdirSync(PASTA).filter(f => f.endsWith('.mjs') && !FERRAMENTAS.includes(f)).sort();
 const rodar = f => new Promise(ok => {

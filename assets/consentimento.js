@@ -5,7 +5,8 @@
 // - Chat da RXSync (Chatwoot): não carrega sozinho. Um botão leve carrega o chat quando a pessoa toca nele (o toque é o
 //   pedido do chat) ou quando a página abre com ?suporte=1 (link de suporte). window.rxChat.abrir() faz o mesmo.
 // Na tag <script>: data-ga-sem-query manda ao Google o endereço sem a query (o onboarding tem o token no ?t=);
-// data-sem-ga é para página sem Google Analytics (só o chat). Em todas as páginas, o código de origem (?ref=) nunca vai
+// data-sem-ga é para página sem Google Analytics (só o chat); data-chat-fora abre o chat numa aba nova, na página inicial
+// (as páginas com a regra de segurança estrita não deixam os estilos que o chat põe na página). Em todas as páginas, o código de origem (?ref=) nunca vai
 // ao Google, nem no endereço da página nem no da página anterior; o resto da query (plano, ciclo) continua.
 (function () {
   var GA_ID = 'G-G5ZS8DRHNM';
@@ -14,6 +15,7 @@
   var tag = document.currentScript || {};
   var temGA = !(tag.hasAttribute && tag.hasAttribute('data-sem-ga'));
   var semQuery = !!(tag.hasAttribute && tag.hasAttribute('data-ga-sem-query'));
+  var chatFora = !!(tag.hasAttribute && tag.hasAttribute('data-chat-fora'));
 
   // ---------- Google Analytics ----------
   var gaLigado = false;
@@ -45,19 +47,10 @@
     document.head.appendChild(s);
   }
 
-  // ---------- estilos (os dois componentes) ----------
-  var css = document.createElement('style');
-  css.textContent =
-    '.rxc-aviso{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;max-width:560px;margin:0 auto;background:#fff;color:#0f172a;border:1px solid #cfd9d5;border-radius:16px;box-shadow:0 20px 50px -20px rgba(15,23,42,.45);padding:16px 18px;font:15px/1.5 Figtree,Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}' +
-    '.rxc-aviso p{margin:0 0 12px}.rxc-aviso a{color:#065f46;font-weight:600}' +
-    '.rxc-acoes{display:flex;flex-wrap:wrap;gap:8px}' +
-    '.rxc-acoes button{flex:1 1 140px;min-height:44px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;padding:0 14px}' +
-    '.rxc-sim{background:#047857;color:#fff;border:1px solid #047857}.rxc-sim:hover{background:#065f46}' +
-    '.rxc-nao{background:#fff;color:#0f172a;border:1px solid #cfd9d5}.rxc-nao:hover{border-color:#0f172a}' +
-    '.rxc-chat{position:fixed;right:16px;bottom:16px;z-index:45;display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:0 18px;border-radius:999px;border:0;background:#0f172a;color:#fff;font:600 15px/1 Figtree,Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;box-shadow:0 10px 30px -10px rgba(15,23,42,.6);cursor:pointer;margin-bottom:env(safe-area-inset-bottom)}' +
-    '.rxc-chat svg{width:20px;height:20px}.rxc-chat[aria-busy="true"]{opacity:.8;cursor:progress}' +
-    '.rxc-aviso button:focus-visible,.rxc-chat:focus-visible,.rxc-aviso a:focus-visible{outline:3px solid #34d399;outline-offset:2px}' +
-    '@media (max-width:1023px){.rxc-chat span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.rxc-chat{padding:0;width:52px;justify-content:center}}';
+  // ---------- estilos (os dois componentes): um arquivo do próprio site, que a regra de segurança das páginas deixa ----------
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = '/assets/css/consentimento.css';
   document.head.appendChild(css);
 
   // ---------- aviso de cookies ----------
@@ -86,6 +79,7 @@
   // ---------- chat sob demanda ----------
   var chatEstado = 'parado', abrirQuandoPronto = false, botao = null;
   function carregarChat(abrir) {
+    if (chatFora) { if (abrir) window.open('/?suporte=1', '_blank', 'noopener'); return; }
     if (abrir) abrirQuandoPronto = true;
     if (chatEstado === 'pronto') { if (abrir && window.$chatwoot) window.$chatwoot.toggle('open'); return; }
     if (chatEstado === 'carregando') return;
@@ -121,7 +115,7 @@
     if (escolha === 'sim') ligarGA();
     else if (escolha !== 'nao') mostrarAviso();
     criarBotao();
-    if (/[?&]suporte=1\b/.test(location.search)) carregarChat(true);
+    if (!chatFora && /[?&]suporte=1\b/.test(location.search)) carregarChat(true);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
 })();
