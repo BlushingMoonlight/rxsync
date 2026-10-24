@@ -28,6 +28,9 @@ export const PAGINAS = {
   'conta-excluir.html': { estilo: "'self'", img: "'self'", connect: N8N },
   // - conectar o WhatsApp: os ícones e o aviso do chat (arquivos do site), o QR (data:) e o n8n. O chat abre numa aba nova.
   'conectar.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: N8N },
+  // - contratar: os ícones e o aviso de cookies (arquivos do site), o Google Analytics, a seta dos campos (data:), o n8n,
+  //   a BrasilAPI (CEP e CNPJ) e os Termos dentro da página (frame do próprio site). O chat abre numa aba nova.
+  'contratar.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self' data:", GA.img), connect: juntar(N8N, BRASILAPI, GA.connect), frame: "'self'" },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;

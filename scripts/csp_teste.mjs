@@ -29,7 +29,7 @@ export async function contextoCsp(browser, { responder = () => ({ ok: true }), o
     if (url.startsWith(N8N)) {
       if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' } });
       let b = {}; try { b = JSON.parse(q.postData() || '{}'); } catch {}
-      chamadas.push({ caminho: url.slice(N8N.length), corpo: b });
+      chamadas.push({ caminho: url.slice(N8N.length), corpo: b, origem: q.headers()['x-rxsync-origem'] || '' });
       const resp = responder(url.slice(N8N.length), b);
       const status = resp && resp.__status ? resp.__status : 200;
       return r.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(resp) });
