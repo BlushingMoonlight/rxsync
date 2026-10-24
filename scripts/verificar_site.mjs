@@ -114,6 +114,7 @@ for (const f of htmls) {
     }
     // Estilo livre ('unsafe-inline'): só nas páginas com o chat dentro e nos Termos antigos (v1 a v6), que não mudam.
     if (p.estiloLivre && !ESTILO_LIVRE.test(arq)) erro(`${arq}: estilo livre ('unsafe-inline') só no index.html, no teste.html e nos Termos v1 a v6`);
+    if (p.atributoEstilo && !/^termos\/2026-10-v[1-6]\.html$/.test(arq)) erro(`${arq}: style= no HTML só nos Termos v1 a v6, que não mudam`);
     if (/script-src[^;]*'unsafe-(inline|eval)'/.test(csp || '')) erro(`${arq}: script nunca com 'unsafe-inline' nem 'unsafe-eval'`);
     if (!p.atributoEstilo && /\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
     if (/<[a-z][^<>]*\son[a-z]+\s*=\s*["']/i.test(s)) erro(`${arq}: atributo on…= (onclick etc.) é bloqueado pela regra de segurança; use addEventListener`);

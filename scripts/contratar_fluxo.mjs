@@ -58,7 +58,11 @@ ok(lead && lead.corpo.plano === 'Gestao' && lead.corpo._ciclo === 'anual' && lea
 // Etapa 2: CNPJ e CPF conferidos
 let buscou = false;
 const etapa2 = async (cnpj, cpf) => {
-  for (const [id, v] of [['cnpj', cnpj], ['razao', 'Clínica Teste Ltda'], ['cep', '80000-000'], ['cpf', cpf]]) await page.fill('#' + id, v);
+  await page.evaluate(() => { document.getElementById('cepMsg').textContent = ''; });
+  for (const [id, v] of [['cnpj', cnpj], ['razao', 'Clínica Teste Ltda'], ['cep', '80000-000']]) await page.fill('#' + id, v);
+  // Espera a busca do CEP terminar antes de seguir: ela põe o foco no número, e o que fosse digitado iria para lá.
+  await page.waitForFunction(() => /Endereço encontrado|Não localizei/.test(document.getElementById('cepMsg').textContent));
+  await page.fill('#cpf', cpf);
   if (!buscou) { await page.locator('#blocoEndereco:not(.hidden)').waitFor(); buscou = await page.inputValue('#logradouro') === 'Rua do CEP'; ok(buscou, 'o CEP busca o endereço (BrasilAPI simulada)'); }
   await page.evaluate(() => { document.getElementById('blocoEndereco').className = 'space-y-4'; });
   for (const [id, v] of [['logradouro', 'Rua de Teste'], ['numero', '10'], ['bairro', 'Centro'], ['cidade', 'Curitiba'], ['uf', 'PR']]) await page.fill('#' + id, v);
@@ -83,7 +87,7 @@ const aceite = await chegou(p => p.caminho === 'cadastro' && p.corpo._evento ===
 ok(aceite && aceite.corpo.modalidade === 'teste' && aceite.corpo.cliente_id === 'RX-TESTE-0001' && aceite.corpo.plano === 'Gestao' && aceite.corpo._ciclo === 'anual',
   'teste grátis: o cadastro vai com o plano, o ciclo e o código do contato da etapa 1');
 ok(aceite && aceite.corpo.cnpj === '11222333000181' && aceite.corpo.representante_cpf === '00000000191' && aceite.corpo.telefone === '41999990000', 'CNPJ, CPF e telefone vão só com dígitos');
-ok(aceite && aceite.corpo.versao_termos === '2026-10-v6' && aceite.corpo.aceite_dpa === 'SIM' && aceite.corpo._origem === 'prospeccao ' + REF && aceite.origem === 'rxsync-site-2026', 'com a versão dos Termos, o aceite do acordo de dados e a origem da prospecção');
+ok(aceite && aceite.corpo.versao_termos === '2026-10-v7' && aceite.corpo.aceite_dpa === 'SIM' && aceite.corpo._origem === 'prospeccao ' + REF && aceite.origem === 'rxsync-site-2026', 'com a versão dos Termos, o aceite do acordo de dados e a origem da prospecção');
 ok(await page.locator('#sucessoTitulo').textContent() === 'Teste grátis registrado', 'a tela de sucesso do teste grátis aparece');
 await anotar(page, 'aceite e sucesso');
 

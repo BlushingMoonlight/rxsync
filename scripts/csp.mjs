@@ -45,6 +45,10 @@ export const PAGINAS = {
     { script: "'self'", estilo: "'self'", img: "'self'", connect: N8N, ...(f === 'index' ? { frame: "'self'" } : {}) }])),
   // - Política de Privacidade: só o estilo e as fontes do site; nada roda.
   'privacidade.html': { estilo: "'self'", img: "'self'", connect: "'none'" },
+  // - Termos de Uso: o pacote de ícones e o preenchimento dos dados de quem contrata (o script da página); nada de fora.
+  //   As versões antigas (v1 a v6) não mudam (só ganham esta regra), por isso têm estilo livre e style= no texto.
+  ...Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map(v => [`termos/2026-10-v${v}.html`,
+    { script: "'self'", estilo: "'self'", img: "'self' data:", connect: "'none'", ...(v <= 6 ? { estiloLivre: true, atributoEstilo: true } : {}) }])),
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;
