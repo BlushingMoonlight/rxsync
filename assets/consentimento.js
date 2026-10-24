@@ -6,8 +6,9 @@
 //   pedido do chat) ou quando a página abre com ?suporte=1 (link de suporte). window.rxChat.abrir() faz o mesmo.
 // Na tag <script>: data-ga-sem-query manda ao Google o endereço sem a query (o onboarding tem o token no ?t=);
 // data-sem-ga é para página sem Google Analytics (só o chat); data-chat-fora abre o chat numa aba nova, na página inicial
-// (as páginas com a regra de segurança estrita não deixam os estilos que o chat põe na página). Em todas as páginas, o código de origem (?ref=) nunca vai
-// ao Google, nem no endereço da página nem no da página anterior; o resto da query (plano, ciclo) continua.
+// (as páginas com a regra de segurança estrita não deixam os estilos que o chat põe na página). Em todas as páginas, o
+// código de origem (?ref=) e o token do onboarding (?t=) nunca vão ao Google, nem no endereço da página nem no da página
+// anterior; o resto da query (plano, ciclo) continua.
 (function () {
   var GA_ID = 'G-G5ZS8DRHNM';
   var CHAT_URL = 'https://app.rxsync.com.br';
@@ -25,12 +26,12 @@
   function ler() { try { return localStorage.getItem('rx_cookies'); } catch (e) { return null; } }
   function gravar(v) { try { localStorage.setItem('rx_cookies', v); } catch (e) { /* aba privada: vale só nesta página */ } }
 
-  // Endereço sem o ?ref= (e sem o #): o que sobra da query fica na mesma ordem.
+  // Endereço sem o ?ref= e o ?t= (e sem o #): o que sobra da query fica na mesma ordem.
   function semRef(u) {
     if (!u) return '';
     try {
       var url = new URL(u);
-      url.searchParams.delete('ref'); url.hash = '';
+      url.searchParams.delete('ref'); url.searchParams.delete('t'); url.hash = '';
       return url.toString();
     } catch (e) { return ''; }
   }
