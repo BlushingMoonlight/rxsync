@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7KfQA2dVY8npzndcTBxFHIuE9GLxhU28V1al2OhSWRU=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- ===================== SEO BÁSICO ===================== -->
@@ -210,6 +211,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* Passos */
 .passos { display: grid; gap: 16px; counter-reset: passo; }
+.passos.sem-marca { list-style: none; padding: 0; margin: 0; }
 @media (min-width: 900px) { .passos { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
 .passo { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; position: relative; }
 .passo .n { width: 40px; height: 40px; border-radius: 12px; background: var(--navy); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: 17px; }
@@ -218,6 +220,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .passo .tempo { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 13.5px; font-weight: 600; color: var(--brand-ink); background: var(--brand-soft); padding: 4px 10px; border-radius: 999px; }
 .passos-rodape { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .passos-rodape p { color: var(--ink-2); font-size: 15px; }
+.isca { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 
 /* Recursos */
 .recursos { display: grid; gap: 16px; }
@@ -256,6 +259,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .barras { display: flex; align-items: flex-end; gap: 8px; height: 92px; }
 .barras i { flex: 1; background: var(--brand-200); border-radius: 6px 6px 2px 2px; }
 .barras i.alto { background: var(--brand); }
+.barras i.a30 { height: 30%; } .barras i.a38 { height: 38%; } .barras i.a47 { height: 47%; } .barras i.a52 { height: 52%; }
+.barras i.a58 { height: 58%; } .barras i.a66 { height: 66%; } .barras i.a81 { height: 81%; }
 .barras-leg { display: flex; gap: 8px; margin-top: 6px; }
 .barras-leg span { flex: 1; text-align: center; font-size: 11px; color: var(--ink-3); }
 .zap-dono { background: #efeae2; border-radius: var(--r-lg); box-shadow: var(--sh-3); border: 6px solid #0b1220; width: min(330px, 92%); margin: -40px 0 0 auto; position: relative; overflow: hidden; }
@@ -323,6 +328,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .preco { margin-top: 20px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .preco .moeda { font-size: 18px; font-weight: 700; }
 .preco .val { font-size: 46px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.preco .val.val-sob { font-size: 36px; }
 .preco .per { color: var(--ink-3); font-weight: 600; }
 .preco-sub { font-size: 14px; color: var(--ink-2); margin-top: 8px; min-height: 44px; }
 .plano .btn { margin-top: 20px; }
@@ -830,7 +836,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     </nav>
     <div class="topo-acoes">
       <a href="/autoedicao.html" class="link-entrar"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg>Já sou cliente</a>
-      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-sm topo-cta" onclick="return iniciarTeste('gestao', 'topo', event)">Começar grátis</a>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-sm topo-cta" data-teste="gestao" data-origem="topo">Começar grátis</a>
       <button type="button" class="btn-menu" id="mobile-menu-btn" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
     </div>
   </div>
@@ -842,7 +848,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     <a class="item" href="#planos">Preços</a>
     <a class="item" href="#duvidas">Dúvidas</a>
     <div class="acoes">
-      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" onclick="return iniciarTeste('gestao', 'menu_mobile', event)">Começar 7 dias grátis</a>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" data-teste="gestao" data-origem="menu_mobile">Começar 7 dias grátis</a>
       <a href="/autoedicao.html" class="btn btn-sec">Já sou cliente: entrar no painel</a>
     </div>
   </div>
@@ -858,8 +864,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <h1 id="titulo-hero">Sua clínica responde e marca consultas no WhatsApp, <em>mesmo quando a recepção está ocupada.</em></h1>
       <p class="lead">A assistente virtual da RXSync atende seus pacientes em segundos, de dia, de noite e no fim de semana: responde sobre valores, convênios e horários, marca a consulta na agenda e manda os lembretes. Quando quiser, sua equipe assume a conversa.</p>
       <div class="hero-ctas">
-        <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" onclick="return iniciarTeste('gestao', 'hero', event)">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-        <a href="#teste-ao-vivo" class="btn btn-sec btn-lg" onclick="trackCta('hero_testar_assistente')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversar com a assistente agora</a>
+        <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="gestao" data-origem="hero">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a href="#teste-ao-vivo" class="btn btn-sec btn-lg" data-cta="hero_testar_assistente"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversar com a assistente agora</a>
       </div>
       <div class="hero-micro">
         <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Sem cartão de crédito</span>
@@ -918,8 +924,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 
     <div class="mt-card">
       <!-- Etapa 1: dados da clínica -->
-      <form id="mtForm" class="mt-form" onsubmit="return mtIniciar(event)" novalidate>
-        <input type="text" id="mt_empresa_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+      <form id="mtForm" class="mt-form" novalidate>
+        <input type="text" id="mt_empresa_site" tabindex="-1" autocomplete="off" aria-hidden="true" class="isca">
         <div class="mt-form-txt">
           <h3>Monte sua clínica de teste</h3>
           <ul class="mt-passos">
@@ -972,7 +978,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
             <button type="button" data-sug="Quanto custa a consulta?">Quanto custa a consulta?</button>
             <button type="button" data-sug="Vocês atendem convênio?">Vocês atendem convênio?</button>
           </div>
-          <form class="wa-barra" id="mtEnvio" onsubmit="return mtEnviar(event)">
+          <form class="wa-barra" id="mtEnvio">
             <label for="mtTexto" class="sr">Sua mensagem</label>
             <input type="text" id="mtTexto" class="wa-campo mt-input" maxlength="500" autocomplete="off" placeholder="Escreva como se fosse um paciente">
             <button type="submit" class="wa-env" id="mtEnv" aria-label="Enviar"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
@@ -980,8 +986,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           <div class="mt-fim" id="mtFim" hidden>
             <strong>Gostou? Coloque a assistente no WhatsApp da sua clínica.</strong>
             <p>Com os seus horários, valores e convênios, por 7 dias grátis, sem cartão.</p>
-            <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-full" onclick="return iniciarTeste('gestao', 'mini_teste', event)">Começar 7 dias grátis</a>
-            <button type="button" class="mt-link" onclick="scrollToForm('')">Prefiro falar com uma pessoa</button>
+            <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-full" data-teste="gestao" data-origem="mini_teste">Começar 7 dias grátis</a>
+            <button type="button" class="mt-link" data-form-plano="">Prefiro falar com uma pessoa</button>
           </div>
         </div>
 
@@ -1033,7 +1039,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <h2 class="h2" id="titulo-como">Pronta em 3 passos, sem precisar entender de tecnologia.</h2>
       <p class="lead">Você conta como a clínica funciona e a assistente sai configurada. Nossa equipe acompanha cada passo.</p>
     </div>
-    <ol class="passos" style="list-style:none;padding:0;margin:0">
+    <ol class="passos sem-marca">
       <li class="passo">
         <span class="n">1</span>
         <h3>Escolha o plano e comece o teste</h3>
@@ -1054,8 +1060,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       </li>
     </ol>
     <div class="passos-rodape">
-      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" onclick="return iniciarTeste('gestao', 'como_funciona', event)">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-      <p>Prefere ver antes? <a href="#contato" onclick="scrollToForm(''); return false;">Peça uma demonstração.</a></p>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" data-teste="gestao" data-origem="como_funciona">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      <p>Prefere ver antes? <a href="#contato" data-form-plano="" data-parar>Peça uma demonstração.</a></p>
     </div>
   </div>
 </section>
@@ -1133,7 +1139,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         </div>
         <div class="pm-graf">
           <div class="tit">Consultas marcadas pela assistente</div>
-          <div class="barras"><i style="height:38%"></i><i style="height:52%"></i><i style="height:47%"></i><i style="height:66%"></i><i style="height:58%"></i><i style="height:81%" class="alto"></i><i style="height:30%"></i></div>
+          <div class="barras"><i class="a38"></i><i class="a52"></i><i class="a47"></i><i class="a66"></i><i class="a58"></i><i class="a81" class="alto"></i><i class="a30"></i></div>
           <div class="barras-leg"><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span><span>dom</span></div>
         </div>
       </div>
@@ -1196,7 +1202,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         <span class="rot">Consultas que podem estar ficando para trás</span>
         <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
         <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299). No plano mensal, há também a implantação de R$ 999, uma vez só.</p>
-        <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" onclick="return iniciarTeste('essencial', 'calculadora', event)">Começar 7 dias grátis no Essencial</a>
+        <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis no Essencial</a>
         <p class="aviso">É uma estimativa com os números que você escolheu, não uma promessa de resultado.</p>
       </div>
     </div>
@@ -1212,8 +1218,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <h2 class="h2" id="titulo-planos">Preço fixo por mês, sem cobrança por mensagem.</h2>
       <p class="lead">Comece com 7 dias grátis em qualquer plano. Você só paga se decidir continuar.</p>
       <div class="ciclo" role="group" aria-label="Forma de pagamento">
-        <button type="button" data-ciclo="mensal" aria-pressed="true" onclick="setCiclo('mensal')">Mensal</button>
-        <button type="button" data-ciclo="anual" aria-pressed="false" onclick="setCiclo('anual')">Anual <span class="tag tag-v">até 2 meses grátis</span></button>
+        <button type="button" data-ciclo="mensal" aria-pressed="true">Mensal</button>
+        <button type="button" data-ciclo="anual" aria-pressed="false">Anual <span class="tag tag-v">até 2 meses grátis</span></button>
       </div>
     </div>
 
@@ -1223,7 +1229,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         <p class="para">Para consultórios que querem parar de perder pacientes no WhatsApp.</p>
         <div class="preco"><span class="moeda">R$</span><span class="val" data-mensal="299" data-anual="269,10">299</span><span class="per">/mês</span></div>
         <p class="preco-sub" data-mensal="Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste" data-anual="12x de R$ 269,10 ou R$ 2.990 à vista (12 meses pelo preço de 10) · sem implantação · contrato de 12 meses">Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste</p>
-        <button type="button" class="btn btn-sec btn-full" onclick="irParaContratacao('essencial','Essencial')">Testar o Essencial grátis</button>
+        <button type="button" class="btn btn-sec btn-full" data-contratar="essencial" data-rotulo="Essencial">Testar o Essencial grátis</button>
         <ul class="inc">
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Atendimento 24 horas por texto e áudio</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Agenda da RXSync, com exportação e importação por planilha</li>
@@ -1247,7 +1253,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         <p class="para">Para clínicas que querem encher a agenda e gastar menos tempo com gestão.</p>
         <div class="preco"><span class="moeda">R$</span><span class="val" data-mensal="599" data-anual="539,10">599</span><span class="per">/mês</span></div>
         <p class="preco-sub" data-mensal="Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste" data-anual="12x de R$ 539,10 ou R$ 5.990 à vista (12 meses pelo preço de 10) · sem implantação · contrato de 12 meses">Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste</p>
-        <button type="button" class="btn btn-prim btn-full" onclick="irParaContratacao('gestao','Gestão Inteligente')">Testar o Gestão grátis</button>
+        <button type="button" class="btn btn-prim btn-full" data-contratar="gestao" data-rotulo="Gestão Inteligente">Testar o Gestão grátis</button>
         <ul class="inc">
           <li class="forte"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tudo do Essencial, e mais:</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Lista de espera</li>
@@ -1268,9 +1274,9 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
       <article class="plano">
         <h3>Enterprise</h3>
         <p class="para">Para redes e operações com várias unidades.</p>
-        <div class="preco"><span class="val" style="font-size:36px">Sob consulta</span></div>
+        <div class="preco"><span class="val val-sob">Sob consulta</span></div>
         <p class="preco-sub">Escopo e condições em proposta</p>
-        <button type="button" class="btn btn-dark btn-full" onclick="scrollToForm('Enterprise')">Falar com a equipe</button>
+        <button type="button" class="btn btn-dark btn-full" data-form-plano="Enterprise">Falar com a equipe</button>
         <ul class="inc">
           <li class="forte"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tudo do Gestão Inteligente, e mais:</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>API para o sistema da clínica ler a agenda e pedir mensagens</li>
@@ -1327,119 +1333,119 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
     </div>
     <div class="faq-wrap">
       <div class="faq-tabs" role="tablist" aria-label="Categorias de perguntas">
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-0" data-faq-tab="0" aria-controls="faq-panel-0" aria-selected="true" tabindex="0" onclick="showFaqTab(0)">Atendimento</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-1" data-faq-tab="1" aria-controls="faq-panel-1" aria-selected="false" tabindex="-1" onclick="showFaqTab(1)">Agenda</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-2" data-faq-tab="2" aria-controls="faq-panel-2" aria-selected="false" tabindex="-1" onclick="showFaqTab(2)">Começar</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-3" data-faq-tab="3" aria-controls="faq-panel-3" aria-selected="false" tabindex="-1" onclick="showFaqTab(3)">Preço e contrato</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-4" data-faq-tab="4" aria-controls="faq-panel-4" aria-selected="false" tabindex="-1" onclick="showFaqTab(4)">WhatsApp e dados</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-0" data-faq-tab="0" aria-controls="faq-panel-0" aria-selected="true" tabindex="0">Atendimento</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-1" data-faq-tab="1" aria-controls="faq-panel-1" aria-selected="false" tabindex="-1">Agenda</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-2" data-faq-tab="2" aria-controls="faq-panel-2" aria-selected="false" tabindex="-1">Começar</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-3" data-faq-tab="3" aria-controls="faq-panel-3" aria-selected="false" tabindex="-1">Preço e contrato</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-4" data-faq-tab="4" aria-controls="faq-panel-4" aria-selected="false" tabindex="-1">WhatsApp e dados</button>
       </div>
       <div class="faq-panel" id="faq-panel-0" role="tabpanel" aria-labelledby="faq-tab-0">
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-0-0">O paciente percebe que fala com uma assistente virtual?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-0">O paciente percebe que fala com uma assistente virtual?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-0-0"><div><p>Sim, de propósito: ela se apresenta como assistente virtual na primeira mensagem. O que o paciente nota, na prática, é a resposta rápida, a qualquer hora.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-0-1">E se ela responder algo errado para um paciente?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-1">E se ela responder algo errado para um paciente?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-0-1"><div><p>Ela só responde com o que você cadastrou e aprovou. Antes de entrar no ar, você conversa com ela num ambiente de teste. Depois, sua equipe pode assumir qualquer conversa na hora, e você corrige a informação no painel, que vale para a próxima resposta. O que for clínico ou delicado, ela passa para a equipe.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-0-2">O que ela faz quando chega uma urgência?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-2">O que ela faz quando chega uma urgência?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-0-2"><div><p>Na implantação, você define o que é urgência para a sua clínica (por exemplo, sangramento ou falta de ar). Quando isso aparece, ela para, manda ao paciente a orientação que você cadastrou e avisa a equipe na hora pelo WhatsApp. Ela não substitui um serviço de emergência.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-0-3">Ela responde dúvidas médicas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-3">Ela responde dúvidas médicas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-0-3"><div><p>Não. Ela cuida de agendamento, valores, convênios, horários e pedidos para a equipe. Não interpreta exames, não orienta tratamento e não responde dúvidas clínicas: avisa o paciente que a equipe vai responder.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-0-4">Minha secretária vai ficar sem função?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-4">Minha secretária vai ficar sem função?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-0-4"><div><p>Não. A assistente tira da secretária as perguntas que se repetem o dia todo e as mensagens fora do horário. O atendimento de quem está na clínica, os casos delicados e as decisões continuam com a equipe, que assume qualquer conversa quando quiser.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-0-5">E quem prefere falar com uma pessoa?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-5">E quem prefere falar com uma pessoa?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-0-5"><div><p>Quando o paciente pede uma pessoa, ou o assunto está na lista que você definiu, ela avisa a equipe e para de responder naquela conversa.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-1" role="tabpanel" aria-labelledby="faq-tab-1">
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-1-0">Preciso trocar de sistema?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-0">Preciso trocar de sistema?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-1-0"><div><p>Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Dá para exportar para Google Agenda, Outlook e iPhone e importar a agenda atual por planilha.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-1-1">Ela respeita tempos de consulta diferentes?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-1">Ela respeita tempos de consulta diferentes?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-1-1"><div><p>Sim. Você define a duração padrão, o intervalo entre consultas e a antecedência mínima. No Gestão Inteligente, com a agenda por profissional, cada tipo de consulta tem a sua duração.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-1-2">Ela envia lembrete de consulta?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-2">Ela envia lembrete de consulta?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-1-2"><div><p>Sim, nos horários que você escolher: 48 horas antes, na véspera, na manhã do dia ou 3, 2 ou 1 hora antes. O paciente confirma ou cancela respondendo, e o horário cancelado volta a ficar livre. No Gestão Inteligente, a vaga vai para quem está na lista de espera.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-1-3">Consigo trazer os pacientes do sistema que uso hoje?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-3">Consigo trazer os pacientes do sistema que uso hoje?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-1-3"><div><p>No Gestão Inteligente, sim: a aba Pacientes importa a planilha que o seu sistema exporta, mostra uma prévia, não duplica ninguém e permite desfazer em até 7 dias. Paciente importado só recebe mensagem automática depois de escrever para a clínica.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-2" role="tabpanel" aria-labelledby="faq-tab-2">
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-0">Preciso entender de inteligência artificial?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-0">Preciso entender de inteligência artificial?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-2-0"><div><p>Não. Você responde um formulário guiado sobre a clínica, de cerca de 10 minutos, e a assistente sai configurada. Se preferir, preenchemos com você.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-1">Posso testar antes de colocar no WhatsApp da clínica?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-1">Posso testar antes de colocar no WhatsApp da clínica?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-2-1"><div><p>Sim, de três jeitos: aqui na página, com 5 mensagens; no ambiente de teste, antes de conectar; e por 7 dias no WhatsApp da clínica, sem cartão, contados a partir do dia em que ela entra no ar.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-2">Como faço ajustes depois que ela estiver no ar?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-2">Como faço ajustes depois que ela estiver no ar?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-2-2"><div><p>Você mesmo ajusta pelo painel, que salva cada mudança na hora. Com a nossa equipe, você tem uma rodada de ajustes no 1º mês; depois, os ajustes são pelo painel. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-3">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-3">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-2-3"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho, e você aprova tudo o que ela responde.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-2-4">Divido o consultório com outros profissionais. Ela pode atender só o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-4">Divido o consultório com outros profissionais. Ela pode atender só o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-2-4"><div><p>Pode. Ela atende só o número conectado, e você pode listar números que ela não deve responder.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-3" role="tabpanel" aria-labelledby="faq-tab-3">
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-3-0">Por que existe a implantação de R$ 999?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-0">Por que existe a implantação de R$ 999?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-3-0"><div><p>Ela paga a configuração da assistente com o conteúdo da sua clínica, a conexão do número e o treinamento da equipe. É cobrada uma vez só, no plano mensal, e só se você continuar depois do teste. No plano anual, não há implantação.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-3-1">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-1">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-3-1"><div><p>Nada é cobrado sozinho. Avisamos antes por e-mail. Para continuar, você paga a primeira mensalidade (e, no mensal, a implantação). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-3-2">Como cancelo?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-2">Como cancelo?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-3-2"><div><p>No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No anual, o contrato é de 12 meses; se sair antes, paga a implantação que foi isentada e a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-3-3">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-3">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-3-3"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; se passar, avisamos e só cobramos a mais com o seu aceite por escrito.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-3-4">Posso começar no Essencial e mudar depois?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-4">Posso começar no Essencial e mudar depois?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-3-4"><div><p>Sim, pelo painel, sem nova implantação.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-4" role="tabpanel" aria-labelledby="faq-tab-4">
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-4-0">Posso perder o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-0">Posso perder o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-4-0"><div><p>Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, em horário comercial. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-4-1">Quem é o dono dos dados dos pacientes?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-1">Quem é o dono dos dados dos pacientes?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-4-1"><div><p>A sua clínica. Pela LGPD, a clínica é a controladora e a RXSync, a operadora: usamos os dados só para prestar o serviço.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-4-2">Por onde os dados passam?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-2">Por onde os dados passam?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-4-2"><div><p>Para responder, o trecho necessário da conversa vai ao provedor do modelo de IA, no exterior, como está descrito nos Termos e na Política de Privacidade.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" onclick="toggleFaq(this)" aria-expanded="false" aria-controls="faq-r-4-3">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-3">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="faq-content" id="faq-r-4-3"><div><p>Sim. Ela se identifica como virtual, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. A Resolução CFM nº 2.454/2026 classifica a IA de agendamento como de baixo risco.</p></div></div>
         </div>
       </div>
-      <p class="faq-mais">Não achou sua pergunta? <button type="button" onclick="trackCta('faq_perguntar_chat'); abrirChat()">Pergunte no chat.</button></p>
+      <p class="faq-mais">Não achou sua pergunta? <button type="button" data-cta="faq_perguntar_chat" data-abre-chat>Pergunte no chat.</button></p>
     </div>
   </div>
 </section>
@@ -1455,11 +1461,11 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Os 7 dias contam</strong> a partir do dia em que ela entra no ar.</span></li>
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Suporte da nossa equipe</strong> pelo WhatsApp, de segunda a sexta, das 9h às 18h.</span></li>
       </ul>
-      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" onclick="return iniciarTeste('gestao', 'final', event)">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="gestao" data-origem="final">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
     </div>
 
-    <form id="formDemo" class="form-card" onsubmit="return enviarFormDemo(event)" novalidate>
-      <input type="text" id="empresa_site" name="empresa_site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <form id="formDemo" class="form-card" novalidate>
+      <input type="text" id="empresa_site" name="empresa_site" tabindex="-1" autocomplete="off" aria-hidden="true" class="isca">
       <h3>Prefere ver uma demonstração antes?</h3>
       <p class="sub">Deixe seu contato. Nossa equipe chama você no WhatsApp para marcar um horário.</p>
       <div class="campos">
@@ -1521,7 +1527,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
           <li><a href="mailto:contato@rxsync.com.br">contato@rxsync.com.br</a></li>
           <li><a href="/termos/2026-10-v6.html" target="_blank" rel="noopener">Termos de Uso</a></li>
           <li><a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></li>
-          <li><button type="button" class="link-rodape" onclick="if (window.rxCookies) rxCookies.reabrir()">Preferências de cookies</button></li>
+          <li><button type="button" class="link-rodape" data-cookies>Preferências de cookies</button></li>
         </ul>
       </div>
     </div>
@@ -1533,7 +1539,7 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 </footer>
 
 <div class="barra-m" id="barraM">
-  <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" onclick="return iniciarTeste('gestao', 'barra_mobile', event)">Começar 7 dias grátis</a>
+  <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" data-teste="gestao" data-origem="barra_mobile">Começar 7 dias grátis</a>
 </div>
 
     <!-- Scripts -->
@@ -1653,6 +1659,32 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
             if (e.key === 'ArrowLeft') { e.preventDefault(); showFaqTab((atual - 1 + total) % total, true); }
         });
     });
+
+    // ===================== CLIQUES (a regra de segurança não deixa onclick= no HTML) =====================
+    // Cada botão ou link diz o que faz por um atributo data-: o FAQ (data-faq), os testes grátis (data-teste e
+    // data-origem), os planos (data-contratar e data-rotulo), o formulário (data-form-plano), o rastreio (data-cta), o
+    // chat (data-abre-chat) e as preferências de cookies (data-cookies).
+    document.addEventListener('click', function (e) {
+        var el = e.target.closest && e.target.closest('[data-faq], [data-teste], [data-contratar], [data-form-plano], [data-cta], [data-cookies]');
+        if (!el) return;
+        var d = el.dataset;
+        if ('faq' in d) toggleFaq(el);
+        if (d.teste && iniciarTeste(d.teste, d.origem, e) === false) e.preventDefault();
+        if (d.contratar) irParaContratacao(d.contratar, d.rotulo);
+        if ('formPlano' in d) { scrollToForm(d.formPlano); if ('parar' in d) e.preventDefault(); }
+        if (d.cta) trackCta(d.cta);
+        if ('abreChat' in d) abrirChat();
+        if ('cookies' in d && window.rxCookies) window.rxCookies.reabrir();
+    });
+    document.querySelectorAll('[data-faq-tab]').forEach(function (tab) {
+        tab.addEventListener('click', function () { showFaqTab(Number(tab.dataset.faqTab)); });
+    });
+    document.querySelectorAll('button[data-ciclo]').forEach(function (b) {
+        b.addEventListener('click', function () { setCiclo(b.dataset.ciclo); });
+    });
+    document.getElementById('mtForm').addEventListener('submit', mtIniciar);
+    document.getElementById('mtEnvio').addEventListener('submit', mtEnviar);
+    document.getElementById('formDemo').addEventListener('submit', enviarFormDemo);
 
     // ===================== MENU NO CELULAR =====================
     (function () {

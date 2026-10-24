@@ -33,6 +33,10 @@ export const PAGINAS = {
   'contratar.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self' data:", GA.img), connect: juntar(N8N, BRASILAPI, GA.connect), frame: "'self'" },
   // - onboarding: os ícones e o aviso de cookies (arquivos do site), o Google Analytics e o n8n. O chat abre numa aba nova.
   'onboarding.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self'", GA.img), connect: juntar(N8N, GA.connect) },
+  // - página inicial: o aviso de cookies (arquivo do site), o Google Analytics, o n8n (o teste ao vivo e o formulário) e
+  //   o chat dentro da página.
+  'index.html': { script: juntar("'self'", GA.script, CHAT_DENTRO.script), estilo: "'self'", estiloLivre: true, img: juntar("'self' data:", GA.img, CHAT_DENTRO.img),
+    connect: juntar(N8N, GA.connect, CHAT_DENTRO.connect), frame: CHAT_DENTRO.frame },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;
