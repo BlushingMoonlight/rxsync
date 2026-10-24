@@ -121,6 +121,22 @@ for (const f of htmls) {
     if (/javascript:/i.test(s)) erro(`${arq}: link javascript: é bloqueado pela regra de segurança`);
   }
 }
+// Nenhuma página publicada sem a regra de segurança: as da lista do scripts/csp.mjs, a Central (a dela) e a fonte da
+// Central (que não roda nada sozinha). Exceção: a demonstração antiga, que não recebe mais mudanças; só as páginas que
+// existem hoje nela (uma página nova ali também precisa da regra).
+{
+  const { PAGINAS } = await import('./csp.mjs');
+  const ANTIGA = 'demo/drandrepontes/';
+  const ANTIGA_PAGINAS = ['app/clean/index.html', 'app/couro/index.html', 'app/cyber/index.html', 'app/index.html', 'datalog/index.html', 'escopo/index.html',
+    'escopo/resumo/index.html', 'fluxo/index.html', 'index.html', 'painel/clean/index.html', 'painel/couro/index.html', 'painel/cyber/index.html', 'painel/index.html',
+    'questionario/index.html'].map(f => ANTIGA + f);
+  for (const f of htmls.map(h => h.split(path.sep).join('/').replace(/^\.\//, ''))) {
+    if (PAGINAS[f] || f === 'central/index.html' || ANTIGA_PAGINAS.includes(f)) continue;
+    if (f === 'central/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte da Central precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
+    erro(`${f}: página sem a regra de segurança; ponha na lista PAGINAS do scripts/csp.mjs e rode node scripts/csp.mjs`);
+  }
+  for (const f of ANTIGA_PAGINAS) if (!fs.existsSync(f)) erro(`${f}: saiu da demonstração antiga; tire da lista ANTIGA_PAGINAS do verificar_site.mjs`);
+}
 // Painel (autoedicao.html): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
 {
   const arq = 'autoedicao.html';

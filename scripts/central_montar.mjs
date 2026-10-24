@@ -18,7 +18,8 @@ export function montar() {
   for (const [nome, txt] of [['estilo', css], ['código', js]]) if (/<\/(script|style)/i.test(txt)) throw new Error(`O ${nome} da Central não pode conter "</script" nem "</style".`);
   let html = ler('pagina.html') + '\n';
   html = html.replace('{{CSS}}', () => css).replace('{{JS}}', () => js);
-  return html.replace('{{CSP}}', () => cspCentral(html));
+  // A fonte, aberta sozinha, não roda nada (default-src 'none'); na Central montada, a regra vira a de verdade.
+  return html.replace("default-src 'none'; {{CSP}}", () => cspCentral(html));
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

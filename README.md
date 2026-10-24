@@ -29,6 +29,13 @@ Os workflows do n8n e o banco ficam no repositório privado `rxsync-sistema`.
 
 Para desfazer: no pull request, botão **Revert**, e depois Merge do pull request de reversão.
 
+## Regra de segurança das páginas
+
+Cada página tem a regra de segurança do navegador (CSP) no começo do arquivo: ela diz de onde a página pode carregar
+scripts, estilos, imagens e conexões. A lista fica em `scripts/csp.mjs` (a Central tem a dela, em `scripts/central_csp.mjs`).
+Depois de mudar o script ou o estilo de uma página, rode `node scripts/csp.mjs`. O GitHub recusa a página sem a regra
+ou com a regra desatualizada, e os testes de tela abrem cada página com a regra ligada.
+
 ## Pendências, decisões e mapa
 
 Tudo neste repositório é público, inclusive Issues, PRs, `README.md` e `CLAUDE.md` (o GitHub Pages publica o repositório
