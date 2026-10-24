@@ -31,6 +31,8 @@ export const PAGINAS = {
   // - contratar: os ícones e o aviso de cookies (arquivos do site), o Google Analytics, a seta dos campos (data:), o n8n,
   //   a BrasilAPI (CEP e CNPJ) e os Termos dentro da página (frame do próprio site). O chat abre numa aba nova.
   'contratar.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self' data:", GA.img), connect: juntar(N8N, BRASILAPI, GA.connect), frame: "'self'" },
+  // - onboarding: os ícones e o aviso de cookies (arquivos do site), o Google Analytics e o n8n. O chat abre numa aba nova.
+  'onboarding.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self'", GA.img), connect: juntar(N8N, GA.connect) },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;

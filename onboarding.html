@@ -2,6 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-bMaxtVsAt7bzO+WTr7a7qqpGRW2elp/lGPmmt/3lzLA=' 'self' https://*.googletagmanager.com; style-src 'sha256-uuwOyF67VW2kuVcm+JACU9wPUUNB/B8rNpF9THkiGAA=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Configurar sua assistente | RXSync</title>
@@ -38,8 +39,10 @@
 <link rel="apple-touch-icon" href="assets/favicon-rxsync.png.PNG">
 
 <!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112). data-ga-sem-query: o endereço
-     vai ao Google sem a query, porque o ?t= é o token do link mágico (mandá-lo seria vazar a credencial da cliente). -->
-<script src="/assets/consentimento.js" data-ga-sem-query defer></script>
+     vai ao Google sem a query, porque o ?t= é o token do link mágico (mandá-lo seria vazar a credencial da cliente).
+     data-chat-fora: o chat abre numa aba nova, na página inicial (a regra de segurança desta página não deixa os estilos
+     que o chat põe na página). -->
+<script src="/assets/consentimento.js" data-ga-sem-query data-chat-fora defer></script>
 
 <link rel="stylesheet" href="/assets/fontes/fontes.css">
 <!-- CSS do Tailwind 3.4.17 gerado uma vez e guardado no site (#93) -->
@@ -63,6 +66,9 @@
     .rotulo { display:block; font-size:.8rem; font-weight:700; color:#334155; margin-bottom:.35rem; }
     .ajuda { display:block; font-size:.75rem; color:#64748b; margin-bottom:.5rem; line-height:1.5; }
     .etapa { display:none; } .etapa.ativa { display:block; }
+    textarea.campo.alto-72 { min-height:72px; } textarea.campo.alto-140 { min-height:140px; }
+    .campo.faixa-hora { width:7.5rem; padding:.55rem .7rem; font-size:.9rem; }
+    .isca { position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden; }
 </style>
 </head>
 
@@ -92,7 +98,7 @@
     </span>
     <h1 class="mt-5 text-lg font-bold text-primary-900">Não consegui abrir este formulário</h1>
     <p id="msgErro" class="mt-2 text-slate-500 text-sm leading-relaxed max-w-md mx-auto"></p>
-    <button type="button" onclick="location.reload()"
+    <button type="button" id="btnTentarDeNovo"
             class="mt-6 w-full sm:w-auto sm:px-10 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">
       Tentar de novo
     </button>
@@ -131,7 +137,7 @@
         <p class="text-slate-500 text-sm mb-6">Como ela se apresenta para quem chega no WhatsApp.</p>
         <div class="space-y-4">
 
-          <div aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden">
+          <div aria-hidden="true" class="isca">
             <label for="empresa_site">Não preencher</label>
             <input id="empresa_site" tabindex="-1" autocomplete="off">
           </div>
@@ -152,13 +158,13 @@
           <div>
             <label class="rotulo" for="endereco_atendimento">Endereço do atendimento</label>
             <span class="ajuda">Rua, número, complemento, bairro e cidade.</span>
-            <textarea id="endereco_atendimento" class="campo" style="min-height:72px" maxlength="300" placeholder="Rua, número, sala — Bairro, Cidade/UF"></textarea>
+            <textarea id="endereco_atendimento" class="campo alto-72" maxlength="300" placeholder="Rua, número, sala — Bairro, Cidade/UF"></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="como_chegar">Como chegar, estacionamento, acessibilidade</label>
             <span class="ajuda">Referências que ajudam quem vem com criança no colo.</span>
-            <textarea id="como_chegar" class="campo" style="min-height:72px" maxlength="500" placeholder="Em frente à praça. Estacionamento conveniado no prédio ao lado. Elevador e acesso para carrinho."></textarea>
+            <textarea id="como_chegar" class="campo alto-72" maxlength="500" placeholder="Em frente à praça. Estacionamento conveniado no prédio ao lado. Elevador e acesso para carrinho."></textarea>
           </div>
 
         </div>
@@ -174,7 +180,7 @@
           <div>
             <label class="rotulo" for="servicos">O que vocês atendem</label>
             <span class="ajuda">Um por linha. Ela usa <strong>estritamente</strong> esta lista — o que não estiver aqui, ela não oferece.</span>
-            <textarea id="servicos" class="campo" style="min-height:140px" maxlength="3000" placeholder="Consulta pediátrica de rotina
+            <textarea id="servicos" class="campo alto-140" maxlength="3000" placeholder="Consulta pediátrica de rotina
 Puericultura (acompanhamento do crescimento)
 Primeira consulta do recém-nascido
 Consulta de retorno
@@ -193,25 +199,25 @@ Orientação sobre vacinas"></textarea>
           <div>
             <label class="rotulo" for="convenios_parcerias">Convênios aceitos</label>
             <span class="ajuda">Liste os que vocês atendem. Se não atendem nenhum, escreva isso.</span>
-            <textarea id="convenios_parcerias" class="campo" style="min-height:72px" maxlength="1000" placeholder="Unimed, Bradesco Saúde e IPE. Não atendemos SUS."></textarea>
+            <textarea id="convenios_parcerias" class="campo alto-72" maxlength="1000" placeholder="Unimed, Bradesco Saúde e IPE. Não atendemos SUS."></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="nao_oferecemos">O que vocês NÃO fazem</label>
             <span class="ajuda">Importante. É o que impede a assistente de prometer o que a clínica não entrega.</span>
-            <textarea id="nao_oferecemos" class="campo" style="min-height:72px" maxlength="1500" placeholder="Não fazemos urgência nem pronto-socorro. Não aplicamos vacinas na clínica. Não atendemos adultos. Não fazemos teleconsulta."></textarea>
+            <textarea id="nao_oferecemos" class="campo alto-72" maxlength="1500" placeholder="Não fazemos urgência nem pronto-socorro. Não aplicamos vacinas na clínica. Não atendemos adultos. Não fazemos teleconsulta."></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="profissionais">Quem atende</label>
             <span class="ajuda">Nome, especialidade e, se fizer diferença, os dias de cada um.</span>
-            <textarea id="profissionais" class="campo" style="min-height:72px" maxlength="1200" placeholder="Dra. [nome] — pediatria, de segunda a quinta.
+            <textarea id="profissionais" class="campo alto-72" maxlength="1200" placeholder="Dra. [nome] — pediatria, de segunda a quinta.
 Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="formas_pagamento">Formas de pagamento</label>
-            <textarea id="formas_pagamento" class="campo" style="min-height:72px" maxlength="600" placeholder="Dinheiro, Pix, débito e crédito em até 3x sem juros. Não parcelamos consulta de convênio."></textarea>
+            <textarea id="formas_pagamento" class="campo alto-72" maxlength="600" placeholder="Dinheiro, Pix, débito e crédito em até 3x sem juros. Não parcelamos consulta de convênio."></textarea>
           </div>
 
         </div>
@@ -239,7 +245,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           <div class="pt-2">
             <label class="rotulo" for="horario_funcionamento">Como ela conta o horário para o paciente</label>
             <span class="ajuda">A gente escreve pela grade acima. Reescreva se quiser dizer de outro jeito.</span>
-            <textarea id="horario_funcionamento" class="campo" style="min-height:72px" maxlength="600"></textarea>
+            <textarea id="horario_funcionamento" class="campo alto-72" maxlength="600"></textarea>
           </div>
 
           <div>
@@ -251,7 +257,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           <div>
             <label class="rotulo" for="mensagem_fora_horario">O que ela diz fora do horário</label>
             <span class="ajuda">Ela pode agendar a qualquer hora. Evite prometer que alguém vai confirmar depois: o horário que ela marca já está confirmado.</span>
-            <textarea id="mensagem_fora_horario" class="campo" style="min-height:72px" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Enquanto isso, posso ver os horários livres e já deixar sua consulta marcada."></textarea>
+            <textarea id="mensagem_fora_horario" class="campo alto-72" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Enquanto isso, posso ver os horários livres e já deixar sua consulta marcada."></textarea>
           </div>
 
         </div>
@@ -365,7 +371,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           <div>
             <label class="rotulo" for="usuarios_painel">Quem mais atende neste WhatsApp</label>
             <span class="ajuda">Nome e função de cada pessoa. Ajuda a assistente a não responder por cima de quem já está falando com o paciente.</span>
-            <textarea id="usuarios_painel" class="campo" style="min-height:72px" maxlength="600" placeholder="[nome] — médica
+            <textarea id="usuarios_painel" class="campo alto-72" maxlength="600" placeholder="[nome] — médica
 [nome] — recepção, atende de manhã"></textarea>
           </div>
 
@@ -384,7 +390,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
           <div>
             <label class="rotulo" for="saudacao">Primeira frase da conversa</label>
-            <textarea id="saudacao" class="campo" style="min-height:72px" maxlength="400" placeholder="Oi! Aqui é a assistente da [nome da clínica]. Em que posso ajudar?"></textarea>
+            <textarea id="saudacao" class="campo alto-72" maxlength="400" placeholder="Oi! Aqui é a assistente da [nome da clínica]. Em que posso ajudar?"></textarea>
           </div>
 
           <div>
@@ -396,13 +402,13 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
           <div>
             <label class="rotulo" for="tom_de_voz">Como ela deve falar</label>
-            <textarea id="tom_de_voz" class="campo" style="min-height:72px" maxlength="800" placeholder="Acolhedora e tranquila, como quem fala com mãe ou pai preocupado. Frases curtas. Trata por você. Sem termo médico difícil."></textarea>
+            <textarea id="tom_de_voz" class="campo alto-72" maxlength="800" placeholder="Acolhedora e tranquila, como quem fala com mãe ou pai preocupado. Frases curtas. Trata por você. Sem termo médico difícil."></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="nunca_dizer">Palavras e frases proibidas</label>
             <span class="ajuda">Separe por vírgula. Ela nunca vai usar nada daqui.</span>
-            <textarea id="nunca_dizer" class="campo" style="min-height:72px" maxlength="800" placeholder="garantido, cura, é normal, não se preocupe, com certeza é, sou humana"></textarea>
+            <textarea id="nunca_dizer" class="campo alto-72" maxlength="800" placeholder="garantido, cura, é normal, não se preocupe, com certeza é, sou humana"></textarea>
           </div>
 
           <div>
@@ -413,19 +419,19 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
           <div>
             <label class="rotulo" for="gatilhos_escalonamento">Quando ela deve chamar uma pessoa</label>
-            <textarea id="gatilhos_escalonamento" class="campo" style="min-height:72px" maxlength="800" placeholder="Reclamação, pedido de reembolso, dúvida sobre cobrança, pedido de laudo ou atestado retroativo, qualquer coisa jurídica."></textarea>
+            <textarea id="gatilhos_escalonamento" class="campo alto-72" maxlength="800" placeholder="Reclamação, pedido de reembolso, dúvida sobre cobrança, pedido de laudo ou atestado retroativo, qualquer coisa jurídica."></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="gatilhos_urgencia">O que é urgência</label>
             <span class="ajuda">Sinais que fazem ela parar de agendar e mandar buscar atendimento.</span>
-            <textarea id="gatilhos_urgencia" class="campo" style="min-height:72px" maxlength="800" placeholder="Febre alta em bebê de menos de 3 meses, dificuldade para respirar, convulsão, criança muito molinha ou que não acorda, engasgo, queda com batida na cabeça, sangramento que não para."></textarea>
+            <textarea id="gatilhos_urgencia" class="campo alto-72" maxlength="800" placeholder="Febre alta em bebê de menos de 3 meses, dificuldade para respirar, convulsão, criança muito molinha ou que não acorda, engasgo, queda com batida na cabeça, sangramento que não para."></textarea>
           </div>
 
           <div>
             <label class="rotulo" for="resposta_urgencia">O que ela responde na urgência</label>
             <span class="ajuda">Texto exato. É a mensagem mais importante do formulário.</span>
-            <textarea id="resposta_urgencia" class="campo" style="min-height:72px" maxlength="800" placeholder="Isso precisa de atendimento agora, não dá para esperar consulta marcada. Procure o pronto-socorro pediátrico mais próximo ou ligue 192. Assim que der, me avise como foi."></textarea>
+            <textarea id="resposta_urgencia" class="campo alto-72" maxlength="800" placeholder="Isso precisa de atendimento agora, não dá para esperar consulta marcada. Procure o pronto-socorro pediátrico mais próximo ou ligue 192. Assim que der, me avise como foi."></textarea>
           </div>
 
         </div>
@@ -438,7 +444,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           Opcional, mas é o que mais melhora as respostas dela. Escreva do jeito que a recepção responderia.
         </p>
         <div id="listaFaq" class="space-y-4"></div>
-        <button type="button" onclick="addFaq()" class="mt-4 inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-600">
+        <button type="button" id="btnAddFaq" class="mt-4 inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-600">
           <i data-lucide="plus" class="w-4 h-4"></i> Adicionar pergunta
         </button>
 
@@ -457,7 +463,7 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
         <div class="flex gap-3 mt-6">
           <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-          <button type="button" id="btnEnviar" onclick="enviar()" class="flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Enviar e continuar</button>
+          <button type="button" id="btnEnviar" class="flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Enviar e continuar</button>
         </div>
       </section>
 
@@ -575,15 +581,19 @@ function montarGrade() {
   $('grade').innerHTML = DIAS.map(([id, nome]) => `
     <div class="flex items-start gap-3 flex-wrap">
       <label class="flex items-center gap-2 w-28 shrink-0 cursor-pointer pt-2">
-        <input type="checkbox" id="ab_${id}" class="w-4 h-4 accent-emerald-600" onchange="alternarDia('${id}')">
+        <input type="checkbox" id="ab_${id}" class="w-4 h-4 accent-emerald-600">
         <span class="text-sm font-medium text-slate-600">${nome}</span>
       </label>
       <div id="bx_${id}" class="flex-1 min-w-0 space-y-2 hidden">
         <div id="fx_${id}" class="space-y-2"></div>
-        <button type="button" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800" onclick="addFaixa('${id}')">+ Adicionar horário (ex.: depois do almoço)</button>
+        <button type="button" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800">+ Adicionar horário (ex.: depois do almoço)</button>
       </div>
     </div>
   `).join('');
+  DIAS.forEach(([id]) => {
+    $('ab_' + id).addEventListener('change', () => alternarDia(id));
+    $('bx_' + id).querySelector('button').addEventListener('click', () => addFaixa(id));
+  });
 
   PERFIL.gradePadrao.dias.forEach(d => { $('ab_' + d).checked = true; alternarDia(d); });
 }
@@ -594,9 +604,9 @@ function addFaixa(id, de = '', ate = '', removivel = null) {
   const row = document.createElement('div');
   row.className = 'faixa flex items-center gap-2 flex-wrap';
   row.innerHTML = `
-    <input type="time" class="campo fx-de" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem">
+    <input type="time" class="campo fx-de faixa-hora">
     <span class="text-xs text-slate-400">às</span>
-    <input type="time" class="campo fx-ate" style="width:7.5rem;padding:.55rem .7rem;font-size:.9rem">
+    <input type="time" class="campo fx-ate faixa-hora">
     ${removivel ? '<button type="button" class="text-xs text-slate-400 hover:text-red-500" title="Remover este horário">remover</button>' : ''}`;
   const [i1, i2] = row.querySelectorAll('input');
   i1.value = de; i2.value = ate;
@@ -683,7 +693,7 @@ function addFaq(p = '', r = '') {
     <div class="flex items-start gap-3">
       <div class="flex-1 space-y-3">
         <input class="campo faq-p" maxlength="200" placeholder="Vocês atendem no mesmo dia?">
-        <textarea class="campo faq-r" maxlength="800" style="min-height:72px" placeholder="Temos encaixe quase todo dia de manhã. Me diz o que está acontecendo que eu vejo o horário mais próximo."></textarea>
+        <textarea class="campo faq-r alto-72" maxlength="800" placeholder="Temos encaixe quase todo dia de manhã. Me diz o que está acontecendo que eu vejo o horário mais próximo."></textarea>
       </div>
       <button type="button" class="shrink-0 p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-white transition-colors" title="Remover">
         <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -914,6 +924,11 @@ async function abrir() {
     falhar('Não consegui falar com o servidor. Confira sua internet e tente de novo.');
   }
 }
+
+// Os botões fixos da página (a regra de segurança não deixa onclick= no HTML).
+$('btnTentarDeNovo').addEventListener('click', () => location.reload());
+$('btnAddFaq').addEventListener('click', () => addFaq());
+$('btnEnviar').addEventListener('click', () => enviar());
 
 abrir();
 </script>
