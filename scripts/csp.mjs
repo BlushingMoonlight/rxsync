@@ -43,6 +43,8 @@ export const PAGINAS = {
   //   dela, no desenho do celular (frame do próprio site).
   ...Object.fromEntries(['index', 'app/index', 'central/index', 'escopo/index', 'manual/index'].map(f => [`demo/clinica/${f}.html`,
     { script: "'self'", estilo: "'self'", img: "'self'", connect: N8N, ...(f === 'index' ? { frame: "'self'" } : {}) }])),
+  // - Política de Privacidade: só o estilo e as fontes do site; nada roda.
+  'privacidade.html': { estilo: "'self'", img: "'self'", connect: "'none'" },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;

@@ -205,7 +205,8 @@ for (const f of htmls) {
     hist = (pol.match(/<li><strong>(\d{4}-\d{2}-v\d+)<\/strong>, vigente/) || [])[1];
   if (!selo || selo !== texto || texto !== hist) erro(`privacidade.html: a versão do selo (${selo}), a do texto (${texto}) e a primeira do histórico (${hist}) têm de ser a mesma`);
   const corpoPol = pol.replace(/<li><strong>\d{4}-\d{2}-v\d+<\/strong>, vigente[\s\S]*?<\/li>/g, '');
-  for (const frase of ['cópias de segurança criptografadas', 'sem exposição à rede pública', 'separado do de testes', 'termo de confidencialidade', 'Cópias de segurança (backup)', 'Quero conversar'])
+  for (const frase of ['cópias de segurança criptografadas', 'sem exposição à rede pública', 'separado do de testes', 'termo de confidencialidade', 'Cópias de segurança (backup)', 'Quero conversar',
+    'menor privilégio', 'Expurgados automaticamente após a resolução do atendimento', 'backup diário', 'atualização periódica'])
     if (corpoPol.includes(frase)) erro(`privacidade.html: "${frase}" voltou ao texto (sem prova ou fora do produto; rxsync-sistema#101, DEC-143)`);
 }
 // Página da exclusão da conta (rxsync-sistema DEC-114): noindex, nada de fora além do n8n, sem Google Analytics nem
