@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NZqDbDhvEBi7IubYaAiJp80neXRaTssw63IH1DyFcTg=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>Contratar — RXSync</title>
@@ -40,6 +41,7 @@
   .etapa { display:none; } .etapa.ativa { display:block; }
   .termos-box { height:300px; overflow-y:auto; border:1px solid #cbd5e1; border-radius:.75rem; background:#fff; }
   .termos-box iframe { width:100%; height:100%; border:0; }
+  .isca { position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden; }
 </style>
 </head>
 <body class="bg-slate-50 font-sans antialiased">
@@ -99,7 +101,7 @@
       <h2 class="text-lg font-bold text-primary-900 mb-1">Quem vamos atender</h2>
       <p class="text-slate-500 text-sm mb-6">Começamos pelo básico. Leva menos de um minuto.</p>
       <div class="space-y-4">
-        <div aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden">
+        <div aria-hidden="true" class="isca">
           <label for="empresa_site">Não preencher</label>
           <input id="empresa_site" tabindex="-1" autocomplete="off">
         </div>
@@ -164,13 +166,13 @@
       <h2 class="text-lg font-bold text-primary-900 mb-1">Termos da contratação</h2>
       <p class="text-slate-500 text-sm mb-5">Leia antes de aceitar. Este é o contrato entre você e a RXSync, já preenchido com os seus dados.</p>
 
-      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-10-v6"></iframe></div>
-      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-10-v6</strong> · <a id="linkTermos" href="/termos/2026-10-v6.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
+      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-10-v7"></iframe></div>
+      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-10-v7</strong> · <a id="linkTermos" href="/termos/2026-10-v7.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
       <p class="text-xs text-slate-500 mb-5 -mt-3">Os dados deste cadastro são tratados pela RXSync conforme a <a href="/privacidade.html" target="_blank" rel="noopener" class="text-primary-600 underline">Política de Privacidade</a>.</p>
 
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteTermos" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
-        <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-10-v6.</span>
+        <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-10-v7.</span>
       </label>
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteDpa" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
@@ -213,8 +215,9 @@
   </section>
 </main>
 
-<!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112) -->
-<script src="/assets/consentimento.js"></script>
+<!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112). O chat abre numa aba nova, na
+     página inicial: a regra de segurança desta página não deixa os estilos que o chat põe na página. -->
+<script src="/assets/consentimento.js" data-chat-fora></script>
 
 <script>
 const WEBHOOK = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/cadastro';
@@ -265,7 +268,7 @@ async function aguardarLink(clienteId, email) {
   document.getElementById('pagamentoCarregando').classList.add('hidden');
   document.getElementById('pagamentoDemorou').classList.remove('hidden');
 }
-const VERSAO = '2026-10-v6';
+const VERSAO = '2026-10-v7';
 
 const PLANOS = {
   essencial: { nome:'Essencial', mensal:299, anual12:'269,10', anualTotal:'3.229,20', avista:'2.990,00',
@@ -634,6 +637,11 @@ document.getElementById('form').addEventListener('submit', async evt => {
       headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
       body: JSON.stringify(dados)
     });
+    // 409: os Termos mudaram depois que a página abriu; mostra a mensagem do servidor (recarregar a página).
+    if (r.status === 409) {
+      let m = ''; try { m = ((await r.json()) || {}).mensagem || ''; } catch (_) {}
+      const e = new Error(m || 'Os Termos mudaram. Recarregue a página para ver a versão nova.'); e.doServidor = true; throw e;
+    }
     if (!r.ok) throw new Error();
     let clienteId = '';
     try { clienteId = ((await r.json()) || {}).cliente_id || ''; } catch (_) {}
@@ -651,7 +659,7 @@ document.getElementById('form').addEventListener('submit', async evt => {
   } catch (e) {
     botoes.forEach((b, i) => { b.disabled = false; b.textContent = textos[i]; });
     box.classList.remove('hidden');
-    box.textContent = 'Não consegui registrar agora. Tente de novo em instantes ou fale com a gente pelo WhatsApp.';
+    box.textContent = e && e.doServidor ? e.message : 'Não consegui registrar agora. Tente de novo em instantes ou fale com a gente pelo WhatsApp.';
   }
 });
 

@@ -6,6 +6,7 @@
 //      erros das importações da agenda e de pacientes, depois da prévia de cada uma.
 // Uso (precisa do Playwright): node scripts/painel_csp.mjs
 import { abrirNavegador, servirSite, qrDeMentira } from './central_simulado.mjs';
+import { contextoCsp, bloqueios } from './csp_teste.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const SESSAO = 'a'.repeat(64);
@@ -44,23 +45,8 @@ function responder(url, b) {
 
 const site = await servirSite(); const browser = await abrirNavegador();
 async function contexto(comSessao) {
-  const ctx = await browser.newContext({ viewport: { width: 1024, height: 900 }, acceptDownloads: true });
-  // Cada bloqueio da regra vira um registro na página (o navegador dispara "securitypolicyviolation").
-  await ctx.addInitScript(() => { window.__bloqueios = []; document.addEventListener('securitypolicyviolation', e => window.__bloqueios.push(e.violatedDirective + ' ' + (e.blockedURI || 'inline'))); });
-  if (comSessao) await ctx.addInitScript(s => { try { sessionStorage.setItem('painel_sessao', s); } catch (e) {} }, SESSAO);
-  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
-    const q = r.request();
-    if (!q.url().startsWith(N8N)) return r.abort();
-    if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' } });
-    let b = {}; try { b = JSON.parse(q.postData() || '{}'); } catch {}
-    return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(responder(q.url(), b)) });
-  });
-  const page = await ctx.newPage(); page.setDefaultTimeout(15000);
-  const erros = []; page.on('pageerror', e => erros.push(String(e)));
-  page.on('console', m => { if (m.type() === 'error' && /Content Security Policy/i.test(m.text())) erros.push(m.text()); });
-  return { ctx, page, erros };
+  return contextoCsp(browser, { responder: (caminho, b) => responder(N8N + caminho, b), antes: comSessao ? { fn: s => { try { sessionStorage.setItem('painel_sessao', s); } catch (e) {} }, arg: SESSAO } : null });
 }
-const bloqueios = page => page.evaluate(() => window.__bloqueios.splice(0));
 const PAINEL = site.base + '/autoedicao.html';
 
 // 0. A regra está na página e bloqueia de verdade.

@@ -17,7 +17,7 @@ function responder(url, h, b) {
   chamadas.push({ caminho, acao: b.acao, sessao: h['x-rxsync-painel'] || '', dados: b.dados || {} });
   if (caminho === 'painel-entrada' && b.acao === 'termos_estado') return estado.fim
     ? { ok: true, pendente: false, so_baixar: true, papel: estado.papel, mensagem: 'O contrato terminou.' }
-    : { ok: true, pendente: false, papel: estado.papel, versao: '2026-10-v6' };
+    : { ok: true, pendente: false, papel: estado.papel, versao: '2026-10-v7' };
   if (caminho === 'painel-entrada' && b.acao === 'dados_exportar') return { ok: true, parte: b.dados.parte, pagina: 0, tem_mais: false,
     linhas: [{ codigo: 1, inicio: '2026-11-01 10:00', paciente: 'Paciente Um', telefone: '41999990000' }] };
   if (caminho === 'painel-entrada' && b.acao === 'sair') return { ok: true, sair: true };

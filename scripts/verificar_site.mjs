@@ -94,17 +94,48 @@ for (const f of htmls) {
 {
   const { PAGINAS, cspPagina, META_CSP, N8N: N8N_CSP } = await import('./csp.mjs');
   if (N8N_CSP !== N8N) erro('scripts/csp.mjs: endereço do n8n diferente do verificar_site.mjs');
+  const ESTILO_LIVRE = /^(index\.html|teste\.html|termos\/2026-10-v[1-6]\.html)$/;
   for (const [arq, p] of Object.entries(PAGINAS)) {
     const s = fs.readFileSync(arq, 'utf8');
     const csp = (s.match(META_CSP) || [])[1];
     if (!csp) erro(`${arq}: falta a regra de segurança (rode node scripts/csp.mjs)`);
     else if (csp !== cspPagina(s, p)) erro(`${arq}: a regra de segurança não bate com o script ou o estilo da página (rode node scripts/csp.mjs)`);
     if (s.search(META_CSP) > s.search(/<(script|style|link)\b/)) erro(`${arq}: a regra de segurança precisa vir antes de qualquer <script>, <style> ou <link>`);
-    if ((s.match(/<script\b/g) || []).length !== (s.match(/<script>/g) || []).length) erro(`${arq}: <script> com src ou atributos; o código fica dentro da página`);
-    if (/\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
+    // <script>: dentro da página, um arquivo do próprio site ou os dados estruturados (application/ld+json, que não rodam).
+    for (const m of s.matchAll(/<script\b([^>]*)>/g)) {
+      const at = m[1].trim(), src = (at.match(/\bsrc="([^"]*)"/) || [])[1];
+      if (!at || at === 'type="application/ld+json"') continue;
+      if (!src || /^(https?:)?\/\//i.test(src)) erro(`${arq}: <script ${at}>: só um arquivo do próprio site (ou o código dentro da página)`);
+      else if (!/vendor\//.test(src)) {
+        const js = fs.readFileSync(src.startsWith('/') ? '.' + src : path.join(path.dirname(arq), src), 'utf8');
+        if (/\sstyle\s*=\s*\\?["']/.test(js)) erro(`${src} (usado em ${arq}): monta marca com style=, que a regra de segurança bloqueia; use uma classe`);
+        if (/<[a-z][^<>]*\son[a-z]+\s*=\s*\\?["']/i.test(js)) erro(`${src} (usado em ${arq}): monta marca com on…=, que a regra de segurança bloqueia; use addEventListener`);
+      }
+    }
+    // Estilo livre ('unsafe-inline'): só nas páginas com o chat dentro e nos Termos antigos (v1 a v6), que não mudam.
+    if (p.estiloLivre && !ESTILO_LIVRE.test(arq)) erro(`${arq}: estilo livre ('unsafe-inline') só no index.html, no teste.html e nos Termos v1 a v6`);
+    if (p.atributoEstilo && !/^termos\/2026-10-v[1-6]\.html$/.test(arq)) erro(`${arq}: style= no HTML só nos Termos v1 a v6, que não mudam`);
+    if (/script-src[^;]*'unsafe-(inline|eval)'/.test(csp || '')) erro(`${arq}: script nunca com 'unsafe-inline' nem 'unsafe-eval'`);
+    if (!p.atributoEstilo && /\sstyle\s*=\s*["']/.test(s)) erro(`${arq}: atributo style= é bloqueado pela regra de segurança; use uma classe`);
     if (/<[a-z][^<>]*\son[a-z]+\s*=\s*["']/i.test(s)) erro(`${arq}: atributo on…= (onclick etc.) é bloqueado pela regra de segurança; use addEventListener`);
     if (/javascript:/i.test(s)) erro(`${arq}: link javascript: é bloqueado pela regra de segurança`);
   }
+}
+// Nenhuma página publicada sem a regra de segurança: as da lista do scripts/csp.mjs, a Central (a dela) e a fonte da
+// Central (que não roda nada sozinha). Exceção: a demonstração antiga, que não recebe mais mudanças; só as páginas que
+// existem hoje nela (uma página nova ali também precisa da regra).
+{
+  const { PAGINAS } = await import('./csp.mjs');
+  const ANTIGA = 'demo/drandrepontes/';
+  const ANTIGA_PAGINAS = ['app/clean/index.html', 'app/couro/index.html', 'app/cyber/index.html', 'app/index.html', 'datalog/index.html', 'escopo/index.html',
+    'escopo/resumo/index.html', 'fluxo/index.html', 'index.html', 'painel/clean/index.html', 'painel/couro/index.html', 'painel/cyber/index.html', 'painel/index.html',
+    'questionario/index.html'].map(f => ANTIGA + f);
+  for (const f of htmls.map(h => h.split(path.sep).join('/').replace(/^\.\//, ''))) {
+    if (PAGINAS[f] || f === 'central/index.html' || ANTIGA_PAGINAS.includes(f)) continue;
+    if (f === 'central/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte da Central precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
+    erro(`${f}: página sem a regra de segurança; ponha na lista PAGINAS do scripts/csp.mjs e rode node scripts/csp.mjs`);
+  }
+  for (const f of ANTIGA_PAGINAS) if (!fs.existsSync(f)) erro(`${f}: saiu da demonstração antiga; tire da lista ANTIGA_PAGINAS do verificar_site.mjs`);
 }
 // Painel (autoedicao.html): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
 {
@@ -191,7 +222,8 @@ for (const f of htmls) {
     hist = (pol.match(/<li><strong>(\d{4}-\d{2}-v\d+)<\/strong>, vigente/) || [])[1];
   if (!selo || selo !== texto || texto !== hist) erro(`privacidade.html: a versão do selo (${selo}), a do texto (${texto}) e a primeira do histórico (${hist}) têm de ser a mesma`);
   const corpoPol = pol.replace(/<li><strong>\d{4}-\d{2}-v\d+<\/strong>, vigente[\s\S]*?<\/li>/g, '');
-  for (const frase of ['cópias de segurança criptografadas', 'sem exposição à rede pública', 'separado do de testes', 'termo de confidencialidade', 'Cópias de segurança (backup)', 'Quero conversar'])
+  for (const frase of ['cópias de segurança criptografadas', 'sem exposição à rede pública', 'separado do de testes', 'termo de confidencialidade', 'Cópias de segurança (backup)', 'Quero conversar',
+    'menor privilégio', 'Expurgados automaticamente após a resolução do atendimento', 'backup diário', 'atualização periódica'])
     if (corpoPol.includes(frase)) erro(`privacidade.html: "${frase}" voltou ao texto (sem prova ou fora do produto; rxsync-sistema#101, DEC-143)`);
 }
 // Página da exclusão da conta (rxsync-sistema DEC-114): noindex, nada de fora além do n8n, sem Google Analytics nem

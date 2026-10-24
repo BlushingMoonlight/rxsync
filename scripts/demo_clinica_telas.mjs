@@ -3,10 +3,11 @@
 // tela: nenhuma rolagem para o lado, alvos de toque de 44 px, contraste do texto (4,5:1; texto grande 3:1), nenhum
 // "null"/"undefined" na tela e nenhum erro no console. Confere também os caminhos: marcar e enviar o escopo, pergunta no
 // chat (vai no lote de eventos), a coerência entre o app e a central (mesma fonte de dados, o ciclo nos dois sentidos),
-// link inativo, fora do ar e sem código.
+// link inativo, fora do ar e sem código, e a regra de segurança (CSP) das 5 páginas.
 // Uso (precisa do Playwright): node scripts/demo_clinica_telas.mjs [pasta das fotos]   ·   sem fotos: node scripts/demo_clinica_telas.mjs - sem-fotos
 import fs from 'node:fs';
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
+import { regraDa, provarBloqueio } from './csp_teste.mjs';
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demonstracao';
 const OUT = process.argv[2] && process.argv[2] !== '-' ? process.argv[2] : 'fotos-demo', FOTOS = process.argv[3] !== 'sem-fotos';
 if (FOTOS) fs.mkdirSync(OUT, { recursive: true });
@@ -605,6 +606,17 @@ for (const vp of [{ width: 820, height: 1180 }, { width: 1440, height: 900 }]) {
   const janela = {}; new Function('window', fs.readFileSync('demo/clinica/comum/manual.js', 'utf8'))(janela);
   const ruinsF = janela.DEMO_MANUAL.FLUXOS.flatMap(f => f.etapas.filter(e => /\?$/.test(e.texto) && /^se /.test(e.seta || '')).map(e => f.titulo + ': ' + e.texto));
   ok(!ruinsF.length, `fluxogramas: "se sim" na seta que chega na pergunta (${ruinsF.join('; ')})`);
+}
+// Regra de segurança (CSP) das 5 páginas: está na página e bloqueia de verdade (um script escrito depois não roda). Que
+// nada do uso normal é bloqueado, as telas acima conferem: cada bloqueio vira erro no console.
+for (const cam of ['', 'app/', 'central/', 'escopo/', 'manual/']) {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); const page = await ctx.newPage();
+  await page.addInitScript(() => { window.__bloqueios = []; document.addEventListener('securitypolicyviolation', e => window.__bloqueios.push(e.violatedDirective)); });
+  await page.route(N8N, simular([])); await page.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.request().url().startsWith(N8N) ? r.fallback() : r.abort());
+  await page.goto(`${site.base}/demo/clinica/${cam}#${ATIVO}`);
+  await page.waitForFunction(() => document.querySelector('#raiz h1, #raiz h2'), null, { timeout: 8000 }).catch(() => {});
+  ok(/default-src 'none'/.test(await regraDa(page)) && await provarBloqueio(page), `regra de segurança: demo/clinica/${cam} sem a regra, ou ela não bloqueia`);
+  await ctx.close();
 }
 await browser.close(); site.fechar();
 console.log(`${fotos} fotos. ` + (falhas ? falhas + ' falha(s).' : 'Tudo certo: celular de 360 a 430 px, iPad e computador; escopo, chat, coerência entre o app e a central, inativo e fora do ar.'));
