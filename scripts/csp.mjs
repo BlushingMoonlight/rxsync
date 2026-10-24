@@ -37,6 +37,8 @@ export const PAGINAS = {
   //   o chat dentro da página.
   'index.html': { script: juntar("'self'", GA.script, CHAT_DENTRO.script), estilo: "'self'", estiloLivre: true, img: juntar("'self' data:", GA.img, CHAT_DENTRO.img),
     connect: juntar(N8N, GA.connect, CHAT_DENTRO.connect), frame: CHAT_DENTRO.frame },
+  // - teste da assistente: só o chat dentro da página (sem Google Analytics nem n8n).
+  'teste.html': { script: CHAT_DENTRO.script, estilo: "'self'", estiloLivre: true, img: juntar("'self' data:", CHAT_DENTRO.img), connect: CHAT_DENTRO.connect, frame: CHAT_DENTRO.frame },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;
