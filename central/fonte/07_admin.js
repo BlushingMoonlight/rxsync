@@ -82,7 +82,7 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
   tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
-  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
+  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre', termos_v7: 'Termos v7 para quem já é cliente', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && !['tela_cliente_sensivel', 'tela_assistente'].includes(k.chave)],
   ['IA da Central', k => k.chave === 'tela_assistente'],
@@ -92,26 +92,36 @@ const GRUPOS_CHAVE = [
   ['Enterprise', k => ['editar_chaves_api', 'editar_avisos_eventos'].includes(k.chave)],
   ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)],
   ['Demonstrações', k => ['tela_demonstracoes', 'editar_demonstracoes', 'demo_links'].includes(k.chave)]];
-// As chaves do motor da prospecção pedem nível para LIGAR (busca e IA: 2; disparo: 3, com o nome "Disparo de prospecção");
-// desligar continua num toque (DEC-078).
-async function mudarChave(chave, valor, desfazendo) {
+// Ligar algumas chaves pede nível (NIVEL_CHAVE: busca, IA, links e assistente, 2; disparo e Termos v7, 3, com o nome);
+// desligar continua num toque (DEC-078). Se o servidor pedir um nível maior (ou outro nome no nível 3) do que a página
+// sabia, a janela abre de novo, uma vez, no nível dele, em vez de só mostrar "Toque em Confirmar para seguir".
+// A senha (nível 3 com a última há mais de 12 horas) é pedida pelo chamar e repetida uma vez.
+const TEXTO_CHAVE = {
+  prosp_disparo: 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.',
+  prosp_busca: 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.',
+  prosp_ia: 'A IA passa a responder os leads das campanhas com a IA ligada.',
+  demo_links: 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos no Telegram.',
+  tela_assistente: 'As perguntas e o que as telas da Central mostram vão à OpenAI, sem o "nunca" (CPF, CNPJ, senhas, chaves, dados de pacientes e o texto das conversas; e-mails e telefones mascarados). Nada muda sem o seu Confirmar.',
+  termos_v7: 'Os Termos v7 passam a valer para quem já é cliente, com os 30 dias do aviso contados de hoje. Desligar depois não volta a v6 nem muda a data.' };
+const ROTULO_CHAVE = { demo_links: 'os médicos passam a ver', tela_assistente: 'dados de clientes vão à OpenAI', termos_v7: 'não tem volta', prosp_disparo: 'manda ou gasta de verdade', prosp_busca: 'manda ou gasta de verdade', prosp_ia: 'manda ou gasta de verdade' };
+const SEM_DESFAZER = ['termos_v7'];   // desligar não desfaz a troca dos Termos
+async function mudarChave(chave, valor, desfazendo, pedido) {
+  const nome = NOME_CHAVE[chave] || chave;
   let d = { chave, valor };
-  if (nivelDe('ligar_chave', d) > 1) {
-    d = await pedirAcao('ligar_chave', d, { titulo: 'Ligar: ' + (NOME_CHAVE[chave] || chave), nome: 'Disparo de prospecção', rotuloNome: 'o nome da chave',
-      rotuloNivel: chave === 'demo_links' ? 'os médicos passam a ver' : chave === 'tela_assistente' ? 'dados de clientes vão à OpenAI' : 'manda ou gasta de verdade',
-      linhas: [[NOME_CHAVE[chave] || chave, 'desligada', 'ligada']], botao: 'Ligar',
-      texto: chave === 'prosp_disparo' ? 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.'
-        : chave === 'prosp_busca' ? 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.'
-        : chave === 'demo_links' ? 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos no Telegram.'
-        : chave === 'tela_assistente' ? 'As perguntas e o que as telas da Central mostram vão à OpenAI, sem o "nunca" (CPF, CNPJ, senhas, chaves, dados de pacientes e o texto das conversas; e-mails e telefones mascarados). Nada muda sem o seu Confirmar.'
-        : 'A IA passa a responder os leads das campanhas com a IA ligada.' });
+  const nivel = (pedido && pedido.nivel) || nivelDe('ligar_chave', d);
+  if (nivel > 1) {
+    d = await pedirAcao('ligar_chave', d, { nivel, titulo: 'Ligar: ' + nome, nome: (pedido && pedido.nome) || NOME_NIVEL3_CHAVE[chave] || nome, rotuloNome: 'o nome da chave',
+      rotuloNivel: ROTULO_CHAVE[chave], linhas: [[nome, 'desligada', 'ligada']], botao: 'Ligar', texto: TEXTO_CHAVE[chave] });
     if (!d) { await rotear(); return; }
   }
   const r = await chamar('ligar_chave', d);
+  if (!r.ok && r.nivel >= 2 && !pedido) {
+    const nomeServidor = r.nivel === 3 ? ((r.mensagem || '').match(/digite o nome \((.+)\)\.?$/) || [])[1] : null;
+    if (r.nivel > nivel || (nomeServidor && nomeServidor !== d.confirmacao_nome)) return mudarChave(chave, valor, desfazendo, { nivel: r.nivel, nome: nomeServidor });
+  }
   if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); await rotear(); return; }
   est.chaves[chave] = r.depois; montarNav();
-  const nome = NOME_CHAVE[chave] || chave;
-  rapida(nome + (r.depois === 'SIM' ? ' ligada.' : ' desligada.') + ' Aviso no Telegram.', desfazendo ? null : () => mudarChave(chave, r.antes, true).then(() => rotear()));
+  rapida(nome + (r.depois === 'SIM' ? ' ligada.' : ' desligada.') + ' Aviso no Telegram.', desfazendo || SEM_DESFAZER.includes(chave) ? null : () => mudarChave(chave, r.antes, true).then(() => rotear()));
 }
 TELAS.ajustes = async c => {
   topo('Ajustes da Central', [['Administração'], ['Ajustes da Central']]);

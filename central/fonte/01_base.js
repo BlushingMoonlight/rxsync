@@ -170,7 +170,8 @@ function nivelDe(acao, d) {
   // Prospecção (sql/031, DEC-078): as mesmas regras de rx_central_nivel. Desligar ou pausar é um toque.
   // Demonstrações (sql/056, DEC-125): ligar os links (demo_links) é nível 2.
   // IA da Central (sql/061, DEC-145): ligar o assistente (tela_assistente) é nível 2.
-  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : d.chave === 'prosp_disparo' ? 3 : /^prosp_(busca|ia)$/.test(d.chave) || d.chave === 'demo_links' || d.chave === 'tela_assistente' ? 2 : 1;
+  // Termos v7 (sql/063): ligar a termos_v7 é nível 3. Chave que o servidor sobe sem estar aqui: mudarChave pergunta de novo.
+  if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : NIVEL_CHAVE[d.chave] || 1;
   if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
   if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
   // Públicos (sql/036, DEC-088): tirar um contato é um toque (pôr de volta num público em uso: a página passa o nível 2).
@@ -180,6 +181,9 @@ function nivelDe(acao, d) {
   const n = Number((est.niveis.acoes || {})[acao]);
   return n >= 1 && n <= 3 ? n : 2; // ação sem nível conhecido: pede pelo menos o Confirmar
 }
+// Ligar estas chaves pede nível (desligar é sempre um toque). No nível 3, o nome que se digita é o do servidor.
+const NIVEL_CHAVE = { prosp_busca: 2, prosp_ia: 2, demo_links: 2, tela_assistente: 2, prosp_disparo: 3, termos_v7: 3 };
+const NOME_NIVEL3_CHAVE = { prosp_disparo: 'Disparo de prospecção', termos_v7: 'Termos v7' };
 // Pede o que a ação precisa (campos, antes/depois, nome da clínica) e devolve os dados prontos para mandar, ou null.
 // op: { titulo, texto, linhas, campos: [{k, rot, tipo, valor, opcoes, longo, obrig, minimo, erro, ajuda, min, max, ph}], nome, botao, perigo }
 function pedirAcao(acao, d, op) {

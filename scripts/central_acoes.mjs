@@ -17,7 +17,8 @@ const page = await ctx.newPage(); page.setDefaultTimeout(6000); const erros = []
 page.on('pageerror', e => erros.push(String(e))); page.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
 const chaves = CHAVES_LIGADAS(), chamadas = [];
 let fichaExtra = {};
-await entrar(page, site.base, chaves, chamadas, { cliente: () => ({ ok: true, cliente: { ...ficha(), ...fichaExtra } }) });
+const respostas = { cliente: () => ({ ok: true, cliente: { ...ficha(), ...fichaExtra } }) };   // um caso pode trocar a resposta de uma ação
+await entrar(page, site.base, chaves, chamadas, respostas);
 
 const janela = '#camada .janela';
 const botao = (nome, onde = '#conteudo') => page.locator(onde).getByRole('button', { name: nome, exact: true }).first();
@@ -369,6 +370,52 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   await abrir('ajustes');
   ok(await page.getByRole('switch', { name: 'Painel: o link antigo (?t=) ainda abre', exact: true }).count() === 1, 'ajustes: a chave painel_link_antigo com nome legível');
   feitos += 4;
+}
+// Chaves com nível do servidor (rxsync-sistema sql/063): ligar a termos_v7 abre a janela do nível 3 ("Termos v7"),
+// depois pede a senha (a última há mais de 12 horas) e repete uma vez; uma chave que o servidor sobe de nível sem a página
+// saber (aqui, tela_avisos no nível 2) também abre a janela, em vez de só mostrar "Toque em Confirmar para seguir".
+{
+  const servidorChave = d => {
+    const antes = chaves[d.chave], liga = () => { chaves[d.chave] = d.valor; return { ok: true, antes, depois: d.valor }; };
+    if (d.valor !== 'SIM') return liga();
+    if (d.chave === 'termos_v7') {
+      if (d.confirmacao !== 'CONFIRMAR') return { ok: false, nivel: 3, mensagem: 'Toque em Confirmar para seguir.' };
+      if (String(d.confirmacao_nome || '').toLowerCase() !== 'termos v7') return { ok: false, nivel: 3, mensagem: 'Para confirmar, digite o nome (Termos v7).' };
+      if (!d._repetido) return { ok: false, nivel: 3, pedir_senha: true, mensagem: 'Para esta confirmação, digite a senha de novo (a última foi há mais de 12 horas).' };
+    }
+    if (d.chave === 'tela_avisos' && d.confirmacao !== 'CONFIRMAR') return { ok: false, nivel: 2, mensagem: 'Toque em Confirmar para seguir.' };
+    return liga();
+  };
+  respostas.ligar_chave = servidorChave;
+  respostas.senha_reconfirmar = d => d.senha === 'senha-de-teste-123' ? { ok: true } : { ok: false, mensagem: 'Senha errada.' };
+  chaves.termos_v7 = 'NAO'; await abrir('ajustes'); let desde = chamadas.length;
+  await page.getByRole('switch', { name: 'Termos v7 para quem já é cliente', exact: true }).click();
+  await page.waitForSelector(janela);
+  ok(await page.locator(janela + ' .nivel', { hasText: 'Nível 3' }).count() === 1 && await page.locator(janela + ' #c-nome-clinica').count() === 1, 'termos_v7: a janela do nível 3, com o nome para digitar');
+  ok(!chamadas.slice(desde).some(x => x.acao === 'ligar_chave'), 'termos_v7: nada vai ao servidor antes da janela');
+  const conf = page.locator(janela + ' button[type=submit]');
+  ok(await conf.isDisabled(), 'termos_v7: o botão começa travado');
+  await page.fill(janela + ' #c-nome-clinica', 'termos V7'); await conf.click();
+  await page.waitForSelector(janela + ' #c-senha-de-novo');
+  ok(await page.locator(janela).getByText('a última foi há mais de 12 horas').count() === 1, 'termos_v7: depois do nome, pede a senha de novo');
+  await page.fill(janela + ' #c-senha-de-novo', 'senha-de-teste-123'); await page.locator(janela + ' button[type=submit]').click();
+  await page.waitForFunction(() => !document.querySelector('#camada .janela'));
+  const envios = chamadas.slice(desde).filter(x => x.acao === 'ligar_chave').map(x => x.dados), ultimo = envios[envios.length - 1] || {};
+  ok(envios.length === 2 && ultimo.confirmacao === 'CONFIRMAR' && ultimo.confirmacao_nome === 'termos V7' && ultimo._repetido === true && chaves.termos_v7 === 'SIM', `termos_v7: liga depois do nome e da senha (${JSON.stringify(envios)})`);
+  await page.locator('#rapida').getByText('ligada').waitFor().catch(() => {});
+  ok(await page.locator('#rapida').getByText('Termos v7 para quem já é cliente ligada').count() === 1, 'termos_v7: a mensagem diz que ligou');
+  ok(await page.locator('#rapida').getByRole('button', { name: 'Desfazer' }).count() === 0, 'termos_v7: sem "Desfazer" (desligar não volta a v6)');
+  chaves.tela_avisos = 'NAO'; await abrir('ajustes'); desde = chamadas.length;
+  await page.getByRole('switch', { name: 'Avisos', exact: true }).click();
+  await page.waitForSelector(janela, { timeout: 2000 }).catch(() => {});
+  ok(await page.locator(janela + ' .nivel', { hasText: 'Nível 2' }).count() === 1, 'chave com nível só do servidor: abre a janela do nível 2');
+  if (await page.locator(janela).count()) await page.locator(janela + ' button[type=submit]').click();
+  await page.waitForTimeout(300);
+  const e2 = chamadas.slice(desde).filter(x => x.acao === 'ligar_chave').map(x => x.dados);
+  ok(e2.length === 2 && e2[1].confirmacao === 'CONFIRMAR' && chaves.tela_avisos === 'SIM', `chave com nível só do servidor: liga com o Confirmar (${JSON.stringify(e2)})`);
+  ok(await page.locator('#rapida').getByText('Toque em Confirmar').count() === 0, 'chave com nível só do servidor: sem "Toque em Confirmar para seguir"');
+  delete respostas.ligar_chave; delete respostas.senha_reconfirmar; chaves.termos_v7 = 'NAO'; chaves.tela_avisos = 'SIM';
+  feitos += 2;
 }
 // Nenhuma chamada saiu sem a origem certa: o simulado só responde ao n8n da Central (o resto é bloqueado).
 ok(!erros.length, 'erro no console: ' + erros.join(' | '));
