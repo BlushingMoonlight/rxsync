@@ -24,6 +24,8 @@ export const juntar = (...xs) => xs.filter(Boolean).join(' ');
 // - painel: o gráfico e as fontes do próprio site, o QR do WhatsApp (data:), a lista de municípios ('self') e o n8n.
 export const PAGINAS = {
   'autoedicao.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}` },
+  // - exclusão da conta: só o próprio código, as fontes do site e o n8n.
+  'conta-excluir.html': { estilo: "'self'", img: "'self'", connect: N8N },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;
