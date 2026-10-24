@@ -39,6 +39,10 @@ export const PAGINAS = {
     connect: juntar(N8N, GA.connect, CHAT_DENTRO.connect), frame: CHAT_DENTRO.frame },
   // - teste da assistente: só o chat dentro da página (sem Google Analytics nem n8n).
   'teste.html': { script: CHAT_DENTRO.script, estilo: "'self'", estiloLivre: true, img: juntar("'self' data:", CHAT_DENTRO.img), connect: CHAT_DENTRO.connect, frame: CHAT_DENTRO.frame },
+  // - demonstração por link (as 5 páginas): só os arquivos do site e o n8n (/demonstracao); a entrada mostra o app dentro
+  //   dela, no desenho do celular (frame do próprio site).
+  ...Object.fromEntries(['index', 'app/index', 'central/index', 'escopo/index', 'manual/index'].map(f => [`demo/clinica/${f}.html`,
+    { script: "'self'", estilo: "'self'", img: "'self'", connect: N8N, ...(f === 'index' ? { frame: "'self'" } : {}) }])),
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;
