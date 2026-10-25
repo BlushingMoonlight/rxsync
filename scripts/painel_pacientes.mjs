@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela a aba Pacientes, com o n8n SIMULADO aqui (nada sai para a internet; pacientes
+// Painel (painel/, DEC-156): testa pela tela a aba Pacientes, com o n8n SIMULADO aqui (nada sai para a internet; pacientes
 // inventados):
 //   1. a lista e a busca (que espera a segunda letra);
 //   2. a ficha, com os possíveis duplicados, e juntar dois cadastros (com a confirmação);
@@ -77,65 +77,67 @@ async function abrir() {
   const page = await ctx.newPage(); page.setDefaultTimeout(30000);
   page.on('pageerror', e => erros.push(String(e)));
   page.on('dialog', d => d.accept());   // as confirmações ("Juntar…?", "Marcar…?", "Excluir…?")
-  await page.goto(site.base + '/autoedicao.html#pacientes');
+  await page.goto(site.base + '/painel/#pacientes');
   await page.locator('#app').waitFor({ state: 'visible' });
   return { ctx, page };
 }
-const nomes = page => page.locator('#pacLista .pc-item .t1').allTextContents();
+const nomes = page => page.locator('#pacLista .linha .t1').allTextContents();
 const ultima = acao => chamadas.filter(c => c.acao === acao).pop();
 
 // 1. Lista e busca
 reiniciar();
 let { ctx, page } = await abrir();
-await page.locator('#pacLista .pc-item').first().waitFor();
+await page.locator('#pacLista .linha').first().waitFor();
 ok((await nomes(page)).length === 3 && /3 pacientes/.test(await page.locator('#pacTotal').textContent()), 'a lista mostra os 3 pacientes e o total');
-ok(await page.locator('#pacLista .pill', { hasText: 'Sem conversa' }).count() === 1 && await page.locator('#pacLista .pill', { hasText: 'Importado' }).count() === 1, 'a lista marca quem não conversou e quem veio da planilha');
+ok(await page.locator('#pacLista .etq', { hasText: 'Sem conversa' }).count() === 1 && await page.locator('#pacLista .etq', { hasText: 'Importado' }).count() === 1, 'a lista marca quem não conversou e quem veio da planilha');
 const antes = chamadas.filter(c => c.acao === 'paciente_listar').length;
 await page.fill('#pacBusca', 'b');
 await page.waitForTimeout(600);   // a busca espera 350 ms parada; com uma letra só, não pede nada
 ok(chamadas.filter(c => c.acao === 'paciente_listar').length === antes, 'busca com uma letra só: não pede nada (espera a segunda)');
 await page.fill('#pacBusca', 'Bruno');
-await page.waitForFunction(() => document.querySelectorAll('#pacLista .pc-item').length === 1);
+await page.waitForFunction(() => document.querySelectorAll('#pacLista .linha').length === 1);
 ok(ultima('paciente_listar').dados.busca === 'Bruno' && (await nomes(page)).join() === 'Bruno Teste' && ultima('paciente_listar').sessao === SESSAO, 'busca "Bruno": pede ao servidor com a sessão e mostra só ele');
 await page.fill('#pacBusca', '');
 
 // 2. Ficha e juntar duplicados
 await page.evaluate(() => { location.hash = 'pacientes/ficha/PAC-0001'; });
-await page.locator('#pacFicha h1.titulo', { hasText: 'Ana Silva Teste' }).waitFor();
+await page.locator('#pacFicha h2.titulo', { hasText: 'Ana Silva Teste' }).waitFor();
 ok(/\(41\) 99999-0001/.test(await page.locator('#pacFicha').textContent()), 'ficha: nome, telefone formatado e os dados do cadastro');
-ok(await page.locator('#pacFicha .pc-sec', { hasText: 'Possíveis duplicados' }).count() === 1, 'ficha: mostra o possível duplicado (mesmo nome)');
-await page.locator('#pacFicha .lista .pc-item', { hasText: 'Ana Silva Teste' }).click();
-await page.locator('#pacAcaoArea .pc-escolha').first().waitFor();
-ok(await page.locator('#pacAcaoArea .pc-escolha').count() === 2 && await page.locator('#pacAcaoArea .aviso.ambar').isHidden(), 'juntar: escolhe quem fica; com o mesmo telefone, sem o aviso de telefone diferente');
-await page.locator('#pacAcaoArea button', { hasText: /^Juntar$/ }).click();
+ok(await page.locator('#pacDupFicha').count() === 1, 'ficha: mostra o possível duplicado (mesmo nome)');
+await page.locator('#pacDupFicha .linha', { hasText: 'Ana Silva Teste' }).click();
+await page.locator('#pacJuntar .pc-escolha').first().waitFor();
+ok(await page.locator('#pacJuntar .pc-escolha').count() === 2 && await page.locator('#pacJuntar .aviso.atencao').isHidden(), 'juntar: escolhe quem fica; com o mesmo telefone, sem o aviso de telefone diferente');
+await page.click('#pacJuntarOk'); await page.click('#confOk');
 await page.getByText('Cadastros juntados.').waitFor();
 ok(ultima('paciente_juntar') && ultima('paciente_juntar').dados.fica === 'PAC-0001' && ultima('paciente_juntar').dados.sai === 'PAC-0002', 'juntar: confirmado, fica o PAC-0001 e sai o PAC-0002');
 
 // 3. Não contatar e voltar a enviar
-await page.locator('#pacFicha button', { hasText: 'Não quer receber avisos' }).click();
+await page.locator('#pacFicha button', { hasText: 'Não quer receber avisos' }).click(); await page.click('#confOk');
 await page.getByText('Marcado: não recebe mais avisos').waitFor();
 ok(ultima('paciente_nao_contatar').dados.marcar === true, '"Não quer receber avisos": marcado depois da confirmação');
-ok(await page.locator('#pacFicha .aviso.rosa', { hasText: 'Pediu para não receber avisos' }).count() === 1, 'a ficha mostra que o paciente não quer avisos');
+ok(await page.locator('#pacFicha .aviso.perigo', { hasText: 'Pediu para não receber avisos' }).count() === 1, 'a ficha mostra que o paciente não quer avisos');
 await page.locator('#pacFicha button', { hasText: 'Voltar a enviar avisos' }).click();
-const voltar = page.locator('#pacAcaoArea button', { hasText: 'Voltar a enviar avisos' });
-await page.fill('#pacAcaoArea input', 'quero voltar');
+const voltar = page.locator('#confOk');
+await page.fill('#confFrase', 'quero voltar');
 ok(await voltar.isDisabled(), 'voltar a enviar: com a frase errada, o botão fica desligado');
-await page.fill('#pacAcaoArea input', FRASE);
+await page.fill('#confFrase', FRASE);
 await voltar.click();
 await page.getByText('Pronto: volta a receber os avisos').waitFor();
 ok(ultima('paciente_nao_contatar').dados.marcar === false && ultima('paciente_nao_contatar').dados.frase === FRASE, 'voltar a enviar: só com a frase exata');
 
 // 4. Excluir
 await page.evaluate(() => { location.hash = 'pacientes/ficha/PAC-0003'; });
-await page.locator('#pacFicha h1.titulo', { hasText: 'Bruno Teste' }).waitFor();
+await page.locator('#pacFicha h2.titulo', { hasText: 'Bruno Teste' }).waitFor();
 await page.locator('#pacFicha button', { hasText: 'Excluir' }).click();
+await page.fill('#confFrase', 'Bruno Teste'); await page.click('#confOk');
 await page.getByText('Cancele na Agenda antes de excluir').waitFor();
 ok(!!achar('PAC-0003'), 'excluir com consulta futura: recusado, com o aviso para cancelar na Agenda');
 await page.evaluate(() => { location.hash = 'pacientes/ficha/PAC-0001'; });
-await page.locator('#pacFicha h1.titulo', { hasText: 'Ana Silva Teste' }).waitFor();
+await page.locator('#pacFicha h2.titulo', { hasText: 'Ana Silva Teste' }).waitFor();
 await page.locator('#pacFicha button', { hasText: 'Excluir' }).click();
+await page.fill('#confFrase', 'Ana Silva Teste'); await page.click('#confOk');
 await page.waitForFunction(() => location.hash === '#pacientes');
-await page.waitForFunction(() => document.querySelectorAll('#pacLista .pc-item').length === 1);
+await page.waitForFunction(() => document.querySelectorAll('#pacLista .linha').length === 1);
 ok(ultima('paciente_excluir').dados.confirmar === true && (await nomes(page)).join() === 'Bruno Teste', 'excluir: confirmado, o paciente sai da lista');
 
 // 5. Possíveis duplicados (tela)
@@ -148,9 +150,9 @@ await ctx.close();
 // 6. Como equipe
 estado.papel = 'equipe'; reiniciar();
 ({ ctx, page } = await abrir());
-await page.locator('#pacLista .pc-item').first().waitFor();
+await page.locator('#pacLista .linha').first().waitFor();
 await page.evaluate(() => { location.hash = 'pacientes/ficha/PAC-0003'; });
-await page.locator('#pacFicha h1.titulo', { hasText: 'Bruno Teste' }).waitFor();
+await page.locator('#pacFicha h2.titulo', { hasText: 'Bruno Teste' }).waitFor();
 ok((await nomes(page)).length === 3 && ultima('paciente_ver').sessao === SESSAO, 'equipe: a lista e a ficha abrem, com a sessão');
 await ctx.close();
 

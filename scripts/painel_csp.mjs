@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela a regra de segurança da página (CSP), com o n8n SIMULADO aqui (nada sai para a
+// Painel (painel/, DEC-156): testa pela tela a regra de segurança da página (CSP), com o n8n SIMULADO aqui (nada sai para a
 // internet; dados inventados). A regra está ligada e bloqueia de verdade (uma marca com style= é recusada); depois:
 //   1. a entrada (sem sessão) e todas as telas e subtelas abrem sem nenhum bloqueio, inclusive o gráfico de Resultados;
 //   2. Conta › WhatsApp › Reconectar: o QR (inventado, data:image/png) aparece;
@@ -47,7 +47,7 @@ const site = await servirSite(); const browser = await abrirNavegador();
 async function contexto(comSessao) {
   return contextoCsp(browser, { responder: (caminho, b) => responder(N8N + caminho, b), antes: comSessao ? { fn: s => { try { sessionStorage.setItem('painel_sessao', s); } catch (e) {} }, arg: SESSAO } : null });
 }
-const PAINEL = site.base + '/autoedicao.html';
+const PAINEL = site.base + '/painel/';
 
 // 0. A regra está na página e bloqueia de verdade.
 let { ctx, page, erros } = await contexto(false);
@@ -69,13 +69,16 @@ await ctx.close();
 ({ ctx, page, erros } = await contexto(true));
 await page.goto(PAINEL + '#hoje');
 await page.locator('#app').waitFor({ state: 'visible' });
-const TELAS = ['hoje', 'agenda', 'agenda/horarios', 'agenda/integracao', 'agenda/documentos', 'agenda/espera', 'pacientes', 'pacientes/ficha/PAC-0001', 'pacientes/editar',
-  'pacientes/importar', 'pacientes/importacoes', 'pacientes/duplicados', 'resultados', 'assistente', 'conta', 'conta/contato', 'conta/assinatura', 'conta/contrato',
+const TELAS = ['hoje', 'resultados', 'agenda', 'agenda/espera', 'agenda/documentos', 'agenda/horarios', 'agenda/horarios/grade', 'agenda/horarios/regras', 'agenda/horarios/medicos',
+  'agenda/horarios/perguntas', 'agenda/horarios/feriados', 'agenda/horarios/pagamento', 'agenda/horarios/integracao', 'agenda/horarios/integracao/link', 'agenda/horarios/integracao/reservio',
+  'agenda/horarios/integracao/importar', 'agenda/horarios/integracao/importacoes', 'pacientes', 'pacientes/ficha/PAC-0001', 'pacientes/organizar', 'pacientes/importar',
+  'pacientes/importacoes', 'pacientes/duplicados', 'assistente', 'assistente/clinica', 'assistente/conversa', 'assistente/valores', 'assistente/urgencia', 'assistente/automaticas',
+  'assistente/limites', 'assistente/extras', 'assistente/faq', 'assistente/funcoes', 'conta', 'conta/contato', 'conta/assinatura', 'conta/contrato',
   'conta/gestao', 'conta/equipe', 'conta/dados', 'conta/acessos', 'conta/whatsapp'];
 const comBloqueio = [];
 for (const t of TELAS) {
   await page.evaluate(h => { location.hash = h; }, t);
-  await page.locator(`section[data-view="${t.split('/')[0]}"]`).waitFor({ state: 'visible' });
+  await page.locator(`section[data-tela="${t.replace(/\/PAC-.*$/, '')}"]`).waitFor({ state: 'visible' });
   await page.waitForLoadState('networkidle');
   if (t === 'resultados') await page.waitForFunction(() => window.Chart && window.Chart.getChart(document.getElementById('grDias')));
   b = await bloqueios(page); if (b.length) comBloqueio.push(t + ': ' + b.join(' | '));
@@ -100,9 +103,9 @@ async function baixa(nome, acao, padrao) {
 await page.evaluate(() => { location.hash = 'conta/dados'; }); await page.locator('#btnBaixarAgenda').waitFor({ state: 'visible' });
 await baixa('Baixar meus dados › Agenda', () => page.click('#btnBaixarAgenda'), /^rxsync-agenda-.*\.csv$/);
 await baixa('Baixar meus dados › Pacientes', () => page.click('#btnBaixarPacientes'), /^rxsync-pacientes-.*\.csv$/);
-await page.evaluate(() => { location.hash = 'agenda'; }); await page.locator('#agExportar').waitFor({ state: 'visible' });
-await baixa('Agenda › Exportar (.ics)', () => page.click('#agExportar'), /^agenda-rxsync-.*\.ics$/);
-await page.evaluate(() => { location.hash = 'agenda/integracao'; });
+await page.evaluate(() => { location.hash = 'agenda'; }); await page.locator('#agMais').click();
+await baixa('Agenda › Exportar (.ics)', () => page.getByRole('button', { name: /^Exportar/ }).click(), /^agenda-rxsync-.*\.ics$/);
+await page.evaluate(() => { location.hash = 'agenda/horarios/integracao/importar'; });
 await page.locator('#aiTela input[type=file]').waitFor({ state: 'attached' });
 await page.setInputFiles('#aiTela input[type=file]', { name: 'agenda.csv', mimeType: 'text/csv', buffer: Buffer.from(AGENDA_CSV, 'utf8') });
 await page.getByRole('button', { name: 'Ver a prévia' }).click();

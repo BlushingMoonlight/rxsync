@@ -1,8 +1,9 @@
-// Painel (autoedicao.html): testa pela tela o botão "Agenda por médico" (DEC-103, rxsync-sistema#77), com o n8n
+// Painel (painel/, DEC-156): testa pela tela o botão "Agenda por médico" (DEC-103, rxsync-sistema#77), com o n8n
 // SIMULADO aqui (nada sai para a internet):
-//   1. Gestão: o botão aparece em Funções da assistente, desligado, e ligar manda func_medicos = SIM ao 24;
-//   2. Agenda › Horários com médico cadastrado e o botão desligado: aviso "A agenda por médico está desligada", e a
-//      grade da clínica continua à vista; ligado (o 24 devolve modo_medicos), o aviso verde do modo médicos;
+//   1. Gestão: o botão aparece no alto de Agenda › Horários › Médicos e tipos, desligado, e ligar manda func_medicos = SIM ao 24;
+//   2. Médicos e tipos com médico cadastrado e o botão desligado: aviso "A agenda por médico está desligada", e a
+//      grade da clínica continua valendo (Horários de atendimento, sem o aviso dos médicos); ligado (o 24 devolve
+//      modo_medicos), o aviso verde do modo médicos, e Horários de atendimento aponta para Médicos e tipos;
 //   3. Essencial: o botão aparece travado.
 // Uso (precisa do Playwright): node scripts/painel_agenda_medico.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
@@ -34,33 +35,37 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
 });
 const erros = [];
 const abrir = async rota => { const p = await ctx.newPage(); p.setDefaultTimeout(8000); p.on('pageerror', e => erros.push(String(e)));
-  await p.goto(site.base + '/autoedicao.html#' + rota); await p.waitForFunction(() => !document.getElementById('app').hidden); return p; };
+  await p.goto(site.base + '/painel/#' + rota); await p.waitForFunction(() => !document.getElementById('app').hidden); return p; };
 const botao = p => p.locator('#campo_func_medicos').locator('xpath=..').getByRole('switch', { name: 'Agenda por médico' });
 
-// 2a. Horários com médico e o botão desligado.
-let page = await abrir('agenda/horarios');
+// 2a. Médicos e tipos com médico e o botão desligado.
+let page = await abrir('agenda/horarios/medicos');
 await page.locator('#medBox').waitFor();
-await page.waitForFunction(() => !document.getElementById('medDesligadoAviso').classList.contains('hidden'));
-ok(await page.locator('#medDesligadoAviso').isVisible() && await page.locator('#gradeBox').isVisible() && await page.locator('#medModoAviso').isHidden(),
-  'médico cadastrado com o botão desligado: aviso "agenda por médico está desligada" e a grade da clínica à vista');
-// 1. Funções da assistente: o botão, desligado, liga e salva.
-await page.goto(site.base + '/autoedicao.html#assistente/funcoes');
+await page.waitForFunction(() => !document.getElementById('medDesligadoAviso').hidden);
+ok(await page.locator('#medDesligadoAviso').isVisible() && await page.locator('#medModoAviso').isHidden(), 'médico cadastrado com o botão desligado: aviso "agenda por médico está desligada"');
+await page.goto(site.base + '/painel/#agenda/horarios/grade');
+await page.locator('#gradeBox .dia-grade').first().waitFor();
+ok(await page.locator('#gradeBox').isVisible() && !(await page.locator('#gradeAvisos').innerText()).includes('agenda por médico'), 'desligado: a grade da clínica continua valendo');
+// 1. O botão, desligado, liga e salva.
+await page.goto(site.base + '/painel/#agenda/horarios/medicos');
 const sw = botao(page); await sw.waitFor();
-ok(await sw.getAttribute('aria-checked') === 'false' && await sw.isEnabled(), 'Gestão: "Agenda por médico" em Funções da assistente, desligado');
+ok(await sw.getAttribute('aria-checked') === 'false' && await sw.isEnabled(), 'Gestão: "Agenda por médico" no alto de Médicos e tipos, desligado');
 await sw.click();
 await page.waitForFunction(() => document.querySelector('#campo_func_medicos').value === 'SIM');
 await page.waitForTimeout(400);
 const salvo = chamadas.filter(c => c.acao === 'salvar').pop();
 ok(salvo && salvo.dados.func_medicos === 'SIM', 'ligar manda func_medicos = SIM ao 24');
 // 2b. Ligado: a agenda passa a ser por médico na hora.
-await page.goto(site.base + '/autoedicao.html#agenda/horarios');
-await page.waitForFunction(() => !document.getElementById('medModoAviso').classList.contains('hidden'));
-ok(await page.locator('#medDesligadoAviso').isHidden() && await page.locator('#gradeBox').isHidden(), 'ligado: aviso verde do modo médicos, sem o aviso de desligado');
-ok(/desligue “Agenda por médico” em Funções da assistente/.test(await page.locator('#medModoAviso').innerText()), 'o aviso verde diz como voltar a uma agenda só');
+await page.waitForFunction(() => !document.getElementById('medModoAviso').hidden);
+ok(await page.locator('#medDesligadoAviso').isHidden(), 'ligado: aviso verde do modo médicos, sem o aviso de desligado');
+ok(/desligue “Agenda por médico” no alto desta página/.test(await page.locator('#medModoAviso').innerText()), 'o aviso verde diz como voltar a uma agenda só');
+await page.goto(site.base + '/painel/#agenda/horarios/grade');
+await page.locator('#gradeAvisos').getByText('agenda por médico').waitFor();
+ok(true, 'ligado: Horários de atendimento aponta para Médicos e tipos');
 await page.close();
 // 3. Essencial: travado.
 estado.gestao = false; estado.botao = '';
-page = await abrir('assistente/funcoes');
+page = await abrir('agenda/horarios/medicos');
 const sw2 = botao(page); await sw2.waitFor();
 ok(await sw2.isDisabled(), 'Essencial: "Agenda por médico" travado');
 ok(!erros.length, 'sem erro de JavaScript na página' + (erros.length ? ': ' + erros.join(' | ') : ''));

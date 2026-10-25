@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela o "Pausar a assistente" e os "Acessos recentes" (rxsync-sistema DEC-136,
+// Painel (painel/, DEC-156): testa pela tela o "Pausar a assistente" e os "Acessos recentes" (rxsync-sistema DEC-136,
 // #183 e #184), com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. dono, assistente atendendo: Assistente mostra "Pausar a assistente"; pausar pede confirmação, vai ao 29 com a
 //      sessão, a faixa "Assistente pausada" aparece no alto de todas as telas com "Retomar"; retomar tira a faixa;
@@ -48,7 +48,7 @@ async function abrir(rota, comSessao = true) {
   });
   const p = await ctx.newPage(); p.setDefaultTimeout(8000); p.on('pageerror', e => erros.push(String(e)));
   const dialogos = []; p.on('dialog', d => { dialogos.push(d.message()); d.accept(); });
-  await p.goto(site.base + '/autoedicao.html' + (comSessao ? '' : '?t=' + TOKEN) + '#' + rota); await p.locator('#app').waitFor();
+  await p.goto(site.base + '/painel/' + (comSessao ? '' : '?t=' + TOKEN) + '#' + rota); await p.locator('#app').waitFor();
   return { ctx, p, dialogos };
 }
 
@@ -58,13 +58,14 @@ await p.locator('#btnPausa').waitFor();
 ok(await p.locator('#btnPausa').textContent() === 'Pausar a assistente', 'dono: Assistente mostra "Pausar a assistente"');
 ok(await p.locator('#faixaPausa').isHidden(), 'atendendo: sem a faixa');
 await p.click('#btnPausa');
+dialogos.push(await p.locator('#confJanela').textContent()); await p.click('#confOk');
 await p.locator('#faixaPausa').waitFor();
 const pz = chamadas.filter(c => c.acao === 'assistente_pausar').pop();
 ok(dialogos.some(d => /mensalidade continua/.test(d)), 'pausar: pede confirmação e diz que a mensalidade continua');
 ok(pz && pz.caminho === 'painel-entrada' && pz.sessao === SESSAO, 'pausar: vai ao 29 com a sessão');
 ok(/23\/10 às 09:15/.test(await p.locator('#faixaPausaTxt').textContent()) && await p.locator('#btnFaixaRetomar').isVisible(), 'pausada pelo painel: a faixa diz desde quando e tem "Retomar"');
 ok(await p.locator('[data-estado-curto]').first().textContent() === 'Assistente pausada', 'o topo diz "Assistente pausada"');
-await p.goto(site.base + '/autoedicao.html#agenda');
+await p.goto(site.base + '/painel/#agenda');
 ok(await p.locator('#faixaPausa').isVisible(), 'a faixa aparece também em outra tela (Agenda)');
 await p.click('#btnFaixaRetomar');
 await p.locator('#faixaPausa').waitFor({ state: 'hidden' });
@@ -83,9 +84,9 @@ await ctx.close();
 estado.ativo = true; estado.papel = 'equipe';
 ({ ctx, p } = await abrir('assistente'));
 await p.locator('#btnPausa').waitFor();
-await p.click('#btnPausa'); await p.locator('#faixaPausa').waitFor();
+await p.click('#btnPausa'); await p.click('#confOk'); await p.locator('#faixaPausa').waitFor();
 ok(true, 'equipe: pausa pelo painel');
-await p.goto(site.base + '/autoedicao.html#conta');
+await p.goto(site.base + '/painel/#conta');
 ok(await p.locator('#listaConta').getByText('Acessos recentes').isHidden(), 'equipe: Conta não mostra "Acessos recentes"');
 await ctx.close();
 
@@ -93,7 +94,7 @@ await ctx.close();
 estado.papel = 'dono'; estado.ativo = true; estado.peloPainel = false;
 ({ ctx, p } = await abrir('conta'));
 ok(await p.locator('#listaConta').getByText('Acessos recentes').isVisible(), 'dono: Conta mostra "Acessos recentes"');
-await p.goto(site.base + '/autoedicao.html#conta/acessos');
+await p.goto(site.base + '/painel/#conta/acessos');
 await p.locator('#acessosLista').getByText('Pausou a assistente').waitFor();
 const lista = await p.locator('#acessosLista').textContent();
 ok(/equipe · s•••@clinica-a\.test/.test(lista) && /iPad · Safari/.test(lista), 'Acessos recentes: o quê, quem e o aparelho');
@@ -101,7 +102,7 @@ ok(!/\d+\.\d+\.\d+\.\d+/.test(lista), 'Acessos recentes: sem IP');
 ok(chamadas.some(c => c.acao === 'acessos_recentes' && c.sessao === SESSAO), 'Acessos recentes: vai ao 29 com a sessão');
 // Resultados: o Chart.js vem do próprio site (rxsync-sistema#104); qualquer endereço de fora é bloqueado neste teste.
 const libs = []; p.on('request', q => { if (/chart/i.test(q.url())) libs.push(q.url()); });
-await p.goto(site.base + '/autoedicao.html#resultados');
+await p.goto(site.base + '/painel/#resultados');
 await p.waitForFunction(() => !!window.Chart, null, { timeout: 8000 }).catch(() => {});
 ok(await p.evaluate(() => !!window.Chart) && libs.length && libs.every(u => u.startsWith(site.base + '/assets/vendor/')), 'Resultados: o Chart.js carrega do próprio site (' + libs.join(', ') + ')');
 await ctx.close();

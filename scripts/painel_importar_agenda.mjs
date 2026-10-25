@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela a importação da agenda (DEC-093), já com a entrada nova (DEC-097), com o n8n
+// Painel (painel/, DEC-156): testa pela tela a importação da agenda (DEC-093), já com a entrada nova (DEC-097), com o n8n
 // SIMULADO aqui (nada sai para a internet):
 //   1. o arquivo CSV é lido no aparelho e as colunas são reconhecidas;
 //   2. a prévia e a gravação vão em lotes ao 24 (agenda_importar), com a sessão no cabeçalho e só as colunas da lista
@@ -39,7 +39,7 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
 });
 const page = await ctx.newPage(); page.setDefaultTimeout(8000);
 const erros = []; page.on('pageerror', e => erros.push(String(e)));
-await page.goto(site.base + '/autoedicao.html#agenda/integracao');
+await page.goto(site.base + '/painel/#agenda/horarios/integracao/importar');
 await page.locator('#aiTela input[type=file]').waitFor({ state: 'attached' });
 await page.setInputFiles('#aiTela input[type=file]', { name: 'agenda.csv', mimeType: 'text/csv', buffer: Buffer.from(CSV, 'utf8') });
 await page.getByRole('button', { name: 'Ver a prévia' }).waitFor();
@@ -53,9 +53,11 @@ ok(previa && previa.dados.gravar === false && previa.dados.linhas.length === 2 &
 ok(chaves === 'cancelada,codigo,duracao_min,fim,inicio,linha,medico_id,nome,paga,servico,telefone,tipo_id' && !JSON.stringify(previa.dados).includes('dipirona') && !JSON.stringify(previa.dados).includes('111.222'),
   'só as colunas da lista fechada vão ao servidor (sem observação nem CPF)');
 await page.getByRole('button', { name: /Importar 2 consulta/ }).click();
+await page.click('#confOk');
 await page.getByText(/importada\(s\)/).waitFor();
 ok(chamadas.some(c => c.acao === 'agenda_importar' && c.dados.gravar === true && c.sessao === SESSAO), 'gravação com a sessão');
-await page.getByRole('button', { name: 'Desfazer' }).waitFor();
+await page.evaluate(() => { location.hash = 'agenda/horarios/integracao/importacoes'; });
+await page.locator('#aiLista').getByRole('button', { name: 'Desfazer' }).waitFor();
 ok(true, 'a importação aparece na lista com o "Desfazer"');
 ok(!erros.length, 'sem erro de script na página' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await browser.close(); site.fechar();

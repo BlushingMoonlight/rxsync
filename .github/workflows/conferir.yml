@@ -31,3 +31,21 @@ jobs:
       - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.63.0
       - run: npx --no-install playwright install --with-deps chromium
       - run: node scripts/testes_tela.mjs
+
+  # Os testes do painel também no motor do Safari (WebKit), o do iPhone e do iPad (rxsync-sistema DEC-156).
+  safari:
+    name: Testes do painel no Safari
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-package-lock --ignore-scripts playwright@1.63.0
+      - run: npx --no-install playwright install --with-deps webkit
+      - run: node scripts/testes_tela.mjs painel_
+        env:
+          NAVEGADOR: webkit

@@ -24,6 +24,8 @@ export const juntar = (...xs) => xs.filter(Boolean).join(' ');
 // - painel: o gráfico e as fontes do próprio site, o QR do WhatsApp (data:), a lista de municípios ('self') e o n8n.
 export const PAGINAS = {
   'autoedicao.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}` },
+  // - painel novo (DEC-156): o mesmo do painel antigo. Gravada pelo painel_montar.mjs (não pelo node scripts/csp.mjs).
+  'painel/index.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}`, montada: true },
   // - exclusão da conta: só o próprio código, as fontes do site e o n8n.
   'conta-excluir.html': { estilo: "'self'", img: "'self'", connect: N8N },
   // - conectar o WhatsApp: os ícones e o aviso do chat (arquivos do site), o QR (data:) e o n8n. O chat abre numa aba nova.
@@ -66,6 +68,7 @@ export function cspPagina(html, p) {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   for (const [arq, p] of Object.entries(PAGINAS)) {
+    if (p.montada) continue;
     const f = path.join(raiz, arq); let s = fs.readFileSync(f, 'utf8');
     const meta = `<meta http-equiv="Content-Security-Policy" content="${cspPagina(s, p)}">`;
     s = META_CSP.test(s) ? s.replace(META_CSP, meta) : s.replace(/(<meta charset="UTF-8">\r?\n)/i, `$1${meta}\n`);
