@@ -36,7 +36,7 @@ function chatAbrir() {
   const tecla = e => { if (e.key === 'Escape' && !JANELAS.length) { e.preventDefault(); chatFechar(); } };
   document.addEventListener('keydown', tecla);
   chatFecharJanela = () => { document.removeEventListener('keydown', tecla); if (origem && origem.isConnected) origem.focus(); };
-  setTimeout(() => { const f = $('chatTexto') || p.querySelector('button'); if (f) f.focus(); }, 30);
+  if (!p.contains(document.activeElement)) { const f = $('chatTexto') || p.querySelector('button'); if (f) f.focus(); }
 }
 function chatFechar() {
   $('painelChat').hidden = true;

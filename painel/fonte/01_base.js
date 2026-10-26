@@ -160,7 +160,8 @@ function janela(conteudo, op) {
   document.addEventListener('keydown', tecla, true);
   JANELAS.push(fechar);
   veu.addEventListener('click', e => { if (e.target === veu) { if (op.pedirFechar) op.pedirFechar(); else fechar(); } });
-  setTimeout(() => { const p = conteudo.querySelector(op.foco || '[data-foco], input:not([type=hidden]):not([type=checkbox]), select, textarea, .pe button'); if (p) p.focus(); }, 30);
+  // o cursor vai já para o primeiro campo (ou para o "Cancelar"), e nunca sai de um campo que a pessoa já começou a usar
+  if (!conteudo.contains(document.activeElement)) { const p = conteudo.querySelector(op.foco || '[data-foco], input:not([type=hidden]):not([type=checkbox]), select, textarea, .pe button'); if (p) p.focus(); }
   return fechar;
 }
 // Folha (molde H): Cancelar e título no topo, os campos, o botão de confirmar. Fechar com mudança pergunta "Descartar?".
