@@ -30,7 +30,7 @@ TELAS.sistema = async c => {
   const problemas = fora.length + (falhas7 ? 1 : 0) + integErro;
   trocar(c, cabecalho('Saúde do sistema', 'workflows, WhatsApp e integrações'),
     el('div', { class: 'pilha' },
-      el('div', { class: 'aviso ' + (problemas ? 'atencao' : 'ok'), role: 'status' }, icone(problemas ? 'alerta' : 'ok'), el('div', {}, el('b', { text: problemas ? problemas + ' ponto(s) para olhar. ' : 'Tudo funcionando. ' }),
+      el('div', { class: 'aviso ' + (problemas ? 'atencao' : 'ok'), role: 'status' }, icone(problemas ? 'alerta' : 'ok'), el('div', {}, el('b', { text: problemas ? pl(problemas, 'ponto', 'pontos') + ' para olhar. ' : 'Tudo funcionando. ' }),
         `WhatsApp fora: ${fora.length} · falhas em 7 dias: ${falhas7} · agendas com erro: ${integErro}`)),
       el('div', { class: 'kpis' }, kpi('Último aviso recebido', d.ultimo_aviso_recebido ? fmtHora(d.ultimo_aviso_recebido) : '—'), kpi('Última foto do dia', d.ultima_foto_indicadores ? fmtHora(d.ultima_foto_indicadores) : '—'),
         kpi('WhatsApp fora', fmtNum(fora.length)), kpi('Falhas em 7 dias', fmtNum(falhas7))),
@@ -95,7 +95,7 @@ TELAS.crescimento = async (c, [periodo]) => {
     // Mini testes do site (sql/059, DEC-134): os dados que antes iam ao Telegram ficam só aqui, por 90 dias.
     cartao('Mini testes do site', el('span', { class: 'mudo peq', text: 'os 50 mais novos · guardados por 90 dias' }), (d.mini_testes || []).length ? el('ul', { class: 'lista' }, d.mini_testes.map(m => el('li', {}, el('div', { class: 'linha' },
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: [m.clinica, m.especialidade].filter(Boolean).join(' · ') || 'Mini teste' }),
-        el('div', { class: 't2', text: [fmtHora(m.criado_em), m.telefone, fmtNum(m.mensagens || 0) + ' mensagem(ns)', m.agendamento ? 'marcou consulta' : 'não marcou', m.origem ? 'origem: ' + m.origem : ''].filter(Boolean).join(' · ') }),
+        el('div', { class: 't2', text: [fmtHora(m.criado_em), m.telefone, pl(m.mensagens, 'mensagem', 'mensagens'), m.agendamento ? 'marcou consulta' : 'não marcou', m.origem ? 'origem: ' + m.origem : ''].filter(Boolean).join(' · ') }),
         Array.isArray(m.conversa) && m.conversa.length ? el('details', { class: 'mt' }, el('summary', { text: 'Ver a conversa' }),
           el('ul', { class: 'lista' }, m.conversa.map(t => el('li', {}, el('div', { class: 't2', text: (t.r === 'a' ? 'Assistente: ' : 'Pessoa: ') + String(t.t || '') }))))) : null),
       wa(m.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(m.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum mini teste nos últimos 90 dias.', 'crescimento'))));
@@ -131,7 +131,7 @@ TELAS.agregados = async c => {
   topo('Agregados de pacientes', [['Análise'], ['Agregados de pacientes']]);
   const r = await chamar('agregados'); if (falhou(c, r, 'Agregados de pacientes')) return;
   const cols = [['pacientes', 'Pacientes'], ['consultas_30d_ia', 'Consultas pela IA (30 d)'], ['consultas_30d_equipe', 'Pela equipe (30 d)'], ['lista_espera_ativa', 'Lista de espera'],
-    ['documentos_30d', 'Documentos (30 d)'], ['preconsulta_30d', 'Pré-consulta (30 d)'], ['pesquisa_nota_media_90d', 'Nota média (90 d)'], ['relacionamento_30d', 'Relacionamento (30 d)']];
+    ['documentos_30d', 'Documentos (30 d)'], ['preconsulta_30d', 'Perguntas antes de agendar (30 d)'], ['pesquisa_nota_media_90d', 'Nota média (90 d)'], ['relacionamento_30d', 'Relacionamento (30 d)']];
   trocar(c, cabecalho('Agregados de pacientes', 'só contagens e médias por clínica; nenhum dado de paciente'),
     cartao(null, null, el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Tabela de agregados (role para o lado)' }, el('table', { class: 'dados-t' },
       el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: 'Clínica' }), cols.map(([, n]) => el('th', { scope: 'col', text: n })))),

@@ -5,7 +5,7 @@ const COBRANCA_TESTE = ['editar_plano', 'editar_preco', 'editar_cobranca', 'edit
 const ehTesteCobranca = x => !!x && !!x.cliente_id && est.chaves.cobranca_teste_cliente === x.cliente_id;
 const podeEm = x => k => ligada(k) || (ehTesteCobranca(x) && COBRANCA_TESTE.includes(k));
 const RECURSOS_NOMES = { documentos: 'Leitura de fotos e PDFs', fila: 'Lista de espera', pesquisa: 'Pesquisa de satisfação e Google', reconhecer: 'Reconhecer quem volta',
-  tipo_visita: '1ª vez ou retorno', empilhamento: 'Empilhamento de horários', preconsulta: 'Perguntas antes de agendar', medicos: 'Agenda por médico',
+  tipo_visita: '1ª vez ou retorno', empilhamento: 'Agrupar pacientes', preconsulta: 'Perguntas antes de agendar', medicos: 'Agenda por médico',
   relacionamento: 'Retorno, convite e "não contatar"', assistente_dono: 'Assistente de gestão', pacientes: 'Aba Pacientes' };
 // Campos de cada grupo (os mesmos do servidor, rx_central_campos).
 const GRUPOS = {
@@ -37,7 +37,7 @@ const ROTULOS = { nome_exibicao: 'Nome da clínica', descricao_curta: 'Descriç�
   link_agendamento: 'Link de agendamento', retorno_prazo_dias: 'Prazo de retorno (dias)', reativacao_dias: 'Convite para quem sumiu (dias)',
   func_documentos: 'Ler fotos e PDFs', func_agendamento: 'Agendamento direto', func_briefing: 'Briefing', func_lembretes: 'Lembretes', func_fila: 'Lista de espera',
   func_feriados: 'Feriados', func_reservio: 'Reservio', func_regras_linguagem: 'Regras de linguagem', func_reconhecer: 'Reconhecer quem volta', func_tipo_visita: '1ª vez ou retorno',
-  func_empilhamento: 'Empilhamento', func_medicos: 'Agenda por médico', func_preconsulta: 'Perguntas antes de agendar', func_retorno: 'Aviso de retorno', func_reativacao: 'Convite para quem sumiu',
+  func_empilhamento: 'Agrupar pacientes', func_medicos: 'Agenda por médico', func_preconsulta: 'Perguntas antes de agendar', func_retorno: 'Aviso de retorno', func_reativacao: 'Convite para quem sumiu',
   pesquisa_ativa: 'Pesquisa de satisfação', assistente_dono_ativa: 'Assistente de gestão', dono_pode_editar: 'Dono pode editar pelo WhatsApp', link_agendamento_ativo: 'Link de agendamento ligado',
   franquia_mensagens: 'Franquia por mês (mínimo 5.000)', limitar_franquia: 'Limitar na franquia', dono_limite_dia: 'Perguntas ao assistente por dia', relac_limite_dia: 'Avisos de relacionamento por dia',
   limite_info_extra: 'Tamanho das informações extras', envio_limite_dia: 'Envios por dia pela API',
@@ -331,15 +331,15 @@ function abaHistorico(c, x) {
   cartao('Envios das conversas', el('span', { class: 'mudo peq', text: 'os 5 mais recentes · o arquivo não passa pela Central' }), (x.conversas_envios || []).length
     ? el('ul', { class: 'lista' }, x.conversas_envios.map(e => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: 'Pedido em ' + fmtHora(e.pedido_em) }),
-      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? fmtNum(e.mensagens) + ' mensagem(ns)' : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
+      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? pl(e.mensagens, 'mensagem', 'mensagens') : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
       el('div', { class: 'direita' }, etq(SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][0] : (e.situacao || '—'), SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][1] : '')))))) : vazio('Nenhum envio das conversas pedido.', 'relogio')));
-  // Histórico do painel (sql/060, DEC-136, #184): quem entrou e o que fez no painel da clínica, com o IP e o e-mail (o dono
-  // vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.
+  // Acessos recentes (sql/060, DEC-136, #184; antes "Histórico do painel", o nome do painel desde a entrega 5): quem entrou e o
+  // que fez no painel da clínica, com o IP e o e-mail (o dono vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.
   if (!comp) return;
   const area = el('div', {}, corpo(el('p', { class: 'mudo', text: 'Carregando…' })));
-  anexar(c, cartao('Histórico do painel', el('span', { class: 'mudo peq', text: 'os 100 mais recentes · 12 meses' }), area));
+  anexar(c, cartao('Acessos recentes', el('span', { class: 'mudo peq', text: 'os 100 mais recentes · 12 meses' }), area));
   chamar('cliente_painel_historico', { cliente_id: x.cliente_id }).then(r => {
-    if (!r.ok) { trocar(area, corpo(nota(r.mensagem || 'Não consegui carregar o histórico do painel.', true))); return; }
+    if (!r.ok) { trocar(area, corpo(nota(r.mensagem || 'Não consegui carregar os acessos recentes.', true))); return; }
     const l = (r.dados && r.dados.acessos) || [];
     trocar(area, l.length ? el('ul', { class: 'lista' }, l.map(a => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: a.o_que || a.evento || '' }),

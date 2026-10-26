@@ -15,7 +15,7 @@
 .item-escopo.destaque { box-shadow: inset 3px 0 0 var(--acento); background: var(--acento-suave); }
 .cab-item { align-items: flex-start; }
 .item-escopo h3 { font-size: 1rem; margin-bottom: 2px; }
-.num { min-width: 32px; height: 32px; padding: 0 6px; border-radius: 10px; background: var(--superficie-3); color: var(--tinta); display: grid; place-items: center; font-weight: 750; font-size: .82rem; flex: none; }
+.num { min-width: 32px; height: 32px; padding: 0 6px; border-radius: 10px; background: var(--superficie-3); color: var(--tinta); display: grid; place-items: center; font-weight: 600; font-size: .82rem; flex: none; }
 .opcoes { width: 100%; }
 .opcoes > button { flex: 1 1 0; justify-content: center; padding: 0 var(--e-2); font-size: .88rem; }
 .opcoes > .quero[aria-pressed="true"] { background: var(--ok-fundo); color: var(--ok); box-shadow: 0 0 0 1px currentColor; }

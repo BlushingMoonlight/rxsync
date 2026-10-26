@@ -6,7 +6,7 @@
 .dem-cores { display: flex; flex-wrap: wrap; gap: var(--e-2); }
 .dem-cor { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); padding: 0 var(--e-3); border: 1px solid var(--borda-forte); border-radius: var(--r-cheio);
   background: var(--superficie); color: var(--texto); font: inherit; font-size: var(--t-14); cursor: pointer; }
-.dem-cor[aria-checked="true"] { border-color: var(--primaria); box-shadow: 0 0 0 2px var(--primaria); font-weight: 700; }
+.dem-cor[aria-checked="true"] { border-color: var(--primaria); outline: 2px solid var(--primaria); outline-offset: 0; font-weight: 600; }
 .dem-cor:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
 .dem-amostra { width: 20px; height: 20px; border-radius: 50%; flex: none; }
 .dem-endereco { font-size: 15px; letter-spacing: 0; margin-bottom: var(--e-3); }

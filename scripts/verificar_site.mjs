@@ -22,6 +22,30 @@ for (const f of htmls) {
   for (const m of s.matchAll(/https?:\/\/[a-z0-9.-]*sslip\.io/gi)) if (m[0] !== N8N) erro(`${f}: aponta para outro n8n (${m[0]})`);
   if (/https?:\/\/(localhost|127\.0\.0\.1)/i.test(s)) erro(`${f}: tem endereço de teste (localhost)`);
 }
+// Regras da P12 que dá para conferir lendo o estilo (rxsync-sistema docs/mapa/painel-novo.md, seção 11): valem para o
+// painel (entrega 2) e para a Central (entrega 5 do novo front). css: os arquivos de estilo; pagina: o HTML montado.
+function conferirP12(nome, css, pagina) {
+  const estilo = css.map(f => fs.readFileSync(f, 'utf8')).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+  const regras = [...estilo.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(m => ({ sel: m[1].trim(), dec: m[2] }));
+  const p12 = m => erro(`${nome} (estilo): ${m} (P12, rxsync-sistema docs/mapa/painel-novo.md, seção 11)`);
+  for (const c of ['#B4741A', '#5E676E']) if (new RegExp(c, 'i').test(estilo + pagina)) p12(`a cor ${c} saiu da paleta`);
+  if (/figtree/i.test(estilo) || /figtree/i.test(pagina.replace(/<style>[\s\S]*?<\/style>/, ''))) p12(`Figtree é a letra do site; o ${nome} usa Inter`);
+  for (const r of regras) {
+    for (const m of r.dec.matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)) if (+m[1] < 12) p12(`${r.sel}: texto de ${m[1]} px (mínimo 12)`);
+    for (const m of r.dec.matchAll(/font-weight:\s*(\w+)/g)) if (m[1] === 'bold' || m[1] === 'bolder' || +m[1] > 600) p12(`${r.sel}: peso ${m[1]} (máximo 600)`);
+    for (const m of r.dec.matchAll(/(?:^|[;\s])font:\s*(\d{3})\b/g)) if (+m[1] > 600) p12(`${r.sel}: peso ${m[1]} (máximo 600)`);
+    for (const m of r.dec.matchAll(/box-shadow:\s*([^;]+)/g)) if (!/^(none|var\(--sombra-(menu|janela)\))$/.test(m[1].trim())) p12(`${r.sel}: sombra ${m[1].trim()} (só var(--sombra-menu) ou var(--sombra-janela), em menu, janela e folha)`);
+    for (const m of r.dec.matchAll(/(?:transition|animation)(?:-duration)?:\s*([^;]+)/g)) for (const t of m[1].matchAll(/(\d+(?:\.\d+)?)(ms|s)\b|var\((--[\w-]+)\)/g)) {
+      const ms = t[3] ? (t[3] === '--mov' ? 200 : t[3] === '--mov-salvo' && /salvo/.test(r.sel) ? 0 : 9999) : t[2] === 's' ? +t[1] * 1000 : +t[1];
+      if (ms > 300 && !/!important/.test(m[1])) p12(`${r.sel}: animação de ${t[0]} (máximo 300 ms; o "Salvo" usa var(--mov-salvo))`);
+    }
+    if (/gradient\(|backdrop-filter/.test(r.dec) && !/^select/.test(r.sel)) p12(`${r.sel}: sem degradê nem vidro`);   // a seta do select é desenhada assim
+    if (/\.entrada|input|select|textarea/.test(r.sel) && /var\(--borda\)/.test(r.dec)) p12(`${r.sel}: campo com a borda clara (#E3E7E8); use var(--borda-campo), de 3:1`);
+  }
+  if (/prefers-color-scheme/.test(estilo)) p12('o escuro só vale pela escolha da pessoa (data-tema), nunca pelo aparelho');
+  if (!/prefers-reduced-motion:\s*reduce/.test(estilo)) p12('falta a regra de "Reduzir movimento"');
+  if (!/body\s*\{[^}]*font-variant-numeric:\s*tabular-nums/.test(estilo)) p12('os números precisam de largura fixa (font-variant-numeric: tabular-nums no body)');
+}
 // Central RXSync (central/): sem nada de fora, noindex e a CSP com o resumo certo do script e do estilo.
 {
   const { cspCentral, N8N: N8N_CENTRAL } = await import('./central_csp.mjs');
@@ -58,6 +82,13 @@ for (const f of htmls) {
     // Página montada (DEC-068): central/index.html é exatamente o que o central_montar.mjs gera a partir de central/fonte/.
     try { const { montar } = await import('./central_montar.mjs'); if (montar() !== s) erro(`${arq}: diferente do que central/fonte/ monta (rode node scripts/central_montar.mjs e não edite a página à mão)`); }
     catch (e) { erro(`central/fonte: não consegui montar a Central (${e.message})`); }
+    // Visual claro da Central (entrega 5 do novo front, DEC-156): as mesmas regras da P12 do painel.
+    conferirP12('Central', ['assets/ancora/tokens.css', ...fs.readdirSync('central/fonte').filter(x => x.endsWith('.css')).map(x => 'central/fonte/' + x)], s);
+    // Singular ou plural certo, como no painel (pl(n, 'falha', 'falhas')): nenhum "falha(s)", "integração(ões)", "vez(es)".
+    for (const f of fs.readdirSync('central/fonte').filter(x => x.endsWith('.js')))
+      for (const re of [/'(?:[^'\\\n]|\\.)*'/g, /`(?:[^`\\]|\\.)*`/g])   // só nos textos: entre aspas e entre crases (sem o ${…})
+        for (const t of fs.readFileSync(path.join('central/fonte', f), 'utf8').matchAll(re))
+          for (const m of t[0].replace(/\$\{[^}]*\}/g, '').matchAll(/[a-zà-ú]+\((?:s|es|ões|ns)\)/gi)) erro(`central/fonte/${f}: "${m[0]}" na tela; use pl(n, 'singular', 'plural')`);
     // Toda ação de edição tem nível no servidor (sql/030, sql/031 e sql/036, rx_central_niveis). Ação nova precisa entrar lá e aqui.
     // ligar_chave: um toque (DEC-066); as chaves do motor da prospecção sobem para 2 ou 3 ao ligar (rx_central, sql/031).
     const NIVEIS = { 1: ['cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
@@ -179,25 +210,7 @@ for (const arq of ['painel/index.html']) {
       const kb = Buffer.byteLength(s, 'utf8') / 1024;
       if (kb > LIMITE_PAINEL_KB) erro(`${arq}: ${kb.toFixed(0)} KB, acima do limite de ${LIMITE_PAINEL_KB} KB (rxsync-sistema docs/front/plano.md)`);
       // Regras da P12 (rxsync-sistema docs/mapa/painel-novo.md, seção 11), lidas no estilo do painel (tokens + fontes):
-      const estilo = ['assets/ancora/tokens.css', ...fs.readdirSync('painel/fonte').filter(x => x.endsWith('.css')).map(x => 'painel/fonte/' + x)]
-        .map(f => fs.readFileSync(f, 'utf8')).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
-      const regras = [...estilo.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(m => ({ sel: m[1].trim(), dec: m[2] }));
-      const p12 = m => erro(`painel (estilo): ${m} (P12, rxsync-sistema docs/mapa/painel-novo.md, seção 11)`);
-      for (const c of ['#B4741A', '#5E676E']) if (new RegExp(c, 'i').test(estilo + s)) p12(`a cor ${c} saiu da paleta`);
-      if (/figtree/i.test(estilo) || /figtree/i.test(s.replace(/<style>[\s\S]*?<\/style>/, ''))) p12('Figtree é a letra do site; o painel usa Inter');
-      for (const r of regras) {
-        for (const m of r.dec.matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)) if (+m[1] < 12) p12(`${r.sel}: texto de ${m[1]} px (mínimo 12)`);
-        for (const m of r.dec.matchAll(/font-weight:\s*(\w+)/g)) if (m[1] === 'bold' || m[1] === 'bolder' || +m[1] > 600) p12(`${r.sel}: peso ${m[1]} (máximo 600)`);
-        for (const m of r.dec.matchAll(/box-shadow:\s*([^;]+)/g)) if (!/^(none|var\(--sombra-(menu|janela)\))$/.test(m[1].trim())) p12(`${r.sel}: sombra ${m[1].trim()} (só var(--sombra-menu) ou var(--sombra-janela), em menu, janela e folha)`);
-        for (const m of r.dec.matchAll(/(?:transition|animation)(?:-duration)?:\s*([^;]+)/g)) for (const t of m[1].matchAll(/(\d+(?:\.\d+)?)(ms|s)\b|var\((--[\w-]+)\)/g)) {
-          const ms = t[3] ? (t[3] === '--mov' ? 200 : t[3] === '--mov-salvo' && /salvo/.test(r.sel) ? 0 : 9999) : t[2] === 's' ? +t[1] * 1000 : +t[1];
-          if (ms > 300 && !/!important/.test(m[1])) p12(`${r.sel}: animação de ${t[0]} (máximo 300 ms; o "Salvo" usa var(--mov-salvo))`);
-        }
-        if (/\.entrada|input|select|textarea/.test(r.sel) && /var\(--borda\)/.test(r.dec)) p12(`${r.sel}: campo com a borda clara (#E3E7E8); use var(--borda-campo), de 3:1`);
-      }
-      if (/prefers-color-scheme/.test(estilo)) p12('o escuro só vale pela escolha da pessoa (data-tema), nunca pelo aparelho');
-      if (!/prefers-reduced-motion:\s*reduce/.test(estilo)) p12('falta a regra de "Reduzir movimento"');
-      if (!/body\s*\{[^}]*font-variant-numeric:\s*tabular-nums/.test(estilo)) p12('os números precisam de largura fixa (font-variant-numeric: tabular-nums no body)');
+      conferirP12('painel', ['assets/ancora/tokens.css', ...fs.readdirSync('painel/fonte').filter(x => x.endsWith('.css')).map(x => 'painel/fonte/' + x)], s);
       // Cores e tamanhos só no assets/ancora/tokens.css: nas fontes do painel, nenhuma cor solta (#abc, rgb()).
       for (const f of fs.readdirSync('painel/fonte').filter(x => /\.(css|js)$/.test(x))) {
         const t = fs.readFileSync(path.join('painel/fonte', f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
@@ -209,11 +222,13 @@ for (const arq of ['painel/index.html']) {
 }
 // Identidade (rxsync-sistema docs/front/plano.md, "Identidade em todas as páginas"): favicon, ícone da Tela de Início e
 // theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel e a passagem do painel antigo;
-// a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento).
+// a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento; a 5: a Central,
+// com manifest branco, e a entrada, a central, o escopo e o manual da demonstração, cuja entrada tem a prévia própria).
 {
   const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html',
     ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
-  const IDENTIDADE = ['painel/index.html', 'autoedicao.html', ...PUBLICAS];
+  const DEMO = ['index', 'central/index', 'escopo/index', 'manual/index'].map(f => `demo/clinica/${f}.html`);
+  const IDENTIDADE = ['painel/index.html', 'autoedicao.html', ...PUBLICAS, 'central/index.html', ...DEMO];
   for (const arq of PUBLICAS) {
     const s = fs.readFileSync(arq, 'utf8');
     const meta = k => (s.match(new RegExp(`<meta (?:property|name)="${k}" content="([^"]*)"`)) || [])[1];
@@ -222,23 +237,31 @@ for (const arq of ['painel/index.html']) {
     if (meta('twitter:card') && meta('twitter:card') !== 'summary_large_image') erro(`${arq}: twitter:card precisa ser summary_large_image`);
   }
   if (!fs.existsSync('assets/og-rxsync.png')) erro('assets/og-rxsync.png: a imagem da prévia de compartilhamento sumiu');
-  const existe = h => fs.existsSync('.' + h.split('?')[0]);
+  {
+    const s = fs.readFileSync('demo/clinica/index.html', 'utf8'), meta = k => (s.match(new RegExp(`<meta (?:property|name)="${k}" content="([^"]*)"`)) || [])[1];
+    for (const k of ['og:title', 'og:description', 'og:image', 'twitter:card', 'twitter:image']) if (!meta(k)) erro(`demo/clinica/index.html: falta a prévia de compartilhamento (${k})`);
+    if (meta('og:image') !== 'https://rxsync.com.br/demo/clinica/comum/previa.png') erro('demo/clinica/index.html: og:image precisa ser a prévia da demonstração (demo/clinica/comum/previa.png)');
+  }
+  // Endereço do ícone: "/..." a partir da raiz do site; o resto, a partir da pasta da página (a demonstração usa "../../").
+  const existe = (h, arq = '') => fs.existsSync(h.startsWith('/') ? '.' + h.split('?')[0] : path.join(path.dirname(arq), h.split('?')[0]));
   for (const arq of IDENTIDADE) {
     const s = fs.readFileSync(arq, 'utf8');
     const icone = (s.match(/<link rel="icon"[^>]*href="([^"]+)"/) || [])[1], toque = (s.match(/<link rel="apple-touch-icon"[^>]*href="([^"]+)"/) || [])[1];
-    if (!icone || !existe(icone)) erro(`${arq}: falta o favicon (<link rel="icon"> com um arquivo que exista)`);
-    if (!toque || !existe(toque)) erro(`${arq}: falta o ícone da Tela de Início (<link rel="apple-touch-icon"> com um arquivo que exista)`);
+    if (!icone || !existe(icone, arq)) erro(`${arq}: falta o favicon (<link rel="icon"> com um arquivo que exista)`);
+    if (!toque || !existe(toque, arq)) erro(`${arq}: falta o ícone da Tela de Início (<link rel="apple-touch-icon"> com um arquivo que exista)`);
     if (!/<meta name="theme-color" content="#FFFFFF">/i.test(s)) erro(`${arq}: falta o theme-color branco (<meta name="theme-color" content="#FFFFFF">)`);
   }
-  // O painel tem manifest próprio, para "Adicionar à Tela de Início": nome RXSync, cores do Âncora (branco) e os ícones.
-  const s = fs.readFileSync('painel/index.html', 'utf8'), mf = (s.match(/<link rel="manifest" href="([^"]+)">/) || [])[1];
-  if (!mf || !existe(mf)) erro('painel/index.html: falta o manifest (<link rel="manifest">)');
+  // O painel e a Central têm manifest próprio, para "Adicionar à Tela de Início": nome, cores do Âncora (branco) e os ícones.
+  for (const [arq, nome, inicio] of [['painel/index.html', 'RXSync', '/painel/'], ['central/index.html', 'Central RXSync', '/central/']]) {
+  const s = fs.readFileSync(arq, 'utf8'), mf = (s.match(/<link rel="manifest" href="([^"]+)">/) || [])[1];
+  if (!mf || !existe(mf)) erro(`${arq}: falta o manifest (<link rel="manifest">)`);
   else {
     let m = {}; try { m = JSON.parse(fs.readFileSync('.' + mf, 'utf8')); } catch (e) { erro(`${mf}: não é um JSON válido`); }
-    if (m.name !== 'RXSync' || m.start_url !== '/painel/' || m.display !== 'standalone') erro(`${mf}: nome "RXSync", start_url "/painel/" e display "standalone"`);
+    if (m.name !== nome || m.start_url !== inicio || m.display !== 'standalone') erro(`${mf}: nome "${nome}", start_url "${inicio}" e display "standalone"`);
     if (String(m.theme_color).toUpperCase() !== '#FFFFFF' || String(m.background_color).toUpperCase() !== '#FFFFFF') erro(`${mf}: theme_color e background_color brancos (#FFFFFF, o Âncora)`);
     const tam = (m.icons || []).filter(i => existe(i.src)).map(i => i.sizes);
     if (!tam.includes('192x192') || !tam.includes('512x512')) erro(`${mf}: precisa dos ícones de 192 e 512 px (arquivos que existam)`);
+  }
   }
 }
 // Preços (BlushingMoonlight/rxsync-sistema#79): o index.html, o contratar.html e o painel mostram os preços da cópia

@@ -110,11 +110,11 @@ async function pInicio(c) {
   const d = r.dados, res = d.resultados || {}, ch = d.chaves || {}, editar = ligada('editar_prospeccao');
   const soma = k => (res.ultimos_7_dias || []).reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
   const att = [];
-  if (res.para_aprovar) att.push(['atencao', `${fmtNum(res.para_aprovar)} lead(s) para aprovar`, 'Antes de entrar na fila', () => ir('prospeccao/leads/para_aprovar')]);
-  if (res.com_voce) att.push(['atencao', `${fmtNum(res.com_voce)} conversa(s) com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
+  if (res.para_aprovar) att.push(['atencao', `${pl(res.para_aprovar, 'lead', 'leads')} para aprovar`, 'Antes de entrar na fila', () => ir('prospeccao/leads/para_aprovar')]);
+  if (res.com_voce) att.push(['atencao', `${pl(res.com_voce, 'conversa', 'conversas')} com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
   const motor = res.motor || null;
   if (motor && motor.segurado) att.push(['critico', 'Disparo parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O'), null]);
-  if (res.avisos_na_fila) att.push(['info', `${fmtNum(res.avisos_na_fila)} aviso(s) esperando o Telegram`, 'O workflow 54 manda a cada 5 minutos', null]);
+  if (res.avisos_na_fila) att.push(['info', `${pl(res.avisos_na_fila, 'aviso', 'avisos')} esperando o Telegram`, 'O workflow 54 manda a cada 5 minutos', null]);
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
   const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
   const campanhas = d.campanhas || [];
@@ -128,10 +128,10 @@ async function pInicio(c) {
     (j.anuncios || []).map(n => el('li', {}, camada('anuncio', n, `${n.id} · versão ${n.versao}${n.pausa_motivo ? ' · ' + n.pausa_motivo : ''}`))),
     editar && !/^encerrad/.test(j.situacao) ? novoBtn('Novo anúncio', 'anuncio', j.id) : null);
   const conjuntos = cp => el('ul', { class: 'lista p-filhos' },
-    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? fmtNum(j.publicos.length) + ' público(s)' : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
+    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? pl(j.publicos.length, 'público', 'públicos') : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
     editar && !/^encerrad/.test(cp.situacao) ? novoBtn('Novo conjunto', 'conjunto', cp.id) : null);
   const arvore = campanhas.length
-    ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${fmtNum((cp.conjuntos || []).length)} conjunto(s)`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
+    ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${pl((cp.conjuntos || []).length, 'conjunto', 'conjuntos')}`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
     : [cartao(null, null, vazio('Nenhuma campanha ainda. Crie a primeira: campanha (marca, produto e IA) › conjunto (públicos, número, entrega) › anúncios (as mensagens, sorteadas entre os leads).', 'prospeccao'))];
   trocar(c, cabecalho('Prospecção', 'campanha › conjunto › anúncio', editar ? btn('Nova campanha', () => irP('campanha', 'novo'), 'pri', 'mais_um') : null),
     el('div', { class: 'pilha' }, abasP(''),
@@ -438,7 +438,7 @@ async function pPublico(c, parte, id, sub) {
   const sobre = ct => {
     if (ct.lead) return `virou lead ${ct.lead.id} (${nomeP('conjunto', ct.lead.conjunto_id)})`;
     const dias = Number(ct.expira_em_dias);
-    return `encontrado em ${fmtData(ct.encontrado_em)} · ${dias <= 0 ? 'sai hoje' : 'sai em ' + fmtNum(dias) + ' dia(s)'}`;
+    return `encontrado em ${fmtData(ct.encontrado_em)} · ${dias <= 0 ? 'sai hoje' : 'sai em ' + pl(dias, 'dia', 'dias')}`;
   };
   const contatos = d.contatos || [];
   const total = (FILTROS_PUB.find(x => x[0] === f.filtro) || FILTROS_PUB[0])[2], qtd = Number(n[total]) || 0, paginas = Math.max(1, Math.ceil(qtd / 50));
@@ -462,7 +462,7 @@ async function pPublico(c, parte, id, sub) {
       el('div', { class: 'etqs' }, (d.conjuntos || []).length ? (d.conjuntos || []).map(j => etq('conjunto ' + j.nome + (j.ativo ? ' (ativo)' : ''), j.ativo ? 'ok' : '', true)) : etq('nenhum conjunto usa', '', true),
         etq(`${fmtNum(cr.gastos)} de ${fmtNum(cr.limite)} créditos no mês`, '', true)),
       el('div', { class: 'kpis' }, kpi('Contatos', fmtNum(n.tamanho)), kpi('Disponíveis', fmtNum(n.disponiveis), 'podem receber mensagem'), kpi('Em conjuntos', fmtNum(n.em_conjunto), 'já viraram lead'),
-        kpi('Saem em até 7 dias', fmtNum(n.expiram_7d), n.expira_em_dias != null ? 'o primeiro em ' + fmtNum(n.expira_em_dias) + ' dia(s)' : 'prazo de 90 dias')),
+        kpi('Saem em até 7 dias', fmtNum(n.expiram_7d), n.expira_em_dias != null ? 'o primeiro em ' + pl(n.expira_em_dias, 'dia', 'dias') : 'prazo de 90 dias')),
       acoes.length ? el('div', { class: 'acoes' }, acoes) : null,
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação do contato' }, FILTROS_PUB.map(([k, nome, campo]) => el('button', { type: 'button', 'aria-pressed': String(f.filtro === k),
         onclick: () => { f.filtro = k; f.pagina = 1; rotear(); } }, nome, el('span', { class: 'n', text: fmtNum(n[campo]) })))),
@@ -477,7 +477,7 @@ async function pPublico(c, parte, id, sub) {
         f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null,
       (d.buscas || []).length ? cartao('Últimas buscas deste público', null, el('ul', { class: 'lista' }, d.buscas.slice(0, 5).map(b => el('li', {}, el('div', { class: 'linha' },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${fmtNum(b.creditos)} crédito(s)` + (Object.keys(b.contagens || {}).length ? ' · ' + Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') : '') })),
+          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${pl(b.creditos, 'crédito', 'créditos')}` + (Object.keys(b.contagens || {}).length ? ' · ' + Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') : '') })),
         el('div', { class: 'direita' }, etq(b.situacao === 'feita' ? 'feita' : b.situacao === 'falhou' ? 'falhou' : b.situacao === 'rodando' ? 'buscando' : 'na fila', b.situacao === 'feita' ? 'ok' : b.situacao === 'falhou' ? 'perigo' : 'info'))))))) : null,
       arquivar ? cartao('Mais', null, corpo(el('div', { class: 'acoes' }, arquivar))) : null,
       el('p', { class: 'mudo peq', text: 'O telefone aparece só com os 4 últimos dígitos. No envio, tudo é conferido de novo: "não contatar", clientes, demonstração, órgão público, 60 dias entre campanhas, prazo e fuso.' })));
@@ -563,7 +563,7 @@ async function pLeads(c, parte, sit) {
   const total = d.total || 0, paginas = Math.max(1, Math.ceil(total / 50));
   const exportar = () => fazer('prosp_exportar', { conjunto_id: f.conjunto_id, situacao: sit }, { titulo: 'Exportar os leads (CSV)', texto: 'O arquivo sai SEM telefone (DEC-079). Fica no registro da Central.', botao: 'Exportar',
     depois: x => { baixar(x.arquivo || 'leads.csv', x.csv || ''); } , ok: 'Arquivo pronto.' });
-  trocar(c, cabecalho('Leads', `${fmtNum(total)} lead(s)${sit ? ' · ' + P_LEAD[sit][0] : ''}`, btn('Exportar CSV', exportar, 'sec')),
+  trocar(c, cabecalho('Leads', `${pl(total, 'lead', 'leads')}${sit ? ' · ' + P_LEAD[sit][0] : ''}`, btn('Exportar CSV', exportar, 'sec')),
     el('div', { class: 'pilha' }, abasP('leads'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação' }, el('button', { type: 'button', 'aria-pressed': String(!sit), onclick: () => { f.pagina = 1; ir('prospeccao/leads'); } }, 'Todos'),
         SIT_LEADS.filter(k => ps[k] || k === sit).map(k => el('button', { type: 'button', 'aria-pressed': String(sit === k), onclick: () => { f.pagina = 1; ir('prospeccao/leads/' + k); } }, P_LEAD[k][0], el('span', { class: 'n', text: ps[k] || 0 })))),
@@ -609,7 +609,7 @@ async function pLead(c, parte, id) {
       l.situacao === 'com_voce' ? el('div', { class: 'aviso atencao' }, icone('conversa'), el('div', {}, el('b', { text: 'A conversa é sua. ' }), 'A IA e os follow-ups pararam. Responda pelo celular do número ' + (l.numero || '') + '.')) : null,
       acoes.length ? el('div', { class: 'acoes' }, acoes) : null,
       el('div', { class: 'grade-2' },
-        cartao('Conversa', el('span', { class: 'mudo peq', text: fmtNum(ms.length) + ' mensagem(ns)' }), ms.length ? el('ol', { class: 'p-conversa' }, ms.map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
+        cartao('Conversa', el('span', { class: 'mudo peq', text: pl(ms.length, 'mensagem', 'mensagens') }), ms.length ? el('ol', { class: 'p-conversa' }, ms.map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
           el('div', { class: 'p-quem', text: (AUTOR[m.autor] || m.autor) + ' · ' + fmtHora(m.criada_em) }), el('p', { text: m.texto == null ? '(texto apagado no prazo de guarda)' : m.texto }),
           m.direcao === 'saiu' ? el('div', { class: 'p-quem', text: m.situacao === 'falhou' ? 'não saiu' + (m.erro ? ' (' + m.erro + ')' : '') : m.situacao === 'pendente' ? 'saindo…' : m.lida_em ? 'lida' : m.entregue_em ? 'entregue' : 'enviada' }) : null,
           m.prompt_id ? el('button', { class: 'p-ver-prompt', type: 'button', text: 'ver o prompt que ela usou', onclick: () => verPromptUsado(m.prompt_id) }) : null))) : vazio('Nenhuma mensagem ainda.', 'conversa')),
@@ -707,7 +707,7 @@ async function pBuscas(c) {
       el('div', { class: 'form-2' }, selPb),
       cartao('Últimas buscas', null, (d.buscas || []).length ? el('ul', { class: 'lista' }, d.buscas.map(b => el('li', {}, el('div', { class: 'linha' },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${b.publico_id ? nomePub(b.publico_id) : nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${fmtNum(b.paginas)} página(s) · ${fmtNum(b.creditos)} crédito(s)` }),
+          el('div', { class: 't2', text: `${b.publico_id ? nomePub(b.publico_id) : nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${pl(b.paginas, 'página', 'páginas')} · ${pl(b.creditos, 'crédito', 'créditos')}` }),
           Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') }) : null),
         el('div', { class: 'direita' }, etq(...(SITB[b.situacao] || [b.situacao, '']))))))) : vazio('Nenhuma busca ainda.', 'busca'))));
 }
@@ -866,14 +866,14 @@ async function pConversas(c) {
         texto: 'As últimas conversas encerradas deste filtro vão para a IA sem o nome, o telefone, o código, a cidade ou o nicho do contato (nome do negócio, telefones, e-mails e links viram marcas). Nada fica guardado e nada muda sozinho: você revisa e decide.',
         campos: [{ k: 'quantidade', rot: 'Quantas conversas (1 a 20)', tipo: 'number', inputmode: 'numeric', valor: 10, min: 1, max: 20 }], botao: 'Pedir sugestões', silencioso: true,
         depois: x => mostrarSugestoes(x, f.campanha_id) }), 'pri', 'info')) : null;
-  trocar(c, cabecalho('Conversas', `${fmtNum(total)} conversa(s) respondida(s) · sem o telefone`),
+  trocar(c, cabecalho('Conversas', `${pl(total, 'conversa respondida', 'conversas respondidas')} · sem o telefone`),
     el('div', { class: 'pilha' }, abasP('conversas'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Resultado' }, RESULTADOS.map(([k, n]) => el('button', { type: 'button', 'aria-pressed': String(f.resultado === k), onclick: () => mudar('resultado', k) }, n))),
       el('div', { class: 'form-2' }, sel('Campanha', 'campanha_id', [['', 'Todas as campanhas'], ...camps.map(x => [x.id, x.nome])]),
         sel('Conjunto', 'conjunto_id', [['', 'Todos os conjuntos'], ...cjs.map(j => [j.id, (f.campanha_id ? '' : j.campanha.nome + ' › ') + j.nome])]),
         sel('Anúncio', 'anuncio_id', [['', 'Todos os anúncios'], ...ans.map(a => [a.id, a.nome])]),
         sel('Período', 'dias', [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias']]),
-        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${fmtNum(v.respostas)} resposta(s)`])])),
+        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${pl(v.respostas, 'resposta', 'respostas')}`])])),
       sugerir,
       (r.conversas || []).length ? r.conversas.map(cv => cartao(cv.nome || cv.lead_id, etqRes(cv.resultado),
         corpo(el('p', { class: 'mudo peq', text: [cv.lead_id, `${nomeP('campanha', cv.campanha_id)} › ${nomeP('conjunto', cv.conjunto_id)}${cv.anuncio_id ? ' › ' + nomeP('anuncio', cv.anuncio_id) : ''}`,
@@ -890,7 +890,7 @@ function mostrarSugestoes(r, campanhaId) {
   const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-sugestoes' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-sugestoes', text: 'Sugestões para o prompt' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
     el('div', { class: 'corpo' },
-      el('p', { class: 'mudo peq', text: `A partir de ${fmtNum(r.conversas)} conversa(s) encerrada(s), sem os dados dos contatos. Nada mudou: revise antes de usar.` }),
+      el('p', { class: 'mudo peq', text: `A partir de ${pl(r.conversas, 'conversa encerrada', 'conversas encerradas')}, sem os dados dos contatos. Nada mudou: revise antes de usar.` }),
       r.diagnostico ? blocoPrompt('Diagnóstico', r.diagnostico) : null,
       (r.sugestoes || []).map((x, k) => el('div', { class: 'p-sugestao' }, el('h3', { text: (k + 1) + '. ' + (x.onde || 'Sugestão') }),
         x.antes ? blocoPrompt('Antes', x.antes) : null, blocoPrompt('Depois', x.depois), x.porque ? el('p', { class: 'mudo peq', text: 'Por quê: ' + x.porque }) : null)),

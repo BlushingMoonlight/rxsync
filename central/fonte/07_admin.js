@@ -153,12 +153,12 @@ TELAS.ajustes = async c => {
     // Prospecção: o sinal de vida do 52 e do 53 logo abaixo das chaves (DEC-087).
     return titulo === 'Prospecção' ? [b, cartaoMotor(est.prospMotor)] : [b]; });
   const resto = todas.filter(k => !usadas.has(k.chave));
-  const aparenciaSel = el('div', { class: 'filtros', role: 'radiogroup', 'aria-label': 'Aparência' }, [['auto', 'Automática'], ['claro', 'Clara'], ['escuro', 'Escura']].map(([v, t]) =>
+  const aparenciaSel = el('div', { class: 'filtros', role: 'radiogroup', 'aria-label': 'Aparência' }, [['claro', 'Clara'], ['escuro', 'Escura']].map(([v, t]) =>
     el('button', { type: 'button', role: 'radio', 'aria-checked': String(aparencia === v), 'aria-pressed': String(aparencia === v), onclick: () => { guardarAparencia(v); rotear(); } }, t)));
   trocar(c, cabecalho('Ajustes da Central', 'um toque liga ou desliga; cada mudança vai para o registro e para o Telegram, com "Desfazer"'),
     el('div', { class: 'pilha' }, ...blocos.filter(Boolean),
       resto.length ? cartao('Só por PR (SQL)', null, el('ul', { class: 'lista' }, resto.map(linhaChave))) : null,
-      cartao('Aparência', null, corpo(el('p', { class: 'mudo peq', text: 'Automática segue o aparelho. A escolha fica só neste navegador.' }), aparenciaSel)),
+      cartao('Aparência', null, corpo(el('p', { class: 'mudo peq', text: 'A clara é o padrão. A escolha fica só neste navegador.' }), aparenciaSel)),
       cartao('Sessão', null, corpo(el('div', { class: 'acoes' }, btn('Sair', sair, 'perigo-sec', 'sair'), btn('Aparelhos e registro', () => ir('seguranca'), 'sec', 'seguranca'))))));
 };
 
@@ -172,6 +172,6 @@ TELAS.mais = async c => {
     el('p', { class: 'menu-grupo', text: 'Marketing' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Marketing').map(item))),
     el('p', { class: 'menu-grupo', text: 'Administração' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Administração').map(item))),
     el('p', { class: 'menu-grupo', text: 'Conta' }), cartao(null, null, el('ul', { class: 'lista' },
-      el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir('ajustes') }, el('span', { class: 'icone-caixa' }, icone('lua')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Aparência' }), el('div', { class: 't2', text: { auto: 'Automática (segue o aparelho)', claro: 'Clara', escuro: 'Escura' }[aparencia] })), icone('seta'))),
+      el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir('ajustes') }, el('span', { class: 'icone-caixa' }, icone('lua')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Aparência' }), el('div', { class: 't2', text: { claro: 'Clara', escuro: 'Escura' }[aparencia] })), icone('seta'))),
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: sair }, el('span', { class: 'icone-caixa' }, icone('sair')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Sair' }), el('div', { class: 't2', text: 'Encerra a sessão neste aparelho' })))))));
 };
