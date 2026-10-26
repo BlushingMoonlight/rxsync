@@ -23,9 +23,10 @@ export const juntar = (...xs) => xs.filter(Boolean).join(' ');
 // O que cada página pode carregar além do próprio script e estilo ('self' = os arquivos do próprio site):
 // - painel: o gráfico e as fontes do próprio site, o QR do WhatsApp (data:), a lista de municípios ('self') e o n8n.
 export const PAGINAS = {
-  'autoedicao.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}` },
+  // - painel antigo: desde a entrega 3 (DEC-156) só leva para /painel/, com o mesmo ?t= e o mesmo #; nada de fora.
+  'autoedicao.html': { img: "'self'", connect: "'none'" },
   // - painel novo (DEC-156): o mesmo do painel antigo. Gravada pelo painel_montar.mjs (não pelo node scripts/csp.mjs).
-  'painel/index.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}`, montada: true },
+  'painel/index.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}`, manifest: "'self'", montada: true },
   // - exclusão da conta: só o próprio código, as fontes do site e o n8n.
   'conta-excluir.html': { estilo: "'self'", img: "'self'", connect: N8N },
   // - conectar o WhatsApp: os ícones e o aviso do chat (arquivos do site), o QR (data:) e o n8n. O chat abre numa aba nova.
@@ -61,7 +62,7 @@ export function cspPagina(html, p) {
   const fontes = (tag, extra) => [...blocos(html, tag), extra].filter(Boolean).join(' ') || "'none'";
   const estilo = p.estiloLivre ? juntar(p.estilo, "'unsafe-inline'") : fontes('style', p.estilo);
   return `default-src 'none'; script-src ${fontes('script', p.script)}; style-src ${estilo}; font-src 'self'; `
-    + `img-src ${p.img}; connect-src ${p.connect}; ${p.frame ? `frame-src ${p.frame}; ` : ''}base-uri 'none'; form-action 'none'`;
+    + `img-src ${p.img}; connect-src ${p.connect}; ${p.frame ? `frame-src ${p.frame}; ` : ''}${p.manifest ? `manifest-src ${p.manifest}; ` : ''}base-uri 'none'; form-action 'none'`;
 }
 
 // node scripts/csp.mjs: grava a regra certa em cada página da lista (logo depois do <meta charset>).

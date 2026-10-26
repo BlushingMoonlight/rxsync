@@ -74,7 +74,7 @@ const TELAS = ['hoje', 'resultados', 'agenda', 'agenda/espera', 'agenda/document
   'agenda/horarios/integracao/importar', 'agenda/horarios/integracao/importacoes', 'pacientes', 'pacientes/ficha/PAC-0001', 'pacientes/organizar', 'pacientes/importar',
   'pacientes/importacoes', 'pacientes/duplicados', 'assistente', 'assistente/clinica', 'assistente/conversa', 'assistente/valores', 'assistente/urgencia', 'assistente/automaticas',
   'assistente/limites', 'assistente/extras', 'assistente/faq', 'assistente/funcoes', 'conta', 'conta/contato', 'conta/assinatura', 'conta/contrato',
-  'conta/gestao', 'conta/equipe', 'conta/dados', 'conta/acessos', 'conta/whatsapp'];
+  'conta/gestao', 'conta/equipe', 'conta/dados', 'conta/acessos', 'conta/whatsapp', 'conta/mudou'];
 const comBloqueio = [];
 for (const t of TELAS) {
   await page.evaluate(h => { location.hash = h; }, t);

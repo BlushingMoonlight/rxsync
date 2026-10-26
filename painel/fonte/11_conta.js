@@ -11,6 +11,7 @@ tela('conta', {
     el('div', { class: 'bloco' }, el('h2', { text: 'Dados e contrato' }), el('div', { class: 'lista' }, linhaLink('Contato e responsável técnico', 'E-mail, telefones e quem responde pelo conteúdo', 'conta/contato', 'conta'),
       linhaLink('Dados do contrato', 'Razão social, CNPJ e representante', 'conta/contrato', 'escudo'), ehDono() ? linhaLink('Baixar meus dados', 'A agenda e os pacientes em planilha', 'conta/dados', 'baixar') : null)),
     el('div', { class: 'bloco' }, el('h2', { text: 'Ajuda' }), el('div', { class: 'lista' },
+      linhaLink('O que mudou no painel', 'Onde ficou cada coisa', 'conta/mudou', 'info'),
       el('a', { class: 'linha', href: 'mailto:contato@rxsync.com.br' }, el('span', { class: 'ic' }, icone('chat')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Falar com a RXSync' }), el('span', { class: 't2', text: 'contato@rxsync.com.br' })), el('span', { class: 'seta' }, icone('seta'))),
       el('a', { class: 'linha', href: '/termos/' + VERSAO_TERMOS + '.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('documento')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Termos de Uso' })), el('span', { class: 'seta' }, icone('seta'))),
       el('a', { class: 'linha', href: '/privacidade.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('escudo')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Política de Privacidade' })), el('span', { class: 'seta' }, icone('seta')))))),
@@ -145,6 +146,24 @@ tela('conta/gestao', {
   entrar: () => dependenciasAplicar()
 });
 const READONLY = [['razao_social', 'Razão social'], ['cnpj', 'CNPJ'], ['representante_nome', 'Representante'], ['representante_cpf', 'CPF do representante'], ['endereco_faturamento', 'Endereço de faturamento'], ['plano', 'Plano'], ['valor_mensal', 'Valor'], ['numero_whatsapp', 'WhatsApp que a assistente atende']];
+// O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel antigo. Nada muda no servidor.
+const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integração e planilhas', 'agenda/horarios/integracao'],
+  ['Agenda › Horários (a página longa)', 'Agenda › Horários: uma página por assunto (horários de atendimento, regras, médicos, perguntas, feriados, receber dos pacientes)', 'agenda/horarios'],
+  ['Funções da assistente', 'Assistente › O que ela faz', 'assistente/funcoes'],
+  ['Agenda por médico', 'Agenda › Horários › Médicos e tipos, no alto', 'agenda/horarios/medicos'],
+  ['"Bloquear feriados" e "Não atender em feriados"', 'Um controle só, em Agenda › Horários › Feriados', 'agenda/horarios/feriados'],
+  ['Lembretes (a chave e os horários)', 'Um controle só, em Assistente › Mensagens automáticas', 'assistente/automaticas'],
+  ['Agrupar pacientes', 'Agenda › Horários › Regras da agenda', 'agenda/horarios/regras'],
+  ['Pacientes › importar e duplicados', 'Pacientes › ⋯ › Organizar', 'pacientes/organizar'],
+  ['Resultados', 'Hoje › Ver resultados', 'resultados'],
+  ['Assinatura', 'Conta › Plano e pagamento', 'conta/assinatura']];
+tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
+  el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
+    el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),
+    el('li', { text: 'O estado da assistente fica sempre no alto ("Atendendo"). Tocar nele mostra o que está acontecendo e os botões de pausar e testar.' }),
+    el('li', { text: 'A lupa, no alto, acha qualquer tela pelo nome novo ou pelo antigo, e também pacientes e consultas.' }),
+    el('li', { text: 'O assistente de gestão abre pelo ícone de conversa, no alto.' })))),
+  el('div', { class: 'bloco' }, el('h2', { text: 'Onde ficou cada coisa' }), el('div', { class: 'lista', id: 'mudouLista' }, MUDOU.map(([antes, agora, rota]) => linhaLink(agora, 'Antes: ' + antes, rota))))] });
 tela('conta/contrato', { montar: () => [cabTela('Dados do contrato', { voltar: VOLTA_CONTA, sub: 'Para mudar algum desses dados, fale com a RXSync.' }),
   el('div', { class: 'cartao', id: 'somenteLeitura' }, el('dl', { class: 'dados' }, READONLY.map(([k, r]) => [el('dt', { text: r }), el('dd', { text: (k === 'numero_whatsapp' ? foneBonito(RO[k]) : RO[k]) || '—' })])))] });
 

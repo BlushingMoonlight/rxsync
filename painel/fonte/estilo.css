@@ -440,3 +440,5 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
   body.com-assuntos #telas > section:not(.assuntos) .duas-ipad { display: block; }
   body.com-assuntos #telas > section:not(.assuntos) .duas-ipad > * + * { margin-top: var(--e-4); }
 }
+/* lista em texto (O que mudou) */
+.lista-texto { margin: 0; padding-left: var(--e-5); display: flex; flex-direction: column; gap: var(--e-2); }
