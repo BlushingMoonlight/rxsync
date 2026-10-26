@@ -131,7 +131,7 @@ TELAS.agregados = async c => {
   topo('Agregados de pacientes', [['Análise'], ['Agregados de pacientes']]);
   const r = await chamar('agregados'); if (falhou(c, r, 'Agregados de pacientes')) return;
   const cols = [['pacientes', 'Pacientes'], ['consultas_30d_ia', 'Consultas pela IA (30 d)'], ['consultas_30d_equipe', 'Pela equipe (30 d)'], ['lista_espera_ativa', 'Lista de espera'],
-    ['documentos_30d', 'Documentos (30 d)'], ['preconsulta_30d', 'Pré-consulta (30 d)'], ['pesquisa_nota_media_90d', 'Nota média (90 d)'], ['relacionamento_30d', 'Relacionamento (30 d)']];
+    ['documentos_30d', 'Documentos (30 d)'], ['preconsulta_30d', 'Perguntas antes de agendar (30 d)'], ['pesquisa_nota_media_90d', 'Nota média (90 d)'], ['relacionamento_30d', 'Relacionamento (30 d)']];
   trocar(c, cabecalho('Agregados de pacientes', 'só contagens e médias por clínica; nenhum dado de paciente'),
     cartao(null, null, el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Tabela de agregados (role para o lado)' }, el('table', { class: 'dados-t' },
       el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: 'Clínica' }), cols.map(([, n]) => el('th', { scope: 'col', text: n })))),

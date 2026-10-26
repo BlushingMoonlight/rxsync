@@ -115,11 +115,12 @@ document.addEventListener('focusin', e => { if (e.target.matches('input, select,
 document.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('input, select, textarea')) document.body.classList.remove('teclado'); }, 50));
 
 // ---------------------------------------------------------------- aparência (no localStorage, com a lembrança do aparelho; DEC-068, DEC-109)
-function aplicarAparencia(v) { if (v === 'claro' || v === 'escuro') document.documentElement.dataset.tema = v; else delete document.documentElement.dataset.tema; }
-let aparencia = 'auto';
-try { aparencia = localStorage.getItem('central_aparencia') || 'auto'; } catch (e) {}
+// Clara (o padrão) ou escura, só pela escolha do Jean (P12): o aparelho em modo escuro não muda a Central.
+function aplicarAparencia(v) { if (v === 'escuro') document.documentElement.dataset.tema = v; else delete document.documentElement.dataset.tema; }
+let aparencia = 'claro';
+try { aparencia = localStorage.getItem('central_aparencia') === 'escuro' ? 'escuro' : 'claro'; } catch (e) {}
 aplicarAparencia(aparencia);
-function guardarAparencia(v) { aparencia = v; aplicarAparencia(v); try { if (v === 'auto') localStorage.removeItem('central_aparencia'); else localStorage.setItem('central_aparencia', v); } catch (e) {} }
+function guardarAparencia(v) { aparencia = v; aplicarAparencia(v); try { if (v !== 'escuro') localStorage.removeItem('central_aparencia'); else localStorage.setItem('central_aparencia', v); } catch (e) {} }
 
 // ---------------------------------------------------------------- mensagem rápida (com "Desfazer")
 function rapida(texto, desfazer) {

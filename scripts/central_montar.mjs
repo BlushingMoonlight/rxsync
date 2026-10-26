@@ -1,6 +1,6 @@
 // Central RXSync: monta central/index.html a partir das partes em central/fonte/ (DEC-068).
 // - estilo: assets/ancora/tokens.css (as cores e os tamanhos de todas as telas, rxsync-sistema DEC-156) e depois os .css
-//   em ordem de nome, dentro do único <style> (a Central redefine as variáveis dela depois, e a aparência não muda);
+//   em ordem de nome, dentro do único <style> (os nomes próprios da Central apontam para os do Âncora, entrega 5);
 // - código: todos os .js em ordem de nome, dentro do único <script> (numa função, com 'use strict');
 // - regra de segurança (CSP): resumo SHA-256 do <script> e do <style> (scripts/central_csp.mjs).
 // Rode depois de mudar qualquer parte: node scripts/central_montar.mjs (o verificar_site.mjs confere).

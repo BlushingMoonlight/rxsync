@@ -3,17 +3,17 @@
 .heroi-e { display: grid; gap: var(--e-6); align-items: center; padding-top: var(--e-4); }
 @media (min-width: 900px) { .heroi-e { grid-template-columns: minmax(0, 1fr) 360px; gap: var(--e-7); padding-top: var(--e-6); } }
 .texto-heroi { display: grid; gap: var(--e-4); justify-items: start; }
-.titulo-display { font-size: var(--t-display); line-height: 1.04; letter-spacing: -.035em; font-weight: 750; max-width: 16ch; text-wrap: balance; }
+.titulo-display { font-size: var(--t-display); line-height: 1.04; letter-spacing: -.035em; font-weight: 600; max-width: 16ch; text-wrap: balance; }
 .lead { font-size: clamp(1.05rem, 1rem + .3vw, 1.2rem); color: var(--tinta-2); max-width: 46ch; }
 .texto-heroi .botoes { margin-top: var(--e-2); }
 .progresso { display: grid; gap: var(--e-2); }
-.prog-txt { font-size: var(--t-peq); font-weight: 650; color: var(--tinta-2); }
+.prog-txt { font-size: var(--t-peq); font-weight: 600; color: var(--tinta-2); }
 .prog-partes { display: flex; flex-wrap: wrap; gap: var(--e-2); }
-.passo-p { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px 0 10px; border-radius: var(--r-pilula); font-size: var(--t-peq); font-weight: 650; color: var(--tinta-2);
+.passo-p { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px 0 10px; border-radius: var(--r-pilula); font-size: var(--t-peq); font-weight: 600; color: var(--tinta-2);
   border: 1px solid var(--linha-forte); background: var(--superficie); }
 .passo-p.feito { background: var(--ok-fundo); color: var(--ok); border-color: transparent; }
 .bolinha { width: 14px; height: 14px; border-radius: 50%; border: 1.75px solid currentColor; display: inline-block; opacity: .7; }
-.marca-clinica { display: flex; align-items: center; gap: var(--e-3); font-family: var(--fonte-titulo); font-weight: 750; font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); color: var(--acento-texto); letter-spacing: -.02em; line-height: 1.2; }
+.marca-clinica { display: flex; align-items: center; gap: var(--e-3); font-family: var(--fonte-titulo); font-weight: 600; font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); color: var(--acento-texto); letter-spacing: -.02em; line-height: 1.2; }
 .marca-clinica .selo { width: 48px; height: 48px; border-radius: 14px; font-size: 1rem; }
 @media (max-width: 599px) { .texto-heroi .botoes { display: grid; width: 100%; } .texto-heroi .botoes .botao { width: 100%; } }
 /* o celular na tela, com o app funcionando */
@@ -47,7 +47,7 @@ a.bento-bloco:hover .ir { transform: translateX(3px); }
 .mini-lista { display: grid; gap: 6px; }
 .mini-linha { display: flex; align-items: center; gap: var(--e-2); padding: 8px 12px; border-radius: 12px; background: var(--superficie-2); font-size: var(--t-mini); font-weight: 600; color: var(--tinta-2); }
 .pt { width: 8px; height: 8px; border-radius: 50%; flex: none; } .pt.alerta { background: var(--alerta); } .pt.atencao { background: var(--atencao); } .pt.ok { background: var(--ok); }
-.mini-escopo { display: flex; gap: 2px; padding: 3px; border-radius: 99px; background: var(--superficie-3); font-size: var(--t-mini); font-weight: 650; color: var(--tinta-2); justify-self: start; }
+.mini-escopo { display: flex; gap: 2px; padding: 3px; border-radius: 99px; background: var(--superficie-3); font-size: var(--t-mini); font-weight: 600; color: var(--tinta-2); justify-self: start; }
 .mini-escopo span { padding: 6px 10px; border-radius: 99px; } .mini-escopo .on { background: var(--superficie); color: var(--tinta); box-shadow: var(--sombra-1); }
 .destaque-b { gap: var(--e-2); padding: var(--e-4) var(--e-5); background: var(--superficie-2); box-shadow: none; }
 .destaque-b h3 { font-size: 1rem; }

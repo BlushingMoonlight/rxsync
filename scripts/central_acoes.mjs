@@ -227,11 +227,14 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   const d2 = await chamada('ligar_chave', d2desde);
   ok(d2 && d2.chave === 'tela_avisos' && d2.valor === 'SIM', `ligar_chave: Desfazer liga de novo (${JSON.stringify(d2)})`);
   feitos += 2;
-  // Aparência: só ela vai para o localStorage.
+  // Aparência: só ela vai para o localStorage. Clara é o padrão; o aparelho em modo escuro não muda a Central (P12).
+  await page.emulateMedia({ colorScheme: 'dark' });
+  ok(await page.evaluate(() => getComputedStyle(document.body).backgroundColor === 'rgb(255, 255, 255)' && !document.documentElement.dataset.tema), 'aparência: com o aparelho no escuro, a Central continua clara');
+  await page.emulateMedia({ colorScheme: 'light' });
   await page.getByRole('radio', { name: 'Escura' }).click();
   ok(await page.evaluate(() => document.documentElement.dataset.tema === 'escuro' && localStorage.getItem('central_aparencia') === 'escuro' && localStorage.length === 1), 'aparência: escura guardada (só ela no localStorage)');
-  await page.getByRole('radio', { name: 'Automática' }).click();
-  ok(await page.evaluate(() => localStorage.length === 0 && !document.documentElement.dataset.tema), 'aparência: automática apaga a escolha');
+  await page.getByRole('radio', { name: 'Clara' }).click();
+  ok(await page.evaluate(() => localStorage.length === 0 && !document.documentElement.dataset.tema), 'aparência: clara (o padrão) apaga a escolha');
 }
 // Mensagem rápida com Desfazer depois de uma edição de nível 1.
 {
@@ -354,7 +357,7 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
 // Funil, "fora da saúde" nos públicos (sem "pôr de volta") e o nome da chave painel_link_antigo nos Ajustes.
 {
   await abrir('clientes/CLI-001/historico');
-  const hist = page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Histórico do painel' }) });
+  const hist = page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Acessos recentes' }) });
   await hist.getByText('Pausou a assistente').waitFor().catch(() => {});
   ok(await hist.getByText('Pausou a assistente').count() === 1 && /equipe · sec@exemplo\.com/.test(await hist.innerText()) && /IP 10\.0\.0\.5/.test(await hist.innerText()), 'histórico do painel: o quê, quem (e-mail) e o IP');
   ok(chamadas.some(x => x.acao === 'cliente_painel_historico' && x.dados.cliente_id === 'CLI-001'), 'histórico do painel: lê cliente_painel_historico da clínica');

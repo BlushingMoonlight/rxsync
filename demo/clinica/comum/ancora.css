@@ -1,0 +1,68 @@
+/* =====================================================================================================================
+   Âncora na demonstração por link (rxsync-sistema DEC-156, entrega 5 do novo front; P12, onda 5): a entrada, a central da
+   demo, o escopo e o manual com as cores, as letras e os cantos da Central. Vem depois do estilo de cada página.
+   O app do paciente (app/) não carrega este arquivo: ele não muda. A cor da clínica (data-cor) continua sendo o acento,
+   porque a demonstração mostra a marca da clínica; o resto fica branco, neutro e sem sombra de cartão.
+   O escuro só pela escolha da pessoa (o botão do tema): o aparelho em modo escuro não muda estas páginas.
+   ===================================================================================================================== */
+:root, :root:not([data-tema="escuro"]) {
+  color-scheme: light;
+  --fundo: #FFFFFF; --fundo-2: #F7F8F8;
+  --superficie: #FFFFFF; --superficie-2: #F7F8F8; --superficie-3: #EEF1F1;
+  --linha: #E3E7E8; --linha-forte: #848E93;
+  --tinta: #15191C; --tinta-2: #4A545A; --tinta-3: #4A545A;
+  --vidro: #FFFFFF; --vidro-borda: #E3E7E8;
+  --ok: #17653F; --ok-fundo: #EAF5EE; --atencao: #7A4A00; --atencao-fundo: #FDF4E3; --alerta: #962318; --alerta-fundo: #FCEDEB;
+  --sombra-1: none; --sombra-2: none; --sombra-3: 0 12px 32px rgba(21, 25, 28, .18); --veu: rgba(21, 25, 28, .45);
+  --acento: var(--m-600); --acento-forte: var(--m-700); --sobre-acento: #FFFFFF; --acento-texto: var(--m-700);
+  --acento-suave: var(--m-50); --acento-suave-2: var(--m-100); --acento-borda: var(--m-200);
+  --anel-1: var(--m-600); --anel-2: var(--m-400); --anel-3: var(--m-300); --anel-trilho: var(--m-100);
+  --fonte: 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; --fonte-titulo: var(--fonte);
+  --r-cartao: 12px; --r-interno: 8px; --r-controle: 8px;
+}
+:root[data-tema="escuro"] {
+  --fundo: #0E1214; --fundo-2: #0E1214; --superficie: #161B1E; --superficie-2: #0E1214; --superficie-3: #1F262A;
+  --linha: #2A3135; --linha-forte: #9AA4A9; --tinta: #E8ECED; --tinta-2: #C9D0D3; --tinta-3: #C9D0D3;
+  --vidro: #161B1E; --vidro-borda: #2A3135;
+  --ok: #A3E8BE; --ok-fundo: #12291D; --atencao: #F7D48E; --atencao-fundo: #2E2410; --alerta: #FAC2BB; --alerta-fundo: #33181A;
+  --sombra-1: none; --sombra-2: none; --sombra-3: none; --veu: rgba(0, 0, 0, .6);
+  --fonte-titulo: var(--fonte); --r-cartao: 12px; --r-interno: 8px; --r-controle: 8px;
+}
+body { font-family: var(--fonte); font-variant-numeric: tabular-nums; }
+/* sem vidro nem sombra de cartão; o selecionado e o foco na cor da clínica, com borda */
+.vidro { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--superficie); }
+.cartao, .cartao.elevado, .passo button, .msg { box-shadow: none; }
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+/* rótulos sem maiúsculas e pesos até 600 (P12) */
+.sobretitulo { font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.fd-tag { letter-spacing: 0; text-transform: none; }
+h1, h2, h3, h4 { letter-spacing: -.01em; }
+h1, h2, h3, h4,
+.sobretitulo,
+.numero,
+.botao,
+.chip[aria-pressed="true"], .chip[aria-checked="true"],
+.passo output,
+.estado-tag,
+.etq,
+.linha .t1,
+.avatar,
+.dados dd,
+.selo,
+.topo .nome,
+.nutri dd,
+.fd-tag,
+.fd-clinica,
+.tabela-bio thead th,
+.botao-ajuda,
+.tut-conta,
+.etq-juridico,
+.antes-depois dd,
+.topicos-ia dt,
+.botao-ia,
+.passos-ia li::marker { font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+/* a faixa da demonstração (no alto) clara, com borda embaixo, como o cabeçalho do painel e da Central */
+:root:not([data-tema="escuro"]) .faixa-demo { --fd-fundo: #F7F8F8; --fd-texto: #15191C; --fd-texto-2: #4A545A; --fd-linha: #E3E7E8; border-bottom-color: #E3E7E8; }
+:root[data-tema="escuro"] .faixa-demo { --fd-fundo: #161B1E; --fd-texto: #E8ECED; --fd-texto-2: #C9D0D3; --fd-linha: #2A3135; border-bottom-color: #2A3135; }
+.faixa-demo .chave[aria-checked="true"] { background: var(--acento); } .faixa-demo .chave[aria-checked="true"]::after { background: #FFFFFF; }

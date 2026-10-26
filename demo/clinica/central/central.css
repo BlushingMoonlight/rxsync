@@ -15,13 +15,13 @@
 .v-central .kpi .rot { font-size: var(--t-mini); }
 
 /* triagem */
-.v-central .contador { min-width: 28px; height: 28px; padding: 0 8px; border-radius: 99px; background: var(--alerta-fundo); color: var(--alerta); font-weight: 750; display: inline-grid; place-items: center; font-size: .85rem; }
+.v-central .contador { min-width: 28px; height: 28px; padding: 0 8px; border-radius: 99px; background: var(--alerta-fundo); color: var(--alerta); font-weight: 600; display: inline-grid; place-items: center; font-size: .85rem; }
 .v-central .cab-cartao h2 { flex: 0 1 auto; } .v-central .cab-cartao .item { margin-left: auto; }
 .v-central .lista-triagem { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-3); }
 .v-central .alerta-card { border-radius: 20px; padding: var(--e-4); background: var(--superficie-2); border: 1px solid var(--linha); display: grid; gap: var(--e-3); position: relative; overflow: hidden; }
 .v-central .alerta-card::before { content: ''; position: absolute; left: 0; top: 16px; bottom: 16px; width: 3px; border-radius: 0 3px 3px 0; background: var(--atencao); }
 .v-central .alerta-card.alerta::before { background: var(--alerta); }
-.v-central .alerta-card .t1 { font-weight: 700; font-family: var(--fonte-titulo); } .v-central .alerta-card .t2 { font-size: var(--t-peq); color: var(--tinta-2); }
+.v-central .alerta-card .t1 { font-weight: 600; font-family: var(--fonte-titulo); } .v-central .alerta-card .t2 { font-size: var(--t-peq); color: var(--tinta-2); }
 .v-central .alerta-card .motivo { font-size: .94rem; color: var(--tinta-2); }
 .v-central .acoes { display: flex; flex-wrap: wrap; gap: var(--e-2); }
 .v-central .acoes .botao { min-height: 44px; padding: 0 var(--e-4); font-size: .9rem; }
@@ -34,7 +34,7 @@
   text-align: left; color: inherit; border-radius: var(--r-interno); transition: transform .18s var(--suave); }
 .v-central button.linha-pac:active { transform: scale(.99); }
 .v-central .linha-pac[aria-current="true"] { background: var(--acento-suave); }
-.v-central .linha-pac .t1 { display: block; font-weight: 650; } .v-central .linha-pac .t2 { display: block; font-size: var(--t-mini); color: var(--tinta-2); }
+.v-central .linha-pac .t1 { display: block; font-weight: 600; } .v-central .linha-pac .t2 { display: block; font-size: var(--t-mini); color: var(--tinta-2); }
 .v-central .dados-linha { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--e-4); margin-top: 6px; font-size: var(--t-mini); color: var(--tinta-2); font-weight: 600; }
 .v-central .spark { display: inline-flex; align-items: center; gap: 6px; }
 .v-central .linha-fina { width: 56px; height: 20px; color: var(--acento-texto); }
@@ -94,7 +94,7 @@
 .v-central .barra-central { position: sticky; top: 0; z-index: 30; border-width: 0 0 1px; }
 .v-central .barra-central .dentro { width: min(1240px, 100%); margin: 0 auto; padding: 8px var(--e-4); display: flex; align-items: center; gap: var(--e-3); min-height: 64px; }
 @media (min-width: 768px) { .v-central .barra-central .dentro { padding: 8px var(--e-6); } }
-.v-central .barra-central .nome { font-family: var(--fonte-titulo); font-weight: 750; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v-central .barra-central .nome { font-family: var(--fonte-titulo); font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .v-central .barra-central .sub { font-size: var(--t-mini); color: var(--tinta-2); }
 .v-central .hora-ag { min-width: 3.4em; font-family: var(--fonte-titulo); }
 .v-central .regras { margin-bottom: var(--e-3); font-size: var(--t-peq); }

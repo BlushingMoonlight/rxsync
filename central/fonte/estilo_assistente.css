@@ -45,9 +45,8 @@
 .ia-pensando { display: flex; align-items: center; gap: var(--e-2); padding: 0 var(--e-4); font-size: var(--t-13); color: var(--texto-2); }
 .ia-pensando:not(:empty) { padding-top: var(--e-2); padding-bottom: var(--e-2); border-top: 1px solid var(--borda); }
 .ia-pensando #ia-tempo { margin-left: auto; }
-.ia-ponto { width: 10px; height: 10px; border-radius: 50%; background: var(--primaria); flex: none; animation: ia-pulso 1.2s ease-in-out infinite; }
-@keyframes ia-pulso { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .ia-ponto { animation: none; } }
+/* sem piscar (P12: nada anima mais de 300 ms); a frase e o relógio ao lado dizem o que está acontecendo */
+.ia-ponto { width: 10px; height: 10px; border-radius: 50%; background: var(--primaria); flex: none; }
 .ia-form { padding: var(--e-3) var(--e-4) var(--e-4); border-top: 1px solid var(--borda); background: var(--superficie); }
 .ia-form .campo { margin-bottom: var(--e-2); }
 .ia-form textarea { resize: vertical; min-height: 72px; }

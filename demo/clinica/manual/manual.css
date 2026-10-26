@@ -25,17 +25,17 @@
 .man-cab h3:focus { outline: none; }
 .ver-tela { text-decoration: none; flex: none; }
 .man-bloco { display: grid; gap: 6px; }
-.man-bloco h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--tinta-2); }
+.man-bloco h4 { font-size: .8rem; text-transform: none; letter-spacing: .05em; color: var(--tinta-2); }
 .man-bloco ol, .man-bloco ul { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
-.man-passos li::marker { font-weight: 750; color: var(--acento-texto); }
+.man-passos li::marker { font-weight: 600; color: var(--acento-texto); }
 .man-duas { display: grid; gap: var(--e-3); }
 @media (min-width: 720px) { .man-duas { grid-template-columns: 1fr 1fr; } }
-.man-det summary { min-height: var(--alvo); display: flex; align-items: center; cursor: pointer; font-weight: 650; color: var(--acento-texto); }
+.man-det summary { min-height: var(--alvo); display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--acento-texto); }
 .man-elementos { display: grid; grid-template-columns: minmax(0, 15em) minmax(0, 1fr); gap: 6px var(--e-4); margin: var(--e-2) 0 0; font-size: var(--t-peq); }
-.man-elementos dt { font-weight: 650; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.man-elementos dt { font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
 .man-elementos dd { margin: 0; color: var(--tinta-2); }
 @media (max-width: 560px) { .man-elementos { grid-template-columns: 1fr; } .man-elementos dd { margin-bottom: var(--e-2); } }
-.etiqueta { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--tinta-2); background: var(--superficie-3); border-radius: 6px; padding: 1px 6px; }
+.etiqueta { font-size: .7rem; font-weight: 600; text-transform: none; letter-spacing: .04em; color: var(--tinta-2); background: var(--superficie-3); border-radius: 6px; padding: 1px 6px; }
 .man-estados { display: grid; gap: 4px; padding: var(--e-3); border-radius: 12px; background: var(--superficie-2); }
 .man-estados p { margin: 0; }
 .man-itens a { color: var(--acento-texto); }
@@ -50,7 +50,7 @@
 .fx-no:hover .fx-caixa, .fx-no:focus .fx-caixa { stroke: var(--acento); stroke-width: 2; }
 .fx-no:focus { outline: none; }
 .fx-no:focus-visible .fx-caixa { stroke: var(--acento); stroke-width: 3; }
-.fx-lado { font-size: 10.5px; font-weight: 750; letter-spacing: .06em; fill: var(--tinta-2); }
+.fx-lado { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; fill: var(--tinta-2); }
 .fx-texto { font-size: 13.5px; font-weight: 550; fill: var(--tinta); }
 .fx-ir { fill: none; stroke: var(--tinta-3); stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .fx-seta { stroke: var(--tinta-3); stroke-width: 1.75; }
@@ -66,6 +66,6 @@
 .fx-l::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--tinta-3); }
 .fx-l.fx-app::before { background: var(--acento); } .fx-l.fx-central::before { background: var(--tinta); } .fx-l.fx-regra::before { background: var(--atencao); }
 .fx-l.fx-pessoa::before { background: var(--ok); } .fx-l.fx-ia::before { background: var(--alerta); }
-.fx-texto-alt summary { min-height: var(--alvo); display: flex; align-items: center; cursor: pointer; font-weight: 650; color: var(--acento-texto); }
+.fx-texto-alt summary { min-height: var(--alvo); display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--acento-texto); }
 .fx-lista { margin: var(--e-2) 0 0; padding-left: 1.3em; display: grid; gap: var(--e-2); font-size: var(--t-peq); }
 .fx-lista a { display: inline-flex; align-items: center; min-height: var(--alvo); color: var(--acento-texto); font-weight: 600; }
