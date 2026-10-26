@@ -165,8 +165,8 @@ button.linha:active, a.linha:active { background: var(--superficie-2); }
 .grupo-tit:first-child { margin-top: 0; }
 .vazio { padding: var(--e-6) var(--e-4); text-align: center; color: var(--texto-2); }
 .vazio strong { display: block; color: var(--texto); font-weight: 600; margin-bottom: var(--e-1); }
-.vazio .btn { margin-top: var(--e-3); }
-.dados { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; margin: 0; }
+.vazio .btn { display: flex; width: fit-content; margin: var(--e-3) auto 0; }
+.dados { display: grid; grid-template-columns: minmax(110px, 38%) minmax(0, 1fr); margin: 0; }
 .dados dt, .dados dd { margin: 0; padding: var(--e-3) var(--e-4); border-top: 1px solid var(--borda); }
 .dados dt { color: var(--texto-2); font-size: var(--t-2); }
 .dados dd { overflow-wrap: anywhere; }
@@ -262,7 +262,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 
 /* ---------------------------------------------------------------- Lista e item lado a lado (iPad deitado e computador) */
 @media (min-width: 1024px) {
-  .lado-a-lado { display: grid; grid-template-columns: minmax(340px, 400px) 1fr; gap: var(--e-6); align-items: start; }
+  .lado-a-lado { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: var(--e-6); align-items: start; }
   .lado-a-lado > .item-lado { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; }
   .lado-a-lado:has(> .item-lado[hidden]) { grid-template-columns: minmax(0, 1fr); }
   .lado-a-lado:has(> .item-lado[hidden]) > :first-child { max-width: 760px; }
@@ -402,3 +402,41 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 /* título de bloco com espaço acima (pilha): continua em linha, alinhado à esquerda */
 .tit-bloco.pilha { flex-direction: row; }
 @media (min-width: 1024px) { .lado-a-lado:has(> .so-largo:empty) { grid-template-columns: minmax(0, 1fr); } .lado-a-lado:has(> .so-largo:empty) > :last-child { max-width: 760px; } }
+
+/* linha com valor (Conta, Horários): no celular, o valor vai embaixo do título; no iPad e no computador, à direita */
+.linha .tx > .valor { max-width: none; text-align: left; margin-top: 2px; }
+@media (min-width: 768px) {
+  .linha .tx:has(> .valor) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--e-4); align-items: center; }
+  .linha .tx:has(> .valor) > .t1, .linha .tx:has(> .valor) > .t2 { grid-column: 1; }
+  .linha .tx > .valor { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; text-align: right; max-width: 220px; }
+}
+
+/* Agenda no celular: uma fileira de controles (molde B) */
+.so-cel, .titulo-cel { display: none; }
+@media (max-width: 767px) {
+  .controles > .so-cel { display: inline-flex; }
+  #calViews, #agChips, #agMedSel { display: none !important; }
+  .controles { flex-wrap: nowrap; }
+  .controles > #calVisao { flex: none; width: auto; min-width: 104px; }
+  .controles > #agFiltroBtn { flex: 1 1 auto; min-width: 0; justify-content: space-between; }
+  .controles > .data-nav { flex: 1 1 0; min-width: 0; justify-content: flex-end; }
+  #calTitulo { display: none; }
+  .titulo-cel { display: block; font-weight: 600; margin: 0 0 var(--e-3); }
+  .titulo-cel::first-letter { text-transform: uppercase; }
+  .controles { min-width: 0; max-width: 100%; }
+}
+.corta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* Molde D no iPad deitado e no computador: assuntos à esquerda, página à direita */
+@media (min-width: 1024px) {
+  body.com-assuntos #telas { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: var(--e-8); align-items: start; }
+  body.com-assuntos #telas > section.assuntos { grid-column: 1; grid-row: 1; position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; }
+  body.com-assuntos #telas > section:not(.assuntos) { grid-column: 2; grid-row: 1; min-width: 0; max-width: 760px; }
+  body.com-assuntos #telas > section:not(.assuntos) .voltar { display: none; }
+  body.com-assuntos .assuntos .subtitulo { display: none; }
+  body.com-assuntos .assuntos .linha .tx { display: flex; flex-direction: column; align-items: stretch; }
+  body.com-assuntos .assuntos .linha .tx > .valor { text-align: left; max-width: none; margin-top: 2px; }
+  body.com-assuntos .assuntos .linha .seta { display: none; }
+  body.com-assuntos #telas > section:not(.assuntos) .duas-ipad { display: block; }
+  body.com-assuntos #telas > section:not(.assuntos) .duas-ipad > * + * { margin-top: var(--e-4); }
+}

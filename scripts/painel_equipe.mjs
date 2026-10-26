@@ -65,7 +65,7 @@ ok(linhasCsv.length === 2004 && /^Código,Início/.test(linhasCsv[0]), 'CSV com 
 ok(linhasCsv[1].includes(`"'=HIPERLINK(""x"")"`), 'CSV: valor que começa com = vira texto (a planilha não executa)');
 ok(/^rxsync-agenda-\d{4}-\d{2}-\d{2}\.csv$/.test(download.suggestedFilename()), 'nome do arquivo: rxsync-agenda-AAAA-MM-DD.csv');
 await page.goto(site.base + '/painel/#conta/assinatura');
-await page.getByRole('button', { name: 'Cancelar e excluir a conta' }).click();
+await page.locator('#assinConteudo').getByRole('button', { name: 'Cancelar e excluir a conta' }).click();
 await page.click('#confOk');
 await page.waitForTimeout(300);
 ok(chamadas.some(c => c.acao === 'conta_exclusao_pedir' && c.caminho === 'painel-entrada') && !chamadas.some(c => c.acao === 'assinatura_cancelar'), 'Cancelar e excluir: pede o link ao 29; nunca o assinatura_cancelar');

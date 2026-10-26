@@ -186,7 +186,7 @@ async function pacExcluir(p) {
     }
     if (!r.ok) { rapida(pacErro(r)); return; }
     PAC.sujo = true;
-    rapida('Paciente excluído.' + (r.consultas_anonimizadas ? ' ' + r.consultas_anonimizadas + ' consulta(s) ficaram como "Paciente excluído".' : '') + (r.documentos_mantidos ? ' Os documentos desse telefone ficaram, porque outro paciente usa o mesmo número.' : ''), { ms: 7000 });
+    rapida('Paciente excluído.' + (r.consultas_anonimizadas ? ' ' + pl(r.consultas_anonimizadas, 'consulta ficou', 'consultas ficaram') + ' como "Paciente excluído".' : '') + (r.documentos_mantidos ? ' Os documentos desse telefone ficaram, porque outro paciente usa o mesmo número.' : ''), { ms: 7000 });
     ir('pacientes');
   }).catch(() => rapida(PAC_ERROS.interno));
 }
@@ -364,12 +364,12 @@ function impConfirmar() {
   if (p.existentes) det.push('Os já cadastrados (mesmo nome, sem contar acento, e mesmo telefone) não são duplicados: só completamos o e-mail, o nascimento e a observação que estiverem vazios.');
   if (p.parecidos) det.push('Os que têm o telefone de outro paciente com outro nome (por exemplo, mãe e filho) entram como pacientes novos; confira depois em Possíveis duplicados.');
   if (IMP.mapa.observacao >= 0) { const n = IMP.validas.filter(v => v.observacao).length; det.push(n === 1 ? '1 linha tem observação preenchida (vai ser importada). Confira se é só informação administrativa.' : n + ' linhas têm observação preenchida (vão ser importadas). Confira se é só informação administrativa.'); }
-  if (IMP.repetidas + p.repetidas) det.push((IMP.repetidas + p.repetidas) + ' linha(s) repetida(s) no próprio arquivo ficaram de fora.');
+  if (IMP.repetidas + p.repetidas) det.push(pl(IMP.repetidas + p.repetidas, 'linha repetida', 'linhas repetidas') + ' no próprio arquivo ' + (IMP.repetidas + p.repetidas === 1 ? 'ficou' : 'ficaram') + ' de fora.');
   anexar(t, el('div', { class: 'numeros bloco' }, numeroGrande('pacientes novos', p.novos), numeroGrande('já cadastrados', p.existentes), numeroGrande('com o telefone de outro paciente', p.parecidos), numeroGrande('com erro', erros.length)),
     det.map(x => el('p', { class: 'dica', text: x })), impListaErros(erros));
   if (!p.novos && !p.existentes) { anexar(t, el('div', { class: 'pilha' }, aviso('atencao', 'Não há nenhum paciente para importar neste arquivo.'), btn('Escolher outro arquivo', impInicio, 'sec plena'))); return; }
   const cb = el('input', { type: 'checkbox' });
-  const texto = p.novos ? 'Importar ' + p.novos.toLocaleString('pt-BR') + (p.novos === 1 ? ' paciente' : ' pacientes') : 'Completar ' + p.existentes.toLocaleString('pt-BR') + ' cadastro(s)';
+  const texto = p.novos ? 'Importar ' + p.novos.toLocaleString('pt-BR') + (p.novos === 1 ? ' paciente' : ' pacientes') : 'Completar ' + pl(p.existentes, 'cadastro', 'cadastros');
   const ir1 = btn(texto, async () => {
     if (!cb.checked) return;
     if (!(await confirmar({ titulo: texto + '?', texto: ['Os pacientes importados não recebem nenhuma mensagem automática até escreverem para a clínica no WhatsApp.', 'Dá para desfazer em até 7 dias, em Pacientes › Organizar › Importações.'], botao: texto }))) return;
@@ -402,7 +402,7 @@ async function impDesfazer(imp, depois) {
   p24('paciente_importacao_desfazer', { importacao_id: String(imp.id) }).then(r => {
     if (!r.ok) { rapida(r.erro === 'prazo' ? 'Essa importação já foi desfeita ou passou dos 7 dias.' : pacErro(r)); return; }
     PAC.sujo = true;
-    rapida('Importação desfeita: ' + r.removidos + ' paciente(s) removido(s).' + (r.mantidos ? ' ' + r.mantidos + ' ficaram porque já têm consulta, conversa ou edição.' : '') + (r.completados_mantidos ? ' ' + r.completados_mantidos + ' cadastro(s) completado(s) continuam como estão.' : ''), { ms: 9000 });
+    rapida('Importação desfeita: ' + pl(r.removidos, 'paciente removido', 'pacientes removidos') + '.' + (r.mantidos ? ' ' + r.mantidos + ' ficaram porque já têm consulta, conversa ou edição.' : '') + (r.completados_mantidos ? ' ' + (r.completados_mantidos === 1 ? '1 cadastro completado continua como está.' : r.completados_mantidos + ' cadastros completados continuam como estão.') : ''), { ms: 9000 });
     if (depois) depois();
   }).catch(() => rapida(PAC_ERROS.interno));
 }
@@ -417,7 +417,7 @@ function impListaCarregar() {
     const l = d.importacoes || [];
     if (!l.length) { trocar(box, el('div', { class: 'cartao' }, vazio('Nenhuma importação ainda', null, btn('Importar pacientes', () => ir('pacientes/importar'), 'sec')))); return; }
     trocar(box, el('div', { class: 'lista' }, l.map(i => el('div', { class: 'linha' }, el('span', { class: 'tx' }, el('span', { class: 't1' }, fmtQuando(i.criado_em) + ' ', etq(i.origem === 'planilha' ? 'Planilha' : 'Reservio', '')),
-      el('span', { class: 't2', text: [i.novos + ' novo(s)', i.existentes + ' já cadastrado(s)', i.completados + ' completado(s)', i.erros + ' com erro'].join(' · ') }),
+      el('span', { class: 't2', text: [pl(i.novos, 'novo', 'novos'), pl(i.existentes, 'já cadastrado', 'já cadastrados'), pl(i.completados, 'completado', 'completados'), i.erros + ' com erro'].join(' · ') }),
       el('span', { class: 't2', text: i.desfeita_em ? 'Desfeita em ' + fmtQuando(i.desfeita_em) + '.' : i.pode_desfazer ? 'Desfazer até ' + fmtDia(new Date(new Date(i.criado_em).getTime() + 7 * 86400000).toISOString()) + '. Os que já existiam e foram completados não voltam atrás.' : 'Passou o prazo de 7 dias para desfazer.' })),
     !i.desfeita_em && i.pode_desfazer ? btn('Desfazer', () => impDesfazer({ id: i.id, completados: i.completados }, impListaCarregar), 'perigo-sec') : null))));
   }).catch(() => trocar(box, aviso('perigo', PAC_ERROS.interno)));

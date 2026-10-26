@@ -191,7 +191,7 @@ for (const arq of ['autoedicao.html', 'painel/index.html']) {
       if (!/prefers-reduced-motion:\s*reduce/.test(estilo)) p12('falta a regra de "Reduzir movimento"');
       if (!/body\s*\{[^}]*font-variant-numeric:\s*tabular-nums/.test(estilo)) p12('os números precisam de largura fixa (font-variant-numeric: tabular-nums no body)');
       // Cores e tamanhos só no assets/ancora/tokens.css: nas fontes do painel, nenhuma cor solta (#abc, rgb()).
-      for (const f of fs.readdirSync('painel/fonte').filter(x => /\.(css|js)$/.test(x) && x !== '00_cinza.css')) {
+      for (const f of fs.readdirSync('painel/fonte').filter(x => /\.(css|js)$/.test(x))) {
         const t = fs.readFileSync(path.join('painel/fonte', f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
         for (const m of t.matchAll(/#[0-9a-fA-F]{3,8}\b(?![\w-])|rgba?\([^)]*\)/g)) if (!/^#(FFFFFF|fff)$/i.test(m[0]) || f.endsWith('.js')) erro(`painel/fonte/${f}: cor solta ${m[0]}; use uma variável do assets/ancora/tokens.css`);
       }

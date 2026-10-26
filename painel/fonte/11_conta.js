@@ -16,7 +16,7 @@ tela('conta', {
       el('a', { class: 'linha', href: '/privacidade.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('escudo')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Política de Privacidade' })), el('span', { class: 'seta' }, icone('seta')))))),
     el('div', { class: 'bloco' }, el('button', { class: 'btn sec plena', type: 'button', id: 'btnSair', onclick: e => sairPainel(e.currentTarget) }, icone('sair', 'p'), 'Sair do painel'),
       el('p', { class: 'legenda pilha', text: 'Sair encerra a sessão e esquece este aparelho: na próxima vez, o painel pede o e-mail, a senha e o código.' })),
-    ehDono() ? el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Excluir a conta' }), btn('Cancelar e excluir a conta', () => ir('conta/assinatura'), 'perigo-sec plena')) : null]
+    ehDono() ? el('div', { class: 'perigo-zona' }, btn('Cancelar e excluir a conta', () => ir('conta/assinatura'), 'perigo-sec plena')) : null]
 });
 const foneBonito = n => { const d = String(n || '').replace(/\D/g, ''); return d.length === 13 || d.length === 12 ? '+' + d.slice(0, 2) + ' (' + d.slice(2, 4) + ') ' + d.slice(4, -4) + '-' + d.slice(-4) : n; };
 
@@ -37,7 +37,7 @@ tela('conta/assinatura', {
 function assinCarregar() {
   const box = $('assinConteudo');
   if (!ehDono()) { trocar(box, aviso('', 'Plano e pagamento ficam só com o dono da conta.')); return; }
-  trocar(box, el('div', { class: 'cartao' }, esqueleto()));
+  if (!box.firstChild) trocar(box, el('div', { class: 'cartao' }, esqueleto()));   // ao voltar, o que já está na tela fica até chegar o novo
   c24('assinatura_ver', {}).then(r => { if (!r || !r.ok || !r.assinatura) throw new Error(); assinRender(r.assinatura); })
     .catch(() => trocar(box, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'A assinatura não carregou agora.', btn('Tentar de novo', assinCarregar, 'sec')))));
 }
@@ -90,7 +90,7 @@ function assinRender(a) {
     else {
       // Cancelar e excluir a conta (DEC-114): o servidor manda um link ao e-mail do dono; vale só quando ele confirma por lá.
       const teste = a.situacao === 'teste';
-      blocos.push(el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Cancelar e excluir a conta' }),
+      blocos.push(el('div', { class: 'perigo-zona' },
         el('p', { class: 'mudo peq', text: teste ? 'O teste grátis é encerrado na hora e nada é cobrado. Os dados são apagados 15 dias depois.' : a.forma === 'mensal' ? 'Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Os dados são apagados 15 dias depois. Você pode desistir até a data.' : 'Seu plano é anual, com permanência: o pedido vai para a nossa equipe, que fala com você sobre as condições.' }),
         el('p', { class: 'mudo peq bloco', text: 'Mandamos um link para o seu e-mail; o pedido só vale quando você confirmar por ele (24 horas). Antes, baixe a agenda e os pacientes em Conta › Baixar meus dados.' }),
         btn('Cancelar e excluir a conta', ev => contaExcluirPedir(ev.currentTarget), 'perigo-sec plena')));
@@ -211,12 +211,12 @@ async function dadosBaixar(parte, b, msg) {
       const r = await c29('dados_exportar', { parte, pagina });
       if (r && r.sair) { location.reload(); return; }
       if (!r || !r.ok) throw new Error((r && r.mensagem) || 'Não consegui baixar agora.');
-      linhas = linhas.concat(r.linhas || []); msg.textContent = 'Preparando a planilha… ' + linhas.length + ' linha(s)';
+      linhas = linhas.concat(r.linhas || []); msg.textContent = 'Preparando a planilha… ' + pl(linhas.length, 'linha', 'linhas');
       if (!r.tem_mais) break; pagina++;
     }
     const cols = DADOS_COLUNAS[parte];
     baixarArquivo('﻿' + cols.map(c => csvCelula(c[1])).join(',') + '\r\n' + linhas.map(l => cols.map(c => csvCelula(l[c[0]])).join(',')).join('\r\n'), 'text/csv;charset=utf-8', 'rxsync-' + parte + '-' + new Date().toISOString().slice(0, 10) + '.csv');
-    msg.textContent = 'Pronto: ' + linhas.length + ' linha(s).';
+    msg.textContent = 'Pronto: ' + pl(linhas.length, 'linha', 'linhas') + '.';
   } catch (e) { msg.textContent = ''; rapida(e.message, { ms: 6000 }); }
   b.disabled = false;
 }

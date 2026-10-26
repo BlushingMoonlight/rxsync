@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wC6O3kt6eE+XDk8KjxF/CWFYoIJekFZbZFylr5d8BLQ=' 'self'; style-src 'sha256-VQqe9uFOB4Q2FpltUy5Sq4QteKZ6pdn6oBCmpwqJoo8=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-BnqsUt/4ZNORArYxh86NfYY6kuStKxAKpKaJUtNN95g=' 'self'; style-src 'sha256-PoHV2YJDZQzCAeyF5+0HGq70pMeJnaKsmospjJwy+SI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -60,15 +60,6 @@
   --foco: #A8DDD9;
   --sombra-menu: none; --sombra-janela: none; --veu: rgba(0, 0, 0, .6);
   color-scheme: dark;
-}
-/* Esqueleto em cinza (entrega 2 do plano do novo front, primeiro commit): sem cor nem marca, para o Jean aprovar a
-   organização das telas antes da cor. Este arquivo sai no commit da cor, depois do "aprovado". */
-:root {
-  --primaria: #3F474C; --primaria-forte: #2B3135; --primaria-suave: #ECEEEF;
-  --ok-texto: #3F474C; --ok-fundo: #F0F1F2;
-  --atencao-texto: #3F474C; --atencao-fundo: #F0F1F2;
-  --perigo-texto: #3F474C; --perigo-fundo: #F0F1F2; --perigo-forte: #3F474C;
-  --foco: #3F474C;
 }
 /* =====================================================================================================
    Painel da clínica (painel/, rxsync-sistema DEC-156). Cores e tamanhos: assets/ancora/tokens.css (o Âncora).
@@ -237,8 +228,8 @@ button.linha:active, a.linha:active { background: var(--superficie-2); }
 .grupo-tit:first-child { margin-top: 0; }
 .vazio { padding: var(--e-6) var(--e-4); text-align: center; color: var(--texto-2); }
 .vazio strong { display: block; color: var(--texto); font-weight: 600; margin-bottom: var(--e-1); }
-.vazio .btn { margin-top: var(--e-3); }
-.dados { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; margin: 0; }
+.vazio .btn { display: flex; width: fit-content; margin: var(--e-3) auto 0; }
+.dados { display: grid; grid-template-columns: minmax(110px, 38%) minmax(0, 1fr); margin: 0; }
 .dados dt, .dados dd { margin: 0; padding: var(--e-3) var(--e-4); border-top: 1px solid var(--borda); }
 .dados dt { color: var(--texto-2); font-size: var(--t-2); }
 .dados dd { overflow-wrap: anywhere; }
@@ -334,7 +325,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 
 /* ---------------------------------------------------------------- Lista e item lado a lado (iPad deitado e computador) */
 @media (min-width: 1024px) {
-  .lado-a-lado { display: grid; grid-template-columns: minmax(340px, 400px) 1fr; gap: var(--e-6); align-items: start; }
+  .lado-a-lado { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: var(--e-6); align-items: start; }
   .lado-a-lado > .item-lado { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; }
   .lado-a-lado:has(> .item-lado[hidden]) { grid-template-columns: minmax(0, 1fr); }
   .lado-a-lado:has(> .item-lado[hidden]) > :first-child { max-width: 760px; }
@@ -473,7 +464,45 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 .pad-x { padding: var(--e-2) var(--e-4) 0; }
 /* título de bloco com espaço acima (pilha): continua em linha, alinhado à esquerda */
 .tit-bloco.pilha { flex-direction: row; }
-@media (min-width: 1024px) { .lado-a-lado:has(> .so-largo:empty) { grid-template-columns: minmax(0, 1fr); } .lado-a-lado:has(> .so-largo:empty) > :last-child { max-width: 760px; } }</style>
+@media (min-width: 1024px) { .lado-a-lado:has(> .so-largo:empty) { grid-template-columns: minmax(0, 1fr); } .lado-a-lado:has(> .so-largo:empty) > :last-child { max-width: 760px; } }
+
+/* linha com valor (Conta, Horários): no celular, o valor vai embaixo do título; no iPad e no computador, à direita */
+.linha .tx > .valor { max-width: none; text-align: left; margin-top: 2px; }
+@media (min-width: 768px) {
+  .linha .tx:has(> .valor) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--e-4); align-items: center; }
+  .linha .tx:has(> .valor) > .t1, .linha .tx:has(> .valor) > .t2 { grid-column: 1; }
+  .linha .tx > .valor { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; text-align: right; max-width: 220px; }
+}
+
+/* Agenda no celular: uma fileira de controles (molde B) */
+.so-cel, .titulo-cel { display: none; }
+@media (max-width: 767px) {
+  .controles > .so-cel { display: inline-flex; }
+  #calViews, #agChips, #agMedSel { display: none !important; }
+  .controles { flex-wrap: nowrap; }
+  .controles > #calVisao { flex: none; width: auto; min-width: 104px; }
+  .controles > #agFiltroBtn { flex: 1 1 auto; min-width: 0; justify-content: space-between; }
+  .controles > .data-nav { flex: 1 1 0; min-width: 0; justify-content: flex-end; }
+  #calTitulo { display: none; }
+  .titulo-cel { display: block; font-weight: 600; margin: 0 0 var(--e-3); }
+  .titulo-cel::first-letter { text-transform: uppercase; }
+  .controles { min-width: 0; max-width: 100%; }
+}
+.corta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* Molde D no iPad deitado e no computador: assuntos à esquerda, página à direita */
+@media (min-width: 1024px) {
+  body.com-assuntos #telas { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: var(--e-8); align-items: start; }
+  body.com-assuntos #telas > section.assuntos { grid-column: 1; grid-row: 1; position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; }
+  body.com-assuntos #telas > section:not(.assuntos) { grid-column: 2; grid-row: 1; min-width: 0; max-width: 760px; }
+  body.com-assuntos #telas > section:not(.assuntos) .voltar { display: none; }
+  body.com-assuntos .assuntos .subtitulo { display: none; }
+  body.com-assuntos .assuntos .linha .tx { display: flex; flex-direction: column; align-items: stretch; }
+  body.com-assuntos .assuntos .linha .tx > .valor { text-align: left; max-width: none; margin-top: 2px; }
+  body.com-assuntos .assuntos .linha .seta { display: none; }
+  body.com-assuntos #telas > section:not(.assuntos) .duas-ipad { display: block; }
+  body.com-assuntos #telas > section:not(.assuntos) .duas-ipad > * + * { margin-top: var(--e-4); }
+}</style>
 </head>
 <body>
 <!-- Página montada por scripts/painel_montar.mjs a partir de painel/fonte/. Não edite este arquivo à mão. -->
@@ -624,8 +653,10 @@ const aviso = (tom, texto, ...extra) => el('div', { class: 'aviso ' + (tom || ''
 const vazio = (titulo, texto, acao) => el('div', { class: 'vazio' }, titulo ? el('strong', { text: titulo }) : null, texto || null, acao || null);
 const esqueleto = () => el('div', { 'aria-busy': 'true', 'aria-label': 'Carregando' }, el('span', { class: 'esq' }), el('span', { class: 'esq l2' }), el('span', { class: 'esq l3' }));
 const linhaLink = (titulo, sub, rota, ic, valor) => el('button', { class: 'linha', type: 'button', 'data-ir': rota }, ic ? el('span', { class: 'ic' }, icone(ic)) : null,
-  el('span', { class: 'tx' }, el('span', { class: 't1', text: titulo }), sub ? el('span', { class: 't2', text: sub }) : null), valor != null ? el('span', { class: 'valor', text: valor }) : null, el('span', { class: 'seta' }, icone('seta')));
+  el('span', { class: 'tx' }, el('span', { class: 't1', text: titulo }), sub ? el('span', { class: 't2', text: sub }) : null, valor != null ? el('span', { class: 'valor', text: valor }) : null), el('span', { class: 'seta' }, icone('seta')));
 const fmtNum = v => v == null ? '—' : Number(v).toLocaleString('pt-BR');
+// O número com a palavra no singular ou no plural certo: pl(2, 'consulta', 'consultas') = "2 consultas".
+const pl = (n, um, varios) => fmtNum(n || 0) + ' ' + (Number(n) === 1 ? um : varios);
 const semAcento = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 // Larguras e posições calculadas vão pelo CSSOM (element.style), que a regra de segurança permite; nunca por style= no HTML.
 const largura = (n, pct) => { n.style.width = Math.max(0, Math.min(100, pct)) + '%'; return n; };
@@ -946,17 +977,34 @@ function rotaAtual() {
   for (let n = partes.length; n > 0; n--) { const k = partes.slice(0, n).join('/'); if (TELAS[k]) return { rota: k, param: partes.slice(n).join('/') }; }
   return { rota: 'hoje', param: '' };
 }
+// Molde D no iPad deitado e no computador: Conta e Assistente viram menu de assuntos à esquerda (a própria tela de
+// entrada da área) e a página aberta à direita; na entrada da área, abre o primeiro assunto.
+const MOLDE_D = { conta: () => ehDono() ? 'conta/assinatura' : 'conta/whatsapp', assistente: () => 'assistente/clinica' };
+const LARGO = window.matchMedia('(min-width: 1024px)');
+function montarTela(rota) {
+  const t = TELAS[rota];
+  if (!t.sec) { t.sec = el('section', { 'data-tela': rota }); if (t.montar) anexar(t.sec, t.montar(t.sec)); $('telas').append(t.sec); }
+  return t;
+}
 function rotear() {
   if ($('app').hidden) return;
   const { rota, param } = rotaAtual(), t = TELAS[rota];
   document.body.dataset.area = t.area;
   document.querySelectorAll('[data-area]').forEach(b => { if (b.dataset.area === t.area) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  if (!t.sec) { t.sec = el('section', { 'data-tela': rota }); if (t.montar) anexar(t.sec, t.montar(t.sec)); $('telas').append(t.sec); }
-  document.querySelectorAll('#telas > section').forEach(s => { s.hidden = s !== t.sec; });
-  if (t.entrar) t.entrar(param, t.sec);
+  const d = LARGO.matches && MOLDE_D[t.area] && TELAS[t.area] ? t.area : null;
+  const rotaAberta = d && rota === d ? MOLDE_D[d]() : rota, aberta = montarTela(rotaAberta), raiz = d ? montarTela(d) : null;
+  if (raiz) raiz.sec.classList.add('assuntos');
+  document.body.classList.toggle('com-assuntos', !!d);
+  document.querySelectorAll('#telas > section').forEach(s => { s.hidden = s !== aberta.sec && !(raiz && s === raiz.sec); });
+  if (raiz) {
+    if (raiz.entrar) raiz.entrar('', raiz.sec);
+    raiz.sec.querySelectorAll('[data-ir]').forEach(b => { const sim = b.getAttribute('data-ir') === rotaAberta; b.classList.toggle('selecionada', sim); if (sim) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  }
+  if (aberta.entrar) aberta.entrar(rotaAberta === rota ? param : '', aberta.sec);
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', rotear);
+LARGO.addEventListener('change', () => rotear());
 // Cabeçalho de tela: onde estou, a ação principal (fixa embaixo no celular, no alto no iPad) e o ⋯ do que é raro.
 function cabTela(titulo, op) {
   op = op || {};
@@ -1441,13 +1489,13 @@ function hojeRender() {
     el('span', { class: 'tx' }, el('span', { class: 't1', text: np === 1 ? '1 consulta não paga' : np + ' consultas não pagas' }), el('span', { class: 't2', text: 'Confirmadas sem pagamento marcado' })), el('span', { class: 'seta' }, icone('seta'))));
   if (HOJE.docs7) precisa.push(linhaLink(HOJE.docs7 === 1 ? '1 documento recebido' : HOJE.docs7 + ' documentos recebidos', 'De pacientes, nos últimos 7 dias', 'agenda/documentos', 'documento'));
   const colPrincipal = [el('div', { class: 'bloco', id: 'hojeAtencao' }, el('h2', { text: 'Precisa de você' }), precisa.length ? el('div', { class: 'lista' }, precisa) : el('div', { class: 'cartao' }, vazio(null, 'Nada pendente agora.'))),
-    el('div', { class: 'bloco' }, el('h2', { class: 'tit-bloco' }, 'Consultas de hoje', el('span', { class: 'extra num', id: 'hojeTotal', text: lista.filter(a => a.servico !== 'BLOQUEIO').length ? lista.filter(a => a.servico !== 'BLOQUEIO').length + ' consulta(s)' : '' })),
+    el('div', { class: 'bloco' }, el('h2', { class: 'tit-bloco' }, 'Consultas de hoje', el('span', { class: 'extra num', id: 'hojeTotal', text: lista.filter(a => a.servico !== 'BLOQUEIO').length ? pl(lista.filter(a => a.servico !== 'BLOQUEIO').length, 'consulta', 'consultas') : '' })),
       el('div', { id: 'hojeLinha' }, AG.carregou ? (lista.length ? el('div', { class: 'lista' }, lista.map(a => consultaLinha(a, { hora: true }))) : el('div', { class: 'cartao' }, vazio('Nenhuma consulta hoje', 'Quando a assistente ou a equipe marcar, a consulta aparece aqui.', btn('Nova consulta', () => { ir('agenda'); setTimeout(() => consultaNova(), 50); }, 'sec', 'soma')))) : el('div', { class: 'cartao' }, esqueleto())),
       el('p', { class: 'mudo peq pilha', id: 'hojeAmanha', text: nAmanha ? 'Amanhã: ' + nAmanha + (nAmanha === 1 ? ' consulta marcada.' : ' consultas marcadas.') : '' }))];
   const ind = HOJE.ind, a = ind && ind.atual;
   const numeros = el('div', { class: 'bloco', id: 'hojeNumeros' }, el('h2', { text: 'Últimos 30 dias' }), !ind ? el('div', { class: 'cartao' }, esqueleto()) : ind.erro ? el('div', { class: 'cartao' }, vazio(null, 'Os números não carregaram agora.')) :
-    el('div', { class: 'numeros' }, indicador('Conversas', fmtNum(a.conversas), 'pessoas que falaram com a assistente (Chatwoot)'), indicador('Marcadas pela assistente', fmtNum(a.agendadas_ia), 'consultas sem trabalho da equipe (agenda)'),
-      indicador('Confirmaram presença', a.com_lembrete ? a.presenca_confirmada + ' de ' + a.com_lembrete : '—', 'responderam ao lembrete (agenda)')),
+    el('div', { class: 'numeros' }, indicador('Conversas', fmtNum(a.conversas), 'pessoas que falaram com a assistente'), indicador('Marcadas pela assistente', fmtNum(a.agendadas_ia), 'consultas sem trabalho da equipe'),
+      indicador('Confirmaram presença', a.com_lembrete ? a.presenca_confirmada + ' de ' + a.com_lembrete : '—', 'responderam ao lembrete')),
     el('div', { class: 'pilha' }, btn('Ver resultados', () => ir('resultados'), 'sec', 'grafico')));
   const colLado = [numeros, sem('assistente_dono') && !HOJE.semGestaoFechado && ehDono() ? el('div', { class: 'cartao pad bloco' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'selo-plano', text: 'Gestão' }), 'Assistente de gestão'),
     el('p', { class: 'mudo', text: 'Pergunte sobre a agenda e peça mudanças pelo painel ou pelo seu WhatsApp, sem abrir o painel. Faz parte do plano Gestão Inteligente.' }),
@@ -1517,7 +1565,7 @@ function resultadosCarregar() {
   }).catch(() => trocar(box, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'Os resultados não carregaram agora.', btn('Tentar de novo', resultadosCarregar, 'sec')))));
 }
 const resCartaoGrafico = (t, id) => el('div', { class: 'bloco' }, el('h2', { text: t }), el('div', { class: 'cartao pad' }, el('div', { class: 'grafico-caixa baixo' }, el('canvas', { id, role: 'img', 'aria-label': t }))));
-function resDescreverSerie(s) { const ia = s.reduce((n, x) => n + (x.ia || 0), 0), eq = s.reduce((n, x) => n + (x.manual || 0), 0); return 'No período: ' + ia + ' consulta(s) marcadas pela assistente e ' + eq + ' pela equipe.'; }
+function resDescreverSerie(s) { const ia = s.reduce((n, x) => n + (x.ia || 0), 0), eq = s.reduce((n, x) => n + (x.manual || 0), 0); return 'No período: ' + pl(ia, 'consulta marcada', 'consultas marcadas') + ' pela assistente e ' + eq + ' pela equipe.'; }
 function resTotais(t) {
   const total = t.ia || 0; let nivel = RES_NIVEIS[0], prox = null;
   RES_NIVEIS.forEach((n, i) => { if (total >= n[0]) { nivel = n; prox = RES_NIVEIS[i + 1] || null; } });
@@ -1644,13 +1692,18 @@ tela('agenda', {
     ['Bloquear horário', 'bloquear', () => bloquearForm()], ['Exportar para Google Agenda, Outlook ou iPhone', 'baixar', () => agExportar()],
     ['Ver as canceladas', 'proibido', () => { AG.visao = 'lista'; AG.filtro = 'cancelados'; agMostrar(); }]] } }),
     agAbas(''),
+    // No celular, uma fileira só (molde B): a visão num seletor e, na Lista, o filtro num botão que abre uma folha.
     el('div', { class: 'controles' },
+      el('select', { class: 'entrada so-cel', id: 'calVisao', 'aria-label': 'Visão', onchange: e => { AG.visao = e.target.value; agMostrar(); } },
+        [['lista', 'Lista'], ['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([v, t]) => el('option', { value: v, text: t }))),
+      el('button', { class: 'btn sec so-cel', type: 'button', id: 'agFiltroBtn', 'aria-haspopup': 'dialog', onclick: () => agFiltroFolha() }),
       el('div', { class: 'seg', role: 'group', 'aria-label': 'Visão', id: 'calViews' }, [['lista', 'Lista'], ['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([v, t]) =>
         el('button', { type: 'button', 'data-v': v, text: t, onclick: () => { AG.visao = v; agMostrar(); } }))),
       el('div', { class: 'data-nav', id: 'calNav' }, el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Anterior', id: 'calPrev', onclick: () => calMover(-1) }, icone('voltar')),
         el('button', { class: 'btn sec', type: 'button', id: 'calHoje', text: 'Hoje', onclick: () => { calRef = hojeLocal(); agMostrar(); } }),
         el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Próximo', id: 'calProx', onclick: () => calMover(1) }, icone('seta')), el('span', { class: 'titulo-data', id: 'calTitulo' })),
       el('select', { class: 'entrada cresce', id: 'agMedSel', 'aria-label': 'Médico', hidden: true, onchange: e => { MED.filtro = e.target.value; agMostrar(); } })),
+    el('p', { class: 'titulo-cel', id: 'calTituloCel', 'aria-live': 'polite' }),   // no celular, a data fica embaixo da fileira
     el('div', { class: 'filtros', id: 'agChips', role: 'group', 'aria-label': 'Filtrar consultas' }),
     el('div', { class: 'lado-a-lado' }, el('div', {}, el('div', { id: 'agLista' }, el('div', { class: 'cartao' }, esqueleto())), el('div', { id: 'calBox', hidden: true })),
       el('div', { class: 'item-lado', id: 'agItem', hidden: true }))],
@@ -1665,22 +1718,38 @@ function agMostrar() {
   if (!$('calViews')) return;
   document.querySelectorAll('#calViews button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === AG.visao)));
   const lista = AG.visao === 'lista', diaLista = AG.visao === 'dia' && estreito();
-  $('agChips').hidden = !lista; $('calNav').hidden = lista;
+  $('agChips').hidden = !lista; $('agFiltroBtn').hidden = !lista; $('calNav').hidden = lista; $('calTituloCel').hidden = lista; $('calVisao').value = AG.visao;
   $('agLista').hidden = !(lista || diaLista); $('calBox').hidden = lista || diaLista;
   const sel = $('agMedSel'), ativos = MED.dados.filter(m => m.ativo);
   if (!MED.modo || (MED.filtro && !ativos.some(m => String(m.id) === MED.filtro))) MED.filtro = '';
   trocar(sel, el('option', { value: '', text: 'Todos os médicos' }), ativos.map(m => el('option', { value: String(m.id), text: m.nome })));
   sel.value = MED.filtro; sel.hidden = !MED.modo;
-  $('calTitulo').textContent = calTitulo();
+  $('calTitulo').textContent = $('calTituloCel').textContent = calTitulo();
   agRender();
   if (!lista) calCarregar();
+}
+const AG_FIL = [['novos', 'Novos'], ['proximos', 'Próximos'], ['passados', 'Passados'], ['cancelados', 'Cancelados'], ['naopagas', 'Não pagas']];
+// Filtro da Lista no celular: uma folha com as opções (e o médico, na agenda por médico); tocar aplica e fecha.
+function agFiltroFolha() {
+  const qtd = AG.contagem || (() => '');
+  const opc = AG_FIL.map(([k, t]) => el('button', { class: 'linha' + (AG.filtro === k ? ' selecionada' : ''), type: 'button', 'aria-pressed': String(AG.filtro === k),
+    onclick: () => { AG.filtro = k; if (k === 'naopagas') agNaoPagasCarregar(); f.fechar(); agRender(); } },
+    el('span', { class: 'tx' }, el('span', { class: 't1', text: t + qtd(k) })), AG.filtro === k ? el('span', { class: 'seta' }, icone('ok')) : null));
+  const ativos = MED.modo ? MED.dados.filter(m => m.ativo) : [];
+  const med = ativos.length ? el('select', { class: 'entrada', id: 'agFiltroMed', 'aria-label': 'Médico', onchange: e => { MED.filtro = e.target.value; f.fechar(); agMostrar(); } },
+    el('option', { value: '', text: 'Todos os médicos' }), ativos.map(m => el('option', { value: String(m.id), text: m.nome, selected: String(m.id) === MED.filtro }))) : null;
+  const f = folha('Filtrar consultas', el('div', {}, el('div', { class: 'lista' }, opc), med ? el('div', { class: 'campo pilha' }, el('label', { for: 'agFiltroMed', text: 'Médico' }), med) : null));
 }
 function agRender() {
   const lista = $('agLista'); if (!lista || !AG.carregou) return;
   if (AG.visao === 'dia' && estreito()) return calCarregar();
   if (AG.visao !== 'lista') return;
   const g = agGrupos(AG.dados.filter(medFiltra)); g.naopagas = (AG.naoPagas || []).filter(medFiltra);
-  const FIL = [['novos', 'Novos'], ['proximos', 'Próximos'], ['passados', 'Passados'], ['cancelados', 'Cancelados'], ['naopagas', 'Não pagas']];
+  const FIL = AG_FIL;
+  const qtd = k => k === 'naopagas' && AG.naoPagas === null ? '' : ' (' + g[k].length + ')';
+  const fil = FIL.find(([k]) => k === AG.filtro) || FIL[0], med = MED.filtro && medNome(MED.filtro);
+  trocar($('agFiltroBtn'), el('span', { class: 'corta', text: 'Filtro: ' + fil[1] + qtd(fil[0]) + (med ? ' · ' + med : '') }), icone('seta', 'p'));
+  AG.contagem = qtd;
   trocar($('agChips'), FIL.map(([k, t]) => el('button', { type: 'button', 'aria-pressed': String(AG.filtro === k), text: t + (k === 'naopagas' && AG.naoPagas === null ? '' : ' (' + g[k].length + ')'),
     onclick: () => { AG.filtro = k; if (k === 'naopagas') agNaoPagasCarregar(); agRender(); } })));
   const itens = g[AG.filtro] || [];
@@ -1688,9 +1757,9 @@ function agRender() {
   if (AG.filtro === 'naopagas') topo.push(el('p', { class: 'mudo peq bloco', text: AG.naoPagas === null ? 'Carregando…' : 'Consultas confirmadas sem pagamento marcado, dos últimos 180 dias em diante. Marcar como paga é só um registro: nada é cancelado sozinho.' }));
   if (AG.filtro === 'cancelados' && itens.length) topo.push(el('div', { class: 'bloco' }, btn('Excluir todas as canceladas (' + itens.length + ')', async ev => {
     const b = ev.currentTarget;
-    if (!(await confirmar({ titulo: 'Excluir as ' + itens.length + ' consultas canceladas?', texto: 'Saem de vez da agenda. Não dá para desfazer.', botao: 'Excluir ' + itens.length, perigo: true }))) return;
+    if (!(await confirmar({ titulo: itens.length === 1 ? 'Excluir a consulta cancelada?' : 'Excluir as ' + itens.length + ' consultas canceladas?', texto: 'Saem de vez da agenda. Não dá para desfazer.', botao: 'Excluir ' + itens.length, perigo: true }))) return;
     b.disabled = true;
-    d24('agenda_excluir_cancelados').then(r => { rapida((r && r.n ? r.n : 0) + ' excluída(s).'); agCarregar(); }).catch(() => { b.disabled = false; rapida('Não consegui excluir. Tente de novo.'); });
+    d24('agenda_excluir_cancelados').then(r => { rapida(pl(r && r.n ? r.n : 0, 'consulta excluída', 'consultas excluídas') + '.'); agCarregar(); }).catch(() => { b.disabled = false; rapida('Não consegui excluir. Tente de novo.'); });
   }, 'perigo-sec plena')));
   trocar(lista, topo, itens.length ? el('div', { class: 'lista' }, itens.map(a => consultaLinha(a))) : el('div', { class: 'cartao' }, vazio(null, AG.filtro === 'novos' ? 'Nenhuma consulta nova para ver.' : 'Nada por aqui.')));
 }
@@ -1757,8 +1826,8 @@ function consultaItem(a) {
       a.preconsulta.map(q => el('p', { class: 'quebra' }, el('b', { text: (q.pergunta || '') + ' ' }), q.resposta || ''))) : null,
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
     !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
-    ativa && !externa ? el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Cancelar' }), btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
-    !ativa ? el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Excluir' }), btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
+    ativa && !externa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
+    !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
 }
 async function agEnviarLink(a, botao) {
   if (!(await confirmar({ titulo: 'Enviar o link de pagamento?', texto: 'Vai agora para ' + a.nome_paciente + ' pelo WhatsApp da clínica, com o mesmo texto da assistente.', botao: 'Enviar link' }))) return;
@@ -1918,7 +1987,7 @@ function agExportar() {
     });
     L.push('END:VCALENDAR');
     baixarArquivo(L.map(icsDobra).join('\r\n') + '\r\n', 'text/calendar;charset=utf-8', 'agenda-rxsync-' + new Date().toLocaleDateString('sv-SE', { timeZone: TZ }) + '.ics');
-    rapida(ativos.length + ' consulta(s) exportada(s). Abra o arquivo no Google Agenda, no Outlook ou no iPhone.');
+    rapida(pl(ativos.length, 'consulta exportada', 'consultas exportadas') + '. Abra o arquivo no Google Agenda, no Outlook ou no iPhone.');
   }).catch(() => rapida('Não consegui exportar agora. Tente de novo.'));
 }
 // ---------------------------------------------------------------- calendário: Dia, Semana e Mês (no fuso da clínica)
@@ -1942,7 +2011,7 @@ function calMover(dir) {
 function calCarregar() {
   if (AG.visao === 'lista' || !$('calBox')) return;
   const r = calIntervalo(), n = ++AG.calReq;
-  $('calTitulo').textContent = calTitulo();
+  $('calTitulo').textContent = $('calTituloCel').textContent = calTitulo();
   d24('agenda_listar', { de: isoLocal(chave(r.ini) + 'T00:00'), ate: isoLocal(chave(somaDias(r.ini, r.n)) + 'T00:00') }).then(rows => {
     if (n !== AG.calReq) return;
     AG.cal = (rows || []).filter(agAtiva).filter(medFiltra); calRender();
@@ -2016,7 +2085,7 @@ function calMes() {
   for (let i = 0; i < semanas * 7; i++) {
     const d = somaDias(r.ini, i), k = chave(d), lista = (porDia[k] || []).sort((x, y) => new Date(x.inicio) - new Date(y.inicio));
     const fora = d.getUTCMonth() !== mes, semGrade = gv.length && !gv.some(x => x.dia === d.getUTCDay());
-    g.append(el('button', { type: 'button', class: (fora ? 'fora' : semGrade ? 'sem-grade' : ''), 'aria-label': fmtD(d, { day: 'numeric', month: 'long' }) + ': ' + lista.length + ' consulta(s)',
+    g.append(el('button', { type: 'button', class: (fora ? 'fora' : semGrade ? 'sem-grade' : ''), 'aria-label': fmtD(d, { day: 'numeric', month: 'long' }) + ': ' + pl(lista.length, 'consulta', 'consultas'),
       onclick: () => { AG.visao = 'dia'; calRef = d; agMostrar(); } }, el('span', { class: 'dnum' + (k === hoje ? ' hoje' : ''), text: String(d.getUTCDate()) }),
       estreito() ? (lista.length ? el('span', { class: 'qtd', text: String(lista.length) }) : null)
         : [lista.slice(0, 3).map(a => el('span', { class: 'ev', text: hhmm(minDia(a.inicio)) + ' ' + (ehBloqueio(a) ? 'Bloqueado' : a.nome_paciente) })), lista.length > 3 ? el('span', { class: 'ev mudo', text: '+' + (lista.length - 3) + ' mais' }) : null]));
@@ -2093,9 +2162,9 @@ function horIndice() {
   const dias = new Set((GRADE.dados || []).map(g => g.dia)).size, med = MED.dados.filter(m => m.ativo).length;
   const st = INT.status || {};
   trocar(box, el('div', { class: 'lista bloco' },
-    linhaLink('Horários de atendimento', MED.modo ? 'Cada médico tem os próprios horários' : (st.conectado && st.importar_horarios !== false && (st.horarios || []).length ? 'Vêm do ' + (st.plataforma_nome || 'Reservio') : dias ? dias + ' dia(s) com atendimento' : 'Nenhum dia com atendimento'), 'agenda/horarios/grade', 'relogio'),
+    linhaLink('Horários de atendimento', MED.modo ? 'Cada médico tem os próprios horários' : (st.conectado && st.importar_horarios !== false && (st.horarios || []).length ? 'Vêm do ' + (st.plataforma_nome || 'Reservio') : dias ? pl(dias, 'dia', 'dias') + ' com atendimento' : 'Nenhum dia com atendimento'), 'agenda/horarios/grade', 'relogio'),
     linhaLink('Regras da agenda', 'Consulta de ' + duracaoPadrao() + ' min' + (VAL.buffer_min && VAL.buffer_min !== '0' ? ', intervalo de ' + VAL.buffer_min + ' min' : ''), 'agenda/horarios/regras', 'ajustes'),
-    linhaLink('Médicos e tipos', sem('medicos') ? 'Plano Gestão' : (ligado('func_medicos') ? 'Agenda por médico ligada' : 'Agenda por médico desligada') + (med ? ' · ' + med + ' médico(s)' : ''), 'agenda/horarios/medicos', 'medico'),
+    linhaLink('Médicos e tipos', sem('medicos') ? 'Plano Gestão' : (ligado('func_medicos') ? 'Agenda por médico ligada' : 'Agenda por médico desligada') + (med ? ' · ' + pl(med, 'médico', 'médicos') : ''), 'agenda/horarios/medicos', 'medico'),
     linhaLink('Perguntas antes de agendar', sem('preconsulta') ? 'Plano Gestão' : ligado('func_preconsulta') ? 'Ligada' : 'Desligada', 'agenda/horarios/perguntas', 'pergunta'),
     linhaLink('Feriados', feriadosLigados() ? 'Não atende em feriados' + (FER.cfg && FER.cfg.cidade ? ' · ' + FER.cfg.cidade + '/' + FER.cfg.uf : '') : 'Atende em feriados', 'agenda/horarios/feriados', 'agenda'),
     linhaLink('Receber dos pacientes', ligado('func_pagamento_link') ? 'Link de pagamento ligado' : 'Link de pagamento desligado', 'agenda/horarios/pagamento', 'dinheiro'),
@@ -2191,7 +2260,7 @@ function medLista() {
   const box = $('medLista'); if (!box) return;
   if (!MED.dados.length) { trocar(box, el('div', { class: 'cartao' }, vazio('Nenhum médico cadastrado', 'Sem médicos, a agenda é uma só para a clínica.'))); return; }
   trocar(box, el('div', { class: 'lista' }, MED.dados.map(m => el('button', { class: 'linha', type: 'button', onclick: () => medAbrir(m) }, el('span', { class: 'ic' }, icone('medico')),
-    el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: (m.consultas_futuras ? m.consultas_futuras + ' consulta(s) marcada(s)' : 'Sem consultas marcadas') + ' · ' + ((m.grade || []).length ? (m.grade || []).length + ' faixa(s) de horário' : 'sem horários') + ' · ' + (m.tipos || []).filter(t => t.ativo).length + ' tipo(s)' }),
+    el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: (m.consultas_futuras ? pl(m.consultas_futuras, 'consulta marcada', 'consultas marcadas') : 'Sem consultas marcadas') + ' · ' + ((m.grade || []).length ? pl((m.grade || []).length, 'faixa', 'faixas') + ' de horário' : 'sem horários') + ' · ' + pl((m.tipos || []).filter(t => t.ativo).length, 'tipo', 'tipos') }),
       m.ativo && !(m.grade || []).length ? el('span', { class: 'etqs' }, etq('Sem horários: a assistente não marca com este médico', 'atencao', 'alerta')) : null),
     !m.ativo ? etq('Removido', '') : null, el('span', { class: 'seta' }, icone('seta'))))));
 }
@@ -2220,7 +2289,7 @@ function medAbrir(m0) {
     const gradeBox = el('div', { class: 'cartao' });
     const desenharGrade = () => trocar(gradeBox, gradeEditor(gradeLista, desenharGrade, false));
     desenharGrade();
-    return [el('div', { class: 'item-cab' }, el('span', { class: 'av', text: iniciais(m.nome) }), el('div', { class: 'tx' }, el('h2', { text: m.nome }), el('p', { class: 'mudo', text: m.consultas_futuras ? m.consultas_futuras + ' consulta(s) marcada(s) daqui para a frente' : 'Sem consultas marcadas' }))),
+    return [el('div', { class: 'item-cab' }, el('span', { class: 'av', text: iniciais(m.nome) }), el('div', { class: 'tx' }, el('h2', { text: m.nome }), el('p', { class: 'mudo', text: m.consultas_futuras ? pl(m.consultas_futuras, 'consulta marcada', 'consultas marcadas') + ' daqui para a frente' : 'Sem consultas marcadas' }))),
       el('div', { class: 'cartao campos bloco' }, chaveMed('agendamento', 'A assistente marca com este médico', 'Desligado, só a equipe marca.', 'A assistente marca para ' + m.nome + '.', 'A assistente não marca mais para ' + m.nome + '.'),
         chaveMed('paga_consultorio', 'Paciente paga no consultório', 'Ligado, a assistente não manda o link de pagamento das consultas com este médico.', 'A assistente não manda link de pagamento para ' + m.nome + '.', 'A assistente manda o link de pagamento para ' + m.nome + '.')),
       el('h2', { class: 'tit-bloco', text: 'Tipos de consulta' }),
@@ -2235,10 +2304,10 @@ function medAbrir(m0) {
         if (r && r.ok) { rapida('Horários salvos.'); medCarregar(); } else rapida((r && r.mensagem) || 'Confira os horários: o fim precisa ser depois do começo, e as faixas de um mesmo dia não podem se sobrepor.', { ms: 8000 });
       }).catch(() => rapida('Não foi salvo: sem conexão.')), 'pri plena')),
       el('div', { class: 'pilha' }, btn('Renomear', () => renomear(m), 'sec plena')),
-      el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Remover' }), btn('Remover ' + m.nome, async () => {
+      el('div', { class: 'perigo-zona' }, btn('Remover ' + m.nome, async () => {
         const ultimo = MED.dados.filter(x => x.ativo).length === 1;
-        if (ultimo && !(await confirmar({ titulo: 'Remover o último médico?', texto: ['É o último médico ativo: a agenda volta a ser uma só, com os horários gerais da clínica (que estão guardados).', m.consultas_futuras ? 'As ' + m.consultas_futuras + ' consulta(s) marcada(s) continuam valendo.' : null], botao: 'Remover', perigo: true }))) return;
-        medAcao('agenda_medico_ativo', { id: m.id, ativo: false }, r => { f.fechar(); rapida(r.consultas_futuras ? 'Removido. ' + r.consultas_futuras + ' consulta(s) futura(s) continuam valendo.' : 'Removido.', { desfazer: () => medAcao('agenda_medico_ativo', { id: m.id, ativo: true }) }); });
+        if (ultimo && !(await confirmar({ titulo: 'Remover o último médico?', texto: ['É o último médico ativo: a agenda volta a ser uma só, com os horários gerais da clínica (que estão guardados).', m.consultas_futuras ? (m.consultas_futuras === 1 ? 'A consulta marcada continua valendo.' : 'As ' + m.consultas_futuras + ' consultas marcadas continuam valendo.') : null], botao: 'Remover', perigo: true }))) return;
+        medAcao('agenda_medico_ativo', { id: m.id, ativo: false }, r => { f.fechar(); rapida(r.consultas_futuras ? 'Removido. ' + pl(r.consultas_futuras, 'consulta futura continua', 'consultas futuras continuam') + ' valendo.' : 'Removido.', { desfazer: () => medAcao('agenda_medico_ativo', { id: m.id, ativo: true }) }); });
       }, 'perigo-sec plena'))];
   };
   const corpo = el('div', {}, montar());
@@ -2415,7 +2484,7 @@ tela('agenda/horarios/pagamento', {
 function pagResumo() {
   const box = $('pagMedResumo'); if (!box) return;
   const pc = MED.dados.filter(m => m.ativo && medPagaConsultorio(m.id)).length, tv = MED.dados.reduce((n, m) => n + (m.tipos || []).filter(t => t.ativo && t.valor).length, 0);
-  trocar(box, MED.modo ? el('div', { class: 'lista bloco pilha' }, linhaLink(pc + ' médico(s) recebem no consultório · ' + tv + ' tipo(s) com valor próprio', 'Cada tipo pode ter o próprio link e valor', 'agenda/horarios/medicos', 'medico')) : null);
+  trocar(box, MED.modo ? el('div', { class: 'lista bloco pilha' }, linhaLink((pc === 1 ? '1 médico recebe' : pc + ' médicos recebem') + ' no consultório · ' + pl(tv, 'tipo', 'tipos') + ' com valor próprio', 'Cada tipo pode ter o próprio link e valor', 'agenda/horarios/medicos', 'medico')) : null);
 }
 function asaasCarregar() {
   const box = $('asaasBox'); if (!box) return;
@@ -2427,7 +2496,7 @@ function asaasRender(r) {
   const q = $('pagQuemMarca'); if (q) trocar(q, aviso('', sit.conectado ? 'Pelo Asaas da clínica: cada consulta com valor recebe um link próprio e fica paga sozinha quando o paciente paga.' : 'Pelo seu link fixo: a RXSync não confere esse pagamento; a equipe marca a consulta como paga na Agenda.'));
   if (sit.conectado) {
     trocar(box, el('div', { class: 'cartao pad' }, el('p', { class: 'etqs' }, etq('Conectado', 'ok', 'ok')), el('p', { text: (sit.conta_nome ? 'Conta ' + sit.conta_nome : 'Conta Asaas') + (sit.ambiente === 'sandbox' ? ' (conta de testes)' : '') + (sit.desde ? ', desde ' + new Date(sit.desde).toLocaleDateString('pt-BR') : '') + '.' }),
-      el('p', { class: 'dica', text: (sit.links_abertos || 0) + ' link(s) aberto(s) · ' + (sit.pagos_30_dias || 0) + ' pago(s) nos últimos 30 dias.' }),
+      el('p', { class: 'dica', text: pl(sit.links_abertos, 'link aberto', 'links abertos') + ' · ' + pl(sit.pagos_30_dias, 'pago', 'pagos') + ' nos últimos 30 dias.' }),
       sit.status === 'erro' && sit.ultimo_erro ? aviso('atencao', 'Último aviso do Asaas: ' + sit.ultimo_erro) : null,
       ehDono() ? el('div', { class: 'perigo-zona' }, btn('Desconectar o Asaas', async ev => {
         const b = ev.currentTarget;
@@ -2548,7 +2617,7 @@ function intRender(r, ultimo) {
       'O ' + nomePlat + ' não permite cancelar pela integração. Quando o paciente cancela pelo WhatsApp, avisamos no WhatsApp de avisos para você cancelar lá.',
       r.importar_horarios !== false ? 'Os dias e horários de atendimento vêm do ' + nomePlat + '. Feriados seguem o que estiver em Agenda › Horários › Feriados. Folgas de um dia específico ainda não vêm de lá: use "Bloquear horário" na Agenda.' : 'Mantenha os Horários de atendimento iguais aos do ' + nomePlat + '.'
     ].map(t => el('p', { class: 'dica', text: t }))),
-    el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Desconectar' }), btn('Desconectar do ' + nomePlat, async ev => {
+    el('div', { class: 'perigo-zona' }, btn('Desconectar do ' + nomePlat, async ev => {
       const b = ev.currentTarget;
       if (!(await confirmar({ titulo: 'Desconectar do ' + nomePlat + '?', texto: 'As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de lançar consultas lá.', botao: 'Desconectar', perigo: true }))) return;
       ocupado(b, 'Desconectando…'); c12('desconectar').then(x => intRender(x)).catch(() => { rapida('Não consegui desconectar.'); intRender(r); });
@@ -2687,7 +2756,7 @@ function aiColunas() {
     }
     trocar(extras, blocos);
   };
-  anexar(t, el('p', { class: 'mudo bloco', text: 'Arquivo ' + AI.arquivo + ': ' + AI.dados.length.toLocaleString('pt-BR') + ' linha(s). Confira de qual coluna vem cada informação.' }),
+  anexar(t, el('p', { class: 'mudo bloco', text: 'Arquivo ' + AI.arquivo + ': ' + pl(AI.dados.length, 'linha', 'linhas') + '. Confira de qual coluna vem cada informação.' }),
     el('div', { class: 'cartao pad mapa-colunas' }, AI_CAMPOS.filter(f => !f.med || MED.modo).map(f => {
       const s = el('select', { class: 'entrada', id: 'aiCol_' + f.k }, el('option', { value: '-1', text: f.obrig ? 'Escolha a coluna' : 'Não usar' }), AI.cab.map((h, i) => el('option', { value: String(i), text: h || 'Coluna ' + (i + 1) })));
       s.value = String(AI.mapa[f.k]); s.addEventListener('change', () => { AI.mapa[f.k] = +s.value; aiExtras(); });
@@ -2744,13 +2813,13 @@ function aiPrevia() {
     const reservio = !!(st && st.conectado), t2 = aiTela(3); AI.prev = tot;
     const cb = el('input', { type: 'checkbox', checked: AI.lembretes }); cb.addEventListener('change', () => { AI.lembretes = cb.checked; });
     const erros = aiErrosTodos(tot);
-    const gr = btn('Importar ' + tot.novas + ' consulta(s)', async () => {
-      if (!(await confirmar({ titulo: 'Importar ' + tot.novas + ' consulta(s)?', texto: ['As consultas entram na agenda da RXSync.' + (AI.lembretes ? ' As futuras recebem lembrete.' : ' Sem lembrete das futuras.'), 'Dá para desfazer em até 7 dias, em Importações da agenda.'], botao: 'Importar ' + tot.novas }))) return;
+    const gr = btn('Importar ' + pl(tot.novas, 'consulta', 'consultas'), async () => {
+      if (!(await confirmar({ titulo: 'Importar ' + pl(tot.novas, 'consulta', 'consultas') + '?', texto: ['As consultas entram na agenda da RXSync.' + (AI.lembretes ? ' As futuras recebem lembrete.' : ' Sem lembrete das futuras.'), 'Dá para desfazer em até 7 dias, em Importações da agenda.'], botao: 'Importar ' + tot.novas }))) return;
       gr.disabled = true; aiGravar();
     }, 'pri plena', null, { disabled: !tot.novas });
     anexar(t2, el('div', { class: 'numeros bloco' }, [['vão entrar', tot.novas], ['já existiam', tot.existentes], ['repetidas', tot.repetidas + AI.repetidas], ['conflitos', tot.conflitos], ['com erro', tot.erros + AI.erros.length], ['canceladas (histórico)', tot.canceladas], ['futuras', tot.futuras]].map(([a, b]) => numeroGrande(a, b))),
       reservio && AI.mapa.codigo < 0 && tot.futuras ? aviso('atencao', 'O Reservio está conectado e o arquivo não tem a coluna do código da reserva. As consultas futuras entram assim mesmo, mas a mesma consulta pode aparecer duas vezes se for alterada lá depois.') : null,
-      el('label', { class: 'marcar' }, cb, el('span', { text: 'Mandar lembrete das consultas futuras importadas (' + tot.pacientes_lembrete + ' paciente(s) receberiam).' })),
+      el('label', { class: 'marcar' }, cb, el('span', { text: 'Mandar lembrete das consultas futuras importadas (' + pl(tot.pacientes_lembrete, 'paciente receberia', 'pacientes receberiam') + ').' })),
       !tot.lembretes_clinica ? el('p', { class: 'dica', text: 'Os lembretes da clínica estão desligados agora: mesmo marcando, nenhum lembrete sai até você ligar em Assistente › Mensagens automáticas.' }) : null,
       el('div', { class: 'pilha' }, erros.length ? btn('Baixar o relatório de conflitos e erros (CSV)', () => impBaixarCsv(AI.cab, AI.dados, erros, 'agenda-conflitos-e-erros.csv'), 'sec plena') : null, gr, btn('Voltar às colunas', aiColunas, 'sec plena')));
   }).catch(() => { const t2 = aiTela(3); anexar(t2, aviso('perigo', 'Não consegui conferir o arquivo agora. Tente de novo.'), btn('Voltar às colunas', aiColunas, 'sec plena')); });
@@ -2759,7 +2828,7 @@ function aiGravar() {
   const t = aiTela(3), prog = el('p', { class: 'mudo', text: 'Importando…', 'aria-live': 'polite' }); anexar(t, prog);
   aiLotes(true, (k, n) => { prog.textContent = 'Importando o lote ' + (k + 1) + ' de ' + n + '…'; }).then(tot => {
     const t2 = aiTela(4), erros = aiErrosTodos(tot);
-    anexar(t2, aviso('ok', tot.novas + ' consulta(s) importada(s). Dá para desfazer em até 7 dias, em Importações da agenda.'), el('div', { class: 'pilha' },
+    anexar(t2, aviso('ok', pl(tot.novas, 'consulta importada', 'consultas importadas') + '. Dá para desfazer em até 7 dias, em Importações da agenda.'), el('div', { class: 'pilha' },
       erros.length ? btn('Baixar o relatório de conflitos e erros (CSV)', () => impBaixarCsv(AI.cab, AI.dados, erros, 'agenda-conflitos-e-erros.csv'), 'sec plena') : null,
       btn('Ver as importações', () => ir('agenda/horarios/integracao/importacoes'), 'pri plena'), btn('Importar outro arquivo', aiInicio, 'sec plena')));
     agCarregar();
@@ -2779,7 +2848,7 @@ function aiListar() {
       i.pode_desfazer ? el('span', { class: 't2', text: 'Desfazer até ' + fmtDia(new Date(new Date(i.criado_em).getTime() + 7 * 86400000).toISOString()) }) : null),
     i.pode_desfazer ? btn('Desfazer', async () => {
       if (!(await confirmar({ titulo: 'Desfazer esta importação?', texto: 'Saem as consultas dela que ninguém mexeu depois, e os pacientes criados por ela que não têm outra consulta.', botao: 'Desfazer importação', perigo: true }))) return;
-      d24('agenda_importacao_desfazer', { id: i.id }).then(r => { rapida(r && r.ok ? r.removidas + ' consulta(s) removida(s)' + (r.mantidas ? '; ' + r.mantidas + ' ficaram (foram mexidas depois)' : '') + '.' : 'O prazo de 7 dias já passou.', { ms: 7000 }); aiListar(); agCarregar(); })
+      d24('agenda_importacao_desfazer', { id: i.id }).then(r => { rapida(r && r.ok ? pl(r.removidas, 'consulta removida', 'consultas removidas') + (r.mantidas ? '; ' + r.mantidas + ' ficaram (foram mexidas depois)' : '') + '.' : 'O prazo de 7 dias já passou.', { ms: 7000 }); aiListar(); agCarregar(); })
         .catch(() => rapida('Não consegui desfazer. Tente de novo.'));
     }, 'perigo-sec') : null))));
   }).catch(() => trocar(box, aviso('perigo', 'Não consegui carregar as importações.')));
@@ -2974,7 +3043,7 @@ async function pacExcluir(p) {
     }
     if (!r.ok) { rapida(pacErro(r)); return; }
     PAC.sujo = true;
-    rapida('Paciente excluído.' + (r.consultas_anonimizadas ? ' ' + r.consultas_anonimizadas + ' consulta(s) ficaram como "Paciente excluído".' : '') + (r.documentos_mantidos ? ' Os documentos desse telefone ficaram, porque outro paciente usa o mesmo número.' : ''), { ms: 7000 });
+    rapida('Paciente excluído.' + (r.consultas_anonimizadas ? ' ' + pl(r.consultas_anonimizadas, 'consulta ficou', 'consultas ficaram') + ' como "Paciente excluído".' : '') + (r.documentos_mantidos ? ' Os documentos desse telefone ficaram, porque outro paciente usa o mesmo número.' : ''), { ms: 7000 });
     ir('pacientes');
   }).catch(() => rapida(PAC_ERROS.interno));
 }
@@ -3152,12 +3221,12 @@ function impConfirmar() {
   if (p.existentes) det.push('Os já cadastrados (mesmo nome, sem contar acento, e mesmo telefone) não são duplicados: só completamos o e-mail, o nascimento e a observação que estiverem vazios.');
   if (p.parecidos) det.push('Os que têm o telefone de outro paciente com outro nome (por exemplo, mãe e filho) entram como pacientes novos; confira depois em Possíveis duplicados.');
   if (IMP.mapa.observacao >= 0) { const n = IMP.validas.filter(v => v.observacao).length; det.push(n === 1 ? '1 linha tem observação preenchida (vai ser importada). Confira se é só informação administrativa.' : n + ' linhas têm observação preenchida (vão ser importadas). Confira se é só informação administrativa.'); }
-  if (IMP.repetidas + p.repetidas) det.push((IMP.repetidas + p.repetidas) + ' linha(s) repetida(s) no próprio arquivo ficaram de fora.');
+  if (IMP.repetidas + p.repetidas) det.push(pl(IMP.repetidas + p.repetidas, 'linha repetida', 'linhas repetidas') + ' no próprio arquivo ' + (IMP.repetidas + p.repetidas === 1 ? 'ficou' : 'ficaram') + ' de fora.');
   anexar(t, el('div', { class: 'numeros bloco' }, numeroGrande('pacientes novos', p.novos), numeroGrande('já cadastrados', p.existentes), numeroGrande('com o telefone de outro paciente', p.parecidos), numeroGrande('com erro', erros.length)),
     det.map(x => el('p', { class: 'dica', text: x })), impListaErros(erros));
   if (!p.novos && !p.existentes) { anexar(t, el('div', { class: 'pilha' }, aviso('atencao', 'Não há nenhum paciente para importar neste arquivo.'), btn('Escolher outro arquivo', impInicio, 'sec plena'))); return; }
   const cb = el('input', { type: 'checkbox' });
-  const texto = p.novos ? 'Importar ' + p.novos.toLocaleString('pt-BR') + (p.novos === 1 ? ' paciente' : ' pacientes') : 'Completar ' + p.existentes.toLocaleString('pt-BR') + ' cadastro(s)';
+  const texto = p.novos ? 'Importar ' + p.novos.toLocaleString('pt-BR') + (p.novos === 1 ? ' paciente' : ' pacientes') : 'Completar ' + pl(p.existentes, 'cadastro', 'cadastros');
   const ir1 = btn(texto, async () => {
     if (!cb.checked) return;
     if (!(await confirmar({ titulo: texto + '?', texto: ['Os pacientes importados não recebem nenhuma mensagem automática até escreverem para a clínica no WhatsApp.', 'Dá para desfazer em até 7 dias, em Pacientes › Organizar › Importações.'], botao: texto }))) return;
@@ -3190,7 +3259,7 @@ async function impDesfazer(imp, depois) {
   p24('paciente_importacao_desfazer', { importacao_id: String(imp.id) }).then(r => {
     if (!r.ok) { rapida(r.erro === 'prazo' ? 'Essa importação já foi desfeita ou passou dos 7 dias.' : pacErro(r)); return; }
     PAC.sujo = true;
-    rapida('Importação desfeita: ' + r.removidos + ' paciente(s) removido(s).' + (r.mantidos ? ' ' + r.mantidos + ' ficaram porque já têm consulta, conversa ou edição.' : '') + (r.completados_mantidos ? ' ' + r.completados_mantidos + ' cadastro(s) completado(s) continuam como estão.' : ''), { ms: 9000 });
+    rapida('Importação desfeita: ' + pl(r.removidos, 'paciente removido', 'pacientes removidos') + '.' + (r.mantidos ? ' ' + r.mantidos + ' ficaram porque já têm consulta, conversa ou edição.' : '') + (r.completados_mantidos ? ' ' + (r.completados_mantidos === 1 ? '1 cadastro completado continua como está.' : r.completados_mantidos + ' cadastros completados continuam como estão.') : ''), { ms: 9000 });
     if (depois) depois();
   }).catch(() => rapida(PAC_ERROS.interno));
 }
@@ -3205,7 +3274,7 @@ function impListaCarregar() {
     const l = d.importacoes || [];
     if (!l.length) { trocar(box, el('div', { class: 'cartao' }, vazio('Nenhuma importação ainda', null, btn('Importar pacientes', () => ir('pacientes/importar'), 'sec')))); return; }
     trocar(box, el('div', { class: 'lista' }, l.map(i => el('div', { class: 'linha' }, el('span', { class: 'tx' }, el('span', { class: 't1' }, fmtQuando(i.criado_em) + ' ', etq(i.origem === 'planilha' ? 'Planilha' : 'Reservio', '')),
-      el('span', { class: 't2', text: [i.novos + ' novo(s)', i.existentes + ' já cadastrado(s)', i.completados + ' completado(s)', i.erros + ' com erro'].join(' · ') }),
+      el('span', { class: 't2', text: [pl(i.novos, 'novo', 'novos'), pl(i.existentes, 'já cadastrado', 'já cadastrados'), pl(i.completados, 'completado', 'completados'), i.erros + ' com erro'].join(' · ') }),
       el('span', { class: 't2', text: i.desfeita_em ? 'Desfeita em ' + fmtQuando(i.desfeita_em) + '.' : i.pode_desfazer ? 'Desfazer até ' + fmtDia(new Date(new Date(i.criado_em).getTime() + 7 * 86400000).toISOString()) + '. Os que já existiam e foram completados não voltam atrás.' : 'Passou o prazo de 7 dias para desfazer.' })),
     !i.desfeita_em && i.pode_desfazer ? btn('Desfazer', () => impDesfazer({ id: i.id, completados: i.completados }, impListaCarregar), 'perigo-sec') : null))));
   }).catch(() => trocar(box, aviso('perigo', PAC_ERROS.interno)));
@@ -3365,7 +3434,7 @@ tela('conta', {
       el('a', { class: 'linha', href: '/privacidade.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('escudo')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Política de Privacidade' })), el('span', { class: 'seta' }, icone('seta')))))),
     el('div', { class: 'bloco' }, el('button', { class: 'btn sec plena', type: 'button', id: 'btnSair', onclick: e => sairPainel(e.currentTarget) }, icone('sair', 'p'), 'Sair do painel'),
       el('p', { class: 'legenda pilha', text: 'Sair encerra a sessão e esquece este aparelho: na próxima vez, o painel pede o e-mail, a senha e o código.' })),
-    ehDono() ? el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Excluir a conta' }), btn('Cancelar e excluir a conta', () => ir('conta/assinatura'), 'perigo-sec plena')) : null]
+    ehDono() ? el('div', { class: 'perigo-zona' }, btn('Cancelar e excluir a conta', () => ir('conta/assinatura'), 'perigo-sec plena')) : null]
 });
 const foneBonito = n => { const d = String(n || '').replace(/\D/g, ''); return d.length === 13 || d.length === 12 ? '+' + d.slice(0, 2) + ' (' + d.slice(2, 4) + ') ' + d.slice(4, -4) + '-' + d.slice(-4) : n; };
 
@@ -3386,7 +3455,7 @@ tela('conta/assinatura', {
 function assinCarregar() {
   const box = $('assinConteudo');
   if (!ehDono()) { trocar(box, aviso('', 'Plano e pagamento ficam só com o dono da conta.')); return; }
-  trocar(box, el('div', { class: 'cartao' }, esqueleto()));
+  if (!box.firstChild) trocar(box, el('div', { class: 'cartao' }, esqueleto()));   // ao voltar, o que já está na tela fica até chegar o novo
   c24('assinatura_ver', {}).then(r => { if (!r || !r.ok || !r.assinatura) throw new Error(); assinRender(r.assinatura); })
     .catch(() => trocar(box, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'A assinatura não carregou agora.', btn('Tentar de novo', assinCarregar, 'sec')))));
 }
@@ -3439,7 +3508,7 @@ function assinRender(a) {
     else {
       // Cancelar e excluir a conta (DEC-114): o servidor manda um link ao e-mail do dono; vale só quando ele confirma por lá.
       const teste = a.situacao === 'teste';
-      blocos.push(el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Cancelar e excluir a conta' }),
+      blocos.push(el('div', { class: 'perigo-zona' },
         el('p', { class: 'mudo peq', text: teste ? 'O teste grátis é encerrado na hora e nada é cobrado. Os dados são apagados 15 dias depois.' : a.forma === 'mensal' ? 'Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Os dados são apagados 15 dias depois. Você pode desistir até a data.' : 'Seu plano é anual, com permanência: o pedido vai para a nossa equipe, que fala com você sobre as condições.' }),
         el('p', { class: 'mudo peq bloco', text: 'Mandamos um link para o seu e-mail; o pedido só vale quando você confirmar por ele (24 horas). Antes, baixe a agenda e os pacientes em Conta › Baixar meus dados.' }),
         btn('Cancelar e excluir a conta', ev => contaExcluirPedir(ev.currentTarget), 'perigo-sec plena')));
@@ -3560,12 +3629,12 @@ async function dadosBaixar(parte, b, msg) {
       const r = await c29('dados_exportar', { parte, pagina });
       if (r && r.sair) { location.reload(); return; }
       if (!r || !r.ok) throw new Error((r && r.mensagem) || 'Não consegui baixar agora.');
-      linhas = linhas.concat(r.linhas || []); msg.textContent = 'Preparando a planilha… ' + linhas.length + ' linha(s)';
+      linhas = linhas.concat(r.linhas || []); msg.textContent = 'Preparando a planilha… ' + pl(linhas.length, 'linha', 'linhas');
       if (!r.tem_mais) break; pagina++;
     }
     const cols = DADOS_COLUNAS[parte];
     baixarArquivo('﻿' + cols.map(c => csvCelula(c[1])).join(',') + '\r\n' + linhas.map(l => cols.map(c => csvCelula(l[c[0]])).join(',')).join('\r\n'), 'text/csv;charset=utf-8', 'rxsync-' + parte + '-' + new Date().toISOString().slice(0, 10) + '.csv');
-    msg.textContent = 'Pronto: ' + linhas.length + ' linha(s).';
+    msg.textContent = 'Pronto: ' + pl(linhas.length, 'linha', 'linhas') + '.';
   } catch (e) { msg.textContent = ''; rapida(e.message, { ms: 6000 }); }
   b.disabled = false;
 }

@@ -1,9 +1,0 @@
-/* Esqueleto em cinza (entrega 2 do plano do novo front, primeiro commit): sem cor nem marca, para o Jean aprovar a
-   organização das telas antes da cor. Este arquivo sai no commit da cor, depois do "aprovado". */
-:root {
-  --primaria: #3F474C; --primaria-forte: #2B3135; --primaria-suave: #ECEEEF;
-  --ok-texto: #3F474C; --ok-fundo: #F0F1F2;
-  --atencao-texto: #3F474C; --atencao-fundo: #F0F1F2;
-  --perigo-texto: #3F474C; --perigo-fundo: #F0F1F2; --perigo-forte: #3F474C;
-  --foco: #3F474C;
-}

@@ -28,17 +28,34 @@ function rotaAtual() {
   for (let n = partes.length; n > 0; n--) { const k = partes.slice(0, n).join('/'); if (TELAS[k]) return { rota: k, param: partes.slice(n).join('/') }; }
   return { rota: 'hoje', param: '' };
 }
+// Molde D no iPad deitado e no computador: Conta e Assistente viram menu de assuntos à esquerda (a própria tela de
+// entrada da área) e a página aberta à direita; na entrada da área, abre o primeiro assunto.
+const MOLDE_D = { conta: () => ehDono() ? 'conta/assinatura' : 'conta/whatsapp', assistente: () => 'assistente/clinica' };
+const LARGO = window.matchMedia('(min-width: 1024px)');
+function montarTela(rota) {
+  const t = TELAS[rota];
+  if (!t.sec) { t.sec = el('section', { 'data-tela': rota }); if (t.montar) anexar(t.sec, t.montar(t.sec)); $('telas').append(t.sec); }
+  return t;
+}
 function rotear() {
   if ($('app').hidden) return;
   const { rota, param } = rotaAtual(), t = TELAS[rota];
   document.body.dataset.area = t.area;
   document.querySelectorAll('[data-area]').forEach(b => { if (b.dataset.area === t.area) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  if (!t.sec) { t.sec = el('section', { 'data-tela': rota }); if (t.montar) anexar(t.sec, t.montar(t.sec)); $('telas').append(t.sec); }
-  document.querySelectorAll('#telas > section').forEach(s => { s.hidden = s !== t.sec; });
-  if (t.entrar) t.entrar(param, t.sec);
+  const d = LARGO.matches && MOLDE_D[t.area] && TELAS[t.area] ? t.area : null;
+  const rotaAberta = d && rota === d ? MOLDE_D[d]() : rota, aberta = montarTela(rotaAberta), raiz = d ? montarTela(d) : null;
+  if (raiz) raiz.sec.classList.add('assuntos');
+  document.body.classList.toggle('com-assuntos', !!d);
+  document.querySelectorAll('#telas > section').forEach(s => { s.hidden = s !== aberta.sec && !(raiz && s === raiz.sec); });
+  if (raiz) {
+    if (raiz.entrar) raiz.entrar('', raiz.sec);
+    raiz.sec.querySelectorAll('[data-ir]').forEach(b => { const sim = b.getAttribute('data-ir') === rotaAberta; b.classList.toggle('selecionada', sim); if (sim) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  }
+  if (aberta.entrar) aberta.entrar(rotaAberta === rota ? param : '', aberta.sec);
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', rotear);
+LARGO.addEventListener('change', () => rotear());
 // Cabeçalho de tela: onde estou, a ação principal (fixa embaixo no celular, no alto no iPad) e o ⋯ do que é raro.
 function cabTela(titulo, op) {
   op = op || {};

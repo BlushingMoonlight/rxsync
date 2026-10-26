@@ -48,13 +48,18 @@ tela('agenda', {
     ['Bloquear horário', 'bloquear', () => bloquearForm()], ['Exportar para Google Agenda, Outlook ou iPhone', 'baixar', () => agExportar()],
     ['Ver as canceladas', 'proibido', () => { AG.visao = 'lista'; AG.filtro = 'cancelados'; agMostrar(); }]] } }),
     agAbas(''),
+    // No celular, uma fileira só (molde B): a visão num seletor e, na Lista, o filtro num botão que abre uma folha.
     el('div', { class: 'controles' },
+      el('select', { class: 'entrada so-cel', id: 'calVisao', 'aria-label': 'Visão', onchange: e => { AG.visao = e.target.value; agMostrar(); } },
+        [['lista', 'Lista'], ['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([v, t]) => el('option', { value: v, text: t }))),
+      el('button', { class: 'btn sec so-cel', type: 'button', id: 'agFiltroBtn', 'aria-haspopup': 'dialog', onclick: () => agFiltroFolha() }),
       el('div', { class: 'seg', role: 'group', 'aria-label': 'Visão', id: 'calViews' }, [['lista', 'Lista'], ['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']].map(([v, t]) =>
         el('button', { type: 'button', 'data-v': v, text: t, onclick: () => { AG.visao = v; agMostrar(); } }))),
       el('div', { class: 'data-nav', id: 'calNav' }, el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Anterior', id: 'calPrev', onclick: () => calMover(-1) }, icone('voltar')),
         el('button', { class: 'btn sec', type: 'button', id: 'calHoje', text: 'Hoje', onclick: () => { calRef = hojeLocal(); agMostrar(); } }),
         el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Próximo', id: 'calProx', onclick: () => calMover(1) }, icone('seta')), el('span', { class: 'titulo-data', id: 'calTitulo' })),
       el('select', { class: 'entrada cresce', id: 'agMedSel', 'aria-label': 'Médico', hidden: true, onchange: e => { MED.filtro = e.target.value; agMostrar(); } })),
+    el('p', { class: 'titulo-cel', id: 'calTituloCel', 'aria-live': 'polite' }),   // no celular, a data fica embaixo da fileira
     el('div', { class: 'filtros', id: 'agChips', role: 'group', 'aria-label': 'Filtrar consultas' }),
     el('div', { class: 'lado-a-lado' }, el('div', {}, el('div', { id: 'agLista' }, el('div', { class: 'cartao' }, esqueleto())), el('div', { id: 'calBox', hidden: true })),
       el('div', { class: 'item-lado', id: 'agItem', hidden: true }))],
@@ -69,22 +74,38 @@ function agMostrar() {
   if (!$('calViews')) return;
   document.querySelectorAll('#calViews button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === AG.visao)));
   const lista = AG.visao === 'lista', diaLista = AG.visao === 'dia' && estreito();
-  $('agChips').hidden = !lista; $('calNav').hidden = lista;
+  $('agChips').hidden = !lista; $('agFiltroBtn').hidden = !lista; $('calNav').hidden = lista; $('calTituloCel').hidden = lista; $('calVisao').value = AG.visao;
   $('agLista').hidden = !(lista || diaLista); $('calBox').hidden = lista || diaLista;
   const sel = $('agMedSel'), ativos = MED.dados.filter(m => m.ativo);
   if (!MED.modo || (MED.filtro && !ativos.some(m => String(m.id) === MED.filtro))) MED.filtro = '';
   trocar(sel, el('option', { value: '', text: 'Todos os médicos' }), ativos.map(m => el('option', { value: String(m.id), text: m.nome })));
   sel.value = MED.filtro; sel.hidden = !MED.modo;
-  $('calTitulo').textContent = calTitulo();
+  $('calTitulo').textContent = $('calTituloCel').textContent = calTitulo();
   agRender();
   if (!lista) calCarregar();
+}
+const AG_FIL = [['novos', 'Novos'], ['proximos', 'Próximos'], ['passados', 'Passados'], ['cancelados', 'Cancelados'], ['naopagas', 'Não pagas']];
+// Filtro da Lista no celular: uma folha com as opções (e o médico, na agenda por médico); tocar aplica e fecha.
+function agFiltroFolha() {
+  const qtd = AG.contagem || (() => '');
+  const opc = AG_FIL.map(([k, t]) => el('button', { class: 'linha' + (AG.filtro === k ? ' selecionada' : ''), type: 'button', 'aria-pressed': String(AG.filtro === k),
+    onclick: () => { AG.filtro = k; if (k === 'naopagas') agNaoPagasCarregar(); f.fechar(); agRender(); } },
+    el('span', { class: 'tx' }, el('span', { class: 't1', text: t + qtd(k) })), AG.filtro === k ? el('span', { class: 'seta' }, icone('ok')) : null));
+  const ativos = MED.modo ? MED.dados.filter(m => m.ativo) : [];
+  const med = ativos.length ? el('select', { class: 'entrada', id: 'agFiltroMed', 'aria-label': 'Médico', onchange: e => { MED.filtro = e.target.value; f.fechar(); agMostrar(); } },
+    el('option', { value: '', text: 'Todos os médicos' }), ativos.map(m => el('option', { value: String(m.id), text: m.nome, selected: String(m.id) === MED.filtro }))) : null;
+  const f = folha('Filtrar consultas', el('div', {}, el('div', { class: 'lista' }, opc), med ? el('div', { class: 'campo pilha' }, el('label', { for: 'agFiltroMed', text: 'Médico' }), med) : null));
 }
 function agRender() {
   const lista = $('agLista'); if (!lista || !AG.carregou) return;
   if (AG.visao === 'dia' && estreito()) return calCarregar();
   if (AG.visao !== 'lista') return;
   const g = agGrupos(AG.dados.filter(medFiltra)); g.naopagas = (AG.naoPagas || []).filter(medFiltra);
-  const FIL = [['novos', 'Novos'], ['proximos', 'Próximos'], ['passados', 'Passados'], ['cancelados', 'Cancelados'], ['naopagas', 'Não pagas']];
+  const FIL = AG_FIL;
+  const qtd = k => k === 'naopagas' && AG.naoPagas === null ? '' : ' (' + g[k].length + ')';
+  const fil = FIL.find(([k]) => k === AG.filtro) || FIL[0], med = MED.filtro && medNome(MED.filtro);
+  trocar($('agFiltroBtn'), el('span', { class: 'corta', text: 'Filtro: ' + fil[1] + qtd(fil[0]) + (med ? ' · ' + med : '') }), icone('seta', 'p'));
+  AG.contagem = qtd;
   trocar($('agChips'), FIL.map(([k, t]) => el('button', { type: 'button', 'aria-pressed': String(AG.filtro === k), text: t + (k === 'naopagas' && AG.naoPagas === null ? '' : ' (' + g[k].length + ')'),
     onclick: () => { AG.filtro = k; if (k === 'naopagas') agNaoPagasCarregar(); agRender(); } })));
   const itens = g[AG.filtro] || [];
@@ -92,9 +113,9 @@ function agRender() {
   if (AG.filtro === 'naopagas') topo.push(el('p', { class: 'mudo peq bloco', text: AG.naoPagas === null ? 'Carregando…' : 'Consultas confirmadas sem pagamento marcado, dos últimos 180 dias em diante. Marcar como paga é só um registro: nada é cancelado sozinho.' }));
   if (AG.filtro === 'cancelados' && itens.length) topo.push(el('div', { class: 'bloco' }, btn('Excluir todas as canceladas (' + itens.length + ')', async ev => {
     const b = ev.currentTarget;
-    if (!(await confirmar({ titulo: 'Excluir as ' + itens.length + ' consultas canceladas?', texto: 'Saem de vez da agenda. Não dá para desfazer.', botao: 'Excluir ' + itens.length, perigo: true }))) return;
+    if (!(await confirmar({ titulo: itens.length === 1 ? 'Excluir a consulta cancelada?' : 'Excluir as ' + itens.length + ' consultas canceladas?', texto: 'Saem de vez da agenda. Não dá para desfazer.', botao: 'Excluir ' + itens.length, perigo: true }))) return;
     b.disabled = true;
-    d24('agenda_excluir_cancelados').then(r => { rapida((r && r.n ? r.n : 0) + ' excluída(s).'); agCarregar(); }).catch(() => { b.disabled = false; rapida('Não consegui excluir. Tente de novo.'); });
+    d24('agenda_excluir_cancelados').then(r => { rapida(pl(r && r.n ? r.n : 0, 'consulta excluída', 'consultas excluídas') + '.'); agCarregar(); }).catch(() => { b.disabled = false; rapida('Não consegui excluir. Tente de novo.'); });
   }, 'perigo-sec plena')));
   trocar(lista, topo, itens.length ? el('div', { class: 'lista' }, itens.map(a => consultaLinha(a))) : el('div', { class: 'cartao' }, vazio(null, AG.filtro === 'novos' ? 'Nenhuma consulta nova para ver.' : 'Nada por aqui.')));
 }
@@ -161,8 +182,8 @@ function consultaItem(a) {
       a.preconsulta.map(q => el('p', { class: 'quebra' }, el('b', { text: (q.pergunta || '') + ' ' }), q.resposta || ''))) : null,
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
     !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
-    ativa && !externa ? el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Cancelar' }), btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
-    !ativa ? el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Excluir' }), btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
+    ativa && !externa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
+    !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
 }
 async function agEnviarLink(a, botao) {
   if (!(await confirmar({ titulo: 'Enviar o link de pagamento?', texto: 'Vai agora para ' + a.nome_paciente + ' pelo WhatsApp da clínica, com o mesmo texto da assistente.', botao: 'Enviar link' }))) return;
@@ -322,7 +343,7 @@ function agExportar() {
     });
     L.push('END:VCALENDAR');
     baixarArquivo(L.map(icsDobra).join('\r\n') + '\r\n', 'text/calendar;charset=utf-8', 'agenda-rxsync-' + new Date().toLocaleDateString('sv-SE', { timeZone: TZ }) + '.ics');
-    rapida(ativos.length + ' consulta(s) exportada(s). Abra o arquivo no Google Agenda, no Outlook ou no iPhone.');
+    rapida(pl(ativos.length, 'consulta exportada', 'consultas exportadas') + '. Abra o arquivo no Google Agenda, no Outlook ou no iPhone.');
   }).catch(() => rapida('Não consegui exportar agora. Tente de novo.'));
 }
 // ---------------------------------------------------------------- calendário: Dia, Semana e Mês (no fuso da clínica)
@@ -346,7 +367,7 @@ function calMover(dir) {
 function calCarregar() {
   if (AG.visao === 'lista' || !$('calBox')) return;
   const r = calIntervalo(), n = ++AG.calReq;
-  $('calTitulo').textContent = calTitulo();
+  $('calTitulo').textContent = $('calTituloCel').textContent = calTitulo();
   d24('agenda_listar', { de: isoLocal(chave(r.ini) + 'T00:00'), ate: isoLocal(chave(somaDias(r.ini, r.n)) + 'T00:00') }).then(rows => {
     if (n !== AG.calReq) return;
     AG.cal = (rows || []).filter(agAtiva).filter(medFiltra); calRender();
@@ -420,7 +441,7 @@ function calMes() {
   for (let i = 0; i < semanas * 7; i++) {
     const d = somaDias(r.ini, i), k = chave(d), lista = (porDia[k] || []).sort((x, y) => new Date(x.inicio) - new Date(y.inicio));
     const fora = d.getUTCMonth() !== mes, semGrade = gv.length && !gv.some(x => x.dia === d.getUTCDay());
-    g.append(el('button', { type: 'button', class: (fora ? 'fora' : semGrade ? 'sem-grade' : ''), 'aria-label': fmtD(d, { day: 'numeric', month: 'long' }) + ': ' + lista.length + ' consulta(s)',
+    g.append(el('button', { type: 'button', class: (fora ? 'fora' : semGrade ? 'sem-grade' : ''), 'aria-label': fmtD(d, { day: 'numeric', month: 'long' }) + ': ' + pl(lista.length, 'consulta', 'consultas'),
       onclick: () => { AG.visao = 'dia'; calRef = d; agMostrar(); } }, el('span', { class: 'dnum' + (k === hoje ? ' hoje' : ''), text: String(d.getUTCDate()) }),
       estreito() ? (lista.length ? el('span', { class: 'qtd', text: String(lista.length) }) : null)
         : [lista.slice(0, 3).map(a => el('span', { class: 'ev', text: hhmm(minDia(a.inicio)) + ' ' + (ehBloqueio(a) ? 'Bloqueado' : a.nome_paciente) })), lista.length > 3 ? el('span', { class: 'ev mudo', text: '+' + (lista.length - 3) + ' mais' }) : null]));

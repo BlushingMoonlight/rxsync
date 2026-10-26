@@ -15,9 +15,9 @@ function horIndice() {
   const dias = new Set((GRADE.dados || []).map(g => g.dia)).size, med = MED.dados.filter(m => m.ativo).length;
   const st = INT.status || {};
   trocar(box, el('div', { class: 'lista bloco' },
-    linhaLink('Horários de atendimento', MED.modo ? 'Cada médico tem os próprios horários' : (st.conectado && st.importar_horarios !== false && (st.horarios || []).length ? 'Vêm do ' + (st.plataforma_nome || 'Reservio') : dias ? dias + ' dia(s) com atendimento' : 'Nenhum dia com atendimento'), 'agenda/horarios/grade', 'relogio'),
+    linhaLink('Horários de atendimento', MED.modo ? 'Cada médico tem os próprios horários' : (st.conectado && st.importar_horarios !== false && (st.horarios || []).length ? 'Vêm do ' + (st.plataforma_nome || 'Reservio') : dias ? pl(dias, 'dia', 'dias') + ' com atendimento' : 'Nenhum dia com atendimento'), 'agenda/horarios/grade', 'relogio'),
     linhaLink('Regras da agenda', 'Consulta de ' + duracaoPadrao() + ' min' + (VAL.buffer_min && VAL.buffer_min !== '0' ? ', intervalo de ' + VAL.buffer_min + ' min' : ''), 'agenda/horarios/regras', 'ajustes'),
-    linhaLink('Médicos e tipos', sem('medicos') ? 'Plano Gestão' : (ligado('func_medicos') ? 'Agenda por médico ligada' : 'Agenda por médico desligada') + (med ? ' · ' + med + ' médico(s)' : ''), 'agenda/horarios/medicos', 'medico'),
+    linhaLink('Médicos e tipos', sem('medicos') ? 'Plano Gestão' : (ligado('func_medicos') ? 'Agenda por médico ligada' : 'Agenda por médico desligada') + (med ? ' · ' + pl(med, 'médico', 'médicos') : ''), 'agenda/horarios/medicos', 'medico'),
     linhaLink('Perguntas antes de agendar', sem('preconsulta') ? 'Plano Gestão' : ligado('func_preconsulta') ? 'Ligada' : 'Desligada', 'agenda/horarios/perguntas', 'pergunta'),
     linhaLink('Feriados', feriadosLigados() ? 'Não atende em feriados' + (FER.cfg && FER.cfg.cidade ? ' · ' + FER.cfg.cidade + '/' + FER.cfg.uf : '') : 'Atende em feriados', 'agenda/horarios/feriados', 'agenda'),
     linhaLink('Receber dos pacientes', ligado('func_pagamento_link') ? 'Link de pagamento ligado' : 'Link de pagamento desligado', 'agenda/horarios/pagamento', 'dinheiro'),
@@ -113,7 +113,7 @@ function medLista() {
   const box = $('medLista'); if (!box) return;
   if (!MED.dados.length) { trocar(box, el('div', { class: 'cartao' }, vazio('Nenhum médico cadastrado', 'Sem médicos, a agenda é uma só para a clínica.'))); return; }
   trocar(box, el('div', { class: 'lista' }, MED.dados.map(m => el('button', { class: 'linha', type: 'button', onclick: () => medAbrir(m) }, el('span', { class: 'ic' }, icone('medico')),
-    el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: (m.consultas_futuras ? m.consultas_futuras + ' consulta(s) marcada(s)' : 'Sem consultas marcadas') + ' · ' + ((m.grade || []).length ? (m.grade || []).length + ' faixa(s) de horário' : 'sem horários') + ' · ' + (m.tipos || []).filter(t => t.ativo).length + ' tipo(s)' }),
+    el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: (m.consultas_futuras ? pl(m.consultas_futuras, 'consulta marcada', 'consultas marcadas') : 'Sem consultas marcadas') + ' · ' + ((m.grade || []).length ? pl((m.grade || []).length, 'faixa', 'faixas') + ' de horário' : 'sem horários') + ' · ' + pl((m.tipos || []).filter(t => t.ativo).length, 'tipo', 'tipos') }),
       m.ativo && !(m.grade || []).length ? el('span', { class: 'etqs' }, etq('Sem horários: a assistente não marca com este médico', 'atencao', 'alerta')) : null),
     !m.ativo ? etq('Removido', '') : null, el('span', { class: 'seta' }, icone('seta'))))));
 }
@@ -142,7 +142,7 @@ function medAbrir(m0) {
     const gradeBox = el('div', { class: 'cartao' });
     const desenharGrade = () => trocar(gradeBox, gradeEditor(gradeLista, desenharGrade, false));
     desenharGrade();
-    return [el('div', { class: 'item-cab' }, el('span', { class: 'av', text: iniciais(m.nome) }), el('div', { class: 'tx' }, el('h2', { text: m.nome }), el('p', { class: 'mudo', text: m.consultas_futuras ? m.consultas_futuras + ' consulta(s) marcada(s) daqui para a frente' : 'Sem consultas marcadas' }))),
+    return [el('div', { class: 'item-cab' }, el('span', { class: 'av', text: iniciais(m.nome) }), el('div', { class: 'tx' }, el('h2', { text: m.nome }), el('p', { class: 'mudo', text: m.consultas_futuras ? pl(m.consultas_futuras, 'consulta marcada', 'consultas marcadas') + ' daqui para a frente' : 'Sem consultas marcadas' }))),
       el('div', { class: 'cartao campos bloco' }, chaveMed('agendamento', 'A assistente marca com este médico', 'Desligado, só a equipe marca.', 'A assistente marca para ' + m.nome + '.', 'A assistente não marca mais para ' + m.nome + '.'),
         chaveMed('paga_consultorio', 'Paciente paga no consultório', 'Ligado, a assistente não manda o link de pagamento das consultas com este médico.', 'A assistente não manda link de pagamento para ' + m.nome + '.', 'A assistente manda o link de pagamento para ' + m.nome + '.')),
       el('h2', { class: 'tit-bloco', text: 'Tipos de consulta' }),
@@ -157,10 +157,10 @@ function medAbrir(m0) {
         if (r && r.ok) { rapida('Horários salvos.'); medCarregar(); } else rapida((r && r.mensagem) || 'Confira os horários: o fim precisa ser depois do começo, e as faixas de um mesmo dia não podem se sobrepor.', { ms: 8000 });
       }).catch(() => rapida('Não foi salvo: sem conexão.')), 'pri plena')),
       el('div', { class: 'pilha' }, btn('Renomear', () => renomear(m), 'sec plena')),
-      el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Remover' }), btn('Remover ' + m.nome, async () => {
+      el('div', { class: 'perigo-zona' }, btn('Remover ' + m.nome, async () => {
         const ultimo = MED.dados.filter(x => x.ativo).length === 1;
-        if (ultimo && !(await confirmar({ titulo: 'Remover o último médico?', texto: ['É o último médico ativo: a agenda volta a ser uma só, com os horários gerais da clínica (que estão guardados).', m.consultas_futuras ? 'As ' + m.consultas_futuras + ' consulta(s) marcada(s) continuam valendo.' : null], botao: 'Remover', perigo: true }))) return;
-        medAcao('agenda_medico_ativo', { id: m.id, ativo: false }, r => { f.fechar(); rapida(r.consultas_futuras ? 'Removido. ' + r.consultas_futuras + ' consulta(s) futura(s) continuam valendo.' : 'Removido.', { desfazer: () => medAcao('agenda_medico_ativo', { id: m.id, ativo: true }) }); });
+        if (ultimo && !(await confirmar({ titulo: 'Remover o último médico?', texto: ['É o último médico ativo: a agenda volta a ser uma só, com os horários gerais da clínica (que estão guardados).', m.consultas_futuras ? (m.consultas_futuras === 1 ? 'A consulta marcada continua valendo.' : 'As ' + m.consultas_futuras + ' consultas marcadas continuam valendo.') : null], botao: 'Remover', perigo: true }))) return;
+        medAcao('agenda_medico_ativo', { id: m.id, ativo: false }, r => { f.fechar(); rapida(r.consultas_futuras ? 'Removido. ' + pl(r.consultas_futuras, 'consulta futura continua', 'consultas futuras continuam') + ' valendo.' : 'Removido.', { desfazer: () => medAcao('agenda_medico_ativo', { id: m.id, ativo: true }) }); });
       }, 'perigo-sec plena'))];
   };
   const corpo = el('div', {}, montar());
@@ -337,7 +337,7 @@ tela('agenda/horarios/pagamento', {
 function pagResumo() {
   const box = $('pagMedResumo'); if (!box) return;
   const pc = MED.dados.filter(m => m.ativo && medPagaConsultorio(m.id)).length, tv = MED.dados.reduce((n, m) => n + (m.tipos || []).filter(t => t.ativo && t.valor).length, 0);
-  trocar(box, MED.modo ? el('div', { class: 'lista bloco pilha' }, linhaLink(pc + ' médico(s) recebem no consultório · ' + tv + ' tipo(s) com valor próprio', 'Cada tipo pode ter o próprio link e valor', 'agenda/horarios/medicos', 'medico')) : null);
+  trocar(box, MED.modo ? el('div', { class: 'lista bloco pilha' }, linhaLink((pc === 1 ? '1 médico recebe' : pc + ' médicos recebem') + ' no consultório · ' + pl(tv, 'tipo', 'tipos') + ' com valor próprio', 'Cada tipo pode ter o próprio link e valor', 'agenda/horarios/medicos', 'medico')) : null);
 }
 function asaasCarregar() {
   const box = $('asaasBox'); if (!box) return;
@@ -349,7 +349,7 @@ function asaasRender(r) {
   const q = $('pagQuemMarca'); if (q) trocar(q, aviso('', sit.conectado ? 'Pelo Asaas da clínica: cada consulta com valor recebe um link próprio e fica paga sozinha quando o paciente paga.' : 'Pelo seu link fixo: a RXSync não confere esse pagamento; a equipe marca a consulta como paga na Agenda.'));
   if (sit.conectado) {
     trocar(box, el('div', { class: 'cartao pad' }, el('p', { class: 'etqs' }, etq('Conectado', 'ok', 'ok')), el('p', { text: (sit.conta_nome ? 'Conta ' + sit.conta_nome : 'Conta Asaas') + (sit.ambiente === 'sandbox' ? ' (conta de testes)' : '') + (sit.desde ? ', desde ' + new Date(sit.desde).toLocaleDateString('pt-BR') : '') + '.' }),
-      el('p', { class: 'dica', text: (sit.links_abertos || 0) + ' link(s) aberto(s) · ' + (sit.pagos_30_dias || 0) + ' pago(s) nos últimos 30 dias.' }),
+      el('p', { class: 'dica', text: pl(sit.links_abertos, 'link aberto', 'links abertos') + ' · ' + pl(sit.pagos_30_dias, 'pago', 'pagos') + ' nos últimos 30 dias.' }),
       sit.status === 'erro' && sit.ultimo_erro ? aviso('atencao', 'Último aviso do Asaas: ' + sit.ultimo_erro) : null,
       ehDono() ? el('div', { class: 'perigo-zona' }, btn('Desconectar o Asaas', async ev => {
         const b = ev.currentTarget;
@@ -470,7 +470,7 @@ function intRender(r, ultimo) {
       'O ' + nomePlat + ' não permite cancelar pela integração. Quando o paciente cancela pelo WhatsApp, avisamos no WhatsApp de avisos para você cancelar lá.',
       r.importar_horarios !== false ? 'Os dias e horários de atendimento vêm do ' + nomePlat + '. Feriados seguem o que estiver em Agenda › Horários › Feriados. Folgas de um dia específico ainda não vêm de lá: use "Bloquear horário" na Agenda.' : 'Mantenha os Horários de atendimento iguais aos do ' + nomePlat + '.'
     ].map(t => el('p', { class: 'dica', text: t }))),
-    el('div', { class: 'perigo-zona' }, el('p', { class: 'legenda', text: 'Desconectar' }), btn('Desconectar do ' + nomePlat, async ev => {
+    el('div', { class: 'perigo-zona' }, btn('Desconectar do ' + nomePlat, async ev => {
       const b = ev.currentTarget;
       if (!(await confirmar({ titulo: 'Desconectar do ' + nomePlat + '?', texto: 'As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de lançar consultas lá.', botao: 'Desconectar', perigo: true }))) return;
       ocupado(b, 'Desconectando…'); c12('desconectar').then(x => intRender(x)).catch(() => { rapida('Não consegui desconectar.'); intRender(r); });
@@ -609,7 +609,7 @@ function aiColunas() {
     }
     trocar(extras, blocos);
   };
-  anexar(t, el('p', { class: 'mudo bloco', text: 'Arquivo ' + AI.arquivo + ': ' + AI.dados.length.toLocaleString('pt-BR') + ' linha(s). Confira de qual coluna vem cada informação.' }),
+  anexar(t, el('p', { class: 'mudo bloco', text: 'Arquivo ' + AI.arquivo + ': ' + pl(AI.dados.length, 'linha', 'linhas') + '. Confira de qual coluna vem cada informação.' }),
     el('div', { class: 'cartao pad mapa-colunas' }, AI_CAMPOS.filter(f => !f.med || MED.modo).map(f => {
       const s = el('select', { class: 'entrada', id: 'aiCol_' + f.k }, el('option', { value: '-1', text: f.obrig ? 'Escolha a coluna' : 'Não usar' }), AI.cab.map((h, i) => el('option', { value: String(i), text: h || 'Coluna ' + (i + 1) })));
       s.value = String(AI.mapa[f.k]); s.addEventListener('change', () => { AI.mapa[f.k] = +s.value; aiExtras(); });
@@ -666,13 +666,13 @@ function aiPrevia() {
     const reservio = !!(st && st.conectado), t2 = aiTela(3); AI.prev = tot;
     const cb = el('input', { type: 'checkbox', checked: AI.lembretes }); cb.addEventListener('change', () => { AI.lembretes = cb.checked; });
     const erros = aiErrosTodos(tot);
-    const gr = btn('Importar ' + tot.novas + ' consulta(s)', async () => {
-      if (!(await confirmar({ titulo: 'Importar ' + tot.novas + ' consulta(s)?', texto: ['As consultas entram na agenda da RXSync.' + (AI.lembretes ? ' As futuras recebem lembrete.' : ' Sem lembrete das futuras.'), 'Dá para desfazer em até 7 dias, em Importações da agenda.'], botao: 'Importar ' + tot.novas }))) return;
+    const gr = btn('Importar ' + pl(tot.novas, 'consulta', 'consultas'), async () => {
+      if (!(await confirmar({ titulo: 'Importar ' + pl(tot.novas, 'consulta', 'consultas') + '?', texto: ['As consultas entram na agenda da RXSync.' + (AI.lembretes ? ' As futuras recebem lembrete.' : ' Sem lembrete das futuras.'), 'Dá para desfazer em até 7 dias, em Importações da agenda.'], botao: 'Importar ' + tot.novas }))) return;
       gr.disabled = true; aiGravar();
     }, 'pri plena', null, { disabled: !tot.novas });
     anexar(t2, el('div', { class: 'numeros bloco' }, [['vão entrar', tot.novas], ['já existiam', tot.existentes], ['repetidas', tot.repetidas + AI.repetidas], ['conflitos', tot.conflitos], ['com erro', tot.erros + AI.erros.length], ['canceladas (histórico)', tot.canceladas], ['futuras', tot.futuras]].map(([a, b]) => numeroGrande(a, b))),
       reservio && AI.mapa.codigo < 0 && tot.futuras ? aviso('atencao', 'O Reservio está conectado e o arquivo não tem a coluna do código da reserva. As consultas futuras entram assim mesmo, mas a mesma consulta pode aparecer duas vezes se for alterada lá depois.') : null,
-      el('label', { class: 'marcar' }, cb, el('span', { text: 'Mandar lembrete das consultas futuras importadas (' + tot.pacientes_lembrete + ' paciente(s) receberiam).' })),
+      el('label', { class: 'marcar' }, cb, el('span', { text: 'Mandar lembrete das consultas futuras importadas (' + pl(tot.pacientes_lembrete, 'paciente receberia', 'pacientes receberiam') + ').' })),
       !tot.lembretes_clinica ? el('p', { class: 'dica', text: 'Os lembretes da clínica estão desligados agora: mesmo marcando, nenhum lembrete sai até você ligar em Assistente › Mensagens automáticas.' }) : null,
       el('div', { class: 'pilha' }, erros.length ? btn('Baixar o relatório de conflitos e erros (CSV)', () => impBaixarCsv(AI.cab, AI.dados, erros, 'agenda-conflitos-e-erros.csv'), 'sec plena') : null, gr, btn('Voltar às colunas', aiColunas, 'sec plena')));
   }).catch(() => { const t2 = aiTela(3); anexar(t2, aviso('perigo', 'Não consegui conferir o arquivo agora. Tente de novo.'), btn('Voltar às colunas', aiColunas, 'sec plena')); });
@@ -681,7 +681,7 @@ function aiGravar() {
   const t = aiTela(3), prog = el('p', { class: 'mudo', text: 'Importando…', 'aria-live': 'polite' }); anexar(t, prog);
   aiLotes(true, (k, n) => { prog.textContent = 'Importando o lote ' + (k + 1) + ' de ' + n + '…'; }).then(tot => {
     const t2 = aiTela(4), erros = aiErrosTodos(tot);
-    anexar(t2, aviso('ok', tot.novas + ' consulta(s) importada(s). Dá para desfazer em até 7 dias, em Importações da agenda.'), el('div', { class: 'pilha' },
+    anexar(t2, aviso('ok', pl(tot.novas, 'consulta importada', 'consultas importadas') + '. Dá para desfazer em até 7 dias, em Importações da agenda.'), el('div', { class: 'pilha' },
       erros.length ? btn('Baixar o relatório de conflitos e erros (CSV)', () => impBaixarCsv(AI.cab, AI.dados, erros, 'agenda-conflitos-e-erros.csv'), 'sec plena') : null,
       btn('Ver as importações', () => ir('agenda/horarios/integracao/importacoes'), 'pri plena'), btn('Importar outro arquivo', aiInicio, 'sec plena')));
     agCarregar();
@@ -701,7 +701,7 @@ function aiListar() {
       i.pode_desfazer ? el('span', { class: 't2', text: 'Desfazer até ' + fmtDia(new Date(new Date(i.criado_em).getTime() + 7 * 86400000).toISOString()) }) : null),
     i.pode_desfazer ? btn('Desfazer', async () => {
       if (!(await confirmar({ titulo: 'Desfazer esta importação?', texto: 'Saem as consultas dela que ninguém mexeu depois, e os pacientes criados por ela que não têm outra consulta.', botao: 'Desfazer importação', perigo: true }))) return;
-      d24('agenda_importacao_desfazer', { id: i.id }).then(r => { rapida(r && r.ok ? r.removidas + ' consulta(s) removida(s)' + (r.mantidas ? '; ' + r.mantidas + ' ficaram (foram mexidas depois)' : '') + '.' : 'O prazo de 7 dias já passou.', { ms: 7000 }); aiListar(); agCarregar(); })
+      d24('agenda_importacao_desfazer', { id: i.id }).then(r => { rapida(r && r.ok ? pl(r.removidas, 'consulta removida', 'consultas removidas') + (r.mantidas ? '; ' + r.mantidas + ' ficaram (foram mexidas depois)' : '') + '.' : 'O prazo de 7 dias já passou.', { ms: 7000 }); aiListar(); agCarregar(); })
         .catch(() => rapida('Não consegui desfazer. Tente de novo.'));
     }, 'perigo-sec') : null))));
   }).catch(() => trocar(box, aviso('perigo', 'Não consegui carregar as importações.')));

@@ -44,13 +44,13 @@ function hojeRender() {
     el('span', { class: 'tx' }, el('span', { class: 't1', text: np === 1 ? '1 consulta não paga' : np + ' consultas não pagas' }), el('span', { class: 't2', text: 'Confirmadas sem pagamento marcado' })), el('span', { class: 'seta' }, icone('seta'))));
   if (HOJE.docs7) precisa.push(linhaLink(HOJE.docs7 === 1 ? '1 documento recebido' : HOJE.docs7 + ' documentos recebidos', 'De pacientes, nos últimos 7 dias', 'agenda/documentos', 'documento'));
   const colPrincipal = [el('div', { class: 'bloco', id: 'hojeAtencao' }, el('h2', { text: 'Precisa de você' }), precisa.length ? el('div', { class: 'lista' }, precisa) : el('div', { class: 'cartao' }, vazio(null, 'Nada pendente agora.'))),
-    el('div', { class: 'bloco' }, el('h2', { class: 'tit-bloco' }, 'Consultas de hoje', el('span', { class: 'extra num', id: 'hojeTotal', text: lista.filter(a => a.servico !== 'BLOQUEIO').length ? lista.filter(a => a.servico !== 'BLOQUEIO').length + ' consulta(s)' : '' })),
+    el('div', { class: 'bloco' }, el('h2', { class: 'tit-bloco' }, 'Consultas de hoje', el('span', { class: 'extra num', id: 'hojeTotal', text: lista.filter(a => a.servico !== 'BLOQUEIO').length ? pl(lista.filter(a => a.servico !== 'BLOQUEIO').length, 'consulta', 'consultas') : '' })),
       el('div', { id: 'hojeLinha' }, AG.carregou ? (lista.length ? el('div', { class: 'lista' }, lista.map(a => consultaLinha(a, { hora: true }))) : el('div', { class: 'cartao' }, vazio('Nenhuma consulta hoje', 'Quando a assistente ou a equipe marcar, a consulta aparece aqui.', btn('Nova consulta', () => { ir('agenda'); setTimeout(() => consultaNova(), 50); }, 'sec', 'soma')))) : el('div', { class: 'cartao' }, esqueleto())),
       el('p', { class: 'mudo peq pilha', id: 'hojeAmanha', text: nAmanha ? 'Amanhã: ' + nAmanha + (nAmanha === 1 ? ' consulta marcada.' : ' consultas marcadas.') : '' }))];
   const ind = HOJE.ind, a = ind && ind.atual;
   const numeros = el('div', { class: 'bloco', id: 'hojeNumeros' }, el('h2', { text: 'Últimos 30 dias' }), !ind ? el('div', { class: 'cartao' }, esqueleto()) : ind.erro ? el('div', { class: 'cartao' }, vazio(null, 'Os números não carregaram agora.')) :
-    el('div', { class: 'numeros' }, indicador('Conversas', fmtNum(a.conversas), 'pessoas que falaram com a assistente (Chatwoot)'), indicador('Marcadas pela assistente', fmtNum(a.agendadas_ia), 'consultas sem trabalho da equipe (agenda)'),
-      indicador('Confirmaram presença', a.com_lembrete ? a.presenca_confirmada + ' de ' + a.com_lembrete : '—', 'responderam ao lembrete (agenda)')),
+    el('div', { class: 'numeros' }, indicador('Conversas', fmtNum(a.conversas), 'pessoas que falaram com a assistente'), indicador('Marcadas pela assistente', fmtNum(a.agendadas_ia), 'consultas sem trabalho da equipe'),
+      indicador('Confirmaram presença', a.com_lembrete ? a.presenca_confirmada + ' de ' + a.com_lembrete : '—', 'responderam ao lembrete')),
     el('div', { class: 'pilha' }, btn('Ver resultados', () => ir('resultados'), 'sec', 'grafico')));
   const colLado = [numeros, sem('assistente_dono') && !HOJE.semGestaoFechado && ehDono() ? el('div', { class: 'cartao pad bloco' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'selo-plano', text: 'Gestão' }), 'Assistente de gestão'),
     el('p', { class: 'mudo', text: 'Pergunte sobre a agenda e peça mudanças pelo painel ou pelo seu WhatsApp, sem abrir o painel. Faz parte do plano Gestão Inteligente.' }),
@@ -120,7 +120,7 @@ function resultadosCarregar() {
   }).catch(() => trocar(box, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'Os resultados não carregaram agora.', btn('Tentar de novo', resultadosCarregar, 'sec')))));
 }
 const resCartaoGrafico = (t, id) => el('div', { class: 'bloco' }, el('h2', { text: t }), el('div', { class: 'cartao pad' }, el('div', { class: 'grafico-caixa baixo' }, el('canvas', { id, role: 'img', 'aria-label': t }))));
-function resDescreverSerie(s) { const ia = s.reduce((n, x) => n + (x.ia || 0), 0), eq = s.reduce((n, x) => n + (x.manual || 0), 0); return 'No período: ' + ia + ' consulta(s) marcadas pela assistente e ' + eq + ' pela equipe.'; }
+function resDescreverSerie(s) { const ia = s.reduce((n, x) => n + (x.ia || 0), 0), eq = s.reduce((n, x) => n + (x.manual || 0), 0); return 'No período: ' + pl(ia, 'consulta marcada', 'consultas marcadas') + ' pela assistente e ' + eq + ' pela equipe.'; }
 function resTotais(t) {
   const total = t.ia || 0; let nivel = RES_NIVEIS[0], prox = null;
   RES_NIVEIS.forEach((n, i) => { if (total >= n[0]) { nivel = n; prox = RES_NIVEIS[i + 1] || null; } });

@@ -54,7 +54,7 @@ ok(chaves === 'cancelada,codigo,duracao_min,fim,inicio,linha,medico_id,nome,paga
   'só as colunas da lista fechada vão ao servidor (sem observação nem CPF)');
 await page.getByRole('button', { name: /Importar 2 consulta/ }).click();
 await page.click('#confOk');
-await page.getByText(/importada\(s\)/).waitFor();
+await page.getByText(/consultas? importadas?/).waitFor();
 ok(chamadas.some(c => c.acao === 'agenda_importar' && c.dados.gravar === true && c.sessao === SESSAO), 'gravação com a sessão');
 await page.evaluate(() => { location.hash = 'agenda/horarios/integracao/importacoes'; });
 await page.locator('#aiLista').getByRole('button', { name: 'Desfazer' }).waitFor();
