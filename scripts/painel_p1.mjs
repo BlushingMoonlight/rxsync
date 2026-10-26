@@ -45,7 +45,7 @@ const TELAS = ['hoje', 'resultados', 'agenda', 'agenda/espera', 'agenda/document
   'agenda/horarios/integracao/importar', 'agenda/horarios/integracao/importacoes', 'pacientes', 'pacientes/ficha/PAC-0001', 'pacientes/organizar', 'pacientes/duplicados', 'pacientes/importar',
   'pacientes/importacoes', 'assistente', 'assistente/clinica', 'assistente/conversa', 'assistente/valores', 'assistente/urgencia', 'assistente/automaticas', 'assistente/limites',
   'assistente/extras', 'assistente/faq', 'assistente/funcoes', 'conta', 'conta/assinatura', 'conta/whatsapp', 'conta/contato', 'conta/gestao', 'conta/contrato', 'conta/equipe',
-  'conta/acessos', 'conta/dados'];
+  'conta/acessos', 'conta/dados', 'conta/mudou'];
 
 const site = await servirSite(); const browser = await abrirNavegador();
 async function abrir(op) {

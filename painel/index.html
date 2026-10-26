@@ -2,15 +2,17 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-BnqsUt/4ZNORArYxh86NfYY6kuStKxAKpKaJUtNN95g=' 'self'; style-src 'sha256-PoHV2YJDZQzCAeyF5+0HGq70pMeJnaKsmospjJwy+SI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-v08ovYw56GLYFnP4zPlL5UuGj6uE49fh07ieEOzhHJY=' 'self'; style-src 'sha256-1ghvJigqueECxOoNrRZyspq5hkSXdirSbpgFH/SMdJY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="format-detection" content="telephone=no">
 <title>Painel | RXSync</title>
-<link rel="icon" href="/assets/favicon-rxsync.png.PNG">
-<link rel="apple-touch-icon" href="/assets/favicon-rxsync.png.PNG">
+<link rel="manifest" href="/painel/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
+<meta name="apple-mobile-web-app-title" content="RXSync">
 <style>/* =====================================================================================================
    Âncora: as cores e os tamanhos de todas as telas da RXSync, num arquivo só (rxsync-sistema DEC-156, P12).
    Quem usa: o painel da clínica (painel/, montado por scripts/painel_montar.mjs) e a Central (central/, montada por
@@ -502,7 +504,9 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
   body.com-assuntos .assuntos .linha .seta { display: none; }
   body.com-assuntos #telas > section:not(.assuntos) .duas-ipad { display: block; }
   body.com-assuntos #telas > section:not(.assuntos) .duas-ipad > * + * { margin-top: var(--e-4); }
-}</style>
+}
+/* lista em texto (O que mudou) */
+.lista-texto { margin: 0; padding-left: var(--e-5); display: flex; flex-direction: column; gap: var(--e-2); }</style>
 </head>
 <body>
 <!-- Página montada por scripts/painel_montar.mjs a partir de painel/fonte/. Não edite este arquivo à mão. -->
@@ -1164,7 +1168,7 @@ const BUSCA_TELAS = [
   ['Conta', 'conta', 'perfil'], ['Plano e pagamento', 'conta/assinatura', 'assinatura plano mensalidade cobrança cancelar excluir conta'], ['WhatsApp da clínica', 'conta/whatsapp', 'reconectar número qr'],
   ['Assistente de gestão', 'conta/gestao', 'resumo do dia números autorizados'], ['Contato e responsável técnico', 'conta/contato', 'e-mail telefone responsável'],
   ['Equipe', 'conta/equipe', 'convidar secretária pessoas'], ['Acessos recentes', 'conta/acessos', 'histórico do painel'], ['Baixar meus dados', 'conta/dados', 'exportar csv planilha'],
-  ['Dados do contrato', 'conta/contrato', 'cnpj razão social']];
+  ['Dados do contrato', 'conta/contrato', 'cnpj razão social'], ['O que mudou no painel', 'conta/mudou', 'novidades visual novo onde ficou mudança painel antigo']];
 function buscaAbrir() {
   const inp = el('input', { class: 'entrada', type: 'search', id: 'buscaTexto', placeholder: 'Buscar telas, pacientes e consultas', 'aria-label': 'Buscar', autocomplete: 'off', enterkeyhint: 'search' });
   const res = el('div', { class: 'busca-res', role: 'region', 'aria-live': 'polite' });
@@ -3429,6 +3433,7 @@ tela('conta', {
     el('div', { class: 'bloco' }, el('h2', { text: 'Dados e contrato' }), el('div', { class: 'lista' }, linhaLink('Contato e responsável técnico', 'E-mail, telefones e quem responde pelo conteúdo', 'conta/contato', 'conta'),
       linhaLink('Dados do contrato', 'Razão social, CNPJ e representante', 'conta/contrato', 'escudo'), ehDono() ? linhaLink('Baixar meus dados', 'A agenda e os pacientes em planilha', 'conta/dados', 'baixar') : null)),
     el('div', { class: 'bloco' }, el('h2', { text: 'Ajuda' }), el('div', { class: 'lista' },
+      linhaLink('O que mudou no painel', 'Onde ficou cada coisa', 'conta/mudou', 'info'),
       el('a', { class: 'linha', href: 'mailto:contato@rxsync.com.br' }, el('span', { class: 'ic' }, icone('chat')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Falar com a RXSync' }), el('span', { class: 't2', text: 'contato@rxsync.com.br' })), el('span', { class: 'seta' }, icone('seta'))),
       el('a', { class: 'linha', href: '/termos/' + VERSAO_TERMOS + '.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('documento')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Termos de Uso' })), el('span', { class: 'seta' }, icone('seta'))),
       el('a', { class: 'linha', href: '/privacidade.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('escudo')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Política de Privacidade' })), el('span', { class: 'seta' }, icone('seta')))))),
@@ -3563,6 +3568,24 @@ tela('conta/gestao', {
   entrar: () => dependenciasAplicar()
 });
 const READONLY = [['razao_social', 'Razão social'], ['cnpj', 'CNPJ'], ['representante_nome', 'Representante'], ['representante_cpf', 'CPF do representante'], ['endereco_faturamento', 'Endereço de faturamento'], ['plano', 'Plano'], ['valor_mensal', 'Valor'], ['numero_whatsapp', 'WhatsApp que a assistente atende']];
+// O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel antigo. Nada muda no servidor.
+const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integração e planilhas', 'agenda/horarios/integracao'],
+  ['Agenda › Horários (a página longa)', 'Agenda › Horários: uma página por assunto (horários de atendimento, regras, médicos, perguntas, feriados, receber dos pacientes)', 'agenda/horarios'],
+  ['Funções da assistente', 'Assistente › O que ela faz', 'assistente/funcoes'],
+  ['Agenda por médico', 'Agenda › Horários › Médicos e tipos, no alto', 'agenda/horarios/medicos'],
+  ['"Bloquear feriados" e "Não atender em feriados"', 'Um controle só, em Agenda › Horários › Feriados', 'agenda/horarios/feriados'],
+  ['Lembretes (a chave e os horários)', 'Um controle só, em Assistente › Mensagens automáticas', 'assistente/automaticas'],
+  ['Agrupar pacientes', 'Agenda › Horários › Regras da agenda', 'agenda/horarios/regras'],
+  ['Pacientes › importar e duplicados', 'Pacientes › ⋯ › Organizar', 'pacientes/organizar'],
+  ['Resultados', 'Hoje › Ver resultados', 'resultados'],
+  ['Assinatura', 'Conta › Plano e pagamento', 'conta/assinatura']];
+tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
+  el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
+    el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),
+    el('li', { text: 'O estado da assistente fica sempre no alto ("Atendendo"). Tocar nele mostra o que está acontecendo e os botões de pausar e testar.' }),
+    el('li', { text: 'A lupa, no alto, acha qualquer tela pelo nome novo ou pelo antigo, e também pacientes e consultas.' }),
+    el('li', { text: 'O assistente de gestão abre pelo ícone de conversa, no alto.' })))),
+  el('div', { class: 'bloco' }, el('h2', { text: 'Onde ficou cada coisa' }), el('div', { class: 'lista', id: 'mudouLista' }, MUDOU.map(([antes, agora, rota]) => linhaLink(agora, 'Antes: ' + antes, rota))))] });
 tela('conta/contrato', { montar: () => [cabTela('Dados do contrato', { voltar: VOLTA_CONTA, sub: 'Para mudar algum desses dados, fale com a RXSync.' }),
   el('div', { class: 'cartao', id: 'somenteLeitura' }, el('dl', { class: 'dados' }, READONLY.map(([k, r]) => [el('dt', { text: r }), el('dd', { text: (k === 'numero_whatsapp' ? foneBonito(RO[k]) : RO[k]) || '—' })])))] });
 

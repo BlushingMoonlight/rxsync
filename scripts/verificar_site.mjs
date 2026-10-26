@@ -139,10 +139,18 @@ for (const f of htmls) {
   }
   for (const f of ANTIGA_PAGINAS) if (!fs.existsSync(f)) erro(`${f}: saiu da demonstração antiga; tire da lista ANTIGA_PAGINAS do verificar_site.mjs`);
 }
-// Painel (autoedicao.html e o novo, painel/index.html, DEC-156): o que a clínica pode usar vem de "recursos" do servidor
-// (DEC-063), não do nome do plano.
-for (const arq of ['autoedicao.html', 'painel/index.html']) {
-  const novo = arq === 'painel/index.html';
+// Painel antigo (autoedicao.html): desde a troca (DEC-156, entrega 3) só leva para /painel/, com o mesmo ?t= e o mesmo #
+// (os links dos e-mails, os favoritos e o atalho na Tela de Início continuam abrindo). Nada de fetch nem do navegador.
+{
+  const arq = 'autoedicao.html', s = fs.readFileSync(arq, 'utf8');
+  if (!/location\.replace\('\/painel\/' \+ location\.search \+ h\)/.test(s)) erro(`${arq}: precisa levar para /painel/ com o mesmo ?t= e o mesmo # (location.replace)`);
+  if (!/<a href="\/painel\/">/.test(s)) erro(`${arq}: falta o link "Abrir o painel" (para quem não tem JavaScript)`);
+  if (/fetch\(|localStorage|sessionStorage|indexedDB|document\.cookie/.test(s)) erro(`${arq}: a página de passagem não chama o servidor nem guarda nada no navegador`);
+  if (Buffer.byteLength(s, 'utf8') > 4096) erro(`${arq}: a página de passagem passou de 4 KB; o painel mora em painel/`);
+}
+// Painel (painel/index.html, DEC-156): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
+for (const arq of ['painel/index.html']) {
+  const novo = true;
   if (fs.existsSync(arq)) {
     const s = fs.readFileSync(arq, 'utf8');
     if (!/resp\.recursos/.test(s)) erro(`${arq}: o painel precisa ler "recursos" da resposta do abrir (DEC-063)`);
@@ -199,6 +207,29 @@ for (const arq of ['autoedicao.html', 'painel/index.html']) {
     if (/autoedicao\.html\?t=|chamar\("reenviar"/.test(s)) erro(`${arq}: o painel não monta mais link com o token nem pede o "reenviar" (DEC-097)`);
   }
 }
+// Identidade (rxsync-sistema docs/front/plano.md, "Identidade em todas as páginas"): favicon, ícone da Tela de Início e
+// theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel e a passagem do painel antigo).
+{
+  const IDENTIDADE = ['painel/index.html', 'autoedicao.html'];
+  const existe = h => fs.existsSync('.' + h.split('?')[0]);
+  for (const arq of IDENTIDADE) {
+    const s = fs.readFileSync(arq, 'utf8');
+    const icone = (s.match(/<link rel="icon"[^>]*href="([^"]+)"/) || [])[1], toque = (s.match(/<link rel="apple-touch-icon"[^>]*href="([^"]+)"/) || [])[1];
+    if (!icone || !existe(icone)) erro(`${arq}: falta o favicon (<link rel="icon"> com um arquivo que exista)`);
+    if (!toque || !existe(toque)) erro(`${arq}: falta o ícone da Tela de Início (<link rel="apple-touch-icon"> com um arquivo que exista)`);
+    if (!/<meta name="theme-color" content="#FFFFFF">/i.test(s)) erro(`${arq}: falta o theme-color branco (<meta name="theme-color" content="#FFFFFF">)`);
+  }
+  // O painel tem manifest próprio, para "Adicionar à Tela de Início": nome RXSync, cores do Âncora (branco) e os ícones.
+  const s = fs.readFileSync('painel/index.html', 'utf8'), mf = (s.match(/<link rel="manifest" href="([^"]+)">/) || [])[1];
+  if (!mf || !existe(mf)) erro('painel/index.html: falta o manifest (<link rel="manifest">)');
+  else {
+    let m = {}; try { m = JSON.parse(fs.readFileSync('.' + mf, 'utf8')); } catch (e) { erro(`${mf}: não é um JSON válido`); }
+    if (m.name !== 'RXSync' || m.start_url !== '/painel/' || m.display !== 'standalone') erro(`${mf}: nome "RXSync", start_url "/painel/" e display "standalone"`);
+    if (String(m.theme_color).toUpperCase() !== '#FFFFFF' || String(m.background_color).toUpperCase() !== '#FFFFFF') erro(`${mf}: theme_color e background_color brancos (#FFFFFF, o Âncora)`);
+    const tam = (m.icons || []).filter(i => existe(i.src)).map(i => i.sizes);
+    if (!tam.includes('192x192') || !tam.includes('512x512')) erro(`${mf}: precisa dos ícones de 192 e 512 px (arquivos que existam)`);
+  }
+}
 // Preços (BlushingMoonlight/rxsync-sistema#79): o index.html, o contratar.html e o painel mostram os preços da cópia
 // oficial (scripts/precos_oficiais.json, que espelha a tabela precos do banco).
 {
@@ -219,8 +250,8 @@ for (const arq of ['autoedicao.html', 'painel/index.html']) {
     confere('contratar.html', m[1], P[k].mensal, `a mensalidade do ${k}`); confere('contratar.html', m[2], P[k].parcelado, `o anual em 12x do ${k}`);
     confere('contratar.html', m[3], br(num(P[k].parcelado) * 12), `o total do anual em 12x do ${k}`); confere('contratar.html', m[4], P[k].avista, `o anual à vista do ${k}`);
   }
-  // autoedicao.html e o painel novo: a tabela da aba Assinatura (Conta › Plano e pagamento).
-  for (const f of ['autoedicao.html', 'painel/index.html']) {
+  // o painel: a tabela de Conta › Plano e pagamento.
+  for (const f of ['painel/index.html']) {
   const a = ler(f);
   for (const k of planos) {
     const m = a.match(new RegExp(k + ':\\s*\\{[^}]*?mensal:\\s*"([\\d.,]+)",\\s*parcelado:\\s*"([\\d.,]+)",\\s*avista:\\s*"([\\d.,]+)"'));

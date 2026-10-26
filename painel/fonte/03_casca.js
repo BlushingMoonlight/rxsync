@@ -215,7 +215,7 @@ const BUSCA_TELAS = [
   ['Conta', 'conta', 'perfil'], ['Plano e pagamento', 'conta/assinatura', 'assinatura plano mensalidade cobrança cancelar excluir conta'], ['WhatsApp da clínica', 'conta/whatsapp', 'reconectar número qr'],
   ['Assistente de gestão', 'conta/gestao', 'resumo do dia números autorizados'], ['Contato e responsável técnico', 'conta/contato', 'e-mail telefone responsável'],
   ['Equipe', 'conta/equipe', 'convidar secretária pessoas'], ['Acessos recentes', 'conta/acessos', 'histórico do painel'], ['Baixar meus dados', 'conta/dados', 'exportar csv planilha'],
-  ['Dados do contrato', 'conta/contrato', 'cnpj razão social']];
+  ['Dados do contrato', 'conta/contrato', 'cnpj razão social'], ['O que mudou no painel', 'conta/mudou', 'novidades visual novo onde ficou mudança painel antigo']];
 function buscaAbrir() {
   const inp = el('input', { class: 'entrada', type: 'search', id: 'buscaTexto', placeholder: 'Buscar telas, pacientes e consultas', 'aria-label': 'Buscar', autocomplete: 'off', enterkeyhint: 'search' });
   const res = el('div', { class: 'busca-res', role: 'region', 'aria-live': 'polite' });
