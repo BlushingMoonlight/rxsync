@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7KfQA2dVY8npzndcTBxFHIuE9GLxhU28V1al2OhSWRU=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FFFFFF">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
 
     <!-- ===================== SEO BÁSICO ===================== -->
     <title>Secretária virtual com IA no WhatsApp para clínicas | RXSync</title>
@@ -11,7 +15,6 @@
     <meta name="author" content="RXSync Tecnologia e Automação em Saúde">
     <meta name="robots" content="index, follow">
 
-    <meta name="theme-color" content="#0f172a">
     <meta name="format-detection" content="telephone=no">
 
     <!-- Verificação do Google Search Console: se usar o método de tag HTML, troque SEU_CODIGO_AQUI e tire o comentário -->
@@ -29,7 +32,7 @@
     <meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Conversa de exemplo: paciente pede horário e a assistente da clínica oferece duas opções e marca a consulta">
+    <meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
     <meta property="og:locale" content="pt_BR">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -37,9 +40,6 @@
     <meta name="twitter:description" content="Assistente virtual para clínicas e consultórios. Teste 7 dias grátis no WhatsApp da clínica, sem cartão.">
     <meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
 
-    <!-- ===================== FAVICON ===================== -->
-    <link rel="icon" type="image/png" href="/assets/favicon-rxsync.png.PNG">
-    <link rel="apple-touch-icon" href="/assets/favicon-rxsync.png.PNG">
 
     <!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112) -->
     <script src="/assets/consentimento.js" defer></script>
@@ -503,6 +503,56 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ======================== Âncora (rxsync-sistema DEC-156, entrega 4) ========================
+   As cores e as letras do novo front: branco predominante, a marca (petróleo) só no botão principal, no link e no
+   selecionado, o verde só para "deu certo", sem degradê nem área escura grande, cartão sem sombra. Figtree só nos
+   títulos, Inter no resto. Os valores são os do assets/ancora/tokens.css. */
+:root {
+  --bg: #F7F8F8; --surface: #FFFFFF; --ink: #15191C; --ink-2: #4A545A; --ink-3: #4A545A;
+  --line: #E3E7E8; --line-2: #848E93;
+  --brand: #0A5148; --brand-h: #0A5148; --brand-ink: #0A5148; --brand-soft: #E7F1EF; --brand-200: #9FC4BD;
+  --navy: #0A5148; --navy-2: #FFFFFF; --amber-ink: #7A4A00; --amber-soft: #FDF4E3;
+  --sh-1: none; --sh-2: none; --sh-3: 0 12px 32px rgba(21, 25, 28, .18);
+}
+body { font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-variant-numeric: tabular-nums; }
+h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; font-weight: 600; }
+.numero .valor, .calc-res .grande, .preco .val, .passo .n, .campo-r label output, .wa-av, .mt-passos li span { font-weight: 600; }
+.eyebrow { text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 600; }
+.btn-prim { box-shadow: none; }
+.btn-prim:hover { background: #083F38; }
+.btn-dark { background: #FFFFFF; color: var(--brand); border-color: var(--line-2); }
+.btn-ghost-w { color: var(--ink); border-color: var(--line-2); }
+.btn-ghost-w:hover { background: var(--bg); }
+.hero { background: #FFFFFF; }
+.mt-sec { background: var(--bg); }
+.selo .pt { box-shadow: none; }
+.demo::after, .final::before { display: none; }
+.sec-escura, .final, .calc-res { background: var(--bg); color: var(--ink); }
+.sec-escura .h2, .final h2, .calc-res .grande { color: var(--ink); }
+.sec-escura .lead, .final .lead, .final .lista-check li, .calc-res .comp, .calc-res .rot, .calc-res .aviso, .calc-res .grande small { color: var(--ink-2); }
+.sec-escura .eyebrow, .sec-escura .lead a, .calc-res .comp b, .final .lista-check li strong { color: var(--ink); }
+.calc-res .comp { border-top-color: var(--line); }
+.final .lista-check .ok { background: var(--brand-soft); color: var(--brand); }
+.seg-item { background: #FFFFFF; border-color: var(--line); }
+.seg-item .ico { background: var(--brand-soft); color: var(--brand); }
+.seg-item h3 { color: var(--ink); }
+.seg-item p { color: var(--ink-2); }
+.seg-item a { color: var(--brand); }
+.ciclo button[aria-pressed="true"] .tag-v { background: rgba(255, 255, 255, .18); color: #FFFFFF; }
+.plano.dest { box-shadow: none; }
+.form-card { box-shadow: none; border: 1px solid var(--line); }
+.campo input:focus, .campo select:focus { box-shadow: 0 0 0 3px #E7F1EF; }
+.mt-toast .ic { color: #A3E8BE; }
+.rodape { background: var(--bg); color: var(--ink-2); border-top: 1px solid var(--line); }
+.rodape .marca, .rodape h4 { color: var(--ink); }
+.rodape a, .link-rodape { color: var(--ink-2); }
+.rodape a:hover, .link-rodape:hover { color: var(--brand); }
+.rodape-base { border-top-color: var(--line); color: var(--ink-2); }
+.erro-form { background: #FCEDEB; color: #962318; }
+.nav a, .link-entrar { white-space: nowrap; }
+@media (min-width: 1024px) and (max-width: 1199px) { .nav { gap: 0; } .nav a { padding: 8px 8px; font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
     </style>
 
     <!-- ===================== DADOS ESTRUTURADOS (SCHEMA.ORG) ===================== -->

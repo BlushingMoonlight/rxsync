@@ -47,11 +47,12 @@ let ga = await configGA(page);
 ok(ga && !/ref=|PX-/.test(JSON.stringify(ga)) && /plano=gestao/.test(ga.page_location) && /ciclo=anual/.test(ga.page_location), 'Google Analytics: o endereço vai sem o ref, com o plano e o ciclo (' + (ga && ga.page_location || '').replace(site.base, '') + ')');
 
 // 3. Etapa 1: os campos são conferidos antes de seguir
-await page.locator('section[data-etapa="1"] .proximo').click();
-ok(await page.locator('.msg-erro.on').count() >= 3 && await page.locator('section[data-etapa="1"]').evaluate(s => s.classList.contains('ativa')), 'etapa 1 vazia: mostra os erros e não segue');
+await page.locator('section[data-etapa="1"] .proximo').click();   // passo 1: o plano
+await page.locator('section[data-etapa="2"] .proximo').click();
+ok(await page.locator('.msg-erro.on').count() >= 3 && await page.locator('section[data-etapa="2"]').evaluate(s => s.classList.contains('ativa')), 'etapa 1 vazia: mostra os erros e não segue');
 await page.fill('#nome', 'Maria Teste Silva'); await page.fill('#clinica', 'Clínica Teste'); await page.fill('#email', 'maria@exemplo.test'); await page.fill('#whatsapp', '41999990000');
-await page.locator('section[data-etapa="1"] .proximo').click();
-await page.locator('section[data-etapa="2"].ativa').waitFor();
+await page.locator('section[data-etapa="2"] .proximo').click();
+await page.locator('section[data-etapa="3"].ativa').waitFor();
 const lead = await chegou(p => p.caminho === 'cadastro' && p.corpo._evento === 'lead');
 ok(lead && lead.corpo.plano === 'Gestao' && lead.corpo._ciclo === 'anual' && lead.corpo.telefone === '41999990000' && lead.corpo._origem === 'prospeccao ' + REF, 'etapa 1: o contato é registrado com o plano, o ciclo, o telefone só com dígitos e a origem da prospecção');
 
@@ -66,18 +67,21 @@ const etapa2 = async (cnpj, cpf) => {
   if (!buscou) { await page.locator('#blocoEndereco:not(.hidden)').waitFor(); buscou = await page.inputValue('#logradouro') === 'Rua do CEP'; ok(buscou, 'o CEP busca o endereço (BrasilAPI simulada)'); }
   await page.evaluate(() => { document.getElementById('blocoEndereco').className = 'space-y-4'; });
   for (const [id, v] of [['logradouro', 'Rua de Teste'], ['numero', '10'], ['bairro', 'Centro'], ['cidade', 'Curitiba'], ['uf', 'PR']]) await page.fill('#' + id, v);
-  await page.locator('section[data-etapa="2"] .proximo').click();
+  await page.locator('section[data-etapa="3"] .proximo').click();
 };
 await etapa2('11.222.333/0001-80', '000.000.001-90');
-ok(await page.locator('#cnpj.erro').count() === 1 && await page.locator('#cpf.erro').count() === 1 && await page.locator('section[data-etapa="2"].ativa').count() === 1, 'etapa 2: CNPJ e CPF com dígito errado são recusados');
+ok(await page.locator('#cnpj.erro').count() === 1 && await page.locator('#cpf.erro').count() === 1 && await page.locator('section[data-etapa="3"].ativa').count() === 1, 'etapa 2: CNPJ e CPF com dígito errado são recusados');
 await etapa2('11.222.333/0001-81', '000.000.001-91');
-await page.locator('section[data-etapa="3"].ativa').waitFor();
+await page.locator('section[data-etapa="4"].ativa').waitFor();
 ok(true, 'etapa 2: com CNPJ e CPF válidos, segue para os Termos');
 await page.frameLocator('#frameTermos').locator('[data-cli="rep"]').filter({ hasText: 'Maria Teste Silva' }).waitFor({ state: 'attached' });
 ok(true, 'os Termos aparecem dentro da página, com os dados de quem contrata');
 await anotar(page, 'etapas 1 a 3');
 
 // 4. Etapa 3: só manda com os dois aceites
+await page.locator('section[data-etapa="4"] .proximo').click();   // dos Termos para o Confira suas respostas
+await page.locator('section[data-etapa="5"].ativa').waitFor();
+ok(/Maria Teste Silva/.test(await page.locator('#resumo').textContent()), 'Confira suas respostas mostra o que foi digitado');
 await page.click('#btnTeste');
 await page.locator('#erroAceite:not(.hidden)').waitFor();
 ok(!pedidos.some(p => p.corpo._evento === 'aceite'), 'sem os aceites, mostra o aviso e não manda nada');

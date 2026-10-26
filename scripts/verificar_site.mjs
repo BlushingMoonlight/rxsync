@@ -208,9 +208,20 @@ for (const arq of ['painel/index.html']) {
   }
 }
 // Identidade (rxsync-sistema docs/front/plano.md, "Identidade em todas as páginas"): favicon, ícone da Tela de Início e
-// theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel e a passagem do painel antigo).
+// theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel e a passagem do painel antigo;
+// a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento).
 {
-  const IDENTIDADE = ['painel/index.html', 'autoedicao.html'];
+  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html',
+    ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
+  const IDENTIDADE = ['painel/index.html', 'autoedicao.html', ...PUBLICAS];
+  for (const arq of PUBLICAS) {
+    const s = fs.readFileSync(arq, 'utf8');
+    const meta = k => (s.match(new RegExp(`<meta (?:property|name)="${k}" content="([^"]*)"`)) || [])[1];
+    for (const k of ['og:title', 'og:description', 'og:image', 'og:url', 'twitter:card', 'twitter:title', 'twitter:image']) if (!meta(k)) erro(`${arq}: falta a prévia de compartilhamento (${k})`);
+    if (meta('og:image') && !/^https:\/\/rxsync\.com\.br\/assets\/og-rxsync\.png$/.test(meta('og:image'))) erro(`${arq}: og:image precisa ser a imagem do site (https://rxsync.com.br/assets/og-rxsync.png)`);
+    if (meta('twitter:card') && meta('twitter:card') !== 'summary_large_image') erro(`${arq}: twitter:card precisa ser summary_large_image`);
+  }
+  if (!fs.existsSync('assets/og-rxsync.png')) erro('assets/og-rxsync.png: a imagem da prévia de compartilhamento sumiu');
   const existe = h => fs.existsSync('.' + h.split('?')[0]);
   for (const arq of IDENTIDADE) {
     const s = fs.readFileSync(arq, 'utf8');

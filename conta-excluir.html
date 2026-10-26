@@ -2,33 +2,50 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WUocO+leQEWkC+lQL6CyaV8RIkj0Hk12k5kZhaO20CY='; style-src 'sha256-1D+tRnPEaXOIW9wW5pdW/qWgdg/emwyzLqFZkQjsoo0=' 'self'; font-src 'self'; img-src 'self'; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-WUocO+leQEWkC+lQL6CyaV8RIkj0Hk12k5kZhaO20CY='; style-src 'sha256-bW6ujR3VTZxPW32DR6Gc0KqvrTOuCI39Ajst0UjkkzI=' 'self'; font-src 'self'; img-src 'self'; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RXSync">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://rxsync.com.br/conta-excluir.html">
+<meta property="og:title" content="Cancelar e excluir a conta | RXSync">
+<meta property="og:description" content="Confirme o pedido de cancelamento e exclusão da conta da clínica na RXSync.">
+<meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cancelar e excluir a conta | RXSync">
+<meta name="twitter:description" content="Confirme o pedido de cancelamento e exclusão da conta da clínica na RXSync.">
+<meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <title>Cancelar e excluir a conta | RXSync</title>
-<link rel="icon" type="image/png" href="/assets/favicon-rxsync.png.PNG">
 <link rel="stylesheet" href="/assets/fontes/fontes.css">
 <!-- Exclusão da conta pelo link do e-mail (rxsync-sistema DEC-114, workflow 29). Sem Google Analytics, sem chat e sem
      script de fora. O link vem depois do "#" (não vai ao servidor do site) e sai do endereço assim que a página abre;
      abrir só mostra o que vai acontecer; o pedido só vale no botão "Confirmar". Nada fica guardado no navegador. -->
 <style>
-  :root { --bg: #f2f5f4; --surface: #fff; --ink: #0f172a; --ink-2: #445263; --line: #e0e7e4; --brand: #047857; --rose: #b91c1c; --rose-soft: #fff1f2; --amber-soft: #fef3c7; --verde-soft: #e6f5ee; }
+  :root { --bg: #F7F8F8; --surface: #FFFFFF; --ink: #15191C; --ink-2: #4A545A; --line: #E3E7E8; --brand: #0A5148; --rose: #B42318; --rose-txt: #962318; --rose-soft: #FCEDEB; --amber-soft: #FDF4E3; --verde-soft: #EAF5EE; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Figtree, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Inter, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     padding: env(safe-area-inset-top, 0) 16px env(safe-area-inset-bottom, 0); }
   main { max-width: 560px; margin: 40px auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 28px 24px; }
-  .marca { font-weight: 800; letter-spacing: -.02em; font-size: 18px; margin-bottom: 18px; }
-  h1 { font-size: 24px; line-height: 1.25; margin: 0 0 12px; }
+  .marca { font-family: Figtree, Inter, sans-serif; font-weight: 600; letter-spacing: -.02em; font-size: 18px; margin-bottom: 18px; }
+  h1 { font-family: Figtree, Inter, sans-serif; font-weight: 600; font-size: 24px; line-height: 1.3; margin: 0 0 12px; }
   p { margin: 0 0 12px; color: var(--ink-2); }
   .caixa { border-radius: 12px; padding: 14px 16px; margin: 16px 0; }
   .aviso { background: var(--amber-soft); }
-  .erro { background: var(--rose-soft); color: var(--rose); }
-  .certo { background: var(--verde-soft); color: #065f46; }
-  dl { margin: 12px 0; } dt { font-weight: 700; } dd { margin: 0 0 8px; color: var(--ink-2); }
-  button { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid var(--rose); background: var(--rose); color: #fff; font: inherit; font-weight: 700; cursor: pointer; margin-top: 8px; }
+  .erro { background: var(--rose-soft); color: var(--rose-txt); }
+  .certo { background: var(--verde-soft); color: #17653F; }
+  dl { margin: 12px 0; } dt { font-weight: 600; } dd { margin: 0 0 8px; color: var(--ink-2); }
+  button { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid var(--rose); background: var(--rose); color: #fff; font: inherit; font-weight: 600; cursor: pointer; margin-top: 8px; }
   button:disabled { opacity: .6; cursor: progress; }
-  button:focus-visible, a:focus-visible { outline: 3px solid #34d399; outline-offset: 2px; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #0A5148; outline-offset: 2px; }
   a { color: var(--brand); font-weight: 600; }
   .pe { font-size: 13px; color: var(--ink-2); margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
 </style>

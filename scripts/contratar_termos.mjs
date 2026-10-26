@@ -15,7 +15,7 @@ await page.evaluate(() => {
   const p = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
   p('nome', 'Maria Teste'); p('cpf', '529.982.247-25'); p('razao', 'Clínica Teste Ltda'); p('cnpj', '11.222.333/0001-81');
   p('cep', '80000-000'); p('logradouro', 'Rua A'); p('numero', '10'); p('bairro', 'Centro'); p('cidade', 'Curitiba'); p('uf', 'PR');
-  mostrar(3);   // a etapa dos termos (chama carregarTermos)
+  mostrar(4);   // a etapa dos termos (chama carregarTermos)
 });
 const frame = page.frameLocator('#frameTermos');
 await frame.locator('[data-cli="rep"]').filter({ hasText: 'Maria Teste' }).waitFor({ state: 'attached' });

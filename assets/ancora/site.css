@@ -1,0 +1,84 @@
+/* =====================================================================================================
+   Âncora no site (rxsync-sistema DEC-156, entrega 4): a ponte das páginas públicas para o novo front.
+   Vem depois do estilo próprio de cada página (as classes pré-geradas do Tailwind e os estilos da página) e troca as
+   cores, as letras e as bordas pelas do assets/ancora/tokens.css, que vem antes. Regras da P12: branco predominante,
+   nada de área escura grande, a marca (petróleo) só no botão principal, no link e no selecionado, o verde só para
+   "deu certo", cartão sem sombra, borda de campo de 3:1, Figtree só nos títulos e Inter no resto, nenhum peso acima de
+   600, alvos de 44 px.
+   ===================================================================================================== */
+body { font-family: var(--fonte); color: var(--texto); background: var(--fundo); font-variant-numeric: tabular-nums; }
+h1, h2, h3, .titulo-f { font-family: 'Figtree', var(--fonte); font-weight: 600; letter-spacing: -0.01em; }
+.font-bold, .font-extrabold, .font-black, b, strong { font-weight: 600; }
+.bg-slate-50 { background-color: var(--superficie-2); }
+.border-slate-200, .border-slate-100 { border-color: var(--borda); }
+.text-primary-900, .text-slate-900, .text-slate-800, .text-slate-700 { color: var(--texto); }
+.text-slate-600, .text-slate-500, .text-slate-400 { color: var(--texto-2); }
+.text-primary-600, .text-primary-700 { color: var(--primaria); }
+.shadow-sm, .shadow-md, .shadow-lg, .shadow-xl { box-shadow: none; }
+a { color: var(--primaria); }
+.uppercase { text-transform: none; }
+.tracking-wider, .tracking-widest { letter-spacing: 0; }
+
+/* cabeçalho: branco com borda embaixo (sai o escuro) */
+header.bg-primary-900, header.bg-primary-800 { background: var(--fundo); color: var(--texto); border-bottom: 1px solid var(--borda); }
+header .text-white, header a.text-white { color: var(--texto); }
+header .text-white\/70, header .text-white\/60, header .text-white\/50, header [class*="text-white/"] { color: var(--texto-2); }
+header .bg-white\/10 { background: var(--superficie-2); }
+header .border-white\/20 { border-color: var(--borda); }
+header a:hover { color: var(--primaria); }
+
+/* botões: o principal na marca; o verde e o azul-marinho antigos viram a marca */
+.bg-primary-900, .bg-primary-800, .bg-emerald-500, .bg-emerald-600 { background-color: var(--primaria); }
+.hover\:bg-primary-800:hover, .hover\:bg-emerald-400:hover, .hover\:bg-emerald-700:hover { background-color: var(--primaria-forte); }
+.border-primary-900 { border-color: var(--primaria); }
+.border-emerald-500, .border-emerald-200 { border-color: var(--primaria); }
+.bg-emerald-50 { background-color: var(--primaria-suave); }
+.has-\[\:checked\]\:border-emerald-500:has(:checked) { border-color: var(--primaria); }
+.has-\[\:checked\]\:bg-emerald-50:has(:checked) { background-color: var(--primaria-suave); }
+.accent-emerald-600, input[type="checkbox"], input[type="radio"] { accent-color: var(--primaria); }
+.text-emerald-500, .text-emerald-600, .text-emerald-700 { color: var(--ok-texto); }
+.bg-emerald-100 { background-color: var(--ok-fundo); }
+.text-red-600, .text-red-500, .text-rose-700 { color: var(--perigo-texto); }
+.bg-red-50, .bg-rose-50 { background-color: var(--perigo-fundo); }
+.border-red-200, .border-rose-200 { border-color: var(--perigo-fundo); }
+button, .btn, a.btn { min-height: var(--alvo); }
+
+/* campos: borda de 3:1 e o foco na marca */
+.campo, input.campo, select.campo, textarea.campo { border-color: var(--borda-campo); }
+.campo:focus { border-color: var(--primaria); box-shadow: 0 0 0 3px var(--primaria-suave); }
+.campo.erro { border-color: var(--perigo-forte); background: var(--perigo-fundo); }
+.msg-erro { color: var(--perigo-texto); }
+.rotulo { color: var(--texto); font-weight: 500; }
+:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+
+/* molde F (passos): "Passo N de M" no alto, uma coisa por tela, "Continuar" fixo embaixo no celular */
+.passo-de { font-size: var(--t-2); line-height: var(--l-2); font-weight: 500; color: var(--texto-2); margin: 0 0 var(--e-2); }
+.passos-barra { display: flex; gap: 6px; margin-bottom: var(--e-6); }
+.passos-barra > div { height: 4px; flex: 1; border-radius: 2px; background: var(--borda); }
+.passos-barra > div.feito { background: var(--primaria); }
+.resumo-f { margin: 0; display: grid; grid-template-columns: minmax(110px, 38%) minmax(0, 1fr); border: 1px solid var(--borda); border-radius: var(--r-cartao); }
+.resumo-f dt, .resumo-f dd { margin: 0; padding: var(--e-3) var(--e-4); border-top: 1px solid var(--borda); overflow-wrap: anywhere; }
+.resumo-f dt { color: var(--texto-2); font-size: var(--t-2); }
+.resumo-f dt:first-of-type, .resumo-f dd:first-of-type { border-top: 0; }
+.resumo-f .alterar { display: inline-flex; align-items: center; min-height: var(--alvo); margin-left: var(--e-2); background: none; border: 0; padding: 0 var(--e-1); color: var(--primaria); text-decoration: underline; font: inherit; cursor: pointer; }
+.caixa-preco { background: var(--primaria-suave); color: var(--texto); }
+.caixa-preco .text-white, .caixa-preco [class*="text-white"] { color: var(--texto-2); }
+.caixa-preco #precoPrincipal { color: var(--texto); }
+@media (max-width: 767px) {
+  body:has(.acao-fixa-f) .rxc-chat { bottom: 92px; }
+  .acao-fixa-f { position: sticky; bottom: 0; z-index: 5; padding: var(--e-3) 0 calc(var(--e-3) + env(safe-area-inset-bottom)); background: var(--fundo); }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Política de Privacidade e Termos (só o visual; o texto não muda) */
+.doc h1, .doc h2, .doc h3 { font-family: 'Figtree', var(--fonte); font-weight: 600; color: var(--texto); border-bottom-color: var(--borda); }
+.doc p, .doc li, .doc td { color: var(--texto); }
+.doc strong { color: var(--texto); }
+.doc a { color: var(--primaria); }
+.doc blockquote { border-left-color: var(--primaria); background: var(--superficie-2); }
+.doc blockquote p { color: var(--texto); }
+.doc th { background: var(--superficie-2); color: var(--texto); font-weight: 600; }
+.doc th, .doc td { border-color: var(--borda); }
+.doc [data-cli] { color: var(--primaria); background: var(--primaria-suave); font-weight: 600; }
+.doc .pend { color: var(--texto-2); background: var(--superficie-2); }
+.sumario a:hover { color: var(--primaria); }
