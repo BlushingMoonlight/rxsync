@@ -2,6 +2,7 @@
 // todas as páginas apontam para o mesmo n8n e nenhuma aponta para endereço de teste.
 import fs from 'node:fs'; import path from 'node:path';
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io';
+const LIMITE_PAINEL_KB = 400;
 let erros = 0; const erro = m => { erros++; console.log('::error::' + m); };
 const todos = [];
 (function andar(d) { for (const f of fs.readdirSync(d)) { if (f.startsWith('.') || f === 'node_modules' || f === 'scripts') continue; const p = path.join(d, f); fs.statSync(p).isDirectory() ? andar(p) : todos.push(p); } })('.');
@@ -121,8 +122,8 @@ for (const f of htmls) {
     if (/javascript:/i.test(s)) erro(`${arq}: link javascript: é bloqueado pela regra de segurança`);
   }
 }
-// Nenhuma página publicada sem a regra de segurança: as da lista do scripts/csp.mjs, a Central (a dela) e a fonte da
-// Central (que não roda nada sozinha). Exceção: a demonstração antiga, que não recebe mais mudanças; só as páginas que
+// Nenhuma página publicada sem a regra de segurança: as da lista do scripts/csp.mjs, a Central (a dela) e as fontes da
+// Central e do painel (que não rodam nada sozinhas). Exceção: a demonstração antiga, que não recebe mais mudanças; só as páginas que
 // existem hoje nela (uma página nova ali também precisa da regra).
 {
   const { PAGINAS } = await import('./csp.mjs');
@@ -132,14 +133,16 @@ for (const f of htmls) {
     'questionario/index.html'].map(f => ANTIGA + f);
   for (const f of htmls.map(h => h.split(path.sep).join('/').replace(/^\.\//, ''))) {
     if (PAGINAS[f] || f === 'central/index.html' || ANTIGA_PAGINAS.includes(f)) continue;
+    if (f === 'painel/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte do painel precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     if (f === 'central/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte da Central precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     erro(`${f}: página sem a regra de segurança; ponha na lista PAGINAS do scripts/csp.mjs e rode node scripts/csp.mjs`);
   }
   for (const f of ANTIGA_PAGINAS) if (!fs.existsSync(f)) erro(`${f}: saiu da demonstração antiga; tire da lista ANTIGA_PAGINAS do verificar_site.mjs`);
 }
-// Painel (autoedicao.html): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
-{
-  const arq = 'autoedicao.html';
+// Painel (autoedicao.html e o novo, painel/index.html, DEC-156): o que a clínica pode usar vem de "recursos" do servidor
+// (DEC-063), não do nome do plano.
+for (const arq of ['autoedicao.html', 'painel/index.html']) {
+  const novo = arq === 'painel/index.html';
   if (fs.existsSync(arq)) {
     const s = fs.readFileSync(arq, 'utf8');
     if (!/resp\.recursos/.test(s)) erro(`${arq}: o painel precisa ler "recursos" da resposta do abrir (DEC-063)`);
@@ -151,8 +154,48 @@ for (const f of htmls) {
     for (const m of s.matchAll(/localStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || m[2].trim() !== "'painel_lembranca'") erro(`${arq}: só a lembrança do aparelho pode ir para o localStorage (achei ${m[0]})`);
     for (const m of s.matchAll(/sessionStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || m[2].trim() !== "'painel_sessao'") erro(`${arq}: só a sessão pode ir para o sessionStorage (achei ${m[0]})`);
     if (/indexedDB|document\.cookie|caches\.open|(?:local|session)Storage\s*\[/.test(s)) erro(`${arq}: nada além da sessão e da lembrança fica no navegador`);
-    for (const m of s.matchAll(/fetch\((\w+_?WEBHOOK|WEBHOOK)[^;]*?headers:\s*([^,]+),/g)) if (m[1] !== 'ENTRADA_WEBHOOK' && m[2].trim() !== 'cab()') erro(`${arq}: o pedido ao ${m[1]} precisa levar a sessão do painel (headers: cab())`);
-    if ((s.match(/headers: cab\(\)/g) || []).length < 5) erro(`${arq}: os 5 endpoints do painel (24, 13, 32, 12 e 23) precisam de headers: cab()`);
+    if (!novo) {
+      for (const m of s.matchAll(/fetch\((\w+_?WEBHOOK|WEBHOOK)[^;]*?headers:\s*([^,]+),/g)) if (m[1] !== 'ENTRADA_WEBHOOK' && m[2].trim() !== 'cab()') erro(`${arq}: o pedido ao ${m[1]} precisa levar a sessão do painel (headers: cab())`);
+      if ((s.match(/headers: cab\(\)/g) || []).length < 5) erro(`${arq}: os 5 endpoints do painel (24, 13, 32, 12 e 23) precisam de headers: cab()`);
+    } else {
+      // O painel novo fala com o n8n por um lugar só (pedir), sempre com cab(); o outro fetch é a lista de municípios do site.
+      const fetches = [...s.matchAll(/\bfetch\(([^,)]*)/g)].map(m => m[1].trim());
+      if (fetches.filter(f => f === 'url').length !== 1 || !/fetch\(url, \{ method: 'POST', headers: cab\(/.test(s)) erro(`${arq}: todo pedido ao n8n passa pelo pedir(), com headers: cab() (a sessão do painel)`);
+      for (const f of fetches) if (f !== 'url' && !/^'\/assets\//.test(f)) erro(`${arq}: fetch(${f}): fora do pedir(), só arquivo do próprio site (/assets/)`);
+      if (!/<meta name="robots" content="noindex, nofollow">/.test(s)) erro(`${arq}: falta noindex`);
+      // Página montada (DEC-156): painel/index.html é exatamente o que o painel_montar.mjs gera a partir de painel/fonte/ e
+      // do assets/ancora/tokens.css (o arquivo único de cores e tamanhos).
+      try { const { montar } = await import('./painel_montar.mjs'); if (montar() !== s) erro(`${arq}: diferente do que painel/fonte/ monta (rode node scripts/painel_montar.mjs e não edite a página à mão)`); }
+      catch (e) { erro(`painel/fonte: não consegui montar o painel (${e.message})`); }
+      // Peso: o painel antigo tem 405 KB num arquivo só; o novo não pode passar de 400 KB (rxsync-sistema docs/front/plano.md).
+      const kb = Buffer.byteLength(s, 'utf8') / 1024;
+      if (kb > LIMITE_PAINEL_KB) erro(`${arq}: ${kb.toFixed(0)} KB, acima do limite de ${LIMITE_PAINEL_KB} KB (rxsync-sistema docs/front/plano.md)`);
+      // Regras da P12 (rxsync-sistema docs/mapa/painel-novo.md, seção 11), lidas no estilo do painel (tokens + fontes):
+      const estilo = ['assets/ancora/tokens.css', ...fs.readdirSync('painel/fonte').filter(x => x.endsWith('.css')).map(x => 'painel/fonte/' + x)]
+        .map(f => fs.readFileSync(f, 'utf8')).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+      const regras = [...estilo.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(m => ({ sel: m[1].trim(), dec: m[2] }));
+      const p12 = m => erro(`painel (estilo): ${m} (P12, rxsync-sistema docs/mapa/painel-novo.md, seção 11)`);
+      for (const c of ['#B4741A', '#5E676E']) if (new RegExp(c, 'i').test(estilo + s)) p12(`a cor ${c} saiu da paleta`);
+      if (/figtree/i.test(estilo) || /figtree/i.test(s.replace(/<style>[\s\S]*?<\/style>/, ''))) p12('Figtree é a letra do site; o painel usa Inter');
+      for (const r of regras) {
+        for (const m of r.dec.matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)) if (+m[1] < 12) p12(`${r.sel}: texto de ${m[1]} px (mínimo 12)`);
+        for (const m of r.dec.matchAll(/font-weight:\s*(\w+)/g)) if (m[1] === 'bold' || m[1] === 'bolder' || +m[1] > 600) p12(`${r.sel}: peso ${m[1]} (máximo 600)`);
+        for (const m of r.dec.matchAll(/box-shadow:\s*([^;]+)/g)) if (!/^(none|var\(--sombra-(menu|janela)\))$/.test(m[1].trim())) p12(`${r.sel}: sombra ${m[1].trim()} (só var(--sombra-menu) ou var(--sombra-janela), em menu, janela e folha)`);
+        for (const m of r.dec.matchAll(/(?:transition|animation)(?:-duration)?:\s*([^;]+)/g)) for (const t of m[1].matchAll(/(\d+(?:\.\d+)?)(ms|s)\b|var\((--[\w-]+)\)/g)) {
+          const ms = t[3] ? (t[3] === '--mov' ? 200 : t[3] === '--mov-salvo' && /salvo/.test(r.sel) ? 0 : 9999) : t[2] === 's' ? +t[1] * 1000 : +t[1];
+          if (ms > 300 && !/!important/.test(m[1])) p12(`${r.sel}: animação de ${t[0]} (máximo 300 ms; o "Salvo" usa var(--mov-salvo))`);
+        }
+        if (/\.entrada|input|select|textarea/.test(r.sel) && /var\(--borda\)/.test(r.dec)) p12(`${r.sel}: campo com a borda clara (#E3E7E8); use var(--borda-campo), de 3:1`);
+      }
+      if (/prefers-color-scheme/.test(estilo)) p12('o escuro só vale pela escolha da pessoa (data-tema), nunca pelo aparelho');
+      if (!/prefers-reduced-motion:\s*reduce/.test(estilo)) p12('falta a regra de "Reduzir movimento"');
+      if (!/body\s*\{[^}]*font-variant-numeric:\s*tabular-nums/.test(estilo)) p12('os números precisam de largura fixa (font-variant-numeric: tabular-nums no body)');
+      // Cores e tamanhos só no assets/ancora/tokens.css: nas fontes do painel, nenhuma cor solta (#abc, rgb()).
+      for (const f of fs.readdirSync('painel/fonte').filter(x => /\.(css|js)$/.test(x))) {
+        const t = fs.readFileSync(path.join('painel/fonte', f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
+        for (const m of t.matchAll(/#[0-9a-fA-F]{3,8}\b(?![\w-])|rgba?\([^)]*\)/g)) if (!/^#(FFFFFF|fff)$/i.test(m[0]) || f.endsWith('.js')) erro(`painel/fonte/${f}: cor solta ${m[0]}; use uma variável do assets/ancora/tokens.css`);
+      }
+    }
     if (/autoedicao\.html\?t=|chamar\("reenviar"/.test(s)) erro(`${arq}: o painel não monta mais link com o token nem pede o "reenviar" (DEC-097)`);
   }
 }
@@ -176,12 +219,14 @@ for (const f of htmls) {
     confere('contratar.html', m[1], P[k].mensal, `a mensalidade do ${k}`); confere('contratar.html', m[2], P[k].parcelado, `o anual em 12x do ${k}`);
     confere('contratar.html', m[3], br(num(P[k].parcelado) * 12), `o total do anual em 12x do ${k}`); confere('contratar.html', m[4], P[k].avista, `o anual à vista do ${k}`);
   }
-  // autoedicao.html: a tabela da aba Assinatura.
-  const a = ler('autoedicao.html');
+  // autoedicao.html e o painel novo: a tabela da aba Assinatura (Conta › Plano e pagamento).
+  for (const f of ['autoedicao.html', 'painel/index.html']) {
+  const a = ler(f);
   for (const k of planos) {
     const m = a.match(new RegExp(k + ':\\s*\\{[^}]*?mensal:\\s*"([\\d.,]+)",\\s*parcelado:\\s*"([\\d.,]+)",\\s*avista:\\s*"([\\d.,]+)"'));
-    if (!m) { erro(`autoedicao.html: não achei os preços de ${k} em ASSIN_PRECOS`); continue; }
-    confere('autoedicao.html', m[1], P[k].mensal, `a mensalidade do ${k}`); confere('autoedicao.html', m[2], P[k].parcelado, `o anual em 12x do ${k}`); confere('autoedicao.html', m[3], P[k].avista, `o anual à vista do ${k}`);
+    if (!m) { erro(`${f}: não achei os preços de ${k} em ASSIN_PRECOS`); continue; }
+    confere(f, m[1], P[k].mensal, `a mensalidade do ${k}`); confere(f, m[2], P[k].parcelado, `o anual em 12x do ${k}`); confere(f, m[3], P[k].avista, `o anual à vista do ${k}`);
+  }
   }
   // index.html: os cards (mensal e 12x), o "à vista" do texto e o preço do JSON-LD.
   const ix = ler('index.html');

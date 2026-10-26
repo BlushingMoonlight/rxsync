@@ -1,12 +1,14 @@
 // Roda todos os testes de tela (scripts/*.mjs que abrem o navegador, com o n8n simulado), um por vez, e mostra quais
 // passaram. Os que fotografam as telas rodam sem fotos. Quem usa: o GitHub em todo pull request (conferir.yml) e quem
 // quiser rodar todos aqui. Uso (precisa do Playwright): node scripts/testes_tela.mjs
+// Só os que começam com um nome: node scripts/testes_tela.mjs painel_ (o conferir.yml roda assim os do painel no Safari,
+// com NAVEGADOR=webkit).
 import fs from 'node:fs'; import path from 'node:path'; import { spawn } from 'node:child_process'; import { fileURLToPath } from 'node:url';
 const PASTA = path.dirname(fileURLToPath(import.meta.url));
 // Ferramentas (não são testes): o servidor simulado, as regras de segurança (e o que os testes delas fazem igual), a montagem da Central e as conferências.
-const FERRAMENTAS = ['central_simulado.mjs', 'central_csp.mjs', 'csp_teste.mjs', 'central_montar.mjs', 'csp.mjs', 'verificar_site.mjs', 'testes_tela.mjs'];
+const FERRAMENTAS = ['central_simulado.mjs', 'central_csp.mjs', 'csp_teste.mjs', 'central_montar.mjs', 'painel_montar.mjs', 'csp.mjs', 'verificar_site.mjs', 'testes_tela.mjs'];
 const SEM_FOTOS = ['central_telas.mjs', 'demo_clinica_telas.mjs'];
-const testes = fs.readdirSync(PASTA).filter(f => f.endsWith('.mjs') && !FERRAMENTAS.includes(f)).sort();
+const testes = fs.readdirSync(PASTA).filter(f => f.endsWith('.mjs') && !FERRAMENTAS.includes(f) && f.startsWith(process.argv[2] || '')).sort();
 const rodar = f => new Promise(ok => {
   const inicio = Date.now(); let saida = '';
   const p = spawn(process.execPath, [path.join(PASTA, f), ...(SEM_FOTOS.includes(f) ? ['-', 'sem-fotos'] : [])], { cwd: path.join(PASTA, '..') });

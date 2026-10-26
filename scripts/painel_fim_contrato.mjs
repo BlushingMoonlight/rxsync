@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela o fim do contrato, com o n8n SIMULADO aqui
+// Painel (painel/, DEC-156): testa pela tela o fim do contrato, com o n8n SIMULADO aqui
 // (nada sai para a internet):
 //   1. dono, contrato encerrado (termos_estado com so_baixar): a tela só tem "Baixar meus dados" e "Sair"; o 24 nunca é
 //      chamado; a agenda baixa pelo 29 (dados_exportar) com a sessão; "Sair" encerra a sessão e volta para a entrada;
@@ -44,7 +44,7 @@ async function contexto() {
 
 // 1. dono
 let { ctx, p } = await contexto();
-await p.goto(site.base + '/autoedicao.html');
+await p.goto(site.base + '/painel/');
 await p.locator('#fimContrato').waitFor();
 ok(await p.locator('#btnFimAgenda').isVisible() && await p.locator('#btnFimPacientes').isVisible(), 'dono: a tela do fim do contrato mostra os dois botões de baixar');
 ok(await p.locator('#app').isHidden() && await p.locator('#entrada').isHidden(), 'dono: nem o painel nem a entrada aparecem');
@@ -66,7 +66,7 @@ await ctx.close();
 // 2. equipe
 estado.papel = 'equipe'; chamadas.length = 0;
 ({ ctx, p } = await contexto());
-await p.goto(site.base + '/autoedicao.html');
+await p.goto(site.base + '/painel/');
 await p.locator('#fimContrato').waitFor();
 ok(await p.locator('#fimEquipe').isVisible() && await p.locator('#btnFimAgenda').isHidden(), 'equipe: só o aviso "Só o dono…", sem os botões de baixar');
 ok(await p.locator('#btnFimSair').isVisible(), 'equipe: o Sair aparece');
@@ -75,7 +75,7 @@ await ctx.close();
 // 3. contrato ativo
 estado.papel = 'dono'; estado.fim = false; chamadas.length = 0;
 ({ ctx, p } = await contexto());
-await p.goto(site.base + '/autoedicao.html');
+await p.goto(site.base + '/painel/');
 await p.locator('#app').waitFor();
 ok(await p.locator('#fimContrato').isHidden(), 'contrato ativo: o painel abre normal');
 await p.waitForTimeout(300);

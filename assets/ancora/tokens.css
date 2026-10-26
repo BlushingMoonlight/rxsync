@@ -1,0 +1,50 @@
+/* =====================================================================================================
+   Âncora: as cores e os tamanhos de todas as telas da RXSync, num arquivo só (rxsync-sistema DEC-156, P12).
+   Quem usa: o painel da clínica (painel/, montado por scripts/painel_montar.mjs) e a Central (central/, montada por
+   scripts/central_montar.mjs). Os dois montadores põem este arquivo no começo do <style> da página.
+   A Central ainda redefine as variáveis dela logo depois (a aparência dela muda só na entrega 5 do plano do novo front).
+   Regras: branco predominante; a marca só no botão principal, no link, no foco e no item selecionado; o verde só para
+   "deu certo"; estado sempre com cor, ícone e palavra. O escuro só vale quando a pessoa escolhe (data-tema="escuro").
+   Contraste conferido na WCAG e no APCA (tabela no rxsync-sistema, docs/mapa/painel-novo.md, seção 11).
+   ===================================================================================================== */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('/assets/fontes/inter-400.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('/assets/fontes/inter-500.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/fontes/inter-600.woff2') format('woff2'); }
+:root {
+  /* cores do modo claro (o padrão) */
+  --fundo: #FFFFFF; --superficie: #FFFFFF; --superficie-2: #F7F8F8;
+  --texto: #15191C; --texto-2: #4A545A;
+  --borda-campo: #848E93; --borda: #E3E7E8;
+  --primaria: #0A5148; --primaria-forte: #083F38; --primaria-suave: #E7F1EF; --botao-texto: #FFFFFF;
+  --ok-texto: #17653F; --ok-fundo: #EAF5EE;
+  --atencao-texto: #7A4A00; --atencao-fundo: #FDF4E3;
+  --perigo-texto: #962318; --perigo-fundo: #FCEDEB; --perigo-forte: #B42318; --perigo-botao-texto: #FFFFFF;
+  --toggle-off: #6B767C; --desativado: #8A9499;
+  --foco: #0A5148;
+  --sombra-menu: 0 2px 8px rgba(21, 25, 28, .10); --sombra-janela: 0 12px 32px rgba(21, 25, 28, .18);
+  --veu: rgba(21, 25, 28, .45);
+  /* tipografia (tamanho / altura da linha) */
+  --fonte: 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --t-titulo: 24px; --l-titulo: 32px; --t-bloco: 18px; --l-bloco: 26px; --t-numero: 28px; --l-numero: 36px;
+  --t-corpo: 16px; --l-corpo: 24px; --t-2: 14px; --l-2: 20px; --t-peq: 12px; --l-peq: 16px;
+  /* espaços, cantos, medidas e movimento */
+  --e-1: 4px; --e-2: 8px; --e-3: 12px; --e-4: 16px; --e-5: 20px; --e-6: 24px; --e-8: 32px; --e-10: 40px; --e-12: 48px;
+  --r-marcar: 6px; --r-botao: 8px; --r-cartao: 12px; --r-janela: 16px; --r-capsula: 999px;
+  --alvo: 44px; --alvo-principal: 48px; --barra-h: 64px;
+  --mov: 200ms; --mov-salvo: 450ms;
+  color-scheme: light;
+}
+/* cores do modo escuro: só quando a pessoa escolhe (nunca pelo aparelho sozinho) */
+:root[data-tema="escuro"] {
+  --fundo: #0E1214; --superficie: #161B1E; --superficie-2: #0E1214;
+  --texto: #E8ECED; --texto-2: #C9D0D3;
+  --borda-campo: #9AA4A9; --borda: #2A3135;
+  --primaria: #A8DDD9; --primaria-forte: #C9ECE9; --primaria-suave: #173A36; --botao-texto: #0E1214;
+  --ok-texto: #A3E8BE; --ok-fundo: #12291D;
+  --atencao-texto: #F7D48E; --atencao-fundo: #2E2410;
+  --perigo-texto: #FAC2BB; --perigo-fundo: #33181A; --perigo-forte: #FAC2BB; --perigo-botao-texto: #0E1214;
+  --toggle-off: #9AA4A9; --desativado: #8A9499;
+  --foco: #A8DDD9;
+  --sombra-menu: none; --sombra-janela: none; --veu: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}

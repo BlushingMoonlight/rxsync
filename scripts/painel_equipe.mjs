@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela a equipe, o "Baixar meus dados" e o "Cancelar e excluir a conta"
+// Painel (painel/, DEC-156): testa pela tela a equipe, o "Baixar meus dados" e o "Cancelar e excluir a conta"
 // (rxsync-sistema DEC-114 e DEC-115), com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. dono: Conta mostra Equipe e Baixar meus dados; a Equipe lista e convida (equipe_convidar no 29); Baixar a agenda
 //      pede as páginas até tem_mais = false e baixa um CSV com todas as linhas (e sem fórmula de planilha);
@@ -41,20 +41,20 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
 });
 const erros = [];
 const abrir = async rota => { const p = await ctx.newPage(); p.setDefaultTimeout(8000); p.on('pageerror', e => erros.push(String(e))); p.on('dialog', d => d.accept());
-  await p.goto(site.base + '/autoedicao.html#' + rota); await p.locator('#app').waitFor(); return p; };
+  await p.goto(site.base + '/painel/#' + rota); await p.locator('#app').waitFor(); return p; };
 
 // 1. dono
 let page = await abrir('conta');
 ok(await page.locator('#listaConta').getByText('Equipe', { exact: true }).isVisible(), 'dono: Conta mostra Equipe');
 ok(await page.locator('#listaConta').getByText('Baixar meus dados').isVisible(), 'dono: Conta mostra Baixar meus dados');
-await page.goto(site.base + '/autoedicao.html#conta/equipe');
+await page.goto(site.base + '/painel/#conta/equipe');
 await page.locator('#equipeLista').getByText('sec@clinica-a.test').waitFor();
 ok(await page.locator('#equipeLista').getByText('Convite enviado, vale até 27/10/2026').isVisible(), 'Equipe: lista o dono e o convite em aberto');
 await page.fill('#equipeEmail', 'Recepcao@Clinica-A.test'); await page.click('#btnEquipeConvidar');
 await page.waitForTimeout(300);
 const conv = chamadas.filter(c => c.acao === 'equipe_convidar').pop();
 ok(conv && conv.caminho === 'painel-entrada' && conv.dados.email === 'recepcao@clinica-a.test' && conv.sessao === SESSAO, 'Convidar: vai ao 29 com a sessão e o e-mail em minúsculas');
-await page.goto(site.base + '/autoedicao.html#conta/dados');
+await page.goto(site.base + '/painel/#conta/dados');
 const [download] = await Promise.all([page.waitForEvent('download'), page.click('#btnBaixarAgenda')]);
 const bruto = fs.readFileSync(await download.path());
 const csv = bruto.toString('utf8');
@@ -64,8 +64,9 @@ ok(bruto.slice(0, 3).toString('hex') === 'efbbbf', 'CSV com a marca UTF-8 no com
 ok(linhasCsv.length === 2004 && /^Código,Início/.test(linhasCsv[0]), 'CSV com o cabeçalho e as 2.003 consultas');   // o trim() tira a marca
 ok(linhasCsv[1].includes(`"'=HIPERLINK(""x"")"`), 'CSV: valor que começa com = vira texto (a planilha não executa)');
 ok(/^rxsync-agenda-\d{4}-\d{2}-\d{2}\.csv$/.test(download.suggestedFilename()), 'nome do arquivo: rxsync-agenda-AAAA-MM-DD.csv');
-await page.goto(site.base + '/autoedicao.html#conta/assinatura');
-await page.getByRole('button', { name: 'Cancelar e excluir a conta' }).click();
+await page.goto(site.base + '/painel/#conta/assinatura');
+await page.locator('#assinConteudo').getByRole('button', { name: 'Cancelar e excluir a conta' }).click();
+await page.click('#confOk');
 await page.waitForTimeout(300);
 ok(chamadas.some(c => c.acao === 'conta_exclusao_pedir' && c.caminho === 'painel-entrada') && !chamadas.some(c => c.acao === 'assinatura_cancelar'), 'Cancelar e excluir: pede o link ao 29; nunca o assinatura_cancelar');
 await page.close();
@@ -74,10 +75,11 @@ await page.close();
 estado.papel = 'equipe';
 page = await abrir('conta');
 for (const t of ['Plano e pagamento', 'Equipe', 'Baixar meus dados']) ok(await page.locator('#listaConta').getByText(t, { exact: true }).isHidden(), `equipe: "${t}" não aparece`);
-await page.goto(site.base + '/autoedicao.html#conta/contato');
+await page.goto(site.base + '/painel/#conta/contato');
 ok(await page.locator('#campo_email').isDisabled() && await page.getByText('Só o dono da conta muda o e-mail').isVisible(), 'equipe: o e-mail da conta fica travado, com o aviso');
-await page.goto(site.base + '/autoedicao.html#conta/whatsapp');
+await page.goto(site.base + '/painel/#conta/whatsapp');
 ok(await page.locator('#btnReconectar').isHidden(), 'equipe: o Reconectar não aparece');
+await page.goto(site.base + '/painel/#conta/gestao');
 ok(await page.locator('#campo_dono_whatsapp').isDisabled(), 'equipe: os números autorizados ficam travados');
 
 ok(!erros.length, 'sem erro de JavaScript na página' + (erros.length ? ': ' + erros.join(' | ') : ''));

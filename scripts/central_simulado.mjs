@@ -3,10 +3,12 @@
 import fs from 'node:fs'; import path from 'node:path'; import http from 'node:http'; import zlib from 'node:zlib'; import { fileURLToPath } from 'node:url';
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/central';
+// NAVEGADOR=webkit roda no motor do Safari (o do iPhone e do iPad); sem ele, no Chrome (rxsync-sistema DEC-156).
 export async function abrirNavegador() {
-  let chromium;
-  try { ({ chromium } = await import('playwright')); } catch { ({ chromium } = await import('/opt/node-tools/node_modules/playwright/index.mjs')); }
-  return chromium.launch().catch(() => chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
+  let pw;
+  try { pw = await import('playwright'); } catch { pw = await import('/opt/node-tools/node_modules/playwright/index.mjs'); }
+  if (process.env.NAVEGADOR === 'webkit') return pw.webkit.launch();
+  return pw.chromium.launch().catch(() => pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 }
 // Servidor local só com os arquivos do site (127.0.0.1).
 const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.png': 'image/png', '.PNG': 'image/png', '.webmanifest': 'application/manifest+json' };

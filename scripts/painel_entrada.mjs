@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela a entrada nova (DEC-097), com o n8n SIMULADO aqui (nada sai para a internet):
+// Painel (painel/, DEC-156): testa pela tela a entrada nova (DEC-097), com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. sem sessão: e-mail + senha → código → o painel abre com a sessão no cabeçalho x-rxsync-painel, sem token;
 //   2. "Lembrar este aparelho": a lembrança fica no aparelho e, numa aba nova, o painel abre sem senha (retomar);
 //   3. Sair: encerra a sessão, esquece o aparelho e volta para a entrada;
@@ -53,7 +53,7 @@ const LIMITE = 30000;
 const chegou = async f => { for (const fim = Date.now() + LIMITE; Date.now() < fim; await new Promise(r => setTimeout(r, 50))) if (chamadas.some(f)) return true; return false; };
 const nova = async () => { const p = await ctx.newPage(); p.setDefaultTimeout(LIMITE); p.on('pageerror', e => erros.push(String(e))); return p; };
 const guardado = p => p.evaluate(() => ({ local: Object.keys(localStorage), sessao: Object.keys(sessionStorage) }));
-const PAINEL = site.base + '/autoedicao.html';
+const PAINEL = site.base + '/painel/';
 
 // 1. e-mail + senha + código, lembrando o aparelho
 let page = await nova();

@@ -1,4 +1,4 @@
-// Painel (autoedicao.html): testa pela tela o link de pagamento pedido pela equipe (DEC-099), com o n8n SIMULADO aqui
+// Painel (painel/, DEC-156): testa pela tela o link de pagamento pedido pela equipe (DEC-099), com o n8n SIMULADO aqui
 // (nada sai para a internet):
 //   1. nova consulta: a opção "Enviar link de pagamento ao paciente" aparece desmarcada, some no BLOQUEIO e só vai ao
 //      24 (agenda_criar com enviar_link) quando marcada; o aviso "não deu para enviar" aparece na tela;
@@ -41,30 +41,30 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
 });
 const erros = [];
 const abrirPainel = async () => { const p = await ctx.newPage(); p.setDefaultTimeout(8000); p.on('pageerror', e => erros.push(String(e))); p.on('dialog', d => d.accept());
-  await p.goto(site.base + '/autoedicao.html#agenda'); await p.locator('#calViews').getByRole('button', { name: 'Lista' }).click();
+  await p.goto(site.base + '/painel/#agenda'); await p.locator('#calViews').getByRole('button', { name: 'Lista' }).click();
   await p.locator('#agLista').getByText('Ana Souza').first().waitFor(); return p; };
 const campo = (p, rotulo) => p.locator('#agForm label', { hasText: rotulo }).locator('xpath=following-sibling::input[1]');
 
 // 1. nova consulta
 let page = await abrirPainel();
-await page.click('#agNovo');
+await page.click('#agNovoTopo');
 const opcao = page.locator('#agEnviarLink');
 ok(await opcao.isVisible() && !(await opcao.isChecked()), 'nova consulta: "Enviar link de pagamento ao paciente" aparece desmarcada');
 await campo(page, 'Serviço').fill('BLOQUEIO');
 ok(await opcao.isHidden(), 'no BLOQUEIO a opção some');
 await campo(page, 'Serviço').fill('Consulta');
 await campo(page, 'Nome do paciente').fill('Carla Dias'); await campo(page, 'Telefone com DDD').fill('41977773333');
-await campo(page, 'Início').fill('2027-03-02T10:00'); await campo(page, 'Fim').fill('2027-03-02T10:30');
-await page.getByRole('button', { name: 'Salvar' }).click();
+await page.fill('#agfData', '2027-03-02'); await page.fill('#agfHora', '10:00'); await page.fill('#agfDur', '30');
+await page.click('#agfSalvar');
 await page.locator('#agForm').waitFor({ state: 'hidden' });
 let criar = chamadas.filter(c => c.acao === 'agenda_criar').pop();
 ok(criar && !('enviar_link' in criar.dados), 'desmarcada: o pedido vai sem enviar_link');
-await page.click('#agNovo');
+await page.click('#agNovoTopo');
 ok(!(await page.locator('#agEnviarLink').isChecked()), 'ao abrir de novo, a opção volta desmarcada');
 await campo(page, 'Nome do paciente').fill('Carla Dias'); await campo(page, 'Telefone com DDD').fill('41977773333'); await campo(page, 'Serviço').fill('Consulta');
-await campo(page, 'Início').fill('2027-03-02T11:00'); await campo(page, 'Fim').fill('2027-03-02T11:30');
+await page.fill('#agfData', '2027-03-02'); await page.fill('#agfHora', '11:00'); await page.fill('#agfDur', '30');
 await page.check('#agEnviarLink');
-await page.getByRole('button', { name: 'Salvar' }).click();
+await page.click('#agfSalvar');
 await page.locator('#toast', { hasText: 'não tem conversa no WhatsApp' }).waitFor();
 criar = chamadas.filter(c => c.acao === 'agenda_criar').pop();
 ok(criar.dados.enviar_link === true && criar.sessao === SESSAO, 'marcada: agenda_criar com enviar_link, pela sessão');
@@ -72,29 +72,31 @@ ok(true, 'a tela avisa que não deu para enviar');
 
 // 2. consulta marcada: "Enviar link agora"
 await page.locator('#agLista').getByText('Ana Souza').first().waitFor();
-const cartao = nome => page.locator('#agLista > *', { hasText: nome }).first();
-await cartao('Ana Souza').getByRole('button', { name: 'Editar' }).click();
+const cartao = nome => page.locator('#agLista .linha', { hasText: nome }).first();
+await cartao('Ana Souza').locator('.linha-abrir').click();
 await page.getByRole('button', { name: 'Enviar link agora' }).click();
+await page.click('#confOk');
 await page.locator('#toast', { hasText: 'Link de pagamento enviado' }).waitFor();
 const env = chamadas.filter(c => c.acao === 'agenda_pagamento_enviar').pop();
 ok(env && String(env.dados.id) === '11' && Object.keys(env.dados).join() === 'id', '"Enviar link agora": agenda_pagamento_enviar só com o id da consulta');
-await cartao('Bruno Lima').getByRole('button', { name: 'Editar' }).click();
+await cartao('Bruno Lima').locator('.linha-abrir').click();
 ok(await page.getByRole('button', { name: 'Enviar link agora' }).count() === 0, 'consulta paga: sem "Enviar link agora"');
 await page.close();
 
 // 3. botão da clínica desligado
 estado.ligado = false;
 page = await abrirPainel();
-await page.click('#agNovo');
+await page.click('#agNovoTopo');
 ok(await page.locator('#agEnviarLink').isHidden(), 'com o link de pagamento desligado, a opção não aparece');
-await cartao('Ana Souza').getByRole('button', { name: 'Editar' }).click();
+await page.keyboard.press('Escape'); await page.locator('#agForm').waitFor({ state: 'detached' });
+await cartao('Ana Souza').locator('.linha-abrir').click();
 ok(await page.getByRole('button', { name: 'Enviar link agora' }).count() === 0, 'com o link de pagamento desligado, sem "Enviar link agora"');
 await page.close();
 
 // 4. modo médicos: médico que está como "paga no consultório" não tem a opção
 estado.ligado = true; estado.medicos = true;
 page = await abrirPainel();
-await page.click('#agNovo');
+await page.click('#agNovoTopo');
 const med = page.locator('#agForm select').first();
 await med.selectOption('1');
 ok(await page.locator('#agEnviarLink').isVisible(), 'modo médicos: com a Dra. Ana, a opção aparece');
