@@ -61,7 +61,13 @@ ok(await page.locator('#medDesligadoAviso').isHidden(), 'ligado: aviso verde do 
 ok(/desligue “Agenda por médico” no alto desta página/.test(await page.locator('#medModoAviso').innerText()), 'o aviso verde diz como voltar a uma agenda só');
 await page.goto(site.base + '/painel/#agenda/horarios/grade');
 await page.locator('#gradeAvisos').getByText('agenda por médico').waitFor();
-ok(true, 'ligado: Horários de atendimento aponta para Médicos e tipos');
+const avisoGrade = await page.locator('#gradeAvisos').innerText();
+const irMedicos = page.locator('#gradeAvisos').getByRole('button', { name: 'Médicos e tipos' });
+ok(/usa agenda por médico: cada médico tem os próprios horários, em Médicos e tipos/.test(avisoGrade) && await irMedicos.count() === 1 && await irMedicos.isVisible(),
+  'ligado: Horários de atendimento avisa que cada médico tem os próprios horários, com o botão "Médicos e tipos"');
+await irMedicos.click();
+await page.locator('section[data-tela="agenda/horarios/medicos"]').waitFor({ state: 'visible' });
+ok(await page.evaluate(() => location.hash) === '#agenda/horarios/medicos' && await page.locator('#medBox').isVisible(), 'o botão do aviso abre Médicos e tipos');
 await page.close();
 // 3. Essencial: travado.
 estado.gestao = false; estado.botao = '';
