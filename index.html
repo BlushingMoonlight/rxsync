@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7KfQA2dVY8npzndcTBxFHIuE9GLxhU28V1al2OhSWRU=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1FlIFFbdyw2KlRR2ieWwxh3xbsZBzdBP/gexPkgtFU0=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#FFFFFF">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -552,6 +552,33 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .erro-form { background: #FCEDEB; color: #962318; }
 .nav a, .link-entrar { white-space: nowrap; }
 @media (min-width: 1024px) and (max-width: 1199px) { .nav { gap: 0; } .nav a { padding: 8px 8px; font-size: 14px; } }
+/* ---- Página inicial pela P7 (rxsync-sistema docs/auditorias/2026-10-26-landing-page.md) ---- */
+.pular:focus, .eyebrow, .btn, .marca, .wa-av, .wa-nome, .numero .valor, .ao-vivo, .passo .n, .tag, .pm-kpi em, .acoes-b span,
+.campo-r label output, .calc-res .grande, .ciclo button, .plano .fita, .preco .moeda, .preco .val, .plano .inc li.forte,
+.faq-tab, .faq-item > button, .faq-mais button, .rodape h4, .mt-passos li span, .mt-cont, .mt-link, .mt-dias button,
+.mt-grade th, .mt-grade td.ia, .rec-grupo, b, strong, th { font-weight: 600; }
+.link-demo { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 4px; color: var(--brand); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 767px) {
+  .hero .palco, .hero .legenda-mock { display: none; }
+  .hero { padding-bottom: 24px; }
+  .topo .topo-cta { display: none; }
+  .topo.mostrar-cta .topo-cta { display: inline-flex; }
+}
+@media (max-width: 1023px) { .planos .plano.dest { order: -1; } }
+/* fundos alternados na ordem nova: a segurança fica branca, entre o controle e os planos (cinza) */
+#seguranca { background: #FFFFFF; }
+.inc-det { margin-top: 20px; }
+.inc-det > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--brand); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.inc-det > summary::-webkit-details-marker { display: none; }
+.inc-det .inc { margin-top: 8px; }
+.comparar { margin-top: 32px; overflow-x: auto; }
+.comparar table { width: 100%; border-collapse: collapse; background: #FFFFFF; border: 1px solid var(--line); border-radius: 12px; font-size: 15px; }
+.comparar caption { text-align: left; font-family: 'Figtree', 'Inter', sans-serif; font-weight: 600; font-size: 20px; padding: 0 0 12px; color: var(--ink); }
+.comparar th, .comparar td { padding: 12px; border-top: 1px solid var(--line); text-align: center; color: var(--ink); }
+.comparar thead th { border-top: 0; font-size: 14px; color: var(--ink-2); }
+.comparar thead th:first-child { text-align: left; }
+.comparar tbody th { text-align: left; font-weight: 400; color: var(--ink-2); }
+@media (max-width: 559px) { .comparar th, .comparar td { padding: 10px 6px; font-size: 14px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
     </style>
 
@@ -780,7 +807,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Serve para dentista, psicólogo, fisioterapeuta ou estética?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho, e você aprova tudo o que ela responde."
+            "text": "Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho. Você define o que ela responde, e ela passa para a equipe quando o paciente pede uma pessoa."
           }
         },
         {
@@ -860,7 +887,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "A assistente segue as regras do CFM?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sim. Ela se identifica como virtual, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. A Resolução CFM nº 2.454/2026 classifica a IA de agendamento como de baixo risco."
+            "text": "Ela foi feita para elas: se apresenta na primeira mensagem como atendimento automatizado, não como pessoa, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. Pela Resolução CFM nº 2.454/2026, uma IA que só agenda e dá informações gerais é de baixo risco. O que a clínica divulga continua sendo responsabilidade do médico."
           }
         }
       ]
@@ -912,13 +939,12 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <div>
       <span class="selo"><span class="pt" aria-hidden="true"></span>Assistente virtual para clínicas e consultórios</span>
       <h1 id="titulo-hero">Sua clínica responde e marca consultas no WhatsApp, <em>mesmo quando a recepção está ocupada.</em></h1>
-      <p class="lead">A assistente virtual da RXSync atende seus pacientes em segundos, de dia, de noite e no fim de semana: responde sobre valores, convênios e horários, marca a consulta na agenda e manda os lembretes. Quando quiser, sua equipe assume a conversa.</p>
+      <p class="lead">A assistente da RXSync responde valores, convênios e horários, marca a consulta e manda os lembretes, de dia, de noite e no fim de semana. Quando o paciente pede uma pessoa, ela passa a conversa para a sua equipe.</p>
       <div class="hero-ctas">
-        <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="gestao" data-origem="hero">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-        <a href="#teste-ao-vivo" class="btn btn-sec btn-lg" data-cta="hero_testar_assistente"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversar com a assistente agora</a>
+        <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="gestao" data-origem="hero">Testar 7 dias grátis, sem cartão <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a href="#teste-ao-vivo" class="link-demo" data-cta="hero_testar_assistente">Ou converse com a assistente agora <svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></a>
       </div>
       <div class="hero-micro">
-        <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Sem cartão de crédito</span>
         <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Os 7 dias contam a partir do dia em que ela entra no ar</span>
         <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Planos a partir de R$ 299/mês</span>
       </div>
@@ -952,12 +978,12 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 </section>
 
 <!-- ===================== FATOS ===================== -->
-<div class="fatos">
+<div class="fatos" aria-label="Em resumo">
   <ul class="wrap">
     <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Responde 24 horas, também no fim de semana</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>Entende texto e áudio</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>Agenda e lembretes inclusos</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Sua equipe assume quando quiser</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Passa para a equipe quando o paciente pede uma pessoa</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>LGPD: os dados são da sua clínica</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>Só o administrativo: não orienta tratamento</li>
   </ul>
 </div>
 
@@ -1056,7 +1082,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 </section>
 
 <!-- ===================== PROBLEMA ===================== -->
-<section class="sec sec-alt" id="problema" aria-labelledby="titulo-problema">
+<section class="sec" id="problema" aria-labelledby="titulo-problema">
   <span id="dores" class="ancora"></span>
   <div class="wrap">
     <div class="sec-head">
@@ -1077,6 +1103,42 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <p>Numa revisão de 21 estudos, as faltas caíram de 21% para 15%.</p>
         <p class="fonte">Fonte: <a href="https://bmjopen.bmj.com/content/6/10/e012116" target="_blank" rel="noopener">revisão sistemática publicada na BMJ Open, 2016</a></p>
       </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CALCULADORA ===================== -->
+<section class="sec sec-alt" id="calculadora" aria-labelledby="titulo-calc">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Faça a conta</span>
+      <h2 class="h2" id="titulo-calc">Quanto custa deixar mensagem sem resposta?</h2>
+      <p class="lead">Mexa nos números com a realidade da sua clínica. A conta fica toda aqui.</p>
+    </div>
+    <div class="calc">
+      <div class="calc-ent">
+        <div class="campo-r">
+          <label for="c-msgs">Pacientes por semana que ficam sem resposta a tempo <output id="o-msgs" for="c-msgs">10</output></label>
+          <small>À noite, no fim de semana ou quando a recepção está ocupada.</small>
+          <input type="range" id="c-msgs" min="1" max="60" step="1" value="10">
+        </div>
+        <div class="campo-r">
+          <label for="c-taxa">Quantos deles marcariam se fossem atendidos na hora <output id="o-taxa" for="c-taxa">30%</output></label>
+          <small>Não existe um número oficial: use o que você vê na sua clínica.</small>
+          <input type="range" id="c-taxa" min="5" max="80" step="5" value="30">
+        </div>
+        <div class="campo-r">
+          <label for="c-valor">Valor médio da consulta <output id="o-valor" for="c-valor">R$ 300</output></label>
+          <input type="range" id="c-valor" min="100" max="1500" step="50" value="300">
+        </div>
+      </div>
+      <div class="calc-res" aria-live="polite">
+        <span class="rot">Consultas que podem estar ficando para trás</span>
+        <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
+        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299). No plano mensal, há também a implantação de R$ 999, uma vez só.</p>
+        <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis no Essencial</a>
+        <p class="aviso">É uma estimativa com os números que você escolheu, não uma promessa de resultado.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -1147,25 +1209,8 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
   </div>
 </section>
 
-<!-- ===================== EQUIPE NO CONTROLE ===================== -->
-<section class="sec" id="controle" aria-labelledby="titulo-controle">
-  <span id="integracoes" class="ancora"></span>
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Sua equipe no controle</span>
-      <h2 class="h2" id="titulo-controle">A recepção continua no comando. Só deixa de correr atrás do WhatsApp.</h2>
-    </div>
-    <div class="controle">
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><div><h3>Sua equipe assume quando quiser</h3><p>Basta responder o paciente. A assistente percebe e fica em silêncio nessa conversa pelo tempo que você escolher (o padrão é 2 horas).</p></div></div>
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><div><h3>A secretária ganha tempo, não perde a função</h3><p>A assistente responde o que se repete o dia todo e passa para a equipe o que precisa de uma pessoa: casos delicados, reclamações e tudo o que você definir.</p></div></div>
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span><div><h3>O número da clínica, o histórico de sempre</h3><p>As conversas continuam no WhatsApp da clínica. Dá para listar números que ela não deve responder, como família e fornecedores.</p></div></div>
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><div><h3>Sem trocar de sistema</h3><p>A agenda da RXSync vem pronta no painel, exporta para Google Agenda, Outlook e iPhone e importa a sua agenda atual por planilha.</p></div></div>
-    </div>
-  </div>
-</section>
-
 <!-- ===================== PARA O DONO ===================== -->
-<section class="sec sec-alt" id="gestao" aria-labelledby="titulo-dono">
+<section class="sec" id="gestao" aria-labelledby="titulo-dono">
   <div class="wrap dono">
     <div>
       <span class="eyebrow">Para você</span>
@@ -1206,6 +1251,23 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
   </div>
 </section>
 
+<!-- ===================== EQUIPE NO CONTROLE ===================== -->
+<section class="sec sec-alt" id="controle" aria-labelledby="titulo-controle">
+  <span id="integracoes" class="ancora"></span>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Sua equipe no controle</span>
+      <h2 class="h2" id="titulo-controle">A recepção continua no comando. Só deixa de correr atrás do WhatsApp.</h2>
+    </div>
+    <div class="controle">
+      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><div><h3>Sua equipe assume quando quiser</h3><p>Basta responder o paciente. A assistente percebe e fica em silêncio nessa conversa pelo tempo que você escolher (o padrão é 2 horas).</p></div></div>
+      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><div><h3>A secretária ganha tempo, não perde a função</h3><p>A assistente responde o que se repete o dia todo e passa para a equipe o que precisa de uma pessoa: casos delicados, reclamações e tudo o que você definir.</p></div></div>
+      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span><div><h3>O número da clínica, o histórico de sempre</h3><p>As conversas continuam no WhatsApp da clínica. Dá para listar números que ela não deve responder, como família e fornecedores.</p></div></div>
+      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><div><h3>Sem trocar de sistema</h3><p>A agenda da RXSync vem pronta no painel, exporta para Google Agenda, Outlook e iPhone e importa a sua agenda atual por planilha.</p></div></div>
+    </div>
+  </div>
+</section>
+
 <!-- ===================== SEGURANÇA ===================== -->
 <section class="sec sec-escura" id="seguranca" aria-labelledby="titulo-seg">
   <div class="wrap">
@@ -1216,45 +1278,9 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     </div>
     <div class="seg">
       <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><h3>Só o administrativo</h3><p>Ela se apresenta como assistente virtual, não interpreta exames, não orienta tratamento e passa para a equipe tudo o que precisa do profissional.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg></span><h3>Pronta para a Resolução CFM nº 2.454/2026</h3><p>A resolução, em vigor desde agosto de 2026, classifica a IA de agendamento como de baixo risco e pede que o paciente saiba que fala com uma IA: a assistente avisa na primeira mensagem. Em outras áreas da saúde, valem também as regras do seu conselho.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg></span><h3>Pronta para a Resolução CFM nº 2.454/2026</h3><p>A resolução, em vigor desde agosto de 2026, classifica a IA de agendamento como de baixo risco e pede que o paciente saiba que não fala com uma pessoa: a assistente avisa na primeira mensagem que é um atendimento automatizado. Em outras áreas da saúde, valem também as regras do seu conselho.</p></article>
       <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span><h3>Os dados são da sua clínica</h3><p>Pela LGPD, a clínica é a controladora e a RXSync, a operadora: usamos os dados só para prestar o serviço, e eles são apagados 15 dias depois do fim do contrato ou do teste.</p></article>
       <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><h3>IA com transferência informada</h3><p>Para responder, só o trecho necessário da conversa vai ao provedor do modelo de IA, no exterior. Isso está descrito nos Termos e na Política de Privacidade.</p></article>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== CALCULADORA ===================== -->
-<section class="sec" id="calculadora" aria-labelledby="titulo-calc">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Faça a conta</span>
-      <h2 class="h2" id="titulo-calc">Quanto custa deixar mensagem sem resposta?</h2>
-      <p class="lead">Mexa nos números com a realidade da sua clínica. A conta fica toda aqui.</p>
-    </div>
-    <div class="calc">
-      <div class="calc-ent">
-        <div class="campo-r">
-          <label for="c-msgs">Pacientes por semana que ficam sem resposta a tempo <output id="o-msgs" for="c-msgs">10</output></label>
-          <small>À noite, no fim de semana ou quando a recepção está ocupada.</small>
-          <input type="range" id="c-msgs" min="1" max="60" step="1" value="10">
-        </div>
-        <div class="campo-r">
-          <label for="c-taxa">Quantos deles marcariam se fossem atendidos na hora <output id="o-taxa" for="c-taxa">30%</output></label>
-          <small>Não existe um número oficial: use o que você vê na sua clínica.</small>
-          <input type="range" id="c-taxa" min="5" max="80" step="5" value="30">
-        </div>
-        <div class="campo-r">
-          <label for="c-valor">Valor médio da consulta <output id="o-valor" for="c-valor">R$ 300</output></label>
-          <input type="range" id="c-valor" min="100" max="1500" step="50" value="300">
-        </div>
-      </div>
-      <div class="calc-res" aria-live="polite">
-        <span class="rot">Consultas que podem estar ficando para trás</span>
-        <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
-        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299). No plano mensal, há também a implantação de R$ 999, uma vez só.</p>
-        <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis no Essencial</a>
-        <p class="aviso">É uma estimativa com os números que você escolheu, não uma promessa de resultado.</p>
-      </div>
     </div>
   </div>
 </section>
@@ -1280,6 +1306,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <div class="preco"><span class="moeda">R$</span><span class="val" data-mensal="299" data-anual="269,10">299</span><span class="per">/mês</span></div>
         <p class="preco-sub" data-mensal="Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste" data-anual="12x de R$ 269,10 ou R$ 2.990 à vista (12 meses pelo preço de 10) · sem implantação · contrato de 12 meses">Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste</p>
         <button type="button" class="btn btn-sec btn-full" data-contratar="essencial" data-rotulo="Essencial">Testar o Essencial grátis</button>
+        <details class="inc-det"><summary>Ver tudo o que inclui</summary>
         <ul class="inc">
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Atendimento 24 horas por texto e áudio</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Agenda da RXSync, com exportação e importação por planilha</li>
@@ -1295,6 +1322,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Profissional da RXSync responsável pela sua conta</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Treinamento da equipe (até 90 minutos)</li>
         </ul>
+        </details>
       </article>
 
       <article class="plano dest">
@@ -1304,6 +1332,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <div class="preco"><span class="moeda">R$</span><span class="val" data-mensal="599" data-anual="539,10">599</span><span class="per">/mês</span></div>
         <p class="preco-sub" data-mensal="Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste" data-anual="12x de R$ 539,10 ou R$ 5.990 à vista (12 meses pelo preço de 10) · sem implantação · contrato de 12 meses">Sem fidelidade · implantação de R$ 999, uma vez só, paga só se você continuar depois do teste</p>
         <button type="button" class="btn btn-prim btn-full" data-contratar="gestao" data-rotulo="Gestão Inteligente">Testar o Gestão grátis</button>
+        <details class="inc-det"><summary>Ver tudo o que inclui</summary>
         <ul class="inc">
           <li class="forte"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tudo do Essencial, e mais:</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Lista de espera</li>
@@ -1319,6 +1348,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Até 5.000 mensagens por mês</li>
           <li class="breve"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Em implantação, sem custo extra quando chegar: integração com o sistema de gestão que tenha API aberta e acompanhamento de orçamentos.</li>
         </ul>
+        </details>
       </article>
 
       <article class="plano">
@@ -1327,6 +1357,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <div class="preco"><span class="val val-sob">Sob consulta</span></div>
         <p class="preco-sub">Escopo e condições em proposta</p>
         <button type="button" class="btn btn-dark btn-full" data-form-plano="Enterprise">Falar com a equipe</button>
+        <details class="inc-det"><summary>Ver tudo o que inclui</summary>
         <ul class="inc">
           <li class="forte"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tudo do Gestão Inteligente, e mais:</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>API para o sistema da clínica ler a agenda e pedir mensagens</li>
@@ -1336,7 +1367,25 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Escopo e prazos de atendimento na proposta</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Instruções extras: até 10.000 letras</li>
         </ul>
+        </details>
       </article>
+    </div>
+
+    <div class="comparar">
+      <table>
+        <caption>Compare os planos</caption>
+        <thead><tr><th scope="col">O que inclui</th><th scope="col">Essencial</th><th scope="col">Gestão</th><th scope="col">Enterprise</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Atendimento 24 horas, por texto e áudio</th><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">Agenda, lembretes e confirmação de presença</th><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">Link de pagamento depois de marcar</th><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">Até 3 pessoas da equipe no painel</th><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">Lista de espera e agenda por profissional</th><td><span aria-hidden="true">—</span><span class="sr">Não</span></td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">Pacientes, avaliação no Google e retornos</th><td><span aria-hidden="true">—</span><span class="sr">Não</span></td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">Assistente de gestão no seu WhatsApp</th><td><span aria-hidden="true">—</span><span class="sr">Não</span></td><td>Sim</td><td>Sim</td></tr>
+          <tr><th scope="row">API para o sistema da clínica</th><td><span aria-hidden="true">—</span><span class="sr">Não</span></td><td><span aria-hidden="true">—</span><span class="sr">Não</span></td><td>Sim</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="implant">
@@ -1448,7 +1497,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         </div>
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-3">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-3"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho, e você aprova tudo o que ela responde.</p></div></div>
+          <div class="faq-content" id="faq-r-2-3"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho. Você define o que ela responde, e ela passa para a equipe quando o paciente pede uma pessoa.</p></div></div>
         </div>
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-4">Divido o consultório com outros profissionais. Ela pode atender só o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1492,7 +1541,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         </div>
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-3">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-3"><div><p>Sim. Ela se identifica como virtual, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. A Resolução CFM nº 2.454/2026 classifica a IA de agendamento como de baixo risco.</p></div></div>
+          <div class="faq-content" id="faq-r-4-3"><div><p>Ela foi feita para elas: se apresenta na primeira mensagem como atendimento automatizado, não como pessoa, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. Pela Resolução CFM nº 2.454/2026, uma IA que só agenda e dá informações gerais é de baixo risco. O que a clínica divulga continua sendo responsabilidade do médico.</p></div></div>
         </div>
       </div>
       <p class="faq-mais">Não achou sua pergunta? <button type="button" data-cta="faq_perguntar_chat" data-abre-chat>Pergunte no chat.</button></p>
@@ -1825,6 +1874,15 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         }
         return false;
     }
+
+    // ===================== BOTÃO DO TOPO (celular) =====================
+    // No celular, a primeira tela tem uma chamada só (P7): o "Começar grátis" do topo aparece depois que o botão do
+    // título sai da tela. No iPad e no computador ele fica sempre.
+    (function () {
+        var topo = document.getElementById('topo'), alvo = document.querySelector('.hero-ctas .btn-prim');
+        if (!topo || !alvo || !('IntersectionObserver' in window)) { if (topo) topo.classList.add('mostrar-cta'); return; }
+        new IntersectionObserver(function (ents) { topo.classList.toggle('mostrar-cta', !ents[0].isIntersecting); }).observe(alvo);
+    })();
 
     // ===================== CALCULADORA =====================
     (function () {
