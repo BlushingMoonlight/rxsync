@@ -55,6 +55,8 @@ await proximo(5);
 const perguntas = await page.locator('#listaFaq > *').count();
 await page.click('#btnAddFaq');
 ok(await page.locator('#listaFaq > *').count() === perguntas + 1, 'etapa 6: "Adicionar pergunta" põe mais uma');
+await proximo(6);   // Confira suas respostas (molde F)
+ok(/Dra\. Teste/.test(await page.locator('#resumo').textContent()), 'etapa 7: Confira suas respostas mostra o que foi preenchido');
 await page.click('#btnEnviar');
 await page.locator('#erroDeclaracao.on').waitFor();
 ok(!chamadas.some(c => c.corpo.acao === 'salvar'), 'sem a aprovação do responsável técnico, não envia');

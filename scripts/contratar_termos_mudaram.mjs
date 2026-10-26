@@ -10,7 +10,7 @@ const estado = { resposta: { __status: 409, ok: false, mensagem: MSG } };
 const site = await servirSite(); const browser = await abrirNavegador();
 const { page, erros, chamadas } = await contextoCsp(browser, { responder: (caminho, b) => caminho === 'cadastro' && b._evento === 'aceite' ? estado.resposta : { ok: true } });
 await page.goto(site.base + '/contratar.html?plano=essencial&ciclo=mensal');
-await page.evaluate(() => { const p = (id, v) => { document.getElementById(id).value = v; }; p('nome', 'Maria Teste'); p('email', 'maria@exemplo.test'); p('whatsapp', '41999990000'); mostrar(3); });
+await page.evaluate(() => { const p = (id, v) => { document.getElementById(id).value = v; }; p('nome', 'Maria Teste'); p('email', 'maria@exemplo.test'); p('whatsapp', '41999990000'); mostrar(5); });
 await page.check('#aceiteTermos'); await page.check('#aceiteDpa');
 await page.click('#btnTeste');
 await page.locator('#erroAceite:not(.hidden)').waitFor();

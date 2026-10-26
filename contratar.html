@@ -2,11 +2,30 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NZqDbDhvEBi7IubYaAiJp80neXRaTssw63IH1DyFcTg=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-srVM7bir6+TuKIJV6bLvNLwE/fbrHxAz//w4N9/Dg0o=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RXSync">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://rxsync.com.br/contratar.html">
+<meta property="og:title" content="Contratar — RXSync">
+<meta property="og:description" content="Escolha o plano e comece 7 dias grátis, sem cartão: a assistente atende os pacientes da clínica no WhatsApp, 24 horas.">
+<meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Contratar — RXSync">
+<meta name="twitter:description" content="Escolha o plano e comece 7 dias grátis, sem cartão: a assistente atende os pacientes da clínica no WhatsApp, 24 horas.">
+<meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
 <meta name="robots" content="noindex, nofollow">
 <title>Contratar — RXSync</title>
 <link rel="stylesheet" href="/assets/fontes/fontes.css">
+<link rel="stylesheet" href="/assets/ancora/tokens.css">
 <!-- Tailwind CSS -->
     <!-- CSS do Tailwind 3.4.17 gerado uma vez e guardado no site (#93) -->
 <link rel="stylesheet" href="/assets/css/contratar.css">
@@ -43,6 +62,7 @@
   .termos-box iframe { width:100%; height:100%; border:0; }
   .isca { position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden; }
 </style>
+<link rel="stylesheet" href="/assets/ancora/site.css">
 </head>
 <body class="bg-slate-50 font-sans antialiased">
 
@@ -55,9 +75,18 @@
 
 <main class="max-w-3xl mx-auto px-5 py-8">
 
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+  <!-- Molde F (rxsync-sistema DEC-156): uma coisa por tela, "Passo N de 5", "Continuar" fixo embaixo no celular e o
+       "Confira suas respostas" no fim, com o aceite e os botões de concluir. -->
+  <div class="passos-barra" id="progresso" aria-hidden="true"><div data-p="1" class="feito"></div><div data-p="2"></div><div data-p="3"></div><div data-p="4"></div><div data-p="5"></div></div>
+
+  <form id="form" novalidate>
+
+    <section class="etapa ativa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="1">
+      <p class="passo-de">Passo 1 de 5</p>
+      <h2 class="text-lg font-bold text-primary-900 mb-1">Escolha o plano</h2>
+      <p class="text-slate-500 text-sm mb-5">Dá para mudar de plano depois, pelo painel, sem nova taxa de implantação.</p>
+      <div class="border border-slate-200 rounded-2xl overflow-hidden">
     <div class="px-5 pt-5">
-      <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Escolha o plano</p>
       <div class="grid grid-cols-2 gap-2 mb-3">
         <button type="button" data-plano="essencial" class="btnPlano text-sm font-bold py-3 rounded-xl border-2">Essencial</button>
         <button type="button" data-plano="gestao" class="btnPlano text-sm font-bold py-3 rounded-xl border-2">Gestão Inteligente</button>
@@ -72,7 +101,7 @@
       </div>
     </div>
 
-    <div class="bg-primary-900 text-white px-5 py-5">
+    <div class="caixa-preco px-5 py-5">
       <div class="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <p id="precoPrincipal" class="text-3xl font-black leading-none">R$ 299<span class="text-base font-medium text-white/60">/mês</span></p>
@@ -87,17 +116,13 @@
       <ul id="features" class="space-y-2.5"></ul>
       <p id="notaUpgrade" class="text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200"></p>
     </div>
-  </div>
+      </div>
+      <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
+    </section>
 
-  <div class="flex items-center gap-2 mb-6" id="progresso">
-    <div class="h-1.5 flex-1 rounded-full bg-emerald-500" data-p="1"></div>
-    <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="2"></div>
-    <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="3"></div>
-  </div>
-
-  <form id="form" novalidate>
-
-    <section class="etapa ativa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="1">
+    <section class="etapa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="2">
+      <button type="button" class="voltar voltar-topo">‹ Voltar</button>
+      <p class="passo-de">Passo 2 de 5</p>
       <h2 class="text-lg font-bold text-primary-900 mb-1">Quem vamos atender</h2>
       <p class="text-slate-500 text-sm mb-6">Começamos pelo básico. Leva menos de um minuto.</p>
       <div class="space-y-4">
@@ -110,11 +135,13 @@
         <div><label class="rotulo" for="email">E-mail</label><input id="email" type="email" class="campo" autocomplete="email" inputmode="email"><p class="msg-erro" data-de="email">E-mail inválido.</p></div>
         <div><label class="rotulo" for="whatsapp">Seu WhatsApp, com DDD</label><p class="text-xs text-slate-500 mb-2 leading-relaxed">É por aqui que falamos com você durante a implantação. Pode ser o seu pessoal, ou o de quem responde pela contratação.<br><strong class="text-slate-600">Não é o número que a assistente vai atender</strong> — esse você escolhe depois, na configuração.</p><input id="whatsapp" class="campo" inputmode="numeric" maxlength="15" placeholder="(00) 00000-0000"><p class="msg-erro" data-de="whatsapp">Telefone inválido.</p></div>
       </div>
-      <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+      <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
       <p class="text-xs text-slate-400 mt-4 text-center">Seus dados são usados apenas para esta contratação.</p>
     </section>
 
-    <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="2">
+    <section class="etapa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="3">
+      <button type="button" class="voltar voltar-topo">‹ Voltar</button>
+      <p class="passo-de">Passo 3 de 5</p>
       <h2 class="text-lg font-bold text-primary-900 mb-1">Dados de faturamento</h2>
       <p class="text-slate-500 text-sm mb-5">Para emitir a nota fiscal e identificar quem está contratando nos Termos.</p>
 
@@ -156,13 +183,12 @@
         <div id="wrapTitular" class="hidden"><label class="rotulo" for="titular">Nome do titular do CPF</label><input id="titular" class="campo"><p class="text-xs text-slate-500 mt-1.5">Preenchido a partir da etapa anterior. Ajuste se necessário.</p></div>
       </div>
 
-      <div class="flex gap-3 mt-6">
-        <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-        <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
-      </div>
+      <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
     </section>
 
-    <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="3">
+    <section class="etapa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="4">
+      <button type="button" class="voltar voltar-topo">‹ Voltar</button>
+      <p class="passo-de">Passo 4 de 5</p>
       <h2 class="text-lg font-bold text-primary-900 mb-1">Termos da contratação</h2>
       <p class="text-slate-500 text-sm mb-5">Leia antes de aceitar. Este é o contrato entre você e a RXSync, já preenchido com os seus dados.</p>
 
@@ -170,6 +196,15 @@
       <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-10-v7</strong> · <a id="linkTermos" href="/termos/2026-10-v7.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
       <p class="text-xs text-slate-500 mb-5 -mt-3">Os dados deste cadastro são tratados pela RXSync conforme a <a href="/privacidade.html" target="_blank" rel="noopener" class="text-primary-600 underline">Política de Privacidade</a>.</p>
 
+      <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
+    </section>
+
+    <section class="etapa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="5">
+      <button type="button" class="voltar voltar-topo">‹ Voltar</button>
+      <p class="passo-de">Passo 5 de 5</p>
+      <h2 class="text-lg font-bold text-primary-900 mb-1">Confira suas respostas</h2>
+      <p class="text-slate-500 text-sm mb-5">Se algo estiver errado, toque em "Alterar". Depois, aceite os Termos e escolha como começar.</p>
+      <dl class="resumo-f mb-5" id="resumo"></dl>
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteTermos" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
         <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-10-v7.</span>
@@ -189,9 +224,9 @@
         <button type="submit" id="btnTeste" data-modalidade="teste" class="w-full bg-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-400 transition-colors shadow-lg">Começar 7 dias grátis</button>
         <p class="text-xs text-slate-500 text-center -mt-1">Sem cartão e sem cobrança automática.</p>
         <button type="submit" id="btnEnviar" data-modalidade="contratado" class="w-full bg-white text-primary-900 font-bold py-3.5 rounded-xl border-2 border-primary-900 hover:bg-slate-50 transition-colors">Contratar e pagar agora</button>
-        <button type="button" class="voltar w-full px-5 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
       </div>
     </section>
+
   </form>
 
   <section id="sucesso" class="hidden bg-white rounded-2xl border border-emerald-200 shadow-sm p-8 text-center">
@@ -451,11 +486,11 @@ function checar(id, teste) {
 function validarEtapa(n) {
   let ok = true, primeiro = null;
   const testar = (id, fn) => { const r = checar(id, fn); if (!r && !primeiro) primeiro = id; ok = ok && r; };
-  if (n === 1) {
+  if (n === 2) {
     testar('nome', nomeOk); testar('clinica', v => v.trim().length > 1);
     testar('email', emailOk); testar('whatsapp', telOk);
   }
-  if (n === 2) {
+  if (n === 3) {
     if (tipo === 'pj') { testar('cnpj', cnpjOk); testar('razao', v => v.trim().length > 2); }
     testar('cep', v => dig(v).length === 8);
     testar('logradouro', v => v.trim().length > 2);
@@ -486,13 +521,14 @@ function mostrar(n) {
   etapa = n;
   ev('checkout_etapa_' + n);
   document.querySelectorAll('.etapa').forEach(s => s.classList.toggle('ativa', +s.dataset.etapa === n));
-  document.querySelectorAll('#progresso div').forEach(d => d.className = 'h-1.5 flex-1 rounded-full ' + (+d.dataset.p <= n ? 'bg-emerald-500' : 'bg-slate-200'));
-  if (n === 3) carregarTermos();
+  document.querySelectorAll('#progresso div').forEach(d => d.classList.toggle('feito', +d.dataset.p <= n));
+  if (n === 4) carregarTermos();
+  if (n === 5) montarResumo();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 document.querySelectorAll('.proximo').forEach(b => b.onclick = () => {
   if (!validarEtapa(etapa)) return;
-  if (etapa === 1) registrarLead();
+  if (etapa === 2) registrarLead();
   mostrar(etapa + 1);
 });
 
@@ -526,6 +562,21 @@ async function registrarLead() {
   }
 }
 document.querySelectorAll('.voltar').forEach(b => b.onclick = () => mostrar(etapa - 1));
+// Confira suas respostas (molde F): o que a pessoa escolheu e digitou, com "Alterar" que volta ao passo. Só texto.
+function montarResumo() {
+  const v = id => (document.getElementById(id).value || '').trim();
+  const linhas = [['Plano', descricaoPlano(), 1], ['Seu nome', v('nome'), 2], ['Clínica', v('clinica'), 2], ['E-mail', v('email'), 2], ['WhatsApp', v('whatsapp'), 2],
+    tipo === 'pj' ? ['Empresa', v('razao') + ' · CNPJ ' + v('cnpj'), 3] : ['Titular', (v('titular') || v('nome')), 3],
+    ['Endereço', enderecoCompleto(), 3], [tipo === 'pj' ? 'CPF de quem contrata' : 'CPF', v('cpf'), 3]];
+  const dl = document.getElementById('resumo'); dl.replaceChildren();
+  linhas.forEach(([rot, val, passo]) => {
+    const dt = document.createElement('dt'); dt.textContent = rot;
+    const dd = document.createElement('dd'); dd.append(document.createTextNode(val || '—'));
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'alterar'; b.textContent = 'Alterar'; b.setAttribute('aria-label', 'Alterar ' + rot.toLowerCase());
+    b.onclick = () => mostrar(passo); dd.append(b);
+    dl.append(dt, dd);
+  });
+}
 
 function descricaoPlano() {
   const P = PLANOS[plano];

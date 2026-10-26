@@ -2,8 +2,12 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-bMaxtVsAt7bzO+WTr7a7qqpGRW2elp/lGPmmt/3lzLA=' 'self' https://*.googletagmanager.com; style-src 'sha256-uuwOyF67VW2kuVcm+JACU9wPUUNB/B8rNpF9THkiGAA=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-km73xi64vaXZSX0K+QW2/WU4H0w/lg+QQekcUJLkpKI=' 'self' https://*.googletagmanager.com; style-src 'sha256-uuwOyF67VW2kuVcm+JACU9wPUUNB/B8rNpF9THkiGAA=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
 
 <title>Configurar sua assistente | RXSync</title>
 <meta name="description" content="Conte como a sua clínica funciona para a assistente virtual da RXSync atender do jeito de vocês.">
@@ -14,7 +18,6 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="canonical" href="https://rxsync.com.br/onboarding.html">
 
-<meta name="theme-color" content="#0f172a">
 <meta name="format-detection" content="telephone=no">
 
 <meta property="og:type" content="website">
@@ -27,7 +30,7 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Configuração da assistente RXSync">
+<meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
 <meta property="og:locale" content="pt_BR">
 
 <meta name="twitter:card" content="summary_large_image">
@@ -35,8 +38,6 @@
 <meta name="twitter:description" content="Uns 10 minutos e sua assistente entra no ar.">
 <meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
 
-<link rel="icon" type="image/png" href="assets/favicon-rxsync.png.PNG">
-<link rel="apple-touch-icon" href="assets/favicon-rxsync.png.PNG">
 
 <!-- Google Analytics só depois de "Aceitar" e chat só no toque (rxsync-sistema DEC-112). data-ga-sem-query: o endereço
      vai ao Google sem a query, porque o ?t= é o token do link mágico (mandá-lo seria vazar a credencial da cliente).
@@ -45,6 +46,7 @@
 <script src="/assets/consentimento.js" data-ga-sem-query data-chat-fora defer></script>
 
 <link rel="stylesheet" href="/assets/fontes/fontes.css">
+<link rel="stylesheet" href="/assets/ancora/tokens.css">
 <!-- CSS do Tailwind 3.4.17 gerado uma vez e guardado no site (#93) -->
 <link rel="stylesheet" href="/assets/css/onboarding.css">
 <script src="/assets/vendor/lucide-0.468.0.min.js"></script>
@@ -70,6 +72,7 @@
     .campo.faixa-hora { width:7.5rem; padding:.55rem .7rem; font-size:.9rem; }
     .isca { position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden; }
 </style>
+<link rel="stylesheet" href="/assets/ancora/site.css">
 </head>
 
 <body class="bg-slate-50 font-sans text-slate-700 antialiased">
@@ -78,7 +81,7 @@
   <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
     <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
     <span id="selo" class="hidden text-xs text-white/70">
-      Passo <span id="passoAtual">1</span> de 6
+      Passo <span id="passoAtual">1</span> de 7
     </span>
   </div>
 </header>
@@ -120,14 +123,7 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-2 mb-6" id="progresso">
-      <div class="h-1.5 flex-1 rounded-full bg-emerald-500" data-p="1"></div>
-      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="2"></div>
-      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="3"></div>
-      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="4"></div>
-      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="5"></div>
-      <div class="h-1.5 flex-1 rounded-full bg-slate-200" data-p="6"></div>
-    </div>
+    <div class="passos-barra" id="progresso" aria-hidden="true"><div data-p="1" class="feito"></div><div data-p="2"></div><div data-p="3"></div><div data-p="4"></div><div data-p="5"></div><div data-p="6"></div><div data-p="7"></div></div>
 
     <form id="form" novalidate>
 
@@ -168,11 +164,12 @@
           </div>
 
         </div>
-        <button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+        <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
       </section>
 
       <!-- ---------- ETAPA 2 ---------- -->
       <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="2">
+        <button type="button" class="voltar voltar-topo">‹ Voltar</button>
         <h2 class="text-lg font-bold text-primary-900 mb-1">Atendimentos e valores</h2>
         <p class="text-slate-500 text-sm mb-6">A parte que mais define se ela responde certo.</p>
         <div class="space-y-4">
@@ -221,14 +218,14 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
         </div>
-        <div class="flex gap-3 mt-6">
-          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+        <div class="acao-fixa-f">
+          <button type="button" class="proximo w-full bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
       </section>
 
       <!-- ---------- ETAPA 3 ---------- -->
       <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="3">
+        <button type="button" class="voltar voltar-topo">‹ Voltar</button>
         <h2 class="text-lg font-bold text-primary-900 mb-1">Horários</h2>
         <p class="text-slate-500 text-sm mb-6">Marque os dias em que a clínica atende. Se vocês param no almoço (ou em qualquer outro horário), clique em “+ Adicionar horário” para colocar a volta. Ex.: 8h às 12h e 14h às 18h.</p>
         <div class="space-y-4">
@@ -261,14 +258,14 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
         </div>
-        <div class="flex gap-3 mt-6">
-          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+        <div class="acao-fixa-f">
+          <button type="button" class="proximo w-full bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
       </section>
 
       <!-- ---------- ETAPA 4 ---------- -->
       <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="4">
+        <button type="button" class="voltar voltar-topo">‹ Voltar</button>
         <h2 class="text-lg font-bold text-primary-900 mb-1">Agendamento</h2>
         <p class="text-slate-500 text-sm mb-6">Como ela marca uma consulta na agenda da RXSync, que fica no seu painel.</p>
         <div class="space-y-4">
@@ -308,14 +305,14 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
         </div>
-        <div class="flex gap-3 mt-6">
-          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+        <div class="acao-fixa-f">
+          <button type="button" class="proximo w-full bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
       </section>
 
       <!-- ---------- ETAPA 5 ---------- -->
       <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="5">
+        <button type="button" class="voltar voltar-topo">‹ Voltar</button>
         <h2 class="text-lg font-bold text-primary-900 mb-1">Contatos e responsabilidade</h2>
         <p class="text-slate-500 text-sm mb-6">Números com DDD.</p>
         <div class="space-y-4">
@@ -376,14 +373,14 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
         </div>
-        <div class="flex gap-3 mt-6">
-          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-          <button type="button" class="proximo flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
+        <div class="acao-fixa-f">
+          <button type="button" class="proximo w-full bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button>
         </div>
       </section>
 
       <!-- ---------- ETAPA 6 ---------- -->
       <section class="etapa bg-white rounded-2xl border border-slate-200 shadow-sm p-6" data-etapa="6">
+        <button type="button" class="voltar voltar-topo">‹ Voltar</button>
         <h2 class="text-lg font-bold text-primary-900 mb-1">Jeito de falar e limites</h2>
         <p class="text-slate-500 text-sm mb-6">O último passo, e o que mais muda a cara dela.</p>
         <div class="space-y-4">
@@ -448,7 +445,19 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           <i data-lucide="plus" class="w-4 h-4"></i> Adicionar pergunta
         </button>
 
-        <div class="mt-6 pt-5 border-t border-slate-100">
+        <div class="acao-fixa-f">
+          <button type="button" class="proximo w-full bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors mt-6">Continuar</button>
+        </div>
+      </section>
+
+
+      <!-- ---------- ETAPA 7: Confira suas respostas (molde F) ---------- -->
+      <section class="etapa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="7">
+        <button type="button" class="voltar voltar-topo">‹ Voltar</button>
+        <h2 class="text-lg font-bold text-primary-900 mb-1">Confira suas respostas</h2>
+        <p class="text-slate-500 text-sm mb-5">É isso que a assistente vai saber. Se algo estiver errado, toque em "Alterar". Depois, o responsável técnico aprova e você envia.</p>
+        <dl class="resumo-f" id="resumo"></dl>
+        <div class="mt-6">
           <label class="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" id="declaracao_rt" class="mt-1 w-5 h-5 shrink-0 accent-emerald-600">
             <span class="text-sm text-slate-700 leading-relaxed">
@@ -461,9 +470,8 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
         <p id="erroForm" class="msg-erro mt-5"></p>
 
-        <div class="flex gap-3 mt-6">
-          <button type="button" class="voltar px-5 py-3.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold">Voltar</button>
-          <button type="button" id="btnEnviar" class="flex-1 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Enviar e continuar</button>
+        <div class="acao-fixa-f">
+          <button type="button" id="btnEnviar" class="w-full bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Enviar e continuar</button>
         </div>
       </section>
 
@@ -476,8 +484,8 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
 
   <!-- ================= SUCESSO ================= -->
   <section id="telaOk" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
-    <span class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-900 to-emerald-600 shadow-md flex items-center justify-center mx-auto">
-      <i data-lucide="check" class="w-7 h-7 text-white"></i>
+    <span class="w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center mx-auto">
+      <i data-lucide="check" class="w-7 h-7 text-emerald-700"></i>
     </span>
     <h1 class="mt-5 text-xl font-extrabold tracking-tight text-primary-900">Recebemos tudo</h1>
     <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-md mx-auto">
@@ -535,7 +543,7 @@ const PERFIL = {
 
 const WEBHOOK      = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/onboarding';
 const ORIGEM_CHAVE = 'rxsync-site-2026';
-const TOTAL_ETAPAS = 6;
+const TOTAL_ETAPAS = 7;
 
 const TOKEN = new URLSearchParams(location.search).get('t') || '';
 const CHAVE_RASCUNHO = 'rxsync_onb_' + TOKEN.slice(0, 8);
@@ -802,12 +810,35 @@ function irPara(n) {
   document.querySelectorAll('.etapa').forEach(el =>
     el.classList.toggle('ativa', Number(el.dataset.etapa) === passo));
 
-  document.querySelectorAll('#progresso [data-p]').forEach(el =>
-    el.className = 'h-1.5 flex-1 rounded-full ' + (Number(el.dataset.p) <= passo ? 'bg-emerald-500' : 'bg-slate-200'));
+  document.querySelectorAll('#progresso [data-p]').forEach(el => el.classList.toggle('feito', Number(el.dataset.p) <= passo));
+  if (passo === 7) montarResumo();
 
   $('passoAtual').textContent = passo;
   salvarRascunho();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function montarResumo() {
+  const dl = $('resumo'); dl.replaceChildren();
+  for (let n = 1; n <= 6; n++) {
+    const secs = document.querySelectorAll('section.etapa[data-etapa="' + n + '"]');
+    const itens = [];
+    secs.forEach(sec => sec.querySelectorAll('input, select, textarea').forEach(el => {
+      if (el.type === 'hidden' || el.closest('[aria-hidden="true"]') || el.id === 'empresa_site') return;
+      let val = el.tagName === 'SELECT' ? (el.value ? el.options[el.selectedIndex].text : '') : el.type === 'checkbox' || el.type === 'radio' ? (el.checked ? 'Sim' : '') : el.value.trim();
+      if (!val) return;
+      const lab = (el.id && sec.querySelector('label[for="' + el.id + '"]')) || el.closest('label');
+      const rot = lab ? lab.textContent.replace(/\s+/g, ' ').trim().slice(0, 60) : (el.getAttribute('aria-label') || el.placeholder || '');
+      if (rot) itens.push([rot, val.length > 160 ? val.slice(0, 157) + '…' : val]);
+    }));
+    const titulo = secs[0] ? secs[0].querySelector('h2').textContent : 'Etapa ' + n;
+    const dt = document.createElement('dt'); dt.textContent = titulo;
+    const dd = document.createElement('dd');
+    dd.append(document.createTextNode(itens.length ? itens.map(([r, v]) => r + ': ' + v).join(' · ') : 'Nada preenchido'));
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'alterar'; b.textContent = 'Alterar'; b.setAttribute('aria-label', 'Alterar ' + titulo.toLowerCase());
+    b.onclick = () => irPara(n); dd.append(b);
+    dl.append(dt, dd);
+  }
 }
 
 /* ===================== REDE ===================== */

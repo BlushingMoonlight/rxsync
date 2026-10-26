@@ -46,6 +46,8 @@ export const PAGINAS = {
   //   dela, no desenho do celular (frame do próprio site).
   ...Object.fromEntries(['index', 'app/index', 'central/index', 'escopo/index', 'manual/index'].map(f => [`demo/clinica/${f}.html`,
     { script: "'self'", estilo: "'self'", img: "'self'", connect: N8N, ...(f === 'index' ? { frame: "'self'" } : {}) }])),
+  // - página 404 (DEC-156, entrega 4): só o estilo, as fontes e o ícone do site; nada roda.
+  '404.html': { estilo: "'self'", img: "'self'", connect: "'none'" },
   // - Política de Privacidade: só o estilo e as fontes do site; nada roda.
   'privacidade.html': { estilo: "'self'", img: "'self'", connect: "'none'" },
   // - Termos de Uso: o pacote de ícones e o preenchimento dos dados de quem contrata (o script da página); nada de fora.
