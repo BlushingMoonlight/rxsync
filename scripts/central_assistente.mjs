@@ -207,7 +207,7 @@ async function chamada(page, chamadas, acao, desde) {
   await page.evaluate(() => { location.hash = 'clientes/CLI-001/historico'; });
   const env = page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Envios das conversas' }) });
   await env.waitFor();
-  ok(/enviado/.test(await env.innerText()) && /1\.840 mensagem/.test(await env.innerText()) && /falhou/.test(await env.innerText()) && /recusou o anexo/.test(await env.innerText()), 'ficha: os envios das conversas com a situação, as mensagens e o motivo');
+  ok(/enviado/.test(await env.innerText()) && /1\.840 mensagens/.test(await env.innerText()) && /falhou/.test(await env.innerText()) && /recusou o anexo/.test(await env.innerText()), 'ficha: os envios das conversas com a situação, as mensagens e o motivo');
   // Métricas.
   await page.evaluate(() => { location.hash = 'metricas'; });
   await page.getByRole('heading', { name: 'Custo de IA (Central e prospecção)' }).waitFor();

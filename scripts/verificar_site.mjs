@@ -84,6 +84,11 @@ function conferirP12(nome, css, pagina) {
     catch (e) { erro(`central/fonte: não consegui montar a Central (${e.message})`); }
     // Visual claro da Central (entrega 5 do novo front, DEC-156): as mesmas regras da P12 do painel.
     conferirP12('Central', ['assets/ancora/tokens.css', ...fs.readdirSync('central/fonte').filter(x => x.endsWith('.css')).map(x => 'central/fonte/' + x)], s);
+    // Singular ou plural certo, como no painel (pl(n, 'falha', 'falhas')): nenhum "falha(s)", "integração(ões)", "vez(es)".
+    for (const f of fs.readdirSync('central/fonte').filter(x => x.endsWith('.js')))
+      for (const re of [/'(?:[^'\\\n]|\\.)*'/g, /`(?:[^`\\]|\\.)*`/g])   // só nos textos: entre aspas e entre crases (sem o ${…})
+        for (const t of fs.readFileSync(path.join('central/fonte', f), 'utf8').matchAll(re))
+          for (const m of t[0].replace(/\$\{[^}]*\}/g, '').matchAll(/[a-zà-ú]+\((?:s|es|ões|ns)\)/gi)) erro(`central/fonte/${f}: "${m[0]}" na tela; use pl(n, 'singular', 'plural')`);
     // Toda ação de edição tem nível no servidor (sql/030, sql/031 e sql/036, rx_central_niveis). Ação nova precisa entrar lá e aqui.
     // ligar_chave: um toque (DEC-066); as chaves do motor da prospecção sobem para 2 ou 3 ao ligar (rx_central, sql/031).
     const NIVEIS = { 1: ['cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',

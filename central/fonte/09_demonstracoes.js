@@ -63,7 +63,7 @@ async function dLista(c) {
   const linha = l => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('link', l.id) }, avatarDem(l),
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.clinica }),
       el('div', { class: 't2', text: [`DEM-${l.id}`, `${l.tratamento} ${l.medico}`, l.especialidade, l.cidade, l.lead_codigo,
-        l.ultimo_acesso ? 'último acesso ' + fmtHora(l.ultimo_acesso) : 'criado em ' + fmtData(l.criada_em), fmtNum(l.visitas) + ' visita(s)'].filter(Boolean).join(' · ') })),
+        l.ultimo_acesso ? 'último acesso ' + fmtHora(l.ultimo_acesso) : 'criado em ' + fmtData(l.criada_em), pl(l.visitas, 'visita', 'visitas')].filter(Boolean).join(' · ') })),
     el('div', { class: 'direita' }, l.conversar_em ? etq('quer conversar', 'atencao', true) : null, etqDem(l.situacao)), icone('seta')));
   trocar(c, cabecalho('Demonstrações', 'um link por clínica: o app e a central de exemplo com o nome dela', editar ? btn('Novo link', () => irD('novo'), 'pri', 'mais_um') : null),
     el('div', { class: 'pilha' }, avisoLinksDesligados(),
@@ -191,19 +191,19 @@ async function dLink(c, id) {
           btn('Apagar', apagar, 'perigo-sec')) : null)),
       el('div', { class: 'kpis' }, kpi('Visitas', fmtNum(l.visitas), l.primeiro_acesso ? 'a primeira em ' + fmtHora(l.primeiro_acesso) : 'nunca abriu'),
         kpi('Tempo total', minutos(u.segundos)), kpi('Aparelhos', aparelhos || '—'), kpi('Último acesso', l.ultimo_acesso ? fmtHora(l.ultimo_acesso) : '—')),
-      cartao('Quero conversar', conversas.length ? etq(fmtNum(conversas.length) + ' pedido(s)', 'atencao', true) : null,
+      cartao('Quero conversar', conversas.length ? etq(pl(conversas.length, 'pedido', 'pedidos'), 'atencao', true) : null,
         listaOu(conversas, 'O médico ainda não pediu para conversar.', e => linhaSimples((e.conteudo || {}).texto || '(sem texto)', fmtHora(e.quando)))),
       cartao('Escopo', escopoEnvios.length ? etq('enviado ' + fmtHora(escopoEnvios[0].quando), 'ok', true) : null,
         esc.length ? el('div', { class: 'corpo etqs' }, etq(fmtNum(conta('quero')) + ' quero', 'ok', true), etq(fmtNum(conta('duvida')) + ' com dúvida', 'atencao', true), etq(fmtNum(conta('nao_preciso')) + ' não preciso', '', true)) : null,
         listaOu(esc, 'Nada marcado no escopo ainda.', x => linhaSimples(nomeItem(x.item), [x.nota, 'marcado ' + fmtHora(x.atualizado_em)].filter(Boolean).join(' · '),
           x.escolha ? etq((DEM_ESCOLHA[x.escolha] || [x.escolha])[0], (DEM_ESCOLHA[x.escolha] || [])[1]) : null))),
-      cartao('Telas mais vistas', null, listaOu(u.telas || [], 'Nenhuma tela vista ainda.', t => linhaSimples((DEM_PAGINA[t.pagina] || t.pagina) + (t.tela ? ' › ' + t.tela : ''), fmtNum(t.vezes) + ' vez(es) · ' + minutos(t.segundos)))),
-      cartao('O que mais tocou', null, listaOu(u.toques || [], 'Nenhum toque registrado ainda.', t => linhaSimples(t.alvo, (DEM_PAGINA[t.pagina] || t.pagina) + ' · ' + fmtNum(t.vezes) + ' vez(es)'))),
+      cartao('Telas mais vistas', null, listaOu(u.telas || [], 'Nenhuma tela vista ainda.', t => linhaSimples((DEM_PAGINA[t.pagina] || t.pagina) + (t.tela ? ' › ' + t.tela : ''), pl(t.vezes, 'vez', 'vezes') + ' · ' + minutos(t.segundos)))),
+      cartao('O que mais tocou', null, listaOu(u.toques || [], 'Nenhum toque registrado ainda.', t => linhaSimples(t.alvo, (DEM_PAGINA[t.pagina] || t.pagina) + ' · ' + pl(t.vezes, 'vez', 'vezes')))),
       cartao('Perguntas nos chats', null, listaOu(u.perguntas || [], 'Nenhuma pergunta nos chats de exemplo.', p => linhaSimples(p.texto || '', ({ equipe: 'chat com a equipe', personal: 'personal do app', whatsapp: 'personal no WhatsApp', central: 'assistente da central' }[p.chat] || 'assistente do app') + ' · ' + fmtHora(p.quando)))),
       cartao('Visitas', null, listaOu(u.visitas || [], 'Nenhuma visita ainda.', v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('visita', l.id, v.id) },
         el('span', { class: 'icone-caixa' }, icone(v.tipo_aparelho === 'computador' ? 'demonstracao' : 'telefone')),
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: fmtHora(v.inicio) + ' · ' + minutos(v.segundos) }),
-          el('div', { class: 't2', text: [(DEM_APARELHO[v.tipo_aparelho] || [v.tipo_aparelho])[0], v.navegador, 'aparelho ' + v.aparelho + '…', fmtNum(v.eventos) + ' evento(s)'].filter(Boolean).join(' · ') })), icone('seta'))))),
+          el('div', { class: 't2', text: [(DEM_APARELHO[v.tipo_aparelho] || [v.tipo_aparelho])[0], v.navegador, 'aparelho ' + v.aparelho + '…', pl(v.eventos, 'evento', 'eventos')].filter(Boolean).join(' · ') })), icone('seta'))))),
       cartao('Sobre o link', null, corpo(dados([['Criado em', fmtHora(l.criada_em)], ['Válido até', fmtData(l.valida_ate)], ['Cidade', l.cidade], ['Cor', (DEM_CORES.find(x => x[0] === l.cor) || [0, l.cor])[1]],
         ['Lead da prospecção', l.lead_codigo], ['Anotação', l.anotacao]])))));
 }
@@ -215,7 +215,7 @@ async function dVisita(c, linkId, visitaId) {
   if (falhou(c, r, 'Visita')) return;
   const resumo = d => { if (!d || typeof d !== 'object') return ''; return Object.entries(d).map(([k, v]) => k === 's' ? minutos(v) : typeof v === 'object' ? '' : String(v)).filter(Boolean).join(' · '); };
   const evs = r.eventos || [];
-  trocar(c, cabecalho('Visita', `${fmtNum(evs.length)} evento(s), na ordem`),
+  trocar(c, cabecalho('Visita', `${pl(evs.length, 'evento', 'eventos')}, na ordem`),
     el('div', { class: 'pilha' }, cartao(null, null, evs.length ? el('ul', { class: 'lista' }, evs.map(e => el('li', {}, el('div', { class: 'linha' },
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: (DEM_PAGINA[e.pagina] || e.pagina) + (e.tela ? ' › ' + e.tela : '') + ' · ' + e.acao }),
         el('div', { class: 't2', text: [fmtHora(e.quando), resumo(e.detalhe)].filter(Boolean).join(' · ') })))))) : vazio('Nenhum evento nesta visita.', 'info'))));

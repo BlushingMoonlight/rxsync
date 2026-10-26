@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Ll2nEh7aOioow8fP6OXqTEIp/26pv8gANMP2GUl4VvE='; style-src 'sha256-wkdj8cd0j6sVfL9IAgN6cUAw4Gk5pe+IgU4jHg28coM='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ixHh1erAvdUBLbA4knh8OhnoE1/XG6TLKbwdDhOQXr8='; style-src 'sha256-8V8lM65+VH/J/JqyV9bXBopvfru61leWxqa6cyw7W0k='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -108,7 +108,8 @@ svg.icone.p { width: 16px; height: 16px; } svg.icone.g { width: 24px; height: 24
 .topo .migalhas { display: none; }
 .btn-ic { width: var(--alvo); height: var(--alvo); display: grid; place-items: center; border-radius: var(--r-2); border: 0; background: none; color: var(--texto-2); cursor: pointer; flex: none; position: relative; }
 .btn-ic:hover { background: var(--superficie-3); }
-.marca { width: 32px; height: 32px; border-radius: var(--r-botao); background: var(--primaria); color: var(--botao-texto); display: grid; place-items: center; font: 600 13px/1 var(--fonte); flex: none; }
+/* o ícone do logo (assets/icones/), no alto do menu, do trilho e da entrada */
+.marca { width: 32px; height: 32px; border-radius: var(--r-botao); display: block; flex: none; }
 .busca-campo { display: none; }
 .barra { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: var(--superficie); border-top: 1px solid var(--borda);
   padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
@@ -490,7 +491,7 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 <!-- Página montada por scripts/central_montar.mjs a partir de central/fonte/. Não edite este arquivo à mão. -->
 <div id="entrada" class="tela-entrada" hidden>
   <div class="cartao" role="main">
-    <div class="cab-entrada"><div class="marca">RX</div><div><div class="nome-grande">Central RXSync</div><div class="mudo peq">Área do administrador</div></div></div>
+    <div class="cab-entrada"><img class="marca" src="/assets/icones/rxsync-192.png" alt="" width="32" height="32"><div><div class="nome-grande">Central RXSync</div><div class="mudo peq">Área do administrador</div></div></div>
     <div id="entrada-corpo"></div>
   </div>
 </div>
@@ -547,6 +548,8 @@ const ICONES = {
 const icone = (n, tam) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('class', 'icone' + (tam ? ' ' + tam : '')); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.8'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', ICONES[n] || ''); s.append(p); return s; };
 const fmtReal = v => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const fmtNum = v => (Number(v) || 0).toLocaleString('pt-BR');
+// Número com a palavra no singular ou no plural (como no painel): pl(1, 'falha', 'falhas') = "1 falha".
+const pl = (n, um, varios) => fmtNum(n || 0) + ' ' + (Number(n) === 1 ? um : varios);
 const fmtData = v => { if (!v) return '—'; const d = new Date(String(v).length === 10 ? v + 'T12:00:00' : v); return isNaN(d) ? String(v) : d.toLocaleDateString('pt-BR'); };
 const fmtHora = v => { if (!v) return '—'; const d = new Date(String(v).replace(' ', 'T')); return isNaN(d) ? String(v) : d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); };
 const diaCurto = d => fmtData(d).slice(0, 5);
@@ -920,7 +923,7 @@ function montarNav() {
   const ativa = secaoAtiva(); const naAba = SECOES.some(s => s.aba && s.id === ativa);
   const cont = id => est.contadores[id] ? el('span', { class: 'contador', text: est.contadores[id], 'aria-label': est.contadores[id] + ' pendências' }) : null;
   const lat = $('lateral');
-  trocar(lat, el('div', { class: 'cab' }, el('div', { class: 'marca', text: 'RX' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
+  trocar(lat, el('div', { class: 'cab' }, el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
     el('button', { class: 'btn-ic', type: 'button', 'aria-label': est.recolhida ? 'Abrir o menu' : 'Recolher o menu', 'aria-expanded': String(!est.recolhida), onclick: () => { est.recolhida = !est.recolhida; $('app').classList.toggle('recolhida', est.recolhida); montarNav(); } }, icone(est.recolhida ? 'expandir' : 'recolher'))));
   let grupo = '';
   for (const s of SECOES.filter(visivel)) {
@@ -930,7 +933,7 @@ function montarNav() {
   }
   lat.append(el('div', { class: 'rodape' }, el('button', { class: 'item-nav', type: 'button', 'aria-label': est.recolhida ? 'Sair' : null, onclick: sair }, icone('sair'), el('span', { class: 'rotulo', text: 'Sair' }))));
   const principais = SECOES.filter(s => s.aba);
-  trocar($('trilho'), el('div', { class: 'marca', text: 'RX', 'aria-hidden': 'true' }),
+  trocar($('trilho'), el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
     ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
     el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
     el('button', { type: 'button', onclick: sair }, icone('sair', 'g'), 'Sair'));
@@ -942,7 +945,7 @@ function montarNav() {
 function topo(titulo, caminho, voltar) {
   document.title = titulo + ' · Central RXSync';
   trocar($('topo'), 
-    voltar ? el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Voltar', onclick: () => ir(voltar) }, icone('voltar')) : el('div', { class: 'marca marca-topo', text: 'RX', 'aria-hidden': 'true' }),
+    voltar ? el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Voltar', onclick: () => ir(voltar) }, icone('voltar')) : el('img', { class: 'marca marca-topo', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
     el('div', { class: 'titulo', text: titulo }),
     el('nav', { class: 'migalhas', 'aria-label': 'Onde estou' }, el('ol', {}, caminho.map(([nome, rota], i) => el('li', {}, i ? icone('seta', 'p') : null,
       rota ? el('a', { href: '#' + rota, text: nome }) : el('span', { 'aria-current': 'page', text: nome }))))),
@@ -1060,17 +1063,17 @@ TELAS.hoje = async c => {
   const pend = [];
   const add = (prior, t, s, rota) => pend.push({ prior, t, s, rota });
   for (const w of p.whatsapp_fora || []) add('critico', 'WhatsApp desconectado', `${nomeCli(w)} · desde ${fmtHora(w.desde)}`, 'clientes/' + encodeURIComponent(w.cliente_id));
-  if (p.falhas_24h) add('critico', `${p.falhas_24h} falha(s) de workflow em 24 horas`, 'Ver em Saúde do sistema', 'sistema');
+  if (p.falhas_24h) add('critico', `${pl(p.falhas_24h, 'falha', 'falhas')} de workflow em 24 horas`, 'Ver em Saúde do sistema', 'sistema');
   for (const x of p.suspensos || []) add('critico', 'Clínica suspensa', nomeCli(x), 'clientes/' + encodeURIComponent(x.cliente_id) + '/cobranca');
   for (const x of p.aviso_atraso || []) add('atencao', 'Aviso de atraso enviado', nomeCli(x), 'clientes/' + encodeURIComponent(x.cliente_id) + '/cobranca');
   for (const x of p.cancelamentos_agendados || []) add('atencao', 'Cancelamento em ' + fmtData(x.em), nomeCli(x), 'clientes/' + encodeURIComponent(x.cliente_id));
   for (const x of p.onboarding_vencido || []) add('atencao', 'Onboarding vencido', nomeCli(x), 'clientes/' + encodeURIComponent(x.cliente_id) + '/cadastro');
   for (const x of p.franquia_80 || []) add('atencao', `${fmtNum(x.usadas)} de ${fmtNum(x.franquia)} mensagens`, nomeCli(x), 'clientes/' + encodeURIComponent(x.cliente_id) + '/recursos');
-  if (p.integracoes_com_erro) add('atencao', `${p.integracoes_com_erro} integração(ões) de agenda com erro`, 'Ver em Saúde do sistema', 'sistema');
-  if (p.avisos_eventos_desistidos_7d) add('atencao', `${p.avisos_eventos_desistidos_7d} aviso(s) de eventos não entregue(s)`, 'Últimos 7 dias', 'sistema');
+  if (p.integracoes_com_erro) add('atencao', `${pl(p.integracoes_com_erro, 'integração', 'integrações')} de agenda com erro`, 'Ver em Saúde do sistema', 'sistema');
+  if (p.avisos_eventos_desistidos_7d) add('atencao', `${pl(p.avisos_eventos_desistidos_7d, 'aviso de eventos não entregue', 'avisos de eventos não entregues')}`, 'Últimos 7 dias', 'sistema');
   const limite = somaDias(hojeISO(), 3);
   for (const x of (rd && rd.ok ? rd.dados.testes : []) || []) if (x.fim_teste && x.fim_teste <= limite) add('atencao', 'Teste termina em ' + fmtData(x.fim_teste), nomeCli(x), 'clientes/' + encodeURIComponent(x.cliente_id) + '/cobranca');
-  if (p.pedidos_demonstracao_7d) add('info', `${p.pedidos_demonstracao_7d} pedido(s) de demonstração`, 'Últimos 7 dias', 'crescimento');
+  if (p.pedidos_demonstracao_7d) add('info', `${pl(p.pedidos_demonstracao_7d, 'pedido', 'pedidos')} de demonstração`, 'Últimos 7 dias', 'crescimento');
   est.contadores.hoje = pend.filter(x => x.prior !== 'info').length || 0;
   est.contadores.sistema = (p.whatsapp_fora || []).length + (p.falhas_24h ? 1 : 0) + (p.integracoes_com_erro ? 1 : 0);
   montarNav();
@@ -1428,7 +1431,7 @@ function abaHistorico(c, x) {
   cartao('Envios das conversas', el('span', { class: 'mudo peq', text: 'os 5 mais recentes · o arquivo não passa pela Central' }), (x.conversas_envios || []).length
     ? el('ul', { class: 'lista' }, x.conversas_envios.map(e => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: 'Pedido em ' + fmtHora(e.pedido_em) }),
-      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? fmtNum(e.mensagens) + ' mensagem(ns)' : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
+      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? pl(e.mensagens, 'mensagem', 'mensagens') : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
       el('div', { class: 'direita' }, etq(SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][0] : (e.situacao || '—'), SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][1] : '')))))) : vazio('Nenhum envio das conversas pedido.', 'relogio')));
   // Acessos recentes (sql/060, DEC-136, #184; antes "Histórico do painel", o nome do painel desde a entrega 5): quem entrou e o
   // que fez no painel da clínica, com o IP e o e-mail (o dono vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.
@@ -1519,7 +1522,7 @@ TELAS.sistema = async c => {
   const problemas = fora.length + (falhas7 ? 1 : 0) + integErro;
   trocar(c, cabecalho('Saúde do sistema', 'workflows, WhatsApp e integrações'),
     el('div', { class: 'pilha' },
-      el('div', { class: 'aviso ' + (problemas ? 'atencao' : 'ok'), role: 'status' }, icone(problemas ? 'alerta' : 'ok'), el('div', {}, el('b', { text: problemas ? problemas + ' ponto(s) para olhar. ' : 'Tudo funcionando. ' }),
+      el('div', { class: 'aviso ' + (problemas ? 'atencao' : 'ok'), role: 'status' }, icone(problemas ? 'alerta' : 'ok'), el('div', {}, el('b', { text: problemas ? pl(problemas, 'ponto', 'pontos') + ' para olhar. ' : 'Tudo funcionando. ' }),
         `WhatsApp fora: ${fora.length} · falhas em 7 dias: ${falhas7} · agendas com erro: ${integErro}`)),
       el('div', { class: 'kpis' }, kpi('Último aviso recebido', d.ultimo_aviso_recebido ? fmtHora(d.ultimo_aviso_recebido) : '—'), kpi('Última foto do dia', d.ultima_foto_indicadores ? fmtHora(d.ultima_foto_indicadores) : '—'),
         kpi('WhatsApp fora', fmtNum(fora.length)), kpi('Falhas em 7 dias', fmtNum(falhas7))),
@@ -1584,7 +1587,7 @@ TELAS.crescimento = async (c, [periodo]) => {
     // Mini testes do site (sql/059, DEC-134): os dados que antes iam ao Telegram ficam só aqui, por 90 dias.
     cartao('Mini testes do site', el('span', { class: 'mudo peq', text: 'os 50 mais novos · guardados por 90 dias' }), (d.mini_testes || []).length ? el('ul', { class: 'lista' }, d.mini_testes.map(m => el('li', {}, el('div', { class: 'linha' },
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: [m.clinica, m.especialidade].filter(Boolean).join(' · ') || 'Mini teste' }),
-        el('div', { class: 't2', text: [fmtHora(m.criado_em), m.telefone, fmtNum(m.mensagens || 0) + ' mensagem(ns)', m.agendamento ? 'marcou consulta' : 'não marcou', m.origem ? 'origem: ' + m.origem : ''].filter(Boolean).join(' · ') }),
+        el('div', { class: 't2', text: [fmtHora(m.criado_em), m.telefone, pl(m.mensagens, 'mensagem', 'mensagens'), m.agendamento ? 'marcou consulta' : 'não marcou', m.origem ? 'origem: ' + m.origem : ''].filter(Boolean).join(' · ') }),
         Array.isArray(m.conversa) && m.conversa.length ? el('details', { class: 'mt' }, el('summary', { text: 'Ver a conversa' }),
           el('ul', { class: 'lista' }, m.conversa.map(t => el('li', {}, el('div', { class: 't2', text: (t.r === 'a' ? 'Assistente: ' : 'Pessoa: ') + String(t.t || '') }))))) : null),
       wa(m.telefone) ? el('div', { class: 'direita' }, el('a', { class: 'btn sec', href: wa(m.telefone), target: '_blank', rel: 'noopener noreferrer', text: 'WhatsApp' })) : null)))) : vazio('Nenhum mini teste nos últimos 90 dias.', 'crescimento'))));
@@ -1919,11 +1922,11 @@ async function pInicio(c) {
   const d = r.dados, res = d.resultados || {}, ch = d.chaves || {}, editar = ligada('editar_prospeccao');
   const soma = k => (res.ultimos_7_dias || []).reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
   const att = [];
-  if (res.para_aprovar) att.push(['atencao', `${fmtNum(res.para_aprovar)} lead(s) para aprovar`, 'Antes de entrar na fila', () => ir('prospeccao/leads/para_aprovar')]);
-  if (res.com_voce) att.push(['atencao', `${fmtNum(res.com_voce)} conversa(s) com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
+  if (res.para_aprovar) att.push(['atencao', `${pl(res.para_aprovar, 'lead', 'leads')} para aprovar`, 'Antes de entrar na fila', () => ir('prospeccao/leads/para_aprovar')]);
+  if (res.com_voce) att.push(['atencao', `${pl(res.com_voce, 'conversa', 'conversas')} com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
   const motor = res.motor || null;
   if (motor && motor.segurado) att.push(['critico', 'Disparo parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O'), null]);
-  if (res.avisos_na_fila) att.push(['info', `${fmtNum(res.avisos_na_fila)} aviso(s) esperando o Telegram`, 'O workflow 54 manda a cada 5 minutos', null]);
+  if (res.avisos_na_fila) att.push(['info', `${pl(res.avisos_na_fila, 'aviso', 'avisos')} esperando o Telegram`, 'O workflow 54 manda a cada 5 minutos', null]);
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
   const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
   const campanhas = d.campanhas || [];
@@ -1937,10 +1940,10 @@ async function pInicio(c) {
     (j.anuncios || []).map(n => el('li', {}, camada('anuncio', n, `${n.id} · versão ${n.versao}${n.pausa_motivo ? ' · ' + n.pausa_motivo : ''}`))),
     editar && !/^encerrad/.test(j.situacao) ? novoBtn('Novo anúncio', 'anuncio', j.id) : null);
   const conjuntos = cp => el('ul', { class: 'lista p-filhos' },
-    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? fmtNum(j.publicos.length) + ' público(s)' : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
+    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? pl(j.publicos.length, 'público', 'públicos') : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
     editar && !/^encerrad/.test(cp.situacao) ? novoBtn('Novo conjunto', 'conjunto', cp.id) : null);
   const arvore = campanhas.length
-    ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${fmtNum((cp.conjuntos || []).length)} conjunto(s)`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
+    ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${pl((cp.conjuntos || []).length, 'conjunto', 'conjuntos')}`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
     : [cartao(null, null, vazio('Nenhuma campanha ainda. Crie a primeira: campanha (marca, produto e IA) › conjunto (públicos, número, entrega) › anúncios (as mensagens, sorteadas entre os leads).', 'prospeccao'))];
   trocar(c, cabecalho('Prospecção', 'campanha › conjunto › anúncio', editar ? btn('Nova campanha', () => irP('campanha', 'novo'), 'pri', 'mais_um') : null),
     el('div', { class: 'pilha' }, abasP(''),
@@ -2247,7 +2250,7 @@ async function pPublico(c, parte, id, sub) {
   const sobre = ct => {
     if (ct.lead) return `virou lead ${ct.lead.id} (${nomeP('conjunto', ct.lead.conjunto_id)})`;
     const dias = Number(ct.expira_em_dias);
-    return `encontrado em ${fmtData(ct.encontrado_em)} · ${dias <= 0 ? 'sai hoje' : 'sai em ' + fmtNum(dias) + ' dia(s)'}`;
+    return `encontrado em ${fmtData(ct.encontrado_em)} · ${dias <= 0 ? 'sai hoje' : 'sai em ' + pl(dias, 'dia', 'dias')}`;
   };
   const contatos = d.contatos || [];
   const total = (FILTROS_PUB.find(x => x[0] === f.filtro) || FILTROS_PUB[0])[2], qtd = Number(n[total]) || 0, paginas = Math.max(1, Math.ceil(qtd / 50));
@@ -2271,7 +2274,7 @@ async function pPublico(c, parte, id, sub) {
       el('div', { class: 'etqs' }, (d.conjuntos || []).length ? (d.conjuntos || []).map(j => etq('conjunto ' + j.nome + (j.ativo ? ' (ativo)' : ''), j.ativo ? 'ok' : '', true)) : etq('nenhum conjunto usa', '', true),
         etq(`${fmtNum(cr.gastos)} de ${fmtNum(cr.limite)} créditos no mês`, '', true)),
       el('div', { class: 'kpis' }, kpi('Contatos', fmtNum(n.tamanho)), kpi('Disponíveis', fmtNum(n.disponiveis), 'podem receber mensagem'), kpi('Em conjuntos', fmtNum(n.em_conjunto), 'já viraram lead'),
-        kpi('Saem em até 7 dias', fmtNum(n.expiram_7d), n.expira_em_dias != null ? 'o primeiro em ' + fmtNum(n.expira_em_dias) + ' dia(s)' : 'prazo de 90 dias')),
+        kpi('Saem em até 7 dias', fmtNum(n.expiram_7d), n.expira_em_dias != null ? 'o primeiro em ' + pl(n.expira_em_dias, 'dia', 'dias') : 'prazo de 90 dias')),
       acoes.length ? el('div', { class: 'acoes' }, acoes) : null,
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação do contato' }, FILTROS_PUB.map(([k, nome, campo]) => el('button', { type: 'button', 'aria-pressed': String(f.filtro === k),
         onclick: () => { f.filtro = k; f.pagina = 1; rotear(); } }, nome, el('span', { class: 'n', text: fmtNum(n[campo]) })))),
@@ -2286,7 +2289,7 @@ async function pPublico(c, parte, id, sub) {
         f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null,
       (d.buscas || []).length ? cartao('Últimas buscas deste público', null, el('ul', { class: 'lista' }, d.buscas.slice(0, 5).map(b => el('li', {}, el('div', { class: 'linha' },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${fmtNum(b.creditos)} crédito(s)` + (Object.keys(b.contagens || {}).length ? ' · ' + Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') : '') })),
+          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${pl(b.creditos, 'crédito', 'créditos')}` + (Object.keys(b.contagens || {}).length ? ' · ' + Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') : '') })),
         el('div', { class: 'direita' }, etq(b.situacao === 'feita' ? 'feita' : b.situacao === 'falhou' ? 'falhou' : b.situacao === 'rodando' ? 'buscando' : 'na fila', b.situacao === 'feita' ? 'ok' : b.situacao === 'falhou' ? 'perigo' : 'info'))))))) : null,
       arquivar ? cartao('Mais', null, corpo(el('div', { class: 'acoes' }, arquivar))) : null,
       el('p', { class: 'mudo peq', text: 'O telefone aparece só com os 4 últimos dígitos. No envio, tudo é conferido de novo: "não contatar", clientes, demonstração, órgão público, 60 dias entre campanhas, prazo e fuso.' })));
@@ -2372,7 +2375,7 @@ async function pLeads(c, parte, sit) {
   const total = d.total || 0, paginas = Math.max(1, Math.ceil(total / 50));
   const exportar = () => fazer('prosp_exportar', { conjunto_id: f.conjunto_id, situacao: sit }, { titulo: 'Exportar os leads (CSV)', texto: 'O arquivo sai SEM telefone (DEC-079). Fica no registro da Central.', botao: 'Exportar',
     depois: x => { baixar(x.arquivo || 'leads.csv', x.csv || ''); } , ok: 'Arquivo pronto.' });
-  trocar(c, cabecalho('Leads', `${fmtNum(total)} lead(s)${sit ? ' · ' + P_LEAD[sit][0] : ''}`, btn('Exportar CSV', exportar, 'sec')),
+  trocar(c, cabecalho('Leads', `${pl(total, 'lead', 'leads')}${sit ? ' · ' + P_LEAD[sit][0] : ''}`, btn('Exportar CSV', exportar, 'sec')),
     el('div', { class: 'pilha' }, abasP('leads'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação' }, el('button', { type: 'button', 'aria-pressed': String(!sit), onclick: () => { f.pagina = 1; ir('prospeccao/leads'); } }, 'Todos'),
         SIT_LEADS.filter(k => ps[k] || k === sit).map(k => el('button', { type: 'button', 'aria-pressed': String(sit === k), onclick: () => { f.pagina = 1; ir('prospeccao/leads/' + k); } }, P_LEAD[k][0], el('span', { class: 'n', text: ps[k] || 0 })))),
@@ -2418,7 +2421,7 @@ async function pLead(c, parte, id) {
       l.situacao === 'com_voce' ? el('div', { class: 'aviso atencao' }, icone('conversa'), el('div', {}, el('b', { text: 'A conversa é sua. ' }), 'A IA e os follow-ups pararam. Responda pelo celular do número ' + (l.numero || '') + '.')) : null,
       acoes.length ? el('div', { class: 'acoes' }, acoes) : null,
       el('div', { class: 'grade-2' },
-        cartao('Conversa', el('span', { class: 'mudo peq', text: fmtNum(ms.length) + ' mensagem(ns)' }), ms.length ? el('ol', { class: 'p-conversa' }, ms.map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
+        cartao('Conversa', el('span', { class: 'mudo peq', text: pl(ms.length, 'mensagem', 'mensagens') }), ms.length ? el('ol', { class: 'p-conversa' }, ms.map(m => el('li', { class: 'p-bolha ' + (m.direcao === 'entrou' ? 'entrou' : 'saiu') },
           el('div', { class: 'p-quem', text: (AUTOR[m.autor] || m.autor) + ' · ' + fmtHora(m.criada_em) }), el('p', { text: m.texto == null ? '(texto apagado no prazo de guarda)' : m.texto }),
           m.direcao === 'saiu' ? el('div', { class: 'p-quem', text: m.situacao === 'falhou' ? 'não saiu' + (m.erro ? ' (' + m.erro + ')' : '') : m.situacao === 'pendente' ? 'saindo…' : m.lida_em ? 'lida' : m.entregue_em ? 'entregue' : 'enviada' }) : null,
           m.prompt_id ? el('button', { class: 'p-ver-prompt', type: 'button', text: 'ver o prompt que ela usou', onclick: () => verPromptUsado(m.prompt_id) }) : null))) : vazio('Nenhuma mensagem ainda.', 'conversa')),
@@ -2516,7 +2519,7 @@ async function pBuscas(c) {
       el('div', { class: 'form-2' }, selPb),
       cartao('Últimas buscas', null, (d.buscas || []).length ? el('ul', { class: 'lista' }, d.buscas.map(b => el('li', {}, el('div', { class: 'linha' },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${b.publico_id ? nomePub(b.publico_id) : nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${fmtNum(b.paginas)} página(s) · ${fmtNum(b.creditos)} crédito(s)` }),
+          el('div', { class: 't2', text: `${b.publico_id ? nomePub(b.publico_id) : nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${pl(b.paginas, 'página', 'páginas')} · ${pl(b.creditos, 'crédito', 'créditos')}` }),
           Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') }) : null),
         el('div', { class: 'direita' }, etq(...(SITB[b.situacao] || [b.situacao, '']))))))) : vazio('Nenhuma busca ainda.', 'busca'))));
 }
@@ -2675,14 +2678,14 @@ async function pConversas(c) {
         texto: 'As últimas conversas encerradas deste filtro vão para a IA sem o nome, o telefone, o código, a cidade ou o nicho do contato (nome do negócio, telefones, e-mails e links viram marcas). Nada fica guardado e nada muda sozinho: você revisa e decide.',
         campos: [{ k: 'quantidade', rot: 'Quantas conversas (1 a 20)', tipo: 'number', inputmode: 'numeric', valor: 10, min: 1, max: 20 }], botao: 'Pedir sugestões', silencioso: true,
         depois: x => mostrarSugestoes(x, f.campanha_id) }), 'pri', 'info')) : null;
-  trocar(c, cabecalho('Conversas', `${fmtNum(total)} conversa(s) respondida(s) · sem o telefone`),
+  trocar(c, cabecalho('Conversas', `${pl(total, 'conversa respondida', 'conversas respondidas')} · sem o telefone`),
     el('div', { class: 'pilha' }, abasP('conversas'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Resultado' }, RESULTADOS.map(([k, n]) => el('button', { type: 'button', 'aria-pressed': String(f.resultado === k), onclick: () => mudar('resultado', k) }, n))),
       el('div', { class: 'form-2' }, sel('Campanha', 'campanha_id', [['', 'Todas as campanhas'], ...camps.map(x => [x.id, x.nome])]),
         sel('Conjunto', 'conjunto_id', [['', 'Todos os conjuntos'], ...cjs.map(j => [j.id, (f.campanha_id ? '' : j.campanha.nome + ' › ') + j.nome])]),
         sel('Anúncio', 'anuncio_id', [['', 'Todos os anúncios'], ...ans.map(a => [a.id, a.nome])]),
         sel('Período', 'dias', [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias']]),
-        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${fmtNum(v.respostas)} resposta(s)`])])),
+        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${pl(v.respostas, 'resposta', 'respostas')}`])])),
       sugerir,
       (r.conversas || []).length ? r.conversas.map(cv => cartao(cv.nome || cv.lead_id, etqRes(cv.resultado),
         corpo(el('p', { class: 'mudo peq', text: [cv.lead_id, `${nomeP('campanha', cv.campanha_id)} › ${nomeP('conjunto', cv.conjunto_id)}${cv.anuncio_id ? ' › ' + nomeP('anuncio', cv.anuncio_id) : ''}`,
@@ -2699,7 +2702,7 @@ function mostrarSugestoes(r, campanhaId) {
   const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-sugestoes' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-sugestoes', text: 'Sugestões para o prompt' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
     el('div', { class: 'corpo' },
-      el('p', { class: 'mudo peq', text: `A partir de ${fmtNum(r.conversas)} conversa(s) encerrada(s), sem os dados dos contatos. Nada mudou: revise antes de usar.` }),
+      el('p', { class: 'mudo peq', text: `A partir de ${pl(r.conversas, 'conversa encerrada', 'conversas encerradas')}, sem os dados dos contatos. Nada mudou: revise antes de usar.` }),
       r.diagnostico ? blocoPrompt('Diagnóstico', r.diagnostico) : null,
       (r.sugestoes || []).map((x, k) => el('div', { class: 'p-sugestao' }, el('h3', { text: (k + 1) + '. ' + (x.onde || 'Sugestão') }),
         x.antes ? blocoPrompt('Antes', x.antes) : null, blocoPrompt('Depois', x.depois), x.porque ? el('p', { class: 'mudo peq', text: 'Por quê: ' + x.porque }) : null)),
@@ -2775,7 +2778,7 @@ async function dLista(c) {
   const linha = l => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('link', l.id) }, avatarDem(l),
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.clinica }),
       el('div', { class: 't2', text: [`DEM-${l.id}`, `${l.tratamento} ${l.medico}`, l.especialidade, l.cidade, l.lead_codigo,
-        l.ultimo_acesso ? 'último acesso ' + fmtHora(l.ultimo_acesso) : 'criado em ' + fmtData(l.criada_em), fmtNum(l.visitas) + ' visita(s)'].filter(Boolean).join(' · ') })),
+        l.ultimo_acesso ? 'último acesso ' + fmtHora(l.ultimo_acesso) : 'criado em ' + fmtData(l.criada_em), pl(l.visitas, 'visita', 'visitas')].filter(Boolean).join(' · ') })),
     el('div', { class: 'direita' }, l.conversar_em ? etq('quer conversar', 'atencao', true) : null, etqDem(l.situacao)), icone('seta')));
   trocar(c, cabecalho('Demonstrações', 'um link por clínica: o app e a central de exemplo com o nome dela', editar ? btn('Novo link', () => irD('novo'), 'pri', 'mais_um') : null),
     el('div', { class: 'pilha' }, avisoLinksDesligados(),
@@ -2903,19 +2906,19 @@ async function dLink(c, id) {
           btn('Apagar', apagar, 'perigo-sec')) : null)),
       el('div', { class: 'kpis' }, kpi('Visitas', fmtNum(l.visitas), l.primeiro_acesso ? 'a primeira em ' + fmtHora(l.primeiro_acesso) : 'nunca abriu'),
         kpi('Tempo total', minutos(u.segundos)), kpi('Aparelhos', aparelhos || '—'), kpi('Último acesso', l.ultimo_acesso ? fmtHora(l.ultimo_acesso) : '—')),
-      cartao('Quero conversar', conversas.length ? etq(fmtNum(conversas.length) + ' pedido(s)', 'atencao', true) : null,
+      cartao('Quero conversar', conversas.length ? etq(pl(conversas.length, 'pedido', 'pedidos'), 'atencao', true) : null,
         listaOu(conversas, 'O médico ainda não pediu para conversar.', e => linhaSimples((e.conteudo || {}).texto || '(sem texto)', fmtHora(e.quando)))),
       cartao('Escopo', escopoEnvios.length ? etq('enviado ' + fmtHora(escopoEnvios[0].quando), 'ok', true) : null,
         esc.length ? el('div', { class: 'corpo etqs' }, etq(fmtNum(conta('quero')) + ' quero', 'ok', true), etq(fmtNum(conta('duvida')) + ' com dúvida', 'atencao', true), etq(fmtNum(conta('nao_preciso')) + ' não preciso', '', true)) : null,
         listaOu(esc, 'Nada marcado no escopo ainda.', x => linhaSimples(nomeItem(x.item), [x.nota, 'marcado ' + fmtHora(x.atualizado_em)].filter(Boolean).join(' · '),
           x.escolha ? etq((DEM_ESCOLHA[x.escolha] || [x.escolha])[0], (DEM_ESCOLHA[x.escolha] || [])[1]) : null))),
-      cartao('Telas mais vistas', null, listaOu(u.telas || [], 'Nenhuma tela vista ainda.', t => linhaSimples((DEM_PAGINA[t.pagina] || t.pagina) + (t.tela ? ' › ' + t.tela : ''), fmtNum(t.vezes) + ' vez(es) · ' + minutos(t.segundos)))),
-      cartao('O que mais tocou', null, listaOu(u.toques || [], 'Nenhum toque registrado ainda.', t => linhaSimples(t.alvo, (DEM_PAGINA[t.pagina] || t.pagina) + ' · ' + fmtNum(t.vezes) + ' vez(es)'))),
+      cartao('Telas mais vistas', null, listaOu(u.telas || [], 'Nenhuma tela vista ainda.', t => linhaSimples((DEM_PAGINA[t.pagina] || t.pagina) + (t.tela ? ' › ' + t.tela : ''), pl(t.vezes, 'vez', 'vezes') + ' · ' + minutos(t.segundos)))),
+      cartao('O que mais tocou', null, listaOu(u.toques || [], 'Nenhum toque registrado ainda.', t => linhaSimples(t.alvo, (DEM_PAGINA[t.pagina] || t.pagina) + ' · ' + pl(t.vezes, 'vez', 'vezes')))),
       cartao('Perguntas nos chats', null, listaOu(u.perguntas || [], 'Nenhuma pergunta nos chats de exemplo.', p => linhaSimples(p.texto || '', ({ equipe: 'chat com a equipe', personal: 'personal do app', whatsapp: 'personal no WhatsApp', central: 'assistente da central' }[p.chat] || 'assistente do app') + ' · ' + fmtHora(p.quando)))),
       cartao('Visitas', null, listaOu(u.visitas || [], 'Nenhuma visita ainda.', v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('visita', l.id, v.id) },
         el('span', { class: 'icone-caixa' }, icone(v.tipo_aparelho === 'computador' ? 'demonstracao' : 'telefone')),
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: fmtHora(v.inicio) + ' · ' + minutos(v.segundos) }),
-          el('div', { class: 't2', text: [(DEM_APARELHO[v.tipo_aparelho] || [v.tipo_aparelho])[0], v.navegador, 'aparelho ' + v.aparelho + '…', fmtNum(v.eventos) + ' evento(s)'].filter(Boolean).join(' · ') })), icone('seta'))))),
+          el('div', { class: 't2', text: [(DEM_APARELHO[v.tipo_aparelho] || [v.tipo_aparelho])[0], v.navegador, 'aparelho ' + v.aparelho + '…', pl(v.eventos, 'evento', 'eventos')].filter(Boolean).join(' · ') })), icone('seta'))))),
       cartao('Sobre o link', null, corpo(dados([['Criado em', fmtHora(l.criada_em)], ['Válido até', fmtData(l.valida_ate)], ['Cidade', l.cidade], ['Cor', (DEM_CORES.find(x => x[0] === l.cor) || [0, l.cor])[1]],
         ['Lead da prospecção', l.lead_codigo], ['Anotação', l.anotacao]])))));
 }
@@ -2927,7 +2930,7 @@ async function dVisita(c, linkId, visitaId) {
   if (falhou(c, r, 'Visita')) return;
   const resumo = d => { if (!d || typeof d !== 'object') return ''; return Object.entries(d).map(([k, v]) => k === 's' ? minutos(v) : typeof v === 'object' ? '' : String(v)).filter(Boolean).join(' · '); };
   const evs = r.eventos || [];
-  trocar(c, cabecalho('Visita', `${fmtNum(evs.length)} evento(s), na ordem`),
+  trocar(c, cabecalho('Visita', `${pl(evs.length, 'evento', 'eventos')}, na ordem`),
     el('div', { class: 'pilha' }, cartao(null, null, evs.length ? el('ul', { class: 'lista' }, evs.map(e => el('li', {}, el('div', { class: 'linha' },
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: (DEM_PAGINA[e.pagina] || e.pagina) + (e.tela ? ' › ' + e.tela : '') + ' · ' + e.acao }),
         el('div', { class: 't2', text: [fmtHora(e.quando), resumo(e.detalhe)].filter(Boolean).join(' · ') })))))) : vazio('Nenhum evento nesta visita.', 'info'))));

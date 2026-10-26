@@ -331,7 +331,7 @@ function abaHistorico(c, x) {
   cartao('Envios das conversas', el('span', { class: 'mudo peq', text: 'os 5 mais recentes · o arquivo não passa pela Central' }), (x.conversas_envios || []).length
     ? el('ul', { class: 'lista' }, x.conversas_envios.map(e => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: 'Pedido em ' + fmtHora(e.pedido_em) }),
-      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? fmtNum(e.mensagens) + ' mensagem(ns)' : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
+      el('div', { class: 't2', text: [e.enviado_em ? 'enviado em ' + fmtHora(e.enviado_em) : '', e.mensagens != null ? pl(e.mensagens, 'mensagem', 'mensagens') : '', e.erro ? 'motivo: ' + e.erro : ''].filter(Boolean).join(' · ') || 'aguardando o workflow 31' })),
       el('div', { class: 'direita' }, etq(SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][0] : (e.situacao || '—'), SIT_ENVIO[e.situacao] ? SIT_ENVIO[e.situacao][1] : '')))))) : vazio('Nenhum envio das conversas pedido.', 'relogio')));
   // Acessos recentes (sql/060, DEC-136, #184; antes "Histórico do painel", o nome do painel desde a entrega 5): quem entrou e o
   // que fez no painel da clínica, com o IP e o e-mail (o dono vê o mesmo em Conta › Acessos recentes, sem o IP). Só com a ficha completa ligada.

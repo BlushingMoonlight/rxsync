@@ -25,7 +25,7 @@ function montarNav() {
   const ativa = secaoAtiva(); const naAba = SECOES.some(s => s.aba && s.id === ativa);
   const cont = id => est.contadores[id] ? el('span', { class: 'contador', text: est.contadores[id], 'aria-label': est.contadores[id] + ' pendências' }) : null;
   const lat = $('lateral');
-  trocar(lat, el('div', { class: 'cab' }, el('div', { class: 'marca', text: 'RX' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
+  trocar(lat, el('div', { class: 'cab' }, el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
     el('button', { class: 'btn-ic', type: 'button', 'aria-label': est.recolhida ? 'Abrir o menu' : 'Recolher o menu', 'aria-expanded': String(!est.recolhida), onclick: () => { est.recolhida = !est.recolhida; $('app').classList.toggle('recolhida', est.recolhida); montarNav(); } }, icone(est.recolhida ? 'expandir' : 'recolher'))));
   let grupo = '';
   for (const s of SECOES.filter(visivel)) {
@@ -35,7 +35,7 @@ function montarNav() {
   }
   lat.append(el('div', { class: 'rodape' }, el('button', { class: 'item-nav', type: 'button', 'aria-label': est.recolhida ? 'Sair' : null, onclick: sair }, icone('sair'), el('span', { class: 'rotulo', text: 'Sair' }))));
   const principais = SECOES.filter(s => s.aba);
-  trocar($('trilho'), el('div', { class: 'marca', text: 'RX', 'aria-hidden': 'true' }),
+  trocar($('trilho'), el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
     ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
     el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
     el('button', { type: 'button', onclick: sair }, icone('sair', 'g'), 'Sair'));
@@ -47,7 +47,7 @@ function montarNav() {
 function topo(titulo, caminho, voltar) {
   document.title = titulo + ' · Central RXSync';
   trocar($('topo'), 
-    voltar ? el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Voltar', onclick: () => ir(voltar) }, icone('voltar')) : el('div', { class: 'marca marca-topo', text: 'RX', 'aria-hidden': 'true' }),
+    voltar ? el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Voltar', onclick: () => ir(voltar) }, icone('voltar')) : el('img', { class: 'marca marca-topo', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
     el('div', { class: 'titulo', text: titulo }),
     el('nav', { class: 'migalhas', 'aria-label': 'Onde estou' }, el('ol', {}, caminho.map(([nome, rota], i) => el('li', {}, i ? icone('seta', 'p') : null,
       rota ? el('a', { href: '#' + rota, text: nome }) : el('span', { 'aria-current': 'page', text: nome }))))),
