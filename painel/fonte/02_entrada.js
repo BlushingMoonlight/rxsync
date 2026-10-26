@@ -8,7 +8,8 @@ function entTela(id, titulo, sub, msg, erro) {
   ENT_TELAS.forEach(t => { $(t).hidden = t !== id; });
   $('entTitulo').textContent = titulo; $('entSub').textContent = sub;
   entMsg(msg || '', erro);
-  const p = $(id).querySelector('input'); if (p) setTimeout(() => { try { p.focus(); } catch (e) {} }, 30);
+  // o cursor vai já para o primeiro campo, e nunca sai de um campo que a pessoa já começou a usar
+  const p = $(id).querySelector('input'); if (p && !$(id).contains(document.activeElement)) { try { p.focus(); } catch (e) {} }
 }
 function entOcupado(form, sim) { form.querySelectorAll('button, input').forEach(x => { x.disabled = sim; }); }
 function entInicio(msg, erro) { entTela('entEntrar', 'Entrar no painel', 'Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.', msg, erro); }

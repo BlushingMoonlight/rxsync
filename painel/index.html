@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-u2eHSMT1WROGBFonu7MS0//oFSjHIRFjjyR2XcA45PA=' 'self'; style-src 'sha256-VQqe9uFOB4Q2FpltUy5Sq4QteKZ6pdn6oBCmpwqJoo8=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0hU6XqWmFBiNojonx8Df3zcnwHezxCitjG34VTxFzmc=' 'self'; style-src 'sha256-VQqe9uFOB4Q2FpltUy5Sq4QteKZ6pdn6oBCmpwqJoo8=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -800,7 +800,8 @@ function entTela(id, titulo, sub, msg, erro) {
   ENT_TELAS.forEach(t => { $(t).hidden = t !== id; });
   $('entTitulo').textContent = titulo; $('entSub').textContent = sub;
   entMsg(msg || '', erro);
-  const p = $(id).querySelector('input'); if (p) setTimeout(() => { try { p.focus(); } catch (e) {} }, 30);
+  // o cursor vai já para o primeiro campo, e nunca sai de um campo que a pessoa já começou a usar
+  const p = $(id).querySelector('input'); if (p && !$(id).contains(document.activeElement)) { try { p.focus(); } catch (e) {} }
 }
 function entOcupado(form, sim) { form.querySelectorAll('button, input').forEach(x => { x.disabled = sim; }); }
 function entInicio(msg, erro) { entTela('entEntrar', 'Entrar no painel', 'Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.', msg, erro); }
