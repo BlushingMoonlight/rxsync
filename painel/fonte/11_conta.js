@@ -156,7 +156,12 @@ const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integraçã
   ['Agrupar pacientes', 'Agenda › Horários › Regras da agenda', 'agenda/horarios/regras'],
   ['Pacientes › importar e duplicados', 'Pacientes › ⋯ › Organizar', 'pacientes/organizar'],
   ['Resultados', 'Hoje › Ver resultados', 'resultados'],
-  ['Assinatura', 'Conta › Plano e pagamento', 'conta/assinatura']];
+  ['Assinatura', 'Conta › Plano e pagamento', 'conta/assinatura'],
+  ['Agenda › Espera ("Fila de espera")', 'Agenda › Lista de espera', 'agenda/espera'],
+  ['Escrever "BLOQUEIO" no serviço de uma consulta', 'Agenda › ⋯ Mais › Bloquear horário', 'agenda'],
+  ['Conta › WhatsApp', 'Conta › Assinatura e WhatsApp › WhatsApp da clínica', 'conta/whatsapp'],
+  ['Conta › Equipe e Acessos recentes', 'Conta › Pessoas', 'conta/equipe'],
+  ['Conta › Baixar meus dados', 'Conta › Dados e contrato › Baixar meus dados', 'conta/dados']];
 tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
   el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
     el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),
