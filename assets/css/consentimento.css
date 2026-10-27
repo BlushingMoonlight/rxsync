@@ -13,6 +13,11 @@
 .rxc-chat svg{width:20px;height:20px}
 .rxc-chat[aria-busy="true"]{opacity:.8;cursor:progress}
 .rxc-aviso button:focus-visible,.rxc-chat:focus-visible,.rxc-aviso a:focus-visible{outline:3px solid #0A5148;outline-offset:2px}
+@media (max-width:559px){
+  .rxc-aviso{left:8px;right:8px;bottom:8px;padding:10px 12px;font-size:14px;line-height:1.4;border-radius:12px}
+  .rxc-aviso p{margin:0 0 8px}
+  .rxc-acoes button{flex:1 1 0;padding:0 8px}
+}
 @media (max-width:1023px){
   .rxc-chat span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
   .rxc-chat{padding:0;width:52px;justify-content:center}
