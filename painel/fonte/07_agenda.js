@@ -191,9 +191,26 @@ function consultaItem(a) {
     Array.isArray(a.preconsulta) && a.preconsulta.length ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Respostas antes da consulta' }),
       a.preconsulta.map(q => el('p', { class: 'quebra' }, el('b', { text: (q.pergunta || '') + ' ' }), q.resposta || ''))) : null,
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
+    !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }), btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')) : null,
     !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
     ativa && !externa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
     !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
+}
+// A conversa da consulta (S5, rxsync-sistema sql/077): só leitura, lida no Chatwoot na hora em que se toca (nada fica
+// guardado). As últimas 20 mensagens, sem as notas internas: paciente de um lado, a assistente e a equipe do outro.
+function agConversaVer(a, caixa) {
+  const leg = el('p', { class: 'legenda', text: 'Conversa com a assistente' });
+  trocar(caixa, leg, esqueleto());
+  d24('agenda_conversa', { id: a.id }).then(r => {
+    r = r || {};
+    if (!r.ok) { trocar(caixa, leg, el('p', { class: 'mudo', text: r.mensagem || 'Não consegui ler a conversa agora. Tente de novo em instantes.' })); return; }
+    const ms = r.mensagens || [];
+    if (r.sem_conversa || !ms.length) { trocar(caixa, leg, el('p', { class: 'mudo', text: r.sem_conversa ? 'Esta consulta não veio de uma conversa com a assistente.' : 'A conversa não tem mensagens para mostrar.' })); return; }
+    const quem = { paciente: 'Paciente', assistente: 'Assistente', equipe: 'Equipe' };
+    trocar(caixa, leg, el('ol', { class: 'conversa-linha', 'aria-label': 'Conversa, da mais antiga para a mais nova' }, ms.map(m => el('li', { class: m.de === 'paciente' ? 'entrou' : 'saiu' },
+      el('span', { class: 'quem', text: (quem[m.de] || '') + (m.em ? ' · ' + fmt(m.em) : '') }), el('p', { class: 'quebra', text: m.texto })))),
+      el('p', { class: 'dica', text: ms.length >= 20 ? 'As últimas 20 mensagens. A conversa inteira fica no WhatsApp da clínica.' : 'Só para ler. Para responder, use o WhatsApp da clínica.' }));
+  }).catch(() => trocar(caixa, leg, el('p', { class: 'mudo', text: 'Não consegui ler a conversa agora. Tente de novo em instantes.' })));
 }
 async function agEnviarLink(a, botao) {
   if (!(await confirmar({ titulo: 'Enviar o link de pagamento?', texto: 'Vai agora para ' + a.nome_paciente + ' pelo WhatsApp da clínica, com o mesmo texto da assistente.', botao: 'Enviar link' }))) return;

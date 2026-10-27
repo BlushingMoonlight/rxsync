@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Xsn/5yvBkJpI970cou/j+vB7pCU+kH/ks6ctXyGJQOE=' 'self'; style-src 'sha256-SIsX5EFKKVh2ahqP2IwIWW5syXfQwiG1nlHU73PTFZ8=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wVUdmniuWt7vNF2PEy6qRUAvrPkhsopCGCttrWGxHRE=' 'self'; style-src 'sha256-8t6oT12cKjNb1/buAA4RgGvEYmCMr7X+BXCSO7EPeiQ=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -348,6 +348,11 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 .acoes-rapidas .btn { flex: 1 1 140px; }
 .caixa-texto { background: var(--superficie-2); border-radius: var(--r-cartao); padding: var(--e-3) var(--e-4); margin-bottom: var(--e-3); }
 .caixa-texto .legenda { margin-bottom: 4px; }
+.conversa-linha { list-style: none; margin: var(--e-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--e-2); }
+.conversa-linha li { max-width: 88%; padding: var(--e-2) var(--e-3); border-radius: var(--r-cartao); background: var(--superficie); border: 1px solid var(--borda); }
+.conversa-linha li.saiu { align-self: flex-end; background: var(--primaria-suave); border-color: transparent; }
+.conversa-linha .quem { display: block; font-size: var(--t-peq); color: var(--texto-2); }
+.conversa-linha p { margin: 2px 0 0; }
 
 /* calendário (variante da Lista) */
 .cal { border: 1px solid var(--borda); border-radius: var(--r-cartao); background: var(--superficie); overflow: auto; }
@@ -1880,9 +1885,26 @@ function consultaItem(a) {
     Array.isArray(a.preconsulta) && a.preconsulta.length ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Respostas antes da consulta' }),
       a.preconsulta.map(q => el('p', { class: 'quebra' }, el('b', { text: (q.pergunta || '') + ' ' }), q.resposta || ''))) : null,
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
+    !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }), btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')) : null,
     !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
     ativa && !externa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
     !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
+}
+// A conversa da consulta (S5, rxsync-sistema sql/077): só leitura, lida no Chatwoot na hora em que se toca (nada fica
+// guardado). As últimas 20 mensagens, sem as notas internas: paciente de um lado, a assistente e a equipe do outro.
+function agConversaVer(a, caixa) {
+  const leg = el('p', { class: 'legenda', text: 'Conversa com a assistente' });
+  trocar(caixa, leg, esqueleto());
+  d24('agenda_conversa', { id: a.id }).then(r => {
+    r = r || {};
+    if (!r.ok) { trocar(caixa, leg, el('p', { class: 'mudo', text: r.mensagem || 'Não consegui ler a conversa agora. Tente de novo em instantes.' })); return; }
+    const ms = r.mensagens || [];
+    if (r.sem_conversa || !ms.length) { trocar(caixa, leg, el('p', { class: 'mudo', text: r.sem_conversa ? 'Esta consulta não veio de uma conversa com a assistente.' : 'A conversa não tem mensagens para mostrar.' })); return; }
+    const quem = { paciente: 'Paciente', assistente: 'Assistente', equipe: 'Equipe' };
+    trocar(caixa, leg, el('ol', { class: 'conversa-linha', 'aria-label': 'Conversa, da mais antiga para a mais nova' }, ms.map(m => el('li', { class: m.de === 'paciente' ? 'entrou' : 'saiu' },
+      el('span', { class: 'quem', text: (quem[m.de] || '') + (m.em ? ' · ' + fmt(m.em) : '') }), el('p', { class: 'quebra', text: m.texto })))),
+      el('p', { class: 'dica', text: ms.length >= 20 ? 'As últimas 20 mensagens. A conversa inteira fica no WhatsApp da clínica.' : 'Só para ler. Para responder, use o WhatsApp da clínica.' }));
+  }).catch(() => trocar(caixa, leg, el('p', { class: 'mudo', text: 'Não consegui ler a conversa agora. Tente de novo em instantes.' })));
 }
 async function agEnviarLink(a, botao) {
   if (!(await confirmar({ titulo: 'Enviar o link de pagamento?', texto: 'Vai agora para ' + a.nome_paciente + ' pelo WhatsApp da clínica, com o mesmo texto da assistente.', botao: 'Enviar link' }))) return;
