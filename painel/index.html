@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mIuw244tYBG8O+z9jk+NVONJshw+V33h7d2YiWGYDhE=' 'self'; style-src 'sha256-dMNBtko//P2P12r1RJvm4Zwj7PmT/iv6rsAOf1x3Ijk=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xHB1eInP3YY/IRG8/phi4NwRh7SN4CghBtKum/ozOno=' 'self'; style-src 'sha256-dMNBtko//P2P12r1RJvm4Zwj7PmT/iv6rsAOf1x3Ijk=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1818,6 +1818,9 @@ function consultaItem(a) {
   if (podePagar(a)) rapidas.push(btn(a.pago_em ? 'Desmarcar paga' : 'Marcar como paga', () => agPagar(a, !a.pago_em), 'sec', a.pago_em ? 'fechar' : 'dinheiro'));
   if (ativa && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
   if (ativa && !externa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
+  // S10 e S13 (rxsync-sistema sql/066): desmarcar "vista" e desfazer o cancelamento (o servidor confere o horário livre).
+  if (ativa && !bloq && a.visto) rapidas.push(btn('Marcar como não vista', () => agVistoDesfazer(a), 'sec', 'sino'));
+  if (!ativa && !bloq && !externa && !a.no_externo && new Date(a.inicio).getTime() > Date.now()) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
   const dadosL = [['Quando', fmtQuando(a.inicio) + ' até ' + fmt(a.fim).slice(-5)], bloq ? null : ['Serviço', a.servico], a.medico_id ? ['Médico', medNome(a.medico_id)] : null,
     bloq ? null : ['Telefone', pacTel(a.telefone_paciente)], bloq ? null : ['Marcada por', externa ? 'o ' + plat : a.criado_por === 'ia' ? 'a assistente' : 'a equipe'],
     a.pagamento_link_enviado_em ? ['Link de pagamento', 'enviado em ' + fmt(a.pagamento_link_enviado_em)] : null].filter(x => x && x[1]);
@@ -1848,6 +1851,22 @@ async function agCancelar(a) {
   if (a.no_externo) textos.push('Essa consulta também está no ' + (a.externo_plataforma === 'reservio' ? 'Reservio' : a.externo_plataforma) + ': cancele lá também.');
   if (!(await confirmar({ titulo: bloq ? 'Desbloquear o horário?' : 'Cancelar a consulta?', texto: textos, botao: bloq ? 'Desbloquear' : 'Cancelar consulta', perigo: true }))) return;
   d24('agenda_cancelar', { id: a.id }).then(() => { rapida(bloq ? 'Horário desbloqueado.' : 'Consulta cancelada.'); consultaFechar(); agCarregar(); }).catch(() => rapida('Não consegui cancelar.'));
+}
+// Desmarcar "vista" (S10): a consulta volta a aparecer como nova em Hoje e no filtro Novos; fecha a consulta, porque abrir de
+// novo marca como vista (decisão 8).
+function agVistoDesfazer(a) {
+  d24('agenda_visto_desfazer', { id: a.id }).then(r => {
+    if (!(r && r.ok)) { rapida('Não consegui desmarcar.'); return; }
+    a.visto = false; rapida('A consulta volta a aparecer como nova.'); consultaFechar(); agSelo(); agRender(); hojeRender();
+  }).catch(() => rapida('Não consegui desmarcar.'));
+}
+// Desfazer o cancelamento (S13, nível 2): só com o horário livre e no futuro; a recusa vem do servidor com o motivo.
+async function agCancelarDesfazer(a) {
+  if (!(await confirmar({ titulo: 'Desfazer o cancelamento?', texto: ['A consulta de ' + a.nome_paciente + ' volta para ' + fmtQuando(a.inicio) + ', se o horário ainda estiver livre.', 'Nenhuma mensagem vai ao paciente. Se ele já sabia do cancelamento, avise pelo WhatsApp.'], botao: 'Desfazer o cancelamento' }))) return;
+  d24('agenda_cancelar_desfazer', { id: a.id }).then(r => {
+    if (r && r.ok) { rapida('Cancelamento desfeito: a consulta voltou.'); consultaFechar(); agCarregar(); }
+    else rapida((r && r.mensagem) || 'Não consegui desfazer o cancelamento.', { ms: 9000 });
+  }).catch(() => rapida('Não consegui desfazer o cancelamento.'));
 }
 async function agExcluir(a) {
   const futuro = new Date(a.inicio).getTime() > Date.now();
