@@ -3,7 +3,8 @@
 //   1. S1: com conta.atendendo_teste no "abrir", a faixa "Atendendo só no teste" aparece já ao abrir (sem tocar em
 //      "Testar"); sem ele, não aparece;
 //   2. S3: Hoje › Precisa de você mostra no alto quem pediu uma pessoa ou teve urgência (a urgência com o selo, o motivo,
-//      "Abrir no WhatsApp" com o número certo); "Resolvido" manda agenda_chamado_resolver só com o id e tira a linha;
+//      "Abrir no WhatsApp" com o número certo; P4: a hora em que a assistente volta a responder, ou que ela continua
+//      respondendo); "Resolvido" manda agenda_chamado_resolver só com o id e tira a linha;
 //   3. a faixa do teste (DEC-166): com recursos.teste_gestao, diz que tudo do plano Gestão está liberado no teste.
 // Uso (precisa do Playwright): node scripts/painel_precisam.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
@@ -13,8 +14,8 @@ const SESSAO = 'a'.repeat(64);
 const chamadas = []; const estado = { teste: true, situacao: '', teste_gestao: false };
 const agora = m => new Date(Date.now() - m * 60000).toISOString();
 const CHAMADOS = [
-  { id: 31, urgente: true, nome_paciente: 'Rosa Lima', telefone: '5541999990001', motivo: 'Dor forte no peito desde cedo', aviso_enviado: true, criado_em: agora(5) },
-  { id: 32, urgente: false, nome_paciente: '', telefone: '5541988880002', motivo: 'Quer falar sobre o convênio', aviso_enviado: false, criado_em: agora(90) }];
+  { id: 31, urgente: true, nome_paciente: 'Rosa Lima', telefone: '5541999990001', motivo: 'Dor forte no peito desde cedo', aviso_enviado: true, criado_em: agora(5), volta_em: agora(-115) },
+  { id: 32, urgente: false, nome_paciente: '', telefone: '5541988880002', motivo: 'Quer falar sobre o convênio', aviso_enviado: false, criado_em: agora(90), volta_em: null }];
 function responder(url, h, b) {
   const caminho = url.slice(N8N.length);
   chamadas.push({ caminho, acao: b.acao, sessao: h['x-rxsync-painel'] || '', dados: b.dados || {} });
@@ -55,6 +56,8 @@ ok(await linhas.count() === 2, 'S3: os 2 chamados aparecem em Precisa de você')
 const l1 = linhas.nth(0), l2 = linhas.nth(1);
 ok((await l1.textContent()).includes('Urgência') && (await l1.textContent()).includes('Rosa Lima') && (await l1.textContent()).includes('Dor forte no peito'), 'S3: a urgência vem primeiro, com o selo, o nome e o motivo');
 ok((await l2.textContent()).includes('Pediu para falar com alguém: (41) 98888-0002') && (await l2.textContent()).includes('não chegou'), 'S3: sem nome, aparece o telefone; o aviso que não chegou é dito');
+ok(/a assistente volta a responder (amanhã )?às \d\d:\d\d/.test(await l1.textContent()), 'P4: diz a hora em que a assistente volta a responder');
+ok((await l2.textContent()).includes('a assistente continua respondendo'), 'P4: sem volta_em, diz que a assistente continua respondendo');
 ok(await l1.locator('a', { hasText: 'Abrir no WhatsApp' }).getAttribute('href') === 'https://wa.me/5541999990001', 'S3: "Abrir no WhatsApp" com o número do paciente');
 await l1.getByRole('button', { name: 'Resolvido' }).click();
 await page.locator('#toast', { hasText: 'resolvido' }).waitFor();
