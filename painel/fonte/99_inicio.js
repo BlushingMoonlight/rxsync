@@ -22,6 +22,7 @@ function abrirPainel(termos) {
     }
     if (resp.limite_catalogo) LIMITE_CATALOGO = resp.limite_catalogo;
     CONTA = resp.conta || {};
+    TESTE.aberto = CONTA.atendendo_teste === true;   // S1 (rxsync-sistema#203): a faixa "Atendendo só no teste" já ao abrir
     aplicarFuso(VAL.fuso_horario);
     document.querySelectorAll('[data-nome-clinica]').forEach(x => { x.textContent = VAL.nome_exibicao || 'Sua clínica'; });
     montarNav();

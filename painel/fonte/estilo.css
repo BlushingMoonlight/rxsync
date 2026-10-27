@@ -156,6 +156,8 @@ button.linha:active, a.linha:active { background: var(--superficie-2); }
 .linha .seta { color: var(--texto-2); flex: none; }
 .linha .ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--r-botao); background: var(--superficie-2); color: var(--texto-2); flex: none; }
 .linha.selecionada { background: var(--primaria-suave); }
+.linha.chamado { align-items: flex-start; padding-block: var(--e-3); }
+.linha.chamado .linha-botoes { margin-top: var(--e-2); }
 /* linha de consulta: a área que abre a consulta é um botão; o selo "Paga" fica fora dele (botão dentro de botão não vale) */
 .linha .linha-abrir { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--e-3); min-height: 44px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .linha > .etq { flex: none; min-height: var(--alvo); padding: 0 var(--e-3); border: 0; cursor: pointer; }
