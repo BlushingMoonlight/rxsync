@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-T4ib+sVZUdZMgqvjDTObRH0FuZmVcJilS8cb0ww2gho=' 'self'; style-src 'sha256-pym3lUqkYtcKyC6ilHnv/65OHoBTpm4lOiQjJapZL58=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-bTC7lFINWKLGMzKwAo+7d9lwoHiIFJDmNNilv/luhZw=' 'self'; style-src 'sha256-pym3lUqkYtcKyC6ilHnv/65OHoBTpm4lOiQjJapZL58=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1060,10 +1060,12 @@ function pausada() { return !!(PAUSA && PAUSA.ativo === false && PAUSA.status ==
 function pausaQuando(t) { const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/.exec(t || ''); return m ? m[3] + '/' + m[2] + ' às ' + m[4] : ''; }
 function estadoAssistente() {
   const c = CONTA || {}, s = c.situacao;
+  // DEC-166 (rxsync-sistema sql/068): o teste novo libera tudo do Gestão; o servidor diz em recursos.teste_gestao.
+  const gestaoNoTeste = REC && REC.teste_gestao === true ? ' Durante o teste, tudo do plano Gestão está liberado.' : '';
   if (pausada()) return { ponto: 'off', curto: 'Assistente pausada', t1: 'A assistente está pausada', t2: 'As mensagens dos pacientes chegam para a equipe responder; lembretes e avisos automáticos também param.' };
   if (TESTE.aberto) return { ponto: 'alerta', curto: 'Atendendo só no teste', t1: 'Atendendo só no teste', t2: 'A assistente não está respondendo no WhatsApp da clínica enquanto o teste estiver aberto.' };
-  if (s === 'em_teste') { const d = c.dias_restantes; return { ponto: 'on', curto: 'Em teste grátis', t1: 'Teste grátis: ' + (d === 0 ? 'termina hoje' : d === 1 ? 'termina amanhã' : d == null ? 'em andamento' : 'faltam ' + d + ' dias'), t2: 'A assistente está atendendo no WhatsApp da clínica.', cartao: true, acao: ['Pagar', 'conta/assinatura'] }; }
-  if (s === 'teste_aguardando') return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'Os 7 dias de teste só começam a contar quando a assistente entrar no ar.', cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
+  if (s === 'em_teste') { const d = c.dias_restantes; return { ponto: 'on', curto: 'Em teste grátis', t1: 'Teste grátis: ' + (d === 0 ? 'termina hoje' : d === 1 ? 'termina amanhã' : d == null ? 'em andamento' : 'faltam ' + d + ' dias'), t2: 'A assistente está atendendo no WhatsApp da clínica.' + gestaoNoTeste, cartao: true, acao: ['Pagar', 'conta/assinatura'] }; }
+  if (s === 'teste_aguardando') return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'Os 7 dias de teste só começam a contar quando a assistente entrar no ar.' + gestaoNoTeste, cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
   if (s === 'teste_encerrado') return { ponto: 'off', curto: 'Assistente parada', t1: 'O teste terminou e a assistente está parada', t2: 'As mensagens chegam para a sua equipe. Seus dados ficam guardados por 15 dias.', cartao: true, acao: ['Pagar o teste agora', 'conta/assinatura'] };
   if (s === 'suspenso') return { ponto: 'off', curto: 'Assistente suspensa', t1: 'Assistente suspensa por falta de pagamento', t2: 'As mensagens chegam para a sua equipe. Ela volta sozinha assim que o pagamento cair.', acao: ['Pagar', 'conta/assinatura'] };
   if (c.no_ar === false) return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'A assistente começa a atender assim que o número for conectado.', cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
