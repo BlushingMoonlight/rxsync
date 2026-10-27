@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sEB/hhlP/RuJxOnfVtauhPEaHz7U+Qu/mOBlDkHpVjY=' 'self'; style-src 'sha256-rtLjTUOSlLAW6wqGH7RUIpmUpB1NeeZTwazvfGgpLiU=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sEB/hhlP/RuJxOnfVtauhPEaHz7U+Qu/mOBlDkHpVjY=' 'self'; style-src 'sha256-88Y7g1g8hZ0d25KTSN/ezgZPe/a0v93pEM8JgpGM9Eo=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -47,7 +47,8 @@
   --r-marcar: 6px; --r-botao: 8px; --r-cartao: 12px; --r-janela: 16px; --r-capsula: 999px;
   --alvo: 44px; --alvo-principal: 48px; --barra-h: 64px;
   --mov: 200ms; --mov-salvo: 450ms;
-  color-scheme: light;
+  /* "only": o escurecimento automático do Android (Chrome e Samsung Internet) não escurece a página sozinho */
+  color-scheme: only light;
 }
 /* cores do modo escuro: só quando a pessoa escolhe (nunca pelo aparelho sozinho) */
 :root[data-tema="escuro"] {

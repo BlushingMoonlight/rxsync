@@ -19,10 +19,11 @@ const DADOS = { clinica: 'Instituto Bem Estar Integrado', tratamento: 'Dra.', me
 // Workflow 43 simulado: guarda cada pedido em "pedidos".
 function simular(pedidos) {
   return async route => {
+    // A consulta prévia (OPTIONS) não é pedido: o Safari a manda por aqui; o Chrome, não.
+    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST' } });
     let b = {}; try { b = JSON.parse(route.request().postData() || '{}'); } catch {}
     pedidos.push({ ...b, _cab: route.request().headers() });
     const r = o => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(o) });
-    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST' } });
     if (b.codigo === INATIVO) return r({ ok: false, inativo: true });
     if (b.codigo === FORA) return r({ ok: false, motivo: 'indisponivel' });
     if (b.tipo === 'abrir') return r({ ok: true, dados: DADOS });
