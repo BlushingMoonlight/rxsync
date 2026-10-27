@@ -71,6 +71,10 @@ await semBloqueio(page, 'Dúvidas, planos e os botões do formulário');
 await page.selectOption('#mt_especialidade', { index: 1 });
 await page.fill('#mt_clinica', 'Clínica Teste'); await page.fill('#mt_profissionais', 'Dra. Teste'); await page.fill('#mt_telefone', '41999990000');
 await page.locator('#mtForm button[type="submit"], #mtBtn').first().click();
+// No Safari do Playwright, às vezes o toque não chega ao formulário (o botão nem passa a "Preparando…"): toca de novo, uma vez.
+if (!await page.locator('#mtTeste').isVisible() && !await page.locator('#mtBtn').isDisabled()) {
+  await page.locator('#mtTeste').waitFor({ state: 'visible', timeout: 4000 }).catch(() => page.locator('#mtBtn').click());
+}
 await page.locator('#mtTeste').waitFor({ state: 'visible' });
 await page.fill('#mtTexto', 'Quero marcar uma consulta'); await page.click('#mtEnv');
 await page.getByText('Olá! Posso ajudar a marcar uma consulta.').waitFor();
