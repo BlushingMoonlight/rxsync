@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sEB/hhlP/RuJxOnfVtauhPEaHz7U+Qu/mOBlDkHpVjY=' 'self'; style-src 'sha256-pym3lUqkYtcKyC6ilHnv/65OHoBTpm4lOiQjJapZL58=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-T4ib+sVZUdZMgqvjDTObRH0FuZmVcJilS8cb0ww2gho=' 'self'; style-src 'sha256-pym3lUqkYtcKyC6ilHnv/65OHoBTpm4lOiQjJapZL58=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -2458,11 +2458,11 @@ function preForm(p) {
 }
 
 // ---------------------------------------------------------------- Feriados (E): um controle só na tela (decisão 7) e a cidade do atendimento
-// Grava as duas chaves de hoje (func_feriados e o "Não atender" de Feriados); juntá-las no banco fica para o servidor.
+// Uma chave só (rxsync-sistema sql/072, S12): o func_feriados do cadastro; o "ativo" que o servidor manda em Feriados vem dela.
 const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 const FACULTATIVOS = [['carnaval', 'Carnaval (segunda e terça)'], ['cinzas', 'Quarta-feira de Cinzas'], ['quinta_santa', 'Quinta-feira Santa'], ['corpus_christi', 'Corpus Christi'], ['vespera_natal', 'Véspera de Natal (24/12)'], ['vespera_ano_novo', 'Véspera de Ano Novo (31/12)']];
 const FER = { cfg: null, prox: [], municipios: {} };
-const feriadosLigados = () => ligado('func_feriados') && (!FER.cfg || FER.cfg.ativo !== false);
+const feriadosLigados = () => ligado('func_feriados');
 function ferCidades(uf) {
   if (!uf) return Promise.resolve([]);
   if (FER.municipios[uf]) return Promise.resolve(FER.municipios[uf]);
@@ -2473,17 +2473,13 @@ tela('agenda/horarios/feriados', {
   montar: () => [cabTela('Feriados', { voltar: VOLTA_HOR, sub: 'A assistente não oferece horários em feriados nacionais, do seu estado e da sua cidade.' }), el('div', { id: 'ferBox' }, el('div', { class: 'cartao' }, esqueleto()))],
   entrar: () => ferCarregar().then(ferRender)
 });
-function ferDados(ativo) {
-  const c = FER.cfg || {};
-  return { ativo, uf: c.uf || '', codigo_ibge: c.codigo_ibge ? String(c.codigo_ibge) : '', cidade: c.cidade || '', facultativos: c.facultativos || [], atende_em: FER.prox.filter(x => x.atende).map(x => x.data) };
-}
 function ferRender() {
   const box = $('ferBox'); if (!box) return;
   if (FER.erro && !FER.cfg) { trocar(box, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'Os feriados não carregaram agora.'))); return; }
   const cfg = FER.cfg || {};
   const { sw } = chaveEl('feriados', 'Não atender em feriados', { semId: true, valor: feriadosLigados, aoMudar: async lig => {
     if (!(await salvarCampo('func_feriados', lig ? 'SIM' : ''))) return false;
-    try { const r = await d24('agenda_feriados_salvar', ferDados(lig)); if (r && r.ok === false) return false; FER.cfg.ativo = lig; } catch (e) { return false; }
+    FER.cfg.ativo = lig;
     rapida(lig ? 'Ligado: não atende em feriados.' : 'Desligado: atende em feriados.'); ferRender(); horIndice(); return true;
   } });
   const topo = el('div', { class: 'cartao campos bloco' }, el('div', { class: 'chave-linha' }, el('div', { class: 'tx' }, el('div', { class: 't1', text: 'Não atender em feriados' }), el('p', { class: 'dica', text: 'A agenda pula sozinha os feriados da cidade da clínica.' })), sw));
