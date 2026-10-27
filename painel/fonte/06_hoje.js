@@ -130,6 +130,9 @@ function resultadosCarregar() {
       indicador('Tempo da 1ª resposta', resTempo(a.tempo_resposta_seg), 'média no período', resDelta(a.tempo_resposta_seg, ant('tempo_resposta_seg'), true)),
       indicador('Confirmaram presença', a.com_lembrete ? a.presenca_confirmada + ' de ' + a.com_lembrete : '—', 'consultas que receberam lembrete', resDelta(pct(a.presenca_confirmada, a.com_lembrete), p ? pct(p.presenca_confirmada, p.com_lembrete) : null)),
       indicador('Cancelamentos', fmtNum(a.canceladas), 'consultas canceladas no período', resDelta(a.canceladas, ant('canceladas'), true))];
+    // S4 (rxsync-sistema sql/075): a taxa de faltas, só entre as consultas com "Chegou" ou "Faltou" marcado pela equipe.
+    if (a.faltaram != null) nums.push(indicador('Taxa de faltas', a.taxa_faltas == null ? '—' : String(a.taxa_faltas).replace('.', ',') + '%',
+      a.taxa_faltas == null ? 'marque "Chegou" ou "Faltou" nas consultas que já passaram' : a.faltaram + ' de ' + pl(a.chegaram + a.faltaram, 'consulta marcada', 'consultas marcadas'), resDelta(a.taxa_faltas, ant('taxa_faltas'), true)));
     if (r.tem_fila !== false && a.fila_entradas != null) nums.push(indicador('Entraram na lista de espera', fmtNum(a.fila_entradas), '', resDelta(a.fila_entradas, ant('fila_entradas'))),
       indicador('Vagas repostas', fmtNum(a.vagas_repostas), 'cancelamentos preenchidos pela lista', resDelta(a.vagas_repostas, ant('vagas_repostas'))));
     if (r.pesquisa && r.pesquisa.enviadas) { const ps = r.pesquisa; nums.push(indicador('Nota média dos pacientes', ps.media == null ? '—' : String(ps.media).replace('.', ',') + ' / 10', ps.respondidas + ' de ' + ps.enviadas + ' responderam à pesquisa'),
