@@ -34,7 +34,7 @@ export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odo
   mensagens_mes: 1200, uso_30d: dias(30, (d, i) => ({ dia: d, recebidas: 10 + i, enviadas: 12 + i })), medicos_ativos: 2, whatsapp: { estado: 'open', desde: '2026-10-05T10:00:00Z' },
   integracao: { plataforma: 'reservio', ativo: true, ultimo_erro: '' }, chaves_api_ativas: 0, avisos_eventos: { ativo: true, servidor: 'api.exemplo.com' },
   ultimos_avisos: [{ recebido_em: '2026-10-15T10:00:00Z', categoria: 'clientes', tipo: 'no_ar' }], pode_reenviar_onboarding: true, suspensao_motivo: '',
-  pausa_painel: null, conversas_envios: [{ pedido_em: '2026-10-22 10:00', situacao: 'enviado', enviado_em: '2026-10-22 10:12', mensagens: 1840, erro: null },
+  pausa_painel: null, pedido_ajuda_agenda: '2026-10-27T13:30:00Z', conversas_envios: [{ pedido_em: '2026-10-22 10:00', situacao: 'enviado', enviado_em: '2026-10-22 10:12', mensagens: 1840, erro: null },
     { pedido_em: '2026-10-20 15:30', situacao: 'falhou', enviado_em: null, mensagens: null, erro: 'O e-mail do cadastro recusou o anexo.' }],
   completa: { campos: { nome_exibicao: 'Clínica Sorriso', servicos: 'Limpeza e clareamento', fuso_horario: 'America/Sao_Paulo', func_fila: 'SIM', pesquisa_ativa: '', franquia_mensagens: '', limitar_franquia: '',
       dono_limite_dia: '', relac_limite_dia: '', limite_info_extra: '', envio_limite_dia: '' },
