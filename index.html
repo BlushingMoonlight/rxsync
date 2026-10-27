@@ -498,6 +498,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .implant { max-width: 760px; margin: 28px auto 0; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 24px; }
 .implant h3 { font-size: 17px; letter-spacing: -0.01em; }
 .implant p { color: var(--ink-2); font-size: 15px; margin-top: 6px; }
+.implant ul { list-style: disc; margin: 10px 0 0; padding-left: 20px; color: var(--ink-2); font-size: 15px; }
+.implant li + li { margin-top: 4px; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -823,7 +825,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Por que existe a implantação de R$ 999?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Ela paga a configuração da assistente com o conteúdo da sua clínica, a conexão do número e o treinamento da equipe. É cobrada uma vez só, no plano mensal, e só se você continuar depois do teste. No plano anual, não há implantação."
+            "text": "Ela paga o trabalho de colocar a assistente para funcionar na sua clínica: configurar com as suas regras (serviços, valores, convênios, profissionais e horários), conectar o WhatsApp da clínica, treinar a equipe a distância (até 90 minutos) e uma rodada de ajustes finos no primeiro mês. É cobrada uma vez só, no plano mensal: no teste grátis, só se você continuar, junto com a primeira mensalidade; sem o teste, depois que a implantação fica pronta e você aprova. Trocar de plano não cobra de novo. No plano anual, a implantação é isenta (se sair antes dos 12 meses, ela é cobrada)."
           }
         },
         {
@@ -1390,7 +1392,13 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 
     <div class="implant">
       <h3>O que a implantação de R$ 999 inclui</h3>
-      <p>Configuração da assistente com o conteúdo da sua clínica, conexão do número e treinamento da equipe (até 90 minutos). Só é cobrada se você continuar depois do teste, junto com a primeira mensalidade. No plano anual, não há implantação.</p>
+      <ul>
+        <li>Configurar a assistente com as regras da sua clínica: serviços, valores, convênios, profissionais e horários.</li>
+        <li>Conectar o WhatsApp da clínica.</li>
+        <li>Treinar a equipe, a distância, em até 90 minutos.</li>
+        <li>Uma rodada de ajustes finos no primeiro mês.</li>
+      </ul>
+      <p>É cobrada uma vez só, no plano mensal: no teste grátis, só se você continuar, junto com a primeira mensalidade; sem o teste, depois que a implantação fica pronta e você aprova. Trocar de plano não cobra de novo. No plano anual, a implantação é isenta (se sair antes dos 12 meses, ela é cobrada).</p>
     </div>
 
     <div class="planos-rodape">
@@ -1507,7 +1515,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <div class="faq-panel hidden" id="faq-panel-3" role="tabpanel" aria-labelledby="faq-tab-3">
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-0">Por que existe a implantação de R$ 999?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-0"><div><p>Ela paga a configuração da assistente com o conteúdo da sua clínica, a conexão do número e o treinamento da equipe. É cobrada uma vez só, no plano mensal, e só se você continuar depois do teste. No plano anual, não há implantação.</p></div></div>
+          <div class="faq-content" id="faq-r-3-0"><div><p>Ela paga o trabalho de colocar a assistente para funcionar na sua clínica: configurar com as suas regras (serviços, valores, convênios, profissionais e horários), conectar o WhatsApp da clínica, treinar a equipe a distância (até 90 minutos) e uma rodada de ajustes finos no primeiro mês. É cobrada uma vez só, no plano mensal: no teste grátis, só se você continuar, junto com a primeira mensalidade; sem o teste, depois que a implantação fica pronta e você aprova. Trocar de plano não cobra de novo. No plano anual, a implantação é isenta (se sair antes dos 12 meses, ela é cobrada).</p></div></div>
         </div>
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-1">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
