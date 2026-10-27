@@ -1,12 +1,14 @@
 // ---------------------------------------------------------------- Hoje (molde A): está tudo bem e o que eu faço agora?
 // Ordem: estado da conta · primeiros passos (só no começo) · precisa de você · consultas de hoje · amanhã · os 3 números do mês.
-// Usa só o que o servidor já manda: agenda_listar, agenda_documentos, assistente_estado, termos_estado, indicadores e abrir.
-const HOJE = { docs7: null, naoPagas: null, ind: null, semGestaoFechado: false };
+// Usa só o que o servidor já manda: agenda_listar, agenda_documentos, agenda_chamados (S3), assistente_estado, termos_estado, indicadores e abrir.
+const HOJE = { docs7: null, naoPagas: null, ind: null, chamados: null, semGestaoFechado: false };
 tela('hoje', {
   montar: () => [el('div', { class: 'cab-tela' }, el('h1', { text: 'Hoje' }), el('span', { class: 'mudo peq', id: 'hojeData' })), el('div', { id: 'hojeCorpo' })],
   entrar: () => { hojeCarregar(); hojeRender(); }
 });
 function hojeCarregar() {
+  // S3 (rxsync-sistema sql/067): quem pediu uma pessoa ou teve urgência nas últimas 48 horas e ainda não foi resolvido.
+  d24('agenda_chamados').then(rows => { HOJE.chamados = Array.isArray(rows) ? rows : []; hojeRender(); }).catch(() => {});
   if (!sem('documentos')) d24('agenda_documentos').then(rows => { const lim = Date.now() - 7 * 86400000; HOJE.docs7 = (rows || []).filter(d => new Date(d.recebido_em).getTime() > lim).length; hojeRender(); }).catch(() => {});
   if (ligado('func_pagamento_link')) d24('agenda_listar', { nao_pagas: true }).then(rows => { HOJE.naoPagas = rows || []; hojeRender(); }).catch(() => {});
   // Os números do mês chegam depois: o "indicadores" consulta o Chatwoot e demora.
@@ -37,7 +39,7 @@ function hojeRender() {
         rota && !feito ? el('span', { class: 'seta' }, icone('seta')) : null)))));
   // precisa de você: as não vistas, as não pagas e os documentos
   const novos = agGrupos().novos.length, np = (HOJE.naoPagas || []).length;
-  const precisa = [];
+  const precisa = (HOJE.chamados || []).map(chamadoLinha);
   if (novos) precisa.push(el('button', { class: 'linha', type: 'button', onclick: () => { AG.filtro = 'novos'; AG.visao = 'lista'; ir('agenda'); } }, el('span', { class: 'ic' }, icone('agenda')),
     el('span', { class: 'tx' }, el('span', { class: 't1', text: novos === 1 ? '1 consulta nova para ver' : novos + ' consultas novas para ver' }), el('span', { class: 't2', text: 'Marcadas desde a última vez que alguém olhou' })), el('span', { class: 'seta' }, icone('seta'))));
   if (ligado('func_pagamento_link') && np) precisa.push(el('button', { class: 'linha', type: 'button', onclick: () => { AG.filtro = 'naopagas'; AG.visao = 'lista'; agNaoPagasCarregar(); ir('agenda'); } }, el('span', { class: 'ic' }, icone('dinheiro')),
@@ -56,6 +58,24 @@ function hojeRender() {
     el('p', { class: 'mudo', text: 'Pergunte sobre a agenda e peça mudanças pelo painel ou pelo seu WhatsApp, sem abrir o painel. Faz parte do plano Gestão Inteligente.' }),
     el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null];
   trocar(box, blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
+}
+// Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, "Abrir no WhatsApp" e "Resolvido".
+function chamadoLinha(ch) {
+  let d = String(ch.telefone || '').replace(/\D/g, ''); if (d.length >= 12 && d.startsWith('55')) d = d.slice(2);
+  const min = Math.max(0, Math.round((Date.now() - new Date(ch.criado_em).getTime()) / 60000));
+  const ha = min < 1 ? 'agora' : min < 60 ? 'há ' + pl(min, 'minuto', 'minutos') : min < 1440 ? 'há ' + pl(Math.round(min / 60), 'hora', 'horas') : 'há ' + pl(Math.round(min / 1440), 'dia', 'dias');
+  const quem = ch.nome_paciente || pacTel(d) || 'Paciente';
+  const resolver = btn('Resolvido', ev => {
+    ev.currentTarget.disabled = true;
+    d24('agenda_chamado_resolver', { id: ch.id }).then(r => {
+      if (r && r.ok) { HOJE.chamados = (HOJE.chamados || []).filter(x => x.id !== ch.id); rapida('Marcado como resolvido.'); hojeRender(); }
+      else { rapida('Não consegui marcar agora. Tente de novo.'); hojeCarregar(); }
+    }).catch(() => rapida('Não consegui marcar agora. Tente de novo.'));
+  }, 'sec', 'ok');
+  return el('div', { class: 'linha chamado' + (ch.urgente ? ' urgente' : '') }, el('span', { class: 'ic' }, icone(ch.urgente ? 'alerta' : 'chat')),
+    el('div', { class: 'tx' }, el('span', { class: 't1' }, ch.urgente ? etq('Urgência', 'perigo', 'alerta') : null, (ch.urgente ? ' ' : 'Pediu para falar com alguém: ') + quem),
+      el('span', { class: 't2', text: [ch.motivo, ha, ch.aviso_enviado === false ? 'o aviso no WhatsApp de avisos não chegou' : ''].filter(Boolean).join(' · ') }),
+      el('div', { class: 'linha-botoes' }, d ? el('a', { class: 'btn sec', href: zap(d), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir no WhatsApp') : null, resolver)));
 }
 function indicador(rot, val, fonte, varia) {
   return el('div', { class: 'indicador' }, el('div', { class: 'rot', text: rot }), el('div', { class: 'val num', text: val }), varia ? el('div', { class: 'var ' + (varia.bom === true ? 'bom' : varia.bom === false ? 'ruim' : ''), text: varia.txt }) : null,
