@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wVUdmniuWt7vNF2PEy6qRUAvrPkhsopCGCttrWGxHRE=' 'self'; style-src 'sha256-8t6oT12cKjNb1/buAA4RgGvEYmCMr7X+BXCSO7EPeiQ=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-lULKUA4UUJPzeYeg3jBsH7TLsixSa46nvqfXeeyIjac=' 'self'; style-src 'sha256-KTwkZnS5cZWkbaGZVwziHiYRymT465RBkoaJumONETI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -453,6 +453,9 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 .chat-msgs { display: flex; flex-direction: column; gap: var(--e-2); padding: var(--e-4); overflow: auto; flex: 1; min-height: 200px; }
 .balao { max-width: 85%; padding: var(--e-2) var(--e-3); border-radius: var(--r-cartao); white-space: pre-wrap; overflow-wrap: anywhere; background: var(--superficie-2); align-self: flex-start; }
 .balao.eu { align-self: flex-end; background: var(--primaria-suave); }
+.chat-cartao { align-self: flex-start; max-width: 85%; padding: var(--e-2) var(--e-3); border: 1px solid var(--borda); border-radius: var(--r-cartao); background: var(--superficie); }
+.chat-cartao ul { list-style: none; margin: 4px 0 0; padding: 0; }
+.chat-cartao li { display: flex; align-items: center; gap: 4px; }
 .chat-sug { display: flex; gap: var(--e-2); overflow-x: auto; padding: 0 var(--e-4) var(--e-2); }
 .chat-sug button { flex: none; min-height: var(--alvo); padding: 0 var(--e-3); border-radius: var(--r-capsula); border: 1px solid var(--borda-campo); background: var(--superficie); cursor: pointer; }
 .chat-in { display: flex; gap: var(--e-2); padding: var(--e-3) var(--e-4); border-top: 1px solid var(--borda); }
@@ -3877,6 +3880,20 @@ function chatFechar() {
   $('painelChat').hidden = true;
   if (chatFecharJanela) { const f = chatFecharJanela; chatFecharJanela = null; f(); }
 }
+// S11 (rxsync-sistema#203): quando o assistente pergunta "Confirma?", um cartão com "Confirmar" e "Não" manda a resposta
+// por você (a confirmação continua sendo a próxima mensagem, como no WhatsApp). Depois de mudar algo, o workflow 13 diz o
+// que mudou (só o que deu certo), num cartão, e o painel recarrega só a parte que mudou.
+function chatConfirmacao() {
+  const botoes = [];
+  const responder = t => { botoes.forEach(b => { b.disabled = true; }); const c = $('chatTexto'); if (c) { c.value = t; chatEnviar(); } };
+  botoes.push(btn('Confirmar', () => responder('Sim, confirmo.'), 'pri', 'ok'), btn('Não', () => responder('Não, deixa como está.'), 'sec', 'fechar'));
+  const cartao = el('div', { class: 'chat-cartao', role: 'group', 'aria-label': 'Confirmar a mudança' }, el('div', { class: 'linha-botoes' }, botoes));
+  const m = $('chatMsgs'); m.append(cartao); m.scrollTop = m.scrollHeight;
+}
+function chatMudou(lista) {
+  const cartao = el('div', { class: 'chat-cartao' }, el('p', { class: 'legenda', text: 'O que mudou' }), el('ul', {}, lista.map(t => el('li', {}, icone('ok', 'p'), ' ' + t))));
+  const m = $('chatMsgs'); m.append(cartao); m.scrollTop = m.scrollHeight;
+}
 function chatEnviar() {
   const caixa = $('chatTexto'), txt = caixa.value.trim();
   if (!txt || CHAT.ocupado) return;
@@ -3890,10 +3907,16 @@ function chatEnviar() {
     espera.remove();
     const resp = (r && r.resposta) || 'Não consegui responder agora. Tente de novo em instantes.';
     chatBalao('assistente', resp); CHAT.hist.push({ de: 'assistente', texto: resp });
-    // o assistente pode ter mexido na agenda ou na grade: recarrega e avisa
-    const antes = JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status]));
-    Promise.resolve(agCarregar()).then(() => { if (JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status])) !== antes) rapida('A agenda foi atualizada.'); }).catch(() => {});
-    gradeCarregar();
+    document.querySelectorAll('#chatMsgs .chat-cartao button').forEach(b => { b.disabled = true; });
+    const mudou = r && Array.isArray(r.mudou) ? r.mudou : null, areas = r && Array.isArray(r.areas) ? r.areas : [];
+    if (mudou && mudou.length) chatMudou(mudou);
+    if (r && r.confirmar === true) chatConfirmacao();
+    // recarrega o que mudou (o servidor antigo não manda "mudou": aí recarrega a agenda e a grade, como antes)
+    if (!mudou || areas.includes('agenda')) {
+      const antes = JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status]));
+      Promise.resolve(agCarregar()).then(() => { if (JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status])) !== antes) rapida('A agenda foi atualizada.'); }).catch(() => {});
+    }
+    if (!mudou || areas.includes('grade')) gradeCarregar();
     if (TELAS.resultados && TELAS.resultados.sec && !TELAS.resultados.sec.hidden) resultadosCarregar();
   }).catch(() => { espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.'); })
     .then(() => { CHAT.ocupado = false; $('chatEnviar').disabled = false; caixa.focus(); });

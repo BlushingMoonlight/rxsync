@@ -387,6 +387,9 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 .chat-msgs { display: flex; flex-direction: column; gap: var(--e-2); padding: var(--e-4); overflow: auto; flex: 1; min-height: 200px; }
 .balao { max-width: 85%; padding: var(--e-2) var(--e-3); border-radius: var(--r-cartao); white-space: pre-wrap; overflow-wrap: anywhere; background: var(--superficie-2); align-self: flex-start; }
 .balao.eu { align-self: flex-end; background: var(--primaria-suave); }
+.chat-cartao { align-self: flex-start; max-width: 85%; padding: var(--e-2) var(--e-3); border: 1px solid var(--borda); border-radius: var(--r-cartao); background: var(--superficie); }
+.chat-cartao ul { list-style: none; margin: 4px 0 0; padding: 0; }
+.chat-cartao li { display: flex; align-items: center; gap: 4px; }
 .chat-sug { display: flex; gap: var(--e-2); overflow-x: auto; padding: 0 var(--e-4) var(--e-2); }
 .chat-sug button { flex: none; min-height: var(--alvo); padding: 0 var(--e-3); border-radius: var(--r-capsula); border: 1px solid var(--borda-campo); background: var(--superficie); cursor: pointer; }
 .chat-in { display: flex; gap: var(--e-2); padding: var(--e-3) var(--e-4); border-top: 1px solid var(--borda); }
