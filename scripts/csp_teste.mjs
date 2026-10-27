@@ -44,18 +44,23 @@ export async function contextoCsp(browser, { responder = () => ({ ok: true }), o
   });
   const page = await ctx.newPage(); page.setDefaultTimeout(15000);
   const erros = []; page.on('pageerror', e => erros.push(String(e)));
-  // O aviso do script da prova (provarBloqueio) não conta: ele é bloqueado de propósito.
-  page.on('console', m => { if (m.type() === 'error' && /Content Security Policy/i.test(m.text()) && !m.text().includes(PROVA_RESUMO)) erros.push(m.text()); });
+  // O aviso do script da prova (provarBloqueio) não conta: ele é bloqueado de propósito. O Chrome escreve o resumo do
+  // script no aviso; o Safari não escreve, então vale também o aviso de script que chega enquanto a prova roda.
+  page.on('console', m => { if (m.type() === 'error' && /Content Security Policy/i.test(m.text()) && !m.text().includes(PROVA_RESUMO)
+    && !(provando && /Refused to execute a script/i.test(m.text()))) erros.push(m.text()); });
   return { ctx, page, erros, chamadas };
 }
 export const bloqueios = page => page.evaluate(() => window.__bloqueios.splice(0));
 export const regraDa = page => page.evaluate(() => (document.querySelector('meta[http-equiv="Content-Security-Policy"]') || {}).content || '');
 const PROVA = 'window.__rodou = true';
+let provando = 0;
 const PROVA_RESUMO = crypto.createHash('sha256').update(PROVA, 'utf8').digest('base64');
 // Prova que a regra bloqueia de verdade: um script escrito na página depois de aberta é recusado (e não roda).
 export async function provarBloqueio(page) {
+  provando++;
   await page.evaluate(t => { const s = document.createElement('script'); s.textContent = t; document.body.appendChild(s); }, PROVA);
   await page.waitForFunction(() => window.__bloqueios.some(b => /^script-src/.test(b)));
+  await page.waitForTimeout(150); provando--;
   const rodou = await page.evaluate(() => !!window.__rodou);
   await bloqueios(page);
   return !rodou;

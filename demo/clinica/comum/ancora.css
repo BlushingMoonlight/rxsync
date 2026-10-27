@@ -6,7 +6,7 @@
    O escuro só pela escolha da pessoa (o botão do tema): o aparelho em modo escuro não muda estas páginas.
    ===================================================================================================================== */
 :root, :root:not([data-tema="escuro"]) {
-  color-scheme: light;
+  color-scheme: only light;   /* "only": o Android não escurece a página sozinho */
   --fundo: #FFFFFF; --fundo-2: #F7F8F8;
   --superficie: #FFFFFF; --superficie-2: #F7F8F8; --superficie-3: #EEF1F1;
   --linha: #E3E7E8; --linha-forte: #848E93;

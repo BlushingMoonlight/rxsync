@@ -32,7 +32,8 @@
   --r-marcar: 6px; --r-botao: 8px; --r-cartao: 12px; --r-janela: 16px; --r-capsula: 999px;
   --alvo: 44px; --alvo-principal: 48px; --barra-h: 64px;
   --mov: 200ms; --mov-salvo: 450ms;
-  color-scheme: light;
+  /* "only": o escurecimento automático do Android (Chrome e Samsung Internet) não escurece a página sozinho */
+  color-scheme: only light;
 }
 /* cores do modo escuro: só quando a pessoa escolhe (nunca pelo aparelho sozinho) */
 :root[data-tema="escuro"] {

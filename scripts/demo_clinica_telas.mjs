@@ -20,6 +20,8 @@ const DADOS = { clinica: 'Instituto Bem Estar Integrado', tratamento: 'Dra.', me
 function simular(pedidos) {
   return async route => {
     let b = {}; try { b = JSON.parse(route.request().postData() || '{}'); } catch {}
+    // O registro de uso vai por sendBeacon (texto, sem cabeçalho); o Safari do Playwright não mostra o corpo dele aqui.
+    if (route.request().postData() == null && route.request().headers()['content-type'] === 'text/plain') b = { tipo: 'eventos', eventos: [] };
     pedidos.push({ ...b, _cab: route.request().headers() });
     const r = o => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(o) });
     if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST' } });

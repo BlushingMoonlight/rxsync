@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ixHh1erAvdUBLbA4knh8OhnoE1/XG6TLKbwdDhOQXr8='; style-src 'sha256-8V8lM65+VH/J/JqyV9bXBopvfru61leWxqa6cyw7W0k='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ixHh1erAvdUBLbA4knh8OhnoE1/XG6TLKbwdDhOQXr8='; style-src 'sha256-DUwFrpI77XCOWRu3wcvAdfUXDzfkmYdF+6yhyQaq2MU='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -50,7 +50,8 @@
   --r-marcar: 6px; --r-botao: 8px; --r-cartao: 12px; --r-janela: 16px; --r-capsula: 999px;
   --alvo: 44px; --alvo-principal: 48px; --barra-h: 64px;
   --mov: 200ms; --mov-salvo: 450ms;
-  color-scheme: light;
+  /* "only": o escurecimento automático do Android (Chrome e Samsung Internet) não escurece a página sozinho */
+  color-scheme: only light;
 }
 /* cores do modo escuro: só quando a pessoa escolhe (nunca pelo aparelho sozinho) */
 :root[data-tema="escuro"] {
@@ -195,6 +196,7 @@ p { margin: 0 0 var(--e-3); }
 .etq { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; padding: 0 10px; border-radius: var(--r-cheio); font-size: var(--t-12); font-weight: 600; white-space: nowrap; background: var(--superficie-3); color: var(--texto-2); }
 .etq::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
 .etq.sp::before { display: none; }
+@media (max-width: 359px) { .etq { white-space: normal; } }   /* letra maior do Android: a etiqueta longa quebra em vez de empurrar a tela */
 .etq.ok { background: var(--ok-fundo); color: var(--ok-texto); } .etq.atencao { background: var(--atencao-fundo); color: var(--atencao-texto); }
 .etq.perigo { background: var(--perigo-fundo); color: var(--perigo-texto); } .etq.info { background: var(--info-fundo); color: var(--info-texto); }
 .etqs { display: flex; gap: var(--e-2); flex-wrap: wrap; }
@@ -272,6 +274,8 @@ textarea.entrada { min-height: 88px; resize: vertical; }
 /* gráfico de barras (desenhado aqui) */
 .grafico { display: flex; align-items: flex-end; gap: 2px; height: 96px; padding-top: var(--e-2); border-bottom: 1px solid var(--borda); }
 .grafico i { flex: 1; min-width: 2px; border-radius: 3px 3px 0 0; background: var(--primaria); }
+@media (max-width: 479px) { .grafico { gap: 1px; } }   /* 90 barras de 2 px cabem em 360 px */
+@media (max-width: 359px) { .grafico i { min-width: 1px; } }   /* e de 1 px com a letra maior do Android (130% = 277 px) */
 .eixo { display: flex; justify-content: space-between; font-size: var(--t-11); color: var(--texto-3); margin-top: 4px; }
 /* lista + detalhe (≥1024) */
 .mestre-detalhe { display: grid; gap: var(--e-4); grid-template-columns: minmax(0, 1fr); }
