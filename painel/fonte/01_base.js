@@ -193,7 +193,7 @@ function confirmar(op) {
     const j = el('div', { class: 'janela', role: nivel >= 3 ? 'alertdialog' : 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'confTit', id: 'confJanela' },
       el('div', { class: 'cab' }, el('h2', { id: 'confTit', text: op.titulo || 'Confirmar' })),
       el('div', { class: 'corpo' }, (Array.isArray(op.texto) ? op.texto : [op.texto]).filter(Boolean).map(t => el('p', { class: 'mudo', text: t })),
-        frase ? el('label', { class: 'campo', for: 'confFrase' }, el('span', { class: 'rot' }, 'Para confirmar, digite: ', el('b', { text: op.frase })), frase) : null),
+        frase ? el('label', { class: 'campo', for: 'confFrase' }, el('span', { class: 'rot' }, 'Para confirmar, digite: ', el('b', { text: op.frase })), frase) : null, op.extra || null),
       el('div', { class: 'pe' }, el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', 'data-foco': frase ? null : '', onclick: () => fim(false) }), ok));
     fechar = janela(j, { aoFechar: () => { if (!feito) { feito = true; resolver(false); } }, foco: frase ? '#confFrase' : '[data-foco]' });
   });

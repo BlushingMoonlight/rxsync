@@ -42,6 +42,20 @@ function chatFechar() {
   $('painelChat').hidden = true;
   if (chatFecharJanela) { const f = chatFecharJanela; chatFecharJanela = null; f(); }
 }
+// S11 (rxsync-sistema#203): quando o assistente pergunta "Confirma?", um cartão com "Confirmar" e "Não" manda a resposta
+// por você (a confirmação continua sendo a próxima mensagem, como no WhatsApp). Depois de mudar algo, o workflow 13 diz o
+// que mudou (só o que deu certo), num cartão, e o painel recarrega só a parte que mudou.
+function chatConfirmacao() {
+  const botoes = [];
+  const responder = t => { botoes.forEach(b => { b.disabled = true; }); const c = $('chatTexto'); if (c) { c.value = t; chatEnviar(); } };
+  botoes.push(btn('Confirmar', () => responder('Sim, confirmo.'), 'pri', 'ok'), btn('Não', () => responder('Não, deixa como está.'), 'sec', 'fechar'));
+  const cartao = el('div', { class: 'chat-cartao', role: 'group', 'aria-label': 'Confirmar a mudança' }, el('div', { class: 'linha-botoes' }, botoes));
+  const m = $('chatMsgs'); m.append(cartao); m.scrollTop = m.scrollHeight;
+}
+function chatMudou(lista) {
+  const cartao = el('div', { class: 'chat-cartao' }, el('p', { class: 'legenda', text: 'O que mudou' }), el('ul', {}, lista.map(t => el('li', {}, icone('ok', 'p'), ' ' + t))));
+  const m = $('chatMsgs'); m.append(cartao); m.scrollTop = m.scrollHeight;
+}
 function chatEnviar() {
   const caixa = $('chatTexto'), txt = caixa.value.trim();
   if (!txt || CHAT.ocupado) return;
@@ -55,10 +69,16 @@ function chatEnviar() {
     espera.remove();
     const resp = (r && r.resposta) || 'Não consegui responder agora. Tente de novo em instantes.';
     chatBalao('assistente', resp); CHAT.hist.push({ de: 'assistente', texto: resp });
-    // o assistente pode ter mexido na agenda ou na grade: recarrega e avisa
-    const antes = JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status]));
-    Promise.resolve(agCarregar()).then(() => { if (JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status])) !== antes) rapida('A agenda foi atualizada.'); }).catch(() => {});
-    gradeCarregar();
+    document.querySelectorAll('#chatMsgs .chat-cartao button').forEach(b => { b.disabled = true; });
+    const mudou = r && Array.isArray(r.mudou) ? r.mudou : null, areas = r && Array.isArray(r.areas) ? r.areas : [];
+    if (mudou && mudou.length) chatMudou(mudou);
+    if (r && r.confirmar === true) chatConfirmacao();
+    // recarrega o que mudou (o servidor antigo não manda "mudou": aí recarrega a agenda e a grade, como antes)
+    if (!mudou || areas.includes('agenda')) {
+      const antes = JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status]));
+      Promise.resolve(agCarregar()).then(() => { if (JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status])) !== antes) rapida('A agenda foi atualizada.'); }).catch(() => {});
+    }
+    if (!mudou || areas.includes('grade')) gradeCarregar();
     if (TELAS.resultados && TELAS.resultados.sec && !TELAS.resultados.sec.hidden) resultadosCarregar();
   }).catch(() => { espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.'); })
     .then(() => { CHAT.ocupado = false; $('chatEnviar').disabled = false; caixa.focus(); });
