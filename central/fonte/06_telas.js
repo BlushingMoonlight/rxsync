@@ -77,6 +77,9 @@ TELAS.crescimento = async (c, [periodo]) => {
       el('div', { class: 'grade-2 iguais' },
         cartao('Cadastros por origem', null, lst(d.cadastros_por_origem, x => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce t1', text: x.origem }), el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: fmtNum(x.cadastros) })))))),
         cartao('Cadastros parados (mais de 14 dias)', null, listaCli(d.cadastros_parados, x => `${x.status} · ${x.dias} dias`, 'geral', 'Nenhum cadastro parado.'))),
+      // S15 (sql/073): o botão do site que levou ao cadastro (data-origem), nos últimos 90 dias.
+      cartao('Testes grátis por origem do clique', null, lst(d.testes_por_origem_90d, x => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce t1', text: x.origem }),
+        el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: `${pl(x.testes, 'teste', 'testes')} · ${pl(x.contratacoes, 'contratação', 'contratações')}` })))))),
       cartao('Onboarding vencido', null, listaCli(d.onboarding_vencido, x => 'venceu ' + fmtData(x.venceu), 'cadastro', 'Nenhum onboarding vencido.')),
       el('p', { class: 'mudo peq', text: `Testes encerrados sem contrato: ${fmtNum(d.testes_encerrados_sem_contrato)}.` })));
     return;

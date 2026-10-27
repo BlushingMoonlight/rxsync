@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-1FlIFFbdyw2KlRR2ieWwxh3xbsZBzdBP/gexPkgtFU0=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Y6RizX3srwyl13UEusx477Y1fd9D1sFzkjR1vOR4jE0=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
     <meta name="theme-color" content="#FFFFFF">
@@ -1677,16 +1677,21 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         try { if (r) sessionStorage.setItem('rx_ref', r); else r = valido(sessionStorage.getItem('rx_ref')); } catch (e) { /* aba privada */ }
         return r;
     })();
-    function urlContratar(plano) {
-        return '/contratar.html?plano=' + plano + '&ciclo=' + cicloAtual + (REF_PROSP ? '&ref=' + REF_PROSP : '');
+    // A origem do clique (data-origem: topo, hero, planos…) vai no endereço e entra no cadastro (rxsync-sistema sql/073, S15).
+    var ORIGEM_OK = /^[a-z0-9_]{2,30}$/;
+    function urlContratar(plano, origem) {
+        return '/contratar.html?plano=' + plano + '&ciclo=' + cicloAtual + (REF_PROSP ? '&ref=' + REF_PROSP : '') + (ORIGEM_OK.test(origem || '') ? '&origem=' + origem : '');
     }
+    document.querySelectorAll('a[href^="/contratar.html"][data-origem]').forEach(function (a) {
+        if (ORIGEM_OK.test(a.dataset.origem) && !/[?&]origem=/.test(a.getAttribute('href'))) a.href = a.getAttribute('href') + '&origem=' + a.dataset.origem;
+    });
     if (REF_PROSP) document.querySelectorAll('a[href^="/contratar.html"]').forEach(function (a) {
         if (!/[?&]ref=/.test(a.getAttribute('href'))) a.href = a.getAttribute('href') + '&ref=' + REF_PROSP;
     });
 
     // Leva para a contratação com 7 dias grátis. Marque "iniciar_teste" como conversão no Google Ads.
     function iniciarTeste(plano, origem, ev) {
-        var url = urlContratar(plano);
+        var url = urlContratar(plano, origem);
         trackCta(origem + '_testar_gratis');
         evento('iniciar_teste', { 'plan_selected': plano, 'ciclo': cicloAtual, 'origem': origem, 'transport_type': 'beacon' });
         if (ev && (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button === 1)) return true; // abrir em nova aba
@@ -1697,7 +1702,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     function irParaContratacao(plano, rotulo) {
         evento('click_cta_plano', { 'plan_selected': rotulo, 'ciclo': cicloAtual });
         evento('iniciar_teste', { 'plan_selected': plano, 'ciclo': cicloAtual, 'origem': 'planos', 'transport_type': 'beacon' });
-        window.location.href = urlContratar(plano);
+        window.location.href = urlContratar(plano, 'planos');
     }
 
     function setCiclo(ciclo) {

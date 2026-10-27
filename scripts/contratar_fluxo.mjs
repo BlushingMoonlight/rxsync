@@ -6,7 +6,7 @@
 //      plano e o ciclo;
 //   3. cada etapa confere os campos (nome, e-mail, WhatsApp, CNPJ, CPF) antes de seguir;
 //   4. a etapa 1 registra o contato e a etapa 3 só manda com os dois aceites; o cadastro vai com o plano, o ciclo, os
-//      documentos só com dígitos, a versão dos Termos e a origem da prospecção;
+//      documentos só com dígitos, a versão dos Termos, a origem da prospecção e a do clique (?origem=, rxsync-sistema sql/073);
 //   5. "Voltar aos planos" leva o código para a página inicial, que também não o manda ao Google;
 //   6. a regra de segurança (CSP) está ligada e bloqueia de verdade; em todas as etapas, com o CEP e o CNPJ (BrasilAPI
 //      simulada), os Termos dentro da página e o Google Analytics (simulado) depois do aceite, nenhum bloqueio.
@@ -34,7 +34,7 @@ const marcado = (p, sel) => p.locator(sel).evaluate(b => b.className.includes('b
 
 // 1 e 2. Plano, ciclo, código de origem e Google Analytics
 let page = await nova();
-await page.goto(site.base + `/contratar.html?plano=gestao&ciclo=anual&ref=${REF}`);
+await page.goto(site.base + `/contratar.html?plano=gestao&ciclo=anual&ref=${REF}&origem=hero`);
 ok(await marcado(page, '[data-plano="gestao"]') && await marcado(page, '[data-ciclo="anual"]') && !(await marcado(page, '[data-plano="essencial"]')), 'o plano (Gestão) e o ciclo (anual) vêm do endereço');
 ok(await page.evaluate(() => sessionStorage.getItem('rx_ref')) === REF, 'o código de origem fica guardado na aba (só o código)');
 const clique = await chegou(p => p.caminho === 'prospeccao-clique');
@@ -54,7 +54,7 @@ await page.fill('#nome', 'Maria Teste Silva'); await page.fill('#clinica', 'Clí
 await page.locator('section[data-etapa="2"] .proximo').click();
 await page.locator('section[data-etapa="3"].ativa').waitFor();
 const lead = await chegou(p => p.caminho === 'cadastro' && p.corpo._evento === 'lead');
-ok(lead && lead.corpo.plano === 'Gestao' && lead.corpo._ciclo === 'anual' && lead.corpo.telefone === '41999990000' && lead.corpo._origem === 'prospeccao ' + REF, 'etapa 1: o contato é registrado com o plano, o ciclo, o telefone só com dígitos e a origem da prospecção');
+ok(lead && lead.corpo.plano === 'Gestao' && lead.corpo._ciclo === 'anual' && lead.corpo.telefone === '41999990000' && lead.corpo._origem === 'prospeccao ' + REF && lead.corpo.origem_clique === 'hero', 'etapa 1: o contato é registrado com o plano, o ciclo, o telefone só com dígitos, a origem da prospecção e a do clique (hero)');
 
 // Etapa 2: CNPJ e CPF conferidos
 let buscou = false;
@@ -91,7 +91,7 @@ const aceite = await chegou(p => p.caminho === 'cadastro' && p.corpo._evento ===
 ok(aceite && aceite.corpo.modalidade === 'teste' && aceite.corpo.cliente_id === 'RX-TESTE-0001' && aceite.corpo.plano === 'Gestao' && aceite.corpo._ciclo === 'anual',
   'teste grátis: o cadastro vai com o plano, o ciclo e o código do contato da etapa 1');
 ok(aceite && aceite.corpo.cnpj === '11222333000181' && aceite.corpo.representante_cpf === '00000000191' && aceite.corpo.telefone === '41999990000', 'CNPJ, CPF e telefone vão só com dígitos');
-ok(aceite && aceite.corpo.versao_termos === '2026-10-v7' && aceite.corpo.aceite_dpa === 'SIM' && aceite.corpo._origem === 'prospeccao ' + REF && aceite.origem === 'rxsync-site-2026', 'com a versão dos Termos, o aceite do acordo de dados e a origem da prospecção');
+ok(aceite && aceite.corpo.versao_termos === '2026-10-v7' && aceite.corpo.aceite_dpa === 'SIM' && aceite.corpo._origem === 'prospeccao ' + REF && aceite.corpo.origem_clique === 'hero' && aceite.origem === 'rxsync-site-2026', 'com a versão dos Termos, o aceite do acordo de dados, a origem da prospecção e a do clique');
 ok(await page.locator('#sucessoTitulo').textContent() === 'Teste grátis registrado', 'a tela de sucesso do teste grátis aparece');
 await anotar(page, 'aceite e sucesso');
 

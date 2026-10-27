@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-srVM7bir6+TuKIJV6bLvNLwE/fbrHxAz//w4N9/Dg0o=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KlQ2uu4mSCYKSj1n98IzVeON6thFPPvVZ8FuWHuzfCY=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -356,6 +356,8 @@ const REF_GUARDADO = (() => { try { return REF_VALIDO(sessionStorage.getItem('rx
 const REF_PROSP = REF_VALIDO(q.get('ref')) || REF_GUARDADO;
 if (REF_PROSP) { try { sessionStorage.setItem('rx_ref', REF_PROSP); } catch (e) { /* aba privada */ } document.getElementById('voltarPlanos').href = '/?ref=' + REF_PROSP + '#precos'; }
 const ORIGEM_CADASTRO = REF_PROSP ? 'prospeccao ' + REF_PROSP : (document.referrer || 'direto');
+// O botão do site que trouxe a pessoa (rxsync-sistema sql/073, S15): topo, hero, planos…; vazio sem botão.
+const ORIGEM_CLIQUE = /^[a-z0-9_]{2,30}$/.test(q.get('origem') || '') ? q.get('origem') : '';
 if (REF_PROSP && REF_PROSP !== REF_GUARDADO) fetch('https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/prospeccao-clique', { method: 'POST', keepalive: true,
   headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE }, body: JSON.stringify({ ref: REF_PROSP }) }).catch(() => {});
 let CLIENTE_ID = '';
@@ -552,7 +554,8 @@ async function registrarLead() {
         observacoes: 'Iniciou a contratação no site. ' + descricaoPlano() + '.',
         _nome_fantasia: v('clinica'),
         _ciclo: ciclo,
-        _origem: ORIGEM_CADASTRO
+        _origem: ORIGEM_CADASTRO,
+        origem_clique: ORIGEM_CLIQUE
       })
     });
     const j = await r.json().catch(() => ({}));
@@ -679,6 +682,7 @@ document.getElementById('form').addEventListener('submit', async evt => {
     _armadilha: (document.getElementById('empresa_site').value || ''),
     _tempo_preenchimento_s: Math.round((Date.now() - INICIO) / 1000),
     _origem: ORIGEM_CADASTRO,
+    origem_clique: ORIGEM_CLIQUE,
     _user_agent: navigator.userAgent
   };
 
