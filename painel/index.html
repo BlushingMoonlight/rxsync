@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sEB/hhlP/RuJxOnfVtauhPEaHz7U+Qu/mOBlDkHpVjY=' 'self'; style-src 'sha256-pym3lUqkYtcKyC6ilHnv/65OHoBTpm4lOiQjJapZL58=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+aOyUNBBlh0mzHbDj02okiYKc0mir9LrFdZtcgWzL4U=' 'self'; style-src 'sha256-pym3lUqkYtcKyC6ilHnv/65OHoBTpm4lOiQjJapZL58=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1060,10 +1060,12 @@ function pausada() { return !!(PAUSA && PAUSA.ativo === false && PAUSA.status ==
 function pausaQuando(t) { const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/.exec(t || ''); return m ? m[3] + '/' + m[2] + ' às ' + m[4] : ''; }
 function estadoAssistente() {
   const c = CONTA || {}, s = c.situacao;
+  // DEC-166 (rxsync-sistema sql/068): o teste novo libera tudo do Gestão; o servidor diz em recursos.teste_gestao.
+  const gestaoNoTeste = REC && REC.teste_gestao === true ? ' Durante o teste, tudo do plano Gestão está liberado.' : '';
   if (pausada()) return { ponto: 'off', curto: 'Assistente pausada', t1: 'A assistente está pausada', t2: 'As mensagens dos pacientes chegam para a equipe responder; lembretes e avisos automáticos também param.' };
   if (TESTE.aberto) return { ponto: 'alerta', curto: 'Atendendo só no teste', t1: 'Atendendo só no teste', t2: 'A assistente não está respondendo no WhatsApp da clínica enquanto o teste estiver aberto.' };
-  if (s === 'em_teste') { const d = c.dias_restantes; return { ponto: 'on', curto: 'Em teste grátis', t1: 'Teste grátis: ' + (d === 0 ? 'termina hoje' : d === 1 ? 'termina amanhã' : d == null ? 'em andamento' : 'faltam ' + d + ' dias'), t2: 'A assistente está atendendo no WhatsApp da clínica.', cartao: true, acao: ['Pagar', 'conta/assinatura'] }; }
-  if (s === 'teste_aguardando') return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'Os 7 dias de teste só começam a contar quando a assistente entrar no ar.', cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
+  if (s === 'em_teste') { const d = c.dias_restantes; return { ponto: 'on', curto: 'Em teste grátis', t1: 'Teste grátis: ' + (d === 0 ? 'termina hoje' : d === 1 ? 'termina amanhã' : d == null ? 'em andamento' : 'faltam ' + d + ' dias'), t2: 'A assistente está atendendo no WhatsApp da clínica.' + gestaoNoTeste, cartao: true, acao: ['Pagar', 'conta/assinatura'] }; }
+  if (s === 'teste_aguardando') return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'Os 7 dias de teste só começam a contar quando a assistente entrar no ar.' + gestaoNoTeste, cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
   if (s === 'teste_encerrado') return { ponto: 'off', curto: 'Assistente parada', t1: 'O teste terminou e a assistente está parada', t2: 'As mensagens chegam para a sua equipe. Seus dados ficam guardados por 15 dias.', cartao: true, acao: ['Pagar o teste agora', 'conta/assinatura'] };
   if (s === 'suspenso') return { ponto: 'off', curto: 'Assistente suspensa', t1: 'Assistente suspensa por falta de pagamento', t2: 'As mensagens chegam para a sua equipe. Ela volta sozinha assim que o pagamento cair.', acao: ['Pagar', 'conta/assinatura'] };
   if (c.no_ar === false) return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'A assistente começa a atender assim que o número for conectado.', cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
@@ -1515,12 +1517,20 @@ function hojeRender() {
     el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null];
   trocar(box, blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
 }
-// Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, "Abrir no WhatsApp" e "Resolvido".
+// Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, quando a assistente volta, "Abrir no WhatsApp" e "Resolvido".
 function chamadoLinha(ch) {
   let d = String(ch.telefone || '').replace(/\D/g, ''); if (d.length >= 12 && d.startsWith('55')) d = d.slice(2);
   const min = Math.max(0, Math.round((Date.now() - new Date(ch.criado_em).getTime()) / 60000));
   const ha = min < 1 ? 'agora' : min < 60 ? 'há ' + pl(min, 'minuto', 'minutos') : min < 1440 ? 'há ' + pl(Math.round(min / 60), 'hora', 'horas') : 'há ' + pl(Math.round(min / 1440), 'dia', 'dias');
   const quem = ch.nome_paciente || pacTel(d) || 'Paciente';
+  // P4 (sql/074): a hora em que a assistente volta a responder a conversa (vazio = ela não parou). Quando a equipe responde
+  // o paciente, o chamado sai sozinho.
+  let volta = '';
+  if ('volta_em' in ch) {
+    const v = ch.volta_em ? new Date(ch.volta_em).getTime() : null, dia = ch.volta_em ? chaveIso(ch.volta_em) : '';
+    volta = v == null ? 'a assistente continua respondendo' : v <= Date.now() ? 'a assistente já voltou a responder'
+      : 'a assistente volta a responder ' + (dia === chave(hojeLocal()) ? '' : dia === chave(somaDias(hojeLocal(), 1)) ? 'amanhã ' : 'em ' + dia.slice(8, 10) + '/' + dia.slice(5, 7) + ' ') + 'às ' + hhmm(minDia(ch.volta_em));
+  }
   const resolver = btn('Resolvido', ev => {
     ev.currentTarget.disabled = true;
     d24('agenda_chamado_resolver', { id: ch.id }).then(r => {
@@ -1530,7 +1540,7 @@ function chamadoLinha(ch) {
   }, 'sec', 'ok');
   return el('div', { class: 'linha chamado' + (ch.urgente ? ' urgente' : '') }, el('span', { class: 'ic' }, icone(ch.urgente ? 'alerta' : 'chat')),
     el('div', { class: 'tx' }, el('span', { class: 't1' }, ch.urgente ? etq('Urgência', 'perigo', 'alerta') : null, (ch.urgente ? ' ' : 'Pediu para falar com alguém: ') + quem),
-      el('span', { class: 't2', text: [ch.motivo, ha, ch.aviso_enviado === false ? 'o aviso no WhatsApp de avisos não chegou' : ''].filter(Boolean).join(' · ') }),
+      el('span', { class: 't2', text: [ch.motivo, ha, ch.aviso_enviado === false ? 'o aviso no WhatsApp de avisos não chegou' : '', volta].filter(Boolean).join(' · ') }),
       el('div', { class: 'linha-botoes' }, d ? el('a', { class: 'btn sec', href: zap(d), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir no WhatsApp') : null, resolver)));
 }
 function indicador(rot, val, fonte, varia) {
@@ -2458,11 +2468,11 @@ function preForm(p) {
 }
 
 // ---------------------------------------------------------------- Feriados (E): um controle só na tela (decisão 7) e a cidade do atendimento
-// Grava as duas chaves de hoje (func_feriados e o "Não atender" de Feriados); juntá-las no banco fica para o servidor.
+// Uma chave só (rxsync-sistema sql/072, S12): o func_feriados do cadastro; o "ativo" que o servidor manda em Feriados vem dela.
 const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 const FACULTATIVOS = [['carnaval', 'Carnaval (segunda e terça)'], ['cinzas', 'Quarta-feira de Cinzas'], ['quinta_santa', 'Quinta-feira Santa'], ['corpus_christi', 'Corpus Christi'], ['vespera_natal', 'Véspera de Natal (24/12)'], ['vespera_ano_novo', 'Véspera de Ano Novo (31/12)']];
 const FER = { cfg: null, prox: [], municipios: {} };
-const feriadosLigados = () => ligado('func_feriados') && (!FER.cfg || FER.cfg.ativo !== false);
+const feriadosLigados = () => ligado('func_feriados');
 function ferCidades(uf) {
   if (!uf) return Promise.resolve([]);
   if (FER.municipios[uf]) return Promise.resolve(FER.municipios[uf]);
@@ -2473,17 +2483,13 @@ tela('agenda/horarios/feriados', {
   montar: () => [cabTela('Feriados', { voltar: VOLTA_HOR, sub: 'A assistente não oferece horários em feriados nacionais, do seu estado e da sua cidade.' }), el('div', { id: 'ferBox' }, el('div', { class: 'cartao' }, esqueleto()))],
   entrar: () => ferCarregar().then(ferRender)
 });
-function ferDados(ativo) {
-  const c = FER.cfg || {};
-  return { ativo, uf: c.uf || '', codigo_ibge: c.codigo_ibge ? String(c.codigo_ibge) : '', cidade: c.cidade || '', facultativos: c.facultativos || [], atende_em: FER.prox.filter(x => x.atende).map(x => x.data) };
-}
 function ferRender() {
   const box = $('ferBox'); if (!box) return;
   if (FER.erro && !FER.cfg) { trocar(box, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'Os feriados não carregaram agora.'))); return; }
   const cfg = FER.cfg || {};
   const { sw } = chaveEl('feriados', 'Não atender em feriados', { semId: true, valor: feriadosLigados, aoMudar: async lig => {
     if (!(await salvarCampo('func_feriados', lig ? 'SIM' : ''))) return false;
-    try { const r = await d24('agenda_feriados_salvar', ferDados(lig)); if (r && r.ok === false) return false; FER.cfg.ativo = lig; } catch (e) { return false; }
+    FER.cfg.ativo = lig;
     rapida(lig ? 'Ligado: não atende em feriados.' : 'Desligado: atende em feriados.'); ferRender(); horIndice(); return true;
   } });
   const topo = el('div', { class: 'cartao campos bloco' }, el('div', { class: 'chave-linha' }, el('div', { class: 'tx' }, el('div', { class: 't1', text: 'Não atender em feriados' }), el('p', { class: 'dica', text: 'A agenda pula sozinha os feriados da cidade da clínica.' })), sw));

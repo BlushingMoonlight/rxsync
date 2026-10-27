@@ -150,6 +150,8 @@ function abaGeral(c, x) {
   // Pausa feita pelo painel da clínica (sql/061, DEC-147): quando e o papel de quem pausou, nunca o nome nem o e-mail.
   if (x.pausa_painel && !x.ativo) avisos.push(el('div', { class: 'aviso atencao' }, icone('info'), el('div', {}, el('b', { text: 'Assistente pausada pelo painel em ' + fmtHora(x.pausa_painel.em) + ' (' + (x.pausa_painel.por === 'dono' ? 'dono' : x.pausa_painel.por === 'equipe' ? 'equipe' : 'quem pausou não está mais na equipe') + '). ' }),
     'A clínica retoma pelo painel; a Central também pode retomar em Ações.')));
+  // "Pedir ajuda para configurar" do painel (Agenda › Horários), dos últimos 30 dias (sql/071, S9 da #203).
+  if (x.pedido_ajuda_agenda) avisos.push(el('div', { class: 'aviso info' }, icone('info'), el('div', {}, el('b', { text: 'Pediu ajuda para configurar a agenda em ' + fmtHora(x.pedido_ajuda_agenda) + '. ' }), 'Entre em contato com a clínica.')));
   const passos = [['Aceite dos Termos', x.aceite ? fmtData(x.aceite) + ' · ' + (x.versao_termos || '') : 'ainda não', !!x.aceite],
     ['Onboarding', x.onboarding || '—', /conclu/i.test(String(x.onboarding || '')) || !!x.go_live], ['No ar', x.go_live ? fmtData(x.go_live) : 'ainda não', !!x.go_live],
     x.modalidade === 'teste' ? ['Fim do teste', fmtData(x.fim_teste), false] : ['Último pagamento', fmtData(x.ultimo_pagamento), !!x.ultimo_pagamento],

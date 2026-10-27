@@ -59,12 +59,20 @@ function hojeRender() {
     el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null];
   trocar(box, blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
 }
-// Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, "Abrir no WhatsApp" e "Resolvido".
+// Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, quando a assistente volta, "Abrir no WhatsApp" e "Resolvido".
 function chamadoLinha(ch) {
   let d = String(ch.telefone || '').replace(/\D/g, ''); if (d.length >= 12 && d.startsWith('55')) d = d.slice(2);
   const min = Math.max(0, Math.round((Date.now() - new Date(ch.criado_em).getTime()) / 60000));
   const ha = min < 1 ? 'agora' : min < 60 ? 'há ' + pl(min, 'minuto', 'minutos') : min < 1440 ? 'há ' + pl(Math.round(min / 60), 'hora', 'horas') : 'há ' + pl(Math.round(min / 1440), 'dia', 'dias');
   const quem = ch.nome_paciente || pacTel(d) || 'Paciente';
+  // P4 (sql/074): a hora em que a assistente volta a responder a conversa (vazio = ela não parou). Quando a equipe responde
+  // o paciente, o chamado sai sozinho.
+  let volta = '';
+  if ('volta_em' in ch) {
+    const v = ch.volta_em ? new Date(ch.volta_em).getTime() : null, dia = ch.volta_em ? chaveIso(ch.volta_em) : '';
+    volta = v == null ? 'a assistente continua respondendo' : v <= Date.now() ? 'a assistente já voltou a responder'
+      : 'a assistente volta a responder ' + (dia === chave(hojeLocal()) ? '' : dia === chave(somaDias(hojeLocal(), 1)) ? 'amanhã ' : 'em ' + dia.slice(8, 10) + '/' + dia.slice(5, 7) + ' ') + 'às ' + hhmm(minDia(ch.volta_em));
+  }
   const resolver = btn('Resolvido', ev => {
     ev.currentTarget.disabled = true;
     d24('agenda_chamado_resolver', { id: ch.id }).then(r => {
@@ -74,7 +82,7 @@ function chamadoLinha(ch) {
   }, 'sec', 'ok');
   return el('div', { class: 'linha chamado' + (ch.urgente ? ' urgente' : '') }, el('span', { class: 'ic' }, icone(ch.urgente ? 'alerta' : 'chat')),
     el('div', { class: 'tx' }, el('span', { class: 't1' }, ch.urgente ? etq('Urgência', 'perigo', 'alerta') : null, (ch.urgente ? ' ' : 'Pediu para falar com alguém: ') + quem),
-      el('span', { class: 't2', text: [ch.motivo, ha, ch.aviso_enviado === false ? 'o aviso no WhatsApp de avisos não chegou' : ''].filter(Boolean).join(' · ') }),
+      el('span', { class: 't2', text: [ch.motivo, ha, ch.aviso_enviado === false ? 'o aviso no WhatsApp de avisos não chegou' : '', volta].filter(Boolean).join(' · ') }),
       el('div', { class: 'linha-botoes' }, d ? el('a', { class: 'btn sec', href: zap(d), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir no WhatsApp') : null, resolver)));
 }
 function indicador(rot, val, fonte, varia) {
