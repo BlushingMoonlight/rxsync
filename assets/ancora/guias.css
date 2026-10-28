@@ -36,7 +36,7 @@ img { max-width: 100%; height: auto; display: block; }
 .marca { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: 21px; color: var(--texto); text-decoration: none; }
 .marca-ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--r-botao); background: var(--primaria); color: var(--botao-texto); }
 .nav { display: none; gap: var(--e-1); }
-.nav a, .link-entrar { display: inline-flex; align-items: center; min-height: var(--alvo); padding: 0 var(--e-3); border-radius: var(--r-botao); color: var(--texto-2); font-size: 15px; font-weight: 500; text-decoration: none; }
+.nav a, .link-entrar { display: inline-flex; align-items: center; min-height: var(--alvo); padding: 0 var(--e-3); border-radius: var(--r-botao); color: var(--texto-2); font-size: 15px; font-weight: 500; text-decoration: none; white-space: nowrap; }
 .nav a:hover, .link-entrar:hover { color: var(--texto); background: var(--superficie-2); }
 .topo-acoes { display: flex; align-items: center; gap: var(--e-2); }
 .link-entrar { display: none; }
@@ -48,7 +48,9 @@ img { max-width: 100%; height: auto; display: block; }
 .menu-m-lista a { display: flex; align-items: center; min-height: var(--alvo); color: var(--texto); text-decoration: none; border-bottom: 1px solid var(--borda); }
 .topo { position: relative; }
 @media (max-width: 359px) { .topo-cta { display: none; } }
-@media (min-width: 1024px) { .nav { display: flex; } .link-entrar { display: inline-flex; } .menu-m { display: none; } }
+/* Como na página inicial: o menu inteiro só a partir de 1280 px (abaixo disso, ele não cabe numa linha e fica no menu ☰). */
+@media (min-width: 1024px) { .link-entrar { display: inline-flex; } }
+@media (min-width: 1280px) { .nav { display: flex; } .nav a { padding: 0 9px; } .menu-m { display: none; } }
 
 /* rodapé (o mesmo do site) */
 .rodape { margin-top: var(--e-12); padding: var(--e-12) 0 var(--e-8); background: var(--superficie-2); border-top: 1px solid var(--borda); color: var(--texto-2); font-size: 15px; line-height: 24px; }
