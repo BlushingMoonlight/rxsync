@@ -21,7 +21,7 @@ function agGrupos(lista) {
 }
 function agCarregar() {
   return d24('agenda_listar').then(rows => {
-    AG.dados = rows || []; AG.carregou = true;
+    AG.dados = comoLista(rows); AG.carregou = true;
     if (!agGrupos().novos.length && AG.filtro === 'novos') AG.filtro = 'proximos';
     agSelo(); agRender(); hojeRender();
     if (AG.visao !== 'lista' && !(AG.visao === 'dia' && estreito())) calCarregar();
@@ -30,7 +30,7 @@ function agCarregar() {
 function agSelo() { const n = agGrupos().novos.length; document.querySelectorAll('[data-selo-agenda]').forEach(x => { x.textContent = n > 99 ? '99+' : String(n); x.hidden = !n; }); }
 const estreito = () => window.innerWidth < 768;
 function agNaoPagasCarregar() {
-  return d24('agenda_listar', { nao_pagas: true }).then(rows => { AG.naoPagas = rows || []; agRender(); })
+  return d24('agenda_listar', { nao_pagas: true }).then(rows => { AG.naoPagas = comoLista(rows); agRender(); })
     .catch(() => { AG.naoPagas = []; agRender(); rapida('Não consegui carregar as consultas não pagas.'); });
 }
 const agPagoTxt = a => a.pago_origem === 'remarcada' ? 'Paga (remarcada)' : a.pago_origem === 'asaas' ? 'Paga (Asaas)' : 'Paga';
@@ -419,7 +419,7 @@ function agExportar() {
   const agora = Date.now(), semMs = d => new Date(d).toISOString().replace(/\.\d{3}Z$/, 'Z');
   rapida('Gerando o arquivo…');
   d24('agenda_listar', { de: semMs(agora - 365 * 86400000), ate: semMs(agora + 730 * 86400000) }).then(rows => {
-    const ativos = (rows || []).filter(agAtiva);
+    const ativos = comoLista(rows).filter(agAtiva);
     if (!ativos.length) { rapida('Não há consultas para exportar.'); return; }
     const carimbo = icsHora(new Date().toISOString());
     const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//RXSync//Agenda//PT-BR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + icsTxt('Agenda ' + (VAL.nome_exibicao || 'RXSync')), 'X-WR-TIMEZONE:' + TZ];
@@ -458,7 +458,7 @@ function calCarregar() {
   $('calTitulo').textContent = $('calTituloCel').textContent = calTitulo();
   d24('agenda_listar', { de: isoLocal(chave(r.ini) + 'T00:00'), ate: isoLocal(chave(somaDias(r.ini, r.n)) + 'T00:00') }).then(rows => {
     if (n !== AG.calReq) return;
-    AG.cal = (rows || []).filter(agAtiva).filter(medFiltra); calRender();
+    AG.cal = comoLista(rows).filter(agAtiva).filter(medFiltra); calRender();
   }).catch(() => { if (n !== AG.calReq) return; trocar($('calBox'), el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'O calendário não carregou agora.', btn('Tentar de novo', calCarregar, 'sec')))); });
 }
 // Horários que sombreiam o calendário: os da clínica, ou (modo médicos) os do médico filtrado ou de todos os ativos.

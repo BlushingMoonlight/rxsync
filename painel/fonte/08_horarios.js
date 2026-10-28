@@ -7,12 +7,13 @@ tela('agenda/horarios', {
     el('div', { class: 'bloco pilha' }, el('p', { class: 'mudo peq', text: 'Ficou alguma dúvida? A equipe da RXSync ajuda a deixar a agenda do jeito da clínica.' }),
       el('button', { class: 'btn sec plena', type: 'button', id: 'btnPedirAjudaAgendamento', text: 'Pedir ajuda para configurar', onclick: e => pedirAjuda(e.currentTarget) }),
       el('p', { class: 'mudo peq', id: 'msgPedirAjuda', 'aria-live': 'polite' }))],
-  entrar: () => { horIndice(); gradeCarregar().then(horIndice); intStatus().then(horIndice); }
+  // Mostra na hora o que já tem e atualiza quando cada resposta chega; o erro volta para a rede de segurança do rotear().
+  entrar: () => { horIndice(); return Promise.all([gradeCarregar().then(horIndice), intStatus().then(horIndice)]); }
 });
 const INT = { status: null };
 function horIndice() {
   const box = $('horIndice'); if (!box) return;
-  const dias = new Set((GRADE.dados || []).map(g => g.dia)).size, med = MED.dados.filter(m => m.ativo).length;
+  const dias = new Set(comoLista(GRADE.dados).map(g => g.dia)).size, med = MED.dados.filter(m => m.ativo).length;
   const st = INT.status || {};
   trocar(box, el('div', { class: 'lista bloco' },
     linhaLink('Horários de atendimento', MED.modo ? 'Cada médico tem os próprios horários' : (st.conectado && st.importar_horarios !== false && (st.horarios || []).length ? 'Vêm do ' + (st.plataforma_nome || 'Reservio') : dias ? pl(dias, 'dia', 'dias') + ' com atendimento' : 'Nenhum dia com atendimento'), 'agenda/horarios/grade', 'relogio'),
@@ -33,7 +34,7 @@ function pedirAjuda(b) {
 const DIAS_SEM = [[1, 'Segunda'], [2, 'Terça'], [3, 'Quarta'], [4, 'Quinta'], [5, 'Sexta'], [6, 'Sábado'], [0, 'Domingo']];
 let gradeEdit = null;
 function gradeCarregar() {
-  return d24('agenda_grade_listar').then(rows => { GRADE.dados = rows || []; if (AG.visao !== 'lista') calRender(); })
+  return d24('agenda_grade_listar').then(rows => { GRADE.dados = comoLista(rows); if (AG.visao !== 'lista') calRender(); })
     .catch(() => { GRADE.erro = true; });
 }
 tela('agenda/horarios/grade', {

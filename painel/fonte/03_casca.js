@@ -48,11 +48,25 @@ function rotear() {
   document.body.classList.toggle('com-assuntos', !!d);
   document.querySelectorAll('#telas > section').forEach(s => { s.hidden = s !== aberta.sec && !(raiz && s === raiz.sec); });
   if (raiz) {
-    if (raiz.entrar) raiz.entrar('', raiz.sec);
+    if (raiz.entrar) entrarSeguro(raiz, '', raiz.sec);
     raiz.sec.querySelectorAll('[data-ir]').forEach(b => { const sim = b.getAttribute('data-ir') === rotaAberta; b.classList.toggle('selecionada', sim); if (sim) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
-  if (aberta.entrar) aberta.entrar(rotaAberta === rota ? param : '', aberta.sec);
+  if (aberta.entrar) entrarSeguro(aberta, rotaAberta === rota ? param : '', aberta.sec);
   window.scrollTo(0, 0);
+}
+// Rede de segurança: se o entrar() de uma tela falhar (erro na hora ou promessa recusada), a tela nunca fica vazia sem
+// aviso. Mostra "Não consegui abrir esta tela.", "Tentar de novo" e, pequeno, o nome do erro e a função (sem dado nenhum
+// da clínica ou de paciente), para o print.
+function entrarSeguro(t, param, sec) {
+  const falhou = e => {
+    const nome = String((e && e.name) || 'Erro').slice(0, 40), onde = String(((e && e.stack) || '').split('\n').map(l => (l.match(/^\s*(?:at\s+)?([\w$.]+)[\s@(]/) || [])[1]).find(f => f && !/^(entrarSeguro|rotear|Promise|async)$/.test(f)) || '').slice(0, 40);
+    let caixa = sec.querySelector(':scope > .tela-falhou');
+    if (!caixa) { caixa = el('div', { class: 'tela-falhou bloco' }); sec.append(caixa); }
+    trocar(caixa, aviso('perigo', 'Não consegui abrir esta tela.'), el('div', { class: 'pilha' }, btn('Tentar de novo', () => { caixa.remove(); entrarSeguro(t, param, sec); }, 'sec')),
+      el('p', { class: 'mudo peq', text: nome + (onde ? ' · ' + onde : '') }));
+  };
+  const velha = sec.querySelector(':scope > .tela-falhou'); if (velha) velha.remove();
+  try { const r = t.entrar(param, sec); if (r && typeof r.then === 'function') r.catch(falhou); } catch (e) { falhou(e); }
 }
 window.addEventListener('hashchange', rotear);
 LARGO.addEventListener('change', () => rotear());

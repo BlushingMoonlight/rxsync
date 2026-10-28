@@ -63,6 +63,8 @@ const vazio = (titulo, texto, acao) => el('div', { class: 'vazio' }, titulo ? el
 const esqueleto = () => el('div', { 'aria-busy': 'true', 'aria-label': 'Carregando' }, el('span', { class: 'esq' }), el('span', { class: 'esq l2' }), el('span', { class: 'esq l3' }));
 const linhaLink = (titulo, sub, rota, ic, valor) => el('button', { class: 'linha', type: 'button', 'data-ir': rota }, ic ? el('span', { class: 'ic' }, icone(ic)) : null,
   el('span', { class: 'tx' }, el('span', { class: 't1', text: titulo }), sub ? el('span', { class: 't2', text: sub }) : null, valor != null ? el('span', { class: 'valor', text: valor }) : null), el('span', { class: 'seta' }, icone('seta')));
+// O que o servidor manda como lista: se vier outra coisa (objeto, erro), vale lista vazia, nunca uma tela quebrada.
+const comoLista = v => Array.isArray(v) ? v : [];
 const fmtNum = v => v == null ? '—' : Number(v).toLocaleString('pt-BR');
 // O número com a palavra no singular ou no plural certo: pl(2, 'consulta', 'consultas') = "2 consultas".
 const pl = (n, um, varios) => fmtNum(n || 0) + ' ' + (Number(n) === 1 ? um : varios);

@@ -9,8 +9,8 @@ tela('hoje', {
 function hojeCarregar() {
   // S3 (rxsync-sistema sql/067): quem pediu uma pessoa ou teve urgência nas últimas 48 horas e ainda não foi resolvido.
   d24('agenda_chamados').then(rows => { HOJE.chamados = Array.isArray(rows) ? rows : []; hojeRender(); }).catch(() => {});
-  if (!sem('documentos')) d24('agenda_documentos').then(rows => { const lim = Date.now() - 7 * 86400000; HOJE.docs7 = (rows || []).filter(d => new Date(d.recebido_em).getTime() > lim).length; hojeRender(); }).catch(() => {});
-  if (ligado('func_pagamento_link')) d24('agenda_listar', { nao_pagas: true }).then(rows => { HOJE.naoPagas = rows || []; hojeRender(); }).catch(() => {});
+  if (!sem('documentos')) d24('agenda_documentos').then(rows => { const lim = Date.now() - 7 * 86400000; HOJE.docs7 = comoLista(rows).filter(d => new Date(d.recebido_em).getTime() > lim).length; hojeRender(); }).catch(() => {});
+  if (ligado('func_pagamento_link')) d24('agenda_listar', { nao_pagas: true }).then(rows => { HOJE.naoPagas = comoLista(rows); hojeRender(); }).catch(() => {});
   // Os números do mês chegam depois: o "indicadores" consulta o Chatwoot e demora.
   if (!HOJE.ind) d24('indicadores', { dias: 30 }).then(r => { HOJE.ind = r || {}; hojeRender(); }).catch(() => { HOJE.ind = { erro: true }; hojeRender(); });
 }
@@ -216,7 +216,7 @@ function resAvaliacoes() {
   const box = $('resAvaliacoes'); if (!box) return;
   if (sem('pesquisa')) { trocar(box); return; }
   d24('agenda_avaliacoes').then(rows => {
-    rows = (rows || []).slice(0, 20);
+    rows = comoLista(rows).slice(0, 20);
     if (!rows.length) { trocar(box); return; }
     const dia = d => d ? new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
     trocar(box, el('div', { class: 'bloco' }, el('h2', { text: 'Avaliações dos pacientes' }), el('p', { class: 'subtitulo', text: 'As 20 mais recentes. O código ao lado do nome é o do paciente, o mesmo da agenda.' }),
