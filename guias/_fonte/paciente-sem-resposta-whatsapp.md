@@ -7,7 +7,7 @@ pesquisa-alvo: paciente não respondido no WhatsApp da clínica
 publicado-em: 2026-10-28
 revisado-em: 2026-10-28
 rascunho: não
-relacionados: reduzir-faltas-consultorio, whatsapp-pessoal-e-da-clinica
+relacionados: reduzir-faltas-consultorio, whatsapp-pessoal-e-da-clinica, mensagens-prontas-recepcao
 perguntas:
   - pergunta: Quanto tempo a clínica pode demorar para responder no WhatsApp?
     resposta: Não existe um prazo oficial. O que funciona é combinar um tempo que a equipe consegue cumprir no horário de atendimento e, fora dele, avisar quando a clínica volta a responder.

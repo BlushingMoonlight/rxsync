@@ -7,7 +7,7 @@ pesquisa-alvo: agendamento de consultas pelo WhatsApp
 publicado-em: 2026-10-28
 revisado-em: 2026-10-28
 rascunho: não
-relacionados: reduzir-faltas-consultorio, ia-whatsapp-clinica-cfm
+relacionados: reduzir-faltas-consultorio, ia-whatsapp-clinica-cfm, mensagens-prontas-recepcao
 perguntas:
   - pergunta: O que perguntar ao paciente para marcar a consulta pelo WhatsApp?
     resposta: Nome completo, com qual médico, se é primeira consulta ou retorno, se é particular ou convênio e qual período prefere. Depois, ofereça dois ou três horários livres.

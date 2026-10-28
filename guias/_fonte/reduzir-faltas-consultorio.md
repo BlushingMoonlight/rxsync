@@ -7,7 +7,7 @@ pesquisa-alvo: como reduzir faltas no consultório
 publicado-em: 2026-10-28
 revisado-em: 2026-10-28
 rascunho: não
-relacionados: paciente-sem-resposta-whatsapp, agendamento-pelo-whatsapp
+relacionados: paciente-sem-resposta-whatsapp, agendamento-pelo-whatsapp, mensagens-prontas-recepcao
 perguntas:
   - pergunta: Quando mandar o lembrete da consulta?
     resposta: O que tem mais prova é o lembrete na véspera, cerca de um dia antes, com a opção de confirmar ou desmarcar ali mesmo. Um segundo lembrete alguns dias antes ajuda o paciente a desmarcar a tempo.
