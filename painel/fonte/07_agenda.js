@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------- Agenda (molde B; o calendário é uma variante da Lista)
-// Uma fileira de controles antes da lista; "+ Nova consulta" fixo embaixo no celular; o raro no ⋯ (Bloquear horário,
-// Exportar, Canceladas). A consulta abre numa folha (celular) ou ao lado da lista (iPad deitado e computador).
+// Uma fileira de controles antes da lista; "+ Nova consulta" fixo embaixo no celular; "Horários" ao lado do ⋯ (os
+// ajustes da agenda, #219); o raro no ⋯ (Bloquear horário, Exportar, Canceladas). A consulta abre numa folha (celular) ou ao lado da lista (iPad deitado e computador).
 const AG = { dados: [], carregou: false, filtro: 'novos', naoPagas: null, visao: window.innerWidth < 768 ? 'dia' : 'semana', cal: [], calReq: 0, aberta: null };
 const MED = { dados: [], modo: false, reservio: false, padrao: { agendamento: true }, filtro: '' };   // agenda por médico (modo_medicos vem do servidor)
 const GRADE = { dados: [] };
@@ -43,8 +43,11 @@ function medPagaConsultorio(id) {
 }
 const podeLink = (medicoId, servico) => ligado('func_pagamento_link') && String(servico || '').trim().toUpperCase() !== 'BLOQUEIO' && !medPagaConsultorio(medicoId);
 
+// #219: o caminho de toque para Agenda › Horários (os ajustes da agenda), ao lado do ⋯ nas três visões. Não é aba: as
+// abas são só visões do mesmo conteúdo (painel-novo.md, seção 9, regra 5), e Horários é o índice de ajustes (molde D).
+const agHorariosBtn = () => el('button', { class: 'btn sec', type: 'button', 'data-ir': 'agenda/horarios' }, icone('relogio', 'p'), 'Horários');
 tela('agenda', {
-  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma', 'agNovo'), mais: { id: 'agMais', lista: [
+  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma', 'agNovo'), extra: agHorariosBtn(), mais: { id: 'agMais', lista: [
     ['Bloquear horário', 'bloquear', () => bloquearForm()], ['Exportar para Google Agenda, Outlook ou iPhone', 'baixar', () => agExportar()],
     ['Ver as canceladas', 'proibido', () => { AG.visao = 'lista'; AG.filtro = 'cancelados'; agMostrar(); }]] } }),
     agAbas(''),
@@ -63,7 +66,7 @@ tela('agenda', {
     el('div', { class: 'filtros', id: 'agChips', role: 'group', 'aria-label': 'Filtrar consultas' }),
     el('div', { class: 'lado-a-lado' }, el('div', {}, el('div', { id: 'agLista' }, el('div', { class: 'cartao' }, esqueleto())), el('div', { id: 'calBox', hidden: true })),
       el('div', { class: 'item-lado', id: 'agItem', hidden: true }))],
-  entrar: () => { agMostrar(); if (!AG.carregou) agCarregar(); }
+  entrar: () => { agMostrar(); if (!AG.carregou) agCarregar(); if (ligado('func_reservio') && !INT.status) intStatus(); }
 });
 function agAbas(atual) {
   return el('div', { class: 'abas', role: 'tablist', 'aria-label': 'Agenda' }, [['', 'Consultas'], ['espera', 'Lista de espera'], ['documentos', 'Documentos']].map(([k, t]) =>
@@ -170,7 +173,7 @@ function consultaItem(a) {
   const rapidas = [];
   if (podePagar(a)) rapidas.push(btn(a.pago_em ? 'Desmarcar paga' : 'Marcar como paga', () => agPagar(a, !a.pago_em), 'sec', a.pago_em ? 'fechar' : 'dinheiro'));
   if (ativa && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
-  if (ativa && !externa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
+  if (ativa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
   // S10 e S13 (rxsync-sistema sql/066): desmarcar "vista" e desfazer o cancelamento (o servidor confere o horário livre).
   if (ativa && !bloq && a.visto) rapidas.push(btn('Marcar como não vista', () => agVistoDesfazer(a), 'sec', 'sino'));
   if (!ativa && !bloq && !externa && !a.no_externo && new Date(a.inicio).getTime() > Date.now()) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
@@ -185,7 +188,7 @@ function consultaItem(a) {
     a.status === 'cancelado' && !bloq && a.motivo_cancelamento ? ['Motivo do cancelamento', a.motivo_cancelamento === 'outro' ? (a.motivo_cancelamento_outro || 'Outro motivo') : (CANC_MOTIVOS.find(m => m[0] === a.motivo_cancelamento) || [])[1]] : null].filter(x => x && x[1]);
   return [el('div', { class: 'item-cab' }, el('div', { class: 'tx' }, el('h2', { text: bloq ? 'Horário bloqueado' : a.nome_paciente }), el('p', { class: 'mudo', text: fmtQuando(a.inicio) }), el('div', { class: 'etqs' }, tags))),
     rapidas.length ? el('div', { class: 'acoes-rapidas' }, rapidas) : null,
-    externa && ativa ? aviso('', 'Veio do ' + plat + '. Para alterar ou cancelar, use o ' + plat + ': a mudança aparece aqui em até 2 minutos.') : null,
+    externa && ativa ? aviso('', 'Veio do ' + plat + '. Remarcar daqui cria a reserva nova no ' + plat + '; a antiga e o cancelamento você faz também lá (a integração não consegue cancelar).') : null,
     el('div', { class: 'cartao bloco' }, el('dl', { class: 'dados' }, dadosL.map(([k, v]) => [el('dt', { text: k }), el('dd', { text: v })]))),
     a.briefing ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Resumo da conversa' }), el('p', { text: a.briefing })) : null,
     Array.isArray(a.preconsulta) && a.preconsulta.length ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Respostas antes da consulta' }),
@@ -193,7 +196,7 @@ function consultaItem(a) {
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
     !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }), btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')) : null,
     !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
-    ativa && !externa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
+    ativa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
     !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
 }
 // A conversa da consulta (S5, rxsync-sistema sql/077): só leitura, lida no Chatwoot na hora em que se toca (nada fica
@@ -244,7 +247,7 @@ async function agCancelar(a) {
   if (!(await confirmar({ titulo: bloq ? 'Desbloquear o horário?' : 'Cancelar a consulta?', texto: textos, botao: bloq ? 'Desbloquear' : 'Cancelar consulta', perigo: true,
     extra: bloq ? null : [el('label', { class: 'campo', for: 'cancMotivo' }, el('span', { class: 'rot', text: 'Motivo (opcional)' }), sel), caixaOutro] }))) return;
   const motivo = sel && sel.value ? { motivo: sel.value, ...(sel.value === 'outro' ? { motivo_outro: outro.value.trim().slice(0, 100) } : {}) } : {};
-  d24('agenda_cancelar', { id: a.id, ...motivo }).then(() => { rapida(bloq ? 'Horário desbloqueado.' : 'Consulta cancelada.'); consultaFechar(); agCarregar(); }).catch(() => rapida('Não consegui cancelar.'));
+  d24('agenda_cancelar', { id: a.id, ...motivo }).then(r => { rsvAviso(r, bloq ? 'Horário desbloqueado.' : 'Consulta cancelada.'); consultaFechar(); agCarregar(); }).catch(() => rapida('Não consegui cancelar.'));
 }
 // Desmarcar "vista" (S10): a consulta volta a aparecer como nova em Hoje e no filtro Novos; fecha a consulta, porque abrir de
 // novo marca como vista (decisão 8).
@@ -270,6 +273,8 @@ async function agExcluir(a) {
 // ---------------------------------------------------------------- nova consulta e remarcar (folha H): data, horário e duração (o fim é calculado)
 const duracaoPadrao = () => { const v = parseInt(VAL.duracao_padrao_min, 10); return v > 0 ? v : 30; };
 function consultaNova() { consultaForm(null); }
+// O que o Reservio respondeu (DEC-173): "Lançada também no Reservio", "Cancele também no Reservio"… fica mais tempo na tela.
+const rsvAviso = (r, padrao) => r && r.aviso_reservio ? rapida(r.aviso_reservio, { ms: 9000 }) : rapida(padrao);
 function consultaForm(a) {
   const bloq = a && ehBloqueio(a);
   const iniPadrao = a ? paraInput(a.inicio) : (AG.visao === 'dia' || AG.visao === 'semana' ? chave(calRef) : chave(hojeLocal())) + 'T09:00';
@@ -305,6 +310,26 @@ function consultaForm(a) {
     medSel.addEventListener('change', () => { tipoMontar(''); linkMostrar(); });
     tipoSel.addEventListener('change', () => { const o = tipoSel.options[tipoSel.selectedIndex]; if (o && o.value) { dur.value = o.getAttribute('data-dur'); atualizarFim(); if (!serv.value.trim()) serv.value = o.getAttribute('data-nome'); } });
   }
+  // Reservio (DEC-173): com a integração ligada, o serviço do Reservio e os horários livres dele, com o profissional; o
+  // horário escolhido vai com o serviço e o profissional, e o Reservio confere na hora (o fim é o do serviço).
+  const st = INT.status || {}, rsv = !bloq && st.conectado && !st.token_recusado && (st.servicos || []).length;
+  let rsvRec = '', rsvSel = null;
+  const rsvLista = el('div', { class: 'linha-botoes', id: 'agfRsvLista' });
+  const rsvMostrar = lista => trocar(rsvLista, lista.length ? lista.map(h => btn(h.inicio.slice(11, 16) + (h.profissional ? ' · ' + h.profissional : ''), () => {
+    hora.value = h.inicio.slice(11, 16); data.value = h.inicio.slice(0, 10); rsvRec = h.recurso_id || ''; dur.value = String(Math.round((new Date(h.fim) - new Date(h.inicio)) / 60000)); atualizarFim();
+    if (!serv.value.trim()) serv.value = rsvSel.options[rsvSel.selectedIndex].text.replace(/ \(\d+ min\)$/, ''); trocar(rsvLista, el('p', { class: 'dica', text: 'Escolhido: ' + hora.value + (h.profissional ? ', com ' + h.profissional : '') + '. Toque em Salvar.' }));
+  }, 'sec')) : el('p', { class: 'dica', text: 'Nenhum horário livre no Reservio neste dia.' }));
+  if (rsv) {
+    rsvSel = el('select', { class: 'entrada', id: 'agfRsv' }, el('option', { value: '', text: 'Escolha' }), st.servicos.map(x => el('option', { value: x.id, text: x.nome + (x.duracao_min ? ' (' + x.duracao_min + ' min)' : '') })));
+    rsvSel.value = a && a.externo_servico_id ? a.externo_servico_id : '';
+  }
+  const rsvBt = rsv ? btn('Ver horários livres no Reservio', async ev => {
+    if (!rsvSel.value) { rsvSel.focus(); rapida('Escolha o serviço do Reservio.'); return; }
+    const b = ev.currentTarget; b.disabled = true;
+    try { const r = await c12('horarios', { servico_id: rsvSel.value, dia: data.value }); if (r.ok === false) trocar(rsvLista, aviso('perigo', r.mensagem)); else rsvMostrar(r.horarios_livres || []); }
+    catch (e) { trocar(rsvLista, aviso('perigo', 'Não consegui falar com o Reservio agora.')); }
+    b.disabled = false;
+  }, 'sec', 'relogio') : null;
   // Link de pagamento (DEC-099): na nova consulta, a opção sempre desmarcada ao abrir.
   const linkCb = !a ? el('input', { type: 'checkbox', id: 'agEnviarLink' }) : null;
   const linkLbl = linkCb ? el('label', { class: 'marcar' }, linkCb, el('span', { text: 'Enviar link de pagamento ao paciente' })) : null;
@@ -316,7 +341,7 @@ function consultaForm(a) {
   const salvar = el('button', { class: 'btn pri', type: 'button', id: 'agfSalvar', text: 'Salvar' });
   const f = folha(a ? (bloq ? 'Editar bloqueio' : 'Remarcar') : 'Nova consulta', el('div', { class: 'form', id: 'agForm' },
     bloq ? null : campo('Nome do paciente', nome), bloq ? null : campo('Telefone com DDD', tel), bloq ? null : campo('Serviço', serv),
-    medSel ? campo('Médico', medSel) : null, tipoCampo,
+    medSel ? campo('Médico', medSel) : null, tipoCampo, rsv ? campo('Serviço do Reservio', rsvSel, 'O Reservio confere o horário na hora e dá a duração do serviço.') : null, rsvBt, rsv ? rsvLista : null,
     el('div', { class: 'duas-col' }, campo('Data', data), campo('Horário', hora)), campo('Duração (minutos)', dur), fimTxt, campo(bloq ? 'Motivo' : 'Observações', obs),
     linkLbl, forcaLbl, erro), { pe: [btn('Cancelar', () => f.fechar(), 'sec'), salvar], foco: bloq ? '#agfData' : '#agfNome' });
   atualizarFim();
@@ -332,6 +357,7 @@ function consultaForm(a) {
     if (medSel) d.medico_id = medSel.value;
     if (tipoSel) d.tipo_consulta_id = tipoCampo.hidden ? '' : tipoSel.value;
     if (linkCb && linkCb.checked && !linkLbl.hidden) d.enviar_link = true;
+    if (rsv && rsvSel.value) { d.reservio_servico_id = rsvSel.value; d.reservio_recurso_id = rsvRec; d.forcar = true; }   // quem confere é o Reservio
     if (MED.modo && medSel && !medSel.value && d.servico !== 'BLOQUEIO') { trocar(erro, aviso('perigo', 'Escolha o médico da consulta. "Sem médico" só vale para bloqueio.')); medSel.focus(); return; }
     if (MED.modo && tipoSel && !tipoCampo.hidden && !tipoSel.value && d.servico !== 'BLOQUEIO') { trocar(erro, aviso('perigo', 'Escolha o tipo de consulta.')); tipoSel.focus(); return; }
     salvar.disabled = true; salvar.textContent = 'Salvando…';
@@ -340,11 +366,12 @@ function consultaForm(a) {
       salvar.disabled = false; salvar.textContent = 'Salvar';
       if (res.ok) {
         f.limpar(); f.fechar();
-        if (res.pagamento) rapida('Salvo. ' + res.pagamento.mensagem, { ms: res.pagamento.enviado ? 4500 : 9000 }); else rapida('Salvo.');
+        if (res.pagamento) rapida('Salvo. ' + res.pagamento.mensagem, { ms: res.pagamento.enviado ? 4500 : 9000 }); else rsvAviso(res, 'Salvo.');
         if (a) consultaFechar();
         agCarregar(); if (medSel) medCarregar();
         return;
       }
+      if (res.erro === 'reservio') { trocar(erro, aviso('perigo', res.mensagem)); if (rsv) rsvMostrar(res.horarios_livres || []); return; }
       if (res.erro === 'conflito' || res.erro === 'fora_da_grade') forcaLbl.hidden = false;
       trocar(erro, aviso('perigo', res.erro === 'conflito' ? 'Já existe uma consulta nesse horário. Para marcar mesmo assim, marque "Permitir encaixe" e salve de novo.'
         : res.erro === 'fora_da_grade' ? 'Fora dos horários de atendimento. Para marcar mesmo assim, marque "Permitir encaixe" e salve de novo.'
@@ -375,7 +402,7 @@ function bloquearForm() {
     try {
       const r = await d24('agenda_criar', d);
       salvar.disabled = false;
-      if (r && r.ok) { f.limpar(); f.fechar(); rapida('Horário bloqueado.'); agCarregar(); return; }
+      if (r && r.ok) { f.limpar(); f.fechar(); rsvAviso(r, 'Horário bloqueado.'); agCarregar(); return; }
       trocar(erro, aviso('perigo', (r && r.mensagem) || 'Não consegui bloquear. Confira os horários.'));
     } catch (e) { salvar.disabled = false; trocar(erro, aviso('perigo', 'Não foi salvo: sem conexão. Tente de novo.')); }
   });
@@ -511,7 +538,7 @@ function calMes() {
 }
 // ---------------------------------------------------------------- Agenda › Lista de espera e Documentos (visões da Agenda)
 tela('agenda/espera', {
-  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma') }), agAbas('espera'),
+  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma'), extra: agHorariosBtn() }), agAbas('espera'),
     el('p', { class: 'subtitulo', text: 'Quem pediu para ser avisado quando abrir um horário. Quando uma consulta é cancelada, a assistente oferece a vaga a uma pessoa por vez, na ordem da lista; quem tem médico preferido só recebe vaga daquele médico.' }),
     el('div', { id: 'filaLista' })],
   entrar: () => filaCarregar()
@@ -535,7 +562,7 @@ function filaCarregar() {
 const DOC_TIPOS = { pedido_exame: 'Pedido de exame', resultado_exame: 'Resultado de exame', receita: 'Receita', atestado_laudo: 'Atestado ou laudo', carteirinha_convenio: 'Carteirinha do convênio', documento_identidade: 'Documento de identidade', comprovante_pagamento: 'Comprovante de pagamento', guia_autorizacao: 'Guia de autorização', outro: 'Outro', ilegivel: 'Não deu para ler' };
 const DOC_ROT = { nome_paciente: 'Paciente', data_nascimento: 'Nascimento', cpf: 'CPF', data_documento: 'Data do documento', convenio: 'Convênio', plano_convenio: 'Plano', numero_carteirinha: 'Carteirinha', validade: 'Validade', profissional: 'Profissional', registro_profissional: 'Registro', procedimentos_solicitados: 'Solicitado', numero_guia: 'Guia', valor_pago: 'Valor' };
 tela('agenda/documentos', {
-  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma') }), agAbas('documentos'),
+  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma'), extra: agHorariosBtn() }), agAbas('documentos'),
     el('p', { class: 'subtitulo', text: 'Fotos e PDFs que os pacientes mandam no WhatsApp: pedido de exame, carteirinha, guia, documento. A assistente anota só os dados administrativos e não interpreta conteúdo clínico. Confira sempre no arquivo original.' }),
     el('div', { id: 'docLista' })],
   entrar: () => docCarregar()
