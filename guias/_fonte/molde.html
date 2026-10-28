@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; {{CSP}}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="only light">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
+<title>{{TITULO_PAGINA}}</title>
+<meta name="description" content="{{DESCRICAO}}">
+<meta name="author" content="RXSync Tecnologia e Automação em Saúde">
+<meta name="robots" content="{{ROBOTS}}">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="{{URL}}">
+<meta property="og:type" content="{{OG_TIPO}}">
+<meta property="og:site_name" content="RXSync">
+<meta property="og:url" content="{{URL}}">
+<meta property="og:title" content="{{TITULO}}">
+<meta property="og:description" content="{{DESCRICAO}}">
+<meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{TITULO}}">
+<meta name="twitter:description" content="{{DESCRICAO}}">
+<meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<link rel="stylesheet" href="/assets/fontes/fontes.css">
+<link rel="stylesheet" href="/assets/ancora/tokens.css">
+<link rel="stylesheet" href="/assets/ancora/guias.css">
+<link rel="stylesheet" href="/assets/ancora/site.css">
+{{DADOS_ESTRUTURADOS}}
+</head>
+<body>
+<a href="#conteudo" class="pular">Pular para o conteúdo</a>
+
+<!-- ===================== topo: o mesmo do site (index.html), sem JavaScript; no celular, o menu abre com details ===================== -->
+<header class="topo">
+  <div class="topo-faixa">
+    <a href="/" class="marca" aria-label="RXSync, página inicial"><span class="marca-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>RXSync</a>
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="/#teste-ao-vivo">Converse agora</a>
+      <a href="/#como-funciona">Como funciona</a>
+      <a href="/#recursos">O que faz</a>
+      <a href="/#seguranca">Segurança</a>
+      <a href="/#planos">Preços</a>
+      <a href="/#duvidas">Dúvidas</a>
+      {{MENU_GUIAS}}
+    </nav>
+    <div class="topo-acoes">
+      <a href="/painel/" class="link-entrar">Já sou cliente</a>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=topo" class="btn btn-prim topo-cta" data-origem="topo">Começar grátis</a>
+      <details class="menu-m">
+        <summary aria-label="Abrir menu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg><span class="sr">Menu</span></summary>
+        <div class="menu-m-lista">
+          <a href="/#teste-ao-vivo">Converse agora</a>
+          <a href="/#como-funciona">Como funciona</a>
+          <a href="/#recursos">O que faz</a>
+          <a href="/#seguranca">Segurança</a>
+          <a href="/#planos">Preços</a>
+          <a href="/#duvidas">Dúvidas</a>
+          {{MENU_GUIAS}}
+          <a href="/painel/">Já sou cliente: entrar no painel</a>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<main id="conteudo">
+{{CONTEUDO}}
+</main>
+
+<!-- ===================== rodapé: o mesmo do site (sem o botão de cookies: os guias não guardam nada nem têm Google Analytics) ===================== -->
+<footer class="rodape">
+  <div class="rodape-faixa">
+    <div class="rodape-grade">
+      <div>
+        <a href="/" class="marca"><span class="marca-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>RXSync</a>
+        <p class="rodape-desc">Assistente virtual que atende e marca consultas pelo WhatsApp de clínicas e consultórios.</p>
+      </div>
+      <div>
+        <h2 class="rodape-tit">Navegação</h2>
+        <ul>
+          <li><a href="/#teste-ao-vivo">Converse agora</a></li>
+          <li><a href="/#como-funciona">Como funciona</a></li>
+          <li><a href="/#recursos">O que faz</a></li>
+          <li><a href="/#seguranca">Segurança</a></li>
+          <li><a href="/#planos">Planos e preços</a></li>
+          <li><a href="/#duvidas">Dúvidas</a></li>
+          {{RODAPE_GUIAS}}
+          <li><a href="/painel/">Já é cliente? Entrar no painel</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="rodape-tit">Contato e legal</h2>
+        <ul>
+          <li><a href="mailto:contato@rxsync.com.br">contato@rxsync.com.br</a></li>
+          <li><a href="/termos/2026-10-v7.html">Termos de Uso</a></li>
+          <li><a href="/privacidade.html">Política de Privacidade</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="rodape-base">
+      <span>© 2026 RXSync Tecnologia e Automação em Saúde · 52.970.673 LUAN DUARTE CAVALHEIRO · CNPJ 52.970.673/0001-78 · Florianópolis/SC · contato@rxsync.com.br</span>
+      <span>Feita em Florianópolis/SC</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
+
+<!-- ======================================================================================================
+     As 10 peças. O montador (scripts/guias_montar.mjs) copia cada uma daqui, troca os {{…}} e põe no lugar de
+     {{CONTEUDO}}. Nada abaixo desta linha vai para a página. Cada peça fica entre <!-- peça: nome --> e <!-- /peça -->.
+     ====================================================================================================== -->
+
+<!-- peça: pagina-guia -->
+<div class="guia">
+  <nav class="caminho" aria-label="Você está em"><ol><li>{{CAMINHO_GUIAS}}</li><li aria-current="page">{{TITULO}}</li></ol></nav>
+  {{FAIXA_RASCUNHO}}
+  <div class="guia-grade">
+    <nav class="indice" aria-labelledby="indice-tit"><p class="indice-tit" id="indice-tit">Neste guia</p><ol>{{INDICE}}</ol></nav>
+    <article class="leitura">
+      <header class="guia-cab">
+        <h1>{{TITULO}}</h1>
+        <p class="guia-datas">Publicado em <time datetime="{{PUBLICADO_ISO}}">{{PUBLICADO}}</time> · Revisado em <time datetime="{{REVISADO_ISO}}">{{REVISADO}}</time></p>
+      </header>
+      <details class="indice-m"><summary>Neste guia</summary><ol>{{INDICE}}</ol></details>
+      {{CORPO}}
+      {{RELACIONADOS}}
+    </article>
+    <aside class="lateral" aria-label="Teste na sua clínica">
+      <div class="cartao-lateral">
+        <p class="cartao-lateral-tit">Teste na sua clínica</p>
+        <p>A assistente atende e marca consultas no WhatsApp da clínica. 7 dias grátis, sem cartão.</p>
+        <a class="btn btn-prim" href="{{LINK_TESTE}}" data-origem="{{ORIGEM}}">Começar grátis</a>
+      </div>
+    </aside>
+  </div>
+</div>
+<!-- /peça -->
+
+<!-- peça: pagina-guias -->
+<div class="guias-pagina">
+  <header class="guias-cab">
+    <h1>Guias</h1>
+    <p>Como organizar o atendimento da clínica pelo WhatsApp, a agenda e as regras, em textos curtos e com fonte.</p>
+    <nav class="temas" aria-label="Temas"><ul>{{TEMAS_LINKS}}</ul></nav>
+  </header>
+  {{TEMAS}}
+  {{CHAMADA}}
+</div>
+<!-- /peça -->
+
+<!-- peça: tema -->
+<section class="tema" id="{{TEMA_ID}}" aria-labelledby="{{TEMA_ID}}-tit"><h2 id="{{TEMA_ID}}-tit">{{TEMA_NOME}}</h2><div class="cartoes">{{CARTOES}}</div></section>
+<!-- /peça -->
+
+<!-- peça: faixa-rascunho -->
+<p class="faixa-rascunho">Rascunho: esta página não aparece no Google, no mapa do site nem na lista de guias.</p>
+<!-- /peça -->
+
+<!-- peça: resposta-curta -->
+<div class="p-resposta-curta"><p class="p-rotulo">Resposta curta</p>{{TEXTO}}</div>
+<!-- /peça -->
+
+<!-- peça: na-rxsync -->
+<div class="p-na-rxsync"><p class="p-rotulo">Na RXSync</p>{{TEXTO}}</div>
+<!-- /peça -->
+
+<!-- peça: passos -->
+<ol class="p-passos">{{ITENS}}</ol>
+<!-- /peça -->
+
+<!-- peça: tabela -->
+<div class="p-tabela" role="region" aria-label="{{LEGENDA}}" tabindex="0"><table><caption>{{LEGENDA}}</caption>{{TABELA}}</table></div>
+<!-- /peça -->
+
+<!-- peça: aviso -->
+<div class="p-aviso" role="note"><p class="p-rotulo">Atenção</p>{{TEXTO}}</div>
+<!-- /peça -->
+
+<!-- peça: modelo-de-mensagem -->
+<figure class="p-modelo"><figcaption>{{LEGENDA}}</figcaption><blockquote>{{TEXTO}}</blockquote></figure>
+<!-- /peça -->
+
+<!-- peça: imagem -->
+<figure class="p-imagem"><img src="{{SRC}}" alt="{{ALT}}" width="{{LARGURA}}" height="{{ALTURA}}" loading="lazy" decoding="async"><figcaption>{{LEGENDA}}</figcaption></figure>
+<!-- /peça -->
+
+<!-- peça: perguntas -->
+<section class="p-perguntas" aria-labelledby="perguntas"><h2 id="perguntas">Perguntas frequentes</h2>{{ITENS}}</section>
+<!-- /peça -->
+
+<!-- peça: pergunta -->
+<div class="p-pergunta"><h3>{{PERGUNTA}}</h3><p>{{RESPOSTA}}</p></div>
+<!-- /peça -->
+
+<!-- peça: chamada -->
+<div class="p-chamada"><p class="p-chamada-tit">{{TITULO}}</p><p>{{TEXTO}}</p><a class="btn btn-prim" href="{{LINK_TESTE}}" data-origem="{{ORIGEM}}">Testar 7 dias grátis</a><p class="p-chamada-pe">Sem cartão. No WhatsApp da própria clínica.</p></div>
+<!-- /peça -->
+
+<!-- peça: cartao-de-guia -->
+<a class="p-cartao" href="/guias/{{ENDERECO}}/"><span class="p-cartao-tema">{{TEMA_NOME}}</span><span class="p-cartao-tit">{{TITULO}}</span><span class="p-cartao-desc">{{DESCRICAO}}</span></a>
+<!-- /peça -->
+
+<!-- peça: relacionados -->
+<section class="relacionados" aria-labelledby="relacionados"><h2 id="relacionados">Leia também</h2><div class="cartoes">{{CARTOES}}</div></section>
+<!-- /peça -->

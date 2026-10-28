@@ -22,7 +22,16 @@ export const BRASILAPI = 'https://brasilapi.com.br';
 export const juntar = (...xs) => xs.filter(Boolean).join(' ');
 // O que cada página pode carregar além do próprio script e estilo ('self' = os arquivos do próprio site):
 // - painel: o gráfico e as fontes do próprio site, o QR do WhatsApp (data:), a lista de municípios ('self') e o n8n.
+// - guias (guias/<endereço>/index.html e guias/index.html, montados pelo scripts/guias_montar.mjs): nenhum script (o
+//   índice do celular e o menu usam <details>), só os estilos e as fontes do site; os dados estruturados
+//   (application/ld+json) não rodam. Gravada pelo guias_montar.mjs (não pelo node scripts/csp.mjs).
+export const PAGINA_GUIA = { estilo: "'self'", img: "'self'", connect: "'none'", montada: true };
+const GUIAS = path.join(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'), 'guias');
+const paginasGuias = () => !fs.existsSync(GUIAS) ? [] : [
+  ...fs.readdirSync(GUIAS, { withFileTypes: true }).filter(d => d.isDirectory() && !d.name.startsWith('_') && fs.existsSync(path.join(GUIAS, d.name, 'index.html'))).map(d => `guias/${d.name}/index.html`),
+  ...(fs.existsSync(path.join(GUIAS, 'index.html')) ? ['guias/index.html'] : [])];
 export const PAGINAS = {
+  ...Object.fromEntries(paginasGuias().map(f => [f, PAGINA_GUIA])),
   // - painel antigo: desde a entrega 3 (DEC-156) só leva para /painel/, com o mesmo ?t= e o mesmo #; nada de fora.
   'autoedicao.html': { img: "'self'", connect: "'none'" },
   // - painel novo (DEC-156): o mesmo do painel antigo. Gravada pelo painel_montar.mjs (não pelo node scripts/csp.mjs).
