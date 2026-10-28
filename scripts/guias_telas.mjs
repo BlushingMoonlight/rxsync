@@ -100,7 +100,9 @@ for (const w of [360, 1024, 1280]) {
   const { ctx, page, erros } = await abrir(w, '/guias/', { publicada: true });
   const l = await larguraOk(page);
   ok(!l.rola && !l.cortados.length, `página Guias, ${w} px: nada rola para o lado nem fica cortado` + (l.cortados.length ? ' (' + l.cortados.join(' · ') + ')' : ''));
-  ok(await page.locator('.temas a').first().isVisible() && await page.locator(`#${G.tema} .p-cartao`).count() >= 1, `página Guias, ${w} px: o tema como âncora e o cartão do guia`);
+  const secao = page.locator(`.tema:has(a.p-cartao[href="/guias/${G.endereco}/"])`);
+  const idTema = await secao.count() === 1 ? await secao.getAttribute('id') : null;
+  ok(idTema && await page.locator(`.temas a[href="#${idTema}"]`).isVisible(), `página Guias, ${w} px: o tema como âncora e o cartão do guia`);
   ok(await page.locator('.p-chamada a.btn').getAttribute('data-origem') === 'guias', `página Guias, ${w} px: a chamada leva a origem "guias"`);
   ok(!erros.length, `página Guias, ${w} px: sem erro no console` + (erros.length ? ': ' + erros.join(' | ') : ''));
   await ctx.close();
