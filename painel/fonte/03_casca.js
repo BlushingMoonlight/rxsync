@@ -60,7 +60,7 @@ LARGO.addEventListener('change', () => rotear());
 function cabTela(titulo, op) {
   op = op || {};
   return [op.voltar ? el('button', { class: 'voltar', type: 'button', 'data-ir': op.voltar[0] }, icone('voltar'), op.voltar[1]) : null,
-    el('div', { class: 'cab-tela' }, el('h1', { text: titulo }), op.acao ? op.acao : null, op.mais ? maisMenu(op.mais) : null),
+    el('div', { class: 'cab-tela' }, el('h1', { text: titulo }), op.acao ? op.acao : null, op.extra || null, op.mais ? maisMenu(op.mais) : null),
     op.sub ? el('p', { class: 'subtitulo', text: op.sub }) : null];
 }
 // ⋯ Mais: o que é raro, perto do que ele afeta, sempre com o mesmo ícone.

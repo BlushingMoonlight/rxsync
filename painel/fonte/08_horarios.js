@@ -21,7 +21,7 @@ function horIndice() {
     linhaLink('Perguntas antes de agendar', sem('preconsulta') ? 'Plano Gestão' : ligado('func_preconsulta') ? 'Ligada' : 'Desligada', 'agenda/horarios/perguntas', 'pergunta'),
     linhaLink('Feriados', feriadosLigados() ? 'Não atende em feriados' + (FER.cfg && FER.cfg.cidade ? ' · ' + FER.cfg.cidade + '/' + FER.cfg.uf : '') : 'Atende em feriados', 'agenda/horarios/feriados', 'agenda'),
     linhaLink('Receber dos pacientes', ligado('func_pagamento_link') ? 'Link de pagamento ligado' : 'Link de pagamento desligado', 'agenda/horarios/pagamento', 'dinheiro'),
-    linhaLink('Integração e planilhas', st.conectado ? (st.plataforma_nome || 'Reservio') + ' conectado' : 'Reservio, link do seu sistema e importar a agenda', 'agenda/horarios/integracao', 'link')));
+    linhaLink('Integração e planilhas', st.conectado ? (st.plataforma_nome || 'Reservio') + ((st.pendencias || []).length ? ': ' + st.pendencias.length + ' para fazer lá' : st.token_recusado ? ': conecte de novo' : ' conectado') : 'Reservio, link do seu sistema e importar a agenda', 'agenda/horarios/integracao', 'link')));
 }
 function pedirAjuda(b) {
   b.disabled = true;
@@ -95,7 +95,7 @@ tela('agenda/horarios/medicos', {
     : [cabTela('Médicos e tipos', { voltar: VOLTA_HOR }), el('div', { id: 'medBox' }, blocoCampos(['func_medicos']),
       el('div', { class: 'pilha' }, aviso('ok', 'Sua clínica usa agenda por médico: cada médico tem os próprios horários, aqui embaixo. Os horários gerais da clínica ficam guardados. Para voltar a uma agenda só, desligue “Agenda por médico” no alto desta página.'),
         aviso('', 'A agenda por médico está desligada: a assistente usa os horários de atendimento da clínica. Para ela usar os médicos abaixo, ligue “Agenda por médico” no alto desta página.'),
-        aviso('', 'A agenda por médico fica pausada enquanto a integração com o Reservio estiver ligada. Por enquanto, a assistente usa os horários de atendimento da clínica.')),
+        aviso('', 'A agenda por médico fica pausada enquanto a integração com o Reservio estiver ligada: os horários e os profissionais vêm do Reservio.')),
       el('h2', { class: 'tit-bloco pilha', text: 'Médicos' }), el('div', { id: 'medLista' }, el('div', { class: 'cartao' }, esqueleto())),
       el('div', { class: 'cartao pad bloco pilha' }, el('div', { class: 'campo form' }, el('label', { for: 'medNovoNome', text: 'Adicionar médico' }),
         el('input', { class: 'entrada', id: 'medNovoNome', type: 'text', maxlength: '80', placeholder: 'Nome do médico (ex.: Dra. Ana Souza)' })), btn('Adicionar', medAdicionar, 'sec plena', 'soma', { id: 'medNovoBtn' })))],
@@ -323,7 +323,6 @@ function ferRender() {
 }
 
 // ---------------------------------------------------------------- Receber dos pacientes (E): o link, a frase e o valor, no lembrete, o Asaas da clínica
-// O servidor cita "Agenda › Horários › Pagamento" (workflow 32): a busca acha por "pagamento".
 tela('agenda/horarios/pagamento', {
   montar: () => [cabTela('Receber dos pacientes', { voltar: VOLTA_HOR, sub: 'Depois de marcar a consulta, a assistente manda ao paciente o link de pagamento da clínica. Nada é cancelado sozinho.' }),
     el('div', { id: 'pagQuemMarca' }), blocoCampos(['func_pagamento_link', 'pagamento_link', 'pagamento_texto', 'pagamento_valor_padrao', 'pagamento_no_lembrete']),
@@ -380,7 +379,6 @@ function asaasConectar() {
 }
 
 // ---------------------------------------------------------------- Integração e planilhas (D): Reservio, link do seu sistema, importar a agenda e as importações
-// O servidor cita "Agenda › Integração" (workflow 12): a busca acha por "integração".
 const VOLTA_INT = ['agenda/horarios/integracao', 'Integração e planilhas'];
 function intStatus() { return c12('status').then(r => { INT.status = r || {}; return INT.status; }).catch(() => ({})); }
 tela('agenda/horarios/integracao', {
@@ -390,7 +388,7 @@ tela('agenda/horarios/integracao', {
 function intIndice() {
   const st = INT.status || {};
   trocar($('intIndice'), el('div', { class: 'lista' },
-    linhaLink('Reservio', st.conectado ? (st.status === 'erro' ? 'Com problema' : 'Conectado') + (st.business_nome ? ' · ' + st.business_nome : '') : 'Não conectado', 'agenda/horarios/integracao/reservio', 'link'),
+    linhaLink('Reservio', st.conectado ? (st.status === 'erro' || st.token_recusado ? 'Com problema' : (st.pendencias || []).length ? (st.pendencias.length + ' para fazer no Reservio') : 'Conectado') + (st.business_nome ? ' · ' + st.business_nome : '') : 'Não conectado', 'agenda/horarios/integracao/reservio', 'link'),
     linhaLink('Link de agendamento do seu sistema', ligado('link_agendamento_ativo') ? 'Ligado: a assistente manda o link em vez de marcar' : 'Desligado', 'agenda/horarios/integracao/link', 'link'),
     linhaLink('Importar a agenda de outro sistema', 'Planilha CSV, em 4 passos', 'agenda/horarios/integracao/importar', 'importar'),
     linhaLink('Importações da agenda', 'Ver e desfazer em até 7 dias', 'agenda/horarios/integracao/importacoes', 'notas')));
@@ -418,57 +416,82 @@ function intRender(r, ultimo) {
   const sel = (id, ops, v) => { const s = el('select', { class: 'entrada', id }, ops.map(([a, b]) => el('option', { value: a, text: b }))); s.value = v || ''; return s; };
   const campo = (rot, i, dica) => el('div', { class: 'campo' }, el('label', { for: i.id, text: rot }), i, dica ? el('p', { class: 'dica', text: dica }) : null);
   const msg = r.mensagem ? aviso(r.ok === false ? 'perigo' : 'ok', r.mensagem) : null;
-  if (!r.conectado) {
+  const ocupado = (b, t) => { b.disabled = true; b.textContent = t; };
+  // R-08 (DEC-173): token recusado: a integração está parada; conectar de novo abre o formulário com o token novo.
+  if (!r.conectado || ultimo === 'reconectar') {
     const plats = Object.keys(r.plataformas || { reservio: 'Reservio' }).map(k => [k, (r.plataformas || {})[k] || 'Reservio']);
     const sPlat = sel('intPlat', plats, (ultimo && ultimo.plataforma) || 'reservio');
     const tok = el('input', { class: 'entrada', id: 'intToken', type: 'password', autocomplete: 'off', spellcheck: 'false', placeholder: 'Cole aqui o token da API', value: ultimo && ultimo.token ? ultimo.token : null });
     let neg = null;
     if (r.escolher_negocio && r.escolher_negocio.length) neg = sel('intNeg', r.escolher_negocio.map(x => [x.id, x.nome || x.id]), '');
     else if (r.pedir_negocio) neg = el('input', { class: 'entrada', id: 'intNeg', type: 'text', placeholder: 'Ex.: b04965e6-a9bb-591f-8f8a-1adcb2c8dc39' });
+    // R-12: a clínica de teste só conecta uma conta do Reservio que seja só de teste, nunca a de uma clínica.
+    const teste = r.pedir_confirmacao_teste ? el('input', { type: 'checkbox', id: 'intTeste' }) : null;
     const bt = el('button', { class: 'btn pri plena', type: 'button', text: 'Conectar' });
     bt.addEventListener('click', () => {
-      const dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg ? neg.value.trim() : '' };
+      const dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg ? neg.value.trim() : '', teste_confirmado: !!(teste && teste.checked) };
       if (!dados.token) { tok.focus(); rapida('Cole o token da API.'); return; }
-      bt.disabled = true; bt.textContent = 'Conectando…';
-      c12('conectar', dados).then(x => intRender(x, x.ok ? null : dados)).catch(() => intRender({ ok: false, mensagem: 'Não consegui conectar agora. Tente de novo em instantes.', plataformas: r.plataformas }, dados));
+      if (teste && !teste.checked) { teste.focus(); rapida('Confirme que a conta do Reservio é só de teste.'); return; }
+      ocupado(bt, 'Conectando…');
+      c12('conectar', dados).then(x => intRender(x, x.ok ? null : dados)).catch(() => intRender({ ok: false, mensagem: 'Não consegui conectar agora. Tente de novo em instantes.', plataformas: r.plataformas, pedir_confirmacao_teste: r.pedir_confirmacao_teste }, dados));
     });
-    trocar(box, msg, el('div', { class: 'cartao pad molde-f' }, el('p', { class: 'tit-bloco', text: 'Conectar a agenda que você já usa' }),
+    trocar(box, msg, el('div', { class: 'cartao pad molde-f' }, el('p', { class: 'tit-bloco', text: r.token_recusado ? 'Conectar de novo' : 'Conectar a agenda que você já usa' }),
       campo('Plataforma', sPlat, 'Por enquanto, a integração funciona com o Reservio.'), campo('Token da API', tok, 'No Reservio, a API faz parte do plano Pro: peça o token ao suporte do Reservio e cole aqui. Ele fica guardado com criptografia e não aparece de novo.'),
-      neg ? campo(r.escolher_negocio ? 'Negócio' : 'ID do negócio', neg, r.escolher_negocio ? 'Sua conta tem mais de um negócio. Escolha o desta clínica.' : 'O suporte do ' + nomePlat + ' informa junto com o token.') : null, bt));
+      neg ? campo(r.escolher_negocio ? 'Negócio' : 'ID do negócio', neg, r.escolher_negocio ? 'Sua conta tem mais de um negócio. Escolha o desta clínica.' : 'O suporte do ' + nomePlat + ' informa junto com o token.') : null,
+      teste ? el('label', { class: 'marcar' }, teste, el('span', { text: 'Esta conta do ' + nomePlat + ' é só de teste (nunca a de uma clínica).' })) : null, bt));
     return;
   }
   const { sw } = chaveEl('func_reservio', 'Integração com o ' + nomePlat, { semId: false });
-  const sServ = sel('intServ', [['', 'Escolha']].concat((r.servicos || []).map(x => [x.id, x.nome + (x.duracao_min ? ' (' + x.duracao_min + ' min)' : '')])), r.servico_id || '');
+  // DEC-173: a clínica marca os serviços que a assistente pode oferecer, com o "quando usar" e se é de convênio.
+  const marcados = {}; (r.servicos_ia || []).forEach(x => { marcados[x.id] = x; });
+  const linhas = (r.servicos || []).map(x => {
+    const m = marcados[x.id], cb = el('input', { type: 'checkbox', checked: !!m, 'aria-label': 'A assistente oferece ' + x.nome });
+    const q = el('input', { class: 'entrada', type: 'text', maxlength: '200', value: m ? m.quando_usar : '', placeholder: 'Quando usar (ex.: consulta online, particular)', 'aria-label': 'Quando usar ' + x.nome });
+    const cv = el('input', { type: 'checkbox', checked: !!(m && m.convenio) });
+    return { x, cb, q, cv, el: el('div', { class: 'cartao pad bloco' }, el('label', { class: 'marcar' }, cb, el('span', { text: x.nome + (x.duracao_min ? ' · ' + x.duracao_min + ' min' : '') })), q,
+      el('label', { class: 'marcar' }, cv, el('span', { text: 'De convênio (só aparece se o paciente disser o convênio)' }))) };
+  });
   const sRec = sel('intRec', [['', 'Todos os profissionais']].concat((r.recursos || []).map(x => [x.id, x.nome])), r.recurso_id || '');
   const cbH = el('input', { type: 'checkbox', checked: r.importar_horarios !== false });
   const salvar = el('button', { class: 'btn pri plena', type: 'button', text: 'Salvar' });
   salvar.addEventListener('click', () => {
-    if (!sServ.value) { sServ.focus(); rapida('Escolha o serviço.'); return; }
-    salvar.disabled = true; salvar.textContent = 'Salvando…';
-    c12('configurar', { servico_id: sServ.value, recurso_id: sRec.value, importar_horarios: cbH.checked }).then(x => intRender(x)).catch(() => { rapida('Não consegui salvar.'); salvar.disabled = false; salvar.textContent = 'Salvar'; });
+    ocupado(salvar, 'Salvando…');
+    c12('configurar', { servicos_ia: linhas.filter(l => l.cb.checked).map(l => ({ id: l.x.id, quando_usar: l.q.value.trim(), convenio: l.cv.checked })), recurso_id: sRec.value, importar_horarios: cbH.checked })
+      .then(x => intRender(x)).catch(() => { rapida('Não consegui salvar.'); salvar.disabled = false; salvar.textContent = 'Salvar'; });
   });
-  const ocupado = (b, t) => { b.disabled = true; b.textContent = t; };
+  const QUEM = { paciente: 'o paciente', equipe: 'a equipe', assistente_gestao: 'o assistente de gestão', api: 'o sistema da clínica', sistema: 'a RXSync' };
+  const TIPO = { cancelar: 'Cancele', cancelar_antiga: 'Cancele a reserva antiga (remarcada)', lancar: 'Lance', bloquear: 'Bloqueie' };
+  const pend = r.pendencias || [];
+  const erroTxt = r.token_recusado ? 'O ' + nomePlat + ' recusou o token. A integração parou: nada vai ao ' + nomePlat + ' e a assistente não marca até você conectar de novo com um token novo.' : r.status === 'erro' && r.ultimo_erro ? r.ultimo_erro : '';
   trocar(box, msg,
-    el('div', { class: 'cartao campos bloco' }, el('div', { class: 'chave-linha' }, el('div', { class: 'tx' }, el('div', { class: 't1' }, nomePlat + (r.business_nome ? ' · ' + r.business_nome : ''), etq(r.status === 'erro' ? 'Com problema' : 'Conectado', r.status === 'erro' ? 'perigo' : 'ok', r.status === 'erro' ? 'alerta' : 'ok')),
+    el('div', { class: 'cartao campos bloco' }, el('div', { class: 'chave-linha' }, el('div', { class: 'tx' }, el('div', { class: 't1' }, nomePlat + (r.business_nome ? ' · ' + r.business_nome : ''), etq(erroTxt ? 'Com problema' : 'Conectado', erroTxt ? 'perigo' : 'ok', erroTxt ? 'alerta' : 'ok')),
       el('p', { class: 'dica', text: 'Última sincronização: ' + intHa(r.ultima_sync) + '. Ligada, mantém os horários em sincronia com a sua agenda no ' + nomePlat + '.' })), sw)),
-    r.status === 'erro' && r.ultimo_erro ? aviso('perigo', r.ultimo_erro) : null,
-    el('h2', { class: 'tit-bloco', text: 'Como a assistente usa o ' + nomePlat }),
-    !r.servico_id ? aviso('atencao', 'Escolha o serviço para a assistente começar a lançar no ' + nomePlat + ' as consultas que ela marca.') : null,
-    el('div', { class: 'cartao pad bloco form' }, campo('Serviço usado quando a assistente marca', sServ), campo('Profissional', sRec, 'As consultas desse profissional ocupam a agenda da RXSync, e é na agenda dele que a assistente marca.'),
+    erroTxt ? aviso('perigo', erroTxt) : null,
+    r.token_recusado ? btn('Conectar de novo', () => intRender(r, 'reconectar'), 'pri plena') : null,
+    pend.length ? [el('h2', { class: 'tit-bloco', text: 'Para fazer no ' + nomePlat + ' (' + pend.length + ')' }),
+      el('p', { class: 'dica', text: 'A API do ' + nomePlat + ' não cancela, não muda e não bloqueia. Faça lá e toque em "Já fiz".' }),
+      el('div', { class: 'lista bloco' }, pend.map(p => el('div', { class: 'linha' }, el('div', { class: 'tx' }, el('div', { class: 't1', text: (TIPO[p.tipo] || p.tipo) + (p.nome ? ': ' + p.nome : '') }),
+        el('div', { class: 't2', text: (p.inicio ? fmtQuando(p.inicio) : '') + (p.profissional ? ' · ' + p.profissional : '') + ' · feito por ' + (QUEM[p.quem] || 'a RXSync') })),
+        btn('Já fiz', ev => { ocupado(ev.currentTarget, '…'); c12('pendencia_resolver', { id: String(p.id) }).then(x => intRender(x)).catch(() => rapida('Não consegui.')); }, 'sec'))))] : null,
+    el('h2', { class: 'tit-bloco', text: 'Serviços que a assistente oferece' }),
+    !(r.servicos_ia || []).length ? aviso('atencao', 'Marque os serviços que a assistente pode oferecer. Sem nenhum, ela não marca e passa os pedidos para a equipe.') : null,
+    el('p', { class: 'dica', text: 'Os horários e a duração vêm do ' + nomePlat + ' na hora. A assistente escolhe o serviço pela conversa e confirma com o paciente.' }),
+    linhas.map(l => l.el),
+    el('div', { class: 'cartao pad bloco form' }, campo('Profissional', sRec, 'Todos: a assistente oferece o primeiro horário livre e diz com quem é. A consulta de um não ocupa o horário do outro.'),
       el('label', { class: 'marcar' }, cbH, el('span', { text: 'Usar os dias e horários de atendimento do ' + nomePlat })),
-      el('p', { class: 'dica', text: r.importar_horarios !== false ? ((r.horarios || []).length ? 'Horários vindos do ' + nomePlat + ': ' + intHorariosResumo(r.horarios) + '. Atualizam sozinhos a cada 30 minutos.' : 'Os horários são lidos do ' + nomePlat + ' quando você salvar.') : 'Desligado: a assistente usa os Horários de atendimento da RXSync.' }),
+      el('p', { class: 'dica', text: r.importar_horarios !== false ? ((r.horarios || []).length ? 'Horários vindos do ' + nomePlat + ': ' + intHorariosResumo(r.horarios) + '. Atualizam sozinhos a cada 30 minutos.' : 'Os horários são lidos do ' + nomePlat + ' quando você salvar.') : 'Desligado: a grade da RXSync fica como está.' }),
       el('div', { class: 'pilha' }, salvar)),
     el('div', { class: 'linha-botoes bloco' }, btn('Sincronizar agora', ev => { ocupado(ev.currentTarget, 'Sincronizando…'); c12('sincronizar').then(x => intRender(x)).catch(() => { rapida('Não consegui sincronizar.'); intRender(r); }); }, 'sec'),
       btn('Atualizar a lista de serviços', ev => { ocupado(ev.currentTarget, 'Atualizando…'); c12('atualizar_opcoes').then(x => intRender(x)).catch(() => { rapida('Não consegui atualizar.'); intRender(r); }); }, 'sec')),
     el('div', { class: 'cartao pad bloco' }, el('p', { class: 'tit-bloco', text: 'Como funciona' }), [
-      'A cada 2 minutos, as consultas do ' + nomePlat + ' aparecem aqui e ocupam o horário, para a assistente não oferecer horário já tomado.',
-      'Quando a assistente marca uma consulta, ela confere se o horário está livre no ' + nomePlat + ' e lança lá. Se alguém tiver ocupado o horário no meio tempo, você recebe um aviso no WhatsApp de avisos.',
-      'O ' + nomePlat + ' não permite cancelar pela integração. Quando o paciente cancela pelo WhatsApp, avisamos no WhatsApp de avisos para você cancelar lá.',
-      r.importar_horarios !== false ? 'Os dias e horários de atendimento vêm do ' + nomePlat + '. Feriados seguem o que estiver em Agenda › Horários › Feriados. Folgas de um dia específico ainda não vêm de lá: use "Bloquear horário" na Agenda.' : 'Mantenha os Horários de atendimento iguais aos do ' + nomePlat + '.'
+      'A cada 2 minutos, as consultas do ' + nomePlat + ' aparecem aqui e ocupam o horário do profissional.',
+      'A assistente pergunta ao ' + nomePlat + ' os horários livres na hora, cria a reserva lá e só então confirma ao paciente.',
+      'Nova consulta, Remarcar e Bloquear horário na Agenda também vão para o ' + nomePlat + '. Cancelar e bloquear você faz também lá: a lista "Para fazer" acima e o WhatsApp de avisos lembram.',
+      'Feriados seguem o que estiver em Agenda › Horários › Feriados.'
     ].map(t => el('p', { class: 'dica', text: t }))),
     el('div', { class: 'perigo-zona' }, btn('Desconectar do ' + nomePlat, async ev => {
       const b = ev.currentTarget;
-      if (!(await confirmar({ titulo: 'Desconectar do ' + nomePlat + '?', texto: 'As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de lançar consultas lá.', botao: 'Desconectar', perigo: true }))) return;
+      if (!(await confirmar({ titulo: 'Desconectar do ' + nomePlat + '?', texto: 'As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de marcar pelo ' + nomePlat + '.', botao: 'Desconectar', perigo: true }))) return;
       ocupado(b, 'Desconectando…'); c12('desconectar').then(x => intRender(x)).catch(() => { rapida('Não consegui desconectar.'); intRender(r); });
     }, 'perigo-sec plena')));
 }

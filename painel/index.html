@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-lULKUA4UUJPzeYeg3jBsH7TLsixSa46nvqfXeeyIjac=' 'self'; style-src 'sha256-KTwkZnS5cZWkbaGZVwziHiYRymT465RBkoaJumONETI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SJY0ezKbO22/Vw6e2IMUp42+VH8C6uH4ZaYZtnsuguU=' 'self'; style-src 'sha256-KTwkZnS5cZWkbaGZVwziHiYRymT465RBkoaJumONETI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1029,7 +1029,7 @@ LARGO.addEventListener('change', () => rotear());
 function cabTela(titulo, op) {
   op = op || {};
   return [op.voltar ? el('button', { class: 'voltar', type: 'button', 'data-ir': op.voltar[0] }, icone('voltar'), op.voltar[1]) : null,
-    el('div', { class: 'cab-tela' }, el('h1', { text: titulo }), op.acao ? op.acao : null, op.mais ? maisMenu(op.mais) : null),
+    el('div', { class: 'cab-tela' }, el('h1', { text: titulo }), op.acao ? op.acao : null, op.extra || null, op.mais ? maisMenu(op.mais) : null),
     op.sub ? el('p', { class: 'subtitulo', text: op.sub }) : null];
 }
 // ⋯ Mais: o que é raro, perto do que ele afeta, sempre com o mesmo ícone.
@@ -1696,8 +1696,8 @@ function resAvaliacoes() {
 
 // ==== 07_agenda.js
 // ---------------------------------------------------------------- Agenda (molde B; o calendário é uma variante da Lista)
-// Uma fileira de controles antes da lista; "+ Nova consulta" fixo embaixo no celular; o raro no ⋯ (Bloquear horário,
-// Exportar, Canceladas). A consulta abre numa folha (celular) ou ao lado da lista (iPad deitado e computador).
+// Uma fileira de controles antes da lista; "+ Nova consulta" fixo embaixo no celular; "Horários" ao lado do ⋯ (os
+// ajustes da agenda, #219); o raro no ⋯ (Bloquear horário, Exportar, Canceladas). A consulta abre numa folha (celular) ou ao lado da lista (iPad deitado e computador).
 const AG = { dados: [], carregou: false, filtro: 'novos', naoPagas: null, visao: window.innerWidth < 768 ? 'dia' : 'semana', cal: [], calReq: 0, aberta: null };
 const MED = { dados: [], modo: false, reservio: false, padrao: { agendamento: true }, filtro: '' };   // agenda por médico (modo_medicos vem do servidor)
 const GRADE = { dados: [] };
@@ -1740,8 +1740,11 @@ function medPagaConsultorio(id) {
 }
 const podeLink = (medicoId, servico) => ligado('func_pagamento_link') && String(servico || '').trim().toUpperCase() !== 'BLOQUEIO' && !medPagaConsultorio(medicoId);
 
+// #219: o caminho de toque para Agenda › Horários (os ajustes da agenda), ao lado do ⋯ nas três visões. Não é aba: as
+// abas são só visões do mesmo conteúdo (painel-novo.md, seção 9, regra 5), e Horários é o índice de ajustes (molde D).
+const agHorariosBtn = () => el('button', { class: 'btn sec', type: 'button', 'data-ir': 'agenda/horarios' }, icone('relogio', 'p'), 'Horários');
 tela('agenda', {
-  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma', 'agNovo'), mais: { id: 'agMais', lista: [
+  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma', 'agNovo'), extra: agHorariosBtn(), mais: { id: 'agMais', lista: [
     ['Bloquear horário', 'bloquear', () => bloquearForm()], ['Exportar para Google Agenda, Outlook ou iPhone', 'baixar', () => agExportar()],
     ['Ver as canceladas', 'proibido', () => { AG.visao = 'lista'; AG.filtro = 'cancelados'; agMostrar(); }]] } }),
     agAbas(''),
@@ -1760,7 +1763,7 @@ tela('agenda', {
     el('div', { class: 'filtros', id: 'agChips', role: 'group', 'aria-label': 'Filtrar consultas' }),
     el('div', { class: 'lado-a-lado' }, el('div', {}, el('div', { id: 'agLista' }, el('div', { class: 'cartao' }, esqueleto())), el('div', { id: 'calBox', hidden: true })),
       el('div', { class: 'item-lado', id: 'agItem', hidden: true }))],
-  entrar: () => { agMostrar(); if (!AG.carregou) agCarregar(); }
+  entrar: () => { agMostrar(); if (!AG.carregou) agCarregar(); if (ligado('func_reservio') && !INT.status) intStatus(); }
 });
 function agAbas(atual) {
   return el('div', { class: 'abas', role: 'tablist', 'aria-label': 'Agenda' }, [['', 'Consultas'], ['espera', 'Lista de espera'], ['documentos', 'Documentos']].map(([k, t]) =>
@@ -1867,7 +1870,7 @@ function consultaItem(a) {
   const rapidas = [];
   if (podePagar(a)) rapidas.push(btn(a.pago_em ? 'Desmarcar paga' : 'Marcar como paga', () => agPagar(a, !a.pago_em), 'sec', a.pago_em ? 'fechar' : 'dinheiro'));
   if (ativa && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
-  if (ativa && !externa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
+  if (ativa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
   // S10 e S13 (rxsync-sistema sql/066): desmarcar "vista" e desfazer o cancelamento (o servidor confere o horário livre).
   if (ativa && !bloq && a.visto) rapidas.push(btn('Marcar como não vista', () => agVistoDesfazer(a), 'sec', 'sino'));
   if (!ativa && !bloq && !externa && !a.no_externo && new Date(a.inicio).getTime() > Date.now()) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
@@ -1882,7 +1885,7 @@ function consultaItem(a) {
     a.status === 'cancelado' && !bloq && a.motivo_cancelamento ? ['Motivo do cancelamento', a.motivo_cancelamento === 'outro' ? (a.motivo_cancelamento_outro || 'Outro motivo') : (CANC_MOTIVOS.find(m => m[0] === a.motivo_cancelamento) || [])[1]] : null].filter(x => x && x[1]);
   return [el('div', { class: 'item-cab' }, el('div', { class: 'tx' }, el('h2', { text: bloq ? 'Horário bloqueado' : a.nome_paciente }), el('p', { class: 'mudo', text: fmtQuando(a.inicio) }), el('div', { class: 'etqs' }, tags))),
     rapidas.length ? el('div', { class: 'acoes-rapidas' }, rapidas) : null,
-    externa && ativa ? aviso('', 'Veio do ' + plat + '. Para alterar ou cancelar, use o ' + plat + ': a mudança aparece aqui em até 2 minutos.') : null,
+    externa && ativa ? aviso('', 'Veio do ' + plat + '. Remarcar daqui cria a reserva nova no ' + plat + '; a antiga e o cancelamento você faz também lá (a integração não consegue cancelar).') : null,
     el('div', { class: 'cartao bloco' }, el('dl', { class: 'dados' }, dadosL.map(([k, v]) => [el('dt', { text: k }), el('dd', { text: v })]))),
     a.briefing ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Resumo da conversa' }), el('p', { text: a.briefing })) : null,
     Array.isArray(a.preconsulta) && a.preconsulta.length ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Respostas antes da consulta' }),
@@ -1890,7 +1893,7 @@ function consultaItem(a) {
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
     !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }), btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')) : null,
     !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
-    ativa && !externa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
+    ativa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
     !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
 }
 // A conversa da consulta (S5, rxsync-sistema sql/077): só leitura, lida no Chatwoot na hora em que se toca (nada fica
@@ -1941,7 +1944,7 @@ async function agCancelar(a) {
   if (!(await confirmar({ titulo: bloq ? 'Desbloquear o horário?' : 'Cancelar a consulta?', texto: textos, botao: bloq ? 'Desbloquear' : 'Cancelar consulta', perigo: true,
     extra: bloq ? null : [el('label', { class: 'campo', for: 'cancMotivo' }, el('span', { class: 'rot', text: 'Motivo (opcional)' }), sel), caixaOutro] }))) return;
   const motivo = sel && sel.value ? { motivo: sel.value, ...(sel.value === 'outro' ? { motivo_outro: outro.value.trim().slice(0, 100) } : {}) } : {};
-  d24('agenda_cancelar', { id: a.id, ...motivo }).then(() => { rapida(bloq ? 'Horário desbloqueado.' : 'Consulta cancelada.'); consultaFechar(); agCarregar(); }).catch(() => rapida('Não consegui cancelar.'));
+  d24('agenda_cancelar', { id: a.id, ...motivo }).then(r => { rsvAviso(r, bloq ? 'Horário desbloqueado.' : 'Consulta cancelada.'); consultaFechar(); agCarregar(); }).catch(() => rapida('Não consegui cancelar.'));
 }
 // Desmarcar "vista" (S10): a consulta volta a aparecer como nova em Hoje e no filtro Novos; fecha a consulta, porque abrir de
 // novo marca como vista (decisão 8).
@@ -1967,6 +1970,8 @@ async function agExcluir(a) {
 // ---------------------------------------------------------------- nova consulta e remarcar (folha H): data, horário e duração (o fim é calculado)
 const duracaoPadrao = () => { const v = parseInt(VAL.duracao_padrao_min, 10); return v > 0 ? v : 30; };
 function consultaNova() { consultaForm(null); }
+// O que o Reservio respondeu (DEC-173): "Lançada também no Reservio", "Cancele também no Reservio"… fica mais tempo na tela.
+const rsvAviso = (r, padrao) => r && r.aviso_reservio ? rapida(r.aviso_reservio, { ms: 9000 }) : rapida(padrao);
 function consultaForm(a) {
   const bloq = a && ehBloqueio(a);
   const iniPadrao = a ? paraInput(a.inicio) : (AG.visao === 'dia' || AG.visao === 'semana' ? chave(calRef) : chave(hojeLocal())) + 'T09:00';
@@ -2002,6 +2007,26 @@ function consultaForm(a) {
     medSel.addEventListener('change', () => { tipoMontar(''); linkMostrar(); });
     tipoSel.addEventListener('change', () => { const o = tipoSel.options[tipoSel.selectedIndex]; if (o && o.value) { dur.value = o.getAttribute('data-dur'); atualizarFim(); if (!serv.value.trim()) serv.value = o.getAttribute('data-nome'); } });
   }
+  // Reservio (DEC-173): com a integração ligada, o serviço do Reservio e os horários livres dele, com o profissional; o
+  // horário escolhido vai com o serviço e o profissional, e o Reservio confere na hora (o fim é o do serviço).
+  const st = INT.status || {}, rsv = !bloq && st.conectado && !st.token_recusado && (st.servicos || []).length;
+  let rsvRec = '', rsvSel = null;
+  const rsvLista = el('div', { class: 'linha-botoes', id: 'agfRsvLista' });
+  const rsvMostrar = lista => trocar(rsvLista, lista.length ? lista.map(h => btn(h.inicio.slice(11, 16) + (h.profissional ? ' · ' + h.profissional : ''), () => {
+    hora.value = h.inicio.slice(11, 16); data.value = h.inicio.slice(0, 10); rsvRec = h.recurso_id || ''; dur.value = String(Math.round((new Date(h.fim) - new Date(h.inicio)) / 60000)); atualizarFim();
+    if (!serv.value.trim()) serv.value = rsvSel.options[rsvSel.selectedIndex].text.replace(/ \(\d+ min\)$/, ''); trocar(rsvLista, el('p', { class: 'dica', text: 'Escolhido: ' + hora.value + (h.profissional ? ', com ' + h.profissional : '') + '. Toque em Salvar.' }));
+  }, 'sec')) : el('p', { class: 'dica', text: 'Nenhum horário livre no Reservio neste dia.' }));
+  if (rsv) {
+    rsvSel = el('select', { class: 'entrada', id: 'agfRsv' }, el('option', { value: '', text: 'Escolha' }), st.servicos.map(x => el('option', { value: x.id, text: x.nome + (x.duracao_min ? ' (' + x.duracao_min + ' min)' : '') })));
+    rsvSel.value = a && a.externo_servico_id ? a.externo_servico_id : '';
+  }
+  const rsvBt = rsv ? btn('Ver horários livres no Reservio', async ev => {
+    if (!rsvSel.value) { rsvSel.focus(); rapida('Escolha o serviço do Reservio.'); return; }
+    const b = ev.currentTarget; b.disabled = true;
+    try { const r = await c12('horarios', { servico_id: rsvSel.value, dia: data.value }); if (r.ok === false) trocar(rsvLista, aviso('perigo', r.mensagem)); else rsvMostrar(r.horarios_livres || []); }
+    catch (e) { trocar(rsvLista, aviso('perigo', 'Não consegui falar com o Reservio agora.')); }
+    b.disabled = false;
+  }, 'sec', 'relogio') : null;
   // Link de pagamento (DEC-099): na nova consulta, a opção sempre desmarcada ao abrir.
   const linkCb = !a ? el('input', { type: 'checkbox', id: 'agEnviarLink' }) : null;
   const linkLbl = linkCb ? el('label', { class: 'marcar' }, linkCb, el('span', { text: 'Enviar link de pagamento ao paciente' })) : null;
@@ -2013,7 +2038,7 @@ function consultaForm(a) {
   const salvar = el('button', { class: 'btn pri', type: 'button', id: 'agfSalvar', text: 'Salvar' });
   const f = folha(a ? (bloq ? 'Editar bloqueio' : 'Remarcar') : 'Nova consulta', el('div', { class: 'form', id: 'agForm' },
     bloq ? null : campo('Nome do paciente', nome), bloq ? null : campo('Telefone com DDD', tel), bloq ? null : campo('Serviço', serv),
-    medSel ? campo('Médico', medSel) : null, tipoCampo,
+    medSel ? campo('Médico', medSel) : null, tipoCampo, rsv ? campo('Serviço do Reservio', rsvSel, 'O Reservio confere o horário na hora e dá a duração do serviço.') : null, rsvBt, rsv ? rsvLista : null,
     el('div', { class: 'duas-col' }, campo('Data', data), campo('Horário', hora)), campo('Duração (minutos)', dur), fimTxt, campo(bloq ? 'Motivo' : 'Observações', obs),
     linkLbl, forcaLbl, erro), { pe: [btn('Cancelar', () => f.fechar(), 'sec'), salvar], foco: bloq ? '#agfData' : '#agfNome' });
   atualizarFim();
@@ -2029,6 +2054,7 @@ function consultaForm(a) {
     if (medSel) d.medico_id = medSel.value;
     if (tipoSel) d.tipo_consulta_id = tipoCampo.hidden ? '' : tipoSel.value;
     if (linkCb && linkCb.checked && !linkLbl.hidden) d.enviar_link = true;
+    if (rsv && rsvSel.value) { d.reservio_servico_id = rsvSel.value; d.reservio_recurso_id = rsvRec; d.forcar = true; }   // quem confere é o Reservio
     if (MED.modo && medSel && !medSel.value && d.servico !== 'BLOQUEIO') { trocar(erro, aviso('perigo', 'Escolha o médico da consulta. "Sem médico" só vale para bloqueio.')); medSel.focus(); return; }
     if (MED.modo && tipoSel && !tipoCampo.hidden && !tipoSel.value && d.servico !== 'BLOQUEIO') { trocar(erro, aviso('perigo', 'Escolha o tipo de consulta.')); tipoSel.focus(); return; }
     salvar.disabled = true; salvar.textContent = 'Salvando…';
@@ -2037,11 +2063,12 @@ function consultaForm(a) {
       salvar.disabled = false; salvar.textContent = 'Salvar';
       if (res.ok) {
         f.limpar(); f.fechar();
-        if (res.pagamento) rapida('Salvo. ' + res.pagamento.mensagem, { ms: res.pagamento.enviado ? 4500 : 9000 }); else rapida('Salvo.');
+        if (res.pagamento) rapida('Salvo. ' + res.pagamento.mensagem, { ms: res.pagamento.enviado ? 4500 : 9000 }); else rsvAviso(res, 'Salvo.');
         if (a) consultaFechar();
         agCarregar(); if (medSel) medCarregar();
         return;
       }
+      if (res.erro === 'reservio') { trocar(erro, aviso('perigo', res.mensagem)); if (rsv) rsvMostrar(res.horarios_livres || []); return; }
       if (res.erro === 'conflito' || res.erro === 'fora_da_grade') forcaLbl.hidden = false;
       trocar(erro, aviso('perigo', res.erro === 'conflito' ? 'Já existe uma consulta nesse horário. Para marcar mesmo assim, marque "Permitir encaixe" e salve de novo.'
         : res.erro === 'fora_da_grade' ? 'Fora dos horários de atendimento. Para marcar mesmo assim, marque "Permitir encaixe" e salve de novo.'
@@ -2072,7 +2099,7 @@ function bloquearForm() {
     try {
       const r = await d24('agenda_criar', d);
       salvar.disabled = false;
-      if (r && r.ok) { f.limpar(); f.fechar(); rapida('Horário bloqueado.'); agCarregar(); return; }
+      if (r && r.ok) { f.limpar(); f.fechar(); rsvAviso(r, 'Horário bloqueado.'); agCarregar(); return; }
       trocar(erro, aviso('perigo', (r && r.mensagem) || 'Não consegui bloquear. Confira os horários.'));
     } catch (e) { salvar.disabled = false; trocar(erro, aviso('perigo', 'Não foi salvo: sem conexão. Tente de novo.')); }
   });
@@ -2208,7 +2235,7 @@ function calMes() {
 }
 // ---------------------------------------------------------------- Agenda › Lista de espera e Documentos (visões da Agenda)
 tela('agenda/espera', {
-  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma') }), agAbas('espera'),
+  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma'), extra: agHorariosBtn() }), agAbas('espera'),
     el('p', { class: 'subtitulo', text: 'Quem pediu para ser avisado quando abrir um horário. Quando uma consulta é cancelada, a assistente oferece a vaga a uma pessoa por vez, na ordem da lista; quem tem médico preferido só recebe vaga daquele médico.' }),
     el('div', { id: 'filaLista' })],
   entrar: () => filaCarregar()
@@ -2232,7 +2259,7 @@ function filaCarregar() {
 const DOC_TIPOS = { pedido_exame: 'Pedido de exame', resultado_exame: 'Resultado de exame', receita: 'Receita', atestado_laudo: 'Atestado ou laudo', carteirinha_convenio: 'Carteirinha do convênio', documento_identidade: 'Documento de identidade', comprovante_pagamento: 'Comprovante de pagamento', guia_autorizacao: 'Guia de autorização', outro: 'Outro', ilegivel: 'Não deu para ler' };
 const DOC_ROT = { nome_paciente: 'Paciente', data_nascimento: 'Nascimento', cpf: 'CPF', data_documento: 'Data do documento', convenio: 'Convênio', plano_convenio: 'Plano', numero_carteirinha: 'Carteirinha', validade: 'Validade', profissional: 'Profissional', registro_profissional: 'Registro', procedimentos_solicitados: 'Solicitado', numero_guia: 'Guia', valor_pago: 'Valor' };
 tela('agenda/documentos', {
-  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma') }), agAbas('documentos'),
+  montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma'), extra: agHorariosBtn() }), agAbas('documentos'),
     el('p', { class: 'subtitulo', text: 'Fotos e PDFs que os pacientes mandam no WhatsApp: pedido de exame, carteirinha, guia, documento. A assistente anota só os dados administrativos e não interpreta conteúdo clínico. Confira sempre no arquivo original.' }),
     el('div', { id: 'docLista' })],
   entrar: () => docCarregar()
@@ -2282,7 +2309,7 @@ function horIndice() {
     linhaLink('Perguntas antes de agendar', sem('preconsulta') ? 'Plano Gestão' : ligado('func_preconsulta') ? 'Ligada' : 'Desligada', 'agenda/horarios/perguntas', 'pergunta'),
     linhaLink('Feriados', feriadosLigados() ? 'Não atende em feriados' + (FER.cfg && FER.cfg.cidade ? ' · ' + FER.cfg.cidade + '/' + FER.cfg.uf : '') : 'Atende em feriados', 'agenda/horarios/feriados', 'agenda'),
     linhaLink('Receber dos pacientes', ligado('func_pagamento_link') ? 'Link de pagamento ligado' : 'Link de pagamento desligado', 'agenda/horarios/pagamento', 'dinheiro'),
-    linhaLink('Integração e planilhas', st.conectado ? (st.plataforma_nome || 'Reservio') + ' conectado' : 'Reservio, link do seu sistema e importar a agenda', 'agenda/horarios/integracao', 'link')));
+    linhaLink('Integração e planilhas', st.conectado ? (st.plataforma_nome || 'Reservio') + ((st.pendencias || []).length ? ': ' + st.pendencias.length + ' para fazer lá' : st.token_recusado ? ': conecte de novo' : ' conectado') : 'Reservio, link do seu sistema e importar a agenda', 'agenda/horarios/integracao', 'link')));
 }
 function pedirAjuda(b) {
   b.disabled = true;
@@ -2356,7 +2383,7 @@ tela('agenda/horarios/medicos', {
     : [cabTela('Médicos e tipos', { voltar: VOLTA_HOR }), el('div', { id: 'medBox' }, blocoCampos(['func_medicos']),
       el('div', { class: 'pilha' }, aviso('ok', 'Sua clínica usa agenda por médico: cada médico tem os próprios horários, aqui embaixo. Os horários gerais da clínica ficam guardados. Para voltar a uma agenda só, desligue “Agenda por médico” no alto desta página.'),
         aviso('', 'A agenda por médico está desligada: a assistente usa os horários de atendimento da clínica. Para ela usar os médicos abaixo, ligue “Agenda por médico” no alto desta página.'),
-        aviso('', 'A agenda por médico fica pausada enquanto a integração com o Reservio estiver ligada. Por enquanto, a assistente usa os horários de atendimento da clínica.')),
+        aviso('', 'A agenda por médico fica pausada enquanto a integração com o Reservio estiver ligada: os horários e os profissionais vêm do Reservio.')),
       el('h2', { class: 'tit-bloco pilha', text: 'Médicos' }), el('div', { id: 'medLista' }, el('div', { class: 'cartao' }, esqueleto())),
       el('div', { class: 'cartao pad bloco pilha' }, el('div', { class: 'campo form' }, el('label', { for: 'medNovoNome', text: 'Adicionar médico' }),
         el('input', { class: 'entrada', id: 'medNovoNome', type: 'text', maxlength: '80', placeholder: 'Nome do médico (ex.: Dra. Ana Souza)' })), btn('Adicionar', medAdicionar, 'sec plena', 'soma', { id: 'medNovoBtn' })))],
@@ -2584,7 +2611,6 @@ function ferRender() {
 }
 
 // ---------------------------------------------------------------- Receber dos pacientes (E): o link, a frase e o valor, no lembrete, o Asaas da clínica
-// O servidor cita "Agenda › Horários › Pagamento" (workflow 32): a busca acha por "pagamento".
 tela('agenda/horarios/pagamento', {
   montar: () => [cabTela('Receber dos pacientes', { voltar: VOLTA_HOR, sub: 'Depois de marcar a consulta, a assistente manda ao paciente o link de pagamento da clínica. Nada é cancelado sozinho.' }),
     el('div', { id: 'pagQuemMarca' }), blocoCampos(['func_pagamento_link', 'pagamento_link', 'pagamento_texto', 'pagamento_valor_padrao', 'pagamento_no_lembrete']),
@@ -2641,7 +2667,6 @@ function asaasConectar() {
 }
 
 // ---------------------------------------------------------------- Integração e planilhas (D): Reservio, link do seu sistema, importar a agenda e as importações
-// O servidor cita "Agenda › Integração" (workflow 12): a busca acha por "integração".
 const VOLTA_INT = ['agenda/horarios/integracao', 'Integração e planilhas'];
 function intStatus() { return c12('status').then(r => { INT.status = r || {}; return INT.status; }).catch(() => ({})); }
 tela('agenda/horarios/integracao', {
@@ -2651,7 +2676,7 @@ tela('agenda/horarios/integracao', {
 function intIndice() {
   const st = INT.status || {};
   trocar($('intIndice'), el('div', { class: 'lista' },
-    linhaLink('Reservio', st.conectado ? (st.status === 'erro' ? 'Com problema' : 'Conectado') + (st.business_nome ? ' · ' + st.business_nome : '') : 'Não conectado', 'agenda/horarios/integracao/reservio', 'link'),
+    linhaLink('Reservio', st.conectado ? (st.status === 'erro' || st.token_recusado ? 'Com problema' : (st.pendencias || []).length ? (st.pendencias.length + ' para fazer no Reservio') : 'Conectado') + (st.business_nome ? ' · ' + st.business_nome : '') : 'Não conectado', 'agenda/horarios/integracao/reservio', 'link'),
     linhaLink('Link de agendamento do seu sistema', ligado('link_agendamento_ativo') ? 'Ligado: a assistente manda o link em vez de marcar' : 'Desligado', 'agenda/horarios/integracao/link', 'link'),
     linhaLink('Importar a agenda de outro sistema', 'Planilha CSV, em 4 passos', 'agenda/horarios/integracao/importar', 'importar'),
     linhaLink('Importações da agenda', 'Ver e desfazer em até 7 dias', 'agenda/horarios/integracao/importacoes', 'notas')));
@@ -2679,57 +2704,82 @@ function intRender(r, ultimo) {
   const sel = (id, ops, v) => { const s = el('select', { class: 'entrada', id }, ops.map(([a, b]) => el('option', { value: a, text: b }))); s.value = v || ''; return s; };
   const campo = (rot, i, dica) => el('div', { class: 'campo' }, el('label', { for: i.id, text: rot }), i, dica ? el('p', { class: 'dica', text: dica }) : null);
   const msg = r.mensagem ? aviso(r.ok === false ? 'perigo' : 'ok', r.mensagem) : null;
-  if (!r.conectado) {
+  const ocupado = (b, t) => { b.disabled = true; b.textContent = t; };
+  // R-08 (DEC-173): token recusado: a integração está parada; conectar de novo abre o formulário com o token novo.
+  if (!r.conectado || ultimo === 'reconectar') {
     const plats = Object.keys(r.plataformas || { reservio: 'Reservio' }).map(k => [k, (r.plataformas || {})[k] || 'Reservio']);
     const sPlat = sel('intPlat', plats, (ultimo && ultimo.plataforma) || 'reservio');
     const tok = el('input', { class: 'entrada', id: 'intToken', type: 'password', autocomplete: 'off', spellcheck: 'false', placeholder: 'Cole aqui o token da API', value: ultimo && ultimo.token ? ultimo.token : null });
     let neg = null;
     if (r.escolher_negocio && r.escolher_negocio.length) neg = sel('intNeg', r.escolher_negocio.map(x => [x.id, x.nome || x.id]), '');
     else if (r.pedir_negocio) neg = el('input', { class: 'entrada', id: 'intNeg', type: 'text', placeholder: 'Ex.: b04965e6-a9bb-591f-8f8a-1adcb2c8dc39' });
+    // R-12: a clínica de teste só conecta uma conta do Reservio que seja só de teste, nunca a de uma clínica.
+    const teste = r.pedir_confirmacao_teste ? el('input', { type: 'checkbox', id: 'intTeste' }) : null;
     const bt = el('button', { class: 'btn pri plena', type: 'button', text: 'Conectar' });
     bt.addEventListener('click', () => {
-      const dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg ? neg.value.trim() : '' };
+      const dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg ? neg.value.trim() : '', teste_confirmado: !!(teste && teste.checked) };
       if (!dados.token) { tok.focus(); rapida('Cole o token da API.'); return; }
-      bt.disabled = true; bt.textContent = 'Conectando…';
-      c12('conectar', dados).then(x => intRender(x, x.ok ? null : dados)).catch(() => intRender({ ok: false, mensagem: 'Não consegui conectar agora. Tente de novo em instantes.', plataformas: r.plataformas }, dados));
+      if (teste && !teste.checked) { teste.focus(); rapida('Confirme que a conta do Reservio é só de teste.'); return; }
+      ocupado(bt, 'Conectando…');
+      c12('conectar', dados).then(x => intRender(x, x.ok ? null : dados)).catch(() => intRender({ ok: false, mensagem: 'Não consegui conectar agora. Tente de novo em instantes.', plataformas: r.plataformas, pedir_confirmacao_teste: r.pedir_confirmacao_teste }, dados));
     });
-    trocar(box, msg, el('div', { class: 'cartao pad molde-f' }, el('p', { class: 'tit-bloco', text: 'Conectar a agenda que você já usa' }),
+    trocar(box, msg, el('div', { class: 'cartao pad molde-f' }, el('p', { class: 'tit-bloco', text: r.token_recusado ? 'Conectar de novo' : 'Conectar a agenda que você já usa' }),
       campo('Plataforma', sPlat, 'Por enquanto, a integração funciona com o Reservio.'), campo('Token da API', tok, 'No Reservio, a API faz parte do plano Pro: peça o token ao suporte do Reservio e cole aqui. Ele fica guardado com criptografia e não aparece de novo.'),
-      neg ? campo(r.escolher_negocio ? 'Negócio' : 'ID do negócio', neg, r.escolher_negocio ? 'Sua conta tem mais de um negócio. Escolha o desta clínica.' : 'O suporte do ' + nomePlat + ' informa junto com o token.') : null, bt));
+      neg ? campo(r.escolher_negocio ? 'Negócio' : 'ID do negócio', neg, r.escolher_negocio ? 'Sua conta tem mais de um negócio. Escolha o desta clínica.' : 'O suporte do ' + nomePlat + ' informa junto com o token.') : null,
+      teste ? el('label', { class: 'marcar' }, teste, el('span', { text: 'Esta conta do ' + nomePlat + ' é só de teste (nunca a de uma clínica).' })) : null, bt));
     return;
   }
   const { sw } = chaveEl('func_reservio', 'Integração com o ' + nomePlat, { semId: false });
-  const sServ = sel('intServ', [['', 'Escolha']].concat((r.servicos || []).map(x => [x.id, x.nome + (x.duracao_min ? ' (' + x.duracao_min + ' min)' : '')])), r.servico_id || '');
+  // DEC-173: a clínica marca os serviços que a assistente pode oferecer, com o "quando usar" e se é de convênio.
+  const marcados = {}; (r.servicos_ia || []).forEach(x => { marcados[x.id] = x; });
+  const linhas = (r.servicos || []).map(x => {
+    const m = marcados[x.id], cb = el('input', { type: 'checkbox', checked: !!m, 'aria-label': 'A assistente oferece ' + x.nome });
+    const q = el('input', { class: 'entrada', type: 'text', maxlength: '200', value: m ? m.quando_usar : '', placeholder: 'Quando usar (ex.: consulta online, particular)', 'aria-label': 'Quando usar ' + x.nome });
+    const cv = el('input', { type: 'checkbox', checked: !!(m && m.convenio) });
+    return { x, cb, q, cv, el: el('div', { class: 'cartao pad bloco' }, el('label', { class: 'marcar' }, cb, el('span', { text: x.nome + (x.duracao_min ? ' · ' + x.duracao_min + ' min' : '') })), q,
+      el('label', { class: 'marcar' }, cv, el('span', { text: 'De convênio (só aparece se o paciente disser o convênio)' }))) };
+  });
   const sRec = sel('intRec', [['', 'Todos os profissionais']].concat((r.recursos || []).map(x => [x.id, x.nome])), r.recurso_id || '');
   const cbH = el('input', { type: 'checkbox', checked: r.importar_horarios !== false });
   const salvar = el('button', { class: 'btn pri plena', type: 'button', text: 'Salvar' });
   salvar.addEventListener('click', () => {
-    if (!sServ.value) { sServ.focus(); rapida('Escolha o serviço.'); return; }
-    salvar.disabled = true; salvar.textContent = 'Salvando…';
-    c12('configurar', { servico_id: sServ.value, recurso_id: sRec.value, importar_horarios: cbH.checked }).then(x => intRender(x)).catch(() => { rapida('Não consegui salvar.'); salvar.disabled = false; salvar.textContent = 'Salvar'; });
+    ocupado(salvar, 'Salvando…');
+    c12('configurar', { servicos_ia: linhas.filter(l => l.cb.checked).map(l => ({ id: l.x.id, quando_usar: l.q.value.trim(), convenio: l.cv.checked })), recurso_id: sRec.value, importar_horarios: cbH.checked })
+      .then(x => intRender(x)).catch(() => { rapida('Não consegui salvar.'); salvar.disabled = false; salvar.textContent = 'Salvar'; });
   });
-  const ocupado = (b, t) => { b.disabled = true; b.textContent = t; };
+  const QUEM = { paciente: 'o paciente', equipe: 'a equipe', assistente_gestao: 'o assistente de gestão', api: 'o sistema da clínica', sistema: 'a RXSync' };
+  const TIPO = { cancelar: 'Cancele', cancelar_antiga: 'Cancele a reserva antiga (remarcada)', lancar: 'Lance', bloquear: 'Bloqueie' };
+  const pend = r.pendencias || [];
+  const erroTxt = r.token_recusado ? 'O ' + nomePlat + ' recusou o token. A integração parou: nada vai ao ' + nomePlat + ' e a assistente não marca até você conectar de novo com um token novo.' : r.status === 'erro' && r.ultimo_erro ? r.ultimo_erro : '';
   trocar(box, msg,
-    el('div', { class: 'cartao campos bloco' }, el('div', { class: 'chave-linha' }, el('div', { class: 'tx' }, el('div', { class: 't1' }, nomePlat + (r.business_nome ? ' · ' + r.business_nome : ''), etq(r.status === 'erro' ? 'Com problema' : 'Conectado', r.status === 'erro' ? 'perigo' : 'ok', r.status === 'erro' ? 'alerta' : 'ok')),
+    el('div', { class: 'cartao campos bloco' }, el('div', { class: 'chave-linha' }, el('div', { class: 'tx' }, el('div', { class: 't1' }, nomePlat + (r.business_nome ? ' · ' + r.business_nome : ''), etq(erroTxt ? 'Com problema' : 'Conectado', erroTxt ? 'perigo' : 'ok', erroTxt ? 'alerta' : 'ok')),
       el('p', { class: 'dica', text: 'Última sincronização: ' + intHa(r.ultima_sync) + '. Ligada, mantém os horários em sincronia com a sua agenda no ' + nomePlat + '.' })), sw)),
-    r.status === 'erro' && r.ultimo_erro ? aviso('perigo', r.ultimo_erro) : null,
-    el('h2', { class: 'tit-bloco', text: 'Como a assistente usa o ' + nomePlat }),
-    !r.servico_id ? aviso('atencao', 'Escolha o serviço para a assistente começar a lançar no ' + nomePlat + ' as consultas que ela marca.') : null,
-    el('div', { class: 'cartao pad bloco form' }, campo('Serviço usado quando a assistente marca', sServ), campo('Profissional', sRec, 'As consultas desse profissional ocupam a agenda da RXSync, e é na agenda dele que a assistente marca.'),
+    erroTxt ? aviso('perigo', erroTxt) : null,
+    r.token_recusado ? btn('Conectar de novo', () => intRender(r, 'reconectar'), 'pri plena') : null,
+    pend.length ? [el('h2', { class: 'tit-bloco', text: 'Para fazer no ' + nomePlat + ' (' + pend.length + ')' }),
+      el('p', { class: 'dica', text: 'A API do ' + nomePlat + ' não cancela, não muda e não bloqueia. Faça lá e toque em "Já fiz".' }),
+      el('div', { class: 'lista bloco' }, pend.map(p => el('div', { class: 'linha' }, el('div', { class: 'tx' }, el('div', { class: 't1', text: (TIPO[p.tipo] || p.tipo) + (p.nome ? ': ' + p.nome : '') }),
+        el('div', { class: 't2', text: (p.inicio ? fmtQuando(p.inicio) : '') + (p.profissional ? ' · ' + p.profissional : '') + ' · feito por ' + (QUEM[p.quem] || 'a RXSync') })),
+        btn('Já fiz', ev => { ocupado(ev.currentTarget, '…'); c12('pendencia_resolver', { id: String(p.id) }).then(x => intRender(x)).catch(() => rapida('Não consegui.')); }, 'sec'))))] : null,
+    el('h2', { class: 'tit-bloco', text: 'Serviços que a assistente oferece' }),
+    !(r.servicos_ia || []).length ? aviso('atencao', 'Marque os serviços que a assistente pode oferecer. Sem nenhum, ela não marca e passa os pedidos para a equipe.') : null,
+    el('p', { class: 'dica', text: 'Os horários e a duração vêm do ' + nomePlat + ' na hora. A assistente escolhe o serviço pela conversa e confirma com o paciente.' }),
+    linhas.map(l => l.el),
+    el('div', { class: 'cartao pad bloco form' }, campo('Profissional', sRec, 'Todos: a assistente oferece o primeiro horário livre e diz com quem é. A consulta de um não ocupa o horário do outro.'),
       el('label', { class: 'marcar' }, cbH, el('span', { text: 'Usar os dias e horários de atendimento do ' + nomePlat })),
-      el('p', { class: 'dica', text: r.importar_horarios !== false ? ((r.horarios || []).length ? 'Horários vindos do ' + nomePlat + ': ' + intHorariosResumo(r.horarios) + '. Atualizam sozinhos a cada 30 minutos.' : 'Os horários são lidos do ' + nomePlat + ' quando você salvar.') : 'Desligado: a assistente usa os Horários de atendimento da RXSync.' }),
+      el('p', { class: 'dica', text: r.importar_horarios !== false ? ((r.horarios || []).length ? 'Horários vindos do ' + nomePlat + ': ' + intHorariosResumo(r.horarios) + '. Atualizam sozinhos a cada 30 minutos.' : 'Os horários são lidos do ' + nomePlat + ' quando você salvar.') : 'Desligado: a grade da RXSync fica como está.' }),
       el('div', { class: 'pilha' }, salvar)),
     el('div', { class: 'linha-botoes bloco' }, btn('Sincronizar agora', ev => { ocupado(ev.currentTarget, 'Sincronizando…'); c12('sincronizar').then(x => intRender(x)).catch(() => { rapida('Não consegui sincronizar.'); intRender(r); }); }, 'sec'),
       btn('Atualizar a lista de serviços', ev => { ocupado(ev.currentTarget, 'Atualizando…'); c12('atualizar_opcoes').then(x => intRender(x)).catch(() => { rapida('Não consegui atualizar.'); intRender(r); }); }, 'sec')),
     el('div', { class: 'cartao pad bloco' }, el('p', { class: 'tit-bloco', text: 'Como funciona' }), [
-      'A cada 2 minutos, as consultas do ' + nomePlat + ' aparecem aqui e ocupam o horário, para a assistente não oferecer horário já tomado.',
-      'Quando a assistente marca uma consulta, ela confere se o horário está livre no ' + nomePlat + ' e lança lá. Se alguém tiver ocupado o horário no meio tempo, você recebe um aviso no WhatsApp de avisos.',
-      'O ' + nomePlat + ' não permite cancelar pela integração. Quando o paciente cancela pelo WhatsApp, avisamos no WhatsApp de avisos para você cancelar lá.',
-      r.importar_horarios !== false ? 'Os dias e horários de atendimento vêm do ' + nomePlat + '. Feriados seguem o que estiver em Agenda › Horários › Feriados. Folgas de um dia específico ainda não vêm de lá: use "Bloquear horário" na Agenda.' : 'Mantenha os Horários de atendimento iguais aos do ' + nomePlat + '.'
+      'A cada 2 minutos, as consultas do ' + nomePlat + ' aparecem aqui e ocupam o horário do profissional.',
+      'A assistente pergunta ao ' + nomePlat + ' os horários livres na hora, cria a reserva lá e só então confirma ao paciente.',
+      'Nova consulta, Remarcar e Bloquear horário na Agenda também vão para o ' + nomePlat + '. Cancelar e bloquear você faz também lá: a lista "Para fazer" acima e o WhatsApp de avisos lembram.',
+      'Feriados seguem o que estiver em Agenda › Horários › Feriados.'
     ].map(t => el('p', { class: 'dica', text: t }))),
     el('div', { class: 'perigo-zona' }, btn('Desconectar do ' + nomePlat, async ev => {
       const b = ev.currentTarget;
-      if (!(await confirmar({ titulo: 'Desconectar do ' + nomePlat + '?', texto: 'As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de lançar consultas lá.', botao: 'Desconectar', perigo: true }))) return;
+      if (!(await confirmar({ titulo: 'Desconectar do ' + nomePlat + '?', texto: 'As consultas que vieram de lá saem da agenda da RXSync, e a assistente deixa de marcar pelo ' + nomePlat + '.', botao: 'Desconectar', perigo: true }))) return;
       ocupado(b, 'Desconectando…'); c12('desconectar').then(x => intRender(x)).catch(() => { rapida('Não consegui desconectar.'); intRender(r); });
     }, 'perigo-sec plena')));
 }
@@ -3193,7 +3243,7 @@ function pacForm(p) {
     }).catch(() => { salvar.disabled = false; trocar(erro, aviso('perigo', PAC_ERROS.interno)); });
   });
 }
-// ---------------------------------------------------------------- Pacientes › Organizar (D): duplicados, importar e importações
+// ---------------------------------------------------------------- Pacientes › ⋯ › Organizar (D): duplicados, importar e importações
 tela('pacientes/organizar', {
   montar: () => [cabTela('Organizar', { voltar: VOLTA_PAC }), el('div', { class: 'lista' }, linhaLink('Possíveis duplicados', 'Cadastros com o mesmo nome', 'pacientes/duplicados', 'duplicados'),
     linhaLink('Importar pacientes', 'De uma planilha CSV, em 4 passos', 'pacientes/importar', 'importar'), linhaLink('Importações', 'Ver e desfazer em até 7 dias', 'pacientes/importacoes', 'notas'))]
@@ -3339,7 +3389,7 @@ function impConfirmar() {
   const texto = p.novos ? 'Importar ' + p.novos.toLocaleString('pt-BR') + (p.novos === 1 ? ' paciente' : ' pacientes') : 'Completar ' + pl(p.existentes, 'cadastro', 'cadastros');
   const ir1 = btn(texto, async () => {
     if (!cb.checked) return;
-    if (!(await confirmar({ titulo: texto + '?', texto: ['Os pacientes importados não recebem nenhuma mensagem automática até escreverem para a clínica no WhatsApp.', 'Dá para desfazer em até 7 dias, em Pacientes › Organizar › Importações.'], botao: texto }))) return;
+    if (!(await confirmar({ titulo: texto + '?', texto: ['Os pacientes importados não recebem nenhuma mensagem automática até escreverem para a clínica no WhatsApp.', 'Dá para desfazer em até 7 dias, em Pacientes › ⋯ › Organizar › Importações.'], botao: texto }))) return;
     impGravar();
   }, 'pri plena', null, { disabled: true });
   cb.addEventListener('change', () => { ir1.disabled = !cb.checked; });
@@ -3722,6 +3772,7 @@ tela('conta/gestao', {
 });
 const READONLY = [['razao_social', 'Razão social'], ['cnpj', 'CNPJ'], ['representante_nome', 'Representante'], ['representante_cpf', 'CPF do representante'], ['endereco_faturamento', 'Endereço de faturamento'], ['plano', 'Plano'], ['valor_mensal', 'Valor'], ['numero_whatsapp', 'WhatsApp que a assistente atende']];
 // O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel antigo. Nada muda no servidor.
+// caminhos-antigos: começo (a primeira coluna são os nomes de antes; a segunda, conferida, fica na tela abaixo)
 const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integração e planilhas', 'agenda/horarios/integracao'],
   ['Agenda › Horários (a página longa)', 'Agenda › Horários: uma página por assunto (horários de atendimento, regras, médicos, perguntas, feriados, receber dos pacientes)', 'agenda/horarios'],
   ['Funções da assistente', 'Assistente › O que ela faz', 'assistente/funcoes'],
@@ -3737,6 +3788,7 @@ const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integraçã
   ['Conta › WhatsApp', 'Conta › Assinatura e WhatsApp › WhatsApp da clínica', 'conta/whatsapp'],
   ['Conta › Equipe e Acessos recentes', 'Conta › Pessoas', 'conta/equipe'],
   ['Conta › Baixar meus dados', 'Conta › Dados e contrato › Baixar meus dados', 'conta/dados']];
+// caminhos-antigos: fim
 tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
   el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
     el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),

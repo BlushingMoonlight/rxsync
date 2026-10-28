@@ -13,4 +13,5 @@
 - Mapa: todo PR que mudar uma página do site ou do painel atualiza o mapa num PR no `rxsync-sistema` (`docs/mapa/`), com a ordem do Merge.
 - O GitHub Pages publica o repositório inteiro, inclusive este arquivo e o `README.md`: não escreva neles nada interno (arquitetura, falhas abertas, clientes).
 - PR: use o modelo `.github/pull_request_template.md`.
+- Caminhos: antes de passar um caminho ao Jean ou a uma clínica ("Agenda › Horários › Feriados"), confira que ele existe como toque. A lista é a `scripts/caminhos_validos.json`, gravada pelo `node scripts/painel_alcance.mjs --gravar` (o teste que chega a cada tela só tocando, em 360, 820 e 1280 px); o `verificar_site.mjs` acusa caminho escrito que não existe. Nome de botão vai entre aspas no fim. Mudou uma tela ou um nome do painel ou da Central: grave a lista de novo e copie para o `scripts/` do `rxsync-sistema` no PR de lá.
 - Antes de abrir o PR: `node scripts/verificar_site.mjs`.
