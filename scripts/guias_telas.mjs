@@ -1,20 +1,22 @@
-// Guias do site (guias/, montados pelo scripts/guias_montar.mjs): testa pela tela o guia de exemplo e, como se ele já
-// estivesse publicado, a página Guias e o link "Guias" do site. Nada sai para a internet (o site é servido aqui).
-//   1. o exemplo em 360, 390, 820 e 1280 px: nada rola para o lado nem fica cortado; no computador (1280), o índice à
+// Guias do site (guias/, montados pelo scripts/guias_montar.mjs): testa pela tela o primeiro guia publicado (o guia de
+// exemplo saiu com ele), a página Guias e o link "Guias" do site. Nada sai para a internet (o site é servido aqui).
+//   1. o guia em 360, 390, 820 e 1280 px: nada rola para o lado nem fica cortado; no computador (1280), o índice à
 //      esquerda, a leitura de até 680 px e o cartão "Teste na sua clínica" à direita; no celular, o índice recolhido no
 //      topo e nenhuma barra fixa embaixo;
 //   2. o índice do celular e o menu abrem e fecham (sem JavaScript: <details>);
-//   3. a tabela rola só dentro da caixa;
-//   4. a chamada leva a origem do clique (data-origem="guia-exemplo" e origem=guia_exemplo no endereço do contratar);
+//   3. a tabela (se houver) não deixa a página rolar para o lado: o que não cabe rola dentro da caixa;
+//   4. a chamada leva a origem do clique (data-origem="guia-<endereço>" e origem=guia_<endereço> no endereço do contratar);
 //   5. nenhum script roda na página (só os dados estruturados) e a regra de segurança não bloqueia nada;
-//   6. prévia publicada: a página Guias (temas e cartões) e o "Guias" no menu e no rodapé da página inicial cabem em
-//      360, 1024 e 1280 px.
+//   6. a página Guias (temas e cartões) e o "Guias" no menu e no rodapé da página inicial cabem em 360, 1024 e 1280 px
+//      (com os rascunhos tratados como publicados, para ver também os guias que ainda vão sair).
 // Roda no Chrome e, com NAVEGADOR=webkit, no motor do Safari. Uso (precisa do Playwright): node scripts/guias_telas.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
-import { montar } from './guias_montar.mjs';
+import { montar, origemParam } from './guias_montar.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const site = await servirSite(); const browser = await abrirNavegador();
-const previa = montar({ previa: true }).arquivos;
+const { arquivos: previa, publicados } = montar({ previa: true });
+const real = montar().publicados;
+const G = (real[0] || publicados[0]).cab, ROTA = `/guias/${G.endereco}/`, ORIGEM = origemParam(G.endereco);
 async function abrir(largura, rota, { publicada = false } = {}) {
   const ctx = await browser.newContext({ viewport: { width: largura, height: 800 }, deviceScaleFactor: 2, isMobile: largura < 700, hasTouch: largura < 1024 });
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
@@ -46,7 +48,7 @@ const visivel = (page, sel) => page.locator(sel).first().isVisible();
 
 // 1. larguras
 for (const w of [360, 390, 820, 1280]) {
-  const { ctx, page, erros } = await abrir(w, '/guias/exemplo/');
+  const { ctx, page, erros } = await abrir(w, ROTA);
   const l = await larguraOk(page);
   ok(!l.rola && !l.cortados.length, `${w} px: nada rola para o lado nem fica cortado` + (l.cortados.length ? ' (' + l.cortados.join(' · ') + ')' : ''));
   if (w >= 1200) {
@@ -66,7 +68,7 @@ for (const w of [360, 390, 820, 1280]) {
 
 // 2 a 5. no celular
 {
-  const { ctx, page } = await abrir(360, '/guias/exemplo/');
+  const { ctx, page } = await abrir(360, ROTA);
   const det = page.locator('details.indice-m');
   ok(!(await det.evaluate(d => d.open)) && !(await page.locator('.indice-m a').first().isVisible()), 'o índice do celular começa fechado');
   await det.locator('summary').click();
@@ -81,13 +83,15 @@ for (const w of [360, 390, 820, 1280]) {
   const lm = await larguraOk(page);
   ok(!lm.rola && !lm.cortados.length, 'com o menu aberto, nada passa da borda' + (lm.cortados.length ? ' (' + lm.cortados.join(' · ') + ')' : ''));
   await menu.locator('summary').click();
-  const tab = await page.locator('.p-tabela').evaluate(t => ({ rola: t.scrollWidth > t.clientWidth + 1, pagina: document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1 }));
-  ok(tab.rola && tab.pagina, 'a tabela rola só dentro da caixa (a página não rola para o lado)');
+  if (await page.locator('.p-tabela').count()) {
+    const tab = await page.locator('.p-tabela').first().evaluate(t => ({ cabe: t.scrollWidth <= t.clientWidth + 1, rolaDentro: ['auto', 'scroll'].includes(getComputedStyle(t).overflowX), pagina: document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1 }));
+    ok((tab.cabe || tab.rolaDentro) && tab.pagina, 'a tabela cabe ou rola só dentro da caixa (a página não rola para o lado)');
+  }
   const ch = page.locator('.p-chamada a.btn');
-  ok(await ch.getAttribute('data-origem') === 'guia-exemplo' && /[?&]origem=guia_exemplo$/.test(await ch.getAttribute('href')), 'a chamada leva a origem (data-origem="guia-exemplo" e origem=guia_exemplo)');
+  ok(await ch.getAttribute('data-origem') === 'guia-' + G.endereco && new URL(await ch.getAttribute('href'), site.base).searchParams.get('origem') === ORIGEM, `a chamada leva a origem (data-origem="guia-${G.endereco}" e origem=${ORIGEM})`);
   ok(await page.evaluate(() => [...document.scripts].every(s => s.type === 'application/ld+json')), 'nenhum script na página, só os dados estruturados');
   await ch.click(); await page.waitForURL(/contratar\.html/);
-  ok(new URL(page.url()).searchParams.get('origem') === 'guia_exemplo', 'tocar na chamada abre o contratar com a origem');
+  ok(new URL(page.url()).searchParams.get('origem') === ORIGEM, 'tocar na chamada abre o contratar com a origem');
   await ctx.close();
 }
 
@@ -96,7 +100,7 @@ for (const w of [360, 1024, 1280]) {
   const { ctx, page, erros } = await abrir(w, '/guias/', { publicada: true });
   const l = await larguraOk(page);
   ok(!l.rola && !l.cortados.length, `página Guias, ${w} px: nada rola para o lado nem fica cortado` + (l.cortados.length ? ' (' + l.cortados.join(' · ') + ')' : ''));
-  ok(await page.locator('.temas a', { hasText: 'Atendimento' }).isVisible() && await page.locator('#atendimento .p-cartao').count() === 1, `página Guias, ${w} px: o tema como âncora e o cartão do guia`);
+  ok(await page.locator('.temas a').first().isVisible() && await page.locator(`#${G.tema} .p-cartao`).count() >= 1, `página Guias, ${w} px: o tema como âncora e o cartão do guia`);
   ok(await page.locator('.p-chamada a.btn').getAttribute('data-origem') === 'guias', `página Guias, ${w} px: a chamada leva a origem "guias"`);
   ok(!erros.length, `página Guias, ${w} px: sem erro no console` + (erros.length ? ': ' + erros.join(' | ') : ''));
   await ctx.close();

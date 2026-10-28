@@ -32,6 +32,7 @@ chamada-texto: (opcional) o texto da chamada
 - `**negrito**` e `[texto](/endereço-do-site)` ou `[texto](https://…)`.
 - Todo número precisa da fonte no mesmo trecho: `(fonte: Nome, ano)` ou `[fonte: Nome, ano](https://…)`.
 - Nada de "melhor", "garante" ou "100%". Nada de assunto clínico.
+- No fim, a seção `## Fontes`, com o link de cada fonte usada no texto (cada item com `[fonte: …](endereço)`).
 
 ## As 10 peças
 
@@ -50,5 +51,6 @@ Cada peça abre com `:::nome` e fecha com `:::`, sozinhos na linha.
 | `:::chamada` | vazia: o botão "Testar 7 dias grátis", com a origem do clique `guia-<endereço>` |
 | `:::cartao-de-guia endereço` | o cartão de outro guia publicado |
 
-O `exemplo.md` (rascunho) usa as 10 peças e sai quando o primeiro guia de verdade for publicado.
+O guia de exemplo, com as 10 peças, saiu quando o primeiro guia foi publicado (28/10/2026); ele continua no histórico do
+Git. Os guias publicados mostram as peças em uso.
 O topo, o rodapé e o HTML de cada peça ficam no `molde.html`; o estilo, no `assets/ancora/guias.css`.
