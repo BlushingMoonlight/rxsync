@@ -7,7 +7,7 @@ pesquisa-alvo: inteligência artificial no WhatsApp da clínica CFM
 publicado-em: 2026-10-28
 revisado-em: 2026-10-28
 rascunho: não
-relacionados: paciente-sem-resposta-whatsapp
+relacionados: paciente-sem-resposta-whatsapp, whatsapp-pessoal-e-da-clinica
 perguntas:
   - pergunta: O CFM permite usar inteligência artificial no WhatsApp da clínica?
     resposta: Sim. A resolução do CFM sobre IA não proíbe o uso no atendimento; ela pede que o paciente seja informado, que a IA não comunique diagnóstico nem decisão de tratamento e que o médico continue responsável.
