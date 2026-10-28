@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-SJY0ezKbO22/Vw6e2IMUp42+VH8C6uH4ZaYZtnsuguU=' 'self'; style-src 'sha256-KTwkZnS5cZWkbaGZVwziHiYRymT465RBkoaJumONETI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KvdpFfanvHZeQJTHcynctebxl3BzvmCOVFDTOrOrHHs=' 'self'; style-src 'sha256-KTwkZnS5cZWkbaGZVwziHiYRymT465RBkoaJumONETI=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -674,6 +674,8 @@ const vazio = (titulo, texto, acao) => el('div', { class: 'vazio' }, titulo ? el
 const esqueleto = () => el('div', { 'aria-busy': 'true', 'aria-label': 'Carregando' }, el('span', { class: 'esq' }), el('span', { class: 'esq l2' }), el('span', { class: 'esq l3' }));
 const linhaLink = (titulo, sub, rota, ic, valor) => el('button', { class: 'linha', type: 'button', 'data-ir': rota }, ic ? el('span', { class: 'ic' }, icone(ic)) : null,
   el('span', { class: 'tx' }, el('span', { class: 't1', text: titulo }), sub ? el('span', { class: 't2', text: sub }) : null, valor != null ? el('span', { class: 'valor', text: valor }) : null), el('span', { class: 'seta' }, icone('seta')));
+// O que o servidor manda como lista: se vier outra coisa (objeto, erro), vale lista vazia, nunca uma tela quebrada.
+const comoLista = v => Array.isArray(v) ? v : [];
 const fmtNum = v => v == null ? '—' : Number(v).toLocaleString('pt-BR');
 // O número com a palavra no singular ou no plural certo: pl(2, 'consulta', 'consultas') = "2 consultas".
 const pl = (n, um, varios) => fmtNum(n || 0) + ' ' + (Number(n) === 1 ? um : varios);
@@ -1017,11 +1019,25 @@ function rotear() {
   document.body.classList.toggle('com-assuntos', !!d);
   document.querySelectorAll('#telas > section').forEach(s => { s.hidden = s !== aberta.sec && !(raiz && s === raiz.sec); });
   if (raiz) {
-    if (raiz.entrar) raiz.entrar('', raiz.sec);
+    if (raiz.entrar) entrarSeguro(raiz, '', raiz.sec);
     raiz.sec.querySelectorAll('[data-ir]').forEach(b => { const sim = b.getAttribute('data-ir') === rotaAberta; b.classList.toggle('selecionada', sim); if (sim) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   }
-  if (aberta.entrar) aberta.entrar(rotaAberta === rota ? param : '', aberta.sec);
+  if (aberta.entrar) entrarSeguro(aberta, rotaAberta === rota ? param : '', aberta.sec);
   window.scrollTo(0, 0);
+}
+// Rede de segurança: se o entrar() de uma tela falhar (erro na hora ou promessa recusada), a tela nunca fica vazia sem
+// aviso. Mostra "Não consegui abrir esta tela.", "Tentar de novo" e, pequeno, o nome do erro e a função (sem dado nenhum
+// da clínica ou de paciente), para o print.
+function entrarSeguro(t, param, sec) {
+  const falhou = e => {
+    const nome = String((e && e.name) || 'Erro').slice(0, 40), onde = String(((e && e.stack) || '').split('\n').map(l => (l.match(/^\s*(?:at\s+)?([\w$.]+)[\s@(]/) || [])[1]).find(f => f && !/^(entrarSeguro|rotear|Promise|async)$/.test(f)) || '').slice(0, 40);
+    let caixa = sec.querySelector(':scope > .tela-falhou');
+    if (!caixa) { caixa = el('div', { class: 'tela-falhou bloco' }); sec.append(caixa); }
+    trocar(caixa, aviso('perigo', 'Não consegui abrir esta tela.'), el('div', { class: 'pilha' }, btn('Tentar de novo', () => { caixa.remove(); entrarSeguro(t, param, sec); }, 'sec')),
+      el('p', { class: 'mudo peq', text: nome + (onde ? ' · ' + onde : '') }));
+  };
+  const velha = sec.querySelector(':scope > .tela-falhou'); if (velha) velha.remove();
+  try { const r = t.entrar(param, sec); if (r && typeof r.then === 'function') r.catch(falhou); } catch (e) { falhou(e); }
 }
 window.addEventListener('hashchange', rotear);
 LARGO.addEventListener('change', () => rotear());
@@ -1476,8 +1492,8 @@ tela('hoje', {
 function hojeCarregar() {
   // S3 (rxsync-sistema sql/067): quem pediu uma pessoa ou teve urgência nas últimas 48 horas e ainda não foi resolvido.
   d24('agenda_chamados').then(rows => { HOJE.chamados = Array.isArray(rows) ? rows : []; hojeRender(); }).catch(() => {});
-  if (!sem('documentos')) d24('agenda_documentos').then(rows => { const lim = Date.now() - 7 * 86400000; HOJE.docs7 = (rows || []).filter(d => new Date(d.recebido_em).getTime() > lim).length; hojeRender(); }).catch(() => {});
-  if (ligado('func_pagamento_link')) d24('agenda_listar', { nao_pagas: true }).then(rows => { HOJE.naoPagas = rows || []; hojeRender(); }).catch(() => {});
+  if (!sem('documentos')) d24('agenda_documentos').then(rows => { const lim = Date.now() - 7 * 86400000; HOJE.docs7 = comoLista(rows).filter(d => new Date(d.recebido_em).getTime() > lim).length; hojeRender(); }).catch(() => {});
+  if (ligado('func_pagamento_link')) d24('agenda_listar', { nao_pagas: true }).then(rows => { HOJE.naoPagas = comoLista(rows); hojeRender(); }).catch(() => {});
   // Os números do mês chegam depois: o "indicadores" consulta o Chatwoot e demora.
   if (!HOJE.ind) d24('indicadores', { dias: 30 }).then(r => { HOJE.ind = r || {}; hojeRender(); }).catch(() => { HOJE.ind = { erro: true }; hojeRender(); });
 }
@@ -1683,7 +1699,7 @@ function resAvaliacoes() {
   const box = $('resAvaliacoes'); if (!box) return;
   if (sem('pesquisa')) { trocar(box); return; }
   d24('agenda_avaliacoes').then(rows => {
-    rows = (rows || []).slice(0, 20);
+    rows = comoLista(rows).slice(0, 20);
     if (!rows.length) { trocar(box); return; }
     const dia = d => d ? new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
     trocar(box, el('div', { class: 'bloco' }, el('h2', { text: 'Avaliações dos pacientes' }), el('p', { class: 'subtitulo', text: 'As 20 mais recentes. O código ao lado do nome é o do paciente, o mesmo da agenda.' }),
@@ -1718,7 +1734,7 @@ function agGrupos(lista) {
 }
 function agCarregar() {
   return d24('agenda_listar').then(rows => {
-    AG.dados = rows || []; AG.carregou = true;
+    AG.dados = comoLista(rows); AG.carregou = true;
     if (!agGrupos().novos.length && AG.filtro === 'novos') AG.filtro = 'proximos';
     agSelo(); agRender(); hojeRender();
     if (AG.visao !== 'lista' && !(AG.visao === 'dia' && estreito())) calCarregar();
@@ -1727,7 +1743,7 @@ function agCarregar() {
 function agSelo() { const n = agGrupos().novos.length; document.querySelectorAll('[data-selo-agenda]').forEach(x => { x.textContent = n > 99 ? '99+' : String(n); x.hidden = !n; }); }
 const estreito = () => window.innerWidth < 768;
 function agNaoPagasCarregar() {
-  return d24('agenda_listar', { nao_pagas: true }).then(rows => { AG.naoPagas = rows || []; agRender(); })
+  return d24('agenda_listar', { nao_pagas: true }).then(rows => { AG.naoPagas = comoLista(rows); agRender(); })
     .catch(() => { AG.naoPagas = []; agRender(); rapida('Não consegui carregar as consultas não pagas.'); });
 }
 const agPagoTxt = a => a.pago_origem === 'remarcada' ? 'Paga (remarcada)' : a.pago_origem === 'asaas' ? 'Paga (Asaas)' : 'Paga';
@@ -2116,7 +2132,7 @@ function agExportar() {
   const agora = Date.now(), semMs = d => new Date(d).toISOString().replace(/\.\d{3}Z$/, 'Z');
   rapida('Gerando o arquivo…');
   d24('agenda_listar', { de: semMs(agora - 365 * 86400000), ate: semMs(agora + 730 * 86400000) }).then(rows => {
-    const ativos = (rows || []).filter(agAtiva);
+    const ativos = comoLista(rows).filter(agAtiva);
     if (!ativos.length) { rapida('Não há consultas para exportar.'); return; }
     const carimbo = icsHora(new Date().toISOString());
     const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//RXSync//Agenda//PT-BR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + icsTxt('Agenda ' + (VAL.nome_exibicao || 'RXSync')), 'X-WR-TIMEZONE:' + TZ];
@@ -2155,7 +2171,7 @@ function calCarregar() {
   $('calTitulo').textContent = $('calTituloCel').textContent = calTitulo();
   d24('agenda_listar', { de: isoLocal(chave(r.ini) + 'T00:00'), ate: isoLocal(chave(somaDias(r.ini, r.n)) + 'T00:00') }).then(rows => {
     if (n !== AG.calReq) return;
-    AG.cal = (rows || []).filter(agAtiva).filter(medFiltra); calRender();
+    AG.cal = comoLista(rows).filter(agAtiva).filter(medFiltra); calRender();
   }).catch(() => { if (n !== AG.calReq) return; trocar($('calBox'), el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'O calendário não carregou agora.', btn('Tentar de novo', calCarregar, 'sec')))); });
 }
 // Horários que sombreiam o calendário: os da clínica, ou (modo médicos) os do médico filtrado ou de todos os ativos.
@@ -2295,12 +2311,13 @@ tela('agenda/horarios', {
     el('div', { class: 'bloco pilha' }, el('p', { class: 'mudo peq', text: 'Ficou alguma dúvida? A equipe da RXSync ajuda a deixar a agenda do jeito da clínica.' }),
       el('button', { class: 'btn sec plena', type: 'button', id: 'btnPedirAjudaAgendamento', text: 'Pedir ajuda para configurar', onclick: e => pedirAjuda(e.currentTarget) }),
       el('p', { class: 'mudo peq', id: 'msgPedirAjuda', 'aria-live': 'polite' }))],
-  entrar: () => { horIndice(); gradeCarregar().then(horIndice); intStatus().then(horIndice); }
+  // Mostra na hora o que já tem e atualiza quando cada resposta chega; o erro volta para a rede de segurança do rotear().
+  entrar: () => { horIndice(); return Promise.all([gradeCarregar().then(horIndice), intStatus().then(horIndice)]); }
 });
 const INT = { status: null };
 function horIndice() {
   const box = $('horIndice'); if (!box) return;
-  const dias = new Set((GRADE.dados || []).map(g => g.dia)).size, med = MED.dados.filter(m => m.ativo).length;
+  const dias = new Set(comoLista(GRADE.dados).map(g => g.dia)).size, med = MED.dados.filter(m => m.ativo).length;
   const st = INT.status || {};
   trocar(box, el('div', { class: 'lista bloco' },
     linhaLink('Horários de atendimento', MED.modo ? 'Cada médico tem os próprios horários' : (st.conectado && st.importar_horarios !== false && (st.horarios || []).length ? 'Vêm do ' + (st.plataforma_nome || 'Reservio') : dias ? pl(dias, 'dia', 'dias') + ' com atendimento' : 'Nenhum dia com atendimento'), 'agenda/horarios/grade', 'relogio'),
@@ -2321,7 +2338,7 @@ function pedirAjuda(b) {
 const DIAS_SEM = [[1, 'Segunda'], [2, 'Terça'], [3, 'Quarta'], [4, 'Quinta'], [5, 'Sexta'], [6, 'Sábado'], [0, 'Domingo']];
 let gradeEdit = null;
 function gradeCarregar() {
-  return d24('agenda_grade_listar').then(rows => { GRADE.dados = rows || []; if (AG.visao !== 'lista') calRender(); })
+  return d24('agenda_grade_listar').then(rows => { GRADE.dados = comoLista(rows); if (AG.visao !== 'lista') calRender(); })
     .catch(() => { GRADE.erro = true; });
 }
 tela('agenda/horarios/grade', {
