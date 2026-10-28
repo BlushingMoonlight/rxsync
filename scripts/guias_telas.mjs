@@ -100,13 +100,17 @@ for (const w of [360, 1024, 1280]) {
   ok(await page.locator('.p-chamada a.btn').getAttribute('data-origem') === 'guias', `página Guias, ${w} px: a chamada leva a origem "guias"`);
   ok(!erros.length, `página Guias, ${w} px: sem erro no console` + (erros.length ? ': ' + erros.join(' | ') : ''));
   await ctx.close();
+  // A página inicial com o "Guias" não pode ficar mais larga que a de hoje (sem guia publicado): em 1024 px o topo já está
+  // no limite, e a letra muda um pouco de um computador para outro.
+  const medir = p => p.evaluate(() => ({ pagina: document.documentElement.scrollWidth, topo: document.querySelector('.topo .wrap').scrollWidth }));
+  const hoje = await abrir(w, '/'); const antes = await medir(hoje.page); await hoje.ctx.close();
   const ini = await abrir(w, '/', { publicada: true });
-  const li = await larguraOk(ini.page);
+  const depois = await medir(ini.page);
   // No computador, o "Guias" do menu aparece a partir de 1280 px (em 1024, o menu já ocupa a largura toda); no celular, no menu.
   const naNav = await ini.page.locator('.nav a', { hasText: 'Guias' }).isVisible(), noMenuM = await ini.page.locator('#mobile-menu a', { hasText: 'Guias' }).count() === 1;
-  const topo = await ini.page.evaluate(() => { const w = document.querySelector('.topo .wrap'); return w.scrollWidth <= w.clientWidth + 1; });
-  ok((w >= 1280 ? naNav : !naNav) && noMenuM && await ini.page.locator('.rodape a', { hasText: 'Guias' }).count() === 1 && !li.rola && topo,
-    `página inicial, ${w} px: "Guias" ${w >= 1280 ? 'no menu' : 'no menu do celular'} e no rodapé, sem rolar para o lado e sem passar do topo`);
+  const topoOk = depois.pagina <= Math.max(antes.pagina, w) && (depois.topo <= antes.topo || depois.topo <= await ini.page.evaluate(() => document.querySelector('.topo .wrap').clientWidth + 1));
+  ok((w >= 1280 ? naNav : !naNav) && noMenuM && await ini.page.locator('.rodape a', { hasText: 'Guias' }).count() === 1 && topoOk,
+    `página inicial, ${w} px: "Guias" ${w >= 1280 ? 'no menu' : 'no menu do celular'} e no rodapé, sem deixar a página nem o topo mais largos que hoje (topo ${antes.topo} → ${depois.topo} px)`);
   await ini.ctx.close();
 }
 await browser.close(); site.fechar();
