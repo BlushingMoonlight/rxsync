@@ -7,7 +7,7 @@ pesquisa-alvo: separar WhatsApp pessoal do médico e da clínica
 publicado-em: 2026-10-28
 revisado-em: 2026-10-28
 rascunho: não
-relacionados: paciente-sem-resposta-whatsapp, ia-whatsapp-clinica-cfm
+relacionados: paciente-sem-resposta-whatsapp, ia-whatsapp-clinica-cfm, mensagens-prontas-recepcao
 perguntas:
   - pergunta: O médico pode falar com o paciente pelo WhatsApp?
     resposta: Pode. O CFM permite o WhatsApp entre médico e paciente, com sigilo. Com quem já é paciente, serve para tirar dúvidas e passar orientações, e o que for relevante vai para o prontuário.
