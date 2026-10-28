@@ -12,7 +12,7 @@ for (const f of htmls) {
   if (!/<title>[^<]+<\/title>/i.test(s)) erro(`${f}: página sem <title>`);
   for (const m of s.matchAll(/\b(?:href|src)\s*=\s*"([^"]+)"/gi)) {
     let u = m[1].trim();
-    if (!u || /^(https?:|mailto:|tel:|#|javascript:|data:|\/\/|\{|\$)/i.test(u) || /['+]/.test(u) || u.includes('${')) continue;
+    if (!u || /^(https?:|mailto:|tel:|#|javascript:|data:|\/\/|\{|\$)/i.test(u) || /['+]/.test(u) || u.includes('${') || u.includes('{{')) continue;
     u = u.split('#')[0].split('?')[0]; if (!u) continue;
     let alvo = u.startsWith('/') ? path.join('.', u) : path.join(path.dirname(f), u);
     try { alvo = decodeURIComponent(alvo); } catch {}
@@ -165,6 +165,7 @@ function conferirP12(nome, css, pagina) {
   for (const f of htmls.map(h => h.split(path.sep).join('/').replace(/^\.\//, ''))) {
     if (PAGINAS[f] || f === 'central/index.html' || ANTIGA_PAGINAS.includes(f)) continue;
     if (f === 'painel/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte do painel precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
+    if (f === 'guias/_fonte/molde.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: o molde dos guias precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     if (f === 'central/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte da Central precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     erro(`${f}: página sem a regra de segurança; ponha na lista PAGINAS do scripts/csp.mjs e rode node scripts/csp.mjs`);
   }
@@ -228,6 +229,9 @@ for (const arq of ['painel/index.html']) {
   const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html',
     ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
   const DEMO = ['index', 'central/index', 'escopo/index', 'manual/index'].map(f => `demo/clinica/${f}.html`);
+  // Os guias (guias/, scripts/guias_montar.mjs) também, inclusive os rascunhos.
+  const { paginasExistentes } = await import('./guias_montar.mjs');
+  PUBLICAS.push(...paginasExistentes());
   const IDENTIDADE = ['painel/index.html', 'autoedicao.html', ...PUBLICAS, 'central/index.html', ...DEMO];
   for (const arq of PUBLICAS) {
     const s = fs.readFileSync(arq, 'utf8');
@@ -407,6 +411,69 @@ for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f))
   const m = fs.readFileSync(f, 'utf8').match(/\bN-[0-9]{2,3}\b/);
   if (m) erro(`${f}: cita um número de achado (${m[0]}); o site é público, deixe os detalhes no PR do sistema`);
 }
+// Guias do site (guias/, decisão da seção Guias no rxsync-sistema): as páginas são exatamente o que o
+// scripts/guias_montar.mjs gera a partir de guias/_fonte/; o texto não promete ("melhor", "garante", "100%"); todo número
+// tem a fonte no mesmo bloco ("(fonte: …)"); endereço publicado nunca muda; nenhum JavaScript; a chamada leva a origem;
+// o estilo segue o Âncora. "Revisado em" com mais de 6 meses só avisa.
+let avisosGuias = 0;
+if (fs.existsSync('guias/_fonte')) {
+  const G = await import('./guias_montar.mjs');
+  let r = null;
+  try { r = G.montar(); } catch (e) { erro(`guias/_fonte: ${e.message}`); }
+  if (r) {
+    for (const [f, s] of Object.entries(r.arquivos)) if (!fs.existsSync(f) || fs.readFileSync(f, 'utf8') !== s) erro(`${f}: diferente do que guias/_fonte/ monta (rode node scripts/guias_montar.mjs e não edite à mão)`);
+    for (const f of G.paginasExistentes()) if (!r.arquivos[f]) erro(`${f}: página de guia sem fonte em guias/_fonte/ (rode node scripts/guias_montar.mjs)`);
+    const PROIBIDAS = [[/\bmelhor(es)?\b/i, '"melhor"'], [/\bgarant(e|em|ido|ida|idos|idas|imos)\b/i, '"garante"'], [/\b100\s*%/, '"100%"']];
+    const hoje = new Date();
+    for (const g of r.guias) {
+      const c = g.cab, textos = [c.titulo, c.descricao, c['chamada-titulo'] || '', c['chamada-texto'] || '', ...c.perguntas.flatMap(p => [p.pergunta, p.resposta]), g.corpo].join('\n');
+      for (const [re, nome] of PROIBIDAS) { const m = textos.match(re); if (m) erro(`${g.arquivo}: ${nome} não entra nos guias (achei "${m[0]}"); diga o que a clínica pode fazer, sem prometer`); }
+      // Todo número com a fonte no mesmo bloco: parágrafo, item, peça inteira (a tabela pode pôr a fonte na legenda) ou
+      // resposta das perguntas. Ficam de fora o modelo de mensagem e a imagem (texto de exemplo e endereço do arquivo).
+      const blocosTexto = []; let atual = [], peca = null;
+      for (const l of g.corpo.replace(/\r\n/g, '\n').split('\n')) {
+        const ab = l.match(/^:::([a-z-]+)(?: (.*))?$/);
+        if (ab && !peca) { if (atual.length) blocosTexto.push(atual.join(' ')); atual = []; peca = ab[1]; if (ab[2]) atual.push(ab[2]); continue; }
+        if (l === ':::' && peca) { if (!['modelo-de-mensagem', 'imagem'].includes(peca) && atual.length) blocosTexto.push(atual.join(' ')); atual = []; peca = null; continue; }
+        if (peca) { if (peca === 'tabela' || peca === 'passos') atual.push(l); else if (!l.trim()) { if (atual.length) blocosTexto.push(atual.join(' ')); atual = []; } else atual.push(l); continue; }
+        if (!l.trim() || /^(-|\d+\.) /.test(l) || /^#/.test(l)) { if (atual.length) blocosTexto.push(atual.join(' ')); atual = []; }
+        if (l.trim()) { atual.push(l.replace(/^(\d+\.) /, '')); if (/^(-|#)/.test(l)) { blocosTexto.push(atual.join(' ')); atual = []; } }
+      }
+      if (atual.length) blocosTexto.push(atual.join(' '));
+      blocosTexto.push(...c.perguntas.map(p => p.resposta));
+      for (const b of blocosTexto) if (/\d/.test(b.replace(/\]\([^)]*\)/g, ']')) && !/\bfonte:/i.test(b)) erro(`${g.arquivo}: número sem fonte no mesmo trecho ("${b.slice(0, 80)}…"); escreva "(fonte: nome, ano)" ou um link "[fonte: …](endereço)"`);
+      const meses = (hoje - new Date(c['revisado-em'] + 'T12:00:00')) / (30.44 * 86400000);
+      if (!c.rascunho && meses > 6) { avisosGuias++; console.log(`::warning title=Guia::${g.arquivo}: revisado em ${c['revisado-em']}, há mais de 6 meses; reveja o texto e as fontes e troque o "revisado-em".`); }
+      const f = `guias/${c.endereco}/index.html`, s = r.arquivos[f] || '';
+      if (c.rascunho !== /<meta name="robots" content="noindex, nofollow">/.test(s)) erro(`${f}: ${c.rascunho ? 'rascunho precisa de noindex' : 'guia publicado não pode ter noindex'}`);
+      if (/<script(?![^>]*type="application\/ld\+json")/.test(s)) erro(`${f}: nenhum JavaScript nos guias (só os dados estruturados)`);
+      if (!s.includes(`data-origem="guia-${c.endereco}"`) || !s.includes(`origem=${G.origemParam(c.endereco)}"`)) erro(`${f}: a chamada precisa levar a origem (data-origem="guia-${c.endereco}" e origem=${G.origemParam(c.endereco)} no endereço)`);
+      for (const m of s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+        let d = null; try { d = JSON.parse(m[1]); } catch (e) { erro(`${f}: dados estruturados inválidos (${e.message})`); continue; }
+        const faq = (d['@graph'] || []).find(x => x['@type'] === 'FAQPage');
+        for (const q of faq ? faq.mainEntity : []) if (!s.includes(`<h3>${q.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</h3>`)) erro(`${f}: a pergunta "${q.name}" dos dados estruturados não aparece na página`);
+      }
+    }
+    const sm = r.arquivos['sitemap.xml'];
+    for (const g of r.guias) if (g.cab.rascunho === sm.includes(`/guias/${g.cab.endereco}/<`)) erro(`sitemap.xml: ${g.cab.rascunho ? 'rascunho fora do sitemap' : 'guia publicado no sitemap'} (${g.cab.endereco})`);
+    // Endereço publicado nunca muda: todo guia do sitemap da main continua publicado no mesmo endereço.
+    const { execSync } = await import('node:child_process');
+    const daMain = () => { try { return execSync('git show origin/main:sitemap.xml', { stdio: ['ignore', 'pipe', 'ignore'] }).toString(); } catch { return null; } };
+    let main = daMain();
+    if (main === null) { try { execSync('git fetch -q --depth=1 origin main', { stdio: 'ignore', timeout: 30000 }); } catch {} main = daMain(); }
+    if (main === null) { avisosGuias++; console.log('::warning title=Guias::não consegui ler o sitemap.xml da main para conferir que nenhum endereço publicado mudou.'); }
+    else for (const m of main.matchAll(/<loc>https:\/\/rxsync\.com\.br\/guias\/([a-z0-9-]*)\/?<\/loc>/g))
+      if (m[1] ? !r.publicados.some(g => g.cab.endereco === m[1]) : !r.publicados.length) erro(`guias: o endereço publicado /guias/${m[1] ? m[1] + '/' : ''} sumiu ou virou rascunho; endereço publicado nunca muda (volte o endereço na fonte)`);
+  }
+  // Estilo dos guias: nenhuma cor solta (só as variáveis do tokens.css), pesos até 600, sem sombra de cartão nem degradê.
+  const css = fs.readFileSync('assets/ancora/guias.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of css.matchAll(/#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)/g)) erro(`assets/ancora/guias.css: cor solta ${m[0]}; use uma variável do assets/ancora/tokens.css`);
+  for (const m of css.matchAll(/font-weight:\s*(\w+)/g)) if (m[1] === 'bold' || m[1] === 'bolder' || +m[1] > 600) erro(`assets/ancora/guias.css: peso ${m[1]} (máximo 600)`);
+  for (const m of css.matchAll(/box-shadow:\s*([^;}]+)/g)) if (!/^(none|var\(--sombra-menu\))$/.test(m[1].trim())) erro(`assets/ancora/guias.css: sombra ${m[1].trim()} (cartão sem sombra; só o menu aberto usa var(--sombra-menu))`);
+  if (/gradient\(|backdrop-filter/.test(css)) erro('assets/ancora/guias.css: sem degradê nem vidro');
+  if (!/prefers-reduced-motion:\s*reduce/.test(css)) erro('assets/ancora/guias.css: falta a regra de "Reduzir movimento"');
+}
+if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não bloqueia).`);
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
