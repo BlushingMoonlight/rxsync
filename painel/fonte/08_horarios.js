@@ -323,7 +323,6 @@ function ferRender() {
 }
 
 // ---------------------------------------------------------------- Receber dos pacientes (E): o link, a frase e o valor, no lembrete, o Asaas da clínica
-// O servidor cita "Agenda › Horários › Pagamento" (workflow 32): a busca acha por "pagamento".
 tela('agenda/horarios/pagamento', {
   montar: () => [cabTela('Receber dos pacientes', { voltar: VOLTA_HOR, sub: 'Depois de marcar a consulta, a assistente manda ao paciente o link de pagamento da clínica. Nada é cancelado sozinho.' }),
     el('div', { id: 'pagQuemMarca' }), blocoCampos(['func_pagamento_link', 'pagamento_link', 'pagamento_texto', 'pagamento_valor_padrao', 'pagamento_no_lembrete']),
@@ -471,7 +470,7 @@ function intRender(r, ultimo) {
     r.token_recusado ? btn('Conectar de novo', () => intRender(r, 'reconectar'), 'pri plena') : null,
     pend.length ? [el('h2', { class: 'tit-bloco', text: 'Para fazer no ' + nomePlat + ' (' + pend.length + ')' }),
       el('p', { class: 'dica', text: 'A API do ' + nomePlat + ' não cancela, não muda e não bloqueia. Faça lá e toque em "Já fiz".' }),
-      el('div', { class: 'lista' }, pend.map(p => el('div', { class: 'linha' }, el('div', { class: 'tx' }, el('div', { class: 't1', text: (TIPO[p.tipo] || p.tipo) + (p.nome ? ': ' + p.nome : '') }),
+      el('div', { class: 'lista bloco' }, pend.map(p => el('div', { class: 'linha' }, el('div', { class: 'tx' }, el('div', { class: 't1', text: (TIPO[p.tipo] || p.tipo) + (p.nome ? ': ' + p.nome : '') }),
         el('div', { class: 't2', text: (p.inicio ? fmtQuando(p.inicio) : '') + (p.profissional ? ' · ' + p.profissional : '') + ' · feito por ' + (QUEM[p.quem] || 'a RXSync') })),
         btn('Já fiz', ev => { ocupado(ev.currentTarget, '…'); c12('pendencia_resolver', { id: String(p.id) }).then(x => intRender(x)).catch(() => rapida('Não consegui.')); }, 'sec'))))] : null,
     el('h2', { class: 'tit-bloco', text: 'Serviços que a assistente oferece' }),

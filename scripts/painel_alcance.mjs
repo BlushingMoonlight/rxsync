@@ -318,7 +318,9 @@ await browser.close(); site.fechar();
 // Os caminhos de toque, para a conferência dos caminhos escritos (verificar_site.mjs e, no rxsync-sistema, verificar.mjs).
 if (GRAVAR && !SO) {
   const arq = path.join(RAIZ, 'scripts', 'caminhos_validos.json');
-  const ordenar = s => [...s].filter(c => c && !c.includes('folha:')).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  // Fora da lista: o estado da assistente ("Atendendo", que abre em toda tela) e os avisos do início da Central ("Informação: 3 …").
+  const ruido = c => /(^| › )(Atendendo|Pausada|Em teste)( › |$)/.test(c) || /^[^›]*: \d/.test(c);
+  const ordenar = s => [...s].filter(c => c && !c.includes('folha:') && !ruido(c)).sort((a, b) => a.localeCompare(b, 'pt-BR'));
   fs.writeFileSync(arq, JSON.stringify({ _sobre: 'Caminhos de toque do painel e da Central, gravados pelo scripts/painel_alcance.mjs --gravar (não edite à mão). O verificar_site.mjs e o verificar.mjs do rxsync-sistema conferem que todo "X › Y" escrito nos textos é um destes caminhos (ou o começo de um).', painel: ordenar(todosCaminhos.painel), central: ordenar(todosCaminhos.central) }, null, 1) + '\n');
   console.log('Gravado: scripts/caminhos_validos.json');
 }

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QmEDkkgJCpk0JWVPGGT2xChNBqERsf8rtC03iMHxHik='; style-src 'sha256-bW6ujR3VTZxPW32DR6Gc0KqvrTOuCI39Ajst0UjkkzI=' 'self'; font-src 'self'; img-src 'self'; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9S1iy6urNFtzm/F7/KUI2C6L8TQVS/2HSkCzc0yO1Hg='; style-src 'sha256-bW6ujR3VTZxPW32DR6Gc0KqvrTOuCI39Ajst0UjkkzI=' 'self'; font-src 'self'; img-src 'self'; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
 <meta name="theme-color" content="#FFFFFF">
@@ -85,7 +85,7 @@
       .catch(function () { return { ok: false, mensagem: "Sem conexão. Confira a internet e abra o link de novo." }; });
   }
   function erro(t) { el("carregando").hidden = true; el("pedido").hidden = true; el("erro").textContent = t; el("erro").hidden = false; }
-  if (!/^[0-9a-f]{64}$/.test(link)) { erro("Este link não está completo. Abra de novo o botão do e-mail ou peça outro no painel: Conta › Cancelar e excluir a conta."); return; }
+  if (!/^[0-9a-f]{64}$/.test(link)) { erro("Este link não está completo. Abra de novo o botão do e-mail ou peça outro no painel: Conta › Plano e pagamento › “Cancelar e excluir a conta”."); return; }
   chamar("conta_exclusao_ver").then(function (r) {
     if (!r || !r.ok) { erro((r && r.mensagem) || "Este link não vale."); return; }
     el("carregando").hidden = true;

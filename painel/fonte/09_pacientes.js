@@ -226,7 +226,7 @@ function pacForm(p) {
     }).catch(() => { salvar.disabled = false; trocar(erro, aviso('perigo', PAC_ERROS.interno)); });
   });
 }
-// ---------------------------------------------------------------- Pacientes › Organizar (D): duplicados, importar e importações
+// ---------------------------------------------------------------- Pacientes › ⋯ › Organizar (D): duplicados, importar e importações
 tela('pacientes/organizar', {
   montar: () => [cabTela('Organizar', { voltar: VOLTA_PAC }), el('div', { class: 'lista' }, linhaLink('Possíveis duplicados', 'Cadastros com o mesmo nome', 'pacientes/duplicados', 'duplicados'),
     linhaLink('Importar pacientes', 'De uma planilha CSV, em 4 passos', 'pacientes/importar', 'importar'), linhaLink('Importações', 'Ver e desfazer em até 7 dias', 'pacientes/importacoes', 'notas'))]
@@ -372,7 +372,7 @@ function impConfirmar() {
   const texto = p.novos ? 'Importar ' + p.novos.toLocaleString('pt-BR') + (p.novos === 1 ? ' paciente' : ' pacientes') : 'Completar ' + pl(p.existentes, 'cadastro', 'cadastros');
   const ir1 = btn(texto, async () => {
     if (!cb.checked) return;
-    if (!(await confirmar({ titulo: texto + '?', texto: ['Os pacientes importados não recebem nenhuma mensagem automática até escreverem para a clínica no WhatsApp.', 'Dá para desfazer em até 7 dias, em Pacientes › Organizar › Importações.'], botao: texto }))) return;
+    if (!(await confirmar({ titulo: texto + '?', texto: ['Os pacientes importados não recebem nenhuma mensagem automática até escreverem para a clínica no WhatsApp.', 'Dá para desfazer em até 7 dias, em Pacientes › ⋯ › Organizar › Importações.'], botao: texto }))) return;
     impGravar();
   }, 'pri plena', null, { disabled: true });
   cb.addEventListener('change', () => { ir1.disabled = !cb.checked; });

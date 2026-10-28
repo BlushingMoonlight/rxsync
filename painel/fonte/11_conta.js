@@ -147,6 +147,7 @@ tela('conta/gestao', {
 });
 const READONLY = [['razao_social', 'Razão social'], ['cnpj', 'CNPJ'], ['representante_nome', 'Representante'], ['representante_cpf', 'CPF do representante'], ['endereco_faturamento', 'Endereço de faturamento'], ['plano', 'Plano'], ['valor_mensal', 'Valor'], ['numero_whatsapp', 'WhatsApp que a assistente atende']];
 // O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel antigo. Nada muda no servidor.
+// caminhos-antigos: começo (a primeira coluna são os nomes de antes; a segunda, conferida, fica na tela abaixo)
 const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integração e planilhas', 'agenda/horarios/integracao'],
   ['Agenda › Horários (a página longa)', 'Agenda › Horários: uma página por assunto (horários de atendimento, regras, médicos, perguntas, feriados, receber dos pacientes)', 'agenda/horarios'],
   ['Funções da assistente', 'Assistente › O que ela faz', 'assistente/funcoes'],
@@ -162,6 +163,7 @@ const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integraçã
   ['Conta › WhatsApp', 'Conta › Assinatura e WhatsApp › WhatsApp da clínica', 'conta/whatsapp'],
   ['Conta › Equipe e Acessos recentes', 'Conta › Pessoas', 'conta/equipe'],
   ['Conta › Baixar meus dados', 'Conta › Dados e contrato › Baixar meus dados', 'conta/dados']];
+// caminhos-antigos: fim
 tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
   el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
     el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),

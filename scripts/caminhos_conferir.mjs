@@ -8,10 +8,12 @@
 // o nome mais comprido entre os que existem ali (o texto pode seguir com ponto, vírgula ou outras palavras). O botão ⋯
 // pode ser escrito "⋯", "⋯ Mais" ou "Mais"; um item do ⋯ pode ser escrito só até os dois-pontos ("Organizar" vale por
 // "Organizar: duplicados e importação"); um pedaço entre parênteses vale por qualquer nome daquele lugar ("Clientes ›
-// (a clínica) › …"). Linhas com a marca "caminhos-antigos" ficam de fora (as listas do que mudou de nome).
-export function arvoreDosCaminhos(listas) {
+// (a clínica) › …"); um pedaço entre aspas no fim é o nome de um botão daquela tela ("Segurança › "Sair de todos os
+// aparelhos""). "Central › …" só vale com uma seção da Central logo depois. Linhas com a marca "caminhos-antigos" ficam
+// de fora (as listas do que mudou de nome).
+export function arvoreDosCaminhos(painel, central) {
   const raiz = new Map();
-  for (const cam of listas.flat()) {
+  for (const cam of [...painel, ...central, ...central.map(c => 'Central › ' + c)]) {
     let no = raiz;
     for (const parte of cam.split(' › ')) { if (!no.has(parte)) no.set(parte, new Map()); no = no.get(parte); }
   }
@@ -20,7 +22,9 @@ export function arvoreDosCaminhos(listas) {
 // Devolve os caminhos escritos que não existem: [{ caminho, onde }] ("onde" é o pedaço que não bate).
 export function caminhosQuebrados(texto, raiz) {
   const achados = [], vistos = new Set();
-  const s = String(texto || '').split('\n').map(l => l.includes('caminhos-antigos') ? '' : l).join('\n');
+  // "caminhos-antigos" numa linha tira a linha; "caminhos-antigos: começo" e "caminhos-antigos: fim" tiram o trecho entre elas.
+  let fora = false;
+  const s = String(texto || '').split('\n').map(l => { if (l.includes('caminhos-antigos: começo')) { fora = true; return ''; } if (l.includes('caminhos-antigos: fim')) { fora = false; return ''; } return fora || l.includes('caminhos-antigos') ? '' : l; }).join('\n');
   const nomesRaiz = [...raiz.keys()].sort((a, b) => b.length - a.length);
   let i = s.indexOf('›');
   while (i >= 0) {
@@ -33,9 +37,10 @@ export function caminhosQuebrados(texto, raiz) {
       const resto = s.slice(pos + 1).replace(/^\s+/, ''), desloc = s.length - (pos + 1) - resto.length;
       const fim = n => !/[\p{L}\p{N}]/u.test(resto.charAt(n.length) || ' ');
       const mais = resto.match(/^⋯(\s+Mais)?/), coringa = resto.match(/^\([^)\n]{1,40}\)/);
+      if (/^["“]/.test(resto)) break;   // o nome de um botão, entre aspas
       let filho = null, escrito = '';
       if (mais && no.has('Mais')) { filho = 'Mais'; escrito = mais[0]; }
-      else if (coringa && no.size) { filho = [...no.keys()][0]; escrito = coringa[0]; }
+      else if (coringa) { if (!no.size) break; filho = [...no.keys()][0]; escrito = coringa[0]; }   // a ficha de um cliente, de um paciente…
       else {
         const nomes = [...no.keys()].sort((a, b) => b.length - a.length);
         filho = nomes.find(n => resto.startsWith(n) && fim(n)) || null; escrito = filho || '';

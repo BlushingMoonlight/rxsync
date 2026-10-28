@@ -474,6 +474,18 @@ if (fs.existsSync('guias/_fonte')) {
   if (!/prefers-reduced-motion:\s*reduce/.test(css)) erro('assets/ancora/guias.css: falta a regra de "Reduzir movimento"');
 }
 if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não bloqueia).`);
+// #219: todo caminho escrito ("Agenda › Horários › Feriados") nos textos do site, do painel, da Central e dos guias é um
+// caminho de toque que existe. A lista vem do scripts/painel_alcance.mjs --gravar (scripts/caminhos_validos.json), a
+// mesma que o verificar.mjs do rxsync-sistema usa (cópia lá). Os index.html montados do painel e da Central ficam de fora
+// (as fontes são conferidas).
+{
+  const { arvoreDosCaminhos, caminhosQuebrados } = await import('./caminhos_conferir.mjs');
+  const v = JSON.parse(fs.readFileSync('scripts/caminhos_validos.json', 'utf8'));
+  const raiz = arvoreDosCaminhos(v.painel, v.central);
+  const textos = todos.filter(f => /\.(html|js|md|css)$/.test(f) && !/^(scripts|node_modules)\//.test(f) && !/^(painel|central)\/index\.html$/.test(f) && !/^guias\/[^_][^/]*\/index\.html$/.test(f));
+  for (const f of textos) for (const q of caminhosQuebrados(fs.readFileSync(f, 'utf8'), raiz))
+    erro(`${f}: o caminho "${q.caminho}" não existe como toque ("${q.onde}" não está ali). Confira no painel ou na Central e corrija o texto (lista: scripts/caminhos_validos.json)`);
+}
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
