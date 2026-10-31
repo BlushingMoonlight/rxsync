@@ -71,6 +71,11 @@ async function testar(confirmado) {
   try { r = await c23('testar', { confirmar: !!confirmado }); } catch (e) { rapida('Erro ao abrir o teste. Tente de novo.'); return; }
   if (r.ok && r.link) {
     TESTE.aberto = true; estadoMostrar();
+    // Antes de conectar o WhatsApp (#225, item 22): o teste não tira nada do ar; o próximo passo é conectar.
+    if (semWhats()) { const g = folha('Testar a assistente', el('div', {}, el('p', { class: 'bloco', text: r.mensagem || 'Pronto! Também enviamos por e-mail.' }),
+      el('a', { class: 'btn pri plena', href: r.link, target: '_blank', rel: 'noopener', id: 'testeLink' }, 'Conversar com a assistente'),
+      el('p', { class: 'dica', text: 'Converse com ela como se fosse um paciente; as mensagens do teste não chegam a ninguém. Ela começa a atender os pacientes quando você conectar o WhatsApp.' })),
+      { pe: [btn('Conectar o WhatsApp', () => { g.fechar(); ir('conta/whatsapp'); }, 'sec'), btn('Fechar', () => g.fechar(), 'fant')] }); return; }
     const f = folha('Testar a assistente', el('div', {}, el('p', { class: 'bloco', text: r.mensagem || 'Pronto! Também enviamos por e-mail.' }),
       el('a', { class: 'btn pri plena', href: r.link, target: '_blank', rel: 'noopener', id: 'testeLink' }, 'Conversar com a assistente'),
       el('p', { class: 'dica', text: 'Converse com ela como se fosse um paciente; as mensagens do teste não chegam a ninguém. Enquanto o teste estiver aberto, a assistente não responde no WhatsApp da clínica. Quando terminar, toque em "Voltar a atender no WhatsApp".' })),
@@ -84,7 +89,7 @@ async function testar(confirmado) {
   rapida(r.mensagem || 'Não consegui gerar o teste.');
 }
 function voltarWhats() {
-  c23('whatsapp').then(r => { if (r.ok) { TESTE.aberto = false; estadoMostrar(); } rapida(r.mensagem || (r.ok ? 'A assistente voltou a atender no WhatsApp.' : 'Não consegui voltar ao WhatsApp.')); })
+  c23('whatsapp').then(r => { if (r.ok || r.sem_whatsapp) { TESTE.aberto = false; estadoMostrar(); } rapida(r.mensagem || (r.ok ? 'A assistente voltou a atender no WhatsApp.' : 'Não consegui voltar ao WhatsApp.')); })
     .catch(() => rapida('Erro de conexão. Tente de novo.'));
 }
 // ---------------------------------------------------------------- as páginas de cada assunto (molde E): salvo ao sair de cada campo

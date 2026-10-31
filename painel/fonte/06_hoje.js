@@ -25,7 +25,8 @@ function hojeRender() {
   const blocos = [];
   // estado da conta (teste grátis, falta conectar, teste encerrado, suspensa) e o cancelamento agendado
   if (e.cartao) blocos.push(el('div', { class: 'cartao pad bloco', id: 'hojeEstado' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'ponto ' + e.ponto }), e.t1), el('p', { class: 'mudo', text: e.t2 }),
-    e.acao && (ehDono() || e.acao[1] !== 'conta/assinatura') ? el('div', { class: 'pilha' }, btn(e.acao[0], () => ir(e.acao[1]), 'pri')) : null));
+    e.acao && (ehDono() || e.acao[1] !== 'conta/assinatura') ? el('div', { class: 'pilha' }, btn(e.acao[0], () => ir(e.acao[1]), 'pri'),
+      e.acao[1] === 'conta/whatsapp' ? btn(TESTE.aberto ? 'Testar de novo' : 'Testar a assistente', () => testar(false), 'sec') : null) : null));
   if (CONTA.cancelar_em) blocos.push(aviso('atencao', 'Cancelamento agendado para ' + CONTA.cancelar_em + '. Até lá tudo funciona normalmente. ', ehDono() ? el('button', { class: 'link', type: 'button', 'data-ir': 'conta/assinatura', text: 'Desistir do cancelamento' }) : null));
   // primeiros passos: cada um marcado pelo que o servidor já manda; some quando tudo estiver feito
   const passos = [['WhatsApp conectado', CONTA.no_ar !== false && CONTA.situacao !== 'teste_aguardando', 'conta/whatsapp'],

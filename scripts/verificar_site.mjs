@@ -487,5 +487,10 @@ if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não blo
     erro(`${f}: o caminho "${q.caminho}" não existe como toque ("${q.onde}" não está ali). Confira no painel ou na Central e corrija o texto (lista: scripts/caminhos_validos.json)`);
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
+// O /conectar no visual das outras páginas do molde F (rxsync-sistema #225, item 20): cabeçalho branco com a marca, sem
+// degradê nem sombra de cartão nas classes da página.
+{ const c = fs.readFileSync('conectar.html', 'utf8');
+  if (!/<header class="topo-f">/.test(c)) erro('conectar.html: o cabeçalho é o branco das páginas do molde F (topo-f), com a marca (#225, item 20)');
+  if (/class="[^"]*\b(bg-gradient-|from-|shadow-(sm|md|lg|xl))/.test(c)) erro('conectar.html: sem degradê nem sombra de cartão (P12, #225, item 20)'); }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
