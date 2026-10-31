@@ -9,16 +9,15 @@
 .rxc-sim:hover{background:#083F38}
 .rxc-nao{background:#fff;color:#15191C;border:1px solid #848E93}
 .rxc-nao:hover{border-color:#15191C}
-.rxc-chat{position:fixed;right:16px;bottom:16px;z-index:45;display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:0 18px;border-radius:999px;border:0;background:#0A5148;color:#fff;font:600 15px/1 Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;box-shadow:0 2px 8px rgba(21,25,28,.10);cursor:pointer;margin-bottom:env(safe-area-inset-bottom)}
-.rxc-chat svg{width:20px;height:20px}
+.rxc-chat{position:fixed;right:20px;bottom:20px;z-index:45;display:grid;place-items:center;width:64px;height:64px;padding:0;border-radius:50%;border:0;background:#0A5148;color:#fff;box-shadow:0 2px 8px rgba(21,25,28,.16);cursor:pointer;margin-bottom:env(safe-area-inset-bottom)}
+.rxc-chat svg{width:28px;height:28px}
 .rxc-chat[aria-busy="true"]{opacity:.8;cursor:progress}
-.rxc-aviso button:focus-visible,.rxc-chat:focus-visible,.rxc-aviso a:focus-visible{outline:3px solid #0A5148;outline-offset:2px}
+.rxc-ponto{position:absolute;top:6px;right:6px;width:12px;height:12px;border-radius:50%;background:#17653F;border:2px solid #fff}
+.rxc-dica{position:fixed;right:96px;bottom:32px;z-index:45;max-width:calc(100vw - 120px);min-height:44px;padding:0 14px;border-radius:12px;border:1px solid #E3E7E8;background:#fff;color:#15191C;font:500 14px/1.3 Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;cursor:pointer;margin-bottom:env(safe-area-inset-bottom)}
+.rxc-aviso button:focus-visible,.rxc-chat:focus-visible,.rxc-dica:focus-visible,.rxc-aviso a:focus-visible{outline:3px solid #0A5148;outline-offset:2px}
 @media (max-width:559px){
   .rxc-aviso{left:8px;right:8px;bottom:8px;padding:10px 12px;font-size:14px;line-height:1.4;border-radius:12px}
   .rxc-aviso p{margin:0 0 8px}
   .rxc-acoes button{flex:1 1 0;padding:0 8px}
 }
-@media (max-width:1023px){
-  .rxc-chat span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  .rxc-chat{padding:0;width:52px;justify-content:center}
-}
+
