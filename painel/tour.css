@@ -1,0 +1,7 @@
+/* Tour guiado (rxsync-sistema #225, item 23; arquivo à parte, DEC-178, carregado pelo painel/tour.js): um cartão no canto, sem escurecer nem bloquear a tela; a área apontada
+   ganha o contorno do foco. */
+.tour-alvo { outline: 3px solid var(--foco); outline-offset: 4px; border-radius: var(--r-cartao); }
+.tour-cartao { position: fixed; z-index: 60; left: var(--e-4); right: var(--e-4); bottom: calc(76px + env(safe-area-inset-bottom)); max-width: 420px; margin: 0 auto; padding: var(--e-4); background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); border-radius: var(--r-cartao); box-shadow: var(--sombra-janela); }
+@media (min-width: 1024px) { .tour-cartao { left: auto; right: var(--e-6); bottom: var(--e-6); } }
+.tour-texto { margin: var(--e-2) 0 var(--e-3); }
+.tour-acoes { display: flex; flex-wrap: wrap; gap: var(--e-2); }

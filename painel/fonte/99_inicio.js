@@ -32,10 +32,10 @@ function abrirPainel(termos) {
     if (!sem('medicos')) medCarregar();
     faixasAtualizar(); estadoMostrar();
     rotear();
-    // Arquivos à parte (rxsync-sistema DEC-178), carregados só depois de abrir: instalar e notificações (app.js). Eles só
+    // Arquivos à parte (rxsync-sistema DEC-178), carregados só depois de abrir: instalar e notificações (app.js) e o tour (tour.js). Eles só
     // veem estas funções do painel.
     if (!window.rxPainel) { window.rxPainel = Object.freeze({ el, btn, c29, rapida, ir, comSessao: () => !!sessao, papel: () => PAPEL });
-      ['/painel/app.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); }); }
+      ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); }); }
   }).catch(() => { $('carregando').hidden = true; mostrarErro('Sem conexão. Confira a internet e abra o painel de novo.'); });
 }
 if (!token && !sessao) entradaAbrir();
