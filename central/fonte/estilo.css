@@ -295,7 +295,7 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .mestre-detalhe .ficha-cab .nome-ficha { font-size: var(--t-20); }
 .mestre-detalhe .abas button { padding: 0 var(--e-2); }
 
-/* #225: a central de avisos, o app autenticador, as notificações e o "Instalar" (DEC-179 a DEC-181) */
+/* #225: a central de avisos, as notificações e o "Instalar" (DEC-179 e DEC-181; o app autenticador saiu, DEC-186) */
 .aviso-linha { align-items: flex-start; }
 .aviso-texto { margin: var(--e-2) 0 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--texto); }
 .nao-lido .t1 { font-weight: 600; }
@@ -306,6 +306,5 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .chk { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); }
 .acoes-fim { display: flex; flex-wrap: wrap; gap: var(--e-2); justify-content: space-between; }
 .passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
-.codigos-rec { margin: var(--e-2) 0; padding-left: 1.5rem; columns: 2; font-variant-numeric: tabular-nums; }
 .opcoes-assuntos { display: flex; flex-wrap: wrap; gap: var(--e-1) var(--e-4); margin: var(--e-3) 0; }
 .tit-peq { font-weight: 600; margin: var(--e-3) 0 0; }

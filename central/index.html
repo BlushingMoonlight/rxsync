@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Fx7ZNulpfrm7bWU7FPKJh+cXR6qP5zIxK+7Q66xcxaA='; style-src 'sha256-tVDBFFqNLc8KinYPNst7IdM9IaXX3MyonRhHTBdoiOA='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kn0dJNH4staTaCO5FZ0l7MbCS77TQEL+S5T7lwanUiU='; style-src 'sha256-hMrPxkT/a7EFjb6o+zGTE+3YYY8Z1NnqRu/lJVkGUmk='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -364,7 +364,7 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .mestre-detalhe .ficha-cab .nome-ficha { font-size: var(--t-20); }
 .mestre-detalhe .abas button { padding: 0 var(--e-2); }
 
-/* #225: a central de avisos, o app autenticador, as notificações e o "Instalar" (DEC-179 a DEC-181) */
+/* #225: a central de avisos, as notificações e o "Instalar" (DEC-179 e DEC-181; o app autenticador saiu, DEC-186) */
 .aviso-linha { align-items: flex-start; }
 .aviso-texto { margin: var(--e-2) 0 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--texto); }
 .nao-lido .t1 { font-weight: 600; }
@@ -375,7 +375,6 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .chk { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); }
 .acoes-fim { display: flex; flex-wrap: wrap; gap: var(--e-2); justify-content: space-between; }
 .passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
-.codigos-rec { margin: var(--e-2) 0; padding-left: 1.5rem; columns: 2; font-variant-numeric: tabular-nums; }
 .opcoes-assuntos { display: flex; flex-wrap: wrap; gap: var(--e-1) var(--e-4); margin: var(--e-3) 0; }
 .tit-peq { font-weight: 600; margin: var(--e-3) 0 0; }
 /* ---------- IA da Central (DEC-145): o assistente ao lado (1180 px ou mais) ou em tela cheia (iPad em pé e celular) ---------- */
@@ -784,8 +783,8 @@ async function desfazer(registroId) {
 
 // ==== 02_entrada.js
 // ---------------------------------------------------------------- entrada (DEC-062, sem mudança de lógica)
-// E-mail (só o nome de usuário; quem confere é o servidor) + senha → o código de 6 dígitos do app autenticador (DEC-180,
-// conferido no servidor) ou um código de recuperação. "Criar senha" e "Esqueci a senha" usam o mesmo código.
+// E-mail (só o nome de usuário; quem confere é o servidor) + senha → o código de 6 dígitos que o servidor manda ao e-mail
+// de cadastro da Central (DEC-186; sem app autenticador e sem Telegram). "Criar senha" e "Esqueci a senha" usam o mesmo código.
 function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; trocar($('entrada-corpo'), ...filhos); const i = $('entrada-corpo').querySelector('input:not([hidden])'); if (i) i.focus(); }
 const msgErro = () => el('p', { class: 'erro', role: 'alert' });
 const soDigitos = v => String(v || '').replace(/\D/g, '');
@@ -825,7 +824,7 @@ function formEntrada(mensagem, emailAntes) {
   const enviar = async e => {
     e.preventDefault(); botao.disabled = true; erro.textContent = '';
     const r = await chamar('entrar', { email: email.value.trim(), senha: senha.value }); botao.disabled = false;
-    if (r.ok && r.desafio) return formCodigo(r.desafio, r.mensagem, email.value.trim(), r.app === true);
+    if (r.ok && r.desafio) return formCodigo(r.desafio, r.mensagem, email.value.trim());
     if (r.criar_senha) return pedirCodigoSenha(true, r.mensagem);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; senha.value = ''; senha.focus();
   };
@@ -837,30 +836,27 @@ function esperarUmMinuto(b, texto) {
   let falta = 60; b.disabled = true; b.textContent = `${texto} (${falta} s)`;
   const t = setInterval(() => { falta--; if (!b.isConnected) return clearInterval(t); if (falta <= 0) { clearInterval(t); b.disabled = false; b.textContent = texto; } else b.textContent = `${texto} (${falta} s)`; }, 1000);
 }
-// Código do app autenticador (DEC-180) ou um código de recuperação (10 letras e números, com ou sem o traço).
-const codigoValido = (v, app) => { const d = soDigitos(v); if (d.length === 6) return d; const x = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); return app && x.length === 10 ? x : ''; };
-const campoCodigoApp = app => { const i = campoCodigo(); if (app) { i.removeAttribute('maxlength'); i.removeAttribute('pattern'); } return i; };
-const botaoRecuperacao = (app, input) => app ? el('button', { class: 'btn fant plena', type: 'button', text: 'Usar um código de recuperação', onclick: e => {
-  input.setAttribute('inputmode', 'text'); input.setAttribute('autocomplete', 'off'); input.value = ''; input.placeholder = 'XXXXX-XXXXX'; input.focus(); e.currentTarget.remove(); } }) : null;
-function formCodigo(desafio, aviso, email, app) {
-  const codigo = campoCodigoApp(app);
+// O código de 6 dígitos que chega no e-mail de cadastro (DEC-186).
+const codigoValido = v => { const d = soDigitos(v); return d.length === 6 ? d : ''; };
+function formCodigo(desafio, aviso, email) {
+  const codigo = campoCodigo();
   const erro = msgErro(); const botao = el('button', { class: 'btn pri plena', type: 'submit', text: 'Entrar' });
   const outro = el('button', { class: 'btn sec plena', type: 'button', text: 'Mandar outro código', onclick: () => formEntrada('Digite a senha de novo para receber outro código.', email) });
   const enviar = async e => {
-    e.preventDefault(); const c = codigoValido(codigo.value, app); if (!c) { codigo.focus(); return; }
+    e.preventDefault(); const c = codigoValido(codigo.value); if (!c) { codigo.focus(); return; }
     botao.disabled = true; erro.textContent = '';
     const r = await chamar('entrar_codigo', { desafio, codigo: c }); botao.disabled = false;
     if (r.ok && r.sessao) { guardarSessao(r.sessao); await lembrancaNova(r.lembranca); return abrirApp(); }   // já lembra o aparelho, sem perguntar
     if (r.recomecar) return formEntrada(r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
   };
-  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: app ? 'Código do app autenticador' : 'Código de entrada' }),
-    el('p', { class: 'mudo', text: aviso || (app ? 'Digite o código de 6 dígitos que o app autenticador (app Senhas) mostra agora.' : 'Digite o código de 6 dígitos.') }),
-    campoE('Código de 6 dígitos', codigo), erro, botao, botaoRecuperacao(app, codigo),
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Código de entrada' }),
+    el('p', { class: 'mudo', text: aviso || 'Digite o código de 6 dígitos que chegou no seu e-mail.' }),
+    campoE('Código de 6 dígitos', codigo), erro, botao,
     el('div', { class: 'acoes' }, outro, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email) }))));
   esperarUmMinuto(outro, 'Mandar outro código');
 }
-// Primeira senha (primeira = true) ou "Esqueci a senha": com o código do app autenticador (DEC-180).
+// Primeira senha (primeira = true) ou "Esqueci a senha": com o código que chega no e-mail de cadastro (DEC-186).
 function pedirCodigoSenha(primeira, mensagem, emailAntes) {
   const email = campoEmail(emailAntes);
   const erro = msgErro(); erro.textContent = mensagem || '';
@@ -868,25 +864,25 @@ function pedirCodigoSenha(primeira, mensagem, emailAntes) {
   const enviar = async e => {
     e.preventDefault(); botao.disabled = true; erro.textContent = '';
     const r = await chamar('senha_pedir', { email: email.value.trim() }); botao.disabled = false;
-    if (r.ok && r.desafio) return formSenhaNova(r.desafio, r.mensagem, primeira, email.value.trim(), r.app === true);
+    if (r.ok && r.desafio) return formSenhaNova(r.desafio, r.mensagem, primeira, email.value.trim());
     erro.textContent = r.mensagem || 'Não consegui.';
   };
   telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: primeira ? 'Criar senha' : 'Esqueci a senha' }),
     el('p', { class: 'mudo', text: primeira ? 'A Central ainda não tem senha. Digite o seu e-mail; depois, o código de 6 dígitos.'
-      : 'Digite o seu e-mail; depois, o código de 6 dígitos (do app autenticador, ou um código de recuperação). Com ele, você cria uma senha nova.' }),
+      : 'Digite o seu e-mail; depois, o código de 6 dígitos que chega nele. Com o código, você cria uma senha nova.' }),
     campoE('E-mail', email), erro, botao,
     primeira ? null : el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email.value.trim()) }))));
 }
-function formSenhaNova(desafio, aviso, primeira, email, app) {
+function formSenhaNova(desafio, aviso, primeira, email) {
   // O e-mail vai num campo escondido só para o iPad guardar a senha nova junto com ele.
   const usuario = el('input', { type: 'email', autocomplete: 'username', value: email || null, readonly: true, hidden: true });
-  const codigo = campoCodigoApp(app); codigo.setAttribute('enterkeyhint', 'next');
+  const codigo = campoCodigo(); codigo.setAttribute('enterkeyhint', 'next');
   const s1 = el('input', { class: 'entrada', type: 'password', autocomplete: 'new-password', minlength: '12', required: true, enterkeyhint: 'next' });
   const s2 = el('input', { class: 'entrada', type: 'password', autocomplete: 'new-password', minlength: '12', required: true, enterkeyhint: 'done' });
   const erro = msgErro(); const botao = el('button', { class: 'btn pri plena', type: 'submit', text: 'Salvar e entrar' });
   const enviar = async e => {
     e.preventDefault(); erro.textContent = '';
-    const c = codigoValido(codigo.value, app); if (!c) { erro.textContent = app ? 'Digite o código de 6 dígitos do app (ou um código de recuperação).' : 'Digite o código de 6 dígitos.'; codigo.focus(); return; }
+    const c = codigoValido(codigo.value); if (!c) { erro.textContent = 'Digite o código de 6 dígitos.'; codigo.focus(); return; }
     if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; s1.focus(); return; }
     if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; s2.focus(); return; }
     botao.disabled = true; const r = await chamar('senha_nova', { desafio, codigo: c, senha: s1.value }); botao.disabled = false;
@@ -895,8 +891,8 @@ function formSenhaNova(desafio, aviso, primeira, email, app) {
     erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = ''; codigo.focus();
   };
   telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: primeira ? 'Criar senha' : 'Senha nova' }),
-    el('p', { class: 'mudo', text: aviso || 'Digite o código de 6 dígitos do app autenticador.' }),
-    campoE(app ? 'Código de 6 dígitos (do app)' : 'Código de 6 dígitos', codigo), botaoRecuperacao(app, codigo), campoE('Senha nova (12 caracteres ou mais)', s1), campoE('Repita a senha', s2), erro, botao,
+    el('p', { class: 'mudo', text: aviso || 'Digite o código de 6 dígitos que chegou no seu e-mail.' }),
+    campoE('Código de 6 dígitos', codigo), campoE('Senha nova (12 caracteres ou mais)', s1), campoE('Repita a senha', s2), erro, botao,
     el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central (e deixam de ser lembrados) e chega um aviso em Avisos.' }),
     el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => primeira ? pedirCodigoSenha(true, '', email) : formEntrada('', email) }))));
 }
@@ -1690,7 +1686,7 @@ TELAS.agregados = async c => {
 const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
   chave: 'Chave mudada', chaves_padrao: 'Chaves padrão (sql/030)', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
   avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
-  codigo_pedido: 'Código de entrada pedido', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código pedido sem o app autenticador', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
+  codigo_pedido: 'Código de entrada pedido', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código que não saiu por e-mail', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
   viu_dados_sensiveis: 'Viu os dados protegidos', edicao_empresa: 'Empresa editada', edicao_assistente: 'Assistente editada', edicao_configuracoes: 'Configurações editadas', edicao_recursos: 'Botões dos recursos editados',
   aviso_limitacao_franquia: 'Aviso de limitação da franquia', recurso_liberado: 'Recurso liberado', recurso_revogado: 'Liberação revogada', plano_trocado: 'Plano trocado', preco_especial: 'Preço especial',
   cobranca_proxima_data: 'Próxima cobrança mudada', cobranca_vencimento: 'Vencimento mudado', implantacao_isentar: 'Cobrança da implantação cancelada', pagamento_receber_dinheiro: 'Recebido em dinheiro',
@@ -1720,8 +1716,8 @@ TELAS.seguranca = async (c, [aba]) => {
   }
   const r = await chamar('sessoes'); if (falhou(c, r, 'Segurança')) return;
   const d = r.dados;
-  const [cApp, cNotif] = await Promise.all([cartaoApp(), cartaoNotificacoes().catch(() => null)]);   // #225 (DEC-180, DEC-181)
-  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cApp, cNotif,
+  const cNotif = await cartaoNotificacoes().catch(() => null);   // #225 (DEC-181); o app autenticador saiu (DEC-186)
+  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cNotif,
     cartao('Aparelhos conectados', null, el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }), el('div', { class: 't2', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
       s.esta ? el('div', { class: 'direita' }, etq('este', 'ok')) : el('div', { class: 'direita' }, btn('Encerrar', async () => { const x = await chamar('encerrar_sessao', { id: s.id }); rapida(x.ok ? 'Sessão encerrada.' : (x.mensagem || 'Não consegui.')); rotear(); }, 'perigo-sec')))))),
@@ -3195,8 +3191,8 @@ TELAS.metricas = async c => {
 };
 
 // ==== 11_app.js
-// ---------------------------------------------------------------- app autenticador, notificações e instalar (#225, DEC-180 e DEC-181)
-// O código de entrada vem do app autenticador (app Senhas do iPad), conferido no banco. As notificações chegam sem
+// ---------------------------------------------------------------- notificações e instalar (#225, DEC-181)
+// O app autenticador saiu (DEC-186): o código de entrada chega no e-mail de cadastro. As notificações chegam sem
 // conteúdo: o service worker (central/sw.js) pergunta só os números (push_resumo) e mostra "Alertas: 1 aviso novo".
 const ehInstalado = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 const ehIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3224,41 +3220,6 @@ function cartaoInstalar() {
     ehIOS() ? passosInstalar('a Central') : el('p', { class: 'mudo', text: 'No Chrome, use o menu do navegador e "Instalar app".' }),
     el('div', { class: 'acoes' }, btn('Agora não', () => { est.instalarDepois = true; box.remove(); }, 'fant'))));
   return box;
-}
-// Segurança: a entrada pelo app autenticador.
-async function cartaoApp() {
-  const r = await chamar('totp_estado');
-  const cx = corpo();
-  const mostrarCodigos = (codigos, msg) => trocar(cx, el('p', { class: 'mudo', text: msg }),
-    el('p', { class: 'tit-peq', text: 'Códigos de recuperação (cada um vale uma vez; guarde fora do iPad, em papel):' }),
-    el('ol', { class: 'codigos-rec' }, (codigos || []).map(k => el('li', { text: k }))),
-    el('div', { class: 'acoes' }, btn('Copiar os códigos', () => { navigator.clipboard && navigator.clipboard.writeText((codigos || []).join('\n')); rapida('Códigos copiados.'); }, 'sec'), btn('Já guardei', () => rotear(), 'pri')));
-  const pedirSenhaE = async (acao, titulo) => {
-    const v = await pedirAcao(acao, {}, { nivel: 1, titulo, campos: [{ k: 'senha', rot: 'Sua senha da Central', tipo: 'password' }], botao: 'Continuar' });
-    return v ? chamar(acao, { senha: v.senha }) : null;
-  };
-  if (r.ok && r.ativo) {
-    trocar(cx, el('p', { class: 'mudo', text: 'O código de entrada vem do app autenticador' + (r.ativado_em ? ' desde ' + fmtHora(r.ativado_em) : '') + '. Códigos de recuperação que ainda valem: ' + (r.recuperacao_restantes || 0) + '.' }),
-      el('div', { class: 'acoes' }, btn('Gerar códigos de recuperação novos', async () => { const x = await pedirSenhaE('totp_codigos_novos', 'Gerar códigos novos'); if (x && x.ok) mostrarCodigos(x.codigos, x.mensagem); else if (x) rapida(x.mensagem || 'Não consegui.'); }, 'sec')));
-  } else {
-    trocar(cx, el('p', { class: 'mudo', text: 'O app autenticador ainda não foi ativado. Ative-o (o app Senhas do iPad): o código de entrada vem dele.' }),
-      el('div', { class: 'acoes' }, btn('Ativar o app autenticador', async () => {
-        const x = await pedirSenhaE('totp_iniciar', 'Ativar o app autenticador'); if (!x) return; if (!x.ok) { rapida(x.mensagem || 'Não consegui.'); return; }
-        const codigo = el('input', { class: 'entrada codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', 'aria-label': 'Código de 6 dígitos do app' });
-        const erro = el('p', { class: 'erro', role: 'alert' });
-        trocar(cx, el('ol', { class: 'passos-instalar' },
-            el('li', {}, 'Toque em ', el('a', { href: x.otpauth, text: 'Abrir no app Senhas' }), '. No iPad, o app Senhas abre e pergunta onde guardar o código de verificação; escolha "RXSync Central".'),
-            el('li', { text: 'Se o app não abrir, no app Senhas toque em "Códigos" › "+" e digite esta chave: ' + x.segredo }),
-            el('li', { text: 'Digite aqui o código de 6 dígitos que o app mostra.' })),
-          el('label', { class: 'campo' }, el('span', { class: 'rot', text: 'Código de 6 dígitos' }), codigo), erro,
-          el('div', { class: 'acoes' }, btn('Confirmar', async () => {
-            const y = await chamar('totp_ativar', { codigo: soDigitos(codigo.value) });
-            if (y.ok) mostrarCodigos(y.codigos, y.mensagem); else { erro.textContent = y.mensagem || 'Código errado. Confira no app e digite de novo.'; codigo.value = ''; codigo.focus(); }
-          }, 'pri')));
-        codigo.focus();
-      }, 'pri')));
-  }
-  return cartao('Entrada pelo app autenticador', null, cx);
 }
 // Segurança: notificações neste aparelho (só no app instalado; no iPad, iPadOS 16.4 ou mais novo).
 async function cartaoNotificacoes() {
