@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Y6RizX3srwyl13UEusx477Y1fd9D1sFzkjR1vOR4jE0=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-HzolzwSh+P+g0DgJA0ukxx2CWwPTvwH96jhWYPA7MqE=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
     <meta name="theme-color" content="#FFFFFF">
@@ -490,10 +490,6 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .mt-toast .ic { color: #6ee7b7; }
 
 /* Barra fixa no celular */
-.barra-m { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 88px 10px 16px; background: rgba(255,255,255,.96); border-top: 1px solid var(--line); box-shadow: 0 -8px 24px -12px rgba(15,23,42,.2); transform: translateY(110%); transition: transform .25s; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
-.barra-m.vis { transform: none; }
-.barra-m .btn { width: 100%; }
-@media (min-width: 1024px) { .barra-m { display: none; } }
 
 .rec-grupo { font-size: 14px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 16px; }
 .rec-grupo + .recursos { margin-top: 0; }
@@ -565,7 +561,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .mt-grade th, .mt-grade td.ia, .rec-grupo, b, strong, th { font-weight: 600; }
 .link-demo { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 4px; color: var(--brand); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 767px) {
-  .hero .palco, .hero .legenda-mock { display: none; }
   .hero { padding-bottom: 24px; }
   .topo .topo-cta { display: none; }
   .topo.mostrar-cta .topo-cta { display: inline-flex; }
@@ -586,6 +581,26 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .comparar thead th:first-child { text-align: left; }
 .comparar tbody th { text-align: left; font-weight: 400; color: var(--ink-2); }
 @media (max-width: 559px) { .comparar th, .comparar td { padding: 10px 6px; font-size: 14px; } }
+/* ---- Testes do Jean de 31/10/2026 (rxsync-sistema #225, itens 1 a 9) ---- */
+.selo { display: block; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; font-size: 14px; font-weight: 600; color: var(--brand); text-wrap: balance; }
+.btn { line-height: 1.25; }
+.btn svg { flex-shrink: 0; }
+@media (max-width: 559px) { .btn { padding-top: 10px; padding-bottom: 10px; text-wrap: balance; } }
+.topo-cta { white-space: nowrap; line-height: 1; }
+@media (max-width: 767px) {
+  .hero-grid { gap: 32px; }
+  .celular { max-width: 330px; }
+  .celular-tela { height: 440px; }
+  .wa-topo { padding-top: 22px; }
+  .cartao-flut { display: none; }
+}
+@media (max-width: 1023px) { .zap-dono { margin: 16px auto 0; } }
+@media (max-width: 1023px) { .planos-rodape { display: grid; justify-content: center; justify-items: start; gap: 8px; } .planos-rodape span { align-items: flex-start; } .planos-rodape .ic-s { margin-top: 3px; } }
+.hero { isolation: isolate; }
+.hero > .wrap { position: relative; z-index: 1; }
+.hero-fundo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.hero h1 em .l { opacity: 0; transition: opacity .12s; }
+.hero h1 em .l.vis { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
     </style>
 
@@ -598,7 +613,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       "@type": "Organization",
       "@id": "https://rxsync.com.br/#organizacao",
       "name": "RXSync",
-      "legalName": "52.970.673 LUAN DUARTE CAVALHEIRO",
       "alternateName": "RXSync Tecnologia e Automação em Saúde",
       "url": "https://rxsync.com.br/",
       "logo": "https://rxsync.com.br/assets/logo-rxsync.png",
@@ -936,7 +950,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <a class="item" href="/guias/" data-guias>Guias</a>
     <div class="acoes">
       <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" data-teste="gestao" data-origem="menu_mobile">Começar 7 dias grátis</a>
-      <a href="/painel/" class="btn btn-sec">Já sou cliente: entrar no painel</a>
+      <a href="/painel/" class="btn btn-sec">Entrar no painel</a>
     </div>
   </div>
 </header>
@@ -945,9 +959,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 
 <!-- ===================== HERO ===================== -->
 <section class="hero" aria-labelledby="titulo-hero">
+  <canvas class="hero-fundo" id="heroFundo" aria-hidden="true"></canvas>
   <div class="wrap hero-grid">
     <div>
-      <span class="selo"><span class="pt" aria-hidden="true"></span>Assistente virtual para clínicas e consultórios</span>
+      <span class="selo">Assistente virtual para clínicas e consultórios</span>
       <h1 id="titulo-hero">Sua clínica responde e marca consultas no WhatsApp, <em>mesmo quando a recepção está ocupada.</em></h1>
       <p class="lead">A assistente da RXSync responde valores, convênios e horários, marca a consulta e manda os lembretes, de dia, de noite e no fim de semana. Quando o paciente pede uma pessoa, ela passa a conversa para a sua equipe.</p>
       <div class="hero-ctas">
@@ -1145,7 +1160,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <div class="calc-res" aria-live="polite">
         <span class="rot">Consultas que podem estar ficando para trás</span>
         <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
-        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299). No plano mensal, há também a implantação de R$ 999, uma vez só.</p>
+        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299).</p>
         <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis no Essencial</a>
         <p class="aviso">É uma estimativa com os números que você escolheu, não uma promessa de resultado.</p>
       </div>
@@ -1648,15 +1663,12 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       </div>
     </div>
     <div class="rodape-base">
-      <span>© 2026 RXSync Tecnologia e Automação em Saúde · 52.970.673 LUAN DUARTE CAVALHEIRO · CNPJ 52.970.673/0001-78 · Florianópolis/SC · contato@rxsync.com.br</span>
+      <span>© 2026 RXSync Tecnologia e Automação em Saúde — CNPJ 52.970.673/0001-78 · contato@rxsync.com.br</span>
       <span>Feita em Florianópolis/SC</span>
     </div>
   </div>
 </footer>
 
-<div class="barra-m" id="barraM">
-  <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim" data-teste="gestao" data-origem="barra_mobile">Começar 7 dias grátis</a>
-</div>
 
     <!-- Scripts -->
     <script>
@@ -1935,7 +1947,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         var itens = palco.querySelectorAll('[data-passo]');
         var digitando = document.getElementById('digitando');
         palco.classList.add('anima');
-        var roteiro = [[1, 250, false], [2, 1200, true], [3, 1000, false], [4, 1400, true]];
+        var roteiro = [[1, 200, false], [2, 700, true], [3, 500, false], [4, 800, true]];   // menos de 3 s (#225, item 6)
         var i = 0;
         function mostrar(passo) {
             itens.forEach(function (el) { if (+el.dataset.passo === passo) el.classList.add('vis'); });
@@ -1954,24 +1966,53 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         } else { proximo(); }
     })();
 
-    // ===================== CABEÇALHO E BARRA FIXA NO CELULAR =====================
+
+    // ===================== TOPO COM MOVIMENTO (rxsync-sistema #225, item 7) =====================
+    // Digitação na parte verde do título (o texto inteiro já está no HTML; só o desenho aparece em sequência, em até
+    // 1,5 s) e uma grade de pontos que reage ao dedo ou ao mouse. Sem degradê (P12). Com "reduzir movimento", nada anima.
     (function () {
-        var topo = document.getElementById('topo');
-        var barra = document.getElementById('barraM');
-        var hero = document.querySelector('.hero-ctas');
-        var final = document.getElementById('contato');
-        var mtSecao = document.getElementById('teste-ao-vivo');
-        var travado = false;
-        function atualizar() {
-            topo.classList.toggle('rolou', window.scrollY > 8);
-            var passouHero = hero.getBoundingClientRect().bottom < 0;
-            var noFinal = final.getBoundingClientRect().top < window.innerHeight;
-            // Some também no teste ao vivo, para não cobrir o campo de mensagem
-            var mtR = mtSecao ? mtSecao.getBoundingClientRect() : null;
-            var noTeste = mtR && mtR.top < window.innerHeight && mtR.bottom > 0;
-            barra.classList.toggle('vis', passouHero && !noFinal && !noTeste);
-            travado = false;
+        var reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var em = document.querySelector('.hero h1 em');
+        if (em && !reduzir) {
+            var txt = em.textContent; em.textContent = '';
+            var leitor = document.createElement('span'); leitor.className = 'sr'; leitor.textContent = txt; em.appendChild(leitor);   // o leitor de tela lê a frase inteira
+            var desenho = document.createElement('span'); desenho.setAttribute('aria-hidden', 'true'); em.appendChild(desenho);
+            var letras = txt.split('').map(function (c) { var s = document.createElement('span'); s.className = 'l'; s.textContent = c; desenho.appendChild(s); return s; });
+            var passo = Math.min(40, 1500 / letras.length), k = 0;
+            setTimeout(function revelar() { if (k < letras.length) { letras[k++].classList.add('vis'); setTimeout(revelar, passo); } }, 250);
         }
+        var cv = document.getElementById('heroFundo'), hero = document.querySelector('.hero');
+        if (!cv || !cv.getContext || !hero) return;
+        var ctx = cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2), W = 0, H = 0, px = -999, py = -999, pedido = false, visivel = true;
+        var PASSO = 24, RAIO = 130;
+        function medir() { var r = hero.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); desenhar(); }
+        function desenhar() {
+            pedido = false; ctx.clearRect(0, 0, W, H);
+            for (var y = PASSO / 2; y < H; y += PASSO) for (var x = PASSO / 2; x < W; x += PASSO) {
+                var dx = x - px, dy = y - py, d = Math.sqrt(dx * dx + dy * dy), f = d < RAIO ? 1 - d / RAIO : 0;
+                var ox = f ? dx / (d || 1) * 5 * f : 0, oy = f ? dy / (d || 1) * 5 * f : 0;
+                ctx.fillStyle = f > 0.05 ? 'rgba(10,81,72,' + (0.12 + 0.38 * f).toFixed(2) + ')' : '#E3E7E8';
+                ctx.beginPath(); ctx.arc(x + ox, y + oy, 1.3 + f, 0, 6.2832); ctx.fill();
+            }
+        }
+        function mover(e) { if (reduzir || !visivel) return; var r = hero.getBoundingClientRect(); px = e.clientX - r.left; py = e.clientY - r.top; if (!pedido) { pedido = true; requestAnimationFrame(desenhar); } }
+        function sair() { px = py = -999; if (!pedido) { pedido = true; requestAnimationFrame(desenhar); } }
+        window.addEventListener('load', function () {
+            medir();
+            window.addEventListener('resize', medir);
+            hero.addEventListener('pointermove', mover, { passive: true });
+            hero.addEventListener('pointerdown', mover, { passive: true });
+            hero.addEventListener('pointerleave', sair);
+            if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visivel = e[0].isIntersecting; }).observe(hero);
+        });
+    })();
+
+    // ===================== CABEÇALHO (sombra depois de rolar) =====================
+    // A barra fixa de baixo saiu (rxsync-sistema #225, item 5): o "Começar grátis" do topo já aparece depois que o
+    // botão do título sai da tela.
+    (function () {
+        var topo = document.getElementById('topo'), travado = false;
+        function atualizar() { topo.classList.toggle('rolou', window.scrollY > 8); travado = false; }
         window.addEventListener('scroll', function () {
             if (!travado) { travado = true; window.requestAnimationFrame(atualizar); }
         }, { passive: true });

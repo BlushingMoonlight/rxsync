@@ -36,6 +36,33 @@ for (const pg of PAGINAS) {
   else if (cortados.length) { falhas++; console.log(`✗ ${pg}: passa da borda e fica cortado em 360 px: ${cortados.join(' · ')}`); }
   else console.log(`✓ ${pg}`);
 }
+// Página inicial (rxsync-sistema #225, itens 2, 4, 5 e 7): em 360, 390 e 430 px, todo botão visível tem o texto centrado
+// na altura (até 2 px) e no máximo 2 linhas; a barra fixa de baixo não existe; o celular com a conversa aparece; com
+// "reduzir movimento", o título não é desenhado letra por letra.
+for (const w of [360, 390, 430]) {
+  await page.setViewportSize({ width: w, height: 780 });
+  await page.goto(site.base + '/index.html', { waitUntil: 'load' });
+  await page.evaluate(() => document.getElementById('topo').classList.add('mostrar-cta'));
+  const r = await page.evaluate(() => {
+    const ruins = [];
+    for (const b of document.querySelectorAll('a.btn, button.btn')) {
+      const bb = b.getBoundingClientRect(); if (!bb.width || !b.offsetParent) continue;
+      const rg = document.createRange(); rg.selectNodeContents(b);
+      const linhas = [...rg.getClientRects()].filter(x => x.height > 4); if (!linhas.length) continue;
+      const topo = Math.min(...linhas.map(x => x.top)), baixo = Math.max(...linhas.map(x => x.bottom));
+      const nLinhas = new Set(linhas.map(x => Math.round(x.top / 8))).size;
+      const desvio = Math.abs((topo + baixo) / 2 - (bb.top + bb.bottom) / 2);
+      if (desvio > 2 || nLinhas > 3) ruins.push(b.textContent.trim().slice(0, 40) + ` (desvio ${desvio.toFixed(1)} px)`);
+    }
+    return { ruins, barra: !!document.getElementById('barraM'), palco: !!document.querySelector('.hero .palco').offsetParent };
+  });
+  if (r.ruins.length || r.barra || !r.palco) { falhas++; console.log(`✗ index.html em ${w} px: ${r.ruins.join(' · ')}${r.barra ? ' · a barra de baixo voltou' : ''}${r.palco ? '' : ' · o celular com a conversa sumiu'}`); }
+  else console.log(`✓ index.html em ${w} px: botões centrados, sem barra, com a conversa`);
+}
+await page.emulateMedia({ reducedMotion: 'reduce' });
+await page.goto(site.base + '/index.html', { waitUntil: 'load' });
+if (await page.locator('.hero h1 em .l').count()) { falhas++; console.log('✗ index.html: com "reduzir movimento", o título ainda é desenhado letra por letra'); }
+else console.log('✓ index.html: com "reduzir movimento", nada anima no título');
 await browser.close(); site.fechar();
 console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: nenhuma página pública rola para o lado nem fica cortada em 360 px.');
 process.exit(falhas ? 1 : 0);

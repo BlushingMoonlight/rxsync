@@ -78,7 +78,8 @@
   }
 
   // ---------- chat sob demanda ----------
-  var chatEstado = 'parado', abrirQuandoPronto = false, botao = null;
+  var chatEstado = 'parado', abrirQuandoPronto = false, botao = null, dica = null;
+  function fecharDica() { if (dica) { dica.remove(); dica = null; } }
   function carregarChat(abrir) {
     if (chatFora) { if (abrir) window.open('/?suporte=1', '_blank', 'noopener'); return; }
     if (abrir) abrirQuandoPronto = true;
@@ -93,9 +94,16 @@
     s.onerror = function () { chatEstado = 'parado'; if (botao) botao.removeAttribute('aria-busy'); };
     document.head.appendChild(s);
   }
+  // Mais rápido sem gravar nada no aparelho (rxsync-sistema #225, item 11): com a página parada, o script do chat é só
+  // baixado para o cache do navegador (sem rodar e sem cookie); o chat começa a carregar no toque (pointerdown).
+  function adiantar() {
+    if (chatFora || chatEstado !== 'parado' || (navigator.connection && navigator.connection.saveData)) return;
+    try { fetch(CHAT_URL + '/packs/js/sdk.js', { mode: 'no-cors', credentials: 'omit' }).catch(function () {}); } catch (e) { /* sem fetch */ }
+  }
   window.addEventListener('chatwoot:ready', function () {
     chatEstado = 'pronto';
-    if (botao) { botao.remove(); botao = null; }   // o chat mostra o próprio botão
+    if (botao) { botao.remove(); botao = null; }   // o chat mostra o próprio botão (o mesmo desenho e a mesma cor)
+    fecharDica();
     if (abrirQuandoPronto && window.$chatwoot) window.$chatwoot.toggle('open');
   });
   function criarBotao() {
@@ -103,9 +111,21 @@
     botao.type = 'button';
     botao.className = 'rxc-chat';
     botao.setAttribute('aria-label', 'Conversar com a RXSync no chat');
-    botao.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg><span>Fale com a gente</span>';
-    botao.addEventListener('click', function () { if (typeof window.gtag === 'function') window.gtag('event', 'abrir_chat'); carregarChat(true); });
+    // O mesmo desenho do botão do Chatwoot (64 px, redondo, o balão cheio), para não mudar depois de abrir e fechar.
+    botao.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3C6.48 3 2 6.94 2 11.8c0 2.6 1.29 4.93 3.33 6.54L4.5 21.5l3.73-1.86c1.17.38 2.44.58 3.77.58 5.52 0 10-3.94 10-8.8S17.52 3 12 3Z"/></svg><i class="rxc-ponto" aria-hidden="true"></i>';
+    botao.addEventListener('pointerdown', function () { if (!chatFora) carregarChat(false); });
+    botao.addEventListener('click', function () { if (typeof window.gtag === 'function') window.gtag('event', 'abrir_chat'); fecharDica(); carregarChat(true); });
     document.body.appendChild(botao);
+    // Uma vez por visita, depois de 12 s, um balão curto ao lado do botão; some sozinho em 6 s ou ao tocar.
+    var jaViu = false; try { jaViu = sessionStorage.getItem('rx_chat_dica') === '1'; } catch (e) { /* aba privada */ }
+    if (!jaViu) setTimeout(function () {
+      if (!botao || document.querySelector('.rxc-aviso')) return;
+      dica = document.createElement('button'); dica.type = 'button'; dica.className = 'rxc-dica'; dica.textContent = 'Dúvidas? Fale com a gente';
+      dica.addEventListener('click', function () { fecharDica(); carregarChat(true); });
+      document.body.appendChild(dica);
+      try { sessionStorage.setItem('rx_chat_dica', '1'); } catch (e) { /* aba privada */ }
+      setTimeout(fecharDica, 6000);
+    }, 12000);
   }
 
   window.rxCookies = { reabrir: function () { fecharAviso(); mostrarAviso(); } };
@@ -116,6 +136,7 @@
     if (escolha === 'sim') ligarGA();
     else if (escolha !== 'nao') mostrarAviso();
     criarBotao();
+    if ('requestIdleCallback' in window) window.requestIdleCallback(adiantar, { timeout: 8000 }); else setTimeout(adiantar, 4000);
     if (!chatFora && /[?&]suporte=1\b/.test(location.search)) carregarChat(true);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar); else iniciar();
