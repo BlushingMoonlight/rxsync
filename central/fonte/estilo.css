@@ -294,3 +294,18 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 /* ficha ao lado da lista (iPad deitado e computador): nome menor e abas mais juntas, para caber as 5 */
 .mestre-detalhe .ficha-cab .nome-ficha { font-size: var(--t-20); }
 .mestre-detalhe .abas button { padding: 0 var(--e-2); }
+
+/* #225: a central de avisos, o app autenticador, as notificações e o "Instalar" (DEC-179 a DEC-181) */
+.aviso-linha { align-items: flex-start; }
+.aviso-texto { margin: var(--e-2) 0 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--texto); }
+.nao-lido .t1 { font-weight: 600; }
+.ponto-novo { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--primaria); margin-right: var(--e-2); vertical-align: middle; }
+.pilha-peq { display: flex; flex-direction: column; gap: var(--e-1); align-items: flex-end; }
+.linha-filtros { display: flex; flex-wrap: wrap; gap: var(--e-3); align-items: center; }
+.linha-filtros .entrada { flex: 1 1 220px; }
+.chk { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); }
+.acoes-fim { display: flex; flex-wrap: wrap; gap: var(--e-2); justify-content: space-between; }
+.passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
+.codigos-rec { margin: var(--e-2) 0; padding-left: 1.5rem; columns: 2; font-variant-numeric: tabular-nums; }
+.opcoes-assuntos { display: flex; flex-wrap: wrap; gap: var(--e-1) var(--e-4); margin: var(--e-3) 0; }
+.tit-peq { font-weight: 600; margin: var(--e-3) 0 0; }

@@ -22,7 +22,8 @@ const TIPOS = {
   prosp_resumo_do_dia: 'Prospecção: resumo do dia',
   demo_aberta: 'Demonstração aberta', demo_conversar: 'Demonstração: quer conversar', demo_escopo: 'Demonstração: escopo enviado'
 };
-const CATEGORIAS = ['vendas', 'clientes', 'financeiro', 'alertas', 'suporte', 'painel', 'sistema'];
+const CATEGORIAS = ['alertas', 'falhas', 'clientes', 'financeiro', 'vendas', 'suporte', 'painel', 'sistema', 'entradas', 'avx'];
+const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisam de você' };
 const rotuloTipo = t => TIPOS[t] || t || 'Aviso';
 const irCliente = (id, aba) => ir('clientes/' + encodeURIComponent(id) + (aba ? '/' + aba : ''));
 function listaAvisos(avisos, comClinica) {
@@ -60,6 +61,7 @@ TELAS.hoje = async c => {
   const agora = new Date();
   trocar(c, 
     cabecalho('Hoje', agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }), n.asaas_ambiente === 'sandbox' ? etq('Asaas no sandbox', 'atencao') : null),
+    cartaoInstalar(),   // #225, item 28: só no navegador
     el('div', { class: 'pilha' },
       el('div', { class: 'grade-2' },
         cartao('Precisa da sua atenção', etq(pend.length ? pend.length + (pend.length === 1 ? ' item' : ' itens') : 'tudo em dia', pend.length ? '' : 'ok', !!pend.length),

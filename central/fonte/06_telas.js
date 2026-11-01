@@ -118,16 +118,37 @@ TELAS.uso = async c => {
     })) : vazio())));
 };
 
+// A central de avisos (sql/082, DEC-179): o texto de cada aviso (o mesmo que ia ao Telegram), os não lidos em destaque,
+// a busca, marcar como lidos, apagar e "Mandar alerta de teste" (chega aqui, como notificação e por e-mail).
 TELAS.avisos = async (c, [cat]) => {
   topo('Avisos', [['Análise'], ['Avisos']]);
   cat = CATEGORIAS.includes(cat) ? cat : '';
-  const r = await chamar('avisos', { categoria: cat }); if (falhou(c, r, 'Avisos')) return;
-  const pc = r.dados.por_categoria_7d || {};
-  trocar(c, cabecalho('Avisos', 'o que passou pelo Telegram, sem o texto'), el('div', { class: 'pilha' },
-    el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Categoria' }, ['', ...CATEGORIAS].map(k => el('button', { type: 'button', 'aria-pressed': String(k === cat), onclick: () => ir('avisos' + (k ? '/' + k : '')) },
-      k || 'todas', pc[k] ? el('span', { class: 'n', text: pc[k] }) : null))),
-    el('p', { class: 'mudo peq', text: '7 dias: ' + (Object.entries(pc).map(([k, v]) => `${k} ${v}`).join(' · ') || 'nenhum') }),
-    cartao(null, null, listaAvisos(r.dados.avisos, true))));
+  est.avisos = est.avisos || { nao_lidos: false, busca: '' };   // o filtro vale nesta aba, só na memória
+  const filtro = { categoria: cat, nao_lidos: est.avisos.nao_lidos, busca: est.avisos.busca };
+  const r = await chamar('avisos_ver', filtro); if (falhou(c, r, 'Avisos')) return;
+  const nl = r.nao_lidos || {}, total = r.total_nao_lidos || 0, lista = r.avisos || [];
+  const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Buscar nos avisos', 'aria-label': 'Buscar nos avisos', value: filtro.busca, enterkeyhint: 'search' });
+  busca.addEventListener('change', () => { est.avisos.busca = busca.value.trim(); rotear(); });
+  const soNaoLidos = el('button', { type: 'button', class: 'btn sec', 'aria-pressed': String(!!filtro.nao_lidos), onclick: () => { est.avisos.nao_lidos = !est.avisos.nao_lidos; rotear(); } }, 'Só os não lidos');
+  const linha = a => el('li', { class: a.lido ? '' : 'nao-lido' }, el('div', { class: 'linha aviso-linha' },
+    el('div', { class: 'cresce' },
+      el('div', { class: 't1' }, a.lido ? null : el('span', { class: 'ponto-novo', 'aria-label': 'não lido' }), rotuloTipo(a.tipo)),
+      el('div', { class: 't2', text: fmtHora(a.recebido_em) + ' · ' + (NOME_ASSUNTO[a.categoria] || a.categoria) + (a.cliente_id ? ' · ' + (a.nome || a.cliente_id) : '') }),
+      a.texto ? el('p', { class: 'aviso-texto', text: a.texto }) : null),
+    el('div', { class: 'direita pilha-peq' },
+      a.cliente_id && /^CLI-/.test(a.cliente_id) ? btn('Abrir a clínica', () => irCliente(a.cliente_id), 'fant') : null,
+      btn('Apagar', async () => { const x = await chamar('aviso_apagar', { id: a.id }); rapida(x.mensagem || (x.ok ? 'Aviso apagado.' : 'Não consegui.')); rotear(); }, 'fant'))));
+  trocar(c, cabecalho('Avisos', total ? (total === 1 ? '1 aviso não lido' : total + ' avisos não lidos') : 'tudo lido',
+      btn('Marcar todos como lidos', async () => { const x = await chamar('avisos_lidos', { categoria: cat }); rapida(x.ok ? (x.marcados === 1 ? '1 aviso marcado como lido.' : (x.marcados || 0) + ' avisos marcados como lidos.') : 'Não consegui.'); rotear(); }, 'sec')),
+    el('div', { class: 'pilha' },
+      el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Assunto' }, ['', ...CATEGORIAS].map(k => el('button', { type: 'button', 'aria-pressed': String(k === cat), onclick: () => ir('avisos' + (k ? '/' + k : '')) },
+        k ? (NOME_ASSUNTO[k] || k) : 'Todos', nl[k] ? el('span', { class: 'n', text: nl[k] }) : null))),
+      el('div', { class: 'linha-filtros' }, busca, soNaoLidos),
+      cartao(null, null, lista.length ? el('ul', { class: 'lista' }, lista.map(linha)) : vazio(filtro.busca || filtro.nao_lidos || cat ? 'Nenhum aviso com este filtro.' : 'Nenhum aviso.', 'avisos')),
+      el('div', { class: 'acoes-fim' },
+        btn('Mandar alerta de teste', async () => { const x = await chamar('aviso_teste'); rapida(x.mensagem || (x.ok ? 'Alerta de teste enviado.' : 'Não consegui.')); }, 'sec'),
+        btn('Apagar os lidos', () => fazer('avisos_apagar_lidos', {}, { nivel: 2, titulo: 'Apagar os avisos lidos', texto: 'Os avisos já lidos saem da Central de vez. Os não lidos ficam.', botao: 'Apagar os lidos', perigo: true }), 'perigo-sec')),
+      el('p', { class: 'mudo peq', text: 'Os avisos ficam 90 dias. Alertas e falhas também chegam por e-mail.' })));
 };
 
 TELAS.agregados = async c => {
