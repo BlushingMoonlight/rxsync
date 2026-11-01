@@ -44,7 +44,7 @@ async function cartaoApp() {
     trocar(cx, el('p', { class: 'mudo', text: 'O código de entrada vem do app autenticador' + (r.ativado_em ? ' desde ' + fmtHora(r.ativado_em) : '') + '. Códigos de recuperação que ainda valem: ' + (r.recuperacao_restantes || 0) + '.' }),
       el('div', { class: 'acoes' }, btn('Gerar códigos de recuperação novos', async () => { const x = await pedirSenhaE('totp_codigos_novos', 'Gerar códigos novos'); if (x && x.ok) mostrarCodigos(x.codigos, x.mensagem); else if (x) rapida(x.mensagem || 'Não consegui.'); }, 'sec')));
   } else {
-    trocar(cx, el('p', { class: 'mudo', text: 'Hoje o código de entrada chega pelo Telegram. Ative o app autenticador (o app Senhas do iPad) e o código passa a vir dele.' }),
+    trocar(cx, el('p', { class: 'mudo', text: 'O app autenticador ainda não foi ativado. Ative-o (o app Senhas do iPad): o código de entrada vem dele.' }),
       el('div', { class: 'acoes' }, btn('Ativar o app autenticador', async () => {
         const x = await pedirSenhaE('totp_iniciar', 'Ativar o app autenticador'); if (!x) return; if (!x.ok) { rapida(x.mensagem || 'Não consegui.'); return; }
         const codigo = el('input', { class: 'entrada codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', 'aria-label': 'Código de 6 dígitos do app' });

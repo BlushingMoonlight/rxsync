@@ -54,7 +54,7 @@ function responderPainel(caminho, b) {
     if (b.acao === 'assistente_estado') return { ok: true, ativo: true, status: 'Ativo', pode_pausar: true };
     if (b.acao === 'equipe_listar') return { ok: true, limite: 3, pessoas: [{ id: 1, email: 'dono@clinica.test', papel: 'dono', situacao: 'ativa' }] };
     if (b.acao === 'acessos_recentes') return { ok: true, acessos: [{ quando: h(-2), o_que: 'Entrou', quem: 'dono · d•••@clinica.test', aparelho: 'iPad · Safari' }] };
-    return { ok: true, pendente: false, versao: '2026-10-v7' };
+    return { ok: true, pendente: false, versao: '2026-11-v8' };
   }
   if (caminho === 'autoedicao') {
     if (b.acao === 'abrir') return { ok: true, papel: 'dono', editaveis: { nome_exibicao: 'Clínica Sorriso', fuso_horario: 'America/Sao_Paulo', lembrete_ativo: 'SIM', assistente_dono_ativa: 'SIM', func_pagamento_link: 'SIM', func_reservio: 'SIM' },

@@ -92,7 +92,7 @@ const CASOS = [
   { acao: 'pagamento_receber_dinheiro', rota: F + '/cobranca', abrirCom: () => botao('Recebi em dinheiro').click(), campos: { motivo: M }, nome: NOME, espera: { ...C, cobranca_id: 'pay_abc123', valor: '299', data: hoje, motivo: M } },
   { acao: 'asaas_foto_atualizar', rota: F + '/cobranca', abrirCom: () => botao('Atualizar a foto agora').click(), espera: C },
   { acao: 'cobranca_proxima_data', rota: F + '/cobranca', abrirCom: () => botao('Data da próxima cobrança').click(), campos: { data: daqui(20), motivo: M }, nome: NOME, espera: { ...C, data: daqui(20), motivo: M } },
-  { acao: 'implantacao_isentar', rota: F + '/cobranca', abrirCom: () => botao('Isentar a implantação').click(), campos: { motivo: M, combinado: 'na reunião' }, nome: NOME, espera: { ...C, motivo: M, combinado: 'na reunião' } },
+  { acao: 'implantacao_isentar', rota: F + '/cobranca', abrirCom: () => botao('Cancelar a cobrança da implantação').click(), campos: { motivo: M, combinado: 'na reunião' }, nome: NOME, espera: { ...C, motivo: M, combinado: 'na reunião' } },
   { acao: 'teste_estender', rota: F + '/cobranca', abrirCom: () => botao('Estender o teste').click(), campos: { dias: '5', motivo: M }, nome: NOME, espera: { ...C, dias: '5', motivo: M, combinado: '' } },
   // Plano e recursos
   { acao: 'recurso_liberar', rota: F + '/recursos', abrirCom: () => botao('Liberar um recurso').click(), campos: { recurso: 'pesquisa', ate: daqui(30), motivo: M }, espera: { ...C, recurso: 'pesquisa', ate: daqui(30), motivo: M } },

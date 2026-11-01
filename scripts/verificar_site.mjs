@@ -283,9 +283,10 @@ for (const arq of ['painel/index.html']) {
   const planos = ['essencial', 'gestao'];
   const ler = f => fs.readFileSync(f, 'utf8');
   const confere = (f, achou, esperado, oque) => { if (String(achou) !== String(esperado)) erro(`${f}: ${oque} é ${achou}, mas o preço oficial é ${esperado} (scripts/precos_oficiais.json, rxsync-sistema#79)`); };
-  // Taxa de implantação: toda menção "R$ NNN de implantação" e o valor_setup do mensal.
-  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/R\$\s*([\d.]+)\s+de implantação/g)) confere(f, m[1], P.implantacao, 'a implantação');
-  confere('contratar.html', (ler('contratar.html').match(/valor_setup:\s*ciclo === 'mensal' \? '([\d.]+)'/) || [])[1], P.implantacao, 'o valor_setup do mensal');
+  // Implantação completa (rxsync-sistema DEC-182, opcional): toda menção "R$ NNN" junto de "Implantação completa" e o valor
+  // que a contratação manda quando a caixa vem marcada (const IMPLANTACAO).
+  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/Implantação completa[^<"]{0,80}?R\$\s*([\d.]+)/gi)) confere(f, m[1], P.implantacao, 'a Implantação completa');
+  confere('contratar.html', (ler('contratar.html').match(/const IMPLANTACAO = '([\d.]+)';/) || [])[1], P.implantacao, 'a Implantação completa (IMPLANTACAO)');
   // contratar.html: o objeto PLANOS.
   const c = ler('contratar.html');
   for (const k of planos) {

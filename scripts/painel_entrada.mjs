@@ -22,9 +22,9 @@ function responder(url, h, b) {
     if (b.acao === 'entrar_codigo') return d.codigo === '123456' ? { ok: true, sessao: SESSAO, lembranca: d.lembrar ? LEMBRANCA : null } : { ok: false, mensagem: 'E-mail, senha ou código não conferem.' };
     if (b.acao === 'retomar') return d.lembranca === LEMBRANCA ? { ok: true, sessao: SESSAO, lembranca: LEMBRANCA2 } : { ok: false, esquecer: true, mensagem: 'Entre com o e-mail e a senha.' };
     if (b.acao === 'senha_pedir_link') return { ok: true, desafio: 'f'.repeat(48), primeira: true, mensagem: 'Mandamos um código para o e-mail do cadastro (n•••@clinica.test).' };
-    if (b.acao === 'senha_nova') return d.aceite_termos === true && d.versao_termos === '2026-10-v7' ? { ok: true, sessao: SESSAO, primeira: true, lembranca: null } : { ok: false, termos: true, mensagem: 'Marque os Termos.' };
-    if (b.acao === 'termos_estado') return estado.termosPendente ? { ok: true, pendente: true, versao: '2026-10-v7', clientes_desde_texto: '23 de novembro de 2026' } : { ok: true, pendente: false, versao: '2026-10-v7' };
-    if (b.acao === 'termos_aceitar') { estado.termosPendente = false; return d.aceite_termos === true && d.versao_termos === '2026-10-v7' ? { ok: true, pendente: false } : { ok: false, mensagem: 'Marque.' }; }
+    if (b.acao === 'senha_nova') return d.aceite_termos === true && d.versao_termos === '2026-11-v8' ? { ok: true, sessao: SESSAO, primeira: true, lembranca: null } : { ok: false, termos: true, mensagem: 'Marque os Termos.' };
+    if (b.acao === 'termos_estado') return estado.termosPendente ? { ok: true, pendente: true, versao: '2026-11-v8', clientes_desde_texto: '23 de novembro de 2026' } : { ok: true, pendente: false, versao: '2026-11-v8' };
+    if (b.acao === 'termos_aceitar') { estado.termosPendente = false; return d.aceite_termos === true && d.versao_termos === '2026-11-v8' ? { ok: true, pendente: false } : { ok: false, mensagem: 'Marque.' }; }
     return { ok: true, sair: b.acao === 'sair' };
   }
   if (caminho === 'conectar') {
@@ -122,7 +122,7 @@ await page.check('#entTermos'); await page.click('#entNova button[type=submit]')
 await page.waitForURL(u => !u.search.includes('t='));
 await page.locator('#app').waitFor({ state: 'visible' });
 const sn = chamadas.find(c => c.acao === 'senha_nova');
-ok(sn && sn.dados.aceite_termos === true && sn.dados.versao_termos === '2026-10-v7' && !('_ua' in sn.dados), 'senha criada com o aceite dos Termos v7; o endereço perde o ?t=');
+ok(sn && sn.dados.aceite_termos === true && sn.dados.versao_termos === '2026-11-v8' && !('_ua' in sn.dados), 'senha criada com o aceite dos Termos v7; o endereço perde o ?t=');
 ok(chamadas.filter(c => c.acao === 'abrir').pop().sessao === SESSAO, 'depois de criar a senha, o painel abre pela sessão');
 
 // 7. Termos atualizados
@@ -136,7 +136,7 @@ ok(!chamadas.some(c => c.acao === 'termos_aceitar'), 'sem marcar a caixa, não m
 await page.check('#termosOk'); await page.click('#btnTermosAceitar');
 await page.locator('#faixaTermos').waitFor({ state: 'hidden' });
 const ta = chamadas.find(c => c.acao === 'termos_aceitar');
-ok(ta && ta.sessao === SESSAO && ta.dados.versao_termos === '2026-10-v7' && ta.dados.aceite_termos === true, 'aceite da v7 mandado com a sessão; a faixa some');
+ok(ta && ta.sessao === SESSAO && ta.dados.versao_termos === '2026-11-v8' && ta.dados.aceite_termos === true, 'aceite da v7 mandado com a sessão; a faixa some');
 await page.reload(); await page.locator('#app').waitFor({ state: 'visible' }); await page.waitForLoadState('networkidle');
 ok(await page.locator('#faixaTermos').isHidden(), 'depois do aceite, a faixa não volta');
 

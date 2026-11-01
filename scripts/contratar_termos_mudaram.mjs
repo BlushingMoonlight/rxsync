@@ -15,7 +15,7 @@ await page.check('#aceiteTermos'); await page.check('#aceiteDpa');
 await page.click('#btnTeste');
 await page.locator('#erroAceite:not(.hidden)').waitFor();
 const aceite = chamadas.find(c => c.corpo._evento === 'aceite');
-ok(aceite && aceite.corpo.versao_termos === '2026-10-v7', 'o cadastro vai com a versão 2026-10-v7');
+ok(aceite && aceite.corpo.versao_termos === '2026-11-v8', 'o cadastro vai com a versão 2026-11-v8');
 ok(await page.textContent('#erroAceite') === MSG, '409: a página mostra a mensagem do servidor (' + await page.textContent('#erroAceite') + ')');
 ok(await page.locator('#sucesso.hidden').count() === 1 && !(await page.isDisabled('#btnTeste')), 'não mostra o sucesso e devolve os botões');
 estado.resposta = { __status: 500, ok: false };

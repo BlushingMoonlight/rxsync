@@ -91,7 +91,8 @@ const aceite = await chegou(p => p.caminho === 'cadastro' && p.corpo._evento ===
 ok(aceite && aceite.corpo.modalidade === 'teste' && aceite.corpo.cliente_id === 'RX-TESTE-0001' && aceite.corpo.plano === 'Gestao' && aceite.corpo._ciclo === 'anual',
   'teste grátis: o cadastro vai com o plano, o ciclo e o código do contato da etapa 1');
 ok(aceite && aceite.corpo.cnpj === '11222333000181' && aceite.corpo.representante_cpf === '00000000191' && aceite.corpo.telefone === '41999990000', 'CNPJ, CPF e telefone vão só com dígitos');
-ok(aceite && aceite.corpo.versao_termos === '2026-10-v7' && aceite.corpo.aceite_dpa === 'SIM' && aceite.corpo._origem === 'prospeccao ' + REF && aceite.corpo.origem_clique === 'hero' && aceite.origem === 'rxsync-site-2026', 'com a versão dos Termos, o aceite do acordo de dados, a origem da prospecção e a do clique');
+ok(aceite && aceite.corpo.versao_termos === '2026-11-v8' && aceite.corpo.aceite_dpa === 'SIM' && aceite.corpo._origem === 'prospeccao ' + REF && aceite.corpo.origem_clique === 'hero' && aceite.origem === 'rxsync-site-2026', 'com a versão dos Termos, o aceite do acordo de dados, a origem da prospecção e a do clique');
+ok(aceite && aceite.corpo.implantacao_completa === false && aceite.corpo.aceite_novidades === false && aceite.corpo.valor_setup === '0', 'as caixas da Implantação completa e dos e-mails de novidades vêm desmarcadas (rxsync-sistema DEC-182 e DEC-183)');
 ok(await page.locator('#sucessoTitulo').textContent() === 'Teste grátis registrado', 'a tela de sucesso do teste grátis aparece');
 await anotar(page, 'aceite e sucesso');
 

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kZ9xlcoTNDgFUh1vfJWo43g1CazylpzIx0RuFFPKeQ8=' 'self'; style-src 'sha256-Sg5m/5bIF+bMqS93h8XErRI3UKnB9TEs40vWr6MSrBo=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xmMvd099v9IUIy2BYM4wmhZPnDD+wvhOuE6ziTLsRfQ=' 'self'; style-src 'sha256-Sg5m/5bIF+bMqS93h8XErRI3UKnB9TEs40vWr6MSrBo=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -555,7 +555,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
       <div class="campo"><label for="entCodNova">Código de 6 dígitos (chegou no e-mail)</label><input class="entrada codigo" id="entCodNova" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
       <div class="campo"><label for="entSenhaNova">Senha nova (10 caracteres ou mais)</label><input class="entrada" id="entSenhaNova" type="password" autocomplete="new-password"></div>
       <div class="campo"><label for="entSenhaNova2">Repita a senha</label><input class="entrada" id="entSenhaNova2" type="password" autocomplete="new-password"></div>
-      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a href="/termos/2026-10-v7.html" target="_blank" rel="noopener">Termos de Uso</a>, versão 2026-10-v7.</span></label>
+      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a>, versão 2026-10-v7.</span></label>
       <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Salvar a senha e entrar</button>
       <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
@@ -615,7 +615,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 const BASE = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const EP = { e24: BASE + 'autoedicao', e29: BASE + 'painel-entrada', e13: BASE + 'assistente-dono', e12: BASE + 'integracao-agenda', e23: BASE + 'conectar', e32: BASE + 'pagamento-clinica' };
 const ORIGEM = 'rxsync-site-2026';
-const VERSAO_TERMOS = '2026-10-v7';
+const VERSAO_TERMOS = '2026-11-v8';
 
 // A página não abre dentro de outra.
 if (window.top !== window.self) { document.body.textContent = 'O painel não abre dentro de outra página.'; throw new Error('moldura'); }
@@ -1162,7 +1162,7 @@ function faixaMontar(id, f) {
   if (id === 'faixaTermos') {
     const ok = el('input', { type: 'checkbox', id: 'termosOk' });
     trocar(f, icone('documento'), el('div', { class: 'txt', role: 'region', 'aria-label': 'Termos de Uso atualizados' }, el('strong', { text: 'Os Termos de Uso mudaram (versão ' + VERSAO_TERMOS + '). ' }),
-      'Sai a promessa de backup diário (hoje a RXSync não mantém essa rotina), as medidas de segurança passam a ser descritas como funcionam hoje e o Resend passa a constar também como quem envia o histórico das conversas no fim do contrato e recebe os e-mails enviados à RXSync. Valem para a sua clínica a partir de ',
+      'A taxa de implantação deixa de ser obrigatória e vira o serviço opcional Implantação completa; a RXSync passa a ser identificada pelo nome RXSync Tecnologia e Automação em Saúde e pelo CNPJ; sai o Telegram da lista de suboperadores. Valem para a sua clínica a partir de ',
       el('span', { id: 'termosData', text: TERMOS.desde || '30 dias depois do aviso por e-mail' }), ', ou antes, se você aceitar agora. ', el('a', { href: '/termos/' + VERSAO_TERMOS + '.html', target: '_blank', rel: 'noopener', text: 'Ler os Termos' })),
       el('label', {}, ok, el('span', { text: 'Li e aceito os Termos de Uso, versão ' + VERSAO_TERMOS + '.' })),
       el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', id: 'btnTermosAceitar', text: 'Aceitar', onclick: e => termosAceitar(e.currentTarget) }),
@@ -3709,7 +3709,9 @@ function assinRender(a) {
   const sit = SIT[a.situacao] || SIT.em_dia, encerrada = a.situacao === 'cancelada' || a.situacao === 'teste_encerrado';
   const abertas = (a.abertas && a.abertas.length) ? a.abertas : (a.proxima ? [a.proxima] : []);
   const blocos = [el('div', { class: 'cartao pad bloco' }, el('div', { class: 'item-cab' }, el('div', { class: 'tx' }, el('p', { class: 'legenda', text: 'Sua assinatura RXSync' }), el('h2', { text: a.plano || '—' }),
-    el('p', { class: 'mudo', text: 'R$ ' + (a.valor || '—') + assinSufixo(a.forma) + ' · ' + assinForma(a.forma) })), etq(sit[0], sit[1])),
+    el('p', { class: 'mudo', text: 'R$ ' + (a.valor || '—') + assinSufixo(a.forma) + ' · ' + assinForma(a.forma) }),
+    // rxsync-sistema DEC-182: a Implantação completa e o ano de suporte no WhatsApp (o servidor manda quando a clínica tem).
+    a.implantacao_suporte_ate ? el('p', { class: 'mudo', text: 'Implantação completa: suporte no WhatsApp até ' + String(a.implantacao_suporte_ate).split('-').reverse().join('/') + '.' }) : null), etq(sit[0], sit[1])),
     a.cancelar_em ? aviso('atencao', 'Cancelamento agendado para ' + a.cancelar_em + '. Até lá tudo funciona normalmente.') : null,
     a.situacao === 'teste' ? el('p', { class: 'dica', text: a.trial_fim ? 'O teste grátis vai até ' + a.trial_fim + '. Nada é cobrado sem você confirmar.' : 'Os 7 dias grátis começam quando a assistente entrar no ar, depois que você conectar o WhatsApp.' }) : null,
     a.situacao === 'teste_encerrado' ? el('p', { class: 'dica', text: 'O teste terminou e a assistente está parada. Pague abaixo para ela voltar ao ar.' }) : null)];
@@ -3719,13 +3721,13 @@ function assinRender(a) {
   if (!abertas.length && a.proximo_vencimento) blocos.push(el('p', { class: 'mudo bloco', text: 'Próxima cobrança: ' + a.proximo_vencimento + '. O link chega por e-mail alguns dias antes.' }));
   if ((a.situacao === 'teste' || a.situacao === 'teste_encerrado') && !abertas.length && !a.cobranca_gerada) blocos.push(el('div', { class: 'cartao pad bloco' },
     el('p', { class: 'tit-bloco', text: a.situacao === 'teste' ? 'Gostou? Garanta a continuidade agora' : 'Quer reativar a assistente?' }),
-    el('p', { class: 'mudo', text: 'Geramos o pagamento do plano ' + (a.plano || '') + ' (R$ ' + (a.valor || '—') + assinSufixo(a.forma) + (a.forma === 'mensal' ? ', mais a taxa de implantação de R$ 999, uma única vez' : '') + '). ' + (a.situacao === 'teste' && a.trial_fim ? 'O primeiro vencimento fica para o fim do teste, ' + a.trial_fim + ', e a assistente segue sem interrupção.' : 'Assim que o pagamento for confirmado, a assistente volta ao ar.') }),
+    el('p', { class: 'mudo', text: 'Geramos o pagamento do plano ' + (a.plano || '') + ' (R$ ' + (a.valor || '—') + assinSufixo(a.forma) + (Number(String(a.valor_setup || '').replace(/\D/g, '')) > 0 ? ', mais a Implantação completa de R$ ' + a.valor_setup + ', uma única vez' : '') + '). ' + (a.situacao === 'teste' && a.trial_fim ? 'O primeiro vencimento fica para o fim do teste, ' + a.trial_fim + ', e a assistente segue sem interrupção.' : 'Assim que o pagamento for confirmado, a assistente volta ao ar.') }),
     el('div', { class: 'pilha' }, btn(a.situacao === 'teste' ? 'Quero continuar: gerar pagamento' : 'Pagar o teste agora', ev => assinAcao('assinatura_pagar_teste', {}, { titulo: 'Gerar o pagamento agora?', texto: 'Para continuar com a RXSync depois do teste.', botao: 'Gerar pagamento' }, ev.currentTarget), 'pri plena'))));
   if (a.historico && a.historico.length) blocos.push(el('h2', { class: 'tit-bloco', text: 'Histórico de cobranças' }), el('div', { class: 'lista bloco' }, a.historico.map(x => el('div', { class: 'linha' },
     el('span', { class: 'tx' }, el('span', { class: 't1', text: x.vencimento + ' · R$ ' + x.valor }), el('span', { class: 't2', text: (x.descricao ? x.descricao + ' · ' : '') + x.status + (x.pago_em ? ' em ' + x.pago_em : '') })),
     x.link ? el('a', { class: 'btn fant', href: x.link, target: '_blank', rel: 'noopener', text: x.aberta ? 'Pagar' : 'Recibo' }) : null))));
   else if (a.asaas_ok === false) blocos.push(el('p', { class: 'dica bloco', text: 'O histórico de cobranças aparece aqui depois da primeira cobrança.' }));
-  if (!encerrada && ASSIN_PRECOS[a.plano_chave]) blocos.push(el('h2', { class: 'tit-bloco', text: 'Mudar de plano' }), el('p', { class: 'dica bloco', text: 'O novo valor vale a partir da próxima cobrança em aberto. Sem nova taxa de implantação.' }),
+  if (!encerrada && ASSIN_PRECOS[a.plano_chave]) blocos.push(el('h2', { class: 'tit-bloco', text: 'Mudar de plano' }), el('p', { class: 'dica bloco', text: 'O novo valor vale a partir da próxima cobrança em aberto.' }),
     el('div', { class: 'duas-ipad bloco' }, ['essencial', 'gestao'].map(k => {
       const P = ASSIN_PRECOS[k], atual = k === a.plano_chave, bloqueado = a.cancelar_em || a.situacao === 'suspensa' || (a.forma !== 'mensal' && k === 'essencial');
       return el('div', { class: 'cartao pad bloco' + (atual ? ' selecionada' : '') }, el('p', { class: 'tit-bloco' }, P.nome, atual ? etq('Seu plano', 'marca') : null), el('p', { class: 'num', text: 'R$ ' + P[a.forma] + assinSufixo(a.forma) }),

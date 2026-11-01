@@ -248,5 +248,5 @@ async function fazer(acao, d, op) {
   return r;
 }
 async function desfazer(registroId) {
-  await fazer('desfazer', { registro_id: registroId }, { titulo: 'Desfazer a edição', texto: 'Volta ao valor de antes. Fica no registro e avisa no Telegram.', ok: 'Desfeito.' });
+  await fazer('desfazer', { registro_id: registroId }, { titulo: 'Desfazer a edição', texto: 'Volta ao valor de antes. Fica no registro e em Avisos.', ok: 'Desfeito.' });
 }

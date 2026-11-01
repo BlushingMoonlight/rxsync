@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------- entrada (DEC-062, sem mudança de lógica)
-// E-mail (só o nome de usuário; quem confere é o servidor) + senha → o código de 6 dígitos vai para o Telegram do Jean
-// (nunca para esta página) → código. "Criar senha" e "Esqueci a senha" usam o mesmo código no Telegram.
+// E-mail (só o nome de usuário; quem confere é o servidor) + senha → o código de 6 dígitos do app autenticador (DEC-180,
+// conferido no servidor) ou um código de recuperação. "Criar senha" e "Esqueci a senha" usam o mesmo código.
 function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; trocar($('entrada-corpo'), ...filhos); const i = $('entrada-corpo').querySelector('input:not([hidden])'); if (i) i.focus(); }
 const msgErro = () => el('p', { class: 'erro', role: 'alert' });
 const soDigitos = v => String(v || '').replace(/\D/g, '');
@@ -69,13 +69,13 @@ function formCodigo(desafio, aviso, email, app) {
     if (r.recomecar) return formEntrada(r.mensagem, email);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; codigo.value = ''; codigo.focus();
   };
-  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: app ? 'Código do app autenticador' : 'Código no Telegram' }),
-    el('p', { class: 'mudo', text: aviso || (app ? 'Digite o código de 6 dígitos que o app autenticador (app Senhas) mostra agora.' : 'Mandei um código de 6 dígitos no seu Telegram. Ele vale 10 minutos.') }),
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: app ? 'Código do app autenticador' : 'Código de entrada' }),
+    el('p', { class: 'mudo', text: aviso || (app ? 'Digite o código de 6 dígitos que o app autenticador (app Senhas) mostra agora.' : 'Digite o código de 6 dígitos.') }),
     campoE('Código de 6 dígitos', codigo), erro, botao, botaoRecuperacao(app, codigo),
     el('div', { class: 'acoes' }, outro, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email) }))));
   esperarUmMinuto(outro, 'Mandar outro código');
 }
-// Primeira senha (primeira = true) ou "Esqueci a senha": o código vai para o Telegram.
+// Primeira senha (primeira = true) ou "Esqueci a senha": com o código do app autenticador (DEC-180).
 function pedirCodigoSenha(primeira, mensagem, emailAntes) {
   const email = campoEmail(emailAntes);
   const erro = msgErro(); erro.textContent = mensagem || '';
@@ -88,7 +88,7 @@ function pedirCodigoSenha(primeira, mensagem, emailAntes) {
   };
   telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: primeira ? 'Criar senha' : 'Esqueci a senha' }),
     el('p', { class: 'mudo', text: primeira ? 'A Central ainda não tem senha. Digite o seu e-mail; depois, o código de 6 dígitos.'
-      : 'Digite o seu e-mail; depois, o código de 6 dígitos (do app autenticador, ou no Telegram se o app ainda não foi ativado). Com ele, você cria uma senha nova.' }),
+      : 'Digite o seu e-mail; depois, o código de 6 dígitos (do app autenticador, ou um código de recuperação). Com ele, você cria uma senha nova.' }),
     campoE('E-mail', email), erro, botao,
     primeira ? null : el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email.value.trim()) }))));
 }
@@ -101,7 +101,7 @@ function formSenhaNova(desafio, aviso, primeira, email, app) {
   const erro = msgErro(); const botao = el('button', { class: 'btn pri plena', type: 'submit', text: 'Salvar e entrar' });
   const enviar = async e => {
     e.preventDefault(); erro.textContent = '';
-    const c = codigoValido(codigo.value, app); if (!c) { erro.textContent = app ? 'Digite o código de 6 dígitos do app (ou um código de recuperação).' : 'Digite o código de 6 dígitos do Telegram.'; codigo.focus(); return; }
+    const c = codigoValido(codigo.value, app); if (!c) { erro.textContent = app ? 'Digite o código de 6 dígitos do app (ou um código de recuperação).' : 'Digite o código de 6 dígitos.'; codigo.focus(); return; }
     if (s1.value.length < 12) { erro.textContent = 'Use pelo menos 12 caracteres.'; s1.focus(); return; }
     if (s1.value !== s2.value) { erro.textContent = 'As duas senhas não são iguais.'; s2.focus(); return; }
     botao.disabled = true; const r = await chamar('senha_nova', { desafio, codigo: c, senha: s1.value }); botao.disabled = false;
@@ -110,9 +110,9 @@ function formSenhaNova(desafio, aviso, primeira, email, app) {
     erro.textContent = r.mensagem || 'Não consegui.'; codigo.value = ''; codigo.focus();
   };
   telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: primeira ? 'Criar senha' : 'Senha nova' }),
-    el('p', { class: 'mudo', text: aviso || 'Se o e-mail estiver certo, o código chega no seu Telegram em instantes. Ele vale 10 minutos.' }),
-    campoE(app ? 'Código de 6 dígitos (do app)' : 'Código de 6 dígitos (no Telegram)', codigo), botaoRecuperacao(app, codigo), campoE('Senha nova (12 caracteres ou mais)', s1), campoE('Repita a senha', s2), erro, botao,
-    el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central (e deixam de ser lembrados) e chega um aviso no Telegram.' }),
+    el('p', { class: 'mudo', text: aviso || 'Digite o código de 6 dígitos do app autenticador.' }),
+    campoE(app ? 'Código de 6 dígitos (do app)' : 'Código de 6 dígitos', codigo), botaoRecuperacao(app, codigo), campoE('Senha nova (12 caracteres ou mais)', s1), campoE('Repita a senha', s2), erro, botao,
+    el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central (e deixam de ser lembrados) e chega um aviso em Avisos.' }),
     el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => primeira ? pedirCodigoSenha(true, '', email) : formEntrada('', email) }))));
 }
 async function carregarConfig() {
