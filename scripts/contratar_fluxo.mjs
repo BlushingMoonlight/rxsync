@@ -47,6 +47,12 @@ let ga = await configGA(page);
 ok(ga && !/ref=|PX-/.test(JSON.stringify(ga)) && /plano=gestao/.test(ga.page_location) && /ciclo=anual/.test(ga.page_location), 'Google Analytics: o endereço vai sem o ref, com o plano e o ciclo (' + (ga && ga.page_location || '').replace(site.base, '') + ')');
 
 // 3. Etapa 1: os campos são conferidos antes de seguir
+// Auditoria de 01/11/2026, FD-33: a Implantação completa fica no passo do plano, e o preço diz quando ela está marcada.
+ok(await page.locator('section[data-etapa="1"] #querImplantacao').count() === 1 && await page.locator('section[data-etapa="5"] #querImplantacao').count() === 0, 'a Implantação completa fica no passo 1 (o plano), não no Confira suas respostas');
+await page.check('#querImplantacao');
+ok((await page.locator('#precoDetalhe').textContent()).includes('Implantação completa'), 'marcada, o preço do passo 1 diz "+ R$ … da Implantação completa"');
+await page.uncheck('#querImplantacao');
+ok(!(await page.locator('#precoDetalhe').textContent()).includes('Implantação completa'), 'desmarcada, o preço volta');
 await page.locator('section[data-etapa="1"] .proximo').click();   // passo 1: o plano
 await page.locator('section[data-etapa="2"] .proximo').click();
 ok(await page.locator('.msg-erro.on').count() >= 3 && await page.locator('section[data-etapa="2"]').evaluate(s => s.classList.contains('ativa')), 'etapa 1 vazia: mostra os erros e não segue');
@@ -82,6 +88,7 @@ await anotar(page, 'etapas 1 a 3');
 await page.locator('section[data-etapa="4"] .proximo').click();   // dos Termos para o Confira suas respostas
 await page.locator('section[data-etapa="5"].ativa').waitFor();
 ok(/Maria Teste Silva/.test(await page.locator('#resumo').textContent()), 'Confira suas respostas mostra o que foi digitado');
+ok(/Implantação completa\s*Não/.test(await page.locator('#resumo').textContent()), 'Confira suas respostas tem a linha "Implantação completa: Não", com "Alterar"');
 await page.click('#btnTeste');
 await page.locator('#erroAceite:not(.hidden)').waitFor();
 ok(!pedidos.some(p => p.corpo._evento === 'aceite'), 'sem os aceites, mostra o aviso e não manda nada');

@@ -20,20 +20,26 @@ function passosInstalar(onde) {
     el('li', { text: 'Feche o Safari e abra pelo ícone novo da Tela de Início.' }),
     el('li', { text: 'Dentro do app, toque em "Ativar notificações" e depois em "Permitir".' }));
 }
-// Hoje: o cartão "Instalar a Central", só no navegador (no app instalado, não aparece). "Agora não" vale até fechar a Central (só na memória).
+// Hoje: o cartão "Instale a Central", só no navegador (no app instalado, não aparece), no fim de Hoje, depois do que precisa
+// de atenção (auditoria de 01/11/2026, FD-26). "Agora não" vale 30 dias neste aparelho (FD-02).
+const instalarAdiado = () => { if (est.instalarDepois) return true; try { return Date.now() - Number(localStorage.getItem('central_instalar_depois') || 0) < 30 * 86400000; } catch (e) { return false; } };
 function cartaoInstalar() {
-  if (ehInstalado() || est.instalarDepois) return null;
-  const box = cartao('Instale a Central no iPad', null, corpo(el('p', { class: 'mudo', text: 'Instalada, ela abre como um app e pode mandar notificações dos avisos.' }),
+  if (ehInstalado() || instalarAdiado()) return null;
+  const box = cartao('Instale a Central', null, corpo(el('p', { class: 'mudo', text: 'Instalada, ela abre como um app e pode mandar notificações dos avisos.' }),
     ehIOS() ? passosInstalar('a Central') : el('p', { class: 'mudo', text: 'No Chrome, use o menu do navegador e "Instalar app".' }),
-    el('div', { class: 'acoes' }, btn('Agora não', () => { est.instalarDepois = true; box.remove(); }, 'fant'))));
+    el('div', { class: 'acoes' }, btn('Agora não', () => { est.instalarDepois = true; try { localStorage.setItem('central_instalar_depois', String(Date.now())); } catch (e) {} box.remove(); }, 'fant'))));
   return box;
 }
-// Segurança: notificações neste aparelho (só no app instalado; no iPad, iPadOS 16.4 ou mais novo).
+// Segurança: notificações neste aparelho (só no app instalado; no iPad, iPadOS 16.4 ou mais novo) e o "Mandar alerta de
+// teste" (antes no fim de Avisos, onde ninguém achava: auditoria de 01/11/2026, FD-23). O teste vale também sem o app: o
+// e-mail dos urgentes chega do mesmo jeito.
+const alertaTeste = () => btn('Mandar alerta de teste', async () => { const x = await chamar('aviso_teste'); rapida(x.mensagem || (x.ok ? 'Alerta de teste enviado.' : 'Não consegui.')); }, 'sec');
 async function cartaoNotificacoes() {
   const cx = corpo();
   const pronto = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
   if (!ehInstalado() || !pronto) {
-    trocar(cx, el('p', { class: 'mudo', text: 'As notificações só funcionam com a Central instalada (no iPad, iPadOS 16.4 ou mais novo). Para instalar:' }), passosInstalar('a Central'));
+    trocar(cx, el('p', { class: 'mudo', text: 'As notificações só funcionam com a Central instalada (no iPad, iPadOS 16.4 ou mais novo). Para instalar:' }), passosInstalar('a Central'),
+      el('p', { class: 'mudo', text: '"Mandar alerta de teste" manda um alerta para Avisos, para o e-mail de cadastro e, com a Central instalada, como notificação.' }), el('div', { class: 'acoes' }, alertaTeste()));
     return cartao('Notificações neste aparelho', null, cx);
   }
   const reg = await navigator.serviceWorker.register('/central/sw.js', { scope: '/central/' });
@@ -53,7 +59,7 @@ async function cartaoNotificacoes() {
     rapida(x.mensagem || (x.ok ? 'Notificações ligadas.' : 'Não consegui.')); rotear();
   };
   trocar(cx, el('p', { class: 'mudo', text: k.inscrito ? 'Ligadas neste aparelho. Escolha os assuntos e toque em "Salvar".' : 'Escolha os assuntos e toque em "Ativar notificações". O iPad pede a permissão uma vez.' }), caixas,
-    el('div', { class: 'acoes' }, btn(k.inscrito ? 'Salvar' : 'Ativar notificações', ligar, 'pri'),
+    el('div', { class: 'acoes' }, btn(k.inscrito ? 'Salvar' : 'Ativar notificações', ligar, 'pri'), alertaTeste(),
       k.inscrito ? btn('Desligar neste aparelho', async () => { const x = await chamar('push_sair', { endpoint: sub ? sub.endpoint : '' }); if (sub) await sub.unsubscribe(); await guardarInscricao(null); rapida(x.mensagem || 'Desligadas.'); rotear(); }, 'perigo-sec') : null));
   return cartao('Notificações neste aparelho', null, cx);
 }

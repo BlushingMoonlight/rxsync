@@ -68,7 +68,7 @@ body.teclado .barra { display: none; }
 
 @media (min-width: 768px) {
   .barra { display: none; }
-  .topo .clinica { display: block; }
+  .topo .clinica { display: block; margin-left: var(--e-3); }
   .trilho { display: flex; flex-direction: column; align-items: stretch; gap: var(--e-1); position: fixed; left: 0; top: 0; bottom: 0; width: 88px; z-index: 21;
     padding: var(--e-3) var(--e-2); background: var(--superficie-2); border-right: 1px solid var(--borda); }
   .trilho button { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 60px; border: 0; border-radius: var(--r-botao); background: none; color: var(--texto-2);
@@ -143,7 +143,6 @@ body.teclado .acao-fixa { display: none; }
 
 /* ---------------------------------------------------------------- blocos, cartões, listas */
 .bloco { margin-bottom: var(--e-6); }
-.faq-item + .faq-item { margin-top: var(--e-3); }
 .bloco > h2, .tit-bloco { font-size: var(--t-bloco); line-height: var(--l-bloco); margin-bottom: var(--e-3); display: flex; align-items: center; gap: var(--e-2); }
 .tit-bloco .extra { margin-left: auto; font-size: var(--t-2); font-weight: 500; color: var(--texto-2); }
 .cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--r-cartao); }
@@ -252,6 +251,8 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 
 /* ---------------------------------------------------------------- Início (A), Relatório (G) */
 .passos-ini .linha .ic.feito { background: var(--ok-fundo); color: var(--ok-texto); }
+#appCartao:empty { display: none; }
+.passos-ini #appCartao { margin-top: var(--e-2); }
 .numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--e-3); }
 .indicador { padding: var(--e-4); background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--r-cartao); }
 .indicador .rot { font-size: var(--t-2); line-height: var(--l-2); color: var(--texto-2); }
@@ -458,3 +459,4 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 /* lista em texto (O que mudou) */
 .lista-texto { margin: 0; padding-left: var(--e-5); display: flex; flex-direction: column; gap: var(--e-2); }
 .passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
+#agConversa .pilha { align-items: flex-start; }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-kn0dJNH4staTaCO5FZ0l7MbCS77TQEL+S5T7lwanUiU='; style-src 'sha256-hMrPxkT/a7EFjb6o+zGTE+3YYY8Z1NnqRu/lJVkGUmk='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-AAHaaLZiSTrRhdWVjK3Ej2QLNXPgW18MZv5NrTLXxw4='; style-src 'sha256-kXgTOFoC9jh6mgb2OusaZ/Faavq9gu0n6SZbGfBUWYs='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -377,6 +377,10 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
 .opcoes-assuntos { display: flex; flex-wrap: wrap; gap: var(--e-1) var(--e-4); margin: var(--e-3) 0; }
 .tit-peq { font-weight: 600; margin: var(--e-3) 0 0; }
+/* Avisos agrupados por dia (auditoria de 01/11/2026, FD-24) */
+.aviso-dia { margin: 0; padding: var(--e-3) var(--e-4) var(--e-1); font-size: var(--t-2); line-height: var(--l-2); font-weight: 600; color: var(--texto-2); }
+.aviso-dia:not(:first-child) { border-top: 1px solid var(--borda); }
+.aviso-dia::first-letter { text-transform: uppercase; }
 /* ---------- IA da Central (DEC-145): o assistente ao lado (1180 px ou mais) ou em tela cheia (iPad em pé e celular) ---------- */
 .painel-ia { display: none; }
 .casca.com-assistente .painel-ia { display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 60; background: var(--superficie); min-width: 0;
@@ -825,7 +829,8 @@ function formEntrada(mensagem, emailAntes) {
     e.preventDefault(); botao.disabled = true; erro.textContent = '';
     const r = await chamar('entrar', { email: email.value.trim(), senha: senha.value }); botao.disabled = false;
     if (r.ok && r.desafio) return formCodigo(r.desafio, r.mensagem, email.value.trim());
-    if (r.criar_senha) return pedirCodigoSenha(true, r.mensagem);
+    // A tela de criar a senha já explica; a frase do banco ("Toque em Criar senha") não se repete aqui (auditoria de 01/11/2026).
+    if (r.criar_senha) return pedirCodigoSenha(true);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; senha.value = ''; senha.focus();
   };
   telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Entrar' }), campoE('E-mail', email), campoE('Senha', senha), erro, botao,
@@ -1049,13 +1054,20 @@ const TIPOS = {
   assistente_dono_falhou: 'Assistente do dono falhou', whatsapp_caiu: 'WhatsApp desconectado', whatsapp_voltou: 'WhatsApp reconectado', aviso_evento_nao_entregue: 'Aviso de evento não entregue',
   mini_teste_teto: 'Mini teste no teto', copia_n8n_parada: 'Cópia do n8n parada',
   cobranca_criada: 'Cobrança criada', cobranca_faltam_dados: 'Cobrança: faltam dados', cobranca_incompleta: 'Cobrança pela metade', pagamento_confirmado: 'Pagamento confirmado',
-  mensalidade_recebida: 'Mensalidade recebida', taxa_recebida: 'Taxa de implantação recebida', atraso_na_implantacao: 'Atraso (ainda em implantação)', pagamento_atrasado: 'Pagamento atrasado',
+  mensalidade_recebida: 'Mensalidade recebida', taxa_recebida: 'Implantação completa recebida', atraso_na_implantacao: 'Atraso (ainda em implantação)', pagamento_atrasado: 'Pagamento atrasado',
   pagamento_nao_identificado: 'Pagamento não identificado', nota_fiscal_erro: 'Erro na nota fiscal', reativado_apos_atraso: 'Pagou o atraso', valor_divergente: 'Valor diferente do esperado',
   aviso_suspensao: 'Aviso de suspensão', suspenso: 'Suspenso', reativado: 'Reativado', atraso_30_dias: '30 dias sem pagamento', contrato_encerrado: 'Contrato encerrado',
   valor_atualizado: 'Valor atualizado', resumo_do_dia: 'Resumo do dia', troca_de_plano: 'Troca de plano', teste_encerrado_pelo_cliente: 'Teste encerrado pelo cliente',
   pedido_cancelamento: 'Pedido de cancelamento', cancelamento_agendado: 'Cancelamento agendado', cancelamento_desfeito: 'Desistiu do cancelamento', teste_quer_pagar: 'Teste quer pagar', pedido_assinatura: 'Pedido sobre a assinatura',
   ajuda_agenda: 'Pedido de ajuda com a agenda', email_recebido: 'E-mail recebido', painel_movimento: 'Movimento no painel',
   exclusao_amanha: 'Dados serão apagados amanhã', exclusao_falhou: 'Falha ao apagar dados', dados_apagados: 'Dados apagados', outro: 'Outro aviso',
+  // Os tipos que o workflow 02 grava e ainda não tinham nome (auditoria de 01/11/2026, FD-25; o central_avisos_app.mjs confere a lista).
+  deploy_recusado: 'Aplicar SQL: pedido recusado', github_recusado: 'Aviso do GitHub recusado', deploy_sem_prova: 'Aplicar SQL sem a prova do GitHub', limpeza_falhou: 'Limpeza de dados: etapa falhou',
+  coleta_recusada: 'Coleta da Central recusada', lembrete_nao_saiu: 'Lembrete de consulta não saiu', link_conexao_nao_saiu: 'Link de conexão não saiu', reenvio_sem_ip: 'Reenvio do link sem o IP',
+  encerramento_adiado: 'Contrato sem pagamento não encerrado', contrato_sem_pagamento: 'Contrato sem pagamento', contrato_parado: 'Contrato parado', valor_nao_atualizado: 'Valor da assinatura não atualizado',
+  recancelado: 'Assinatura cancelada no Asaas (nova tentativa)', recancelamento_falhou: 'O Asaas ainda não cancelou', pedido_asaas_falhou: 'Pedido ao Asaas falhou',
+  conversas_falhou: 'Envio das conversas falhou', conversas_enviadas: 'Conversas enviadas', pago_em_dobro: 'Consulta paga duas vezes',
+  contatos_chatwoot_ficaram: 'Contatos do Chatwoot não apagados', contatos_antigos: 'Contatos antigos do Chatwoot',
   prosp_numero_caiu: 'Prospecção: número caiu', prosp_numero_conectado: 'Prospecção: número conectado', prosp_token_aceito: 'Prospecção: token aceito',
   prosp_token_recusado: 'Prospecção: token recusado', prosp_busca: 'Prospecção: busca', prosp_conjunto_pausado: 'Prospecção: conjunto pausado', prosp_regra: 'Prospecção: regra automática',
   prosp_saiu: 'Prospecção: pediu para sair', prosp_interesse: 'Prospecção: mostrou interesse', prosp_quer_contratar: 'Prospecção: quer contratar', prosp_recusou: 'Prospecção: recusou',
@@ -1064,7 +1076,7 @@ const TIPOS = {
   demo_aberta: 'Demonstração aberta', demo_conversar: 'Demonstração: quer conversar', demo_escopo: 'Demonstração: escopo enviado'
 };
 const CATEGORIAS = ['alertas', 'falhas', 'clientes', 'financeiro', 'vendas', 'suporte', 'painel', 'sistema', 'entradas', 'avx'];
-const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisam de você' };
+const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisa de você' };
 const rotuloTipo = t => TIPOS[t] || t || 'Aviso';
 const irCliente = (id, aba) => ir('clientes/' + encodeURIComponent(id) + (aba ? '/' + aba : ''));
 function listaAvisos(avisos, comClinica) {
@@ -1102,7 +1114,6 @@ TELAS.hoje = async c => {
   const agora = new Date();
   trocar(c, 
     cabecalho('Hoje', agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }), n.asaas_ambiente === 'sandbox' ? etq('Asaas no sandbox', 'atencao') : null),
-    cartaoInstalar(),   // #225, item 28: só no navegador
     el('div', { class: 'pilha' },
       el('div', { class: 'grade-2' },
         cartao('Precisa da sua atenção', etq(pend.length ? pend.length + (pend.length === 1 ? ' item' : ' itens') : 'tudo em dia', pend.length ? '' : 'ok', !!pend.length),
@@ -1116,7 +1127,8 @@ TELAS.hoje = async c => {
       el('div', { class: 'grade-2' },
         cartao('Funil · 30 dias', null, corpo(grafBarras((f.por_dia || []).map(x => ({ r: diaCurto(x.dia), v: (x.pedidos || 0) + (x.mini_testes || 0) + (x.cadastros || 0) })), 'Pedidos, mini testes e cadastros por dia'),
           el('div', { class: 'mt' }, dados([['Mini testes', fmtNum(f.totais.mini_testes) + ' (' + fmtNum(f.totais.mini_testes_com_consulta) + ' marcaram consulta)'], ['Cadastros (teste / contrato)', fmtNum(f.totais.cadastros_teste) + ' / ' + fmtNum(f.totais.cadastros_contratacao)], ['Foram ao ar', fmtNum(f.totais.go_lives)]])))),
-        cartao('Últimos avisos', btn('Ver todos', () => ir('avisos'), 'fant'), listaAvisos((d.ultimos_avisos || []).slice(0, 6), true)))));
+        cartao('Últimos avisos', btn('Ver todos', () => ir('avisos'), 'fant'), listaAvisos((d.ultimos_avisos || []).slice(0, 6), true))),
+      cartaoInstalar()));   // #225, item 28: só no navegador; no fim, depois do que precisa de atenção (FD-26)
 };
 
 // ==== 05_clientes.js
@@ -1334,8 +1346,8 @@ function abaCobranca(c, x, pode) {
     if (editar) {
       acoes.push(btn('Data da próxima cobrança', () => fazer('cobranca_proxima_data', { cliente_id: x.cliente_id }, { titulo: 'Data da próxima cobrança', nome: x.nome,
         campos: [{ k: 'data', rot: 'Nova data', tipo: 'date', min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 60), obrig: true }, MOTIVO] })));
-      if (Number(x.valor_setup) > 0) acoes.push(btn('Cancelar a cobrança da implantação', () => fazer('implantacao_isentar', { cliente_id: x.cliente_id }, { titulo: 'Isentar a implantação de ' + x.nome, nome: x.nome,
-        linhas: [['Implantação', fmtReal(x.valor_setup), fmtReal(0)]], texto: 'Se a taxa está em aberto no Asaas, ela é cancelada (pela fila). Taxa já paga: estorno fica fora da Central.',
+      if (Number(x.valor_setup) > 0) acoes.push(btn('Cancelar a cobrança da implantação', () => fazer('implantacao_isentar', { cliente_id: x.cliente_id }, { titulo: 'Cancelar a cobrança da implantação de ' + x.nome, nome: x.nome,
+        linhas: [['Implantação completa', fmtReal(x.valor_setup), fmtReal(0)]], texto: 'Se a cobrança da Implantação completa está em aberto no Asaas, ela é cancelada (pela fila). Já paga: o estorno fica fora da Central.',
         campos: [MOTIVO, { k: 'combinado', rot: 'Como foi combinado com a clínica', longo: true, obrig: true, minimo: 5, erro: 'Escreva como foi combinado.' }] }), 'perigo-sec'));
     }
     anexar(c, cartao('Cobranças no Asaas', foto ? el('span', { class: 'mudo peq', text: 'foto de ' + fmtHora(foto.tirada_em) }) : null, lista, acoes.length ? corpo(el('div', { class: 'acoes' }, acoes)) : null));
@@ -1500,7 +1512,7 @@ function menuAcoes(x) {
   // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.
   if (st !== 'Dados apagados') item('Enviar as conversas ao e-mail do cadastro', 'Nível 2. Só a pedido da clínica; o arquivo não passa pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
     titulo: 'Enviar as conversas de ' + x.nome, ok: 'Pedido na fila.',
-    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central, pelo banco nem pelo Telegram; a Central avisa em Avisos quando sair ou se falhar.' }));
+    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central nem pelo banco; a Central avisa em Avisos quando sair ou se falhar.' }));
   if (ligada('editar_onboarding') && x.pode_reenviar_onboarding) item('Reenviar o onboarding', 'O workflow 21 manda o link novo em até 10 minutos.', () => fazer('reenviar_onboarding', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o onboarding de ' + x.nome, linhas: [['Link atual', 'vale', 'deixa de valer']] }));
   if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
     if (ehTesteCobranca(x)) item('Deixar de ser a clínica de teste da cobrança', 'As edições de dinheiro voltam a depender das chaves.', async () => {
@@ -1638,11 +1650,12 @@ TELAS.uso = async c => {
 };
 
 // A central de avisos (sql/082, DEC-179): o texto de cada aviso (o mesmo que antes ia ao Telegram), os não lidos em destaque,
-// a busca, marcar como lidos, apagar e "Mandar alerta de teste" (chega aqui, como notificação e por e-mail).
+// a busca, marcar como lidos e apagar. Agrupados por dia, 50 de cada vez (auditoria de 01/11/2026, FD-24); o "Mandar alerta
+// de teste" fica em Mais › Segurança, junto das notificações (FD-23).
 TELAS.avisos = async (c, [cat]) => {
   topo('Avisos', [['Análise'], ['Avisos']]);
   cat = CATEGORIAS.includes(cat) ? cat : '';
-  est.avisos = est.avisos || { nao_lidos: false, busca: '' };   // o filtro vale nesta aba, só na memória
+  est.avisos = est.avisos || { nao_lidos: false, busca: '', ver: 50 };   // o filtro vale nesta aba, só na memória
   const filtro = { categoria: cat, nao_lidos: est.avisos.nao_lidos, busca: est.avisos.busca };
   const r = await chamar('avisos_ver', filtro); if (falhou(c, r, 'Avisos')) return;
   const nl = r.nao_lidos || {}, total = r.total_nao_lidos || 0, lista = r.avisos || [];
@@ -1663,12 +1676,20 @@ TELAS.avisos = async (c, [cat]) => {
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Assunto' }, ['', ...CATEGORIAS].map(k => el('button', { type: 'button', 'aria-pressed': String(k === cat), onclick: () => ir('avisos' + (k ? '/' + k : '')) },
         k ? (NOME_ASSUNTO[k] || k) : 'Todos', nl[k] ? el('span', { class: 'n', text: nl[k] }) : null))),
       el('div', { class: 'linha-filtros' }, busca, soNaoLidos),
-      cartao(null, null, lista.length ? el('ul', { class: 'lista' }, lista.map(linha)) : vazio(filtro.busca || filtro.nao_lidos || cat ? 'Nenhum aviso com este filtro.' : 'Nenhum aviso.', 'avisos')),
+      cartao(null, null, lista.length ? avisosPorDia(lista.slice(0, est.avisos.ver || 50), linha) : vazio(filtro.busca || filtro.nao_lidos || cat ? 'Nenhum aviso com este filtro.' : 'Nenhum aviso.', 'avisos')),
+      lista.length > (est.avisos.ver || 50) ? el('div', { class: 'acoes' }, btn('Mostrar mais 50', () => { est.avisos.ver = (est.avisos.ver || 50) + 50; rotear(); }, 'sec')) : null,
       el('div', { class: 'acoes-fim' },
-        btn('Mandar alerta de teste', async () => { const x = await chamar('aviso_teste'); rapida(x.mensagem || (x.ok ? 'Alerta de teste enviado.' : 'Não consegui.')); }, 'sec'),
         btn('Apagar os lidos', () => fazer('avisos_apagar_lidos', {}, { nivel: 2, titulo: 'Apagar os avisos lidos', texto: 'Os avisos já lidos saem da Central de vez. Os não lidos ficam.', botao: 'Apagar os lidos', perigo: true }), 'perigo-sec')),
-      el('p', { class: 'mudo peq', text: 'Os avisos ficam 90 dias. Alertas e falhas também chegam por e-mail.' })));
+      el('p', { class: 'mudo peq', text: 'Os avisos ficam 90 dias. Alertas e falhas também chegam por e-mail. Para testar o e-mail e a notificação: Mais › Segurança, "Mandar alerta de teste".' })));
 };
+// Um título por dia (Hoje, Ontem, quarta-feira, 29/10), o mais novo no alto.
+function avisosPorDia(lista, linha) {
+  const chave = v => { const d = new Date(String(v).replace(' ', 'T')); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+  const hoje = hojeISO(), ontem = somaDias(hoje, -1), grupos = [];
+  for (const a of lista) { const k = chave(a.recebido_em); if (!grupos.length || grupos[grupos.length - 1][0] !== k) grupos.push([k, []]); grupos[grupos.length - 1][1].push(a); }
+  const nome = k => k === hoje ? 'Hoje' : k === ontem ? 'Ontem' : k ? new Date(k + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Sem data';
+  return grupos.map(([k, itens]) => [el('h3', { class: 'aviso-dia', text: nome(k) }), el('ul', { class: 'lista' }, itens.map(linha))]);
+}
 
 TELAS.agregados = async c => {
   topo('Agregados de pacientes', [['Análise'], ['Agregados de pacientes']]);
@@ -3213,20 +3234,26 @@ function passosInstalar(onde) {
     el('li', { text: 'Feche o Safari e abra pelo ícone novo da Tela de Início.' }),
     el('li', { text: 'Dentro do app, toque em "Ativar notificações" e depois em "Permitir".' }));
 }
-// Hoje: o cartão "Instalar a Central", só no navegador (no app instalado, não aparece). "Agora não" vale até fechar a Central (só na memória).
+// Hoje: o cartão "Instale a Central", só no navegador (no app instalado, não aparece), no fim de Hoje, depois do que precisa
+// de atenção (auditoria de 01/11/2026, FD-26). "Agora não" vale 30 dias neste aparelho (FD-02).
+const instalarAdiado = () => { if (est.instalarDepois) return true; try { return Date.now() - Number(localStorage.getItem('central_instalar_depois') || 0) < 30 * 86400000; } catch (e) { return false; } };
 function cartaoInstalar() {
-  if (ehInstalado() || est.instalarDepois) return null;
-  const box = cartao('Instale a Central no iPad', null, corpo(el('p', { class: 'mudo', text: 'Instalada, ela abre como um app e pode mandar notificações dos avisos.' }),
+  if (ehInstalado() || instalarAdiado()) return null;
+  const box = cartao('Instale a Central', null, corpo(el('p', { class: 'mudo', text: 'Instalada, ela abre como um app e pode mandar notificações dos avisos.' }),
     ehIOS() ? passosInstalar('a Central') : el('p', { class: 'mudo', text: 'No Chrome, use o menu do navegador e "Instalar app".' }),
-    el('div', { class: 'acoes' }, btn('Agora não', () => { est.instalarDepois = true; box.remove(); }, 'fant'))));
+    el('div', { class: 'acoes' }, btn('Agora não', () => { est.instalarDepois = true; try { localStorage.setItem('central_instalar_depois', String(Date.now())); } catch (e) {} box.remove(); }, 'fant'))));
   return box;
 }
-// Segurança: notificações neste aparelho (só no app instalado; no iPad, iPadOS 16.4 ou mais novo).
+// Segurança: notificações neste aparelho (só no app instalado; no iPad, iPadOS 16.4 ou mais novo) e o "Mandar alerta de
+// teste" (antes no fim de Avisos, onde ninguém achava: auditoria de 01/11/2026, FD-23). O teste vale também sem o app: o
+// e-mail dos urgentes chega do mesmo jeito.
+const alertaTeste = () => btn('Mandar alerta de teste', async () => { const x = await chamar('aviso_teste'); rapida(x.mensagem || (x.ok ? 'Alerta de teste enviado.' : 'Não consegui.')); }, 'sec');
 async function cartaoNotificacoes() {
   const cx = corpo();
   const pronto = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
   if (!ehInstalado() || !pronto) {
-    trocar(cx, el('p', { class: 'mudo', text: 'As notificações só funcionam com a Central instalada (no iPad, iPadOS 16.4 ou mais novo). Para instalar:' }), passosInstalar('a Central'));
+    trocar(cx, el('p', { class: 'mudo', text: 'As notificações só funcionam com a Central instalada (no iPad, iPadOS 16.4 ou mais novo). Para instalar:' }), passosInstalar('a Central'),
+      el('p', { class: 'mudo', text: '"Mandar alerta de teste" manda um alerta para Avisos, para o e-mail de cadastro e, com a Central instalada, como notificação.' }), el('div', { class: 'acoes' }, alertaTeste()));
     return cartao('Notificações neste aparelho', null, cx);
   }
   const reg = await navigator.serviceWorker.register('/central/sw.js', { scope: '/central/' });
@@ -3246,7 +3273,7 @@ async function cartaoNotificacoes() {
     rapida(x.mensagem || (x.ok ? 'Notificações ligadas.' : 'Não consegui.')); rotear();
   };
   trocar(cx, el('p', { class: 'mudo', text: k.inscrito ? 'Ligadas neste aparelho. Escolha os assuntos e toque em "Salvar".' : 'Escolha os assuntos e toque em "Ativar notificações". O iPad pede a permissão uma vez.' }), caixas,
-    el('div', { class: 'acoes' }, btn(k.inscrito ? 'Salvar' : 'Ativar notificações', ligar, 'pri'),
+    el('div', { class: 'acoes' }, btn(k.inscrito ? 'Salvar' : 'Ativar notificações', ligar, 'pri'), alertaTeste(),
       k.inscrito ? btn('Desligar neste aparelho', async () => { const x = await chamar('push_sair', { endpoint: sub ? sub.endpoint : '' }); if (sub) await sub.unsubscribe(); await guardarInscricao(null); rapida(x.mensagem || 'Desligadas.'); rotear(); }, 'perigo-sec') : null));
   return cartao('Notificações neste aparelho', null, cx);
 }

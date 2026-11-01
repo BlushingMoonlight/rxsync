@@ -52,6 +52,9 @@ const folha = page.locator('#consultaFolha');
 // 1. "Chegou" e "Faltou"
 await cartao('Eva Agora').locator('.linha-abrir').click();
 ok(await folha.getByRole('button', { name: 'Chegou', exact: true }).isVisible() && await folha.getByRole('button', { name: 'Faltou', exact: true }).isVisible(), 'consulta que já começou: "Chegou" e "Faltou"');
+// Auditoria de 01/11/2026, FD-08: até 3 ações rápidas (molde C); depois do início, sem "Remarcar" e sem "Enviar link agora".
+ok(await folha.locator('.acoes-rapidas button').count() <= 3 && !(await folha.locator('.acoes-rapidas').getByRole('button', { name: 'Remarcar' }).count()), 'consulta que já começou: até 3 ações rápidas, sem "Remarcar"');
+ok(await folha.locator('.acoes-rapidas').getByRole('button', { name: 'Marcar como não vista' }).count() === 0 && await folha.getByRole('button', { name: 'Marcar como não vista' }).count() === 1, '"Marcar como não vista" fica embaixo, fora das ações rápidas');
 await folha.getByRole('button', { name: 'Faltou', exact: true }).click();
 await page.locator('#toast', { hasText: 'Marcado: faltou' }).waitFor();
 let ch = chamadas.filter(c => c.acao === 'agenda_comparecimento').pop();

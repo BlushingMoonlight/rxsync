@@ -170,15 +170,15 @@ function consultaItem(a) {
   if (a.status === 'cancelado') tags.push(etq('Cancelada', 'perigo', 'proibido'));
   else if (bloq) tags.push(etq('Bloqueio', '', 'bloquear'));
   else { if (a.comparecimento) tags.push(agComparecimentoEtq(a)); else if (a.presenca_confirmada) tags.push(etq('Confirmou presença', 'ok', 'ok')); if (a.pago_em) tags.push(etq(agPagoTxt(a), 'ok', 'ok')); else if (ligado('func_pagamento_link')) tags.push(etq('Não paga', 'atencao', 'dinheiro')); }
-  const rapidas = [];
+  // Até 3 ações rápidas (molde C; auditoria de 01/11/2026, FD-08): antes do início, paga, link e remarcar; depois do
+  // início, paga, "Chegou" e "Faltou" (S4, sql/075: um registro da clínica). "Marcar como não vista" é rara e fica embaixo.
+  const rapidas = [], comecou = new Date(a.inicio).getTime() <= Date.now();
   if (podePagar(a)) rapidas.push(btn(a.pago_em ? 'Desmarcar paga' : 'Marcar como paga', () => agPagar(a, !a.pago_em), 'sec', a.pago_em ? 'fechar' : 'dinheiro'));
-  if (ativa && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
-  if (ativa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
-  // S10 e S13 (rxsync-sistema sql/066): desmarcar "vista" e desfazer o cancelamento (o servidor confere o horário livre).
-  if (ativa && !bloq && a.visto) rapidas.push(btn('Marcar como não vista', () => agVistoDesfazer(a), 'sec', 'sino'));
-  if (!ativa && !bloq && !externa && !a.no_externo && new Date(a.inicio).getTime() > Date.now()) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
-  // S4 (rxsync-sistema sql/075): "Chegou" e "Faltou" só depois que a consulta começa; é um registro da clínica.
-  if (ativa && !bloq && new Date(a.inicio).getTime() <= Date.now()) {
+  if (ativa && !comecou && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
+  if (ativa && (bloq || !comecou)) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
+  // S13 (rxsync-sistema sql/066): desfazer o cancelamento (o servidor confere o horário livre).
+  if (!ativa && !bloq && !externa && !a.no_externo && !comecou) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
+  if (ativa && !bloq && comecou) {
     if (a.comparecimento) rapidas.push(btn(a.comparecimento === 'chegou' ? 'Desmarcar "Chegou"' : 'Desmarcar "Faltou"', () => agComparecer(a, ''), 'sec', 'fechar'));
     else rapidas.push(btn('Chegou', () => agComparecer(a, 'chegou'), 'sec', 'ok'), btn('Faltou', () => agComparecer(a, 'faltou'), 'sec', 'proibido'));
   }
@@ -194,15 +194,19 @@ function consultaItem(a) {
     Array.isArray(a.preconsulta) && a.preconsulta.length ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Respostas antes da consulta' }),
       a.preconsulta.map(q => el('p', { class: 'quebra' }, el('b', { text: (q.pergunta || '') + ' ' }), q.resposta || ''))) : null,
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
-    !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }), btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')) : null,
-    !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
+    // A conversa num bloco só (FD-11): ler aqui (S5) ou abrir no WhatsApp.
+    !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }),
+      el('div', { id: 'agConversaArea' }, btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')),
+      el('div', { class: 'pilha' }, el('a', { class: 'btn sec', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir no WhatsApp'))) : null,
+    // S10 (rxsync-sistema sql/066): desmarcar "vista", raro, longe das ações do dia a dia (regra 7).
+    ativa && !bloq && a.visto ? el('div', { class: 'pilha' }, btn('Marcar como não vista', () => agVistoDesfazer(a), 'fant', 'sino')) : null,
     ativa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
     !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
 }
 // A conversa da consulta (S5, rxsync-sistema sql/077): só leitura, lida no Chatwoot na hora em que se toca (nada fica
 // guardado). As últimas 20 mensagens, sem as notas internas: paciente de um lado, a assistente e a equipe do outro.
 function agConversaVer(a, caixa) {
-  const leg = el('p', { class: 'legenda', text: 'Conversa com a assistente' });
+  const leg = null;   // a legenda fica no bloco (FD-11)
   trocar(caixa, leg, esqueleto());
   d24('agenda_conversa', { id: a.id }).then(r => {
     r = r || {};

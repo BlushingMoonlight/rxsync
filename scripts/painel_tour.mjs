@@ -9,7 +9,7 @@ import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { console.log((c ? '✓ ' : '✗ ') + m); if (!c) falhas++; return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const site = await servirSite(); const browser = await abrirNavegador();
-async function abrir(comTour) {
+async function abrir(comTour, conta) {
   const chamadas = []; let tour = {};
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   await ctx.addInitScript(() => { try { sessionStorage.setItem('painel_sessao', 'a'.repeat(64)); } catch (e) {} });
@@ -19,7 +19,7 @@ async function abrir(comTour) {
     let b = {}; try { b = JSON.parse(q.postData() || '{}'); } catch {}
     const c = q.url().slice(N8N.length); chamadas.push({ c, acao: b.acao, dados: b.dados || {} });
     let o = { ok: true, data: [] };
-    if (c === 'autoedicao' && b.acao === 'abrir') o = { ok: true, editaveis: { nome_exibicao: 'Clínica Tour' }, papel: 'dono', recursos: { pacientes: true }, conta: { no_ar: true } };
+    if (c === 'autoedicao' && b.acao === 'abrir') o = { ok: true, editaveis: { nome_exibicao: 'Clínica Tour' }, papel: 'dono', recursos: { pacientes: true }, conta: conta || { no_ar: true } };
     if (c === 'painel-entrada' && b.acao === 'tour_ler') o = comTour ? { ok: true, tour } : { ok: true };
     if (c === 'painel-entrada' && b.acao === 'tour_marcar') { const d = b.dados; tour = d.tela === '*' && d.estado === 'rever' ? {} : { ...tour, [d.tela]: d.estado }; o = { ok: true, tour }; }
     return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(o) });
@@ -45,6 +45,15 @@ ok(chamadas.some(x => x.acao === 'tour_marcar' && x.dados.tela === '*' && x.dado
 await page.goto(site.base + '/painel/#conta'); await page.locator('#btnReverTour').click();
 await page.locator('.tour-cartao').waitFor();
 ok(chamadas.some(x => x.acao === 'tour_marcar' && x.dados.estado === 'rever') && (await page.locator('.tour-cartao').textContent()).includes('Tour · 1 de'), 'Conta › "Rever o tour" recomeça em Hoje');
+await ctx.close();
+// Auditoria de 01/11/2026, FD-01: com o cartão de estado em Hoje (falta conectar), o tour não começa por cima dele na
+// primeira vista; começa quando Hoje abre de novo.
+({ ctx, page } = await abrir(true, { no_ar: false, situacao: 'teste_aguardando' }));
+await page.locator('#hojeEstado').waitFor(); await page.waitForTimeout(1500);
+ok(!(await page.locator('.tour-cartao').count()), 'Hoje com o cartão de estado: o tour não aparece na primeira vista');
+await page.goto(page.url().replace(/#.*/, '#conta')); await page.waitForTimeout(300); await page.goto(page.url().replace(/#.*/, '#hoje'));
+await page.locator('.tour-cartao').waitFor();
+ok(true, 'Hoje aberto de novo: o tour começa');
 await ctx.close();
 ({ ctx, page } = await abrir(false));
 await page.waitForTimeout(1500);
