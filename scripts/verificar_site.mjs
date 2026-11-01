@@ -75,7 +75,10 @@ function conferirP12(nome, css, pagina) {
     if (!/lembrancaNova\(v\) \{ if \(!\/\^\[0-9a-f\]\{64\}\$\/\.test\(v \|\| ''\)\) return;/.test(s)) erro(`${arq}: a lembrança do aparelho só é guardada com o formato do servidor (64 letras de 0-9a-f)`);
     // Dados sensíveis (CPF, CNPJ, e-mail, telefone) nunca ficam no navegador: só a sessão vai para o sessionStorage.
     for (const m of s.matchAll(/sessionStorage\.setItem\(\s*([^,)]*)/g)) if (m[1].trim() !== "'central_sessao'") erro(`${arq}: só a sessão pode ir para o sessionStorage (achei ${m[1].trim()})`);
-    if (/indexedDB|document\.cookie|caches\.open/.test(s)) erro(`${arq}: nada da Central fica no navegador (indexedDB, cookie ou cache)`);
+    // Notificações (rxsync-sistema DEC-181): só a chave da inscrição fica no aparelho, no IndexedDB 'rxsync-central' (para o
+    // service worker perguntar os números); nada mais (nem cookie nem cache).
+    if (/document\.cookie|caches\.open/.test(s) || [...s.matchAll(/indexedDB\.open\(\s*'([^']*)'/g)].some(m => m[1] !== 'rxsync-central') || (s.match(/indexedDB/g) || []).length !== (s.match(/indexedDB\.open\('rxsync-central', 1\)/g) || []).length)
+      erro(`${arq}: nada da Central fica no navegador (cookie ou cache); o IndexedDB só 'rxsync-central', com a chave das notificações (DEC-181)`);
     // Ficha da clínica (DEC-065): CPF e CNPJ só nos "Dados protegidos", pedidos na hora pela ação cliente_sensivel
     // e marcados com data-sensivel (somem quando a Central vai para o fundo).
     if (!/chamar\('cliente_sensivel'/.test(s) || !/'data-sensivel'/.test(s) || !/querySelectorAll\('\[data-sensivel\]'\)/.test(s)) erro(`${arq}: faltam os dados protegidos (cliente_sensivel com data-sensivel, escondidos ao sair da tela)`);
@@ -91,11 +94,13 @@ function conferirP12(nome, css, pagina) {
           for (const m of t[0].replace(/\$\{[^}]*\}/g, '').matchAll(/[a-zà-ú]+\((?:s|es|ões|ns)\)/gi)) erro(`central/fonte/${f}: "${m[0]}" na tela; use pl(n, 'singular', 'plural')`);
     // Toda ação de edição tem nível no servidor (sql/030, sql/031 e sql/036, rx_central_niveis). Ação nova precisa entrar lá e aqui.
     // ligar_chave: um toque (DEC-066); as chaves do motor da prospecção sobem para 2 ou 3 ao ligar (rx_central, sql/031).
-    const NIVEIS = { 1: ['cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
+    // Sem nível na rx_central_niveis, mas conferidas no servidor pela rx_central_extra (sql/082): totp_iniciar e
+    // totp_codigos_novos pedem a senha; avisos_apagar_lidos é nível 2.
+    const NIVEIS = { 1: ['totp_iniciar', 'totp_codigos_novos', 'cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
         'prosp_campanha_salvar', 'prosp_conjunto_salvar', 'prosp_anuncio_salvar', 'prosp_duplicar', 'prosp_regra_salvar', 'prosp_regra_ligar', 'prosp_anotar', 'prosp_custos_salvar', 'prosp_relatorio_salvar', 'prosp_numero_situacao', 'prosp_lead_aprovar', 'prosp_lead_marcar', 'prosp_lead_assumir',
         'prosp_publico_salvar', 'prosp_publico_renomear', 'prosp_publico_duplicar', 'prosp_publico_contato_marcar',
         'dem_criar', 'dem_desativar', 'dem_reativar', 'dem_ver'],
-      2: ['situacao_pausar', 'situacao_retomar', 'situacao_reativar', 'cancelamento_desfazer', 'link_painel_reenviar', 'link_conectar_reenviar', 'reenviar_onboarding', 'recurso_liberar', 'recurso_revogar',
+      2: ['avisos_apagar_lidos', 'situacao_pausar', 'situacao_retomar', 'situacao_reativar', 'cancelamento_desfazer', 'link_painel_reenviar', 'link_conectar_reenviar', 'reenviar_onboarding', 'recurso_liberar', 'recurso_revogar',
         'cliente_editar_empresa', 'chave_api_criar', 'aviso_destino_definir', 'aviso_destino_desligar', 'desfazer', 'sair_todos', 'aparelho_esquecer',
         'prosp_ligar', 'prosp_apagar_rascunho', 'prosp_numero_criar', 'prosp_numero_qr', 'prosp_numero_desconectar', 'prosp_numero_webhook', 'prosp_numero_teto', 'prosp_buscar_agora', 'prosp_leads_aprovar_todos', 'prosp_lead_nao_contatar', 'prosp_lead_devolver', 'prosp_exportar',
         'prosp_publico_buscar', 'prosp_publico_contatos_lote', 'prosp_publico_arquivar', 'prosp_creditos_teto_salvar', 'prosp_sugerir',
@@ -115,9 +120,10 @@ function conferirP12(nome, css, pagina) {
     if (/\.innerHTML\s*=/.test(s)) erro(`${arq}: use textContent (innerHTML deixa o texto do servidor virar código)`);
     // Sem Face ID (DEC-109, substitui a DEC-095): nada de passkey nem das ações dela na página.
     if (/navigator\.credentials|PublicKeyCredential|retomar_desafio|aparelho_desafio|aparelho_ativar/.test(s)) erro(`${arq}: a Central não usa mais Face ID (passkey); a entrada lembrada é pela lembrança do aparelho (DEC-109)`);
-    // Entrada da Central: e-mail + senha + código no Telegram. Nada de app autenticador, e nenhum endereço de e-mail
-    // escrito na página (o e-mail do administrador fica só no servidor).
-    if (/otpauth:|totp|base32|app Senhas/i.test(s)) erro(`${arq}: a Central não usa mais app autenticador (otpauth, TOTP ou "app Senhas" na página)`);
+    // Entrada da Central (rxsync-sistema DEC-180, substitui a DEC-062): e-mail + senha + código do app autenticador, conferido
+    // no servidor; o segredo e o link otpauth só chegam do servidor (totp_iniciar), nunca escritos na página. Nenhum
+    // endereço de e-mail escrito na página (o e-mail do administrador fica só no servidor).
+    if (/otpauth:\/\/|secret=/i.test(s)) erro(`${arq}: o link otpauth e o segredo do app autenticador só vêm do servidor (DEC-180)`);
     for (const m of s.matchAll(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi)) erro(`${arq}: tem um endereço de e-mail escrito na página (${m[0]}); ele fica só no servidor`);
   }
 }
@@ -487,6 +493,14 @@ if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não blo
     erro(`${f}: o caminho "${q.caminho}" não existe como toque ("${q.onde}" não está ali). Confira no painel ou na Central e corrija o texto (lista: scripts/caminhos_validos.json)`);
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
+// Os arquivos à parte do painel e da Central (rxsync-sistema DEC-178 e DEC-181): carregados só quando precisam, cada um até
+// 60 KB, sem innerHTML e sem eval; o service worker só pergunta os números (push_resumo) e nunca guarda a sessão.
+for (const arq of ['painel/app.js', 'painel/sw.js', 'painel/tour.js', 'central/sw.js'].filter(f => fs.existsSync(f))) {
+  const c = fs.readFileSync(arq, 'utf8');
+  if (Buffer.byteLength(c, 'utf8') > 60 * 1024) erro(`${arq}: passou de 60 KB (DEC-178)`);
+  if (/\.innerHTML\s*=|\beval\(|new Function\(/.test(c)) erro(`${arq}: sem innerHTML nem eval`);
+  if (/sw\.js$/.test(arq) && (/sessao|sessionStorage|localStorage/.test(c) || !/push_resumo/.test(c))) erro(`${arq}: o service worker só pergunta os números (push_resumo), sem a sessão (DEC-181)`);
+}
 // O /conectar no visual das outras páginas do molde F (rxsync-sistema #225, item 20): cabeçalho branco com a marca, sem
 // degradê nem sombra de cartão nas classes da página.
 // O cabeçalho das páginas da contratação é exatamente o mesmo (revisão do rxsync-sistema #225, item 20): branco (estilo só no

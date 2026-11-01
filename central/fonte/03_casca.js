@@ -8,7 +8,7 @@ const SECOES = [
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
-  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'O que passou pelo Telegram, sem o texto' },
+  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'agregados', nome: 'Agregados de pacientes', ic: 'agregados', grupo: 'Análise', chave: 'tela_agregados_pacientes', escondeDesligada: true, desc: 'Contagens e médias por clínica' },
   { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Marketing', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
   { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Marketing', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },

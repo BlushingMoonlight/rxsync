@@ -5,5 +5,5 @@ export const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io';
 export function cspCentral(html) {
   const h = re => 'sha256-' + crypto.createHash('sha256').update((html.match(re) || [, ''])[1], 'utf8').digest('base64');
   return `default-src 'none'; script-src '${h(/<script>([\s\S]*?)<\/script>/)}'; style-src '${h(/<style>([\s\S]*?)<\/style>/)}'; `
-    + `font-src 'self'; img-src 'self' data:; connect-src ${N8N}; manifest-src 'self'; base-uri 'none'; form-action 'none'`;
+    + `font-src 'self'; img-src 'self' data:; connect-src ${N8N}; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'`;   // worker-src: o service worker das notificações (central/sw.js, #225)
 }

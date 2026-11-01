@@ -32,7 +32,8 @@ TELAS.seguranca = async (c, [aba]) => {
   }
   const r = await chamar('sessoes'); if (falhou(c, r, 'Segurança')) return;
   const d = r.dados;
-  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas,
+  const [cApp, cNotif] = await Promise.all([cartaoApp(), cartaoNotificacoes().catch(() => null)]);   // #225 (DEC-180, DEC-181)
+  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cApp, cNotif,
     cartao('Aparelhos conectados', null, el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }), el('div', { class: 't2', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
       s.esta ? el('div', { class: 'direita' }, etq('este', 'ok')) : el('div', { class: 'direita' }, btn('Encerrar', async () => { const x = await chamar('encerrar_sessao', { id: s.id }); rapida(x.ok ? 'Sessão encerrada.' : (x.mensagem || 'Não consegui.')); rotear(); }, 'perigo-sec')))))),

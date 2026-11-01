@@ -58,6 +58,11 @@ export const IA_RESPOSTA = () => ({ ok: true, tokens_entrada: 3200, tokens_saida
     { id: 13, acao: 'teste_estender', resumo: 'Estender o teste da Clínica Sorriso em 7 dias', nivel: 3, nome_nivel3: 'Clínica Sorriso Odontologia Integrada', vence_em: daquiMin(30),
       antes: { clinica: 'Clínica Sorriso Odontologia Integrada', situacao: 'Ativo', plano: 'Essencial', ativo: true }, depois: { cliente_id: 'CLI-001', dias: 7, motivo: 'pedido da clínica' } }] });
 export const DADOS = {
+  // #225 (sql/082): a central de avisos com o texto, o app autenticador e as notificações.
+  avisos_ver: { avisos: [{ id: 7, recebido_em: '2026-10-31T10:00:00Z', categoria: 'alertas', tipo: 'whatsapp_caiu', cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', texto: '⚠️ WhatsApp DESCONECTADO (CLI-001). Reconecte em Conta › WhatsApp da clínica.', lido: false },
+    { id: 6, recebido_em: '2026-10-31T09:00:00Z', categoria: 'entradas', tipo: 'outro', cliente_id: '', texto: '🔐 Central RXSync: entrada de iPad · Safari (app).', lido: true }], nao_lidos: { alertas: 1 }, total_nao_lidos: 1 },
+  totp_estado: { ativo: false, recuperacao_restantes: 0 },
+  push_chave: { publica: '', inscrito: false },
   metricas: { dados: { mrr: { total: 5388, mensal: 4190, anual_parcelado: 599, anual_a_vista_mes: 599, regra: 'Clínicas contratadas e no ar; o anual à vista entra dividido por 12.' },
     pagantes_no_ar: 12, ticket_medio: 449, cancelamentos_mes: { clinicas: 1, receita_perdida: 299, regra: 'Clínicas contratadas com o cancelamento neste mês (o valor é o que ainda está no cadastro).' },
     conversao_teste_90d: { testes: 9, viraram_contrato: 4, percentual: 44.4, regra: 'Testes grátis começados nos últimos 90 dias e quantos viraram contrato.' }, dias_ate_go_live_90d: 6.5,
