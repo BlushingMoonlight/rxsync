@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xmMvd099v9IUIy2BYM4wmhZPnDD+wvhOuE6ziTLsRfQ=' 'self'; style-src 'sha256-Sg5m/5bIF+bMqS93h8XErRI3UKnB9TEs40vWr6MSrBo=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hsWrJkUuqVIJeLVVCp55UHcs+lpjyxSGUgUQH92MyxQ=' 'self'; style-src 'sha256-Sg5m/5bIF+bMqS93h8XErRI3UKnB9TEs40vWr6MSrBo=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -3664,6 +3664,7 @@ tela('conta', {
       linhaLink('Dados do contrato', 'Razão social, CNPJ e representante', 'conta/contrato', 'escudo'), ehDono() ? linhaLink('Baixar meus dados', 'A agenda e os pacientes em planilha', 'conta/dados', 'baixar') : null)),
     el('div', { class: 'bloco' }, el('h2', { text: 'Ajuda' }), el('div', { class: 'lista' },
       linhaLink('O que mudou no painel', 'Onde ficou cada coisa', 'conta/mudou', 'info'),
+      el('button', { class: 'linha', type: 'button', id: 'btnReverTour', onclick: () => { if (window.rxTour) window.rxTour.rever(); else rapida('Tente de novo em instantes.'); } }, el('span', { class: 'ic' }, icone('info')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Rever o tour' }), el('span', { class: 't2', text: 'As dicas de cada tela, de novo' }))),
       el('a', { class: 'linha', href: 'mailto:contato@rxsync.com.br' }, el('span', { class: 'ic' }, icone('chat')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Falar com a RXSync' }), el('span', { class: 't2', text: 'contato@rxsync.com.br' })), el('span', { class: 'seta' }, icone('seta'))),
       el('a', { class: 'linha', href: '/termos/' + VERSAO_TERMOS + '.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('documento')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Termos de Uso' })), el('span', { class: 'seta' }, icone('seta'))),
       el('a', { class: 'linha', href: '/privacidade.html', target: '_blank', rel: 'noopener' }, el('span', { class: 'ic' }, icone('escudo')), el('span', { class: 'tx' }, el('span', { class: 't1', text: 'Política de Privacidade' })), el('span', { class: 'seta' }, icone('seta')))))),
@@ -4040,10 +4041,10 @@ function abrirPainel(termos) {
     if (!sem('medicos')) medCarregar();
     faixasAtualizar(); estadoMostrar();
     rotear();
-    // Arquivos à parte (rxsync-sistema DEC-178), carregados só depois de abrir: instalar e notificações (app.js). Eles só
+    // Arquivos à parte (rxsync-sistema DEC-178), carregados só depois de abrir: instalar e notificações (app.js) e o tour (tour.js). Eles só
     // veem estas funções do painel.
     if (!window.rxPainel) { window.rxPainel = Object.freeze({ el, btn, c29, rapida, ir, comSessao: () => !!sessao, papel: () => PAPEL });
-      ['/painel/app.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); }); }
+      ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); }); }
   }).catch(() => { $('carregando').hidden = true; mostrarErro('Sem conexão. Confira a internet e abra o painel de novo.'); });
 }
 if (!token && !sessao) entradaAbrir();
