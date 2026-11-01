@@ -82,3 +82,13 @@ button, .btn, a.btn { min-height: var(--alvo); }
 .doc [data-cli] { color: var(--primaria); background: var(--primaria-suave); font-weight: 600; }
 .doc .pend { color: var(--texto-2); background: var(--superficie-2); }
 .sumario a:hover { color: var(--primaria); }
+
+/* Cabeçalho das páginas da contratação (contratar, onboarding e conectar; rxsync-sistema #225, item 20): o mesmo nas
+   três, branco, com o ícone e "RXSync". O verificar_site.mjs confere que as três usam exatamente esta marca. */
+.topo-f { position: sticky; top: 0; z-index: 20; background: var(--fundo); border-bottom: 1px solid var(--borda); }
+.topo-f-in { max-width: 48rem; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.topo-f-marca { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: 18px; color: var(--texto); text-decoration: none; }
+.topo-f-marca img { border-radius: 6px; }
+.topo-f-passo { font-size: 14px; color: var(--texto-2); text-align: right; }
+a.topo-f-passo { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
+a.topo-f-passo:hover { color: var(--primaria); }
