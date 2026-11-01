@@ -16,7 +16,7 @@ TELAS.financeiro = async c => {
         cartao('Pagantes', null, listaCli(d.pagantes, x => `${fmtReal(x.valor_no_mes)} · ${x.plano}`, 'cobranca')),
         cartao('Em teste', null, listaCli(d.testes, x => 'até ' + fmtData(x.fim_teste), 'cobranca', 'Nenhuma clínica em teste.'))),
       el('div', { class: 'grade-2 iguais' },
-        cartao('Aviso de atraso enviado', null, listaCli(d.aviso_atraso, x => 'desde ' + fmtData(x.desde), 'cobranca', 'Nenhum atraso.'), corpo(el('p', { class: 'mudo peq', text: 'Dias e valor do atraso vêm do Asaas e aparecem no resumo diário do Telegram.' }))),
+        cartao('Aviso de atraso enviado', null, listaCli(d.aviso_atraso, x => 'desde ' + fmtData(x.desde), 'cobranca', 'Nenhum atraso.'), corpo(el('p', { class: 'mudo peq', text: 'Dias e valor do atraso vêm do Asaas e aparecem no resumo diário, em Avisos.' }))),
         cartao('Suspensas', null, listaCli(d.suspensos, x => 'desde ' + fmtData(x.desde), 'geral', 'Nenhuma clínica suspensa.'))),
       cartao('Cancelamentos agendados', null, listaCli(d.cancelamentos, x => fmtData(x.em), 'geral', 'Nenhum cancelamento agendado.'))));
 };
@@ -118,7 +118,7 @@ TELAS.uso = async c => {
     })) : vazio())));
 };
 
-// A central de avisos (sql/082, DEC-179): o texto de cada aviso (o mesmo que ia ao Telegram), os não lidos em destaque,
+// A central de avisos (sql/082, DEC-179): o texto de cada aviso (o mesmo que antes ia ao Telegram), os não lidos em destaque,
 // a busca, marcar como lidos, apagar e "Mandar alerta de teste" (chega aqui, como notificação e por e-mail).
 TELAS.avisos = async (c, [cat]) => {
   topo('Avisos', [['Análise'], ['Avisos']]);

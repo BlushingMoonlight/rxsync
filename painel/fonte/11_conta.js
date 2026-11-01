@@ -57,7 +57,9 @@ function assinRender(a) {
   const sit = SIT[a.situacao] || SIT.em_dia, encerrada = a.situacao === 'cancelada' || a.situacao === 'teste_encerrado';
   const abertas = (a.abertas && a.abertas.length) ? a.abertas : (a.proxima ? [a.proxima] : []);
   const blocos = [el('div', { class: 'cartao pad bloco' }, el('div', { class: 'item-cab' }, el('div', { class: 'tx' }, el('p', { class: 'legenda', text: 'Sua assinatura RXSync' }), el('h2', { text: a.plano || '—' }),
-    el('p', { class: 'mudo', text: 'R$ ' + (a.valor || '—') + assinSufixo(a.forma) + ' · ' + assinForma(a.forma) })), etq(sit[0], sit[1])),
+    el('p', { class: 'mudo', text: 'R$ ' + (a.valor || '—') + assinSufixo(a.forma) + ' · ' + assinForma(a.forma) }),
+    // rxsync-sistema DEC-182: a Implantação completa e o ano de suporte no WhatsApp (o servidor manda quando a clínica tem).
+    a.implantacao_suporte_ate ? el('p', { class: 'mudo', text: 'Implantação completa: suporte no WhatsApp até ' + String(a.implantacao_suporte_ate).split('-').reverse().join('/') + '.' }) : null), etq(sit[0], sit[1])),
     a.cancelar_em ? aviso('atencao', 'Cancelamento agendado para ' + a.cancelar_em + '. Até lá tudo funciona normalmente.') : null,
     a.situacao === 'teste' ? el('p', { class: 'dica', text: a.trial_fim ? 'O teste grátis vai até ' + a.trial_fim + '. Nada é cobrado sem você confirmar.' : 'Os 7 dias grátis começam quando a assistente entrar no ar, depois que você conectar o WhatsApp.' }) : null,
     a.situacao === 'teste_encerrado' ? el('p', { class: 'dica', text: 'O teste terminou e a assistente está parada. Pague abaixo para ela voltar ao ar.' }) : null)];
@@ -67,13 +69,13 @@ function assinRender(a) {
   if (!abertas.length && a.proximo_vencimento) blocos.push(el('p', { class: 'mudo bloco', text: 'Próxima cobrança: ' + a.proximo_vencimento + '. O link chega por e-mail alguns dias antes.' }));
   if ((a.situacao === 'teste' || a.situacao === 'teste_encerrado') && !abertas.length && !a.cobranca_gerada) blocos.push(el('div', { class: 'cartao pad bloco' },
     el('p', { class: 'tit-bloco', text: a.situacao === 'teste' ? 'Gostou? Garanta a continuidade agora' : 'Quer reativar a assistente?' }),
-    el('p', { class: 'mudo', text: 'Geramos o pagamento do plano ' + (a.plano || '') + ' (R$ ' + (a.valor || '—') + assinSufixo(a.forma) + (a.forma === 'mensal' ? ', mais a taxa de implantação de R$ 999, uma única vez' : '') + '). ' + (a.situacao === 'teste' && a.trial_fim ? 'O primeiro vencimento fica para o fim do teste, ' + a.trial_fim + ', e a assistente segue sem interrupção.' : 'Assim que o pagamento for confirmado, a assistente volta ao ar.') }),
+    el('p', { class: 'mudo', text: 'Geramos o pagamento do plano ' + (a.plano || '') + ' (R$ ' + (a.valor || '—') + assinSufixo(a.forma) + (Number(String(a.valor_setup || '').replace(/\D/g, '')) > 0 ? ', mais a Implantação completa de R$ ' + a.valor_setup + ', uma única vez' : '') + '). ' + (a.situacao === 'teste' && a.trial_fim ? 'O primeiro vencimento fica para o fim do teste, ' + a.trial_fim + ', e a assistente segue sem interrupção.' : 'Assim que o pagamento for confirmado, a assistente volta ao ar.') }),
     el('div', { class: 'pilha' }, btn(a.situacao === 'teste' ? 'Quero continuar: gerar pagamento' : 'Pagar o teste agora', ev => assinAcao('assinatura_pagar_teste', {}, { titulo: 'Gerar o pagamento agora?', texto: 'Para continuar com a RXSync depois do teste.', botao: 'Gerar pagamento' }, ev.currentTarget), 'pri plena'))));
   if (a.historico && a.historico.length) blocos.push(el('h2', { class: 'tit-bloco', text: 'Histórico de cobranças' }), el('div', { class: 'lista bloco' }, a.historico.map(x => el('div', { class: 'linha' },
     el('span', { class: 'tx' }, el('span', { class: 't1', text: x.vencimento + ' · R$ ' + x.valor }), el('span', { class: 't2', text: (x.descricao ? x.descricao + ' · ' : '') + x.status + (x.pago_em ? ' em ' + x.pago_em : '') })),
     x.link ? el('a', { class: 'btn fant', href: x.link, target: '_blank', rel: 'noopener', text: x.aberta ? 'Pagar' : 'Recibo' }) : null))));
   else if (a.asaas_ok === false) blocos.push(el('p', { class: 'dica bloco', text: 'O histórico de cobranças aparece aqui depois da primeira cobrança.' }));
-  if (!encerrada && ASSIN_PRECOS[a.plano_chave]) blocos.push(el('h2', { class: 'tit-bloco', text: 'Mudar de plano' }), el('p', { class: 'dica bloco', text: 'O novo valor vale a partir da próxima cobrança em aberto. Sem nova taxa de implantação.' }),
+  if (!encerrada && ASSIN_PRECOS[a.plano_chave]) blocos.push(el('h2', { class: 'tit-bloco', text: 'Mudar de plano' }), el('p', { class: 'dica bloco', text: 'O novo valor vale a partir da próxima cobrança em aberto.' }),
     el('div', { class: 'duas-ipad bloco' }, ['essencial', 'gestao'].map(k => {
       const P = ASSIN_PRECOS[k], atual = k === a.plano_chave, bloqueado = a.cancelar_em || a.situacao === 'suspensa' || (a.forma !== 'mensal' && k === 'essencial');
       return el('div', { class: 'cartao pad bloco' + (atual ? ' selecionada' : '') }, el('p', { class: 'tit-bloco' }, P.nome, atual ? etq('Seu plano', 'marca') : null), el('p', { class: 'num', text: 'R$ ' + P[a.forma] + assinSufixo(a.forma) }),

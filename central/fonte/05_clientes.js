@@ -72,7 +72,7 @@ function formGrupo(x, grupo, valores, acao, titulo, aberto) {
     for (const k of chaves) { const novo = ins[k].value.trim(), velho = valores[k] == null ? '' : String(valores[k]); if (novo !== velho) { mudou[k] = novo; linhas.push([ROTULOS[k] || k, velho, novo]); } }
     if (!linhas.length) { rapida('Nada mudou.'); return; }
     await fazer(acao, { cliente_id: x.cliente_id, campos: mudou }, { titulo: titulo + ' · ' + x.nome, linhas, ok: 'Salvo.',
-      texto: grupo === 'empresa' ? 'Antes da primeira edição, o servidor guarda a cópia fixa do aceite. Esta edição não tem "desfazer".' : 'Fica no registro e avisa no Telegram (só os nomes dos campos).' });
+      texto: grupo === 'empresa' ? 'Antes da primeira edição, o servidor guarda a cópia fixa do aceite. Esta edição não tem "desfazer".' : 'Fica no registro e em Avisos (só os nomes dos campos).' });
   };
   return el('details', { class: 'grupo', open: aberto || null }, el('summary', { text: titulo }),
     el('div', { class: 'corpo-grupo' }, el('form', { onsubmit: enviar }, el('div', { class: 'form-2' }, chaves.map(campo)), el('button', { class: 'btn pri', type: 'submit', text: 'Salvar' }))));
@@ -212,7 +212,7 @@ function abaCobranca(c, x, pode) {
     if (editar) {
       acoes.push(btn('Data da próxima cobrança', () => fazer('cobranca_proxima_data', { cliente_id: x.cliente_id }, { titulo: 'Data da próxima cobrança', nome: x.nome,
         campos: [{ k: 'data', rot: 'Nova data', tipo: 'date', min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 60), obrig: true }, MOTIVO] })));
-      if (Number(x.valor_setup) > 0) acoes.push(btn('Isentar a implantação', () => fazer('implantacao_isentar', { cliente_id: x.cliente_id }, { titulo: 'Isentar a implantação de ' + x.nome, nome: x.nome,
+      if (Number(x.valor_setup) > 0) acoes.push(btn('Cancelar a cobrança da implantação', () => fazer('implantacao_isentar', { cliente_id: x.cliente_id }, { titulo: 'Isentar a implantação de ' + x.nome, nome: x.nome,
         linhas: [['Implantação', fmtReal(x.valor_setup), fmtReal(0)]], texto: 'Se a taxa está em aberto no Asaas, ela é cancelada (pela fila). Taxa já paga: estorno fica fora da Central.',
         campos: [MOTIVO, { k: 'combinado', rot: 'Como foi combinado com a clínica', longo: true, obrig: true, minimo: 5, erro: 'Escreva como foi combinado.' }] }), 'perigo-sec'));
     }
@@ -282,7 +282,10 @@ function abaRecursos(c, x) {
 // ---------- Cadastro: contato, assistente, configurações, onboarding e Dados protegidos
 function abaCadastro(c, x) {
   const comp = x.completa || null;
-  anexar(c, cartao('Contato', null, corpo(dados([['Razão social', x.razao_social], ['Representante', x.representante], ['E-mail', x.email], ['Telefone', x.telefone], ['Cidade', x.cidade], ['Sistema de gestão', x.sistema_gestao], ['Origem', x.origem]]))));
+  anexar(c, cartao('Contato', null, corpo(dados([['Razão social', x.razao_social], ['Representante', x.representante], ['E-mail', x.email], ['Telefone', x.telefone], ['Cidade', x.cidade], ['Sistema de gestão', x.sistema_gestao], ['Origem', x.origem],
+    // rxsync-sistema DEC-182 e DEC-183: a Implantação completa e o aceite dos e-mails de novidades.
+    ['Implantação completa', x.implantacao_completa === 'SIM' ? 'Sim' + (x.implantacao_suporte_ate ? ', suporte até ' + String(x.implantacao_suporte_ate).split('-').reverse().join('/') : '') : 'Não'],
+    ['E-mails de novidades', x.aceite_novidades === 'SIM' ? 'Aceitou' + (x.aceite_novidades_em ? ' em ' + String(x.aceite_novidades_em).slice(0, 10).split('-').reverse().join('/') : '') : 'Não aceitou']]))));
   const grupos = [];
   if (comp && ligada('editar_assistente')) grupos.push(formGrupo(x, 'assistente', comp.campos, 'cliente_editar_assistente', 'Assistente (o que o onboarding grava)'));
   if (comp && ligada('editar_configuracoes')) grupos.push(formGrupo(x, 'configuracoes', comp.campos, 'cliente_editar_configuracoes', 'Configurações'));
@@ -359,7 +362,7 @@ function menuAcoes(x) {
     if (x.ativo && !parada) item('Pausar a pedido da clínica', 'Cláusula 8.4: a assistente para; a mensalidade continua.', () => fazer('situacao_pausar', { cliente_id: x.cliente_id }, { titulo: 'Pausar a assistente de ' + x.nome, linhas: [['Assistente', 'atendendo', 'pausada']], ok: 'Pausada.' }));
     if (!x.ativo && !parada) item('Retomar o atendimento', 'A assistente volta a atender.', () => fazer('situacao_retomar', { cliente_id: x.cliente_id }, { titulo: 'Retomar a assistente de ' + x.nome, linhas: [['Assistente', 'pausada', 'atendendo']], ok: 'Retomada.' }));
     if (!parada) item('Suspender', 'Nível 3. Equipe: só volta pela Central. Inadimplência: volta ao pagar.', () => fazer('situacao_suspender', { cliente_id: x.cliente_id }, { titulo: 'Suspender ' + x.nome, nome: x.nome, botao: 'Suspender a clínica', ok: 'Suspensa.',
-      texto: 'A assistente para de atender os pacientes desta clínica na hora. O aviso vai para o Telegram (sem dados pessoais).', linhas: [['Situação', st, 'Suspenso'], ['Assistente', x.ativo ? 'atendendo' : 'parada', 'parada']],
+      texto: 'A assistente para de atender os pacientes desta clínica na hora. O aviso vai para Avisos (sem dados pessoais).', linhas: [['Situação', st, 'Suspenso'], ['Assistente', x.ativo ? 'atendendo' : 'parada', 'parada']],
       campos: [{ k: 'suspensao_motivo', rot: 'Por quê?', opcoes: [['equipe', 'Decisão da equipe (só volta pela Central)'], ['inadimplencia', 'Inadimplência (volta sozinha ao pagar)']] }, MOTIVO] }), true);
     if (!x.cancelar_em && st !== 'Cancelado') item('Agendar o cancelamento', 'Nível 3. No dia, o 31 cancela a assinatura e desconecta o WhatsApp.', () => fazer('cancelamento_agendar', { cliente_id: x.cliente_id }, { titulo: 'Agendar o cancelamento de ' + x.nome, nome: x.nome, botao: 'Agendar o cancelamento', ok: 'Cancelamento agendado.',
       texto: 'A clínica recebe um e-mail agora.', campos: [{ k: 'data', rot: 'Data', tipo: 'date', min: somaDias(hojeISO(), 1), obrig: true }, MOTIVO] }), true);
@@ -375,7 +378,7 @@ function menuAcoes(x) {
   // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.
   if (st !== 'Dados apagados') item('Enviar as conversas ao e-mail do cadastro', 'Nível 2. Só a pedido da clínica; o arquivo não passa pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
     titulo: 'Enviar as conversas de ' + x.nome, ok: 'Pedido na fila.',
-    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central, pelo banco nem pelo Telegram; o Telegram avisa quando sair ou se falhar.' }));
+    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central, pelo banco nem pelo Telegram; a Central avisa em Avisos quando sair ou se falhar.' }));
   if (ligada('editar_onboarding') && x.pode_reenviar_onboarding) item('Reenviar o onboarding', 'O workflow 21 manda o link novo em até 10 minutos.', () => fazer('reenviar_onboarding', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o onboarding de ' + x.nome, linhas: [['Link atual', 'vale', 'deixa de valer']] }));
   if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
     if (ehTesteCobranca(x)) item('Deixar de ser a clínica de teste da cobrança', 'As edições de dinheiro voltam a depender das chaves.', async () => {
@@ -383,7 +386,7 @@ function menuAcoes(x) {
       return r;
     });
     else item('Usar como clínica de teste da cobrança', 'Nível 3. Só uma clínica nova de teste, criada por você no contratar.html.', () => fazer('cobranca_teste_definir', { cliente_id: x.cliente_id }, { titulo: 'Clínica de teste da cobrança', nome: x.nome,
-      texto: 'Nela, plano, cobrança e situação mudam mesmo com as chaves desligadas. O servidor recusa clínica que já pagou ou que é cliente de verdade. Chega um aviso no Telegram.', ok: 'Clínica de teste da cobrança definida.',
+      texto: 'Nela, plano, cobrança e situação mudam mesmo com as chaves desligadas. O servidor recusa clínica que já pagou ou que é cliente de verdade. Chega um aviso em Avisos.', ok: 'Clínica de teste da cobrança definida.',
       depois: async () => { await carregarConfig(); await rotear(); } }), true);
   }
   const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-menu' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),

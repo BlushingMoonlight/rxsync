@@ -2,10 +2,10 @@
 const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
   chave: 'Chave mudada', chaves_padrao: 'Chaves padrão (sql/030)', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
   avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
-  codigo_pedido: 'Código pedido no Telegram', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código não saiu pelo Telegram', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
+  codigo_pedido: 'Código de entrada pedido', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código que não saiu por e-mail', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
   viu_dados_sensiveis: 'Viu os dados protegidos', edicao_empresa: 'Empresa editada', edicao_assistente: 'Assistente editada', edicao_configuracoes: 'Configurações editadas', edicao_recursos: 'Botões dos recursos editados',
   aviso_limitacao_franquia: 'Aviso de limitação da franquia', recurso_liberado: 'Recurso liberado', recurso_revogado: 'Liberação revogada', plano_trocado: 'Plano trocado', preco_especial: 'Preço especial',
-  cobranca_proxima_data: 'Próxima cobrança mudada', cobranca_vencimento: 'Vencimento mudado', implantacao_isentar: 'Implantação isenta', pagamento_receber_dinheiro: 'Recebido em dinheiro',
+  cobranca_proxima_data: 'Próxima cobrança mudada', cobranca_vencimento: 'Vencimento mudado', implantacao_isentar: 'Cobrança da implantação cancelada', pagamento_receber_dinheiro: 'Recebido em dinheiro',
   teste_estendido: 'Teste estendido', situacao_suspender: 'Suspensa', situacao_reativar: 'Reativada', situacao_pausar: 'Assistente pausada', situacao_retomar: 'Assistente retomada',
   cancelamento_agendar: 'Cancelamento agendado', cancelamento_desfazer: 'Cancelamento desfeito', link_reenviado: 'Link reenviado', token_painel_novo: 'Link novo do painel',
   cobranca_teste_cliente: 'Clínica de teste da cobrança', chave_api_limites: 'Limites da chave da API',
@@ -32,8 +32,8 @@ TELAS.seguranca = async (c, [aba]) => {
   }
   const r = await chamar('sessoes'); if (falhou(c, r, 'Segurança')) return;
   const d = r.dados;
-  const [cApp, cNotif] = await Promise.all([cartaoApp(), cartaoNotificacoes().catch(() => null)]);   // #225 (DEC-180, DEC-181)
-  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cApp, cNotif,
+  const cNotif = await cartaoNotificacoes().catch(() => null);   // #225 (DEC-181); o app autenticador saiu (DEC-186)
+  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cNotif,
     cartao('Aparelhos conectados', null, el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }), el('div', { class: 't2', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
       s.esta ? el('div', { class: 'direita' }, etq('este', 'ok')) : el('div', { class: 'direita' }, btn('Encerrar', async () => { const x = await chamar('encerrar_sessao', { id: s.id }); rapida(x.ok ? 'Sessão encerrada.' : (x.mensagem || 'Não consegui.')); rotear(); }, 'perigo-sec')))))),
@@ -43,13 +43,13 @@ TELAS.seguranca = async (c, [aba]) => {
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: a.nome + (d.aparelho_esta === a.id ? ' (este aparelho)' : '') }),
           el('div', { class: 't2', text: `lembrado ${fmtHora(a.criado_em)} · último uso ${fmtHora(a.ultimo_uso_em)} (${a.ultimo_nav || '?'}, IP ${a.ultimo_ip || '?'}) · vence ${fmtHora(a.vence_em)}` })),
         el('div', { class: 'direita' }, btn('Esquecer', async () => {
-          const v = await pedirAcao('aparelho_esquecer', { id: a.id }, { titulo: 'Esquecer ' + a.nome, texto: 'Este aparelho volta a entrar com a senha e o código. Chega um aviso no Telegram.', botao: 'Esquecer', perigo: true });
+          const v = await pedirAcao('aparelho_esquecer', { id: a.id }, { titulo: 'Esquecer ' + a.nome, texto: 'Este aparelho volta a entrar com a senha e o código. Chega um aviso em Avisos.', botao: 'Esquecer', perigo: true });
           if (!v) return; const x = await chamar('aparelho_esquecer', v); if (x.ok && d.aparelho_esta === a.id) lembrancaGuardar('');
           rapida(x.ok ? 'Aparelho esquecido.' : (x.mensagem || 'Não consegui.')); rotear();
         }, 'perigo-sec')))))) : corpo(el('p', { class: 'mudo', text: 'Nenhum aparelho lembrado.' }))),
       corpo(el('p', { class: 'mudo peq', text: `A sessão vale 8 horas, ou 30 minutos sem uso.${d.senha_trocada_em ? ' Senha criada ou trocada em ' + fmtHora(d.senha_trocada_em) + '.' : ''} Para trocar a senha, saia e toque em "Esqueci a senha".` }),
         btn('Sair de todos os aparelhos', async () => {
-          const v = await pedirAcao('sair_todos', {}, { titulo: 'Sair de todos os aparelhos', texto: 'Todas as sessões, inclusive esta, terminam agora, e nenhum aparelho fica lembrado. Chega um aviso no Telegram.', botao: 'Sair de todos', perigo: true });
+          const v = await pedirAcao('sair_todos', {}, { titulo: 'Sair de todos os aparelhos', texto: 'Todas as sessões, inclusive esta, terminam agora, e nenhum aparelho fica lembrado. Chega um aviso em Avisos.', botao: 'Sair de todos', perigo: true });
           if (!v) return; await chamar('sair_todos', v); lembrancaGuardar(''); guardarSessao(''); entrada('Você saiu de todos os aparelhos.');
         }, 'perigo-sec')))));
 };
@@ -101,7 +101,7 @@ const TEXTO_CHAVE = {
   prosp_disparo: 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.',
   prosp_busca: 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.',
   prosp_ia: 'A IA passa a responder os leads das campanhas com a IA ligada.',
-  demo_links: 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos no Telegram.',
+  demo_links: 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos em Avisos.',
   tela_assistente: 'As perguntas e o que as telas da Central mostram vão à OpenAI, sem o "nunca" (CPF, CNPJ, senhas, chaves, dados de pacientes e o texto das conversas; e-mails e telefones mascarados). Nada muda sem o seu Confirmar.',
   termos_v7: 'Os Termos v7 passam a valer para quem já é cliente, com os 30 dias do aviso contados de hoje. Desligar depois não volta a v6 nem muda a data.' };
 const ROTULO_CHAVE = { demo_links: 'os médicos passam a ver', tela_assistente: 'dados de clientes vão à OpenAI', termos_v7: 'não tem volta', prosp_disparo: 'manda ou gasta de verdade', prosp_busca: 'manda ou gasta de verdade', prosp_ia: 'manda ou gasta de verdade' };
@@ -122,7 +122,7 @@ async function mudarChave(chave, valor, desfazendo, pedido) {
   }
   if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); await rotear(); return; }
   est.chaves[chave] = r.depois; montarNav();
-  rapida(nome + (r.depois === 'SIM' ? ' ligada.' : ' desligada.') + ' Aviso no Telegram.', desfazendo || SEM_DESFAZER.includes(chave) ? null : () => mudarChave(chave, r.antes, true).then(() => rotear()));
+  rapida(nome + (r.depois === 'SIM' ? ' ligada.' : ' desligada.') + ' Aviso em Avisos.', desfazendo || SEM_DESFAZER.includes(chave) ? null : () => mudarChave(chave, r.antes, true).then(() => rotear()));
 }
 TELAS.ajustes = async c => {
   topo('Ajustes da Central', [['Administração'], ['Ajustes da Central']]);
@@ -156,7 +156,7 @@ TELAS.ajustes = async c => {
   const resto = todas.filter(k => !usadas.has(k.chave));
   const aparenciaSel = el('div', { class: 'filtros', role: 'radiogroup', 'aria-label': 'Aparência' }, [['claro', 'Clara'], ['escuro', 'Escura']].map(([v, t]) =>
     el('button', { type: 'button', role: 'radio', 'aria-checked': String(aparencia === v), 'aria-pressed': String(aparencia === v), onclick: () => { guardarAparencia(v); rotear(); } }, t)));
-  trocar(c, cabecalho('Ajustes da Central', 'um toque liga ou desliga; cada mudança vai para o registro e para o Telegram, com "Desfazer"'),
+  trocar(c, cabecalho('Ajustes da Central', 'um toque liga ou desliga; cada mudança vai para o registro e para Avisos, com "Desfazer"'),
     el('div', { class: 'pilha' }, ...blocos.filter(Boolean),
       resto.length ? cartao('Só por PR (SQL)', null, el('ul', { class: 'lista' }, resto.map(linhaChave))) : null,
       cartao('Aparência', null, corpo(el('p', { class: 'mudo peq', text: 'A clara é o padrão. A escolha fica só neste navegador.' }), aparenciaSel)),

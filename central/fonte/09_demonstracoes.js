@@ -177,13 +177,13 @@ async function dLink(c, id) {
   const linhaSimples = (t1, t2, dir) => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: t1 }), t2 ? el('div', { class: 't2', text: t2 }) : null), dir ? el('div', { class: 'direita' }, dir) : null));
   trocar(c, cabecalho(l.clinica, `DEM-${l.id} · ${l.tratamento} ${l.medico} · ${l.especialidade}`, etqDem(l.situacao)),
     el('div', { class: 'pilha' }, avisoLinksDesligados(),
-      novo ? el('div', { class: 'aviso info', role: 'status' }, icone('ok'), el('div', {}, el('b', { text: 'Link pronto. ' }), 'Copie a mensagem e mande pelo seu WhatsApp. O Telegram avisa quando o médico abrir.')) : null,
+      novo ? el('div', { class: 'aviso info', role: 'status' }, icone('ok'), el('div', {}, el('b', { text: 'Link pronto. ' }), 'Copie a mensagem e mande pelo seu WhatsApp. A Central avisa quando o médico abrir.')) : null,
       inativo ? el('div', { class: 'aviso atencao' }, icone('info'), el('div', { text: l.situacao === 'vencido' ? `Venceu em ${fmtData(l.valida_ate)}: quem abrir vê "não está mais ativo". Mude a validade em Editar.`
         : `Desativado em ${fmtData(l.desativada_em)}: quem abrir vê "não está mais ativo".` + (l.tentou_inativo_em ? ` Última tentativa de abrir: ${fmtHora(l.tentou_inativo_em)}.` : '') })) : null,
       cartao('Link', null, corpo(el('div', { class: 'segredo dem-endereco', text: l.endereco }),
         el('div', { class: 'acoes' }, btn('Copiar a mensagem', () => copiar(l.mensagem, 'Mensagem copiada. Cole no WhatsApp do médico.'), 'pri', 'copiar'), btn('Copiar o link', () => copiar(l.endereco, 'Link copiado.'), 'sec', 'link'),
           editar && !inativo ? (verAgora ? el('a', { class: 'btn sec', href: verAgora.endereco, target: '_blank', rel: 'noopener noreferrer' }, 'Abrir como o médico vê') : btn('Ver como o médico vê', ver, 'sec')) : null),
-        verAgora ? el('p', { class: 'mudo peq', text: 'Abre sem contar visita e sem avisar no Telegram. Vale 15 minutos.' }) : null,
+        verAgora ? el('p', { class: 'mudo peq', text: 'Abre sem contar visita e sem aviso. Vale 15 minutos.' }) : null,
         el('p', { class: 'rot-mensagem mudo peq', text: l.mensagem_editada ? 'Mensagem do WhatsApp (a sua):' : 'Mensagem do WhatsApp (a pronta; mude em Editar):' }),
         el('p', { class: 'dem-mensagem', text: l.mensagem }),
         editar ? el('div', { class: 'acoes' }, btn('Editar', () => irD('link', l.id, 'editar'), 'sec'),

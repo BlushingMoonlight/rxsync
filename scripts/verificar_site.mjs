@@ -94,9 +94,8 @@ function conferirP12(nome, css, pagina) {
           for (const m of t[0].replace(/\$\{[^}]*\}/g, '').matchAll(/[a-zà-ú]+\((?:s|es|ões|ns)\)/gi)) erro(`central/fonte/${f}: "${m[0]}" na tela; use pl(n, 'singular', 'plural')`);
     // Toda ação de edição tem nível no servidor (sql/030, sql/031 e sql/036, rx_central_niveis). Ação nova precisa entrar lá e aqui.
     // ligar_chave: um toque (DEC-066); as chaves do motor da prospecção sobem para 2 ou 3 ao ligar (rx_central, sql/031).
-    // Sem nível na rx_central_niveis, mas conferidas no servidor pela rx_central_extra (sql/082): totp_iniciar e
-    // totp_codigos_novos pedem a senha; avisos_apagar_lidos é nível 2.
-    const NIVEIS = { 1: ['totp_iniciar', 'totp_codigos_novos', 'cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
+    // Sem nível na rx_central_niveis, mas conferida no servidor pela rx_central_extra (sql/082): avisos_apagar_lidos é nível 2.
+    const NIVEIS = { 1: ['cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
         'prosp_campanha_salvar', 'prosp_conjunto_salvar', 'prosp_anuncio_salvar', 'prosp_duplicar', 'prosp_regra_salvar', 'prosp_regra_ligar', 'prosp_anotar', 'prosp_custos_salvar', 'prosp_relatorio_salvar', 'prosp_numero_situacao', 'prosp_lead_aprovar', 'prosp_lead_marcar', 'prosp_lead_assumir',
         'prosp_publico_salvar', 'prosp_publico_renomear', 'prosp_publico_duplicar', 'prosp_publico_contato_marcar',
         'dem_criar', 'dem_desativar', 'dem_reativar', 'dem_ver'],
@@ -120,10 +119,10 @@ function conferirP12(nome, css, pagina) {
     if (/\.innerHTML\s*=/.test(s)) erro(`${arq}: use textContent (innerHTML deixa o texto do servidor virar código)`);
     // Sem Face ID (DEC-109, substitui a DEC-095): nada de passkey nem das ações dela na página.
     if (/navigator\.credentials|PublicKeyCredential|retomar_desafio|aparelho_desafio|aparelho_ativar/.test(s)) erro(`${arq}: a Central não usa mais Face ID (passkey); a entrada lembrada é pela lembrança do aparelho (DEC-109)`);
-    // Entrada da Central (rxsync-sistema DEC-180, substitui a DEC-062): e-mail + senha + código do app autenticador, conferido
-    // no servidor; o segredo e o link otpauth só chegam do servidor (totp_iniciar), nunca escritos na página. Nenhum
-    // endereço de e-mail escrito na página (o e-mail do administrador fica só no servidor).
-    if (/otpauth:\/\/|secret=/i.test(s)) erro(`${arq}: o link otpauth e o segredo do app autenticador só vêm do servidor (DEC-180)`);
+    // Entrada da Central (rxsync-sistema DEC-186, substitui a DEC-180): e-mail + senha + o código de 6 dígitos que o servidor
+    // manda ao e-mail de cadastro. Sem app autenticador (nada das ações totp_* nem de códigos de recuperação na página) e
+    // nenhum endereço de e-mail escrito na página (o e-mail do administrador fica só no servidor).
+    if (/otpauth:\/\/|secret=|totp_|código de recuperação/i.test(s)) erro(`${arq}: a Central não usa mais app autenticador nem códigos de recuperação; o código de entrada chega no e-mail de cadastro (DEC-186)`);
     for (const m of s.matchAll(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/gi)) erro(`${arq}: tem um endereço de e-mail escrito na página (${m[0]}); ele fica só no servidor`);
   }
 }
@@ -283,9 +282,10 @@ for (const arq of ['painel/index.html']) {
   const planos = ['essencial', 'gestao'];
   const ler = f => fs.readFileSync(f, 'utf8');
   const confere = (f, achou, esperado, oque) => { if (String(achou) !== String(esperado)) erro(`${f}: ${oque} é ${achou}, mas o preço oficial é ${esperado} (scripts/precos_oficiais.json, rxsync-sistema#79)`); };
-  // Taxa de implantação: toda menção "R$ NNN de implantação" e o valor_setup do mensal.
-  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/R\$\s*([\d.]+)\s+de implantação/g)) confere(f, m[1], P.implantacao, 'a implantação');
-  confere('contratar.html', (ler('contratar.html').match(/valor_setup:\s*ciclo === 'mensal' \? '([\d.]+)'/) || [])[1], P.implantacao, 'o valor_setup do mensal');
+  // Implantação completa (rxsync-sistema DEC-182, opcional): toda menção "R$ NNN" junto de "Implantação completa" e o valor
+  // que a contratação manda quando a caixa vem marcada (const IMPLANTACAO).
+  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/Implantação completa[^<"]{0,80}?R\$\s*([\d.]+)/gi)) confere(f, m[1], P.implantacao, 'a Implantação completa');
+  confere('contratar.html', (ler('contratar.html').match(/const IMPLANTACAO = '([\d.]+)';/) || [])[1], P.implantacao, 'a Implantação completa (IMPLANTACAO)');
   // contratar.html: o objeto PLANOS.
   const c = ler('contratar.html');
   for (const k of planos) {
@@ -507,7 +507,7 @@ for (const arq of ['painel/app.js', 'painel/sw.js', 'painel/tour.js', 'central/s
 // assets/ancora/site.css), com o ícone rxsync-32 e "RXSync".
 { const MARCA = '<header class="topo-f">\n  <div class="topo-f-in">\n    <a href="/" class="topo-f-marca"><img src="/assets/icones/rxsync-32.png" width="28" height="28" alt="">RXSync</a>';
   const norm = s => s.replace(/\r/g, '').replace(/^[ \t]+/gm, m => ' '.repeat(m.length));
-  const PAGINAS_CONTRATACAO = ['onboarding.html', 'conectar.html'];
+  const PAGINAS_CONTRATACAO = ['contratar.html', 'onboarding.html', 'conectar.html'];
   for (const f of PAGINAS_CONTRATACAO) {
     const c = norm(fs.readFileSync(f, 'utf8'));
     const tira = c.replace(/^ +/gm, '');

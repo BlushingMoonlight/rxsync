@@ -9,8 +9,8 @@ import crypto from 'node:crypto'; import fs from 'node:fs';
 import { contextoCsp, regraDa, provarBloqueio, conferidor } from './csp_teste.mjs';
 import { META_CSP } from './csp.mjs';
 const { ok, semBloqueio, falhas } = conferidor();
-const DOCUMENTOS = [['privacidade.html', /Versão 2026-10-v19<\/strong> · Vigente a partir de 24 de outubro de 2026/],
-  ...[1, 2, 3, 4, 5, 6, 7].map(v => [`termos/2026-10-v${v}.html`, new RegExp(`Versão 2026-10-v${v}</strong>`)])];
+const DOCUMENTOS = [['privacidade.html', /Versão 2026-11-v20<\/strong> · Vigente a partir de 1 de novembro de 2026/],
+  ...[1, 2, 3, 4, 5, 6, 7].map(v => [`termos/2026-10-v${v}.html`, new RegExp(`Versão 2026-10-v${v}</strong>`)]), ['termos/2026-11-v8.html', /Versão 2026-11-v8<\/strong>/]];
 // O resumo (SHA-256) de cada Termos antigo antes da regra: o arquivo sem a linha da regra tem de dar o mesmo resumo.
 const ANTES = {
   '2026-10-v1': 'cd82f9d0e61096979e0b3b938dcccfa6e6369b5047b125e32be6eacc8f15e736',
@@ -38,7 +38,7 @@ for (const [arq, versao] of DOCUMENTOS) {
 await page.goto(site.base + '/contratar.html');
 await page.evaluate(() => { const p = (id, v) => { document.getElementById(id).value = v; }; p('nome', 'Maria Teste'); p('cpf', '529.982.247-25'); p('razao', 'Clínica Teste Ltda'); p('cnpj', '11.222.333/0001-81'); mostrar(4); });
 await page.frameLocator('#frameTermos').locator('[data-cli="rep"]').filter({ hasText: 'Maria Teste' }).waitFor({ state: 'attached' });
-ok(/2026-10-v7\.html$/.test(await page.locator('#frameTermos').getAttribute('src')), 'a contratação mostra os Termos v7 dentro da página, preenchidos');
+ok(/2026-11-v8\.html$/.test(await page.locator('#frameTermos').getAttribute('src')), 'a contratação mostra os Termos v8 dentro da página, preenchidos');
 await semBloqueio(page, 'os Termos v7 dentro da contratação');
 ok(!erros.length, 'sem erro de script nem aviso da regra no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await browser.close(); site.fechar();

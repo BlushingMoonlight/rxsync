@@ -190,7 +190,7 @@ function faixaMontar(id, f) {
   if (id === 'faixaTermos') {
     const ok = el('input', { type: 'checkbox', id: 'termosOk' });
     trocar(f, icone('documento'), el('div', { class: 'txt', role: 'region', 'aria-label': 'Termos de Uso atualizados' }, el('strong', { text: 'Os Termos de Uso mudaram (versão ' + VERSAO_TERMOS + '). ' }),
-      'Sai a promessa de backup diário (hoje a RXSync não mantém essa rotina), as medidas de segurança passam a ser descritas como funcionam hoje e o Resend passa a constar também como quem envia o histórico das conversas no fim do contrato e recebe os e-mails enviados à RXSync. Valem para a sua clínica a partir de ',
+      'A taxa de implantação deixa de ser obrigatória e vira o serviço opcional Implantação completa; a RXSync passa a ser identificada pelo nome RXSync Tecnologia e Automação em Saúde e pelo CNPJ; sai o Telegram da lista de suboperadores. Valem para a sua clínica a partir de ',
       el('span', { id: 'termosData', text: TERMOS.desde || '30 dias depois do aviso por e-mail' }), ', ou antes, se você aceitar agora. ', el('a', { href: '/termos/' + VERSAO_TERMOS + '.html', target: '_blank', rel: 'noopener', text: 'Ler os Termos' })),
       el('label', {}, ok, el('span', { text: 'Li e aceito os Termos de Uso, versão ' + VERSAO_TERMOS + '.' })),
       el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', id: 'btnTermosAceitar', text: 'Aceitar', onclick: e => termosAceitar(e.currentTarget) }),

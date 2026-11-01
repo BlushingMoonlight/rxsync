@@ -114,7 +114,7 @@ async function pInicio(c) {
   if (res.com_voce) att.push(['atencao', `${pl(res.com_voce, 'conversa', 'conversas')} com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
   const motor = res.motor || null;
   if (motor && motor.segurado) att.push(['critico', 'Disparo parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O'), null]);
-  if (res.avisos_na_fila) att.push(['info', `${pl(res.avisos_na_fila, 'aviso', 'avisos')} esperando o Telegram`, 'O workflow 54 manda a cada 5 minutos', null]);
+  if (res.avisos_na_fila) att.push(['info', `${pl(res.avisos_na_fila, 'aviso', 'avisos')} esperando o envio a Avisos`, 'O workflow 54 manda a cada 5 minutos', null]);
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
   const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
   const campanhas = d.campanhas || [];
@@ -166,7 +166,7 @@ const ESQUEMA = {
     // Texto inteiro do prompt (sql/041, DEC-096): vazio = o texto montado pelos campos acima. As regras fixas entram sempre.
     ['Prompt da IA (texto inteiro)', [['ia.prompt_texto', 'Texto do prompt (vazio = o montado pelos campos de "IA de resposta")', 'longo',
       { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]],
-    ['Avisos no Telegram (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
+    ['Avisos na Central (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
       ['ia.avisar.recusou', 'Recusou', 'simnao'], ['ia.avisar.saiu', 'Pediu para sair', 'simnao']]]],
   conjunto: [
     ['Públicos', [['publicos', 'Públicos que o conjunto usa (só do fuso da entrega)', 'publicos', { ajuda: 'até 10; pôr um público num conjunto ativo = nível 3' }]]],

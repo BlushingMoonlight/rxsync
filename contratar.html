@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KlQ2uu4mSCYKSj1n98IzVeON6thFPPvVZ8FuWHuzfCY=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jAC9x6g+ZUooYgKcPAZqVVCf4B2MpR8Va6anb9Nw/+Y=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -66,10 +66,11 @@
 </head>
 <body class="bg-slate-50 font-sans antialiased">
 
-<header class="bg-primary-900 text-white sticky top-0 z-20">
-  <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-    <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-    <a href="/#precos" id="voltarPlanos" class="text-xs text-white/70 hover:text-white">Voltar aos planos</a>
+<!-- Cabeçalho da contratação: o mesmo do onboarding e do conectar (estilo no assets/ancora/site.css; rxsync-sistema #225, item 20). -->
+<header class="topo-f">
+  <div class="topo-f-in">
+    <a href="/" class="topo-f-marca"><img src="/assets/icones/rxsync-32.png" width="28" height="28" alt="">RXSync</a>
+    <a href="/#precos" id="voltarPlanos" class="topo-f-passo">Voltar aos planos</a>
   </div>
 </header>
 
@@ -84,7 +85,7 @@
     <section class="etapa ativa bg-white rounded-2xl border border-slate-200 p-6" data-etapa="1">
       <p class="passo-de">Passo 1 de 5</p>
       <h2 class="text-lg font-bold text-primary-900 mb-1">Escolha o plano</h2>
-      <p class="text-slate-500 text-sm mb-5">Dá para mudar de plano depois, pelo painel, sem nova taxa de implantação.</p>
+      <p class="text-slate-500 text-sm mb-5">Dá para mudar de plano depois, pelo painel.</p>
       <div class="border border-slate-200 rounded-2xl overflow-hidden">
     <div class="px-5 pt-5">
       <div class="grid grid-cols-2 gap-2 mb-3">
@@ -105,7 +106,7 @@
       <div class="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <p id="precoPrincipal" class="text-3xl font-black leading-none">R$ 299<span class="text-base font-medium text-white/60">/mês</span></p>
-          <p id="precoDetalhe" class="text-sm text-white/70 mt-2">+ R$ 999 de implantação, uma única vez &middot; sem fidelidade</p>
+          <p id="precoDetalhe" class="text-sm text-white/70 mt-2">Sem fidelidade</p>
         </div>
         <span id="selo" class="hidden text-xs font-bold bg-emerald-500 text-white rounded-full px-3 py-1.5 shrink-0"></span>
       </div>
@@ -192,8 +193,8 @@
       <h2 class="text-lg font-bold text-primary-900 mb-1">Termos da contratação</h2>
       <p class="text-slate-500 text-sm mb-5">Leia antes de aceitar. Este é o contrato entre você e a RXSync, já preenchido com os seus dados.</p>
 
-      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-10-v7"></iframe></div>
-      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-10-v7</strong> · <a id="linkTermos" href="/termos/2026-10-v7.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
+      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-11-v8"></iframe></div>
+      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-11-v8</strong> · <a id="linkTermos" href="/termos/2026-11-v8.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
       <p class="text-xs text-slate-500 mb-5 -mt-3">Os dados deste cadastro são tratados pela RXSync conforme a <a href="/privacidade.html" target="_blank" rel="noopener" class="text-primary-600 underline">Política de Privacidade</a>.</p>
 
       <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
@@ -207,11 +208,22 @@
       <dl class="resumo-f mb-5" id="resumo"></dl>
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteTermos" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
-        <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-10-v7.</span>
+        <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-11-v8.</span>
       </label>
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteDpa" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
         <span class="text-sm text-slate-700">Li e aceito o <strong>Acordo de Tratamento de Dados Pessoais</strong> (Anexo II), na condição de controlador dos dados dos meus pacientes.</span>
+      </label>
+
+      <!-- rxsync-sistema DEC-182: a Implantação completa é opcional (desmarcada). DEC-183: o aceite dos e-mails de novidades é
+           separado dos Termos e desmarcado. -->
+      <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+        <input type="checkbox" id="querImplantacao" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
+        <span class="text-sm text-slate-700"><strong>Quero a Implantação completa</strong> (opcional, R$ 999, uma vez só). Fazemos as perguntas, configuramos a assistente com você, conectamos o WhatsApp, deixamos o painel pronto e damos 1 ano de suporte no WhatsApp para mudanças na configuração. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar.</span>
+      </label>
+      <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+        <input type="checkbox" id="aceiteNovidades" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
+        <span class="text-sm text-slate-700">Aceito receber e-mails com novidades e promoções <span class="text-slate-500">(opcional; você pode sair quando quiser)</span>.</span>
       </label>
 
       <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-5">
@@ -246,6 +258,7 @@
       </div>
       <p id="pagamentoDemorou" class="hidden text-sm text-slate-600">O link está demorando um pouco. Ele chega no seu e-mail em alguns minutos (confira também o spam).</p>
     </div>
+    <a id="linkOnboarding" href="#" class="hidden block text-center mt-6 bg-primary-900 hover:bg-primary-800 text-white font-bold py-3.5 rounded-xl max-w-md mx-auto">Configurar a assistente agora</a>
     <a href="/" class="inline-block mt-6 text-sm font-bold text-primary-700 underline">Voltar ao site</a>
   </section>
 </main>
@@ -263,6 +276,7 @@ const COBRAR_AGORA = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/
 
 // Depois da contratação paga: pergunta ao n8n (workflow 30) pelo link do Asaas até ele ficar pronto (~até 90 s).
 async function aguardarLink(clienteId, email) {
+  let chave = ''; try { chave = sessionStorage.getItem('rx_contratacao_chave') || ''; } catch (_) {}
   const box = document.getElementById('pagamentoBox');
   box.classList.remove('hidden');
   // Pede ao workflow 30 para criar a cobrança agora (se falhar, o 30 cria sozinho em até 15 minutos e manda por e-mail).
@@ -275,7 +289,7 @@ async function aguardarLink(clienteId, email) {
       const r = await fetch(LINK_PAGAMENTO, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE },
-        body: JSON.stringify({ cliente_id: clienteId, email })
+        body: JSON.stringify({ cliente_id: clienteId, email, chave })
       });
       const j = await r.json().catch(() => ({}));
       if (j && j.pronto && j.link) {
@@ -284,6 +298,7 @@ async function aguardarLink(clienteId, email) {
         document.getElementById('pagamentoLink').href = j.link;
         document.getElementById('pagamentoPronto').classList.remove('hidden');
         ev('link_pagamento_exibido', {});
+        esperarPagamento(clienteId, email, chave);
         return;
       }
       if (j && j.erro) {
@@ -293,6 +308,7 @@ async function aguardarLink(clienteId, email) {
         return;
       }
       if (j && j.pago) {
+        if (pagamentoConfirmado(j)) return;
         document.getElementById('pagamentoCarregando').classList.add('hidden');
         document.getElementById('pagamentoDemorou').textContent = 'Pagamento já confirmado. Confira o seu e-mail para o próximo passo.';
         document.getElementById('pagamentoDemorou').classList.remove('hidden');
@@ -303,7 +319,35 @@ async function aguardarLink(clienteId, email) {
   document.getElementById('pagamentoCarregando').classList.add('hidden');
   document.getElementById('pagamentoDemorou').classList.remove('hidden');
 }
-const VERSAO = '2026-10-v7';
+// Depois do "Pagar agora" (rxsync-sistema #225, item 15): continua perguntando a cada 5 s (até 30 minutos) e de novo
+// quando a pessoa volta para esta aba. Pago, a página mostra "Pagamento confirmado" e o botão para configurar.
+function pagamentoConfirmado(j) {
+  if (!j || !j.pago) return false;
+  document.getElementById('sucessoTitulo').textContent = 'Pagamento confirmado';
+  document.getElementById('sucessoTexto').textContent = j.link_onboarding ? 'Tudo certo. Agora é configurar a sua assistente.' : 'Tudo certo. O link para configurar a sua assistente chegou no seu e-mail.';
+  document.getElementById('pagamentoBox').classList.add('hidden');
+  const a = document.getElementById('linkOnboarding');
+  if (j.link_onboarding && /^https:\/\/rxsync\.com\.br\/onboarding\.html\?t=[A-Za-z0-9]+$/.test(j.link_onboarding)) { a.href = j.link_onboarding; a.classList.remove('hidden'); }
+  try { sessionStorage.removeItem('rx_contratacao_chave'); } catch (_) {}
+  ev('pagamento_confirmado_na_pagina', {});
+  return true;
+}
+function esperarPagamento(clienteId, email, chave) {
+  const inicio = Date.now(); let parar = false;
+  const perguntar = async () => {
+    if (parar || Date.now() - inicio > 30 * 60000 || document.visibilityState !== 'visible') return;
+    try {
+      const r = await fetch(LINK_PAGAMENTO, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-rxsync-origem': ORIGEM_CHAVE }, body: JSON.stringify({ cliente_id: clienteId, email, chave }) });
+      if (pagamentoConfirmado(await r.json())) parar = true;
+    } catch (e) { /* tenta de novo */ }
+  };
+  const t = setInterval(() => { if (parar) clearInterval(t); else perguntar(); }, 5000);
+  document.addEventListener('visibilitychange', perguntar);
+}
+const VERSAO = '2026-11-v8';
+// Implantação completa (rxsync-sistema DEC-182): o mesmo valor da tabela precos (scripts/precos_oficiais.json, chave implantacao).
+const IMPLANTACAO = '999';
+const querImplantacao = () => !!(document.getElementById('querImplantacao') || {}).checked;
 
 const PLANOS = {
   essencial: { nome:'Essencial', mensal:299, anual12:'269,10', anualTotal:'3.229,20', avista:'2.990,00',
@@ -380,24 +424,24 @@ function pintar() {
   const selo = document.getElementById('selo');
   if (ciclo === 'anual') {
     selo.classList.remove('hidden');
-    selo.textContent = forma === 'avista' ? 'Economia de 2 mensalidades' : 'Implantação isenta';
+    selo.textContent = forma === 'avista' ? 'Economia de 2 mensalidades' : '12 meses';
   } else { selo.classList.add('hidden'); }
 
   document.getElementById('notaUpgrade').textContent = (ciclo === 'mensal')
-    ? 'A implantação é cobrada uma única vez. Se depois você migrar de plano, não paga de novo. E você tem 7 dias para desistir sem custo.'
-    : 'A implantação é isenta no plano anual. Se depois você migrar de plano, não há nova cobrança. E você tem 7 dias para desistir sem custo.';
+    ? 'Se depois você migrar de plano, a diferença vale a partir da próxima cobrança. E você tem 7 dias para desistir sem custo.'
+    : 'Se depois você migrar de plano, a diferença vale a partir da próxima cobrança. E você tem 7 dias para desistir sem custo.';
 
   const pp = document.getElementById('precoPrincipal');
   const pd = document.getElementById('precoDetalhe');
   if (ciclo === 'mensal') {
     pp.innerHTML = 'R$ ' + P.mensal + '<span class="text-base font-medium text-white/60">/mês</span>';
-    pd.textContent = '+ R$ 999 de implantação, uma única vez · sem fidelidade';
+    pd.textContent = 'Sem fidelidade';
   } else if (forma === 'parcelado') {
     pp.innerHTML = '12x R$ ' + P.anual12 + '<span class="text-base font-medium text-white/60"> (R$ ' + P.anualTotal + ')</span>';
-    pd.textContent = 'Implantação isenta · permanência de 12 meses';
+    pd.textContent = 'Permanência de 12 meses';
   } else {
     pp.innerHTML = 'R$ ' + P.avista + '<span class="text-base font-medium text-white/60"> à vista</span>';
-    pd.textContent = 'Equivale a 10 mensalidades, com 12 meses de serviço · implantação isenta · permanência de 12 meses';
+    pd.textContent = 'Equivale a 10 mensalidades, com 12 meses de serviço · permanência de 12 meses';
   }
   const u = new URL(location);
   u.searchParams.set('plano', plano); u.searchParams.set('ciclo', ciclo);
@@ -583,9 +627,10 @@ function montarResumo() {
 
 function descricaoPlano() {
   const P = PLANOS[plano];
-  if (ciclo === 'mensal') return P.nome + ' — mensal, R$ ' + P.mensal + '/mês, com implantação de R$ 999';
-  if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$ ' + P.anual12 + ', implantação isenta';
-  return P.nome + ' — anual à vista de R$ ' + P.avista + ', implantação isenta';
+  const impl = querImplantacao() ? ', com a Implantação completa (R$ ' + IMPLANTACAO + ', uma vez só)' : '';
+  if (ciclo === 'mensal') return P.nome + ' — mensal, R$ ' + P.mensal + '/mês' + impl;
+  if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$ ' + P.anual12 + impl;
+  return P.nome + ' — anual à vista de R$ ' + P.avista + impl;
 }
 // Os termos aparecem preenchidos com os dados de quem contrata, mas os dados NUNCA vão no endereço da página (ficariam
 // nos registros do servidor e no histórico): a página dos termos abre limpa e esta página preenche os campos depois de
@@ -659,7 +704,10 @@ document.getElementById('form').addEventListener('submit', async evt => {
     ip_aceite: '',
     aceite_dpa: 'SIM',
     valor_mensal: ciclo === 'mensal' ? P.mensal : (forma === 'parcelado' ? P.anual12 : P.avista),
-    valor_setup: ciclo === 'mensal' ? '999' : '0',
+    valor_setup: querImplantacao() ? IMPLANTACAO : '0',
+    // rxsync-sistema DEC-182 e DEC-183 (sql/083): a Implantação completa (opcional) e o aceite dos e-mails de novidades.
+    implantacao_completa: querImplantacao(),
+    aceite_novidades: document.getElementById('aceiteNovidades').checked,
     data_golive: '',
     resp_tecnico_nome: '', resp_tecnico_conselho: '',
     numero_whatsapp: '', numero_reserva: '', sistema_gestao: '',
@@ -699,7 +747,10 @@ document.getElementById('form').addEventListener('submit', async evt => {
     }
     if (!r.ok) throw new Error();
     let clienteId = '';
-    try { clienteId = ((await r.json()) || {}).cliente_id || ''; } catch (_) {}
+    let chave = '';
+    try { const j = (await r.json()) || {}; clienteId = j.cliente_id || ''; chave = /^[0-9a-f]{48}$/.test(j.chave || '') ? j.chave : ''; } catch (_) {}
+    // A chave de uso único (rxsync-sistema sql/083) fica só nesta aba: com ela, depois do pagamento, o formulário abre aqui.
+    try { if (chave) sessionStorage.setItem('rx_contratacao_chave', chave); } catch (_) {}
     document.getElementById('form').classList.add('hidden');
     document.getElementById('progresso').classList.add('hidden');
     document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));

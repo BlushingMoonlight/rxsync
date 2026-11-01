@@ -3,7 +3,7 @@
 const BASE = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const EP = { e24: BASE + 'autoedicao', e29: BASE + 'painel-entrada', e13: BASE + 'assistente-dono', e12: BASE + 'integracao-agenda', e23: BASE + 'conectar', e32: BASE + 'pagamento-clinica' };
 const ORIGEM = 'rxsync-site-2026';
-const VERSAO_TERMOS = '2026-10-v7';
+const VERSAO_TERMOS = '2026-11-v8';
 
 // A página não abre dentro de outra.
 if (window.top !== window.self) { document.body.textContent = 'O painel não abre dentro de outra página.'; throw new Error('moldura'); }

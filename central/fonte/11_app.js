@@ -1,5 +1,5 @@
-// ---------------------------------------------------------------- app autenticador, notificações e instalar (#225, DEC-180 e DEC-181)
-// O código de entrada vem do app autenticador (app Senhas do iPad), conferido no banco. As notificações chegam sem
+// ---------------------------------------------------------------- notificações e instalar (#225, DEC-181)
+// O app autenticador saiu (DEC-186): o código de entrada chega no e-mail de cadastro. As notificações chegam sem
 // conteúdo: o service worker (central/sw.js) pergunta só os números (push_resumo) e mostra "Alertas: 1 aviso novo".
 const ehInstalado = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 const ehIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -27,41 +27,6 @@ function cartaoInstalar() {
     ehIOS() ? passosInstalar('a Central') : el('p', { class: 'mudo', text: 'No Chrome, use o menu do navegador e "Instalar app".' }),
     el('div', { class: 'acoes' }, btn('Agora não', () => { est.instalarDepois = true; box.remove(); }, 'fant'))));
   return box;
-}
-// Segurança: a entrada pelo app autenticador.
-async function cartaoApp() {
-  const r = await chamar('totp_estado');
-  const cx = corpo();
-  const mostrarCodigos = (codigos, msg) => trocar(cx, el('p', { class: 'mudo', text: msg }),
-    el('p', { class: 'tit-peq', text: 'Códigos de recuperação (cada um vale uma vez; guarde fora do iPad, em papel):' }),
-    el('ol', { class: 'codigos-rec' }, (codigos || []).map(k => el('li', { text: k }))),
-    el('div', { class: 'acoes' }, btn('Copiar os códigos', () => { navigator.clipboard && navigator.clipboard.writeText((codigos || []).join('\n')); rapida('Códigos copiados.'); }, 'sec'), btn('Já guardei', () => rotear(), 'pri')));
-  const pedirSenhaE = async (acao, titulo) => {
-    const v = await pedirAcao(acao, {}, { nivel: 1, titulo, campos: [{ k: 'senha', rot: 'Sua senha da Central', tipo: 'password' }], botao: 'Continuar' });
-    return v ? chamar(acao, { senha: v.senha }) : null;
-  };
-  if (r.ok && r.ativo) {
-    trocar(cx, el('p', { class: 'mudo', text: 'O código de entrada vem do app autenticador' + (r.ativado_em ? ' desde ' + fmtHora(r.ativado_em) : '') + '. Códigos de recuperação que ainda valem: ' + (r.recuperacao_restantes || 0) + '.' }),
-      el('div', { class: 'acoes' }, btn('Gerar códigos de recuperação novos', async () => { const x = await pedirSenhaE('totp_codigos_novos', 'Gerar códigos novos'); if (x && x.ok) mostrarCodigos(x.codigos, x.mensagem); else if (x) rapida(x.mensagem || 'Não consegui.'); }, 'sec')));
-  } else {
-    trocar(cx, el('p', { class: 'mudo', text: 'Hoje o código de entrada chega pelo Telegram. Ative o app autenticador (o app Senhas do iPad) e o código passa a vir dele.' }),
-      el('div', { class: 'acoes' }, btn('Ativar o app autenticador', async () => {
-        const x = await pedirSenhaE('totp_iniciar', 'Ativar o app autenticador'); if (!x) return; if (!x.ok) { rapida(x.mensagem || 'Não consegui.'); return; }
-        const codigo = el('input', { class: 'entrada codigo', type: 'text', inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: '6', 'aria-label': 'Código de 6 dígitos do app' });
-        const erro = el('p', { class: 'erro', role: 'alert' });
-        trocar(cx, el('ol', { class: 'passos-instalar' },
-            el('li', {}, 'Toque em ', el('a', { href: x.otpauth, text: 'Abrir no app Senhas' }), '. No iPad, o app Senhas abre e pergunta onde guardar o código de verificação; escolha "RXSync Central".'),
-            el('li', { text: 'Se o app não abrir, no app Senhas toque em "Códigos" › "+" e digite esta chave: ' + x.segredo }),
-            el('li', { text: 'Digite aqui o código de 6 dígitos que o app mostra.' })),
-          el('label', { class: 'campo' }, el('span', { class: 'rot', text: 'Código de 6 dígitos' }), codigo), erro,
-          el('div', { class: 'acoes' }, btn('Confirmar', async () => {
-            const y = await chamar('totp_ativar', { codigo: soDigitos(codigo.value) });
-            if (y.ok) mostrarCodigos(y.codigos, y.mensagem); else { erro.textContent = y.mensagem || 'Código errado. Confira no app e digite de novo.'; codigo.value = ''; codigo.focus(); }
-          }, 'pri')));
-        codigo.focus();
-      }, 'pri')));
-  }
-  return cartao('Entrada pelo app autenticador', null, cx);
 }
 // Segurança: notificações neste aparelho (só no app instalado; no iPad, iPadOS 16.4 ou mais novo).
 async function cartaoNotificacoes() {
