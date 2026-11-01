@@ -508,7 +508,7 @@ for (const arq of ['painel/app.js', 'painel/sw.js', 'painel/tour.js', 'central/s
 // assets/ancora/site.css), com o ícone rxsync-32 e "RXSync".
 { const MARCA = '<header class="topo-f">\n  <div class="topo-f-in">\n    <a href="/" class="topo-f-marca"><img src="/assets/icones/rxsync-32.png" width="28" height="28" alt="">RXSync</a>';
   const norm = s => s.replace(/\r/g, '').replace(/^[ \t]+/gm, m => ' '.repeat(m.length));
-  const PAGINAS_CONTRATACAO = ['onboarding.html', 'conectar.html'];
+  const PAGINAS_CONTRATACAO = ['contratar.html', 'onboarding.html', 'conectar.html'];
   for (const f of PAGINAS_CONTRATACAO) {
     const c = norm(fs.readFileSync(f, 'utf8'));
     const tira = c.replace(/^ +/gm, '');
