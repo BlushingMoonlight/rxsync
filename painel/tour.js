@@ -25,7 +25,7 @@
   };
   // O estilo do tour fica num arquivo à parte (painel/tour.css), para o painel caber em 400 KB.
   document.head.append(el('link', { rel: 'stylesheet', href: '/painel/tour.css' }));
-  let estado = null, aberto = null;
+  let estado = null, aberto = null, hojeAdiado = false;
   const tela = () => (location.hash.slice(1) || 'hoje').split('?')[0];
   const visivel = s => [...document.querySelectorAll(s)].find(e => e.offsetParent !== null && e.getBoundingClientRect().height > 0);
   function fechar() { if (!aberto) return; aberto.caixa.remove(); if (aberto.alvo) aberto.alvo.classList.remove('tour-alvo'); aberto = null; }
@@ -46,6 +46,9 @@
         btn('Pular', () => { marcar('*', 'pulado'); fechar(); }, 'fant')));
     caixa.addEventListener('keydown', e => { if (e.key === 'Escape') { marcar(t, 'depois'); fechar(); } });
     document.body.append(caixa); aberto = { caixa, alvo };
+    // O cartão nunca cobre a área apontada: se cobrir, vai para o alto da tela (auditoria de 01/11/2026, FD-01).
+    setTimeout(() => { if (!aberto || aberto.caixa !== caixa) return; const r = alvo.getBoundingClientRect(), c = caixa.getBoundingClientRect();
+      caixa.classList.toggle('em-cima', r.bottom > c.top && r.top < c.bottom); }, 450);
     caixa.querySelector('button').focus({ preventScroll: true });
   }
   function talvez() {
@@ -53,6 +56,9 @@
     const t = tela();
     if (!estado || estado['*'] === 'pulado' || !PASSOS[t] || estado[t] === 'visto') return;
     if (estado[t] === 'depois') { estado = Object.assign({}, estado); delete estado[t]; return; }   // "Ver depois": nesta abertura, não
+    // Hoje com o cartão de estado (falta conectar, teste, pagar): a primeira vista é dele; o tour de Hoje fica para a próxima
+    // vez que Hoje abrir (FD-01).
+    if (t === 'hoje' && !hojeAdiado && document.getElementById('hojeEstado')) { hojeAdiado = true; return; }
     setTimeout(() => { if (tela() === t) mostrar(t, 0); }, 600);   // espera a tela montar
   }
   window.rxTour = Object.freeze({ rever: () => { c29('tour_marcar', { tela: '*', estado: 'rever' }).catch(() => {}); estado = {}; location.hash = 'hoje'; setTimeout(talvez, 50); } });

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-jAC9x6g+ZUooYgKcPAZqVVCf4B2MpR8Va6anb9Nw/+Y=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-RFhRkSS1wRJiDuwKF8Y/2EXmNMRrM0Ud2mGzM3oLoXg=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -118,6 +118,12 @@
       <p id="notaUpgrade" class="text-xs text-slate-500 mt-4 pt-4 border-t border-slate-200"></p>
     </div>
       </div>
+      <!-- rxsync-sistema DEC-182: a Implantação completa é opcional (desmarcada). Fica no passo do plano, porque muda o que
+           se paga (auditoria de 01/11/2026, FD-33); o preço acima e o "Confira suas respostas" mostram quando marcada. -->
+      <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mt-4 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
+        <input type="checkbox" id="querImplantacao" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
+        <span class="text-sm text-slate-700"><strong>Quero a Implantação completa</strong> (opcional, R$ 999, uma vez só). Fazemos as perguntas, configuramos a assistente com você, conectamos o WhatsApp, deixamos o painel pronto e damos 1 ano de suporte no WhatsApp para mudanças na configuração. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar.</span>
+      </label>
       <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
     </section>
 
@@ -215,12 +221,7 @@
         <span class="text-sm text-slate-700">Li e aceito o <strong>Acordo de Tratamento de Dados Pessoais</strong> (Anexo II), na condição de controlador dos dados dos meus pacientes.</span>
       </label>
 
-      <!-- rxsync-sistema DEC-182: a Implantação completa é opcional (desmarcada). DEC-183: o aceite dos e-mails de novidades é
-           separado dos Termos e desmarcado. -->
-      <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
-        <input type="checkbox" id="querImplantacao" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
-        <span class="text-sm text-slate-700"><strong>Quero a Implantação completa</strong> (opcional, R$ 999, uma vez só). Fazemos as perguntas, configuramos a assistente com você, conectamos o WhatsApp, deixamos o painel pronto e damos 1 ano de suporte no WhatsApp para mudanças na configuração. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar.</span>
-      </label>
+      <!-- rxsync-sistema DEC-183: o aceite dos e-mails de novidades é separado dos Termos e desmarcado. -->
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteNovidades" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
         <span class="text-sm text-slate-700">Aceito receber e-mails com novidades e promoções <span class="text-slate-500">(opcional; você pode sair quando quiser)</span>.</span>
@@ -443,11 +444,13 @@ function pintar() {
     pp.innerHTML = 'R$ ' + P.avista + '<span class="text-base font-medium text-white/60"> à vista</span>';
     pd.textContent = 'Equivale a 10 mensalidades, com 12 meses de serviço · permanência de 12 meses';
   }
+  if (querImplantacao()) pd.textContent += ' · + R$ ' + IMPLANTACAO + ' da Implantação completa, uma vez só';
   const u = new URL(location);
   u.searchParams.set('plano', plano); u.searchParams.set('ciclo', ciclo);
   history.replaceState(null, '', u);
 }
 document.querySelectorAll('.btnPlano').forEach(b => b.onclick = () => { plano = b.dataset.plano; pintar(); });
+document.getElementById('querImplantacao').addEventListener('change', () => pintar());
 document.querySelectorAll('.btnCiclo').forEach(b => b.onclick = () => { ciclo = b.dataset.ciclo; pintar(); });
 document.querySelectorAll('.btnForma').forEach(b => b.onclick = () => { forma = b.dataset.forma; pintar(); });
 
@@ -612,7 +615,7 @@ document.querySelectorAll('.voltar').forEach(b => b.onclick = () => mostrar(etap
 // Confira suas respostas (molde F): o que a pessoa escolheu e digitou, com "Alterar" que volta ao passo. Só texto.
 function montarResumo() {
   const v = id => (document.getElementById(id).value || '').trim();
-  const linhas = [['Plano', descricaoPlano(), 1], ['Seu nome', v('nome'), 2], ['Clínica', v('clinica'), 2], ['E-mail', v('email'), 2], ['WhatsApp', v('whatsapp'), 2],
+  const linhas = [['Plano', descricaoPlano(true), 1], ['Implantação completa', querImplantacao() ? 'Sim, R$ ' + IMPLANTACAO + ', uma vez só' : 'Não', 1], ['Seu nome', v('nome'), 2], ['Clínica', v('clinica'), 2], ['E-mail', v('email'), 2], ['WhatsApp', v('whatsapp'), 2],
     tipo === 'pj' ? ['Empresa', v('razao') + ' · CNPJ ' + v('cnpj'), 3] : ['Titular', (v('titular') || v('nome')), 3],
     ['Endereço', enderecoCompleto(), 3], [tipo === 'pj' ? 'CPF de quem contrata' : 'CPF', v('cpf'), 3]];
   const dl = document.getElementById('resumo'); dl.replaceChildren();
@@ -625,9 +628,9 @@ function montarResumo() {
   });
 }
 
-function descricaoPlano() {
+function descricaoPlano(semImplantacao) {
   const P = PLANOS[plano];
-  const impl = querImplantacao() ? ', com a Implantação completa (R$ ' + IMPLANTACAO + ', uma vez só)' : '';
+  const impl = !semImplantacao && querImplantacao() ? ', com a Implantação completa (R$ ' + IMPLANTACAO + ', uma vez só)' : '';
   if (ciclo === 'mensal') return P.nome + ' — mensal, R$ ' + P.mensal + '/mês' + impl;
   if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$ ' + P.anual12 + impl;
   return P.nome + ' — anual à vista de R$ ' + P.avista + impl;

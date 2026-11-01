@@ -29,15 +29,19 @@ function hojeRender() {
       e.acao[1] === 'conta/whatsapp' ? btn(TESTE.aberto ? 'Testar de novo' : 'Testar a assistente', () => testar(false), 'sec') : null) : null));
   if (CONTA.cancelar_em) blocos.push(aviso('atencao', 'Cancelamento agendado para ' + CONTA.cancelar_em + '. Até lá tudo funciona normalmente. ', ehDono() ? el('button', { class: 'link', type: 'button', 'data-ir': 'conta/assinatura', text: 'Desistir do cancelamento' }) : null));
   // primeiros passos: cada um marcado pelo que o servidor já manda; some quando tudo estiver feito
-  const passos = [['WhatsApp conectado', CONTA.no_ar !== false && CONTA.situacao !== 'teste_aguardando', 'conta/whatsapp'],
+  // Instalar e notificações (painel/app.js, DEC-178): uma linha nos primeiros passos ou, depois deles, um bloco no fim de
+  // Hoje; nunca um cartão no alto (auditoria de 01/11/2026, FD-01). O WhatsApp não se repete quando o cartão de estado já diz.
+  const appBox = el('div', { class: 'lista', id: 'appCartao' }), zapNoEstado = !!(e.cartao && e.acao && e.acao[1] === 'conta/whatsapp');
+  const passos = [zapNoEstado ? null : ['WhatsApp conectado', CONTA.no_ar !== false && CONTA.situacao !== 'teste_aguardando', 'conta/whatsapp'],
     ['Mande "oi" do seu celular para o WhatsApp da clínica e veja a assistente responder', !!(HOJE.ind && HOJE.ind.atual && HOJE.ind.atual.conversas > 0), null],
     ['Horários de atendimento conferidos', (GRADE.dados || []).length > 0 || MED.modo, 'agenda/horarios/grade'],
-    ['Lembretes de consulta ligados', lembretesLigados(), 'assistente/automaticas']];
-  if (passos.some(p => !p[1]) && (CONTA.situacao === 'em_teste' || CONTA.situacao === 'teste_aguardando' || CONTA.no_ar === false || (HOJE.ind && HOJE.ind.atual && !HOJE.ind.atual.conversas)))
+    ['Lembretes de consulta ligados', lembretesLigados(), 'assistente/automaticas']].filter(Boolean);
+  const comPassos = passos.some(p => !p[1]) && (CONTA.situacao === 'em_teste' || CONTA.situacao === 'teste_aguardando' || CONTA.no_ar === false || (HOJE.ind && HOJE.ind.atual && !HOJE.ind.atual.conversas));
+  if (comPassos)
     blocos.push(el('div', { class: 'bloco passos-ini', id: 'hojePassos' }, el('h2', { text: 'Primeiros passos' }), el('div', { class: 'lista' }, passos.map(([t, feito, rota]) =>
       el(rota && !feito ? 'button' : 'div', { class: 'linha', type: rota && !feito ? 'button' : null, 'data-ir': rota && !feito ? rota : null },
         el('span', { class: 'ic' + (feito ? ' feito' : '') }, icone(feito ? 'ok' : 'relogio')), el('span', { class: 'tx' }, el('span', { class: 't1', text: t }), el('span', { class: 't2', text: feito ? 'Feito' : 'A fazer' })),
-        rota && !feito ? el('span', { class: 'seta' }, icone('seta')) : null)))));
+        rota && !feito ? el('span', { class: 'seta' }, icone('seta')) : null))), appBox));
   // precisa de você: as não vistas, as não pagas e os documentos
   const novos = agGrupos().novos.length, np = (HOJE.naoPagas || []).length;
   const precisa = (HOJE.chamados || []).map(chamadoLinha);
@@ -57,9 +61,10 @@ function hojeRender() {
     el('div', { class: 'pilha' }, btn('Ver resultados', () => ir('resultados'), 'sec', 'grafico')));
   const colLado = [numeros, sem('assistente_dono') && !HOJE.semGestaoFechado && ehDono() ? el('div', { class: 'cartao pad bloco' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'selo-plano', text: 'Gestão' }), 'Assistente de gestão'),
     el('p', { class: 'mudo', text: 'Pergunte sobre a agenda e peça mudanças pelo painel ou pelo seu WhatsApp, sem abrir o painel. Faz parte do plano Gestão Inteligente.' }),
-    el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null];
-  trocar(box, el('div', { id: 'appCartao' }), blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
-  if (window.rxApp) window.rxApp.hoje($('appCartao'));   // instalar e notificações (painel/app.js, DEC-178)
+    el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null,
+    comPassos ? null : el('div', { class: 'bloco', id: 'appBloco', hidden: true }, el('h2', { text: 'Neste aparelho' }), appBox)];
+  trocar(box, blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
+  if (window.rxApp) window.rxApp.hoje(appBox);   // instalar e notificações (painel/app.js, DEC-178)
 }
 // Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, quando a assistente volta, "Abrir no WhatsApp" e "Resolvido".
 function chamadoLinha(ch) {

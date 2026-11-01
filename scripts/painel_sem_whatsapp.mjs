@@ -40,6 +40,18 @@ const cartao = page.locator('#hojeEstado');
 await cartao.waitFor();
 ok((await cartao.textContent()).includes('Falta conectar o WhatsApp'), 'Hoje: "Falta conectar o WhatsApp"');
 ok(await cartao.getByRole('button', { name: 'Conectar' }).count() === 1 && await cartao.getByRole('button', { name: 'Testar a assistente' }).count() === 1, 'Hoje: "Conectar" (principal) e "Testar a assistente"');
+// Auditoria de 01/11/2026, FD-01 e FD-02: nada empilhado no alto de Hoje. O WhatsApp não se repete nos primeiros passos, o
+// instalar é uma linha dos primeiros passos (abre a folha com o passo a passo) e "Agora não" vale 30 dias neste aparelho.
+await page.locator('#hojePassos #appInstalar').waitFor();
+ok(!(await page.locator('#hojePassos').textContent()).includes('WhatsApp conectado'), 'Hoje: os primeiros passos não repetem "WhatsApp conectado" do cartão de estado');
+ok(await page.evaluate(() => { const c = document.getElementById('hojeCorpo').firstElementChild; return !!c && c.id === 'hojeEstado'; }), 'Hoje: o cartão de estado é o primeiro (nenhum cartão de instalar acima dele)');
+await page.locator('#appInstalar').click();
+await page.locator('#appFolha', { hasText: 'Adicionar à Tela de Início' }).or(page.locator('#appFolha', { hasText: 'Instalar app' })).first().waitFor();
+await page.locator('#appFolha').getByRole('button', { name: 'Agora não' }).click();
+await page.waitForTimeout(200);
+ok(!(await page.locator('#appInstalar').count()) && await page.evaluate(() => Number(localStorage.getItem('rx_app_depois')) > 0), '"Agora não" tira a linha e guarda a data no aparelho (30 dias)');
+await page.reload(); await page.locator('#hojeEstado').waitFor(); await page.waitForTimeout(800);
+ok(!(await page.locator('#appInstalar').count()), 'depois do "Agora não", ao abrir de novo, a linha de instalar não volta');
 await cartao.getByRole('button', { name: 'Testar a assistente' }).click();
 const folha = page.getByRole('dialog');
 await folha.getByText('Ela começa a atender os pacientes quando você conectar o WhatsApp.').waitFor();

@@ -212,8 +212,8 @@ function abaCobranca(c, x, pode) {
     if (editar) {
       acoes.push(btn('Data da próxima cobrança', () => fazer('cobranca_proxima_data', { cliente_id: x.cliente_id }, { titulo: 'Data da próxima cobrança', nome: x.nome,
         campos: [{ k: 'data', rot: 'Nova data', tipo: 'date', min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 60), obrig: true }, MOTIVO] })));
-      if (Number(x.valor_setup) > 0) acoes.push(btn('Cancelar a cobrança da implantação', () => fazer('implantacao_isentar', { cliente_id: x.cliente_id }, { titulo: 'Isentar a implantação de ' + x.nome, nome: x.nome,
-        linhas: [['Implantação', fmtReal(x.valor_setup), fmtReal(0)]], texto: 'Se a taxa está em aberto no Asaas, ela é cancelada (pela fila). Taxa já paga: estorno fica fora da Central.',
+      if (Number(x.valor_setup) > 0) acoes.push(btn('Cancelar a cobrança da implantação', () => fazer('implantacao_isentar', { cliente_id: x.cliente_id }, { titulo: 'Cancelar a cobrança da implantação de ' + x.nome, nome: x.nome,
+        linhas: [['Implantação completa', fmtReal(x.valor_setup), fmtReal(0)]], texto: 'Se a cobrança da Implantação completa está em aberto no Asaas, ela é cancelada (pela fila). Já paga: o estorno fica fora da Central.',
         campos: [MOTIVO, { k: 'combinado', rot: 'Como foi combinado com a clínica', longo: true, obrig: true, minimo: 5, erro: 'Escreva como foi combinado.' }] }), 'perigo-sec'));
     }
     anexar(c, cartao('Cobranças no Asaas', foto ? el('span', { class: 'mudo peq', text: 'foto de ' + fmtHora(foto.tirada_em) }) : null, lista, acoes.length ? corpo(el('div', { class: 'acoes' }, acoes)) : null));
@@ -378,7 +378,7 @@ function menuAcoes(x) {
   // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.
   if (st !== 'Dados apagados') item('Enviar as conversas ao e-mail do cadastro', 'Nível 2. Só a pedido da clínica; o arquivo não passa pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
     titulo: 'Enviar as conversas de ' + x.nome, ok: 'Pedido na fila.',
-    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central, pelo banco nem pelo Telegram; a Central avisa em Avisos quando sair ou se falhar.' }));
+    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central nem pelo banco; a Central avisa em Avisos quando sair ou se falhar.' }));
   if (ligada('editar_onboarding') && x.pode_reenviar_onboarding) item('Reenviar o onboarding', 'O workflow 21 manda o link novo em até 10 minutos.', () => fazer('reenviar_onboarding', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o onboarding de ' + x.nome, linhas: [['Link atual', 'vale', 'deixa de valer']] }));
   if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
     if (ehTesteCobranca(x)) item('Deixar de ser a clínica de teste da cobrança', 'As edições de dinheiro voltam a depender das chaves.', async () => {

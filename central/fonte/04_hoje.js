@@ -8,13 +8,20 @@ const TIPOS = {
   assistente_dono_falhou: 'Assistente do dono falhou', whatsapp_caiu: 'WhatsApp desconectado', whatsapp_voltou: 'WhatsApp reconectado', aviso_evento_nao_entregue: 'Aviso de evento não entregue',
   mini_teste_teto: 'Mini teste no teto', copia_n8n_parada: 'Cópia do n8n parada',
   cobranca_criada: 'Cobrança criada', cobranca_faltam_dados: 'Cobrança: faltam dados', cobranca_incompleta: 'Cobrança pela metade', pagamento_confirmado: 'Pagamento confirmado',
-  mensalidade_recebida: 'Mensalidade recebida', taxa_recebida: 'Taxa de implantação recebida', atraso_na_implantacao: 'Atraso (ainda em implantação)', pagamento_atrasado: 'Pagamento atrasado',
+  mensalidade_recebida: 'Mensalidade recebida', taxa_recebida: 'Implantação completa recebida', atraso_na_implantacao: 'Atraso (ainda em implantação)', pagamento_atrasado: 'Pagamento atrasado',
   pagamento_nao_identificado: 'Pagamento não identificado', nota_fiscal_erro: 'Erro na nota fiscal', reativado_apos_atraso: 'Pagou o atraso', valor_divergente: 'Valor diferente do esperado',
   aviso_suspensao: 'Aviso de suspensão', suspenso: 'Suspenso', reativado: 'Reativado', atraso_30_dias: '30 dias sem pagamento', contrato_encerrado: 'Contrato encerrado',
   valor_atualizado: 'Valor atualizado', resumo_do_dia: 'Resumo do dia', troca_de_plano: 'Troca de plano', teste_encerrado_pelo_cliente: 'Teste encerrado pelo cliente',
   pedido_cancelamento: 'Pedido de cancelamento', cancelamento_agendado: 'Cancelamento agendado', cancelamento_desfeito: 'Desistiu do cancelamento', teste_quer_pagar: 'Teste quer pagar', pedido_assinatura: 'Pedido sobre a assinatura',
   ajuda_agenda: 'Pedido de ajuda com a agenda', email_recebido: 'E-mail recebido', painel_movimento: 'Movimento no painel',
   exclusao_amanha: 'Dados serão apagados amanhã', exclusao_falhou: 'Falha ao apagar dados', dados_apagados: 'Dados apagados', outro: 'Outro aviso',
+  // Os tipos que o workflow 02 grava e ainda não tinham nome (auditoria de 01/11/2026, FD-25; o central_avisos_app.mjs confere a lista).
+  deploy_recusado: 'Aplicar SQL: pedido recusado', github_recusado: 'Aviso do GitHub recusado', deploy_sem_prova: 'Aplicar SQL sem a prova do GitHub', limpeza_falhou: 'Limpeza de dados: etapa falhou',
+  coleta_recusada: 'Coleta da Central recusada', lembrete_nao_saiu: 'Lembrete de consulta não saiu', link_conexao_nao_saiu: 'Link de conexão não saiu', reenvio_sem_ip: 'Reenvio do link sem o IP',
+  encerramento_adiado: 'Contrato sem pagamento não encerrado', contrato_sem_pagamento: 'Contrato sem pagamento', contrato_parado: 'Contrato parado', valor_nao_atualizado: 'Valor da assinatura não atualizado',
+  recancelado: 'Assinatura cancelada no Asaas (nova tentativa)', recancelamento_falhou: 'O Asaas ainda não cancelou', pedido_asaas_falhou: 'Pedido ao Asaas falhou',
+  conversas_falhou: 'Envio das conversas falhou', conversas_enviadas: 'Conversas enviadas', pago_em_dobro: 'Consulta paga duas vezes',
+  contatos_chatwoot_ficaram: 'Contatos do Chatwoot não apagados', contatos_antigos: 'Contatos antigos do Chatwoot',
   prosp_numero_caiu: 'Prospecção: número caiu', prosp_numero_conectado: 'Prospecção: número conectado', prosp_token_aceito: 'Prospecção: token aceito',
   prosp_token_recusado: 'Prospecção: token recusado', prosp_busca: 'Prospecção: busca', prosp_conjunto_pausado: 'Prospecção: conjunto pausado', prosp_regra: 'Prospecção: regra automática',
   prosp_saiu: 'Prospecção: pediu para sair', prosp_interesse: 'Prospecção: mostrou interesse', prosp_quer_contratar: 'Prospecção: quer contratar', prosp_recusou: 'Prospecção: recusou',
@@ -23,7 +30,7 @@ const TIPOS = {
   demo_aberta: 'Demonstração aberta', demo_conversar: 'Demonstração: quer conversar', demo_escopo: 'Demonstração: escopo enviado'
 };
 const CATEGORIAS = ['alertas', 'falhas', 'clientes', 'financeiro', 'vendas', 'suporte', 'painel', 'sistema', 'entradas', 'avx'];
-const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisam de você' };
+const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisa de você' };
 const rotuloTipo = t => TIPOS[t] || t || 'Aviso';
 const irCliente = (id, aba) => ir('clientes/' + encodeURIComponent(id) + (aba ? '/' + aba : ''));
 function listaAvisos(avisos, comClinica) {
@@ -61,7 +68,6 @@ TELAS.hoje = async c => {
   const agora = new Date();
   trocar(c, 
     cabecalho('Hoje', agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }), n.asaas_ambiente === 'sandbox' ? etq('Asaas no sandbox', 'atencao') : null),
-    cartaoInstalar(),   // #225, item 28: só no navegador
     el('div', { class: 'pilha' },
       el('div', { class: 'grade-2' },
         cartao('Precisa da sua atenção', etq(pend.length ? pend.length + (pend.length === 1 ? ' item' : ' itens') : 'tudo em dia', pend.length ? '' : 'ok', !!pend.length),
@@ -75,5 +81,6 @@ TELAS.hoje = async c => {
       el('div', { class: 'grade-2' },
         cartao('Funil · 30 dias', null, corpo(grafBarras((f.por_dia || []).map(x => ({ r: diaCurto(x.dia), v: (x.pedidos || 0) + (x.mini_testes || 0) + (x.cadastros || 0) })), 'Pedidos, mini testes e cadastros por dia'),
           el('div', { class: 'mt' }, dados([['Mini testes', fmtNum(f.totais.mini_testes) + ' (' + fmtNum(f.totais.mini_testes_com_consulta) + ' marcaram consulta)'], ['Cadastros (teste / contrato)', fmtNum(f.totais.cadastros_teste) + ' / ' + fmtNum(f.totais.cadastros_contratacao)], ['Foram ao ar', fmtNum(f.totais.go_lives)]])))),
-        cartao('Últimos avisos', btn('Ver todos', () => ir('avisos'), 'fant'), listaAvisos((d.ultimos_avisos || []).slice(0, 6), true)))));
+        cartao('Últimos avisos', btn('Ver todos', () => ir('avisos'), 'fant'), listaAvisos((d.ultimos_avisos || []).slice(0, 6), true))),
+      cartaoInstalar()));   // #225, item 28: só no navegador; no fim, depois do que precisa de atenção (FD-26)
 };

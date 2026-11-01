@@ -1,4 +1,4 @@
-// Service worker do painel (rxsync-sistema #225, DEC-181): a notificação de "Precisam de você" chega SEM conteúdo; aqui
+// Service worker do painel (rxsync-sistema #225, DEC-181): a notificação de "Precisa de você" chega SEM conteúdo; aqui
 // o servidor é perguntado só pelo número de chamados abertos (push_resumo, com a chave desta inscrição, guardada no
 // IndexedDB do aparelho; nunca a sessão). Nenhum dado do paciente. Tocar abre Hoje.
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/painel-entrada';

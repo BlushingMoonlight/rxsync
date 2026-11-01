@@ -41,7 +41,8 @@ function formEntrada(mensagem, emailAntes) {
     e.preventDefault(); botao.disabled = true; erro.textContent = '';
     const r = await chamar('entrar', { email: email.value.trim(), senha: senha.value }); botao.disabled = false;
     if (r.ok && r.desafio) return formCodigo(r.desafio, r.mensagem, email.value.trim());
-    if (r.criar_senha) return pedirCodigoSenha(true, r.mensagem);
+    // A tela de criar a senha já explica; a frase do banco ("Toque em Criar senha") não se repete aqui (auditoria de 01/11/2026).
+    if (r.criar_senha) return pedirCodigoSenha(true);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; senha.value = ''; senha.focus();
   };
   telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Entrar' }), campoE('E-mail', email), campoE('Senha', senha), erro, botao,

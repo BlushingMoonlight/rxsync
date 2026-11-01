@@ -3,5 +3,6 @@
 .tour-alvo { outline: 3px solid var(--foco); outline-offset: 4px; border-radius: var(--r-cartao); }
 .tour-cartao { position: fixed; z-index: 60; left: var(--e-4); right: var(--e-4); bottom: calc(76px + env(safe-area-inset-bottom)); max-width: 420px; margin: 0 auto; padding: var(--e-4); background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); border-radius: var(--r-cartao); box-shadow: var(--sombra-janela); }
 @media (min-width: 1024px) { .tour-cartao { left: auto; right: var(--e-6); bottom: var(--e-6); } }
+.tour-cartao.em-cima { bottom: auto; top: calc(64px + env(safe-area-inset-top)); }
 .tour-texto { margin: var(--e-2) 0 var(--e-3); }
 .tour-acoes { display: flex; flex-wrap: wrap; gap: var(--e-2); }

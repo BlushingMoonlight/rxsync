@@ -113,7 +113,10 @@ ok(!chamadas.some(c => c.caminho === 'conectar' && c.token === TOKEN && c.acao =
 await page.evaluate(() => { location.hash = 'hoje'; });
 await page.click('#btnFaixaSenha');
 await page.locator('#entNova').waitFor({ state: 'visible' });
-ok(await page.locator('#entTermosRot').isVisible(), 'criar a senha: pede o aceite dos Termos v7');
+ok(await page.locator('#entTermosRot').isVisible(), 'criar a senha: pede o aceite dos Termos');
+// Auditoria de 01/11/2026, FD-18: a versão escrita é a mesma do link (dizia v7 com o link da v8).
+{ const t = await page.locator('#entTermosRot').textContent(), href = await page.locator('#entTermosLink').getAttribute('href');
+  ok(t.includes('versão 2026-11-v8') && href === '/termos/2026-11-v8.html', 'criar a senha: a caixa diz a mesma versão do link (2026-11-v8)'); }
 await page.fill('#entCodNova', '654321'); await page.fill('#entSenhaNova', 'uma-senha-boa-1'); await page.fill('#entSenhaNova2', 'uma-senha-boa-1');
 await page.click('#entNova button[type=submit]');
 await page.getByText('Marque que leu e aceita').waitFor();

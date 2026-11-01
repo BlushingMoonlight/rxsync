@@ -119,11 +119,12 @@ TELAS.uso = async c => {
 };
 
 // A central de avisos (sql/082, DEC-179): o texto de cada aviso (o mesmo que antes ia ao Telegram), os não lidos em destaque,
-// a busca, marcar como lidos, apagar e "Mandar alerta de teste" (chega aqui, como notificação e por e-mail).
+// a busca, marcar como lidos e apagar. Agrupados por dia, 50 de cada vez (auditoria de 01/11/2026, FD-24); o "Mandar alerta
+// de teste" fica em Mais › Segurança, junto das notificações (FD-23).
 TELAS.avisos = async (c, [cat]) => {
   topo('Avisos', [['Análise'], ['Avisos']]);
   cat = CATEGORIAS.includes(cat) ? cat : '';
-  est.avisos = est.avisos || { nao_lidos: false, busca: '' };   // o filtro vale nesta aba, só na memória
+  est.avisos = est.avisos || { nao_lidos: false, busca: '', ver: 50 };   // o filtro vale nesta aba, só na memória
   const filtro = { categoria: cat, nao_lidos: est.avisos.nao_lidos, busca: est.avisos.busca };
   const r = await chamar('avisos_ver', filtro); if (falhou(c, r, 'Avisos')) return;
   const nl = r.nao_lidos || {}, total = r.total_nao_lidos || 0, lista = r.avisos || [];
@@ -144,12 +145,20 @@ TELAS.avisos = async (c, [cat]) => {
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Assunto' }, ['', ...CATEGORIAS].map(k => el('button', { type: 'button', 'aria-pressed': String(k === cat), onclick: () => ir('avisos' + (k ? '/' + k : '')) },
         k ? (NOME_ASSUNTO[k] || k) : 'Todos', nl[k] ? el('span', { class: 'n', text: nl[k] }) : null))),
       el('div', { class: 'linha-filtros' }, busca, soNaoLidos),
-      cartao(null, null, lista.length ? el('ul', { class: 'lista' }, lista.map(linha)) : vazio(filtro.busca || filtro.nao_lidos || cat ? 'Nenhum aviso com este filtro.' : 'Nenhum aviso.', 'avisos')),
+      cartao(null, null, lista.length ? avisosPorDia(lista.slice(0, est.avisos.ver || 50), linha) : vazio(filtro.busca || filtro.nao_lidos || cat ? 'Nenhum aviso com este filtro.' : 'Nenhum aviso.', 'avisos')),
+      lista.length > (est.avisos.ver || 50) ? el('div', { class: 'acoes' }, btn('Mostrar mais 50', () => { est.avisos.ver = (est.avisos.ver || 50) + 50; rotear(); }, 'sec')) : null,
       el('div', { class: 'acoes-fim' },
-        btn('Mandar alerta de teste', async () => { const x = await chamar('aviso_teste'); rapida(x.mensagem || (x.ok ? 'Alerta de teste enviado.' : 'Não consegui.')); }, 'sec'),
         btn('Apagar os lidos', () => fazer('avisos_apagar_lidos', {}, { nivel: 2, titulo: 'Apagar os avisos lidos', texto: 'Os avisos já lidos saem da Central de vez. Os não lidos ficam.', botao: 'Apagar os lidos', perigo: true }), 'perigo-sec')),
-      el('p', { class: 'mudo peq', text: 'Os avisos ficam 90 dias. Alertas e falhas também chegam por e-mail.' })));
+      el('p', { class: 'mudo peq', text: 'Os avisos ficam 90 dias. Alertas e falhas também chegam por e-mail. Para testar o e-mail e a notificação: Mais › Segurança, "Mandar alerta de teste".' })));
 };
+// Um título por dia (Hoje, Ontem, quarta-feira, 29/10), o mais novo no alto.
+function avisosPorDia(lista, linha) {
+  const chave = v => { const d = new Date(String(v).replace(' ', 'T')); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return isNaN(d) ? '' : d.toISOString().slice(0, 10); };
+  const hoje = hojeISO(), ontem = somaDias(hoje, -1), grupos = [];
+  for (const a of lista) { const k = chave(a.recebido_em); if (!grupos.length || grupos[grupos.length - 1][0] !== k) grupos.push([k, []]); grupos[grupos.length - 1][1].push(a); }
+  const nome = k => k === hoje ? 'Hoje' : k === ontem ? 'Ontem' : k ? new Date(k + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) : 'Sem data';
+  return grupos.map(([k, itens]) => [el('h3', { class: 'aviso-dia', text: nome(k) }), el('ul', { class: 'lista' }, itens.map(linha))]);
+}
 
 TELAS.agregados = async c => {
   topo('Agregados de pacientes', [['Análise'], ['Agregados de pacientes']]);

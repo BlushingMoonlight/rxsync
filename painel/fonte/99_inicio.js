@@ -31,11 +31,14 @@ function abrirPainel(termos) {
     pausaCarregar(); agCarregar(); gradeCarregar();
     if (!sem('medicos')) medCarregar();
     faixasAtualizar(); estadoMostrar();
+    // Arquivos à parte (rxsync-sistema DEC-178): instalar e notificações (app.js), o tour (tour.js) e as perguntas frequentes
+    // (faq.js, carregado ao abrir a página). Eles só veem estas funções do painel; o objeto existe antes do rotear(), porque
+    // a página das perguntas pode ser a primeira a abrir.
+    const novo = !window.rxPainel;
+    if (novo) window.rxPainel = Object.freeze({ el, btn, c29, d24, rapida, ir, folha, confirmar, aviso, vazio, esqueleto, trocar, cresce, icone,
+      faqContar: n => { FAQ.n = n; assistenteResumos(); }, comSessao: () => !!sessao, papel: () => PAPEL });
     rotear();
-    // Arquivos à parte (rxsync-sistema DEC-178), carregados só depois de abrir: instalar e notificações (app.js) e o tour (tour.js). Eles só
-    // veem estas funções do painel.
-    if (!window.rxPainel) { window.rxPainel = Object.freeze({ el, btn, c29, rapida, ir, comSessao: () => !!sessao, papel: () => PAPEL });
-      ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); }); }
+    if (novo) ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); });
   }).catch(() => { $('carregando').hidden = true; mostrarErro('Sem conexão. Confira a internet e abra o painel de novo.'); });
 }
 if (!token && !sessao) entradaAbrir();

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hsWrJkUuqVIJeLVVCp55UHcs+lpjyxSGUgUQH92MyxQ=' 'self'; style-src 'sha256-Sg5m/5bIF+bMqS93h8XErRI3UKnB9TEs40vWr6MSrBo=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QYnkQENLau6Hhpc7GAUSpp7RR5oq8mffXiC3w+KiRew=' 'self'; style-src 'sha256-dd3f4XiyFWKx20wGC6MUkOPwebw9nGlYwZilfj0VTqg=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -134,7 +134,7 @@ body.teclado .barra { display: none; }
 
 @media (min-width: 768px) {
   .barra { display: none; }
-  .topo .clinica { display: block; }
+  .topo .clinica { display: block; margin-left: var(--e-3); }
   .trilho { display: flex; flex-direction: column; align-items: stretch; gap: var(--e-1); position: fixed; left: 0; top: 0; bottom: 0; width: 88px; z-index: 21;
     padding: var(--e-3) var(--e-2); background: var(--superficie-2); border-right: 1px solid var(--borda); }
   .trilho button { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 60px; border: 0; border-radius: var(--r-botao); background: none; color: var(--texto-2);
@@ -209,7 +209,6 @@ body.teclado .acao-fixa { display: none; }
 
 /* ---------------------------------------------------------------- blocos, cartões, listas */
 .bloco { margin-bottom: var(--e-6); }
-.faq-item + .faq-item { margin-top: var(--e-3); }
 .bloco > h2, .tit-bloco { font-size: var(--t-bloco); line-height: var(--l-bloco); margin-bottom: var(--e-3); display: flex; align-items: center; gap: var(--e-2); }
 .tit-bloco .extra { margin-left: auto; font-size: var(--t-2); font-weight: 500; color: var(--texto-2); }
 .cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--r-cartao); }
@@ -318,6 +317,8 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 
 /* ---------------------------------------------------------------- Início (A), Relatório (G) */
 .passos-ini .linha .ic.feito { background: var(--ok-fundo); color: var(--ok-texto); }
+#appCartao:empty { display: none; }
+.passos-ini #appCartao { margin-top: var(--e-2); }
 .numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--e-3); }
 .indicador { padding: var(--e-4); background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--r-cartao); }
 .indicador .rot { font-size: var(--t-2); line-height: var(--l-2); color: var(--texto-2); }
@@ -523,7 +524,8 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 }
 /* lista em texto (O que mudou) */
 .lista-texto { margin: 0; padding-left: var(--e-5); display: flex; flex-direction: column; gap: var(--e-2); }
-.passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }</style>
+.passos-instalar { margin: var(--e-3) 0; padding-left: 1.25rem; display: grid; gap: var(--e-2); }
+#agConversa .pilha { align-items: flex-start; }</style>
 </head>
 <body>
 <!-- Página montada por scripts/painel_montar.mjs a partir de painel/fonte/. Não edite este arquivo à mão. -->
@@ -539,7 +541,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
       <div class="campo"><label for="entSenha">Senha</label><input class="entrada" id="entSenha" type="password" autocomplete="current-password"></div>
       <label class="marcar"><input id="entLembrar" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Entrar</button>
-      <div class="links"><button type="button" class="link" data-ent="criar">Primeiro acesso: criar senha</button><button type="button" class="link" data-ent="esqueci">Esqueci a senha</button></div>
+      <div class="links"><button type="button" class="link" data-ent="criar">Criar senha</button><button type="button" class="link" data-ent="esqueci">Esqueci a senha</button></div>
     </form>
     <form id="entCodigo" novalidate hidden>
       <div class="campo"><label for="entCod">Código de 6 dígitos</label><input class="entrada codigo" id="entCod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
@@ -555,7 +557,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
       <div class="campo"><label for="entCodNova">Código de 6 dígitos (chegou no e-mail)</label><input class="entrada codigo" id="entCodNova" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
       <div class="campo"><label for="entSenhaNova">Senha nova (10 caracteres ou mais)</label><input class="entrada" id="entSenhaNova" type="password" autocomplete="new-password"></div>
       <div class="campo"><label for="entSenhaNova2">Repita a senha</label><input class="entrada" id="entSenhaNova2" type="password" autocomplete="new-password"></div>
-      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a>, versão 2026-10-v7.</span></label>
+      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a id="entTermosLink" href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a>, versão <span id="entTermosVer">2026-11-v8</span>.</span></label>
       <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Salvar a senha e entrar</button>
       <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
@@ -863,6 +865,8 @@ function entInicio(msg, erro) { entTela('entEntrar', 'Entrar no painel', 'Com o 
 function entNovaTela(msg, termos) {
   ['entCodNova', 'entSenhaNova', 'entSenhaNova2'].forEach(k => { $(k).value = ''; });
   $('entTermosRot').hidden = !termos; $('entTermos').checked = false;
+  // A versão escrita e o link vêm da mesma constante (auditoria de 01/11/2026, FD-18: dizia v7 com o link da v8).
+  $('entTermosVer').textContent = VERSAO_TERMOS; $('entTermosLink').href = '/termos/' + VERSAO_TERMOS + '.html';
   entTela('entNova', ENT.modo === 'esqueci' ? 'Trocar a senha' : 'Criar a senha', 'Digite o código do e-mail e escolha a senha.', msg);
 }
 // Entrou: guarda a sessão (só nesta aba) e a lembrança (se houver) e abre o painel sem o ?t= no endereço.
@@ -1515,15 +1519,19 @@ function hojeRender() {
       e.acao[1] === 'conta/whatsapp' ? btn(TESTE.aberto ? 'Testar de novo' : 'Testar a assistente', () => testar(false), 'sec') : null) : null));
   if (CONTA.cancelar_em) blocos.push(aviso('atencao', 'Cancelamento agendado para ' + CONTA.cancelar_em + '. Até lá tudo funciona normalmente. ', ehDono() ? el('button', { class: 'link', type: 'button', 'data-ir': 'conta/assinatura', text: 'Desistir do cancelamento' }) : null));
   // primeiros passos: cada um marcado pelo que o servidor já manda; some quando tudo estiver feito
-  const passos = [['WhatsApp conectado', CONTA.no_ar !== false && CONTA.situacao !== 'teste_aguardando', 'conta/whatsapp'],
+  // Instalar e notificações (painel/app.js, DEC-178): uma linha nos primeiros passos ou, depois deles, um bloco no fim de
+  // Hoje; nunca um cartão no alto (auditoria de 01/11/2026, FD-01). O WhatsApp não se repete quando o cartão de estado já diz.
+  const appBox = el('div', { class: 'lista', id: 'appCartao' }), zapNoEstado = !!(e.cartao && e.acao && e.acao[1] === 'conta/whatsapp');
+  const passos = [zapNoEstado ? null : ['WhatsApp conectado', CONTA.no_ar !== false && CONTA.situacao !== 'teste_aguardando', 'conta/whatsapp'],
     ['Mande "oi" do seu celular para o WhatsApp da clínica e veja a assistente responder', !!(HOJE.ind && HOJE.ind.atual && HOJE.ind.atual.conversas > 0), null],
     ['Horários de atendimento conferidos', (GRADE.dados || []).length > 0 || MED.modo, 'agenda/horarios/grade'],
-    ['Lembretes de consulta ligados', lembretesLigados(), 'assistente/automaticas']];
-  if (passos.some(p => !p[1]) && (CONTA.situacao === 'em_teste' || CONTA.situacao === 'teste_aguardando' || CONTA.no_ar === false || (HOJE.ind && HOJE.ind.atual && !HOJE.ind.atual.conversas)))
+    ['Lembretes de consulta ligados', lembretesLigados(), 'assistente/automaticas']].filter(Boolean);
+  const comPassos = passos.some(p => !p[1]) && (CONTA.situacao === 'em_teste' || CONTA.situacao === 'teste_aguardando' || CONTA.no_ar === false || (HOJE.ind && HOJE.ind.atual && !HOJE.ind.atual.conversas));
+  if (comPassos)
     blocos.push(el('div', { class: 'bloco passos-ini', id: 'hojePassos' }, el('h2', { text: 'Primeiros passos' }), el('div', { class: 'lista' }, passos.map(([t, feito, rota]) =>
       el(rota && !feito ? 'button' : 'div', { class: 'linha', type: rota && !feito ? 'button' : null, 'data-ir': rota && !feito ? rota : null },
         el('span', { class: 'ic' + (feito ? ' feito' : '') }, icone(feito ? 'ok' : 'relogio')), el('span', { class: 'tx' }, el('span', { class: 't1', text: t }), el('span', { class: 't2', text: feito ? 'Feito' : 'A fazer' })),
-        rota && !feito ? el('span', { class: 'seta' }, icone('seta')) : null)))));
+        rota && !feito ? el('span', { class: 'seta' }, icone('seta')) : null))), appBox));
   // precisa de você: as não vistas, as não pagas e os documentos
   const novos = agGrupos().novos.length, np = (HOJE.naoPagas || []).length;
   const precisa = (HOJE.chamados || []).map(chamadoLinha);
@@ -1543,9 +1551,10 @@ function hojeRender() {
     el('div', { class: 'pilha' }, btn('Ver resultados', () => ir('resultados'), 'sec', 'grafico')));
   const colLado = [numeros, sem('assistente_dono') && !HOJE.semGestaoFechado && ehDono() ? el('div', { class: 'cartao pad bloco' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'selo-plano', text: 'Gestão' }), 'Assistente de gestão'),
     el('p', { class: 'mudo', text: 'Pergunte sobre a agenda e peça mudanças pelo painel ou pelo seu WhatsApp, sem abrir o painel. Faz parte do plano Gestão Inteligente.' }),
-    el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null];
-  trocar(box, el('div', { id: 'appCartao' }), blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
-  if (window.rxApp) window.rxApp.hoje($('appCartao'));   // instalar e notificações (painel/app.js, DEC-178)
+    el('div', { class: 'linha-botoes pilha' }, btn('Conhecer o plano', () => ir('conta/assinatura'), 'sec'), btn('Fechar', () => { HOJE.semGestaoFechado = true; hojeRender(); }, 'fant'))) : null,
+    comPassos ? null : el('div', { class: 'bloco', id: 'appBloco', hidden: true }, el('h2', { text: 'Neste aparelho' }), appBox)];
+  trocar(box, blocos, el('div', { class: 'ini-colunas' }, el('div', {}, colPrincipal), el('div', {}, colLado)));
+  if (window.rxApp) window.rxApp.hoje(appBox);   // instalar e notificações (painel/app.js, DEC-178)
 }
 // Um chamado de "Precisa de você" (S3): urgência ou pediu uma pessoa, o motivo, há quanto tempo, quando a assistente volta, "Abrir no WhatsApp" e "Resolvido".
 function chamadoLinha(ch) {
@@ -1888,15 +1897,15 @@ function consultaItem(a) {
   if (a.status === 'cancelado') tags.push(etq('Cancelada', 'perigo', 'proibido'));
   else if (bloq) tags.push(etq('Bloqueio', '', 'bloquear'));
   else { if (a.comparecimento) tags.push(agComparecimentoEtq(a)); else if (a.presenca_confirmada) tags.push(etq('Confirmou presença', 'ok', 'ok')); if (a.pago_em) tags.push(etq(agPagoTxt(a), 'ok', 'ok')); else if (ligado('func_pagamento_link')) tags.push(etq('Não paga', 'atencao', 'dinheiro')); }
-  const rapidas = [];
+  // Até 3 ações rápidas (molde C; auditoria de 01/11/2026, FD-08): antes do início, paga, link e remarcar; depois do
+  // início, paga, "Chegou" e "Faltou" (S4, sql/075: um registro da clínica). "Marcar como não vista" é rara e fica embaixo.
+  const rapidas = [], comecou = new Date(a.inicio).getTime() <= Date.now();
   if (podePagar(a)) rapidas.push(btn(a.pago_em ? 'Desmarcar paga' : 'Marcar como paga', () => agPagar(a, !a.pago_em), 'sec', a.pago_em ? 'fechar' : 'dinheiro'));
-  if (ativa && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
-  if (ativa) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
-  // S10 e S13 (rxsync-sistema sql/066): desmarcar "vista" e desfazer o cancelamento (o servidor confere o horário livre).
-  if (ativa && !bloq && a.visto) rapidas.push(btn('Marcar como não vista', () => agVistoDesfazer(a), 'sec', 'sino'));
-  if (!ativa && !bloq && !externa && !a.no_externo && new Date(a.inicio).getTime() > Date.now()) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
-  // S4 (rxsync-sistema sql/075): "Chegou" e "Faltou" só depois que a consulta começa; é um registro da clínica.
-  if (ativa && !bloq && new Date(a.inicio).getTime() <= Date.now()) {
+  if (ativa && !comecou && !a.pago_em && !a.pagamento_link_enviado_em && podeLink(a.medico_id, a.servico)) rapidas.push(btn('Enviar link agora', ev => agEnviarLink(a, ev.currentTarget), 'sec', 'link'));
+  if (ativa && (bloq || !comecou)) rapidas.push(btn(bloq ? 'Editar' : 'Remarcar', () => consultaForm(a), 'sec', 'agenda'));
+  // S13 (rxsync-sistema sql/066): desfazer o cancelamento (o servidor confere o horário livre).
+  if (!ativa && !bloq && !externa && !a.no_externo && !comecou) rapidas.push(btn('Desfazer o cancelamento', () => agCancelarDesfazer(a), 'sec', 'voltar'));
+  if (ativa && !bloq && comecou) {
     if (a.comparecimento) rapidas.push(btn(a.comparecimento === 'chegou' ? 'Desmarcar "Chegou"' : 'Desmarcar "Faltou"', () => agComparecer(a, ''), 'sec', 'fechar'));
     else rapidas.push(btn('Chegou', () => agComparecer(a, 'chegou'), 'sec', 'ok'), btn('Faltou', () => agComparecer(a, 'faltou'), 'sec', 'proibido'));
   }
@@ -1912,15 +1921,19 @@ function consultaItem(a) {
     Array.isArray(a.preconsulta) && a.preconsulta.length ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: 'Respostas antes da consulta' }),
       a.preconsulta.map(q => el('p', { class: 'quebra' }, el('b', { text: (q.pergunta || '') + ' ' }), q.resposta || ''))) : null,
     a.observacoes ? el('div', { class: 'caixa-texto' }, el('p', { class: 'legenda', text: bloq ? 'Motivo' : 'Observações' }), el('p', { class: 'quebra', text: a.observacoes })) : null,
-    !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }), btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')) : null,
-    !bloq ? el('a', { class: 'btn sec plena', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir a conversa no WhatsApp') : null,
+    // A conversa num bloco só (FD-11): ler aqui (S5) ou abrir no WhatsApp.
+    !bloq ? el('div', { class: 'caixa-texto', id: 'agConversa' }, el('p', { class: 'legenda', text: 'Conversa com a assistente' }),
+      el('div', { id: 'agConversaArea' }, btn('Ver a conversa', ev => agConversaVer(a, ev.currentTarget.parentNode), 'sec', 'chat')),
+      el('div', { class: 'pilha' }, el('a', { class: 'btn sec', href: zap(a.telefone_paciente), target: '_blank', rel: 'noopener' }, icone('zap', 'p'), 'Abrir no WhatsApp'))) : null,
+    // S10 (rxsync-sistema sql/066): desmarcar "vista", raro, longe das ações do dia a dia (regra 7).
+    ativa && !bloq && a.visto ? el('div', { class: 'pilha' }, btn('Marcar como não vista', () => agVistoDesfazer(a), 'fant', 'sino')) : null,
     ativa ? el('div', { class: 'perigo-zona' }, btn(bloq ? 'Desbloquear o horário' : 'Cancelar consulta', () => agCancelar(a), 'perigo-sec plena')) : null,
     !ativa ? el('div', { class: 'perigo-zona' }, btn('Excluir de vez', () => agExcluir(a), 'perigo-sec plena')) : null];
 }
 // A conversa da consulta (S5, rxsync-sistema sql/077): só leitura, lida no Chatwoot na hora em que se toca (nada fica
 // guardado). As últimas 20 mensagens, sem as notas internas: paciente de um lado, a assistente e a equipe do outro.
 function agConversaVer(a, caixa) {
-  const leg = el('p', { class: 'legenda', text: 'Conversa com a assistente' });
+  const leg = null;   // a legenda fica no bloco (FD-11)
   trocar(caixa, leg, esqueleto());
   d24('agenda_conversa', { id: a.id }).then(r => {
     r = r || {};
@@ -3510,7 +3523,7 @@ function assistenteResumos() {
     const cs = CAMPOS.filter(c => c.grupo === k && !['select', 'multi', 'switch'].includes(c.tipo) && !c.depende);
     if (k === 'automaticas') txt = lembretesLigados() ? 'Lembretes ' + String(VAL.lembrete_horarios && VAL.lembrete_horarios !== 'nao' ? VAL.lembrete_horarios : '24,2').split(',').map(x => x === 'M' ? 'na manhã do dia' : x + 'h antes').join(' e ') : 'Lembretes desligados';
     else if (k === 'funcoes') { const n = FUNCOES_LIGAVEIS.filter(([f]) => ligado(f)).length; txt = n + ' de ' + FUNCOES_LIGAVEIS.length + ' ligadas aqui'; }
-    else if (k === 'faq') txt = FAQ.itens ? pl(FAQ.itens.length, 'pergunta', 'perguntas') : '';
+    else if (k === 'faq') txt = FAQ.n != null ? pl(FAQ.n, 'pergunta', 'perguntas') : '';
     else if (cs.length) { const cheios = cs.filter(c => String(VAL[c.key] || '').trim()).length; txt = cheios === cs.length ? 'Completo' : cheios + ' de ' + cs.length + ' preenchidos'; }
     t2.textContent = txt; if (!t2.parentNode) b.querySelector('.tx').append(t2);
   });
@@ -3582,57 +3595,17 @@ paginaIa('automaticas', 'Mensagens automáticas', 'O que a assistente envia sozi
     el('h2', { class: 'tit-bloco pilha', text: 'Pesquisa de satisfação e avaliação no Google' }), blocoCampos(['pesquisa_ativa', 'pesquisa_horas', 'link_avaliacao_google'], { beneficio: 'Depois da consulta, a assistente pede uma nota e convida o paciente a avaliar a clínica no Google.' }),
     el('h2', { class: 'tit-bloco pilha', text: 'Retorno e convites' }), blocoCampos(['func_retorno', 'retorno_prazo_dias', 'func_reativacao', 'reativacao_dias', 'relac_limite_dia'], { beneficio: 'A assistente avisa quem passou do prazo de retorno e convida quem não volta há um tempo.' })];
 });
-// Perguntas frequentes (S2, rxsync-sistema sql/076): a lista inteira, editada aqui e salva de uma vez (faq_listar e
-// faq_salvar). Os limites (20 perguntas, 200 e 800 letras) vêm do servidor, que confere de novo.
-const FAQ = { itens: null, antigas: 0, limite: 20, lp: 200, lr: 800, sujo: false };
-function faqCarregar() {
-  const box = $('faqCorpo'); if (box) trocar(box, el('div', { class: 'cartao' }, esqueleto()));
-  d24('faq_listar').then(r => {
-    r = r || {}; FAQ.itens = (r.itens || []).map(x => ({ id: x.id, pergunta: x.pergunta || '', resposta: x.resposta || '' }));
-    FAQ.antigas = Number(r.antigas) || 0; FAQ.limite = Number(r.limite) || 20; FAQ.lp = Number(r.limite_pergunta) || 200; FAQ.lr = Number(r.limite_resposta) || 800; FAQ.sujo = false;
-    faqRender(); assistenteResumos();
-  }).catch(() => { const b = $('faqCorpo'); if (b) trocar(b, el('div', { class: 'cartao' }, vazio(null, 'As perguntas não carregaram agora. Tente de novo em instantes.'))); });
-}
-function faqRender() {
-  const box = $('faqCorpo'); if (!box || !FAQ.itens) return;
-  const marcar = () => { FAQ.sujo = true; const b = $('faqSalvar'); if (b) b.disabled = false; };
-  const itens = FAQ.itens.map((f, i) => {
-    const p = el('input', { class: 'entrada', id: 'faqP' + i, maxlength: String(FAQ.lp), autocomplete: 'off', placeholder: 'Vocês atendem no mesmo dia?' });
-    const r = el('textarea', { class: 'entrada', id: 'faqR' + i, maxlength: String(FAQ.lr), rows: '3', placeholder: 'A resposta que a assistente vai dar.' });
-    const cont = el('div', { class: 'contagem', 'aria-live': 'polite' });
-    const contar = () => { cont.textContent = r.value.length + ' de ' + FAQ.lr; };
-    p.value = f.pergunta; r.value = f.resposta; contar(); setTimeout(() => cresce(r), 0);
-    p.addEventListener('input', () => { f.pergunta = p.value; marcar(); });
-    r.addEventListener('input', () => { f.resposta = r.value; cresce(r); contar(); marcar(); });
-    return el('div', { class: 'cartao campos faq-item' },
-      el('div', { class: 'campo' }, el('label', { for: 'faqP' + i, text: 'Pergunta ' + (i + 1) }), p),
-      el('div', { class: 'campo' }, el('label', { for: 'faqR' + i, text: 'Resposta' }), r, cont),
-      el('div', { class: 'linha-botoes' }, btn('Remover', () => { FAQ.itens.splice(i, 1); marcar(); faqRender(); }, 'fant', 'fechar')));
-  });
-  const cheio = FAQ.itens.length >= FAQ.limite;
-  trocar(box,
-    FAQ.antigas ? aviso('', FAQ.antigas === 1 ? 'Há 1 pergunta antiga que a assistente também usa e que só a RXSync muda.' : 'Há ' + FAQ.antigas + ' perguntas antigas que a assistente também usa e que só a RXSync muda.') : null,
-    itens.length ? itens : el('div', { class: 'cartao' }, vazio(null, 'Nenhuma pergunta ainda.')),
-    el('p', { class: 'legenda', text: FAQ.itens.length + ' de ' + FAQ.limite + ' perguntas.' }),
-    el('div', { class: 'linha-botoes pilha' },
-      btn('Acrescentar pergunta', () => { FAQ.itens.push({ id: '', pergunta: '', resposta: '' }); marcar(); faqRender(); const n = $('faqP' + (FAQ.itens.length - 1)); if (n) n.focus(); }, 'sec', 'soma', { disabled: cheio }),
-      btn('Salvar as perguntas', faqSalvar, 'pri', 'ok', { id: 'faqSalvar', disabled: !FAQ.sujo })));
-}
-function faqSalvar(ev) {
-  const b = ev && ev.currentTarget;
-  const itens = FAQ.itens.map(f => ({ id: f.id || '', pergunta: f.pergunta.trim(), resposta: f.resposta.trim() }));
-  if (itens.some(f => !f.pergunta || !f.resposta)) { rapida('Toda pergunta precisa de uma resposta.'); return; }
-  if (b) b.disabled = true;
-  d24('faq_salvar', { itens }).then(r => {
-    if (r && r.ok) { rapida('Perguntas salvas. A assistente já usa as novas respostas.'); faqCarregar(); }
-    else { rapida((r && r.mensagem) || 'Não consegui salvar. Tente de novo.', { ms: 9000 }); if (b) b.disabled = false; }
-  }).catch(() => { rapida('Não consegui salvar. Tente de novo.'); if (b) b.disabled = false; });
-}
+// Perguntas frequentes (S2, rxsync-sistema sql/076): a página mora num arquivo à parte (painel/faq.js; DEC-178 e a decisão
+// FD-21 da auditoria de 01/11/2026: o painel fica abaixo de 400 KB), carregado na primeira vez que ela abre. Aqui fica só a
+// contagem para o índice do Assistente.
+const FAQ = { n: null };
+const faqArquivo = () => window.rxFaq ? Promise.resolve(window.rxFaq) : new Promise((ok, falha) => {
+  const s = el('script', { src: '/painel/faq.js' }); s.onload = () => window.rxFaq ? ok(window.rxFaq) : falha(new Error('faq.js')); s.onerror = () => falha(new Error('faq.js')); document.head.append(s); });
 tela('assistente/faq', {
-  montar: () => [cabTela('Perguntas frequentes', { voltar: VOLTA_IA, sub: 'As perguntas e respostas que a assistente usa como estão. Mude, apague ou acrescente e toque em "Salvar as perguntas".' }),
+  montar: () => [cabTela('Perguntas frequentes', { voltar: VOLTA_IA, sub: 'As perguntas e respostas que a assistente usa. Toque numa pergunta para mudar ou remover.' }),
     el('div', { id: 'faqCorpo' }, el('div', { class: 'cartao' }, esqueleto())),
     el('p', { class: 'dica', text: 'O que muda com frequência (avisos, preparo de exames, campanhas) pode ir em Informações extras.' })],
-  entrar: () => faqCarregar()
+  entrar: () => faqArquivo().then(f => f.entrar($('faqCorpo')))
 });
 // O que ela faz (D): cada função com o estado; as sem nada para configurar ligam aqui, as outras levam à página delas.
 const FUNCOES_LIGAVEIS = [['func_agendamento', 'Agendamento pela assistente'], ['func_briefing', 'Resumo do paciente'], ['func_tipo_visita', '1ª vez ou retorno no resumo'],
@@ -4040,11 +4013,14 @@ function abrirPainel(termos) {
     pausaCarregar(); agCarregar(); gradeCarregar();
     if (!sem('medicos')) medCarregar();
     faixasAtualizar(); estadoMostrar();
+    // Arquivos à parte (rxsync-sistema DEC-178): instalar e notificações (app.js), o tour (tour.js) e as perguntas frequentes
+    // (faq.js, carregado ao abrir a página). Eles só veem estas funções do painel; o objeto existe antes do rotear(), porque
+    // a página das perguntas pode ser a primeira a abrir.
+    const novo = !window.rxPainel;
+    if (novo) window.rxPainel = Object.freeze({ el, btn, c29, d24, rapida, ir, folha, confirmar, aviso, vazio, esqueleto, trocar, cresce, icone,
+      faqContar: n => { FAQ.n = n; assistenteResumos(); }, comSessao: () => !!sessao, papel: () => PAPEL });
     rotear();
-    // Arquivos à parte (rxsync-sistema DEC-178), carregados só depois de abrir: instalar e notificações (app.js) e o tour (tour.js). Eles só
-    // veem estas funções do painel.
-    if (!window.rxPainel) { window.rxPainel = Object.freeze({ el, btn, c29, rapida, ir, comSessao: () => !!sessao, papel: () => PAPEL });
-      ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); }); }
+    if (novo) ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); });
   }).catch(() => { $('carregando').hidden = true; mostrarErro('Sem conexão. Confira a internet e abra o painel de novo.'); });
 }
 if (!token && !sessao) entradaAbrir();

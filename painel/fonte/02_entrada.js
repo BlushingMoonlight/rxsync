@@ -16,6 +16,8 @@ function entInicio(msg, erro) { entTela('entEntrar', 'Entrar no painel', 'Com o 
 function entNovaTela(msg, termos) {
   ['entCodNova', 'entSenhaNova', 'entSenhaNova2'].forEach(k => { $(k).value = ''; });
   $('entTermosRot').hidden = !termos; $('entTermos').checked = false;
+  // A versão escrita e o link vêm da mesma constante (auditoria de 01/11/2026, FD-18: dizia v7 com o link da v8).
+  $('entTermosVer').textContent = VERSAO_TERMOS; $('entTermosLink').href = '/termos/' + VERSAO_TERMOS + '.html';
   entTela('entNova', ENT.modo === 'esqueci' ? 'Trocar a senha' : 'Criar a senha', 'Digite o código do e-mail e escolha a senha.', msg);
 }
 // Entrou: guarda a sessão (só nesta aba) e a lembrança (se houver) e abre o painel sem o ?t= no endereço.

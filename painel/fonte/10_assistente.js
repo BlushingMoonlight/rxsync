@@ -45,7 +45,7 @@ function assistenteResumos() {
     const cs = CAMPOS.filter(c => c.grupo === k && !['select', 'multi', 'switch'].includes(c.tipo) && !c.depende);
     if (k === 'automaticas') txt = lembretesLigados() ? 'Lembretes ' + String(VAL.lembrete_horarios && VAL.lembrete_horarios !== 'nao' ? VAL.lembrete_horarios : '24,2').split(',').map(x => x === 'M' ? 'na manhã do dia' : x + 'h antes').join(' e ') : 'Lembretes desligados';
     else if (k === 'funcoes') { const n = FUNCOES_LIGAVEIS.filter(([f]) => ligado(f)).length; txt = n + ' de ' + FUNCOES_LIGAVEIS.length + ' ligadas aqui'; }
-    else if (k === 'faq') txt = FAQ.itens ? pl(FAQ.itens.length, 'pergunta', 'perguntas') : '';
+    else if (k === 'faq') txt = FAQ.n != null ? pl(FAQ.n, 'pergunta', 'perguntas') : '';
     else if (cs.length) { const cheios = cs.filter(c => String(VAL[c.key] || '').trim()).length; txt = cheios === cs.length ? 'Completo' : cheios + ' de ' + cs.length + ' preenchidos'; }
     t2.textContent = txt; if (!t2.parentNode) b.querySelector('.tx').append(t2);
   });
@@ -117,57 +117,17 @@ paginaIa('automaticas', 'Mensagens automáticas', 'O que a assistente envia sozi
     el('h2', { class: 'tit-bloco pilha', text: 'Pesquisa de satisfação e avaliação no Google' }), blocoCampos(['pesquisa_ativa', 'pesquisa_horas', 'link_avaliacao_google'], { beneficio: 'Depois da consulta, a assistente pede uma nota e convida o paciente a avaliar a clínica no Google.' }),
     el('h2', { class: 'tit-bloco pilha', text: 'Retorno e convites' }), blocoCampos(['func_retorno', 'retorno_prazo_dias', 'func_reativacao', 'reativacao_dias', 'relac_limite_dia'], { beneficio: 'A assistente avisa quem passou do prazo de retorno e convida quem não volta há um tempo.' })];
 });
-// Perguntas frequentes (S2, rxsync-sistema sql/076): a lista inteira, editada aqui e salva de uma vez (faq_listar e
-// faq_salvar). Os limites (20 perguntas, 200 e 800 letras) vêm do servidor, que confere de novo.
-const FAQ = { itens: null, antigas: 0, limite: 20, lp: 200, lr: 800, sujo: false };
-function faqCarregar() {
-  const box = $('faqCorpo'); if (box) trocar(box, el('div', { class: 'cartao' }, esqueleto()));
-  d24('faq_listar').then(r => {
-    r = r || {}; FAQ.itens = (r.itens || []).map(x => ({ id: x.id, pergunta: x.pergunta || '', resposta: x.resposta || '' }));
-    FAQ.antigas = Number(r.antigas) || 0; FAQ.limite = Number(r.limite) || 20; FAQ.lp = Number(r.limite_pergunta) || 200; FAQ.lr = Number(r.limite_resposta) || 800; FAQ.sujo = false;
-    faqRender(); assistenteResumos();
-  }).catch(() => { const b = $('faqCorpo'); if (b) trocar(b, el('div', { class: 'cartao' }, vazio(null, 'As perguntas não carregaram agora. Tente de novo em instantes.'))); });
-}
-function faqRender() {
-  const box = $('faqCorpo'); if (!box || !FAQ.itens) return;
-  const marcar = () => { FAQ.sujo = true; const b = $('faqSalvar'); if (b) b.disabled = false; };
-  const itens = FAQ.itens.map((f, i) => {
-    const p = el('input', { class: 'entrada', id: 'faqP' + i, maxlength: String(FAQ.lp), autocomplete: 'off', placeholder: 'Vocês atendem no mesmo dia?' });
-    const r = el('textarea', { class: 'entrada', id: 'faqR' + i, maxlength: String(FAQ.lr), rows: '3', placeholder: 'A resposta que a assistente vai dar.' });
-    const cont = el('div', { class: 'contagem', 'aria-live': 'polite' });
-    const contar = () => { cont.textContent = r.value.length + ' de ' + FAQ.lr; };
-    p.value = f.pergunta; r.value = f.resposta; contar(); setTimeout(() => cresce(r), 0);
-    p.addEventListener('input', () => { f.pergunta = p.value; marcar(); });
-    r.addEventListener('input', () => { f.resposta = r.value; cresce(r); contar(); marcar(); });
-    return el('div', { class: 'cartao campos faq-item' },
-      el('div', { class: 'campo' }, el('label', { for: 'faqP' + i, text: 'Pergunta ' + (i + 1) }), p),
-      el('div', { class: 'campo' }, el('label', { for: 'faqR' + i, text: 'Resposta' }), r, cont),
-      el('div', { class: 'linha-botoes' }, btn('Remover', () => { FAQ.itens.splice(i, 1); marcar(); faqRender(); }, 'fant', 'fechar')));
-  });
-  const cheio = FAQ.itens.length >= FAQ.limite;
-  trocar(box,
-    FAQ.antigas ? aviso('', FAQ.antigas === 1 ? 'Há 1 pergunta antiga que a assistente também usa e que só a RXSync muda.' : 'Há ' + FAQ.antigas + ' perguntas antigas que a assistente também usa e que só a RXSync muda.') : null,
-    itens.length ? itens : el('div', { class: 'cartao' }, vazio(null, 'Nenhuma pergunta ainda.')),
-    el('p', { class: 'legenda', text: FAQ.itens.length + ' de ' + FAQ.limite + ' perguntas.' }),
-    el('div', { class: 'linha-botoes pilha' },
-      btn('Acrescentar pergunta', () => { FAQ.itens.push({ id: '', pergunta: '', resposta: '' }); marcar(); faqRender(); const n = $('faqP' + (FAQ.itens.length - 1)); if (n) n.focus(); }, 'sec', 'soma', { disabled: cheio }),
-      btn('Salvar as perguntas', faqSalvar, 'pri', 'ok', { id: 'faqSalvar', disabled: !FAQ.sujo })));
-}
-function faqSalvar(ev) {
-  const b = ev && ev.currentTarget;
-  const itens = FAQ.itens.map(f => ({ id: f.id || '', pergunta: f.pergunta.trim(), resposta: f.resposta.trim() }));
-  if (itens.some(f => !f.pergunta || !f.resposta)) { rapida('Toda pergunta precisa de uma resposta.'); return; }
-  if (b) b.disabled = true;
-  d24('faq_salvar', { itens }).then(r => {
-    if (r && r.ok) { rapida('Perguntas salvas. A assistente já usa as novas respostas.'); faqCarregar(); }
-    else { rapida((r && r.mensagem) || 'Não consegui salvar. Tente de novo.', { ms: 9000 }); if (b) b.disabled = false; }
-  }).catch(() => { rapida('Não consegui salvar. Tente de novo.'); if (b) b.disabled = false; });
-}
+// Perguntas frequentes (S2, rxsync-sistema sql/076): a página mora num arquivo à parte (painel/faq.js; DEC-178 e a decisão
+// FD-21 da auditoria de 01/11/2026: o painel fica abaixo de 400 KB), carregado na primeira vez que ela abre. Aqui fica só a
+// contagem para o índice do Assistente.
+const FAQ = { n: null };
+const faqArquivo = () => window.rxFaq ? Promise.resolve(window.rxFaq) : new Promise((ok, falha) => {
+  const s = el('script', { src: '/painel/faq.js' }); s.onload = () => window.rxFaq ? ok(window.rxFaq) : falha(new Error('faq.js')); s.onerror = () => falha(new Error('faq.js')); document.head.append(s); });
 tela('assistente/faq', {
-  montar: () => [cabTela('Perguntas frequentes', { voltar: VOLTA_IA, sub: 'As perguntas e respostas que a assistente usa como estão. Mude, apague ou acrescente e toque em "Salvar as perguntas".' }),
+  montar: () => [cabTela('Perguntas frequentes', { voltar: VOLTA_IA, sub: 'As perguntas e respostas que a assistente usa. Toque numa pergunta para mudar ou remover.' }),
     el('div', { id: 'faqCorpo' }, el('div', { class: 'cartao' }, esqueleto())),
     el('p', { class: 'dica', text: 'O que muda com frequência (avisos, preparo de exames, campanhas) pode ir em Informações extras.' })],
-  entrar: () => faqCarregar()
+  entrar: () => faqArquivo().then(f => f.entrar($('faqCorpo')))
 });
 // O que ela faz (D): cada função com o estado; as sem nada para configurar ligam aqui, as outras levam à página delas.
 const FUNCOES_LIGAVEIS = [['func_agendamento', 'Agendamento pela assistente'], ['func_briefing', 'Resumo do paciente'], ['func_tipo_visita', '1ª vez ou retorno no resumo'],

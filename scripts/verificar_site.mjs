@@ -67,8 +67,9 @@ function conferirP12(nome, css, pagina) {
     if (!px('width') || !px('height') || px('width') > 48 || px('height') > 48) erro(`${arq}: os ícones precisam de tamanho fixo de até 48 px (regra svg.icone)`);
     if (!/createElementNS\('http:\/\/www\.w3\.org\/2000\/svg', 'svg'\); s\.setAttribute\('class', 'icone'( \+ [^)]*)?\)/.test(s)) erro(`${arq}: a função icone() precisa pôr a classe "icone" no <svg>`);
     // localStorage: só a aparência (automática, clara ou escura, 'central_aparencia', DEC-067) e a lembrança do aparelho
-    // ('central_lembranca', DEC-109; o banco guarda só o SHA-256). Nada mais da Central fica no aparelho.
-    for (const m of s.matchAll(/localStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || !["'central_aparencia'", "'central_lembranca'"].includes(m[2].trim())) erro(`${arq}: só a aparência e a lembrança do aparelho podem ir para o localStorage (achei ${m[0]})`);
+    // ('central_lembranca', DEC-109; o banco guarda só o SHA-256) e a data do "Agora não" do cartão de instalar
+    // ('central_instalar_depois', só a hora do toque, por 30 dias: auditoria de 01/11/2026, FD-02). Nada mais da Central fica no aparelho.
+    for (const m of s.matchAll(/localStorage\s*\.\s*(\w+)\s*\(\s*([^,)]*)/g)) if (!['getItem', 'setItem', 'removeItem'].includes(m[1]) || !["'central_aparencia'", "'central_lembranca'", "'central_instalar_depois'"].includes(m[2].trim())) erro(`${arq}: só a aparência e a lembrança do aparelho podem ir para o localStorage (achei ${m[0]})`);
     if (/localStorage\s*\[|localStorage\s*\.\s*(?!getItem|setItem|removeItem)\w/.test(s)) erro(`${arq}: localStorage só com getItem, setItem ou removeItem da aparência e da lembrança`);
     // A lembrança só é gravada se tiver o formato do servidor (64 letras de 0-9a-f) e só sai da página pelo retomar,
     // pelo lembranca_usada e pelo sair (para ser esquecida).
@@ -495,7 +496,7 @@ if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não blo
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 // Os arquivos à parte do painel e da Central (rxsync-sistema DEC-178 e DEC-181): carregados só quando precisam, cada um até
 // 60 KB, sem innerHTML e sem eval; o service worker só pergunta os números (push_resumo) e nunca guarda a sessão.
-for (const arq of ['painel/app.js', 'painel/sw.js', 'painel/tour.js', 'central/sw.js'].filter(f => fs.existsSync(f))) {
+for (const arq of ['painel/app.js', 'painel/sw.js', 'painel/tour.js', 'painel/faq.js', 'central/sw.js'].filter(f => fs.existsSync(f))) {
   const c = fs.readFileSync(arq, 'utf8');
   if (Buffer.byteLength(c, 'utf8') > 60 * 1024) erro(`${arq}: passou de 60 KB (DEC-178)`);
   if (/\.innerHTML\s*=|\beval\(|new Function\(/.test(c)) erro(`${arq}: sem innerHTML nem eval`);
