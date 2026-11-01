@@ -2,7 +2,7 @@
 const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', bloqueio: 'Bloqueio', saida: 'Saída', saida_todos: 'Sair de todos', sessao_encerrada: 'Sessão encerrada',
   chave: 'Chave mudada', chaves_padrao: 'Chaves padrão (sql/030)', edicao_limites: 'Limites editados', reenvio_onboarding: 'Onboarding reenviado', chave_api_criada: 'Chave da API criada', chave_api_revogada: 'Chave da API revogada',
   avisos_eventos_destino: 'Avisos de eventos: endereço', avisos_eventos_desligados: 'Avisos de eventos desligados', desfeito: 'Edição desfeita', erro_interno: 'Erro interno',
-  codigo_pedido: 'Código de entrada pedido', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código pedido sem o app autenticador', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
+  codigo_pedido: 'Código de entrada pedido', codigo_perdido: 'Código perdido (5 erros)', codigo_nao_enviado: 'Código que não saiu por e-mail', senha_criada: 'Senha criada', senha_trocada: 'Senha trocada', reinicio_por_sql: 'Reinício por SQL',
   viu_dados_sensiveis: 'Viu os dados protegidos', edicao_empresa: 'Empresa editada', edicao_assistente: 'Assistente editada', edicao_configuracoes: 'Configurações editadas', edicao_recursos: 'Botões dos recursos editados',
   aviso_limitacao_franquia: 'Aviso de limitação da franquia', recurso_liberado: 'Recurso liberado', recurso_revogado: 'Liberação revogada', plano_trocado: 'Plano trocado', preco_especial: 'Preço especial',
   cobranca_proxima_data: 'Próxima cobrança mudada', cobranca_vencimento: 'Vencimento mudado', implantacao_isentar: 'Cobrança da implantação cancelada', pagamento_receber_dinheiro: 'Recebido em dinheiro',
@@ -32,8 +32,8 @@ TELAS.seguranca = async (c, [aba]) => {
   }
   const r = await chamar('sessoes'); if (falhou(c, r, 'Segurança')) return;
   const d = r.dados;
-  const [cApp, cNotif] = await Promise.all([cartaoApp(), cartaoNotificacoes().catch(() => null)]);   // #225 (DEC-180, DEC-181)
-  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cApp, cNotif,
+  const cNotif = await cartaoNotificacoes().catch(() => null);   // #225 (DEC-181); o app autenticador saiu (DEC-186)
+  trocar(c, cabecalho('Segurança', 'aparelhos conectados'), el('div', { class: 'pilha' }, abas, cNotif,
     cartao('Aparelhos conectados', null, el('ul', { class: 'lista' }, d.sessoes.map(s => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
       el('div', { class: 't1', text: s.navegador + (s.esta ? ' (este aparelho)' : '') }), el('div', { class: 't2', text: `entrou ${fmtHora(s.criada_em)} · IP ${s.ip || '?'} · usada ${fmtHora(s.ultimo_uso_em)}` })),
       s.esta ? el('div', { class: 'direita' }, etq('este', 'ok')) : el('div', { class: 'direita' }, btn('Encerrar', async () => { const x = await chamar('encerrar_sessao', { id: s.id }); rapida(x.ok ? 'Sessão encerrada.' : (x.mensagem || 'Não consegui.')); rotear(); }, 'perigo-sec')))))),
