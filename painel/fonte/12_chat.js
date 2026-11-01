@@ -5,8 +5,10 @@ const CHAT_SUGESTOES = ['Como está minha agenda hoje?', 'Quem vem amanhã?', 'Q
 let chatFecharJanela = null;
 function chatBalao(de, texto) {
   const b = el('div', { class: 'balao' + (de === 'dono' ? ' eu' : '') });
-  // o negrito do WhatsApp (*texto*) vira negrito; o resto é texto puro
-  String(texto).split(/(\*[^*\n]+\*)/).forEach(p => { if (/^\*[^*\n]+\*$/.test(p)) b.append(el('strong', { text: p.slice(1, -1) })); else if (p) b.append(document.createTextNode(p)); });
+  // *texto* e **texto** viram negrito; listas com "• "; asterisco sem par some (#225, item 24). O resto é texto puro.
+  String(texto).replace(/\*\*([^*\n]+?)\*\*/g, '*$1*').replace(/^[ \t]*#{1,6}[ \t]+/gm, '').replace(/^[ \t]*[*-][ \t]+/gm, '• ').split('\n')
+    .map(l => ((l.match(/\*/g) || []).length % 2 ? l.replace(/\*/g, '') : l)).join('\n')
+    .split(/(\*[^*\n]+\*)/).forEach(p => { if (/^\*[^*\n]+\*$/.test(p)) b.append(el('strong', { text: p.slice(1, -1) })); else if (p) b.append(document.createTextNode(p)); });
   const m = $('chatMsgs'); m.append(b); m.scrollTop = m.scrollHeight;
   return b;
 }

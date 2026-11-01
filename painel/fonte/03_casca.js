@@ -110,6 +110,8 @@ document.addEventListener('focusin', e => { if (e.target.matches('input, select,
 document.addEventListener('focusout', () => setTimeout(() => { if (!document.activeElement || !document.activeElement.matches('input, select, textarea')) document.body.classList.remove('teclado'); }, 50));
 
 // ---------------------------------------------------------------- estado da assistente (no alto de todas as telas, tocável)
+// Nunca conectou o WhatsApp (#225, item 22): o teste não tira nada do ar e não há para onde "voltar".
+const semWhats = () => { const c = CONTA || {}; return c.no_ar === false || c.situacao === 'teste_aguardando'; };
 function pausada() { return !!(PAUSA && PAUSA.ativo === false && PAUSA.status === 'Ativo'); }
 function pausaQuando(t) { const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2})/.exec(t || ''); return m ? m[3] + '/' + m[2] + ' às ' + m[4] : ''; }
 function estadoAssistente() {
@@ -117,7 +119,7 @@ function estadoAssistente() {
   // DEC-166 (rxsync-sistema sql/068): o teste novo libera tudo do Gestão; o servidor diz em recursos.teste_gestao.
   const gestaoNoTeste = REC && REC.teste_gestao === true ? ' Durante o teste, tudo do plano Gestão está liberado.' : '';
   if (pausada()) return { ponto: 'off', curto: 'Assistente pausada', t1: 'A assistente está pausada', t2: 'As mensagens dos pacientes chegam para a equipe responder; lembretes e avisos automáticos também param.' };
-  if (TESTE.aberto) return { ponto: 'alerta', curto: 'Atendendo só no teste', t1: 'Atendendo só no teste', t2: 'A assistente não está respondendo no WhatsApp da clínica enquanto o teste estiver aberto.' };
+  if (TESTE.aberto && !semWhats()) return { ponto: 'alerta', curto: 'Atendendo só no teste', t1: 'Atendendo só no teste', t2: 'A assistente não está respondendo no WhatsApp da clínica enquanto o teste estiver aberto.' };
   if (s === 'em_teste') { const d = c.dias_restantes; return { ponto: 'on', curto: 'Em teste grátis', t1: 'Teste grátis: ' + (d === 0 ? 'termina hoje' : d === 1 ? 'termina amanhã' : d == null ? 'em andamento' : 'faltam ' + d + ' dias'), t2: 'A assistente está atendendo no WhatsApp da clínica.' + gestaoNoTeste, cartao: true, acao: ['Pagar', 'conta/assinatura'] }; }
   if (s === 'teste_aguardando') return { ponto: 'alerta', curto: 'Falta conectar o WhatsApp', t1: 'Falta conectar o WhatsApp', t2: 'Os 7 dias de teste só começam a contar quando a assistente entrar no ar.' + gestaoNoTeste, cartao: true, acao: ['Conectar', 'conta/whatsapp'] };
   if (s === 'teste_encerrado') return { ponto: 'off', curto: 'Assistente parada', t1: 'O teste terminou e a assistente está parada', t2: 'As mensagens chegam para a sua equipe. Seus dados ficam guardados por 15 dias.', cartao: true, acao: ['Pagar o teste agora', 'conta/assinatura'] };
@@ -144,8 +146,8 @@ function assistenteAcoes(depois) {
   const l = [];
   if (sessao && PAUSA && PAUSA.pode_pausar) l.push(btn('Pausar a assistente', () => { if (depois) depois(); pausaAgir('assistente_pausar'); }, 'sec plena', 'pausa'));
   if (sessao && PAUSA && PAUSA.pode_retomar) l.push(btn('Retomar a assistente', () => { if (depois) depois(); pausaAgir('assistente_retomar'); }, 'pri plena', 'play'));
-  if (TESTE.aberto) l.push(btn('Voltar a atender no WhatsApp', () => { if (depois) depois(); voltarWhats(); }, 'pri plena', 'zap'));
-  else l.push(btn('Testar a assistente', () => { if (depois) depois(); testar(false); }, 'sec plena', 'frasco'));
+  if (TESTE.aberto && !semWhats()) l.push(btn('Voltar a atender no WhatsApp', () => { if (depois) depois(); voltarWhats(); }, 'pri plena', 'zap'));
+  else l.push(btn(TESTE.aberto ? 'Testar de novo' : 'Testar a assistente', () => { if (depois) depois(); testar(false); }, 'sec plena', 'frasco'));
   if (location.hash.indexOf('#assistente') !== 0) l.push(btn('Abrir Assistente', () => { if (depois) depois(); ir('assistente'); }, 'fant plena'));
   return l;
 }
@@ -159,7 +161,7 @@ function faixasAtualizar() {
     faixaConexao: () => CONEXAO.caiu,
     faixaConta: () => (CONTA || {}).situacao === 'suspenso',
     faixaPausa: () => pausada(),
-    faixaTeste: () => TESTE.aberto,
+    faixaTeste: () => TESTE.aberto && !semWhats(),
     faixaTermos: () => !!(TERMOS && TERMOS.mostrar),
     faixaSenha: () => !!token && !sessao
   };

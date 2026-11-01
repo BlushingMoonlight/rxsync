@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-km73xi64vaXZSX0K+QW2/WU4H0w/lg+QQekcUJLkpKI=' 'self' https://*.googletagmanager.com; style-src 'sha256-uuwOyF67VW2kuVcm+JACU9wPUUNB/B8rNpF9THkiGAA=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+MY/9TKkYcnKTPsPlnaLToZTRDDGNjXypjEg8EKFkpM=' 'self' https://*.googletagmanager.com; style-src 'sha256-hX6qAetGcqfTtvEfseTEXXj0BkU1SHY9spfLDAqpPQY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -71,18 +71,36 @@
     textarea.campo.alto-72 { min-height:72px; } textarea.campo.alto-140 { min-height:140px; }
     .campo.faixa-hora { width:7.5rem; padding:.55rem .7rem; font-size:.9rem; }
     .isca { position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden; }
+    /* Listas no modelo escrever › Adicionar › próximo (rxsync-sistema #225, item 18) */
+    .lista-ed { display:grid; gap:.75rem; }
+    .tipo-linha { display:grid; grid-template-columns: 1fr; gap:.5rem; border:1px solid #E3E7E8; border-radius:.75rem; padding:.75rem; }
+    .tipo-linha .tl-meio { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+    .tipo-linha input[type=time] { width:7.5rem; }
+    .tipo-linha select { width:auto; min-width:9rem; }
+    .tipo-linha .tl-valor { width:8.5rem; }
+    .btn-add, .btn-add-lado, .btn-rem { min-height:44px; border-radius:.75rem; font-weight:600; font-size:.95rem; cursor:pointer; }
+    .btn-add { margin-top:.75rem; padding:0 1rem; border:1px solid #848E93; background:#fff; color:#0A5148; }
+    .add-linha { display:flex; gap:.5rem; }
+    .btn-add-lado { flex-shrink:0; padding:0 1rem; border:0; background:#0A5148; color:#fff; }
+    .btn-rem { padding:0 .75rem; border:0; background:none; color:#962318; text-decoration:underline; }
+    .lista-itens { margin-top:.5rem; display:grid; gap:.35rem; }
+    .lista-itens li { display:flex; align-items:center; justify-content:space-between; gap:.5rem; border:1px solid #E3E7E8; border-radius:.75rem; padding:.15rem .25rem .15rem .9rem; }
+    .lista-itens li span { overflow-wrap:anywhere; }
+    .opcoes { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .opcoes label { display:inline-flex; align-items:center; gap:.5rem; min-height:44px; padding:0 .9rem; border:1px solid #E3E7E8; border-radius:.75rem; cursor:pointer; }
+    .campo-curto { width:auto; min-width:10rem; }
+    .aviso-depois { margin-top:.75rem; font-size:.85rem; color:#4A545A; background:#F7F8F8; border-radius:.75rem; padding:.75rem; }
 </style>
 <link rel="stylesheet" href="/assets/ancora/site.css">
 </head>
 
 <body class="bg-slate-50 font-sans text-slate-700 antialiased">
 
-<header class="bg-primary-900 text-white sticky top-0 z-20">
-  <div class="max-w-3xl mx-auto px-5 py-4 flex items-center justify-between">
-    <a href="/" class="font-extrabold tracking-tight text-lg">RXSync</a>
-    <span id="selo" class="hidden text-xs text-white/70">
-      Passo <span id="passoAtual">1</span> de 7
-    </span>
+<!-- Cabeçalho da contratação: o mesmo do contratar e do conectar (estilo no assets/ancora/site.css; rxsync-sistema #225, item 20). -->
+<header class="topo-f">
+  <div class="topo-f-in">
+    <a href="/" class="topo-f-marca"><img src="/assets/icones/rxsync-32.png" width="28" height="28" alt="">RXSync</a>
+    <span id="selo" class="topo-f-passo hidden">Passo <span id="passoAtual">1</span> de 7</span>
   </div>
 </header>
 
@@ -175,46 +193,64 @@
         <div class="space-y-4">
 
           <div>
-            <label class="rotulo" for="servicos">O que vocês atendem</label>
-            <span class="ajuda">Um por linha. Ela usa <strong>estritamente</strong> esta lista — o que não estiver aqui, ela não oferece.</span>
-            <textarea id="servicos" class="campo alto-140" maxlength="3000" placeholder="Consulta pediátrica de rotina
-Puericultura (acompanhamento do crescimento)
-Primeira consulta do recém-nascido
-Consulta de retorno
-Atestado e declaração de comparecimento
-Orientação sobre vacinas"></textarea>
-            <p class="msg-erro" data-de="servicos">Liste pelo menos os atendimentos principais.</p>
+            <p class="rotulo" id="rot_tipos">Tipos de consulta, duração e valor</p>
+            <span class="ajuda">Um por linha: o nome, quanto tempo dura (hh:mm) e o valor. Ela só fala de preço quando o paciente pergunta.</span>
+            <div id="lst_tipos" class="lista-ed" aria-labelledby="rot_tipos"></div>
+            <button type="button" id="btnAddTipo" class="btn-add">+ Adicionar tipo de consulta</button>
+            <p class="msg-erro" data-de="lst_tipos">Coloque pelo menos um tipo de consulta, com o nome.</p>
+            <p class="aviso-depois">Você pode acrescentar médicos e tipos de consulta depois, no painel, em Agenda › Horários › Médicos e tipos.</p>
           </div>
 
           <div>
-            <label class="rotulo" for="politica_precos">Preços</label>
-            <span class="ajuda">Se não puder passar valor pelo WhatsApp, escreva exatamente o que ela deve responder no lugar.</span>
-            <textarea id="politica_precos" class="campo" maxlength="1500" placeholder="Consulta particular: R$ 350. Retorno em até 30 dias: sem custo. Para convênio, o valor depende do plano — nesses casos, pedir o nome do convênio e a carteirinha."></textarea>
-            <p class="msg-erro" data-de="politica_precos">Sem isto aqui, ela não sabe o que responder sobre valor.</p>
+            <label class="rotulo" for="obs_precos">Observação sobre valores (opcional)</label>
+            <span class="ajuda">Ex.: retorno, desconto ou o que ela deve dizer se não puder passar valor pelo WhatsApp.</span>
+            <textarea id="obs_precos" class="campo alto-72" maxlength="400" placeholder="Retorno em até 30 dias sem custo."></textarea>
           </div>
 
           <div>
-            <label class="rotulo" for="convenios_parcerias">Convênios aceitos</label>
-            <span class="ajuda">Liste os que vocês atendem. Se não atendem nenhum, escreva isso.</span>
-            <textarea id="convenios_parcerias" class="campo alto-72" maxlength="1000" placeholder="Unimed, Bradesco Saúde e IPE. Não atendemos SUS."></textarea>
+            <p class="rotulo" id="rot_formas">Formas de pagamento</p>
+            <div class="opcoes" role="group" aria-labelledby="rot_formas">
+              <label><input type="checkbox" name="forma" value="pix"> Pix</label>
+              <label><input type="checkbox" name="forma" value="dinheiro"> Dinheiro</label>
+              <label><input type="checkbox" name="forma" value="debito"> Cartão de débito</label>
+              <label><input type="checkbox" name="forma" value="credito"> Cartão de crédito</label>
+              <label><input type="checkbox" name="forma" value="boleto"> Boleto</label>
+            </div>
+            <div id="wrapParcelas" class="hidden mt-2">
+              <label class="rotulo" for="parcelas">No crédito, em até</label>
+              <select id="parcelas" class="campo campo-curto"><option value="1">1x (à vista)</option><option value="2">2x</option><option value="3">3x</option><option value="4">4x</option><option value="5">5x</option><option value="6">6x</option><option value="10">10x</option><option value="12">12x</option></select>
+            </div>
+            <label class="rotulo mt-2" for="obs_pagamento">Observação (opcional)</label>
+            <input id="obs_pagamento" class="campo" maxlength="300" placeholder="Não parcelamos consulta de convênio.">
           </div>
 
           <div>
-            <label class="rotulo" for="nao_oferecemos">O que vocês NÃO fazem</label>
-            <span class="ajuda">Importante. É o que impede a assistente de prometer o que a clínica não entrega.</span>
-            <textarea id="nao_oferecemos" class="campo alto-72" maxlength="1500" placeholder="Não fazemos urgência nem pronto-socorro. Não aplicamos vacinas na clínica. Não atendemos adultos. Não fazemos teleconsulta."></textarea>
+            <label class="rotulo" for="add_convenios">Convênios aceitos</label>
+            <span class="ajuda">Um de cada vez. Se não atendem nenhum, deixe vazio.</span>
+            <div class="add-linha"><input id="add_convenios" class="campo" maxlength="120" placeholder="Unimed" data-lista="convenios" enterkeyhint="done"><button type="button" class="btn-add-lado" data-add="convenios">Adicionar</button></div>
+            <ul id="lst_convenios" class="lista-itens" aria-label="Convênios aceitos"></ul>
           </div>
 
           <div>
-            <label class="rotulo" for="profissionais">Quem atende</label>
-            <span class="ajuda">Nome, especialidade e, se fizer diferença, os dias de cada um.</span>
-            <textarea id="profissionais" class="campo alto-72" maxlength="1200" placeholder="Dra. [nome] — pediatria, de segunda a quinta.
-Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
+            <label class="rotulo" for="add_profissionais">Quem atende</label>
+            <span class="ajuda">Nome e, se quiser, a especialidade. Um de cada vez.</span>
+            <div class="add-linha"><input id="add_profissionais" class="campo" maxlength="120" placeholder="Dra. Ana Souza, pediatria" data-lista="profissionais" enterkeyhint="done"><button type="button" class="btn-add-lado" data-add="profissionais">Adicionar</button></div>
+            <ul id="lst_profissionais" class="lista-itens" aria-label="Quem atende"></ul>
           </div>
 
           <div>
-            <label class="rotulo" for="formas_pagamento">Formas de pagamento</label>
-            <textarea id="formas_pagamento" class="campo alto-72" maxlength="600" placeholder="Dinheiro, Pix, débito e crédito em até 3x sem juros. Não parcelamos consulta de convênio."></textarea>
+            <label class="rotulo" for="add_servicos">O que vocês atendem</label>
+            <span class="ajuda">Um de cada vez. Ela só oferece o que estiver aqui.</span>
+            <div class="add-linha"><input id="add_servicos" class="campo" maxlength="120" placeholder="Consulta de rotina" data-lista="servicos" enterkeyhint="done"><button type="button" class="btn-add-lado" data-add="servicos">Adicionar</button></div>
+            <ul id="lst_servicos" class="lista-itens" aria-label="O que vocês atendem"></ul>
+            <p class="msg-erro" data-de="lst_servicos">Coloque pelo menos o atendimento principal.</p>
+          </div>
+
+          <div>
+            <label class="rotulo" for="add_nao_oferecemos">O que vocês não fazem</label>
+            <span class="ajuda">É o que impede a assistente de prometer o que a clínica não entrega.</span>
+            <div class="add-linha"><input id="add_nao_oferecemos" class="campo" maxlength="120" placeholder="Não fazemos urgência" data-lista="nao_oferecemos" enterkeyhint="done"><button type="button" class="btn-add-lado" data-add="nao_oferecemos">Adicionar</button></div>
+            <ul id="lst_nao_oferecemos" class="lista-itens" aria-label="O que vocês não fazem"></ul>
           </div>
 
         </div>
@@ -249,12 +285,6 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
             <label class="rotulo" for="horario_humano">Quando tem alguém da equipe disponível</label>
             <span class="ajuda">A assistente responde 24h. Isto é para ela saber quando dá para transferir para uma pessoa.</span>
             <input id="horario_humano" class="campo" maxlength="200" placeholder="Segunda a sexta, das 8h às 18h">
-          </div>
-
-          <div>
-            <label class="rotulo" for="mensagem_fora_horario">O que ela diz fora do horário</label>
-            <span class="ajuda">Ela pode agendar a qualquer hora. Evite prometer que alguém vai confirmar depois: o horário que ela marca já está confirmado.</span>
-            <textarea id="mensagem_fora_horario" class="campo alto-72" maxlength="600" placeholder="A recepção volta a atender amanhã às 8h. Enquanto isso, posso ver os horários livres e já deixar sua consulta marcada."></textarea>
           </div>
 
         </div>
@@ -420,6 +450,12 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
           </div>
 
           <div>
+            <label class="rotulo" for="mensagem_fora_horario">Quando pedem uma pessoa fora do horário da equipe</label>
+            <span class="ajuda">A assistente atende e marca consultas a qualquer hora. Isto é só para quando o paciente pedir para falar com alguém da equipe e não houver ninguém.</span>
+            <textarea id="mensagem_fora_horario" class="campo alto-72" maxlength="600">A equipe volta no próximo horário de atendimento e responde por aqui. Enquanto isso, eu posso ver os horários livres e marcar a sua consulta.</textarea>
+          </div>
+
+          <div>
             <label class="rotulo" for="gatilhos_urgencia">O que é urgência</label>
             <span class="ajuda">Sinais que fazem ela parar de agendar e mandar buscar atendimento.</span>
             <textarea id="gatilhos_urgencia" class="campo alto-72" maxlength="800" placeholder="Febre alta em bebê de menos de 3 meses, dificuldade para respirar, convulsão, criança muito molinha ou que não acorda, engasgo, queda com batida na cabeça, sangramento que não para."></textarea>
@@ -496,7 +532,12 @@ Dr. [nome] — pediatria e alergologia, às sextas."></textarea>
       Conectar o WhatsApp agora
       <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </a>
-    <p class="mt-5 text-xs text-slate-500">Se preferir fazer depois, o link também está no seu e-mail.</p>
+    <div id="caminhoPainel" class="hidden mt-6 pt-5 border-t border-slate-200">
+      <p class="text-sm text-slate-600 max-w-md mx-auto">O painel é onde você acompanha a agenda e muda o que a assistente responde.</p>
+      <a id="linkPainel" href="/painel/" class="mt-4 w-full sm:w-auto sm:px-10 inline-flex items-center justify-center gap-2 bg-white text-primary-900 font-bold py-3.5 rounded-xl border-2 border-slate-200">Ir ao painel e criar a senha</a>
+      <p class="mt-3 text-xs text-slate-500">No painel, toque em "Criar a senha" e use o e-mail do cadastro: um código chega para você.</p>
+    </div>
+    <p class="mt-5 text-xs text-slate-500">Se preferir fazer depois, os dois links também estão no seu e-mail.</p>
   </section>
 
 </main>
@@ -714,6 +755,73 @@ function addFaq(p = '', r = '') {
   lucide.createIcons();
 }
 
+/* ===================== LISTAS (rxsync-sistema #225, item 18) ===================== */
+// Escrever › Adicionar › próximo. Os tipos de consulta têm nome, duração (hh:mm) e valor (R$ 0,00, sem custo ou pelo
+// convênio). O servidor monta com as listas os mesmos textos que a assistente lê.
+const LISTAS_SIMPLES = ['convenios', 'profissionais', 'servicos', 'nao_oferecemos'];
+const minDe = v => { const m = /^(\d{1,2}):(\d{2})$/.exec(v || ''); return m ? (+m[1]) * 60 + (+m[2]) : 0; };
+const hhmmDe = n => n ? String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0') : '';
+const valorDe = v => { const s = String(v || '').replace(/[^\d,.]/g, ''); if (!s) return null; const n = Number(s.includes(',') ? s.replace(/\./g, '').replace(',', '.') : s); return n > 0 && n <= 100000 ? Math.round(n * 100) / 100 : null; };
+const valorTxt = n => n == null ? '' : n.toFixed(2).replace('.', ',');
+function addTipo(t = {}) {
+  const box = document.createElement('div'); box.className = 'tipo-linha';
+  const nome = document.createElement('input'); nome.className = 'campo tl-nome'; nome.maxLength = 80; nome.placeholder = 'Primeira consulta'; nome.setAttribute('aria-label', 'Nome do tipo de consulta'); nome.value = t.nome || '';
+  const meio = document.createElement('div'); meio.className = 'tl-meio';
+  const dur = document.createElement('input'); dur.type = 'time'; dur.step = 300; dur.min = '00:05'; dur.max = '08:00'; dur.className = 'campo tl-dur'; dur.setAttribute('aria-label', 'Duração (horas e minutos)'); dur.value = hhmmDe(t.duracao_min) || '00:30';
+  const preco = document.createElement('select'); preco.className = 'campo tl-preco'; preco.setAttribute('aria-label', 'Como é o valor');
+  [['valor', 'Valor'], ['sem_custo', 'Sem custo'], ['convenio', 'Pelo convênio']].forEach(([v, r]) => { const o = document.createElement('option'); o.value = v; o.textContent = r; preco.append(o); });
+  preco.value = t.preco || 'valor';
+  const val = document.createElement('input'); val.className = 'campo tl-valor'; val.inputMode = 'decimal'; val.placeholder = 'R$ 0,00'; val.setAttribute('aria-label', 'Valor em reais'); val.value = valorTxt(t.valor);
+  const rem = document.createElement('button'); rem.type = 'button'; rem.className = 'btn-rem'; rem.textContent = 'Remover';
+  const ajustar = () => { val.classList.toggle('hidden', preco.value !== 'valor'); };
+  preco.addEventListener('change', () => { ajustar(); salvarRascunho(); });
+  rem.addEventListener('click', () => { box.remove(); salvarRascunho(); });
+  [nome, dur, val].forEach(el => el.addEventListener('change', salvarRascunho));
+  val.addEventListener('blur', () => { const n = valorDe(val.value); if (n != null) val.value = valorTxt(n); });
+  meio.append(dur, preco, val, rem); box.append(nome, meio); $('lst_tipos').append(box); ajustar();
+  return nome;
+}
+function addItem(k, texto) {
+  texto = String(texto || '').trim().slice(0, 120); if (!texto) return;
+  const li = document.createElement('li'); const s = document.createElement('span'); s.textContent = texto;
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn-rem'; b.textContent = 'Remover'; b.setAttribute('aria-label', 'Remover ' + texto);
+  b.addEventListener('click', () => { li.remove(); salvarRascunho(); });
+  li.append(s, b); $('lst_' + k).append(li);
+}
+function coletarListas() {
+  const tipos = [...document.querySelectorAll('#lst_tipos .tipo-linha')].map(b => ({
+    nome: b.querySelector('.tl-nome').value.trim(), duracao_min: minDe(b.querySelector('.tl-dur').value) || null,
+    preco: b.querySelector('.tl-preco').value, valor: b.querySelector('.tl-preco').value === 'valor' ? valorDe(b.querySelector('.tl-valor').value) : null
+  })).filter(t => t.nome);
+  const L = { tipos, formas: [...document.querySelectorAll('input[name="forma"]:checked')].map(c => c.value),
+    parcelas: Number($('parcelas').value) || 1, obs_pagamento: $('obs_pagamento').value.trim(), obs_precos: $('obs_precos').value.trim() };
+  LISTAS_SIMPLES.forEach(k => { L[k] = [...document.querySelectorAll('#lst_' + k + ' li span')].map(s => s.textContent); });
+  return L;
+}
+function aplicarListas(L) {
+  $('lst_tipos').replaceChildren(); (L.tipos || []).forEach(addTipo);
+  document.querySelectorAll('input[name="forma"]').forEach(c => { c.checked = (L.formas || []).includes(c.value); });
+  if (L.parcelas) $('parcelas').value = String(L.parcelas);
+  $('obs_pagamento').value = L.obs_pagamento || ''; $('obs_precos').value = L.obs_precos || '';
+  LISTAS_SIMPLES.forEach(k => { $('lst_' + k).replaceChildren(); (L[k] || []).forEach(x => addItem(k, x)); });
+  $('wrapParcelas').classList.toggle('hidden', !document.querySelector('input[name="forma"][value="credito"]').checked);
+}
+function iniciarListas() {
+  $('btnAddTipo').addEventListener('click', () => addTipo().focus());
+  document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.add, i = $('add_' + k); addItem(k, i.value); i.value = ''; i.focus(); salvarRascunho(); }));
+  document.querySelectorAll('[data-lista]').forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addItem(i.dataset.lista, i.value); i.value = ''; salvarRascunho(); } }));
+  document.querySelectorAll('input[name="forma"]').forEach(c => c.addEventListener('change', () => { $('wrapParcelas').classList.toggle('hidden', !document.querySelector('input[name="forma"][value="credito"]').checked); salvarRascunho(); }));
+  if (!$('lst_tipos').children.length) addTipo();
+}
+function resumoListas() {
+  const L = coletarListas(), dur = n => n ? (n >= 60 ? Math.floor(n / 60) + 'h' + (n % 60 ? String(n % 60).padStart(2, '0') : '') : n + ' min') : '';
+  const partes = [];
+  if (L.tipos.length) partes.push('Tipos de consulta: ' + L.tipos.map(t => t.nome + (t.duracao_min ? ' (' + dur(t.duracao_min) + ')' : '') + ': ' + (t.preco === 'sem_custo' ? 'sem custo' : t.preco === 'convenio' ? 'pelo convênio' : t.valor ? 'R$ ' + valorTxt(t.valor) : 'valor a confirmar')).join('; '));
+  if (L.formas.length) partes.push('Pagamento: ' + L.formas.map(f => ({ pix: 'Pix', dinheiro: 'dinheiro', debito: 'débito', credito: 'crédito' + (L.parcelas > 1 ? ' em até ' + L.parcelas + 'x' : ''), boleto: 'boleto' })[f]).join(', '));
+  [['convenios', 'Convênios'], ['profissionais', 'Quem atende'], ['servicos', 'O que atendem'], ['nao_oferecemos', 'O que não fazem']].forEach(([k, r]) => { if (L[k].length) partes.push(r + ': ' + L[k].join(', ')); });
+  return partes;
+}
+
 /* ===================== RASCUNHO ===================== */
 function coletar() {
   const d = {};
@@ -731,6 +839,7 @@ function coletar() {
     resposta: el.querySelector('.faq-r').value.trim()
   })).filter(f => f.pergunta && f.resposta);
 
+  d.listas = coletarListas();
   d.declaracao_rt = !!($('declaracao_rt') && $('declaracao_rt').checked);
   return d;
 }
@@ -754,6 +863,7 @@ function lerRascunho() {
       aplicarDia(id, Array.isArray(f) ? f : (f && f.abre && f.fecha ? [f] : []));
     });
   }
+  if (d.listas) aplicarListas(d.listas);
   if (Array.isArray(d.faq)) {
     $('listaFaq').innerHTML = '';
     d.faq.forEach(f => addFaq(f.pergunta, f.resposta));
@@ -762,7 +872,7 @@ function lerRascunho() {
 }
 
 /* ===================== NAVEGAÇÃO ===================== */
-const OBRIGATORIOS = { 1: ['nome_exibicao'], 2: ['servicos', 'politica_precos'], 5: ['numero_whatsapp', 'resp_tecnico_nome', 'resp_tecnico_conselho'] };
+const OBRIGATORIOS = { 1: ['nome_exibicao'], 5: ['numero_whatsapp', 'resp_tecnico_nome', 'resp_tecnico_conselho'] };
 
 function limparErro(id) {
   $(id).classList.remove('erro');
@@ -791,6 +901,14 @@ function validar(n) {
       if (!primeiro) primeiro = 'whatsapp_alerta';
       ok = false;
     }
+  }
+  if (n === 2) {
+    // Pelo menos um tipo de consulta com nome e o atendimento principal (rxsync-sistema #225, item 18).
+    const L = coletarListas();
+    const semTipo = !L.tipos.length, semServ = !L.servicos.length;
+    document.querySelector('.msg-erro[data-de="lst_tipos"]').classList.toggle('on', semTipo);
+    document.querySelector('.msg-erro[data-de="lst_servicos"]').classList.toggle('on', semServ);
+    if (semTipo || semServ) { ok = false; (semTipo ? document.querySelector('#lst_tipos input') || $('btnAddTipo') : $('add_servicos')).focus(); }
   }
   if (n === 3) {
     const msg = validarGrade();
@@ -823,8 +941,9 @@ function montarResumo() {
   for (let n = 1; n <= 6; n++) {
     const secs = document.querySelectorAll('section.etapa[data-etapa="' + n + '"]');
     const itens = [];
+    if (n === 2) itens.push(...resumoListas().map(p => { const i = p.indexOf(': '); return [p.slice(0, i), p.slice(i + 2)]; }));
     secs.forEach(sec => sec.querySelectorAll('input, select, textarea').forEach(el => {
-      if (el.type === 'hidden' || el.closest('[aria-hidden="true"]') || el.id === 'empresa_site') return;
+      if (el.type === 'hidden' || el.closest('[aria-hidden="true"]') || el.id === 'empresa_site' || (n === 2 && el.id !== 'obs_precos' && el.id !== 'obs_pagamento')) return;
       let val = el.tagName === 'SELECT' ? (el.value ? el.options[el.selectedIndex].text : '') : el.type === 'checkbox' || el.type === 'radio' ? (el.checked ? 'Sim' : '') : el.value.trim();
       if (!val) return;
       const lab = (el.id && sec.querySelector('label[for="' + el.id + '"]')) || el.closest('label');
@@ -896,6 +1015,8 @@ async function enviar() {
     try { localStorage.removeItem(CHAVE_RASCUNHO); } catch (e) {}
     if (d.link_conectar) $('linkConectar').href = d.link_conectar;
     else $('linkConectar').classList.add('hidden');
+    // O painel fica pronto no fim do onboarding (rxsync-sistema sql/081, #225, item 21).
+    if (d.painel_pronto) $('caminhoPainel').classList.remove('hidden');
 
     $('selo').classList.add('hidden');
     mostrar('telaOk');
@@ -932,6 +1053,7 @@ async function abrir() {
 
     montarGrade();
     const tinha = lerRascunho();
+    iniciarListas();
     if (tinha) $('avisoRascunho').classList.remove('hidden');
     if ($('listaFaq').children.length === 0) addFaq();
 

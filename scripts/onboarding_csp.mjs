@@ -17,7 +17,7 @@ const responder = (caminho, b) => {
   if (caminho !== 'onboarding' || b.token !== TOKEN) return { ok: false, mensagem: 'Link inválido.' };
   if (!estado.abre) return { ok: false, mensagem: 'Este link venceu. Peça um novo à RXSync.' };
   if (b.acao === 'abrir') return { ok: true, nome_exibicao: 'Clínica Teste', representante_nome: 'Maria Teste', plano: 'Gestão Inteligente' };
-  if (b.acao === 'salvar') return { ok: true, link_conectar: 'https://rxsync.com.br/conectar.html?t=' + 'ab'.repeat(32) };
+  if (b.acao === 'salvar') return { ok: true, link_conectar: 'https://rxsync.com.br/conectar.html?t=' + 'ab'.repeat(32), link_painel: 'https://rxsync.com.br/painel/', painel_pronto: true };
   return { ok: false };
 };
 const site = await servirSite(); const browser = await abrirNavegador();
@@ -38,7 +38,22 @@ const etapa = n => page.locator(`section[data-etapa="${n}"].ativa`).first();
 const proximo = async n => { await page.locator(`section[data-etapa="${n}"] .proximo`).click(); await etapa(n + 1).waitFor(); };
 ok(await page.inputValue('#nome_exibicao') === 'Clínica Teste', 'etapa 1: o nome vem do servidor');
 await proximo(1);
-await page.fill('#servicos', 'Consulta de rotina'); await page.fill('#politica_precos', 'Consulta particular: R$ 350.');
+// #225, item 18: as listas (escrever › Adicionar › próximo); sem tipo de consulta nem atendimento, não passa.
+await page.locator('#lst_tipos .tl-nome').first().fill('');
+await page.locator('section[data-etapa="2"] .proximo').click();
+ok(await page.locator('.msg-erro[data-de="lst_tipos"].on').count() === 1 && await page.locator('.msg-erro[data-de="lst_servicos"].on').count() === 1, 'etapa 2: sem tipo de consulta nem atendimento, pede os dois');
+await page.locator('#lst_tipos .tl-nome').first().fill('Primeira consulta');
+await page.locator('#lst_tipos .tl-dur').first().fill('01:00');
+await page.locator('#lst_tipos .tl-valor').first().fill('350');
+await page.click('#btnAddTipo');
+await page.locator('#lst_tipos .tl-nome').nth(1).fill('Retorno');
+await page.locator('#lst_tipos .tl-preco').nth(1).selectOption('sem_custo');
+ok(await page.locator('#lst_tipos .tl-valor').nth(1).isHidden(), 'etapa 2: "Sem custo" esconde o valor');
+await page.fill('#add_servicos', 'Consulta de rotina'); await page.press('#add_servicos', 'Enter');
+await page.fill('#add_convenios', 'Unimed'); await page.click('[data-add="convenios"]');
+await page.check('input[name="forma"][value="pix"]'); await page.check('input[name="forma"][value="credito"]');
+await page.locator('#wrapParcelas:not(.hidden)').waitFor(); await page.selectOption('#parcelas', '3');
+ok(await page.locator('#lst_servicos li').count() === 1 && await page.locator('#lst_convenios li').count() === 1, 'etapa 2: Enter e "Adicionar" põem o item na lista');
 await proximo(2);
 await page.check('#ab_sab');
 await page.locator('#bx_sab:not(.hidden)').waitFor();
@@ -56,14 +71,19 @@ const perguntas = await page.locator('#listaFaq > *').count();
 await page.click('#btnAddFaq');
 ok(await page.locator('#listaFaq > *').count() === perguntas + 1, 'etapa 6: "Adicionar pergunta" põe mais uma');
 await proximo(6);   // Confira suas respostas (molde F)
-ok(/Dra\. Teste/.test(await page.locator('#resumo').textContent()), 'etapa 7: Confira suas respostas mostra o que foi preenchido');
+const resumo = await page.locator('#resumo').textContent();
+ok(/Dra\. Teste/.test(resumo) && /Primeira consulta \(1h\): R\$ 350,00/.test(resumo) && /crédito em até 3x/.test(resumo), 'etapa 7: Confira suas respostas mostra o que foi preenchido, com as listas');
 await page.click('#btnEnviar');
 await page.locator('#erroDeclaracao.on').waitFor();
 ok(!chamadas.some(c => c.corpo.acao === 'salvar'), 'sem a aprovação do responsável técnico, não envia');
 await page.check('#declaracao_rt'); await page.click('#btnEnviar');
 await page.locator('#telaOk:not(.hidden)').waitFor();
 const salvo = chamadas.find(c => c.corpo.acao === 'salvar');
-ok(salvo && salvo.corpo.dados.horarios.sab && salvo.corpo.dados.horarios.sab.length === 1 && salvo.corpo.dados.servicos === 'Consulta de rotina', 'o envio leva os campos e a grade (com o sábado)');
+const L = salvo && salvo.corpo.dados.listas;
+ok(salvo && salvo.corpo.dados.horarios.sab && salvo.corpo.dados.horarios.sab.length === 1 && L && L.servicos[0] === 'Consulta de rotina'
+  && L.tipos.length === 2 && L.tipos[0].duracao_min === 60 && L.tipos[0].valor === 350 && L.tipos[1].preco === 'sem_custo' && L.parcelas === 3
+  && /fora do horário|próximo horário/.test(salvo.corpo.dados.mensagem_fora_horario), 'o envio leva os campos, as listas e a grade (com o sábado)');
+ok(await page.locator('#caminhoPainel:not(.hidden) #linkPainel[href="/painel/"]').count() === 1, 'a tela do fim mostra também "Ir ao painel e criar a senha"');
 ok(/\/conectar\.html\?t=/.test(await page.getAttribute('#linkConectar', 'href')), 'a tela do fim mostra o link para conectar o WhatsApp');
 await semBloqueio(page, 'as 6 etapas e o envio');
 
