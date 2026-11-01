@@ -504,8 +504,21 @@ for (const arq of ['painel/app.js', 'painel/sw.js', 'painel/tour.js', 'central/s
 }
 // O /conectar no visual das outras páginas do molde F (rxsync-sistema #225, item 20): cabeçalho branco com a marca, sem
 // degradê nem sombra de cartão nas classes da página.
+// O cabeçalho das páginas da contratação é exatamente o mesmo (revisão do rxsync-sistema #225, item 20): branco (estilo só no
+// assets/ancora/site.css), com o ícone rxsync-32 e "RXSync".
+{ const MARCA = '<header class="topo-f">\n  <div class="topo-f-in">\n    <a href="/" class="topo-f-marca"><img src="/assets/icones/rxsync-32.png" width="28" height="28" alt="">RXSync</a>';
+  const norm = s => s.replace(/\r/g, '').replace(/^[ \t]+/gm, m => ' '.repeat(m.length));
+  const PAGINAS_CONTRATACAO = ['contratar.html', 'onboarding.html', 'conectar.html'];
+  for (const f of PAGINAS_CONTRATACAO) {
+    const c = norm(fs.readFileSync(f, 'utf8'));
+    const tira = c.replace(/^ +/gm, '');
+    if ((c.match(/<header\b/g) || []).length !== 1 || !tira.includes(MARCA.replace(/\n +/g, '\n')))
+      erro(`${f}: o cabeçalho é o mesmo das páginas da contratação (${PAGINAS_CONTRATACAO.join(', ')}): <header class="topo-f">, o ícone rxsync-32 e "RXSync" (#225, item 20)`);
+    if (/\.topo-f/.test(c.split('<body')[0])) erro(`${f}: o estilo do cabeçalho fica só no assets/ancora/site.css, igual nas páginas da contratação`);
+  }
+  const css = fs.readFileSync('assets/ancora/site.css', 'utf8');
+  if (!/\.topo-f \{[^}]*background: var\(--fundo\)/.test(css)) erro('assets/ancora/site.css: o cabeçalho das páginas da contratação (.topo-f) é branco (var(--fundo))'); }
 { const c = fs.readFileSync('conectar.html', 'utf8');
-  if (!/<header class="topo-f">/.test(c)) erro('conectar.html: o cabeçalho é o branco das páginas do molde F (topo-f), com a marca (#225, item 20)');
   if (/class="[^"]*\b(bg-gradient-|from-|shadow-(sm|md|lg|xl))/.test(c)) erro('conectar.html: sem degradê nem sombra de cartão (P12, #225, item 20)'); }
 console.log(erros ? `${erros} problema(s).` : `Tudo certo (${htmls.length} páginas).`);
 process.exit(erros ? 1 : 0);
