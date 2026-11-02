@@ -78,7 +78,7 @@ async function dLista(c) {
 
 // ---------- formulário (criar e editar): os mesmos campos; a validade é em dias ao criar e em data ao editar
 function camposDem(l) {
-  // PJ-08: vindo do lead da prospecção, a clínica, a cidade e o PX- já vêm preenchidos (só no link novo).
+  // vindo do lead da prospecção, a clínica, a cidade e o PX- já vêm preenchidos (só no link novo).
   const v = l || est.demPrefill || {};
   if (!l) est.demPrefill = null;
   const entrada = (k, rot, props, ajuda) => { const i = el('input', { class: 'entrada', id: 'd-' + k, autocomplete: 'off', spellcheck: 'false', value: v[k] == null ? null : String(v[k]), ...props });

@@ -10,7 +10,7 @@ ICONES.conversa = 'M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7l-4.5 3.5V17H5a1 1 0
 ICONES.seta_baixo = 'M6 9l6 6 6-6';
 ICONES.mais_um = 'M12 5v14M5 12h14';
 
-// Pedidos do Jean (PJ-02): as abas na ordem do trabalho; o que é semanal ou raro fica no "Mais" da própria Prospecção.
+// Pedidos do Jean: as abas na ordem do trabalho; o que é semanal ou raro fica no "Mais" da própria Prospecção.
 const P_ABAS = [['', 'Início'], ['publicos', 'Públicos'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['numeros', 'Números']];
 const P_MAIS = [['relatorios', 'Relatórios', 'Resultados por campanha, conjunto e anúncio'], ['buscas', 'Buscas', 'Todas as buscas no Google Maps e o teto de créditos'],
   ['regras', 'Regras', 'Pausar ou reduzir quando algo vai mal'], ['custos', 'Custos', 'Preços do SerpAPI e da OpenAI']];
@@ -39,7 +39,7 @@ function maisP() {
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-mais-p', text: 'Mais da prospecção' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
     el('ul', { class: 'menu-acoes' }, P_MAIS.map(([k, n, s]) => el('li', {}, el('button', { type: 'button', onclick: () => { fechar(); irP(k); } }, el('div', {}, n, el('span', { class: 't2', text: s }))))))));
 }
-// Uma chave da prospecção ligada ali mesmo (PJ-04), com o mesmo nível de Ajustes (busca e IA 2, disparo 3).
+// Uma chave da prospecção ligada ali mesmo, com o mesmo nível de Ajustes (busca e IA 2, disparo 3).
 const ligarAqui = (chave, texto) => btn(texto, async () => { await mudarChave(chave, 'SIM'); est.prosp = null; await rotear(); }, 'sec');
 async function arvoreP(forcar) {
   if (est.prosp && !forcar) return est.prosp;
@@ -131,7 +131,7 @@ async function pInicio(c) {
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
   const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
   const campanhas = d.campanhas || [];
-  // Para começar (PJ-03): a ordem do primeiro uso, cada passo marcado pelo que o servidor já manda; some quando tudo está feito.
+  // Para começar: a ordem do primeiro uso, cada passo marcado pelo que o servidor já manda; some quando tudo está feito.
   const pubs = ((await publicosP()) || {}).publicos || [];
   const temCampanha = campanhas.some(cp => ativo(cp.situacao) && (cp.conjuntos || []).some(j => ativo(j.situacao) && (j.anuncios || []).some(n => ativo(n.situacao))));
   const politica = ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM';
@@ -225,7 +225,7 @@ const ESQUEMA = {
       ['qualificacao.pesos.site', 'Peso do site', 'num'], ['qualificacao.pesos.origem', 'Peso da origem do telefone', 'num'], ['qualificacao.pontos_min', 'Pontuação mínima (0 a 100)', 'num'],
       ['qualificacao.revisar_numero', 'Número antigo (sem o 9)', 'sel', { op: [['whatsapp', 'Conferir no WhatsApp'], ['manual', 'Deixar tirado (eu ponho de volta)'], ['descartar', 'Descartar']] }]]],
     ['Redes e concorrentes', [['exclusoes.redes_palavras', 'Palavras de rede', 'lista'], ['exclusoes.rede_min_enderecos', 'Mesmo nome em N endereços = rede', 'num'], ['exclusoes.concorrentes', 'Concorrentes (nome ou site)', 'lista']]],
-    // PJ-07 e PJ-14: o zoom só vale com coordenadas; para uma cidade grande, o caminho é pôr os bairros.
+    // o zoom só vale com coordenadas; para uma cidade grande, o caminho é pôr os bairros.
     ['Avançado (coordenadas e zoom)', [['busca.coordenadas', 'Coordenadas (opcional)', 'texto', { ajuda: '-25.43,-49.27; sem coordenadas, o zoom não vale' }],
       ['busca.zoom', 'Zoom (10 cidade a 18 quarteirão)', 'num', { ajuda: 'deixe 13 ou 14: mais alto = área menor = menos médicos' }]]]],
   anuncio: [
@@ -310,7 +310,7 @@ async function pObjeto(c, tipo, id, pai) {
   };
   const blocos = ESQUEMA[tipo].map(([nomeBloco, campos], k) => el('details', { class: 'grupo', open: k === 0 || null }, el('summary', { text: nomeBloco }),
     el('div', { class: 'corpo-grupo' }, el('div', { class: 'form-2' }, campos.map(campo)))));
-  // Modelo do público novo (PJ-15, DEC-189): "Médicos" preenche os filtros que não cortam consultório médico.
+  // Modelo do público novo (DEC-189): "Médicos" preenche os filtros que não cortam consultório médico.
   const modeloSel = tipo === 'publico' && !o && editar ? el('select', { class: 'entrada', id: 'p-modelo', onchange: e => {
     const m = MODELOS_PUB[e.target.value] || {};
     for (const [cam, v] of Object.entries(m)) if (ins[cam]) ins[cam].i.value = v;
@@ -647,7 +647,7 @@ async function pLead(c, parte, id) {
     if (l.situacao === 'com_voce' || l.assumido_em) acoes.push(btn('Devolver à IA', () => fazer('prosp_lead_devolver', { id: l.id }, { titulo: 'Devolver a conversa à IA', linhas: [['Conversa', 'com você', 'com a IA (na próxima mensagem do lead)']], depois: recarregar }), 'sec'));
     if (!['saiu', 'cliente'].includes(l.situacao)) acoes.push(btn('Marcar', () => fazer('prosp_lead_marcar', { id: l.id }, { titulo: 'Marcar o lead ' + l.id,
       campos: [{ k: 'situacao', rot: 'Situação', opcoes: [['positivo', 'Positivo'], ['recusou', 'Recusou'], ['cadastrou', 'Cadastrou'], ['com_voce', 'Com você']] }], ok: 'Marcado.', depois: recarregar }), 'sec'));
-    // PJ-08: a demonstração para este lead, com a clínica, a cidade e o PX- já preenchidos.
+    // a demonstração para este lead, com a clínica, a cidade e o PX- já preenchidos.
     if (ligada('editar_demonstracoes') && !['saiu'].includes(l.situacao)) acoes.push(btn('Criar demonstração', () => { est.demPrefill = { clinica: l.nome || '', cidade: l.cidade || '', lead_codigo: l.id }; ir('demonstracoes/novo'); }, 'sec', 'demonstracao'));
     if (l.situacao !== 'saiu') acoes.push(btn('Não contatar', () => fazer('prosp_lead_nao_contatar', { id: l.id }, { titulo: 'Não contatar ' + (l.nome || l.id), perigo: true, botao: 'Não contatar',
       linhas: [['Este número', 'pode receber', 'nunca mais, em nenhuma campanha']], texto: 'Guarda só o resumo do telefone (DEC-073). Os dados do lead saem em 30 dias.', ok: 'Não contatar.', depois: recarregar }), 'perigo-sec'));
@@ -759,7 +759,7 @@ async function pBuscas(c) {
           Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') }) : null),
         el('div', { class: 'direita' }, etq(...(SITB[b.situacao] || [b.situacao, '']))))))) : vazio('Nenhuma busca ainda.', 'busca'))));
 }
-// Por que caiu (PJ-11): os motivos dos descartados, do maior para o menor, numa linha que abre ao tocar.
+// Por que caiu: os motivos dos descartados, do maior para o menor, numa linha que abre ao tocar.
 const NAO_MOTIVO = ['achados', 'novos', 'ja_no_publico', 'de_outro_publico', 'fixo_conferir'];
 function porQueCaiu(cont) {
   const m = Object.entries(cont || {}).filter(([k, v]) => !NAO_MOTIVO.includes(k) && Number(v) > 0).sort((a, b) => b[1] - a[1]);
