@@ -59,9 +59,11 @@
     if (gaLigado || !temGA) return;
     gaLigado = true;
     // Consent Mode básico (rxsync-sistema DEC-191): o Google só carrega depois do "Aceitar" (como antes) e recebe o
-    // consentimento junto: negado por padrão e liberado pela escolha da pessoa. Sem "Aceitar", nada vai ao Google.
+    // consentimento junto: negado por padrão; o "Aceitar" libera só o necessário para medir as visitas e as conversões
+    // dos anúncios (analytics_storage, ad_storage e ad_user_data). ad_personalization fica SEMPRE negado: sem anúncio
+    // personalizado nem remarketing (Política, seção 9). Sem "Aceitar", nada vai ao Google.
     window.gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' });
-    window.gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted' });
+    window.gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'denied', analytics_storage: 'granted' });
     window.gtag('js', new Date());
     // A primeira página vista depois do "Aceitar" leva o endereço de chegada (com o gclid e as UTMs), uma vez por aba.
     var chegada = lerAba('rx_chegada');
@@ -90,7 +92,7 @@
     aviso.setAttribute('role', 'region');
     aviso.setAttribute('aria-label', 'Aviso de cookies');
     var p = document.createElement('p');
-    p.appendChild(document.createTextNode('Usamos cookies do Google Analytics para medir as visitas, só se você aceitar. Veja a '));
+    p.appendChild(document.createTextNode('Usamos cookies do Google Analytics e do Google Ads para medir as visitas e os anúncios, só se você aceitar. Veja a '));
     var a = document.createElement('a'); a.href = '/privacidade.html'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Política de Privacidade';
     p.appendChild(a); p.appendChild(document.createTextNode('.'));
     var acoes = document.createElement('div'); acoes.className = 'rxc-acoes';

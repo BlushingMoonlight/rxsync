@@ -1,6 +1,7 @@
 // A página do anúncio e o Google Analytics (rxsync-sistema DEC-190 e DEC-191), com o Google SIMULADO (nada sai):
 //   1. sem o "Aceitar", nada vai ao Google; a origem do anúncio fica só na aba;
-//   2. com o "Aceitar", o Consent Mode básico vem antes de tudo (negado por padrão, liberado pela escolha) e a primeira
+//   2. com o "Aceitar", o Consent Mode básico vem antes de tudo (negado por padrão; o "Aceitar" libera só a medição e
+//      ad_personalization fica sempre negado), o aviso cita o Google Ads, e a primeira
 //      página vista leva o endereço de chegada (com o gclid e as UTMs), uma vez por aba;
 //   3. a origem curta ("google / cpc / campanha") fica na aba, sem o gclid, e a contratação a usa;
 //   4. o contratar manda o begin_checkout (com o valor do plano e BRL) uma vez, ao sair do passo 1;
@@ -25,12 +26,15 @@ ok(await page.locator('main a.chamada').first().textContent() === 'Testar 7 dias
 ok(/default-src 'none'/.test(await regraDa(page)) && !(await bloqueios(page)).length, 'a regra de segurança está ligada e nada é bloqueado');
 // 2. O "Aceitar" na página seguinte: o Google lê o endereço de chegada
 await page.goto(site.base + '/contratar.html?plano=gestao&ciclo=mensal&origem=anuncio');
+ok((await page.locator('.rxc-aviso').textContent()).includes('Google Analytics e do Google Ads para medir as visitas e os anúncios, só se você aceitar'), 'o aviso de cookies cita o Google Analytics e o Google Ads');
 await page.getByRole('button', { name: 'Aceitar' }).click();
 await page.waitForFunction(() => (window.dataLayer || []).some(a => a[0] === 'config'));
 let f = await fila(page);
 const iDef = f.findIndex(a => a[0] === 'consent' && a[1] === 'default'), iUpd = f.findIndex(a => a[0] === 'consent' && a[1] === 'update'), iCfg = f.findIndex(a => a[0] === 'config');
 ok(iDef >= 0 && iUpd > iDef && iCfg > iUpd && f[iDef][2].ad_storage === 'denied' && f[iDef][2].analytics_storage === 'denied' && f[iUpd][2].analytics_storage === 'granted',
   'Consent Mode básico: negado por padrão, liberado pelo "Aceitar", antes do config');
+ok(f[iUpd][2].ad_storage === 'granted' && f[iUpd][2].ad_user_data === 'granted' && f[iUpd][2].ad_personalization === 'denied' && f[iDef][2].ad_personalization === 'denied',
+  'o "Aceitar" libera só a medição (analytics_storage, ad_storage, ad_user_data); ad_personalization fica sempre negado');
 ok(/gclid=TESTE123/.test(f[iCfg][2].page_location) && /utm_campaign=Clinicas/.test(f[iCfg][2].page_location), 'a primeira página vista depois do "Aceitar" leva o endereço de chegada (gclid e UTMs)');
 ok(await page.evaluate(() => typeof ORIGEM_CAMPANHA !== 'undefined' && ORIGEM_CAMPANHA) === 'google / cpc / clinicas-sp', 'o contratar usa a origem da campanha guardada na aba');
 await page.locator('section[data-etapa="1"] .proximo').click(); f = await fila(page);
