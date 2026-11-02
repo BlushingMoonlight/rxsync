@@ -432,6 +432,45 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     }
   }
 }
+// Método de produto (rxsync-sistema docs/front/metodo.md; o resumo público está no CLAUDE.md): o que dá para conferir
+// lendo o código. A ação principal única e as até 3 ações rápidas são conferidas na tela, pelo painel_alcance.mjs (aviso).
+{
+  // 1) Cores e tamanhos só do assets/ancora/tokens.css, também na Central (o painel já é conferido acima). As exceções
+  //    antigas ficam listadas aqui com aviso (sair delas pede mudar a tela, fora deste conferidor); qualquer nova bloqueia.
+  const ANTIGAS = { 'central/fonte/estilo.css': ['#EEF1F1', '#A8DDD9', '#1F262A'],
+    'central/fonte/estilo_demonstracoes.css': ['#1e6b47', '#1f5fa8', '#0f5e68', '#8a2440', '#5b3a9e', '#3d4451'] };   // as 6 cores das clínicas da demonstração
+  // Tamanhos de letra escritos em px ou rem (fora das variáveis --t-*): no máximo os que já existem em cada arquivo.
+  const TAMANHOS_ANTIGOS = { 'painel/fonte/estilo.css': 16, 'central/fonte/estilo.css': 4, 'central/fonte/estilo_demonstracoes.css': 1 };
+  let antigos = 0;
+  for (const d of ['central/fonte', 'painel/fonte']) for (const f of fs.readdirSync(d).filter(x => /\.(css|js)$/.test(x))) {
+    const arq = d + '/' + f, t = fs.readFileSync(arq, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
+    if (d === 'central/fonte') for (const m of t.matchAll(/#[0-9a-fA-F]{3,8}\b(?![\w-])|rgba?\([^)]*\)/g)) {
+      if (/^#(FFFFFF|fff)$/i.test(m[0])) continue;
+      if ((ANTIGAS[arq] || []).some(c => c.toLowerCase() === m[0].toLowerCase())) { antigos++; continue; }
+      erro(`${arq}: cor solta ${m[0]}; use uma variável do assets/ancora/tokens.css (método de produto, regra 11)`);
+    }
+    if (f.endsWith('.css')) {
+      const n = [...t.matchAll(/font-size:\s*\d+(?:\.\d+)?(?:px|rem)\b/g)].length;
+      if (n > (TAMANHOS_ANTIGOS[arq] || 0)) erro(`${arq}: ${n} tamanhos de letra escritos à mão (eram ${TAMANHOS_ANTIGOS[arq] || 0}); use as variáveis --t-* do assets/ancora/tokens.css (método de produto, regra 11)`);
+      else if (n) antigos += n;
+    }
+  }
+  if (antigos) console.log(`::warning title=Método de produto::${antigos} cores e tamanhos antigos fora dos tokens (listados no verificar_site.mjs); saem quando a tela for mexida.`);
+  // 2) PR que muda tela precisa da seção "Fluxo e design" preenchida (só no GitHub, onde existe a descrição do PR). Aviso.
+  const ev = process.env.GITHUB_EVENT_PATH && fs.existsSync(process.env.GITHUB_EVENT_PATH) ? JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')) : null;
+  if (ev && ev.pull_request) {
+    const { execSync } = await import('node:child_process');
+    const base = ev.pull_request.base.ref;
+    let mudados = [];
+    try { execSync(`git fetch -q --depth=200 origin ${base}`, { stdio: 'ignore', timeout: 60000 }); mudados = execSync(`git diff --name-only origin/${base}...HEAD`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().split('\n').filter(Boolean); } catch { /* sem histórico: não confere */ }
+    const TELA = /^(painel\/fonte\/|central\/fonte\/|demo\/clinica\/|assets\/ancora\/|[^/]+\.html$|[^/]+\/index\.html$|guias\/_fonte\/|assets\/consentimento\.js)/;
+    const telas = mudados.filter(f => TELA.test(f));
+    const corpo = ev.pull_request.body || '';
+    const secao = (corpo.split(/^##\s+Fluxo e design\s*$/m)[1] || '').split(/^##\s/m)[0];
+    const preenchida = /\[x\]/i.test(secao) || /não muda (nenhuma )?tela/i.test(secao);
+    if (telas.length && !preenchida) console.log(`::warning title=Método de produto::este PR muda ${telas.length} arquivo(s) de tela (${telas.slice(0, 5).join(', ')}${telas.length > 5 ? '…' : ''}) e a seção "Fluxo e design" do modelo de PR não está preenchida (marque os itens ou escreva "Não muda tela").`);
+  }
+}
 // O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
 // repositório privado).
 for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f)), ...fs.readdirSync('scripts').map(f => path.join('scripts', f))]) {

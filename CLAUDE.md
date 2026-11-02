@@ -1,5 +1,26 @@
 # Instruções para o Claude neste repositório
 
+## Método de produto (obrigatório)
+
+Antes de qualquer mudança de tela, botão, texto ou função nova, leia o método completo no `docs/front/metodo.md` do
+`rxsync-sistema` e siga os 3 passos, nesta ordem: o fluxo das informações (o que a pessoa precisa, em que ordem, onde é
+o lugar natural, quantos toques), o encaixe (árvore, molde, nomes do dicionário) e só então o visual Âncora.
+**Primeiro o fluxo, depois o design; o PR mostra a árvore e os toques** (seção "Fluxo e design" do modelo de PR).
+
+- Fluxo: uma ação principal por tela; o que precisa de ação antes da informação; um aviso por vez; o raro longe do uso
+  diário (no ⋯ ou nos ajustes) e o perigoso no fim; até 3 ações rápidas no item; no máximo 2 níveis abaixo da seção;
+  nada usado toda semana escondido em "Mais"; níveis de confirmação de 0 a 3, nunca o `confirm()` do navegador.
+- Texto: o mesmo nome do botão e do dicionário, sem jargão; caminho escrito existe como toque (veja "Caminhos"); versão
+  escrita igual à do link.
+- Design: cores e tamanhos só do `assets/ancora/tokens.css`; pesos até 600; sem sombra de cartão nem degradê; branco
+  predominante; celular 390, iPad 820 e 1024 px sem rolar para o lado; contraste de 4,5:1, nada abaixo de 12 px e alvos
+  de 44 px.
+- O `verificar_site.mjs` bloqueia cor nova e tamanho novo fora dos tokens e caminho que não existe, e avisa quando o PR
+  muda tela sem "Fluxo e design"; o `painel_alcance.mjs` avisa quando uma tela tem mais de uma ação principal ou um item
+  tem mais de 3 ações rápidas.
+
+## O resto
+
 - Site público da RXSync (GitHub Pages, domínio em `CNAME`). Tudo aqui é público: nunca coloque token, senha ou dado de cliente.
 - O dono (Jean) trabalha só pelo iPad. Toda entrega é um **pull request** em português, com resumo do que muda e o que conferir. Nunca faça merge nem push direto na `main`.
 - Webhooks do n8n: `https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/...` (cabeçalho `x-rxsync-origem: rxsync-site-2026`). Os workflows ficam em `BlushingMoonlight/rxsync-sistema`; mudança que envolve site e n8n vira um pull request em cada repositório, avisando a ordem do Merge.

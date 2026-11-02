@@ -122,7 +122,7 @@ async function tocar(page, i, naJanela) {
 // Explora um app (busca em largura). Cada ligação achada (de uma tela para outra, ou para uma folha) vira uma aresta
 // { de, para, rotulo, grupo, via } (via = o item do ⋯ ou da folha que levou). op: { inicio, rotaDe(page, hash?), repor(page, hash) }
 async function explorar(page, op) {
-  const arestas = [], alcancadas = new Set(), quebrados = [], voltas = [];
+  const arestas = [], alcancadas = new Set(), quebrados = [], voltas = [], disposicao = new Map();
   const inicio = await op.rotaDe(page); alcancadas.add(inicio);
   const fila = [op.inicio], hashes = new Map([[inicio, op.inicio]]);
   const novo = (rota, hash) => { if (!alcancadas.has(rota)) { alcancadas.add(rota); hashes.set(rota, hash); fila.push(hash); } };
@@ -131,6 +131,13 @@ async function explorar(page, op) {
     const hash = fila.shift();
     await op.repor(page, hash);
     const rota = await op.rotaDe(page);
+    // Método de produto (rxsync-sistema docs/front/metodo.md, regras 1 e 5): quantas ações principais aparecem na tela
+    // (fora das folhas e janelas) e quantas ações rápidas o item mostra. Só avisa: a tela pode ter um caso que a regra admite.
+    if (!disposicao.has(rota)) disposicao.set(rota, await page.evaluate(visivelSrc => { const visivel = eval(visivelSrc);
+      const fora = e => !e.closest('.janela, .folha, [role=dialog], [role=alertdialog], #painelChat, #chatCentral, .chat-lado');
+      const pri = [...document.querySelectorAll('.btn.pri')].filter(e => visivel(e) && fora(e)).map(e => e.textContent.replace(/\s+/g, ' ').trim());
+      const rapidas = Math.max(0, ...[...document.querySelectorAll('.rapidas')].filter(visivel).map(r => [...r.querySelectorAll('button')].filter(visivel).length));
+      return { pri: [...new Set(pri)], rapidas }; }, visivelJs));
     for (const t of await tocaveis(page)) {
       if (process.env.ALCANCE_DEBUG2) console.log('  cand', rota, JSON.stringify(t));
       if (t.fora || !t.rotulo) continue;
@@ -166,7 +173,14 @@ async function explorar(page, op) {
       }
     }
   }
-  return { arestas, alcancadas, quebrados, voltas };
+  return { arestas, alcancadas, quebrados, voltas, disposicao };
+}
+// Avisos do método de produto (não contam como falha): mais de uma ação principal na tela; mais de 3 ações rápidas no item.
+function avisarDisposicao(app, largura, disposicao) {
+  for (const [rota, d] of disposicao) {
+    if (d.pri.length > 1) console.log(`⚠ ${app}, ${largura} px, ${rota}: ${d.pri.length} ações principais na tela (${d.pri.join(' · ')}); o método pede uma (docs/front/metodo.md do rxsync-sistema, regra 1)`);
+    if (d.rapidas > 3) console.log(`⚠ ${app}, ${largura} px, ${rota}: ${d.rapidas} ações rápidas no item; o método pede até 3 (regra 5)`);
+  }
 }
 // O caminho de toque de cada tela pelo diagrama: o caminho da tela de cima mais o nome do botão que leva dela até aqui
 // (com o ⋯ quando o botão está no Mais). Devolve { rota: ['Agenda', 'Horários', 'Feriados'] } e os que faltam ligação.
@@ -238,6 +252,7 @@ if (!SO || SO === 'painel') for (const largura of LARGURAS) {
   const { cam, semLigacao } = caminhosPeloDiagrama(rotas, r.arestas, paiPainel, { hoje: ['Hoje'], agenda: ['Agenda'], pacientes: ['Pacientes'], assistente: ['Assistente'], conta: ['Conta'] });
   ok(!semLigacao.length, `painel, ${largura} px: cada tela abre com um toque a partir da tela de cima no diagrama` + lista(semLigacao));
   ok(!r.quebrados.length, `painel, ${largura} px: nenhum botão leva a uma tela que não existe` + lista(r.quebrados));
+  avisarDisposicao('painel', largura, r.disposicao);
   const voltasRuins = r.voltas.filter(v => v.para !== paiPainel(v.de)).map(v => `${v.de}: o voltar "${v.rotulo}" leva a ${v.para} (devia ser ${paiPainel(v.de)})`);
   // Sem voltar, de propósito: as visões da Agenda (abas Lista de espera e Documentos, regra 5) e, no iPad deitado e no
   // computador, as páginas do Assistente e da Conta (o menu de assuntos fica ao lado, molde D).
@@ -278,6 +293,7 @@ if (!SO || SO === 'central') for (const largura of LARGURAS_CENTRAL) {
   const faltam = esperadas.filter(x => !r.alcancadas.has(x));
   ok(!faltam.length, `Central, ${largura} px: ${esperadas.length - faltam.length} de ${esperadas.length} telas alcançadas só tocando a partir do início` + lista(faltam));
   ok(!r.quebrados.length, `Central, ${largura} px: nenhum botão leva a uma tela que não existe` + lista(r.quebrados));
+  avisarDisposicao('Central', largura, r.disposicao);
   // A Central não tem diagrama de navegação próprio: cada seção sai do menu (lateral no computador, barra e "Mais" no
   // celular) e as abas e a ficha saem da própria seção.
   const paiCentral = x => x.includes('/') ? x.split('/')[0] : 'hoje';
