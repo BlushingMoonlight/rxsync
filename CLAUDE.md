@@ -10,12 +10,23 @@ o lugar natural, quantos toques), o encaixe (árvore, molde, nomes do dicionári
 - Fluxo: uma ação principal por tela; o que precisa de ação antes da informação; um aviso por vez; o raro longe do uso
   diário (no ⋯ ou nos ajustes) e o perigoso no fim; até 3 ações rápidas no item; no máximo 2 níveis abaixo da seção;
   nada usado toda semana escondido em "Mais"; níveis de confirmação de 0 a 3, nunca o `confirm()` do navegador.
+- Disposição: abas só para visões do mesmo conteúdo, nunca para assuntos diferentes; sempre um "‹ Voltar" visível fora
+  do primeiro nível; página de ajuste com um assunto só e até cerca de 2 telas de rolagem no celular; agrupar por espaço,
+  cartão só quando o espaço não basta e nunca cartão dentro de cartão; formulário em uma coluna; um jeito de salvar por
+  seção; densidade igual dentro da mesma tela.
+- Site: não usa os moldes do painel; segue a ordem de página de venda (promessa, prova, como funciona, preço, perguntas,
+  chamada final), com uma chamada só por página.
+- Linguagem do CFM em todo texto do site, do painel, da demonstração e dos e-mails: nada de "melhor", "garante", "100%",
+  "nunca erra", "substitui a secretária", "sem risco de bloqueio", "aprovado pelo CFM" nem promessa de resultado
+  ("reduz X% das faltas"); diga o que a clínica pode fazer. Os Termos e a Política, que são texto jurídico, ficam de fora.
 - Texto: o mesmo nome do botão e do dicionário, sem jargão; caminho escrito existe como toque (veja "Caminhos"); versão
   escrita igual à do link.
 - Design: cores e tamanhos só do `assets/ancora/tokens.css`; pesos até 600; sem sombra de cartão nem degradê; branco
   predominante; celular 390, iPad 820 e 1024 px sem rolar para o lado; contraste de 4,5:1, nada abaixo de 12 px e alvos
-  de 44 px.
-- O `verificar_site.mjs` bloqueia cor nova e tamanho novo fora dos tokens e caminho que não existe, e avisa quando o PR
+  de 44 px; números tabulares e alinhados; gráficos de barra ou linha, nunca pizza; estado sempre com cor, ícone e
+  palavra; animação curta (até 300 ms; 150 a 250 ms no painel), desligada com "Reduzir movimento".
+- O `verificar_site.mjs` bloqueia cor nova e tamanho novo fora dos tokens, caminho que não existe, as palavras proibidas
+  do CFM no site, no painel e na demonstração e gráfico de pizza, e avisa quando o PR
   muda tela sem "Fluxo e design"; o `painel_alcance.mjs` avisa quando uma tela tem mais de uma ação principal ou um item
   tem mais de 3 ações rápidas.
 
