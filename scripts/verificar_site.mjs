@@ -6,7 +6,14 @@ const LIMITE_PAINEL_KB = 400;
 let erros = 0; const erro = m => { erros++; console.log('::error::' + m); };
 const todos = [];
 (function andar(d) { for (const f of fs.readdirSync(d)) { if (f.startsWith('.') || f === 'node_modules' || f === 'scripts') continue; const p = path.join(d, f); fs.statSync(p).isDirectory() ? andar(p) : todos.push(p); } })('.');
-const htmls = todos.filter(f => f.endsWith('.html'));
+// O arquivo de verificação do Google Search Console (google<código>.html, na raiz) não é uma página: fica fora de todas as
+// regras de página e é conferido à parte (uma linha só, a do Google, e fora do sitemap).
+const ARQ_GOOGLE = /^google[0-9a-f]{8,32}\.html$/;
+const htmls = todos.filter(f => f.endsWith('.html') && !ARQ_GOOGLE.test(f.split(path.sep).join('/').replace(/^\.\//, '')));
+for (const f of fs.readdirSync('.').filter(x => ARQ_GOOGLE.test(x))) {
+  if (fs.readFileSync(f, 'utf8').replace(/\n$/, '') !== `google-site-verification: ${f}`) erro(`${f}: o arquivo do Search Console tem só a linha "google-site-verification: ${f}"`);
+  if (fs.existsSync('sitemap.xml') && fs.readFileSync('sitemap.xml', 'utf8').includes(f)) erro(`sitemap.xml: o arquivo do Search Console (${f}) fica fora do sitemap`);
+}
 for (const f of htmls) {
   const s = fs.readFileSync(f, 'utf8');
   if (!/<title>[^<]+<\/title>/i.test(s)) erro(`${f}: página sem <title>`);
@@ -170,8 +177,6 @@ function conferirP12(nome, css, pagina) {
     'questionario/index.html'].map(f => ANTIGA + f);
   for (const f of htmls.map(h => h.split(path.sep).join('/').replace(/^\.\//, ''))) {
     if (PAGINAS[f] || f === 'central/index.html' || ANTIGA_PAGINAS.includes(f)) continue;
-    // O arquivo de verificação do Google Search Console (propriedade "Prefixo do URL"): uma linha fixa, sem HTML.
-    if (/^google[0-9a-f]{8,32}\.html$/.test(f)) { if (fs.readFileSync(f, 'utf8').trim() !== `google-site-verification: ${f}`) erro(`${f}: o arquivo do Search Console tem só a linha "google-site-verification: ${f}"`); continue; }
     if (f === 'painel/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte do painel precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     if (f === 'guias/_fonte/molde.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: o molde dos guias precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     if (f === 'central/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte da Central precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
