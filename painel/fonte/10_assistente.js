@@ -14,7 +14,7 @@ tela('assistente', {
   montar: () => [cabTela('Assistente', { sub: 'O que a assistente sabe e como ela atende seus pacientes no WhatsApp. As mudanças valem na hora.' }),
     el('div', { class: 'cartao pad bloco', id: 'cardPausa' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'ponto', 'data-ponto': '' }), el('span', { 'data-estado-curto': '', text: '…' })),
       el('p', { class: 'mudo', id: 'pausaTxt', text: 'Carregando…' }), el('div', { class: 'linha-botoes pilha', id: 'iaAcoes' })),
-    GRUPOS_IA.map(([titulo, itens]) => el('div', { class: 'bloco' }, el('h2', { text: titulo }), el('div', { class: 'lista' }, itens.map(([k, t, ic]) => linhaLink(t, null, 'assistente/' + k, ic)))))],
+    GRUPOS_IA.map(([titulo, itens]) => el('div', { class: 'bloco', id: titulo === 'O que ela sabe' ? 'blocoSabe' : null }, el('h2', { text: titulo }), el('div', { class: 'lista' }, itens.map(([k, t, ic]) => linhaLink(t, null, 'assistente/' + k, ic)))))],
   entrar: () => { assistenteEstadoRender(); assistenteResumos(); }
 });
 function assistenteEstadoRender() {
