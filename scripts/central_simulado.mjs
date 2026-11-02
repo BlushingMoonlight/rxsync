@@ -127,7 +127,9 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   // demonstrações por link (sql/056, DEC-125)
   dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3,
   // histórico das conversas ao e-mail do cadastro (sql/059, DEC-131)
-  conversas_enviar: 2 };
+  conversas_enviar: 2,
+  // excluir e marcar clínicas, o e-mail de entrada do dono e a modalidade (sql/086, DEC-190)
+  cliente_excluir: 3, cliente_excluir_lote: 3, cliente_marcar_teste: 3, cliente_editar_login: 3, cliente_editar_modalidade: 1 };
 export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', painel_link_antigo: 'SIM', assistente_politica: 'SIM' });
 const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17', 'assistente_politica'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },

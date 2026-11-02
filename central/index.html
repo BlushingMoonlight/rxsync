@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-nYvp/hNRvIiatSUr5Hd3WRF48jcJmU1LNSBa+K00azs='; style-src 'sha256-zAtu7zXgfGZr7/fWkS0eY9BLMQBKWZR/LAfz04tiLXA='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-XH4FgKKjGTYU5X2WfJAMnIEPLPHB/BiKH8A56eQHHsg='; style-src 'sha256-UsX5TbDsDX04ZgKMpXoGBwEIErZJh8qPRet4GqPxhBU='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -389,6 +389,14 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .p-caiu > summary { cursor: pointer; color: var(--texto-2); font-size: var(--t-peq); min-height: var(--alvo); display: flex; align-items: center; }
 .p-caiu-lista { list-style: none; margin: 0; padding: 0 0 var(--e-2); }
 .p-caiu-lista li { display: flex; justify-content: space-between; gap: var(--e-3); padding: var(--e-1) 0; border-top: 1px solid var(--borda); font-size: var(--t-peq); }
+
+/* Mais: o que só falta na barra do celular */
+@media (min-width: 768px) { .so-celular { display: none; } }
+
+/* Ações: a linha antes de "É uma clínica de teste" e "Excluir a clínica"; a seleção das clínicas de teste */
+.menu-acoes .separador { border-top: 1px solid var(--borda); margin: var(--e-2) 0; }
+.linha.cli.sel { cursor: pointer; }
+.linha.cli.sel input { width: 22px; height: 22px; flex: none; accent-color: var(--primaria); }
 /* ---------- IA da Central (DEC-145): o assistente ao lado (1180 px ou mais) ou em tela cheia (iPad em pé e celular) ---------- */
 .painel-ia { display: none; }
 .casca.com-assistente .painel-ia { display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 60; background: var(--superficie); min-width: 0;
@@ -931,29 +939,34 @@ async function sair() { await chamar('sair', { esquecer: true, lembranca: lembra
 // ==== 03_casca.js
 // ---------------------------------------------------------------- casca: seções, menu, caminho, busca e rotas (DEC-068)
 ICONES.atualizar = 'M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v5h-5';
+// Pedidos do Jean de 01/11/2026 (DEC-191): o menu lateral em 4 grupos, na ordem do trabalho. A barra do iPad
+// em pé (trilho, 768 a 1023 px) e a do celular (< 768 px) têm cada uma a sua lista (TRILHO e BARRA); o resto fica em "Mais".
 const SECOES = [
-  { id: 'hoje', nome: 'Hoje', ic: 'hoje', grupo: 'Operação', aba: 1 },
-  { id: 'clientes', nome: 'Clientes', ic: 'clientes', grupo: 'Operação', aba: 1 },
-  { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', aba: 1, chave: 'tela_dinheiro' },
-  { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Operação', aba: 1, chave: 'tela_sistema' },
+  { id: 'hoje', nome: 'Hoje', ic: 'hoje', grupo: 'Operação' },
+  { id: 'clientes', nome: 'Clientes', ic: 'clientes', grupo: 'Operação' },
+  { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', chave: 'tela_dinheiro', desc: 'Receita, pagantes e cobranças' },
+  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Operação', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
+  { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Vendas', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
+  { id: 'demonstracoes', nome: 'Demonstrações', curto: 'Demos', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
-  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'agregados', nome: 'Agregados de pacientes', ic: 'agregados', grupo: 'Análise', chave: 'tela_agregados_pacientes', escondeDesligada: true, desc: 'Contagens e médias por clínica' },
-  { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Marketing', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
-  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Marketing', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
-  { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Administração', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
-  { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Administração', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
-  { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Administração', desc: 'Liga e desliga telas e edições, aparência' }
+  { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Sistema', chave: 'tela_sistema', desc: 'Falhas, SQL aplicados, WhatsApp e integrações' },
+  { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Sistema', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
+  { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Sistema', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
+  { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Sistema', desc: 'Liga e desliga telas e edições, aparência' }
 ];
+const TRILHO = ['hoje', 'clientes', 'prospeccao', 'demonstracoes', 'avisos', 'financeiro'];   // iPad em pé
+const BARRA = ['hoje', 'clientes', 'prospeccao', 'avisos'];                                     // celular
+const naLista = l => l.map(id => SECOES.find(s => s.id === id)).filter(s => s && visivel(s));
 const visivel = s => !(s.escondeDesligada && !ligada(s.chave));
 const TELAS = {};
 est.contadores = {};
 function ir(rota) { if (location.hash === '#' + rota) rotear(); else location.hash = rota; }
 function secaoAtiva() { const a = (location.hash || '#hoje').slice(1).split('/')[0]; return a === 'mais' ? 'mais' : (SECOES.find(s => s.id === a) || { id: 'hoje' }).id; }
 function montarNav() {
-  const ativa = secaoAtiva(); const naAba = SECOES.some(s => s.aba && s.id === ativa);
+  const ativa = secaoAtiva(); const trilho = naLista(TRILHO), barra = naLista(BARRA);
   const cont = id => est.contadores[id] ? el('span', { class: 'contador', text: est.contadores[id], 'aria-label': est.contadores[id] + ' pendências' }) : null;
   const lat = $('lateral');
   trocar(lat, el('div', { class: 'cab' }, el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
@@ -965,14 +978,13 @@ function montarNav() {
       icone(s.ic), el('span', { class: 'rotulo', text: s.nome }), cont(s.id)));
   }
   lat.append(el('div', { class: 'rodape' }, el('button', { class: 'item-nav', type: 'button', 'aria-label': est.recolhida ? 'Sair' : null, onclick: sair }, icone('sair'), el('span', { class: 'rotulo', text: 'Sair' }))));
-  const principais = SECOES.filter(s => s.aba);
   trocar($('trilho'), el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
-    ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
-    el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
+    ...trilho.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
+    el('button', { type: 'button', 'aria-current': !trilho.some(s => s.id === ativa) ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
     el('button', { type: 'button', onclick: sair }, icone('sair', 'g'), 'Sair'));
-  trocar($('barra'), ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) },
+  trocar($('barra'), ...barra.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) },
     el('span', { class: 'pilula' }, icone(s.ic)), s.curto || s.nome, cont(s.id))),
-    el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, el('span', { class: 'pilula' }, icone('mais')), 'Mais'));
+    el('button', { type: 'button', 'aria-current': !barra.some(s => s.id === ativa) ? 'page' : null, onclick: () => ir('mais') }, el('span', { class: 'pilula' }, icone('mais')), 'Mais'));
 }
 // Barra de cima: no celular, voltar + título; no iPad e no computador, o caminho e a busca.
 function topo(titulo, caminho, voltar) {
@@ -1223,15 +1235,24 @@ function formGrupo(x, grupo, valores, acao, titulo, aberto) {
 // ---------- lista
 const FILTROS_CLI = [['todos', 'Todas', () => true], ['ar', 'No ar', x => x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => x.ativo && x.modalidade === 'teste'],
   ['implantacao', 'Implantação', x => ['Pago', 'Aguardando dados', 'Em implantação', 'Aceite registrado'].includes(x.status)], ['suspensas', 'Suspensas', x => x.status === 'Suspenso'],
-  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)]];
+  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)],
+  ['interna', 'De teste', x => !!x.interna && !['Excluir agora', 'Dados apagados'].includes(x.status)]];
 est.filtroCli = 'todos'; est.buscaCli = '';
 function listaDeClientes(todos, selecionado) {
-  const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' });
+  const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' }); const acoesLote = el('div', { class: 'acoes' });
   const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Filtrar por nome ou código', 'aria-label': 'Filtrar por nome ou código', autocomplete: 'off', enterkeyhint: 'search', value: est.buscaCli || null });
   const desenhar = () => {
     trocar(filtros, ...FILTROS_CLI.map(([k, n, fn]) => el('button', { type: 'button', 'aria-pressed': String(est.filtroCli === k), onclick: () => { est.filtroCli = k; desenhar(); } }, n, el('span', { class: 'n', text: todos.filter(fn).length }))));
     const fn = FILTROS_CLI.find(f => f[0] === est.filtroCli)[2], q = semAcento(busca.value);
     const vis = todos.filter(x => fn(x) && (!q || semAcento(x.nome + ' ' + x.cliente_id).includes(q)));
+    // DEC-190: só no filtro "De teste", "Selecionar" mostra uma caixa em cada linha e "Excluir as selecionadas".
+    const sel = est.filtroCli === 'interna' && est.selCli ? est.selCli : null;
+    trocar(acoesLote, ...(est.filtroCli === 'interna' && vis.length && ligada('editar_situacao') ? [
+      sel ? btn('Excluir as selecionadas' + (sel.size ? ' (' + sel.size + ')' : ''), () => excluirLote([...sel]), 'perigo-sec', 'fechar') : null,
+      btn(sel ? 'Cancelar a seleção' : 'Selecionar', () => { est.selCli = sel ? null : new Set(); desenhar(); }, 'sec')] : []));
+    if (sel) { trocar(lista, ...vis.map(x => el('li', {}, el('label', { class: 'linha cli sel' }, el('input', { type: 'checkbox', checked: sel.has(x.cliente_id) || null,
+      onchange: e => { if (e.target.checked) sel.add(x.cliente_id); else sel.delete(x.cliente_id); desenhar(); } }),
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: x.cliente_id + ' · ' + (x.status || '—') })))))); return; }
     trocar(lista, ...vis.map(x => el('li', {}, el('button', { class: 'linha cli', type: 'button', 'aria-current': selecionado === x.cliente_id ? 'true' : null, onclick: () => irCliente(x.cliente_id) },
       el('span', { class: 'avatar ' + tomStatus(x.status), text: iniciais(x.nome), 'aria-hidden': 'true' }),
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: `${x.cliente_id} · ${x.plano || '—'} · ${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)}` + (x.whatsapp && x.whatsapp !== 'open' ? ' · WhatsApp fora' : '') }), barraUso(x.mensagens_mes, x.franquia)),
@@ -1240,7 +1261,14 @@ function listaDeClientes(todos, selecionado) {
   };
   busca.oninput = () => { est.buscaCli = busca.value; desenhar(); };
   desenhar();
-  return el('section', { class: 'cartao mestre', 'aria-label': 'Clínicas' }, el('div', { class: 'cab' }, el('div', { class: 'pilha' }, busca, filtros)), lista);
+  return el('section', { class: 'cartao mestre', 'aria-label': 'Clínicas' }, el('div', { class: 'cab' }, el('div', { class: 'pilha' }, busca, filtros, acoesLote)), lista);
+}
+function excluirLote(ids) {
+  if (!ids.length) { rapida('Escolha ao menos uma clínica de teste.'); return; }
+  return fazer('cliente_excluir_lote', { ids }, { nivel: 3, titulo: 'Excluir ' + (ids.length === 1 ? '1 clínica de teste' : ids.length + ' clínicas de teste'), nome: 'EXCLUIR', rotuloNome: 'a palavra',
+    botao: 'Excluir agora', texto: 'Só clínicas de teste. A agenda, os pacientes, o painel e as conversas saem agora; o WhatsApp e o Chatwoot, na rodada das 8h10. Não tem volta.',
+    campos: [{ k: 'quantas', rot: 'Quantas clínicas você escolheu?', inputmode: 'numeric', obrig: true, ajuda: 'Digite o número: ' + ids.length + '.' }],
+    depois: () => { est.selCli = null; est.clientes = null; rotear(); } });
 }
 TELAS.clientes = async (c, [id, aba]) => {
   const largo = matchMedia('(min-width: 1024px)').matches;
@@ -1457,6 +1485,18 @@ function abaCadastro(c, x) {
     esconder();
     anexar(c, cartao('Dados protegidos', etq('CPF, CNPJ e faturamento', '', true), corpo(area)));
   }
+  // sql/086 (DEC-190): o e-mail de entrada do dono no painel (nível 3; o aviso vai ao antigo e ao novo) e, só na
+  // clínica de teste, a modalidade. O código da clínica (cliente_id) não muda: está nas consultas, nos avisos e nos links.
+  if (ligada('editar_empresa')) {
+    const acoesEnt = [btn('Trocar o e-mail de entrada do dono', () => fazer('cliente_editar_login', { cliente_id: x.cliente_id }, {
+      titulo: 'E-mail de entrada de ' + x.nome, nome: x.nome, botao: 'Trocar o e-mail', ok: 'E-mail de entrada trocado.',
+      texto: 'O dono entra no painel com o e-mail novo e a mesma senha. As sessões e os aparelhos lembrados dele saem. O aviso vai ao e-mail antigo e ao novo.',
+      campos: [{ k: 'email', rot: 'E-mail novo', tipo: 'email', inputmode: 'email', obrig: true }] }), 'sec', 'usuario')];
+    if (x.interna) acoesEnt.push(btn('Trocar a modalidade', () => fazer('cliente_editar_modalidade', { cliente_id: x.cliente_id }, {
+      titulo: 'Modalidade de ' + x.nome, ok: 'Modalidade trocada.', botao: 'Salvar',
+      campos: [{ k: 'modalidade', rot: 'Modalidade', valor: x.modalidade, opcoes: [['teste', 'Teste grátis'], ['contratado', 'Contratada']] }] }), 'sec', 'ajustes'));
+    anexar(c, cartao('Entrada no painel', x.interna ? etq('clínica de teste', '', true) : null, corpo(el('p', { class: 'mudo peq', text: 'O código da clínica (' + x.cliente_id + ') não muda.' }), el('div', { class: 'acoes mt' }, acoesEnt))));
+  }
 }
 // A Central foi para o fundo: tira da tela os dados protegidos (voltam com "Mostrar").
 document.addEventListener('visibilitychange', () => {
@@ -1530,6 +1570,21 @@ function menuAcoes(x) {
     else item('Usar como clínica de teste da cobrança', 'Nível 3. Só uma clínica nova de teste, criada por você no contratar.html.', () => fazer('cobranca_teste_definir', { cliente_id: x.cliente_id }, { titulo: 'Clínica de teste da cobrança', nome: x.nome,
       texto: 'Nela, plano, cobrança e situação mudam mesmo com as chaves desligadas. O servidor recusa clínica que já pagou ou que é cliente de verdade. Chega um aviso em Avisos.', ok: 'Clínica de teste da cobrança definida.',
       depois: async () => { await carregarConfig(); await rotear(); } }), true);
+  }
+  // sql/086 (DEC-190): no fim, separados por uma linha. A clínica de teste sai na hora; a de verdade encerra
+  // hoje e os dados saem em 15 dias. "É uma clínica de teste" só para quem nunca pagou (o servidor confere).
+  if (pode('editar_situacao') && !['Excluir agora', 'Dados apagados'].includes(st)) {
+    if (itens.length) itens.push(el('li', { class: 'separador', role: 'separator', 'aria-hidden': 'true' }));
+    if (!x.interna) item('É uma clínica de teste', 'Nível 3. Só para quem nunca pagou: ela sai dos números e pode ser excluída na hora.', () => fazer('cliente_marcar_teste', { cliente_id: x.cliente_id }, {
+      titulo: 'Marcar ' + x.nome + ' como clínica de teste', nome: x.nome, botao: 'Marcar como teste', ok: 'Marcada como clínica de teste.',
+      texto: 'Use para as clínicas que você criou para testar. O servidor recusa quem já pagou alguma vez.', linhas: [['Clínica de teste', 'não', 'sim']] }), true);
+    if (x.interna) item('Excluir a clínica', 'Nível 3. Clínica de teste: apaga tudo agora.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Excluir agora', ok: 'Clínica de teste excluída.', depois: () => { est.clientes = null; ir('clientes'); },
+      texto: 'É uma clínica de teste: a agenda, os pacientes, o painel e as conversas saem agora. O WhatsApp e o Chatwoot dela saem na rodada das 8h10. Não tem volta.' }), true);
+    else if (st !== 'Cancelado') item('Excluir a clínica', 'Nível 3. Encerra o contrato hoje; os dados saem em 15 dias.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Encerrar hoje', ok: 'Contrato encerrado hoje.',
+      texto: 'É uma clínica de verdade: o contrato termina hoje e a assistente para na rodada das 8h10. Os dados de atendimento saem em 15 dias. O cadastro e o aceite ficam 5 anos, como a lei pede. A clínica recebe um e-mail.',
+      linhas: [['Contrato', x.cancelar_em ? 'encerra em ' + fmtData(x.cancelar_em) : 'ativo', 'encerra hoje']], campos: [MOTIVO] }), true);
   }
   const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-menu' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-menu', text: 'Ações · ' + x.nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
@@ -1881,10 +1936,15 @@ TELAS.mais = async c => {
   const item = s => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir(s.id) }, el('span', { class: 'icone-caixa' }, icone(s.ic)),
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: s.nome }), el('div', { class: 't2', text: s.desc || '' })), icone('seta')));
   const grupo = g => SECOES.filter(s => s.grupo === g && visivel(s));
+  // DEC-191: 3 grupos curtos (Análise, Sistema e Conta). Antes deles, só o que não cabe na barra deste aparelho
+  // (no celular: Financeiro e Demonstrações; no iPad em pé, nada).
+  const fora = SECOES.filter(s => ['Operação', 'Vendas'].includes(s.grupo) && visivel(s) && !BARRA.includes(s.id));
+  const foraTrilho = s => TRILHO.includes(s.id);
   trocar(c, cabecalho('Mais'),
+    fora.length ? el('div', { class: fora.every(foraTrilho) ? 'so-celular' : null }, el('p', { class: 'menu-grupo', text: 'Operação e vendas' }),
+      cartao(null, null, el('ul', { class: 'lista' }, fora.map(item)))) : null,
     el('p', { class: 'menu-grupo', text: 'Análise' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Análise').map(item))),
-    el('p', { class: 'menu-grupo', text: 'Marketing' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Marketing').map(item))),
-    el('p', { class: 'menu-grupo', text: 'Administração' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Administração').map(item))),
+    el('p', { class: 'menu-grupo', text: 'Sistema' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Sistema').map(item))),
     el('p', { class: 'menu-grupo', text: 'Conta' }), cartao(null, null, el('ul', { class: 'lista' },
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir('ajustes') }, el('span', { class: 'icone-caixa' }, icone('lua')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Aparência' }), el('div', { class: 't2', text: { claro: 'Clara', escuro: 'Escura' }[aparencia] })), icone('seta'))),
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: sair }, el('span', { class: 'icone-caixa' }, icone('sair')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Sair' }), el('div', { class: 't2', text: 'Encerra a sessão neste aparelho' })))))));

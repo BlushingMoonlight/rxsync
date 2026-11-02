@@ -81,15 +81,24 @@ function formGrupo(x, grupo, valores, acao, titulo, aberto) {
 // ---------- lista
 const FILTROS_CLI = [['todos', 'Todas', () => true], ['ar', 'No ar', x => x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => x.ativo && x.modalidade === 'teste'],
   ['implantacao', 'Implantação', x => ['Pago', 'Aguardando dados', 'Em implantação', 'Aceite registrado'].includes(x.status)], ['suspensas', 'Suspensas', x => x.status === 'Suspenso'],
-  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)]];
+  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)],
+  ['interna', 'De teste', x => !!x.interna && !['Excluir agora', 'Dados apagados'].includes(x.status)]];
 est.filtroCli = 'todos'; est.buscaCli = '';
 function listaDeClientes(todos, selecionado) {
-  const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' });
+  const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' }); const acoesLote = el('div', { class: 'acoes' });
   const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Filtrar por nome ou código', 'aria-label': 'Filtrar por nome ou código', autocomplete: 'off', enterkeyhint: 'search', value: est.buscaCli || null });
   const desenhar = () => {
     trocar(filtros, ...FILTROS_CLI.map(([k, n, fn]) => el('button', { type: 'button', 'aria-pressed': String(est.filtroCli === k), onclick: () => { est.filtroCli = k; desenhar(); } }, n, el('span', { class: 'n', text: todos.filter(fn).length }))));
     const fn = FILTROS_CLI.find(f => f[0] === est.filtroCli)[2], q = semAcento(busca.value);
     const vis = todos.filter(x => fn(x) && (!q || semAcento(x.nome + ' ' + x.cliente_id).includes(q)));
+    // DEC-190: só no filtro "De teste", "Selecionar" mostra uma caixa em cada linha e "Excluir as selecionadas".
+    const sel = est.filtroCli === 'interna' && est.selCli ? est.selCli : null;
+    trocar(acoesLote, ...(est.filtroCli === 'interna' && vis.length && ligada('editar_situacao') ? [
+      sel ? btn('Excluir as selecionadas' + (sel.size ? ' (' + sel.size + ')' : ''), () => excluirLote([...sel]), 'perigo-sec', 'fechar') : null,
+      btn(sel ? 'Cancelar a seleção' : 'Selecionar', () => { est.selCli = sel ? null : new Set(); desenhar(); }, 'sec')] : []));
+    if (sel) { trocar(lista, ...vis.map(x => el('li', {}, el('label', { class: 'linha cli sel' }, el('input', { type: 'checkbox', checked: sel.has(x.cliente_id) || null,
+      onchange: e => { if (e.target.checked) sel.add(x.cliente_id); else sel.delete(x.cliente_id); desenhar(); } }),
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: x.cliente_id + ' · ' + (x.status || '—') })))))); return; }
     trocar(lista, ...vis.map(x => el('li', {}, el('button', { class: 'linha cli', type: 'button', 'aria-current': selecionado === x.cliente_id ? 'true' : null, onclick: () => irCliente(x.cliente_id) },
       el('span', { class: 'avatar ' + tomStatus(x.status), text: iniciais(x.nome), 'aria-hidden': 'true' }),
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: `${x.cliente_id} · ${x.plano || '—'} · ${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)}` + (x.whatsapp && x.whatsapp !== 'open' ? ' · WhatsApp fora' : '') }), barraUso(x.mensagens_mes, x.franquia)),
@@ -98,7 +107,14 @@ function listaDeClientes(todos, selecionado) {
   };
   busca.oninput = () => { est.buscaCli = busca.value; desenhar(); };
   desenhar();
-  return el('section', { class: 'cartao mestre', 'aria-label': 'Clínicas' }, el('div', { class: 'cab' }, el('div', { class: 'pilha' }, busca, filtros)), lista);
+  return el('section', { class: 'cartao mestre', 'aria-label': 'Clínicas' }, el('div', { class: 'cab' }, el('div', { class: 'pilha' }, busca, filtros, acoesLote)), lista);
+}
+function excluirLote(ids) {
+  if (!ids.length) { rapida('Escolha ao menos uma clínica de teste.'); return; }
+  return fazer('cliente_excluir_lote', { ids }, { nivel: 3, titulo: 'Excluir ' + (ids.length === 1 ? '1 clínica de teste' : ids.length + ' clínicas de teste'), nome: 'EXCLUIR', rotuloNome: 'a palavra',
+    botao: 'Excluir agora', texto: 'Só clínicas de teste. A agenda, os pacientes, o painel e as conversas saem agora; o WhatsApp e o Chatwoot, na rodada das 8h10. Não tem volta.',
+    campos: [{ k: 'quantas', rot: 'Quantas clínicas você escolheu?', inputmode: 'numeric', obrig: true, ajuda: 'Digite o número: ' + ids.length + '.' }],
+    depois: () => { est.selCli = null; est.clientes = null; rotear(); } });
 }
 TELAS.clientes = async (c, [id, aba]) => {
   const largo = matchMedia('(min-width: 1024px)').matches;
@@ -315,6 +331,18 @@ function abaCadastro(c, x) {
     esconder();
     anexar(c, cartao('Dados protegidos', etq('CPF, CNPJ e faturamento', '', true), corpo(area)));
   }
+  // sql/086 (DEC-190): o e-mail de entrada do dono no painel (nível 3; o aviso vai ao antigo e ao novo) e, só na
+  // clínica de teste, a modalidade. O código da clínica (cliente_id) não muda: está nas consultas, nos avisos e nos links.
+  if (ligada('editar_empresa')) {
+    const acoesEnt = [btn('Trocar o e-mail de entrada do dono', () => fazer('cliente_editar_login', { cliente_id: x.cliente_id }, {
+      titulo: 'E-mail de entrada de ' + x.nome, nome: x.nome, botao: 'Trocar o e-mail', ok: 'E-mail de entrada trocado.',
+      texto: 'O dono entra no painel com o e-mail novo e a mesma senha. As sessões e os aparelhos lembrados dele saem. O aviso vai ao e-mail antigo e ao novo.',
+      campos: [{ k: 'email', rot: 'E-mail novo', tipo: 'email', inputmode: 'email', obrig: true }] }), 'sec', 'usuario')];
+    if (x.interna) acoesEnt.push(btn('Trocar a modalidade', () => fazer('cliente_editar_modalidade', { cliente_id: x.cliente_id }, {
+      titulo: 'Modalidade de ' + x.nome, ok: 'Modalidade trocada.', botao: 'Salvar',
+      campos: [{ k: 'modalidade', rot: 'Modalidade', valor: x.modalidade, opcoes: [['teste', 'Teste grátis'], ['contratado', 'Contratada']] }] }), 'sec', 'ajustes'));
+    anexar(c, cartao('Entrada no painel', x.interna ? etq('clínica de teste', '', true) : null, corpo(el('p', { class: 'mudo peq', text: 'O código da clínica (' + x.cliente_id + ') não muda.' }), el('div', { class: 'acoes mt' }, acoesEnt))));
+  }
 }
 // A Central foi para o fundo: tira da tela os dados protegidos (voltam com "Mostrar").
 document.addEventListener('visibilitychange', () => {
@@ -388,6 +416,21 @@ function menuAcoes(x) {
     else item('Usar como clínica de teste da cobrança', 'Nível 3. Só uma clínica nova de teste, criada por você no contratar.html.', () => fazer('cobranca_teste_definir', { cliente_id: x.cliente_id }, { titulo: 'Clínica de teste da cobrança', nome: x.nome,
       texto: 'Nela, plano, cobrança e situação mudam mesmo com as chaves desligadas. O servidor recusa clínica que já pagou ou que é cliente de verdade. Chega um aviso em Avisos.', ok: 'Clínica de teste da cobrança definida.',
       depois: async () => { await carregarConfig(); await rotear(); } }), true);
+  }
+  // sql/086 (DEC-190): no fim, separados por uma linha. A clínica de teste sai na hora; a de verdade encerra
+  // hoje e os dados saem em 15 dias. "É uma clínica de teste" só para quem nunca pagou (o servidor confere).
+  if (pode('editar_situacao') && !['Excluir agora', 'Dados apagados'].includes(st)) {
+    if (itens.length) itens.push(el('li', { class: 'separador', role: 'separator', 'aria-hidden': 'true' }));
+    if (!x.interna) item('É uma clínica de teste', 'Nível 3. Só para quem nunca pagou: ela sai dos números e pode ser excluída na hora.', () => fazer('cliente_marcar_teste', { cliente_id: x.cliente_id }, {
+      titulo: 'Marcar ' + x.nome + ' como clínica de teste', nome: x.nome, botao: 'Marcar como teste', ok: 'Marcada como clínica de teste.',
+      texto: 'Use para as clínicas que você criou para testar. O servidor recusa quem já pagou alguma vez.', linhas: [['Clínica de teste', 'não', 'sim']] }), true);
+    if (x.interna) item('Excluir a clínica', 'Nível 3. Clínica de teste: apaga tudo agora.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Excluir agora', ok: 'Clínica de teste excluída.', depois: () => { est.clientes = null; ir('clientes'); },
+      texto: 'É uma clínica de teste: a agenda, os pacientes, o painel e as conversas saem agora. O WhatsApp e o Chatwoot dela saem na rodada das 8h10. Não tem volta.' }), true);
+    else if (st !== 'Cancelado') item('Excluir a clínica', 'Nível 3. Encerra o contrato hoje; os dados saem em 15 dias.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Encerrar hoje', ok: 'Contrato encerrado hoje.',
+      texto: 'É uma clínica de verdade: o contrato termina hoje e a assistente para na rodada das 8h10. Os dados de atendimento saem em 15 dias. O cadastro e o aceite ficam 5 anos, como a lei pede. A clínica recebe um e-mail.',
+      linhas: [['Contrato', x.cancelar_em ? 'encerra em ' + fmtData(x.cancelar_em) : 'ativo', 'encerra hoje']], campos: [MOTIVO] }), true);
   }
   const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-menu' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-menu', text: 'Ações · ' + x.nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
