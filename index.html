@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-HzolzwSh+P+g0DgJA0ukxx2CWwPTvwH96jhWYPA7MqE=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rYCU8ir3twr2JpQrnvghh2RydVZo0kgUoy/G5YMfRPo=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
     <meta name="theme-color" content="#FFFFFF">
@@ -2079,7 +2079,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
             if (!d.ok) throw new Error(d.mensagem || 'Não conseguimos começar o teste agora. Tente de novo em instantes.');
             mt.sessao = d.sessao; mt.restantes = d.restantes; mt.agenda = d.agenda; mt.profs = d.profissionais || [];
             evento('mini_teste_inicio', { 'especialidade': v('mt_especialidade') });
-            evento('generate_lead', { 'event_category': 'mini_teste', 'event_label': 'Mini_Teste_RXSync', 'especialidade': v('mt_especialidade'), 'currency': 'BRL', 'value': 299, 'transport_type': 'beacon' });
+            // O mini teste é só mini_teste_inicio; o generate_lead fica para o formulário (rxsync-sistema DEC-191).
             mtAbrir(d);
         } catch (e) {
             mtErro(e.message || 'Não conseguimos começar o teste agora. Tente de novo em instantes.');

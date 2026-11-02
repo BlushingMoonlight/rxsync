@@ -55,6 +55,9 @@ export const PAGINAS = {
   //   dela, no desenho do celular (frame do próprio site).
   ...Object.fromEntries(['index', 'app/index', 'central/index', 'escopo/index', 'manual/index'].map(f => [`demo/clinica/${f}.html`,
     { script: "'self'", estilo: "'self'", img: "'self'", connect: N8N, ...(f === 'index' ? { frame: "'self'" } : {}) }])),
+  // - página do anúncio (noindex): o aviso de cookies (arquivo do site) e o Google Analytics; o
+  //   resto é texto. O chat e o teste ao vivo ficam na página inicial (links).
+  'assistente-whatsapp-clinica/index.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self'", GA.img), connect: GA.connect },
   // - página 404 (DEC-156, entrega 4): só o estilo, as fontes e o ícone do site; nada roda.
   '404.html': { estilo: "'self'", img: "'self'", connect: "'none'" },
   // - Política de Privacidade: só o estilo e as fontes do site; nada roda.

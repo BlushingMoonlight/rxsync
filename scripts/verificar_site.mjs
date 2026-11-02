@@ -170,6 +170,8 @@ function conferirP12(nome, css, pagina) {
     'questionario/index.html'].map(f => ANTIGA + f);
   for (const f of htmls.map(h => h.split(path.sep).join('/').replace(/^\.\//, ''))) {
     if (PAGINAS[f] || f === 'central/index.html' || ANTIGA_PAGINAS.includes(f)) continue;
+    // O arquivo de verificação do Google Search Console (propriedade "Prefixo do URL"): uma linha fixa, sem HTML.
+    if (/^google[0-9a-f]{8,32}\.html$/.test(f)) { if (fs.readFileSync(f, 'utf8').trim() !== `google-site-verification: ${f}`) erro(`${f}: o arquivo do Search Console tem só a linha "google-site-verification: ${f}"`); continue; }
     if (f === 'painel/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte do painel precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     if (f === 'guias/_fonte/molde.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: o molde dos guias precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
     if (f === 'central/fonte/pagina.html') { if (!/<meta http-equiv="Content-Security-Policy" content="default-src 'none'; \{\{CSP\}\}">/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: a fonte da Central precisa da regra default-src 'none' (que a montagem troca pela de verdade)`); continue; }
@@ -232,7 +234,7 @@ for (const arq of ['painel/index.html']) {
 // a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento; a 5: a Central,
 // com manifest branco, e a entrada, a central, o escopo e o manual da demonstração, cuja entrada tem a prévia própria).
 {
-  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html',
+  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html', 'assistente-whatsapp-clinica/index.html',
     ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
   const DEMO = ['index', 'central/index', 'escopo/index', 'manual/index'].map(f => `demo/clinica/${f}.html`);
   // Os guias (guias/, scripts/guias_montar.mjs) também, inclusive os rascunhos.
@@ -411,11 +413,24 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     if (JSON.stringify(demo.map(x => x[1])) !== JSON.stringify(central)) erro(`${itensArq}: os títulos não batem com os da Central (${centralArq}, DEM_ITENS)`);
   }
   if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');
+  // A página do anúncio tem noindex: fica fora do sitemap.
+  if (fs.existsSync('sitemap.xml') && /assistente-whatsapp-clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a página do anúncio (noindex) fica fora do sitemap');
+  if (fs.existsSync('assistente-whatsapp-clinica/index.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync('assistente-whatsapp-clinica/index.html', 'utf8'))) erro('assistente-whatsapp-clinica/index.html: a página do anúncio precisa do noindex');
+  // O lastmod do sitemap acompanha a página (menos os guias): só avisa (não bloqueia) quando o último commit da página é depois do lastmod.
+  if (fs.existsSync('sitemap.xml')) {
+    const { execSync } = await import('node:child_process');
+    for (const m of fs.readFileSync('sitemap.xml', 'utf8').matchAll(/<loc>https:\/\/rxsync\.com\.br\/([^<]*)<\/loc>\s*<lastmod>([0-9-]{10})<\/lastmod>/g)) {
+      const arq = !m[1] || m[1].endsWith('/') ? m[1] + 'index.html' : m[1];
+      if (!fs.existsSync(arq) || arq.startsWith('guias/')) continue;   // os guias usam a data de revisão (guias_montar.mjs)
+      let dia = ''; try { dia = execSync(`git log -1 --format=%cs -- "${arq}"`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { /* sem histórico */ }
+      if (dia && dia > m[2]) console.log(`::warning title=Sitemap::sitemap.xml: ${arq} mudou em ${dia}, mas o lastmod está em ${m[2]}; atualize o lastmod.`);
+    }
+  }
 }
 // O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
 // repositório privado).
 for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f)), ...fs.readdirSync('scripts').map(f => path.join('scripts', f))]) {
-  const m = fs.readFileSync(f, 'utf8').match(/\bN-[0-9]{2,3}\b/);
+  const m = fs.readFileSync(f, 'utf8').match(/\b(?:N|PJ)-[0-9]{2,3}\b/);
   if (m) erro(`${f}: cita um número de achado (${m[0]}); o site é público, deixe os detalhes no PR do sistema`);
 }
 // Guias do site (guias/, decisão da seção Guias no rxsync-sistema): as páginas são exatamente o que o
