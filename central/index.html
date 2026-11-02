@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-XH4FgKKjGTYU5X2WfJAMnIEPLPHB/BiKH8A56eQHHsg='; style-src 'sha256-UsX5TbDsDX04ZgKMpXoGBwEIErZJh8qPRet4GqPxhBU='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4R70wnASMx7FFoyizjvM/vvpnVJHxc+01RFnsPLYWy4='; style-src 'sha256-ub6XCu+5L89EYLvNr/5CpA2nL+8qsGrp+unOb9cqoIQ='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -81,7 +81,7 @@
   --rapida-fundo: var(--texto); --rapida-acao: #A8DDD9;
   --t-11: 12px; --t-12: 12px; --t-13: 13px; --t-14: 14px; --t-16: 16px; --t-18: 18px; --t-20: 20px; --t-24: 24px; --t-30: 28px;
   --r-1: var(--r-marcar); --r-2: var(--r-botao); --r-3: var(--r-cartao); --r-4: var(--r-janela); --r-cheio: var(--r-capsula);
-  --topo-h: 56px; --lateral: 256px; --lateral-recolhida: 76px; --trilho: 88px;
+  --topo-h: 56px; --lateral: 256px; --lateral-recolhida: 76px; --trilho: 96px;
 }
 :root[data-tema="escuro"] { --superficie-3: #1F262A; --rapida-fundo: var(--superficie); --rapida-acao: var(--primaria); }
 *, *::before, *::after { box-sizing: border-box; }
@@ -127,7 +127,7 @@ body.teclado .barra { display: none; }
   .casca { grid-template-columns: var(--trilho) minmax(0, 1fr); }
   .trilho { display: flex; flex-direction: column; align-items: center; gap: var(--e-1); position: sticky; top: 0; height: 100vh; padding: calc(env(safe-area-inset-top, 0px) + var(--e-3)) 0 var(--e-4); background: var(--nav-fundo); border-right: 1px solid var(--borda); }
   .trilho .marca { margin-bottom: var(--e-4); }
-  .trilho button { width: 72px; min-height: 60px; border: 0; background: none; color: var(--nav-texto); border-radius: var(--r-3); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: var(--t-11); font-weight: 600; cursor: pointer; position: relative; }
+  .trilho button { width: 94px; min-height: 60px; border: 0; background: none; color: var(--nav-texto); border-radius: var(--r-3); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: var(--t-11); font-weight: 600; cursor: pointer; position: relative; }
   .trilho button[aria-current="page"] { color: var(--nav-ativo); background: var(--nav-ativo-fundo); }
   .trilho button:hover { background: var(--superficie-3); }
   .trilho .contador { position: absolute; top: 6px; right: 10px; }
@@ -947,7 +947,7 @@ const SECOES = [
   { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', chave: 'tela_dinheiro', desc: 'Receita, pagantes e cobranças' },
   { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Operação', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Vendas', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
-  { id: 'demonstracoes', nome: 'Demonstrações', curto: 'Demos', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
+  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
@@ -3332,7 +3332,7 @@ TELAS.metricas = async c => {
         el('div', { class: 'cartao kpi ia-mensagens' }, el('div', { class: 'rot', text: 'Mensagens do atendimento no mês' }), el('div', { class: 'val num', text: fmtNum(ci.mensagens_atendimento_mes) }),
           el('div', { class: 'var', text: 'todas as clínicas; fora do custo acima' }))),
       el('div', { class: 'aviso info mt' }, icone('info'), el('div', { text: ci.aviso || 'O atendimento das clínicas não entra: o banco só conta as mensagens, não os tokens.' })),
-      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Preencha o preço por mil tokens (entrada e saída) em Prospecção › Custos para ver o custo em reais.',
+      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída) em Custos (Prospecção › Mais).',
         ligada('tela_prospeccao') ? [' ', el('a', { href: '#prospeccao/custos', text: 'Abrir Custos' })] : null)))),
     cartao('Uso do assistente no mês', null, corpo(dados([['Perguntas', fmtNum(uso.perguntas)], ['Propostas', fmtNum(uso.propostas)], ['Confirmadas', fmtNum(uso.confirmadas)]])))));
 };
