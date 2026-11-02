@@ -168,10 +168,15 @@ TELAS.mais = async c => {
   const item = s => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir(s.id) }, el('span', { class: 'icone-caixa' }, icone(s.ic)),
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: s.nome }), el('div', { class: 't2', text: s.desc || '' })), icone('seta')));
   const grupo = g => SECOES.filter(s => s.grupo === g && visivel(s));
+  // DEC-191: 3 grupos curtos (Análise, Sistema e Conta). Antes deles, só o que não cabe na barra deste aparelho
+  // (no celular: Financeiro e Demonstrações; no iPad em pé, nada).
+  const fora = SECOES.filter(s => ['Operação', 'Vendas'].includes(s.grupo) && visivel(s) && !BARRA.includes(s.id));
+  const foraTrilho = s => TRILHO.includes(s.id);
   trocar(c, cabecalho('Mais'),
+    fora.length ? el('div', { class: fora.every(foraTrilho) ? 'so-celular' : null }, el('p', { class: 'menu-grupo', text: 'Operação e vendas' }),
+      cartao(null, null, el('ul', { class: 'lista' }, fora.map(item)))) : null,
     el('p', { class: 'menu-grupo', text: 'Análise' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Análise').map(item))),
-    el('p', { class: 'menu-grupo', text: 'Marketing' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Marketing').map(item))),
-    el('p', { class: 'menu-grupo', text: 'Administração' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Administração').map(item))),
+    el('p', { class: 'menu-grupo', text: 'Sistema' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Sistema').map(item))),
     el('p', { class: 'menu-grupo', text: 'Conta' }), cartao(null, null, el('ul', { class: 'lista' },
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir('ajustes') }, el('span', { class: 'icone-caixa' }, icone('lua')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Aparência' }), el('div', { class: 't2', text: { claro: 'Clara', escuro: 'Escura' }[aparencia] })), icone('seta'))),
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: sair }, el('span', { class: 'icone-caixa' }, icone('sair')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Sair' }), el('div', { class: 't2', text: 'Encerra a sessão neste aparelho' })))))));

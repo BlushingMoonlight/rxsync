@@ -194,7 +194,7 @@ TELAS.metricas = async c => {
         el('div', { class: 'cartao kpi ia-mensagens' }, el('div', { class: 'rot', text: 'Mensagens do atendimento no mês' }), el('div', { class: 'val num', text: fmtNum(ci.mensagens_atendimento_mes) }),
           el('div', { class: 'var', text: 'todas as clínicas; fora do custo acima' }))),
       el('div', { class: 'aviso info mt' }, icone('info'), el('div', { text: ci.aviso || 'O atendimento das clínicas não entra: o banco só conta as mensagens, não os tokens.' })),
-      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Preencha o preço por mil tokens (entrada e saída) em Prospecção › Custos para ver o custo em reais.',
+      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída) em Custos (Prospecção › Mais).',
         ligada('tela_prospeccao') ? [' ', el('a', { href: '#prospeccao/custos', text: 'Abrir Custos' })] : null)))),
     cartao('Uso do assistente no mês', null, corpo(dados([['Perguntas', fmtNum(uso.perguntas)], ['Propostas', fmtNum(uso.propostas)], ['Confirmadas', fmtNum(uso.confirmadas)]])))));
 };

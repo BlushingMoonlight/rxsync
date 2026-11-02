@@ -12,7 +12,7 @@
   --rapida-fundo: var(--texto); --rapida-acao: #A8DDD9;
   --t-11: 12px; --t-12: 12px; --t-13: 13px; --t-14: 14px; --t-16: 16px; --t-18: 18px; --t-20: 20px; --t-24: 24px; --t-30: 28px;
   --r-1: var(--r-marcar); --r-2: var(--r-botao); --r-3: var(--r-cartao); --r-4: var(--r-janela); --r-cheio: var(--r-capsula);
-  --topo-h: 56px; --lateral: 256px; --lateral-recolhida: 76px; --trilho: 88px;
+  --topo-h: 56px; --lateral: 256px; --lateral-recolhida: 76px; --trilho: 96px;
 }
 :root[data-tema="escuro"] { --superficie-3: #1F262A; --rapida-fundo: var(--superficie); --rapida-acao: var(--primaria); }
 *, *::before, *::after { box-sizing: border-box; }
@@ -58,7 +58,7 @@ body.teclado .barra { display: none; }
   .casca { grid-template-columns: var(--trilho) minmax(0, 1fr); }
   .trilho { display: flex; flex-direction: column; align-items: center; gap: var(--e-1); position: sticky; top: 0; height: 100vh; padding: calc(env(safe-area-inset-top, 0px) + var(--e-3)) 0 var(--e-4); background: var(--nav-fundo); border-right: 1px solid var(--borda); }
   .trilho .marca { margin-bottom: var(--e-4); }
-  .trilho button { width: 72px; min-height: 60px; border: 0; background: none; color: var(--nav-texto); border-radius: var(--r-3); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: var(--t-11); font-weight: 600; cursor: pointer; position: relative; }
+  .trilho button { width: 94px; min-height: 60px; border: 0; background: none; color: var(--nav-texto); border-radius: var(--r-3); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: var(--t-11); font-weight: 600; cursor: pointer; position: relative; }
   .trilho button[aria-current="page"] { color: var(--nav-ativo); background: var(--nav-ativo-fundo); }
   .trilho button:hover { background: var(--superficie-3); }
   .trilho .contador { position: absolute; top: 6px; right: 10px; }
@@ -320,3 +320,11 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .p-caiu > summary { cursor: pointer; color: var(--texto-2); font-size: var(--t-peq); min-height: var(--alvo); display: flex; align-items: center; }
 .p-caiu-lista { list-style: none; margin: 0; padding: 0 0 var(--e-2); }
 .p-caiu-lista li { display: flex; justify-content: space-between; gap: var(--e-3); padding: var(--e-1) 0; border-top: 1px solid var(--borda); font-size: var(--t-peq); }
+
+/* Mais: o que só falta na barra do celular */
+@media (min-width: 768px) { .so-celular { display: none; } }
+
+/* Ações: a linha antes de "É uma clínica de teste" e "Excluir a clínica"; a seleção das clínicas de teste */
+.menu-acoes .separador { border-top: 1px solid var(--borda); margin: var(--e-2) 0; }
+.linha.cli.sel { cursor: pointer; }
+.linha.cli.sel input { width: 22px; height: 22px; flex: none; accent-color: var(--primaria); }
