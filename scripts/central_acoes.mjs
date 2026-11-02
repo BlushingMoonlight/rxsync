@@ -121,6 +121,15 @@ const CASOS = [
   { acao: 'conversas_enviar', rota: F, abrirCom: () => menu('Enviar as conversas ao e-mail do cadastro'), espera: C },
   { acao: 'link_painel_novo', rota: F, abrirCom: () => menu('Gerar um link novo do painel'), nome: NOME, espera: C },
   { acao: 'cobranca_teste_definir', rota: F, abrirCom: () => menu('Usar como clínica de teste'), nome: NOME, espera: C },
+  // Excluir e marcar clínicas (sql/086, DEC-190): de verdade encerra hoje (com o motivo); de teste, na hora; várias de teste pela lista
+  { acao: 'cliente_marcar_teste', rota: F, abrirCom: () => menu('É uma clínica de teste'), nome: NOME, espera: C },
+  { acao: 'cliente_excluir', rota: F, abrirCom: () => menu('Excluir a clínica'), campos: { motivo: M }, nome: NOME, espera: { ...C, motivo: M } },
+  { acao: 'cliente_excluir', rota: F, extra: { interna: true }, abrirCom: () => menu('Excluir a clínica'), nome: NOME, espera: C },
+  { acao: 'cliente_excluir_lote', rota: 'clientes', antes: async () => { await page.locator('.filtros button', { hasText: 'De teste' }).click(); await botao('Selecionar').click();
+      await page.locator('.linha.cli.sel input[type=checkbox]').first().check(); }, abrirCom: () => botao(/^Excluir as selecionadas/).click(), campos: { quantas: '1' }, nome: 'EXCLUIR',
+    espera: { ids: ['RX-TESTE-INTERNA'], quantas: '1' } },
+  { acao: 'cliente_editar_login', rota: F + '/cadastro', abrirCom: () => botao('Trocar o e-mail de entrada do dono').click(), campos: { email: 'novo@exemplo.com' }, nome: NOME, espera: { ...C, email: 'novo@exemplo.com' } },
+  { acao: 'cliente_editar_modalidade', rota: F + '/cadastro', extra: { interna: true }, abrirCom: () => botao('Trocar a modalidade').click(), campos: { modalidade: 'teste' }, espera: { ...C, modalidade: 'teste' } },
   { acao: 'cobranca_teste_definir', nivel: 2, rota: F, antes: async () => { chaves.cobranca_teste_cliente = 'CLI-001'; await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await page.waitForTimeout(300); await abrir(F); },
     abrirCom: () => menu('Deixar de ser a clínica de teste'), espera: { cliente_id: '' } },
   // API (Enterprise)

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QYnkQENLau6Hhpc7GAUSpp7RR5oq8mffXiC3w+KiRew=' 'self'; style-src 'sha256-dd3f4XiyFWKx20wGC6MUkOPwebw9nGlYwZilfj0VTqg=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hUPMO7H0LEhBmDhLlIN+Lg21TFtOenvDWM+kvOpuo+0=' 'self'; style-src 'sha256-dd3f4XiyFWKx20wGC6MUkOPwebw9nGlYwZilfj0VTqg=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -3492,7 +3492,7 @@ tela('assistente', {
   montar: () => [cabTela('Assistente', { sub: 'O que a assistente sabe e como ela atende seus pacientes no WhatsApp. As mudanças valem na hora.' }),
     el('div', { class: 'cartao pad bloco', id: 'cardPausa' }, el('p', { class: 'tit-bloco' }, el('span', { class: 'ponto', 'data-ponto': '' }), el('span', { 'data-estado-curto': '', text: '…' })),
       el('p', { class: 'mudo', id: 'pausaTxt', text: 'Carregando…' }), el('div', { class: 'linha-botoes pilha', id: 'iaAcoes' })),
-    GRUPOS_IA.map(([titulo, itens]) => el('div', { class: 'bloco' }, el('h2', { text: titulo }), el('div', { class: 'lista' }, itens.map(([k, t, ic]) => linhaLink(t, null, 'assistente/' + k, ic)))))],
+    GRUPOS_IA.map(([titulo, itens]) => el('div', { class: 'bloco', id: titulo === 'O que ela sabe' ? 'blocoSabe' : null }, el('h2', { text: titulo }), el('div', { class: 'lista' }, itens.map(([k, t, ic]) => linhaLink(t, null, 'assistente/' + k, ic)))))],
   entrar: () => { assistenteEstadoRender(); assistenteResumos(); }
 });
 function assistenteEstadoRender() {

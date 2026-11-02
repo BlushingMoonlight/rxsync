@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-AAHaaLZiSTrRhdWVjK3Ej2QLNXPgW18MZv5NrTLXxw4='; style-src 'sha256-kXgTOFoC9jh6mgb2OusaZ/Faavq9gu0n6SZbGfBUWYs='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4R70wnASMx7FFoyizjvM/vvpnVJHxc+01RFnsPLYWy4='; style-src 'sha256-ub6XCu+5L89EYLvNr/5CpA2nL+8qsGrp+unOb9cqoIQ='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -81,7 +81,7 @@
   --rapida-fundo: var(--texto); --rapida-acao: #A8DDD9;
   --t-11: 12px; --t-12: 12px; --t-13: 13px; --t-14: 14px; --t-16: 16px; --t-18: 18px; --t-20: 20px; --t-24: 24px; --t-30: 28px;
   --r-1: var(--r-marcar); --r-2: var(--r-botao); --r-3: var(--r-cartao); --r-4: var(--r-janela); --r-cheio: var(--r-capsula);
-  --topo-h: 56px; --lateral: 256px; --lateral-recolhida: 76px; --trilho: 88px;
+  --topo-h: 56px; --lateral: 256px; --lateral-recolhida: 76px; --trilho: 96px;
 }
 :root[data-tema="escuro"] { --superficie-3: #1F262A; --rapida-fundo: var(--superficie); --rapida-acao: var(--primaria); }
 *, *::before, *::after { box-sizing: border-box; }
@@ -127,7 +127,7 @@ body.teclado .barra { display: none; }
   .casca { grid-template-columns: var(--trilho) minmax(0, 1fr); }
   .trilho { display: flex; flex-direction: column; align-items: center; gap: var(--e-1); position: sticky; top: 0; height: 100vh; padding: calc(env(safe-area-inset-top, 0px) + var(--e-3)) 0 var(--e-4); background: var(--nav-fundo); border-right: 1px solid var(--borda); }
   .trilho .marca { margin-bottom: var(--e-4); }
-  .trilho button { width: 72px; min-height: 60px; border: 0; background: none; color: var(--nav-texto); border-radius: var(--r-3); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: var(--t-11); font-weight: 600; cursor: pointer; position: relative; }
+  .trilho button { width: 94px; min-height: 60px; border: 0; background: none; color: var(--nav-texto); border-radius: var(--r-3); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: var(--t-11); font-weight: 600; cursor: pointer; position: relative; }
   .trilho button[aria-current="page"] { color: var(--nav-ativo); background: var(--nav-ativo-fundo); }
   .trilho button:hover { background: var(--superficie-3); }
   .trilho .contador { position: absolute; top: 6px; right: 10px; }
@@ -381,6 +381,22 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .aviso-dia { margin: 0; padding: var(--e-3) var(--e-4) var(--e-1); font-size: var(--t-2); line-height: var(--l-2); font-weight: 600; color: var(--texto-2); }
 .aviso-dia:not(:first-child) { border-top: 1px solid var(--borda); }
 .aviso-dia::first-letter { text-transform: uppercase; }
+
+/* Prospecção: "Para começar" e "por que caiu" */
+.icone-caixa.feito { background: var(--ok-fundo); color: var(--ok-texto); }
+.p-comecar button.linha { width: 100%; text-align: left; }
+.p-caiu { margin-top: var(--e-2); }
+.p-caiu > summary { cursor: pointer; color: var(--texto-2); font-size: var(--t-peq); min-height: var(--alvo); display: flex; align-items: center; }
+.p-caiu-lista { list-style: none; margin: 0; padding: 0 0 var(--e-2); }
+.p-caiu-lista li { display: flex; justify-content: space-between; gap: var(--e-3); padding: var(--e-1) 0; border-top: 1px solid var(--borda); font-size: var(--t-peq); }
+
+/* Mais: o que só falta na barra do celular */
+@media (min-width: 768px) { .so-celular { display: none; } }
+
+/* Ações: a linha antes de "É uma clínica de teste" e "Excluir a clínica"; a seleção das clínicas de teste */
+.menu-acoes .separador { border-top: 1px solid var(--borda); margin: var(--e-2) 0; }
+.linha.cli.sel { cursor: pointer; }
+.linha.cli.sel input { width: 22px; height: 22px; flex: none; accent-color: var(--primaria); }
 /* ---------- IA da Central (DEC-145): o assistente ao lado (1180 px ou mais) ou em tela cheia (iPad em pé e celular) ---------- */
 .painel-ia { display: none; }
 .casca.com-assistente .painel-ia { display: flex; flex-direction: column; position: fixed; inset: 0; z-index: 60; background: var(--superficie); min-width: 0;
@@ -923,29 +939,34 @@ async function sair() { await chamar('sair', { esquecer: true, lembranca: lembra
 // ==== 03_casca.js
 // ---------------------------------------------------------------- casca: seções, menu, caminho, busca e rotas (DEC-068)
 ICONES.atualizar = 'M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v5h-5';
+// Pedidos do Jean de 01/11/2026 (DEC-191): o menu lateral em 4 grupos, na ordem do trabalho. A barra do iPad
+// em pé (trilho, 768 a 1023 px) e a do celular (< 768 px) têm cada uma a sua lista (TRILHO e BARRA); o resto fica em "Mais".
 const SECOES = [
-  { id: 'hoje', nome: 'Hoje', ic: 'hoje', grupo: 'Operação', aba: 1 },
-  { id: 'clientes', nome: 'Clientes', ic: 'clientes', grupo: 'Operação', aba: 1 },
-  { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', aba: 1, chave: 'tela_dinheiro' },
-  { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Operação', aba: 1, chave: 'tela_sistema' },
+  { id: 'hoje', nome: 'Hoje', ic: 'hoje', grupo: 'Operação' },
+  { id: 'clientes', nome: 'Clientes', ic: 'clientes', grupo: 'Operação' },
+  { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', chave: 'tela_dinheiro', desc: 'Receita, pagantes e cobranças' },
+  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Operação', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
+  { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Vendas', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
+  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
-  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'agregados', nome: 'Agregados de pacientes', ic: 'agregados', grupo: 'Análise', chave: 'tela_agregados_pacientes', escondeDesligada: true, desc: 'Contagens e médias por clínica' },
-  { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Marketing', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
-  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Marketing', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
-  { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Administração', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
-  { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Administração', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
-  { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Administração', desc: 'Liga e desliga telas e edições, aparência' }
+  { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Sistema', chave: 'tela_sistema', desc: 'Falhas, SQL aplicados, WhatsApp e integrações' },
+  { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Sistema', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
+  { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Sistema', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
+  { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Sistema', desc: 'Liga e desliga telas e edições, aparência' }
 ];
+const TRILHO = ['hoje', 'clientes', 'prospeccao', 'demonstracoes', 'avisos', 'financeiro'];   // iPad em pé
+const BARRA = ['hoje', 'clientes', 'prospeccao', 'avisos'];                                     // celular
+const naLista = l => l.map(id => SECOES.find(s => s.id === id)).filter(s => s && visivel(s));
 const visivel = s => !(s.escondeDesligada && !ligada(s.chave));
 const TELAS = {};
 est.contadores = {};
 function ir(rota) { if (location.hash === '#' + rota) rotear(); else location.hash = rota; }
 function secaoAtiva() { const a = (location.hash || '#hoje').slice(1).split('/')[0]; return a === 'mais' ? 'mais' : (SECOES.find(s => s.id === a) || { id: 'hoje' }).id; }
 function montarNav() {
-  const ativa = secaoAtiva(); const naAba = SECOES.some(s => s.aba && s.id === ativa);
+  const ativa = secaoAtiva(); const trilho = naLista(TRILHO), barra = naLista(BARRA);
   const cont = id => est.contadores[id] ? el('span', { class: 'contador', text: est.contadores[id], 'aria-label': est.contadores[id] + ' pendências' }) : null;
   const lat = $('lateral');
   trocar(lat, el('div', { class: 'cab' }, el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
@@ -957,14 +978,13 @@ function montarNav() {
       icone(s.ic), el('span', { class: 'rotulo', text: s.nome }), cont(s.id)));
   }
   lat.append(el('div', { class: 'rodape' }, el('button', { class: 'item-nav', type: 'button', 'aria-label': est.recolhida ? 'Sair' : null, onclick: sair }, icone('sair'), el('span', { class: 'rotulo', text: 'Sair' }))));
-  const principais = SECOES.filter(s => s.aba);
   trocar($('trilho'), el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
-    ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
-    el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
+    ...trilho.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
+    el('button', { type: 'button', 'aria-current': !trilho.some(s => s.id === ativa) ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
     el('button', { type: 'button', onclick: sair }, icone('sair', 'g'), 'Sair'));
-  trocar($('barra'), ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) },
+  trocar($('barra'), ...barra.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) },
     el('span', { class: 'pilula' }, icone(s.ic)), s.curto || s.nome, cont(s.id))),
-    el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, el('span', { class: 'pilula' }, icone('mais')), 'Mais'));
+    el('button', { type: 'button', 'aria-current': !barra.some(s => s.id === ativa) ? 'page' : null, onclick: () => ir('mais') }, el('span', { class: 'pilula' }, icone('mais')), 'Mais'));
 }
 // Barra de cima: no celular, voltar + título; no iPad e no computador, o caminho e a busca.
 function topo(titulo, caminho, voltar) {
@@ -1215,15 +1235,24 @@ function formGrupo(x, grupo, valores, acao, titulo, aberto) {
 // ---------- lista
 const FILTROS_CLI = [['todos', 'Todas', () => true], ['ar', 'No ar', x => x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => x.ativo && x.modalidade === 'teste'],
   ['implantacao', 'Implantação', x => ['Pago', 'Aguardando dados', 'Em implantação', 'Aceite registrado'].includes(x.status)], ['suspensas', 'Suspensas', x => x.status === 'Suspenso'],
-  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)]];
+  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)],
+  ['interna', 'De teste', x => !!x.interna && !['Excluir agora', 'Dados apagados'].includes(x.status)]];
 est.filtroCli = 'todos'; est.buscaCli = '';
 function listaDeClientes(todos, selecionado) {
-  const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' });
+  const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' }); const acoesLote = el('div', { class: 'acoes' });
   const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Filtrar por nome ou código', 'aria-label': 'Filtrar por nome ou código', autocomplete: 'off', enterkeyhint: 'search', value: est.buscaCli || null });
   const desenhar = () => {
     trocar(filtros, ...FILTROS_CLI.map(([k, n, fn]) => el('button', { type: 'button', 'aria-pressed': String(est.filtroCli === k), onclick: () => { est.filtroCli = k; desenhar(); } }, n, el('span', { class: 'n', text: todos.filter(fn).length }))));
     const fn = FILTROS_CLI.find(f => f[0] === est.filtroCli)[2], q = semAcento(busca.value);
     const vis = todos.filter(x => fn(x) && (!q || semAcento(x.nome + ' ' + x.cliente_id).includes(q)));
+    // DEC-190: só no filtro "De teste", "Selecionar" mostra uma caixa em cada linha e "Excluir as selecionadas".
+    const sel = est.filtroCli === 'interna' && est.selCli ? est.selCli : null;
+    trocar(acoesLote, ...(est.filtroCli === 'interna' && vis.length && ligada('editar_situacao') ? [
+      sel ? btn('Excluir as selecionadas' + (sel.size ? ' (' + sel.size + ')' : ''), () => excluirLote([...sel]), 'perigo-sec', 'fechar') : null,
+      btn(sel ? 'Cancelar a seleção' : 'Selecionar', () => { est.selCli = sel ? null : new Set(); desenhar(); }, 'sec')] : []));
+    if (sel) { trocar(lista, ...vis.map(x => el('li', {}, el('label', { class: 'linha cli sel' }, el('input', { type: 'checkbox', checked: sel.has(x.cliente_id) || null,
+      onchange: e => { if (e.target.checked) sel.add(x.cliente_id); else sel.delete(x.cliente_id); desenhar(); } }),
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: x.cliente_id + ' · ' + (x.status || '—') })))))); return; }
     trocar(lista, ...vis.map(x => el('li', {}, el('button', { class: 'linha cli', type: 'button', 'aria-current': selecionado === x.cliente_id ? 'true' : null, onclick: () => irCliente(x.cliente_id) },
       el('span', { class: 'avatar ' + tomStatus(x.status), text: iniciais(x.nome), 'aria-hidden': 'true' }),
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: `${x.cliente_id} · ${x.plano || '—'} · ${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)}` + (x.whatsapp && x.whatsapp !== 'open' ? ' · WhatsApp fora' : '') }), barraUso(x.mensagens_mes, x.franquia)),
@@ -1232,7 +1261,14 @@ function listaDeClientes(todos, selecionado) {
   };
   busca.oninput = () => { est.buscaCli = busca.value; desenhar(); };
   desenhar();
-  return el('section', { class: 'cartao mestre', 'aria-label': 'Clínicas' }, el('div', { class: 'cab' }, el('div', { class: 'pilha' }, busca, filtros)), lista);
+  return el('section', { class: 'cartao mestre', 'aria-label': 'Clínicas' }, el('div', { class: 'cab' }, el('div', { class: 'pilha' }, busca, filtros, acoesLote)), lista);
+}
+function excluirLote(ids) {
+  if (!ids.length) { rapida('Escolha ao menos uma clínica de teste.'); return; }
+  return fazer('cliente_excluir_lote', { ids }, { nivel: 3, titulo: 'Excluir ' + (ids.length === 1 ? '1 clínica de teste' : ids.length + ' clínicas de teste'), nome: 'EXCLUIR', rotuloNome: 'a palavra',
+    botao: 'Excluir agora', texto: 'Só clínicas de teste. A agenda, os pacientes, o painel e as conversas saem agora; o WhatsApp e o Chatwoot, na rodada das 8h10. Não tem volta.',
+    campos: [{ k: 'quantas', rot: 'Quantas clínicas você escolheu?', inputmode: 'numeric', obrig: true, ajuda: 'Digite o número: ' + ids.length + '.' }],
+    depois: () => { est.selCli = null; est.clientes = null; rotear(); } });
 }
 TELAS.clientes = async (c, [id, aba]) => {
   const largo = matchMedia('(min-width: 1024px)').matches;
@@ -1449,6 +1485,18 @@ function abaCadastro(c, x) {
     esconder();
     anexar(c, cartao('Dados protegidos', etq('CPF, CNPJ e faturamento', '', true), corpo(area)));
   }
+  // sql/086 (DEC-190): o e-mail de entrada do dono no painel (nível 3; o aviso vai ao antigo e ao novo) e, só na
+  // clínica de teste, a modalidade. O código da clínica (cliente_id) não muda: está nas consultas, nos avisos e nos links.
+  if (ligada('editar_empresa')) {
+    const acoesEnt = [btn('Trocar o e-mail de entrada do dono', () => fazer('cliente_editar_login', { cliente_id: x.cliente_id }, {
+      titulo: 'E-mail de entrada de ' + x.nome, nome: x.nome, botao: 'Trocar o e-mail', ok: 'E-mail de entrada trocado.',
+      texto: 'O dono entra no painel com o e-mail novo e a mesma senha. As sessões e os aparelhos lembrados dele saem. O aviso vai ao e-mail antigo e ao novo.',
+      campos: [{ k: 'email', rot: 'E-mail novo', tipo: 'email', inputmode: 'email', obrig: true }] }), 'sec', 'usuario')];
+    if (x.interna) acoesEnt.push(btn('Trocar a modalidade', () => fazer('cliente_editar_modalidade', { cliente_id: x.cliente_id }, {
+      titulo: 'Modalidade de ' + x.nome, ok: 'Modalidade trocada.', botao: 'Salvar',
+      campos: [{ k: 'modalidade', rot: 'Modalidade', valor: x.modalidade, opcoes: [['teste', 'Teste grátis'], ['contratado', 'Contratada']] }] }), 'sec', 'ajustes'));
+    anexar(c, cartao('Entrada no painel', x.interna ? etq('clínica de teste', '', true) : null, corpo(el('p', { class: 'mudo peq', text: 'O código da clínica (' + x.cliente_id + ') não muda.' }), el('div', { class: 'acoes mt' }, acoesEnt))));
+  }
 }
 // A Central foi para o fundo: tira da tela os dados protegidos (voltam com "Mostrar").
 document.addEventListener('visibilitychange', () => {
@@ -1522,6 +1570,21 @@ function menuAcoes(x) {
     else item('Usar como clínica de teste da cobrança', 'Nível 3. Só uma clínica nova de teste, criada por você no contratar.html.', () => fazer('cobranca_teste_definir', { cliente_id: x.cliente_id }, { titulo: 'Clínica de teste da cobrança', nome: x.nome,
       texto: 'Nela, plano, cobrança e situação mudam mesmo com as chaves desligadas. O servidor recusa clínica que já pagou ou que é cliente de verdade. Chega um aviso em Avisos.', ok: 'Clínica de teste da cobrança definida.',
       depois: async () => { await carregarConfig(); await rotear(); } }), true);
+  }
+  // sql/086 (DEC-190): no fim, separados por uma linha. A clínica de teste sai na hora; a de verdade encerra
+  // hoje e os dados saem em 15 dias. "É uma clínica de teste" só para quem nunca pagou (o servidor confere).
+  if (pode('editar_situacao') && !['Excluir agora', 'Dados apagados'].includes(st)) {
+    if (itens.length) itens.push(el('li', { class: 'separador', role: 'separator', 'aria-hidden': 'true' }));
+    if (!x.interna) item('É uma clínica de teste', 'Nível 3. Só para quem nunca pagou: ela sai dos números e pode ser excluída na hora.', () => fazer('cliente_marcar_teste', { cliente_id: x.cliente_id }, {
+      titulo: 'Marcar ' + x.nome + ' como clínica de teste', nome: x.nome, botao: 'Marcar como teste', ok: 'Marcada como clínica de teste.',
+      texto: 'Use para as clínicas que você criou para testar. O servidor recusa quem já pagou alguma vez.', linhas: [['Clínica de teste', 'não', 'sim']] }), true);
+    if (x.interna) item('Excluir a clínica', 'Nível 3. Clínica de teste: apaga tudo agora.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Excluir agora', ok: 'Clínica de teste excluída.', depois: () => { est.clientes = null; ir('clientes'); },
+      texto: 'É uma clínica de teste: a agenda, os pacientes, o painel e as conversas saem agora. O WhatsApp e o Chatwoot dela saem na rodada das 8h10. Não tem volta.' }), true);
+    else if (st !== 'Cancelado') item('Excluir a clínica', 'Nível 3. Encerra o contrato hoje; os dados saem em 15 dias.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Encerrar hoje', ok: 'Contrato encerrado hoje.',
+      texto: 'É uma clínica de verdade: o contrato termina hoje e a assistente para na rodada das 8h10. Os dados de atendimento saem em 15 dias. O cadastro e o aceite ficam 5 anos, como a lei pede. A clínica recebe um e-mail.',
+      linhas: [['Contrato', x.cancelar_em ? 'encerra em ' + fmtData(x.cancelar_em) : 'ativo', 'encerra hoje']], campos: [MOTIVO] }), true);
   }
   const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-menu' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-menu', text: 'Ações · ' + x.nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
@@ -1873,10 +1936,15 @@ TELAS.mais = async c => {
   const item = s => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir(s.id) }, el('span', { class: 'icone-caixa' }, icone(s.ic)),
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: s.nome }), el('div', { class: 't2', text: s.desc || '' })), icone('seta')));
   const grupo = g => SECOES.filter(s => s.grupo === g && visivel(s));
+  // DEC-191: 3 grupos curtos (Análise, Sistema e Conta). Antes deles, só o que não cabe na barra deste aparelho
+  // (no celular: Financeiro e Demonstrações; no iPad em pé, nada).
+  const fora = SECOES.filter(s => ['Operação', 'Vendas'].includes(s.grupo) && visivel(s) && !BARRA.includes(s.id));
+  const foraTrilho = s => TRILHO.includes(s.id);
   trocar(c, cabecalho('Mais'),
+    fora.length ? el('div', { class: fora.every(foraTrilho) ? 'so-celular' : null }, el('p', { class: 'menu-grupo', text: 'Operação e vendas' }),
+      cartao(null, null, el('ul', { class: 'lista' }, fora.map(item)))) : null,
     el('p', { class: 'menu-grupo', text: 'Análise' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Análise').map(item))),
-    el('p', { class: 'menu-grupo', text: 'Marketing' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Marketing').map(item))),
-    el('p', { class: 'menu-grupo', text: 'Administração' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Administração').map(item))),
+    el('p', { class: 'menu-grupo', text: 'Sistema' }), cartao(null, null, el('ul', { class: 'lista' }, grupo('Sistema').map(item))),
     el('p', { class: 'menu-grupo', text: 'Conta' }), cartao(null, null, el('ul', { class: 'lista' },
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => ir('ajustes') }, el('span', { class: 'icone-caixa' }, icone('lua')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Aparência' }), el('div', { class: 't2', text: { claro: 'Clara', escuro: 'Escura' }[aparencia] })), icone('seta'))),
       el('li', {}, el('button', { class: 'linha', type: 'button', onclick: sair }, el('span', { class: 'icone-caixa' }, icone('sair')), el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Sair' }), el('div', { class: 't2', text: 'Encerra a sessão neste aparelho' })))))));
@@ -1892,9 +1960,13 @@ TELAS.mais = async c => {
 ICONES.prospeccao = 'M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12';
 ICONES.telefone = 'M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 19V5A1.5 1.5 0 0 1 8 3.5M11 17.5h2';
 ICONES.conversa = 'M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7l-4.5 3.5V17H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1M8 9.5h8M8 12.5h5';
+ICONES.seta_baixo = 'M6 9l6 6 6-6';
 ICONES.mais_um = 'M12 5v14M5 12h14';
 
-const P_ABAS = [['', 'Campanhas'], ['publicos', 'Públicos'], ['numeros', 'Números'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['relatorios', 'Relatórios'], ['buscas', 'Buscas'], ['regras', 'Regras'], ['custos', 'Custos']];
+// Pedidos do Jean: as abas na ordem do trabalho; o que é semanal ou raro fica no "Mais" da própria Prospecção.
+const P_ABAS = [['', 'Início'], ['publicos', 'Públicos'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['numeros', 'Números']];
+const P_MAIS = [['relatorios', 'Relatórios', 'Resultados por campanha, conjunto e anúncio'], ['buscas', 'Buscas', 'Todas as buscas no Google Maps e o teto de créditos'],
+  ['regras', 'Regras', 'Pausar ou reduzir quando algo vai mal'], ['custos', 'Custos', 'Preços do SerpAPI e da OpenAI']];
 const P_SIT = { rascunho: ['rascunho', ''], ativa: ['ativa', 'ok'], ativo: ['ativo', 'ok'], pausada: ['pausada', 'atencao'], pausado: ['pausado', 'atencao'], cortado: ['cortado pela regra', 'perigo'],
   encerrada: ['encerrada', ''], encerrado: ['encerrado', ''], arquivado: ['arquivado', ''] };
 const etqSit = s => { const [t, tom] = P_SIT[s] || [s || '—', '']; return etq(t, tom); };
@@ -1911,8 +1983,17 @@ est.prosp = null; // a última tela inicial (árvore de campanhas e números), s
 est.publicos = null; // a última lista de públicos (sql/036), só na memória
 
 function abasP(atual) {
-  return el('div', { class: 'abas abas-p', role: 'tablist', 'aria-label': 'Partes da prospecção' }, P_ABAS.map(([k, n]) => el('button', { role: 'tab', type: 'button', 'aria-selected': String(atual === k), onclick: () => irP(k) }, n)));
+  const naMais = P_MAIS.find(([k]) => k === atual);
+  return el('div', { class: 'abas abas-p', role: 'tablist', 'aria-label': 'Partes da prospecção' }, P_ABAS.map(([k, n]) => el('button', { role: 'tab', type: 'button', 'aria-selected': String(atual === k), onclick: () => irP(k) }, n)),
+    el('button', { role: 'tab', type: 'button', 'aria-selected': String(!!naMais), 'aria-haspopup': 'dialog', onclick: maisP }, naMais ? naMais[1] : 'Mais', icone('seta_baixo', 'p')));
 }
+function maisP() {
+  const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-mais-p' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-mais-p', text: 'Mais da prospecção' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('ul', { class: 'menu-acoes' }, P_MAIS.map(([k, n, s]) => el('li', {}, el('button', { type: 'button', onclick: () => { fechar(); irP(k); } }, el('div', {}, n, el('span', { class: 't2', text: s }))))))));
+}
+// Uma chave da prospecção ligada ali mesmo, com o mesmo nível de Ajustes (busca e IA 2, disparo 3).
+const ligarAqui = (chave, texto) => btn(texto, async () => { await mudarChave(chave, 'SIM'); est.prosp = null; await rotear(); }, 'sec');
 async function arvoreP(forcar) {
   if (est.prosp && !forcar) return est.prosp;
   const r = await chamar('prosp_inicio');
@@ -2003,6 +2084,23 @@ async function pInicio(c) {
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
   const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
   const campanhas = d.campanhas || [];
+  // Para começar: a ordem do primeiro uso, cada passo marcado pelo que o servidor já manda; some quando tudo está feito.
+  const pubs = ((await publicosP()) || {}).publicos || [];
+  const temCampanha = campanhas.some(cp => ativo(cp.situacao) && (cp.conjuntos || []).some(j => ativo(j.situacao) && (j.anuncios || []).some(n => ativo(n.situacao))));
+  const politica = ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM';
+  const passos = [
+    ['Busca e IA ligadas', 'A busca gasta créditos do SerpAPI; a IA responde os leads', ch.prosp_busca === 'SIM' && ch.prosp_ia === 'SIM',
+      editar ? [ch.prosp_busca === 'SIM' ? null : ligarAqui('prosp_busca', 'Ligar a busca'), ch.prosp_ia === 'SIM' ? null : ligarAqui('prosp_ia', 'Ligar a IA')] : null],
+    ['Um número de WhatsApp conectado', 'O número prospec- que manda as mensagens (leia o QR)', (d.numeros || []).some(n => n.situacao === 'conectado'), () => irP('numeros')],
+    ['Um público com contatos', 'Termos, bairros e filtros; depois "Buscar de novo"', pubs.some(p => Number((p.numeros || {}).tamanho) > 0), () => irP('publicos')],
+    ['Uma campanha com conjunto e anúncio ativos', 'Campanha (marca e IA) › conjunto (público, número, entrega) › anúncio', temCampanha, editar ? () => irP('campanha', 'novo') : null],
+    ['Disparo ligado', politica ? 'Por último: as mensagens começam a sair, dentro das travas' : 'Travado até a Política v10 e o balanceamento (só por PR)', ch.prosp_disparo === 'SIM',
+      editar && politica ? [ligarAqui('prosp_disparo', 'Ligar o disparo')] : null]];
+  const paraComecar = passos.some(p => !p[2]) ? cartao('Para começar', el('span', { class: 'mudo peq', text: `${passos.filter(p => p[2]).length} de ${passos.length}` }),
+    el('ul', { class: 'lista p-comecar' }, passos.map(([t, s, feito, acao]) => el('li', {}, el(typeof acao === 'function' && !feito ? 'button' : 'div', { class: 'linha', type: typeof acao === 'function' && !feito ? 'button' : null, onclick: typeof acao === 'function' && !feito ? acao : null },
+      el('span', { class: 'icone-caixa' + (feito ? ' feito' : '') }, icone(feito ? 'ok' : 'relogio')),
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: t }), el('div', { class: 't2', text: feito ? 'Feito' : s })),
+      !feito && Array.isArray(acao) ? el('div', { class: 'direita acoes' }, acao.filter(Boolean)) : !feito && typeof acao === 'function' ? icone('seta') : null))))) : null;
   // Uma camada: a linha (abre a camada) e, ao lado, o interruptor.
   const camada = (tipo, o, t2, ic, extra) => el('div', { class: 'p-camada' + (extra ? ' ' + extra : '') },
     el('button', { class: 'linha', type: 'button', onclick: () => irP(tipo, o.id) }, ic ? el('span', { class: 'icone-caixa' }, icone(ic)) : null,
@@ -2019,7 +2117,7 @@ async function pInicio(c) {
     ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${pl((cp.conjuntos || []).length, 'conjunto', 'conjuntos')}`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
     : [cartao(null, null, vazio('Nenhuma campanha ainda. Crie a primeira: campanha (marca, produto e IA) › conjunto (públicos, número, entrega) › anúncios (as mensagens, sorteadas entre os leads).', 'prospeccao'))];
   trocar(c, cabecalho('Prospecção', 'campanha › conjunto › anúncio', editar ? btn('Nova campanha', () => irP('campanha', 'novo'), 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, abasP(''),
+    el('div', { class: 'pilha' }, abasP(''), paraComecar,
       el('div', { class: 'etqs' }, etq(disparo[0], disparo[1]), etq(ch.prosp_busca === 'SIM' ? 'busca ligada' : 'busca desligada', ch.prosp_busca === 'SIM' ? 'ok' : ''),
         etq(ch.prosp_ia === 'SIM' ? 'IA ligada' : 'IA desligada', ch.prosp_ia === 'SIM' ? 'ok' : ''), etq(fmtNum(d.nao_contatar) + ' no "não contatar"', '', true)),
       el('div', { class: 'kpis' }, kpi('Abordagens (7 dias)', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
@@ -2064,20 +2162,25 @@ const ESQUEMA = {
     ['Frequência e aprendizado', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
       ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }], ['aprendizado_min', 'Fase de aprendizado (envios por anúncio)', 'num']]]],
   publico: [
-    ['Busca no Google Maps', [['busca.termos', 'Termos (um por linha)', 'lista', { ajuda: 'ex.: dentista' }], ['busca.lugares', 'Cidades ou bairros (um por linha)', 'lista'], ['busca.coordenadas', 'Coordenadas (opcional)', 'texto', { ajuda: '-25.43,-49.27' }],
-      ['busca.zoom', 'Zoom (10 cidade a 18 quarteirão)', 'num'], ['busca.paginas', 'Páginas por busca', 'num', { trava: 'paginas_max' }], ['busca.creditos_busca', 'Créditos por busca', 'num'],
+    ['Busca no Google Maps', [['busca.termos', 'Termos (um por linha)', 'lista', { ajuda: 'ex.: cardiologista, dermatologista (uma especialidade por linha)' }],
+      ['busca.lugares', 'Cidades ou bairros (um por linha)', 'lista', { ajuda: 'para cobrir uma cidade grande, ponha os bairros: cada bairro é uma busca de até 120' }],
+      ['busca.paginas', 'Páginas por busca', 'num', { trava: 'paginas_max', ajuda: 'cada página traz até 20 negócios e gasta 1 crédito; a busca para quando o Google não tiver mais' }],
       ['busca.repetir.tipo', 'Repetir', 'sel', { op: [['uma_vez', 'Uma vez'], ['semanal', 'Toda semana']] }], ['busca.repetir.dia_semana', 'Dia da semana', 'sel', { op: DIAS_SEM }], ['busca.repetir.hora', 'A partir das (hora)', 'num'],
       ['busca.nao_repetir_dias', 'Não repetir o mesmo termo e lugar (dias)', 'num']]],
     ['Filtros', [['busca.nota_min', 'Nota mínima', 'num'], ['busca.nota_max', 'Nota máxima', 'num'], ['busca.sem_nota', 'Sem nota', 'sel', { op: [['descartar', 'Descartar'], ['aceitar', 'Aceitar']] }],
       ['busca.avaliacoes_min', 'Avaliações mínimas', 'num'], ['busca.categorias_aceitas', 'Só estas categorias (vazio = todas)', 'lista'], ['busca.categorias_excluidas', 'Nunca estas categorias', 'lista'],
       ['busca.palavras_excluem', 'Palavras que excluem', 'lista'], ['busca.tem_site', 'Tem site', 'sel', { op: [['tanto_faz', 'Tanto faz'], ['sim', 'Sim'], ['nao', 'Não']] }],
+      ['busca.telefone_fixo', 'Telefone fixo', 'sel', { op: [['descartar', 'Descartar'], ['conferir', 'Conferir no WhatsApp']], ajuda: 'conferir: o WhatsApp Business do fixo é conferido antes da 1ª mensagem; no máximo 15 por número por dia' }],
       ['busca.so_celular', 'Só celular', 'simnao'], ['busca.aceitar_wame', 'Aceitar o link wa.me do Maps', 'simnao'], ['busca.so_aberto', 'Só negócio aberto', 'simnao']]],
     ['Fuso, créditos e contatos novos', [['fuso', 'Fuso (o público só junta cidades dele)', 'sel', { op: FUSOS }], ['creditos_mes', 'Créditos do SerpAPI no mês (este público)', 'num', { ajuda: 'o teto geral do mês vale por cima' }],
       ['novos_entram', 'Contatos novos entram', 'sel', { op: [['selecionados', 'Selecionados'], ['tirados', 'Tirados (eu ponho de volta)']], ajuda: 'com um conjunto ativo usando o público, entram sempre tirados' }]]],
     ['Qualificação', [['qualificacao.pesos.nota', 'Peso da nota', 'num'], ['qualificacao.pesos.avaliacoes', 'Peso das avaliações', 'num'], ['qualificacao.pesos.categoria', 'Peso da categoria', 'num'],
       ['qualificacao.pesos.site', 'Peso do site', 'num'], ['qualificacao.pesos.origem', 'Peso da origem do telefone', 'num'], ['qualificacao.pontos_min', 'Pontuação mínima (0 a 100)', 'num'],
       ['qualificacao.revisar_numero', 'Número antigo (sem o 9)', 'sel', { op: [['whatsapp', 'Conferir no WhatsApp'], ['manual', 'Deixar tirado (eu ponho de volta)'], ['descartar', 'Descartar']] }]]],
-    ['Redes e concorrentes', [['exclusoes.redes_palavras', 'Palavras de rede', 'lista'], ['exclusoes.rede_min_enderecos', 'Mesmo nome em N endereços = rede', 'num'], ['exclusoes.concorrentes', 'Concorrentes (nome ou site)', 'lista']]]],
+    ['Redes e concorrentes', [['exclusoes.redes_palavras', 'Palavras de rede', 'lista'], ['exclusoes.rede_min_enderecos', 'Mesmo nome em N endereços = rede', 'num'], ['exclusoes.concorrentes', 'Concorrentes (nome ou site)', 'lista']]],
+    // o zoom só vale com coordenadas; para uma cidade grande, o caminho é pôr os bairros.
+    ['Avançado (coordenadas e zoom)', [['busca.coordenadas', 'Coordenadas (opcional)', 'texto', { ajuda: '-25.43,-49.27; sem coordenadas, o zoom não vale' }],
+      ['busca.zoom', 'Zoom (10 cidade a 18 quarteirão)', 'num', { ajuda: 'deixe 13 ou 14: mais alto = área menor = menos médicos' }]]]],
   anuncio: [
     ['Mensagem', [['abordagem', 'Primeira mensagem', 'longo', { ajuda: 'campos: {nome} {cidade} {bairro} {nicho} {marca}; diga "assistente virtual", a marca e de onde veio o contato (Google Maps)', previa: true }],
       ['tamanho_max', 'Tamanho máximo com o texto de saída', 'num', { trava: 'mensagem_max' }], ['texto_saida', 'Texto de saída (precisa ter SAIR)', 'texto'],
@@ -2086,6 +2189,8 @@ const ESQUEMA = {
       ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]],
     ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; sem preço e sem link de fora; as regras fixas (assistente virtual, preços, SAIR) entram sempre', linhas: 10 }]]]]
 };
+// Modelos do público novo (DEC-189): só preenchem o formulário; o servidor confere tudo ao salvar.
+const MODELOS_PUB = { medicos: { 'busca.avaliacoes_min': '0', 'busca.sem_nota': 'aceitar', 'busca.nota_min': '4', 'busca.nota_max': '5', 'busca.telefone_fixo': 'conferir' } };
 const pegar = (o, cam) => cam.split('.').reduce((x, k) => x == null ? undefined : x[k], o);
 function colocar(o, cam, v) { const ks = cam.split('.'); let x = o; ks.slice(0, -1).forEach((k, i) => { if (x[k] == null) x[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; x = x[k]; }); x[ks[ks.length - 1]] = v; }
 const paraTexto = (tipo, v) => v == null ? '' : tipo === 'publicos' ? (Array.isArray(v) ? v.map(nomePub).join(', ') : '') : tipo === 'lista' ? (Array.isArray(v) ? v.join('\n') : String(v)) : tipo === 'janelas' ? (Array.isArray(v) ? v.map(j => (j || []).join('-')).join(', ') : '')
@@ -2158,6 +2263,12 @@ async function pObjeto(c, tipo, id, pai) {
   };
   const blocos = ESQUEMA[tipo].map(([nomeBloco, campos], k) => el('details', { class: 'grupo', open: k === 0 || null }, el('summary', { text: nomeBloco }),
     el('div', { class: 'corpo-grupo' }, el('div', { class: 'form-2' }, campos.map(campo)))));
+  // Modelo do público novo (DEC-189): "Médicos" preenche os filtros que não cortam consultório médico.
+  const modeloSel = tipo === 'publico' && !o && editar ? el('select', { class: 'entrada', id: 'p-modelo', onchange: e => {
+    const m = MODELOS_PUB[e.target.value] || {};
+    for (const [cam, v] of Object.entries(m)) if (ins[cam]) ins[cam].i.value = v;
+    if (e.target.value) rapida('Filtros do modelo "' + e.target.selectedOptions[0].text + '" preenchidos. Confira e crie.');
+  } }, el('option', { value: '', text: 'Padrão (dentistas e clínicas)' }), el('option', { value: 'medicos', text: 'Médicos' })) : null;
   // O fuso da entrega decide quais públicos o conjunto pode escolher (conferido de novo no servidor).
   if (ins.publicos && ins['entrega.fuso']) { const f = ins['entrega.fuso'].i; ins.publicos.i.conferirFuso(f.value); f.addEventListener('change', () => ins.publicos.i.conferirFuso(f.value)); }
   const prev = tipo === 'anuncio' ? previaAnuncio(ins.abordagem.i, ins.texto_saida.i, ins.tamanho_max.i, marca) : null;
@@ -2237,6 +2348,7 @@ async function pObjeto(c, tipo, id, pai) {
       editar ? null : nota(o && /^(encerrad|arquivad)/.test(o.situacao) ? (o.situacao === 'arquivado' ? 'Arquivado: só leitura. Desarquive para mudar.' : 'Encerrado: só leitura. Para usar de novo, duplique.') : 'Editar está desligado (editar_prospeccao).', !o || !/^(encerrad|arquivad)/.test(o.situacao)),
       el('form', { class: 'cartao', onsubmit: salvar, novalidate: true }, el('div', { class: 'corpo p-topo-form' },
         el('div', { class: 'form-2' }, el('label', { class: 'campo', for: 'p-nome' }, el('span', { class: 'rot', text: 'Nome' }), nomeIn),
+          modeloSel ? el('label', { class: 'campo', for: 'p-modelo' }, el('span', { class: 'rot', text: 'Modelo' }), modeloSel, el('span', { class: 'ajuda', text: 'Médicos: aceita sem nota e poucas avaliações, e confere o fixo no WhatsApp' })) : null,
           numeroSel ? el('label', { class: 'campo', for: 'p-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), numeroSel, el('span', { class: 'ajuda', text: 'trocar o número de um conjunto = nível 3' })) : null)),
         ...blocos, el('div', { class: 'corpo' }, erro, editar ? el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: o ? 'Salvar a versão nova' : 'Criar' })) : null)),
       acoesObj ? cartao('Mais', null, corpo(acoesObj)) : null,
@@ -2287,7 +2399,7 @@ async function pPublicos(c) {
       el('div', { class: 'direita' }, p.situacao === 'arquivado' ? etqSit('arquivado') : emUsoPub(p) ? etq('em uso', 'ok') : etq('sem conjunto ativo', '')), icone('seta'))); };
   trocar(c, cabecalho('Públicos', 'quem pode receber mensagem · cada conjunto escolhe os seus', editar ? btn('Novo público', () => irP('publico', 'novo'), 'pri', 'mais_um') : null),
     el('div', { class: 'pilha' }, abasP('publicos'),
-      d.busca_ligada ? null : el('div', { class: 'aviso info' }, icone('info'), el('div', {}, 'A busca está desligada (chave "Busca no Google Maps" em ', el('a', { href: '#ajustes', text: 'Ajustes' }), '). Os públicos não buscam nem gastam créditos.')),
+      d.busca_ligada ? null : el('div', { class: 'aviso info' }, icone('info'), el('div', {}, 'A busca está desligada: os públicos não buscam nem gastam créditos. ', editar ? ligarAqui('prosp_busca', 'Ligar a busca') : null)),
       el('div', { class: 'kpis' }, kpiTeto(cm, editar), kpi('Públicos', fmtNum(lista.filter(p => p.situacao === 'ativo').length), 'ativos'),
         kpi('Contatos disponíveis', fmtNum(lista.reduce((t, p) => t + (Number((p.numeros || {}).disponiveis) || 0), 0)), 'em todos os públicos')),
       editar ? null : nota('Criar, editar, tirar e pôr contatos de volta estão desligados (editar_prospeccao).', true),
@@ -2333,15 +2445,16 @@ async function pPublico(c, parte, id, sub) {
     rotuloNivel: valor === 'SIM' ? 'podem receber mensagem' : 'ninguém deste público recebe',
     linhas: valor === 'SIM' ? [['Tirados', fmtNum(n.tirados), '0 (os bloqueados para sempre continuam de fora)']] : [['Selecionados', fmtNum((Number(n.tamanho) || 0) - (Number(n.tirados) || 0)), '0 (os que já são leads seguem no conjunto)']],
     ok: 'Pronto.', depois: recarregar });
+  const buscar = editar ? (ligada('prosp_busca') ? btn('Buscar de novo', () => fazer('prosp_publico_buscar', { id: o.id }, { titulo: 'Buscar de novo: ' + o.nome, botao: 'Buscar',
+      texto: 'Cada termo × lugar entra na fila (pula o que foi buscado há menos de "não repetir"). Os contatos novos se juntam aos de agora; gasta créditos do SerpAPI.', depois: recarregar }), 'pri', 'busca')
+    : ligarAqui('prosp_busca', 'Ligar a busca')) : null;
   const acoes = editar ? [
-    ligada('prosp_busca') ? btn('Buscar de novo', () => fazer('prosp_publico_buscar', { id: o.id }, { titulo: 'Buscar de novo: ' + o.nome, botao: 'Buscar',
-      texto: 'Cada termo × lugar entra na fila (pula o que foi buscado há menos de "não repetir"). Os contatos novos se juntam aos de agora; gasta créditos do SerpAPI.', depois: recarregar }), 'pri', 'busca') : null,
     btn('Selecionar todos', () => lote('SIM'), 'sec', 'ok'), btn('Tirar todos', () => lote('NAO'), 'sec'),
     btn('Duplicar', () => fazer('prosp_publico_duplicar', { id: o.id }, { ok: 'Cópia criada.', depois: x => { est.publicos = null; irP('publico', x.id); } }), 'sec')] : [];
   const arquivar = ligada('editar_prospeccao') ? btn(o.situacao === 'arquivado' ? 'Desarquivar' : 'Arquivar', () => fazer('prosp_publico_arquivar', { id: o.id, valor: o.situacao === 'arquivado' ? 'NAO' : 'SIM' },
     { titulo: (o.situacao === 'arquivado' ? 'Desarquivar ' : 'Arquivar ') + o.nome, linhas: [['Situação', o.situacao, o.situacao === 'arquivado' ? 'ativo' : 'arquivado']], botao: o.situacao === 'arquivado' ? 'Desarquivar' : 'Arquivar',
       texto: o.situacao === 'arquivado' ? 'O público volta a poder ser escolhido num conjunto.' : 'Não busca nem entrega mais. Os contatos seguem o prazo de 90 dias. Só dá para arquivar quando nenhum conjunto usa.', depois: recarregar }), o.situacao === 'arquivado' ? 'sec' : 'perigo-sec') : null;
-  trocar(c, cabecalho(o.nome, `público · ${o.id} · versão ${o.versao}`, etqSit(o.situacao)),
+  trocar(c, cabecalho(o.nome, `público · ${o.id} · versão ${o.versao}`, buscar || etqSit(o.situacao)),
     el('div', { class: 'pilha' }, abasPub(o.id, ''),
       emUso ? el('div', { class: 'aviso info' }, icone('info'), el('div', { text: 'Um conjunto ativo usa este público: os contatos novos entram tirados, e pôr um contato de volta pede confirmação (nível 2).' })) : null,
       el('div', { class: 'etqs' }, (d.conjuntos || []).length ? (d.conjuntos || []).map(j => etq('conjunto ' + j.nome + (j.ativo ? ' (ativo)' : ''), j.ativo ? 'ok' : '', true)) : etq('nenhum conjunto usa', '', true),
@@ -2362,7 +2475,8 @@ async function pPublico(c, parte, id, sub) {
         f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null,
       (d.buscas || []).length ? cartao('Últimas buscas deste público', null, el('ul', { class: 'lista' }, d.buscas.slice(0, 5).map(b => el('li', {}, el('div', { class: 'linha' },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${pl(b.creditos, 'crédito', 'créditos')}` + (Object.keys(b.contagens || {}).length ? ' · ' + Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') : '') })),
+          el('div', { class: 't2', text: `${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${pl(b.paginas, 'página', 'páginas')} · achados ${fmtNum((b.contagens || {}).achados || 0)} · entraram ${fmtNum((b.contagens || {}).novos || 0)}` }),
+          porQueCaiu(b.contagens)),
         el('div', { class: 'direita' }, etq(b.situacao === 'feita' ? 'feita' : b.situacao === 'falhou' ? 'falhou' : b.situacao === 'rodando' ? 'buscando' : 'na fila', b.situacao === 'feita' ? 'ok' : b.situacao === 'falhou' ? 'perigo' : 'info'))))))) : null,
       arquivar ? cartao('Mais', null, corpo(el('div', { class: 'acoes' }, arquivar))) : null,
       el('p', { class: 'mudo peq', text: 'O telefone aparece só com os 4 últimos dígitos. No envio, tudo é conferido de novo: "não contatar", clientes, demonstração, órgão público, 60 dias entre campanhas, prazo e fuso.' })));
@@ -2486,6 +2600,8 @@ async function pLead(c, parte, id) {
     if (l.situacao === 'com_voce' || l.assumido_em) acoes.push(btn('Devolver à IA', () => fazer('prosp_lead_devolver', { id: l.id }, { titulo: 'Devolver a conversa à IA', linhas: [['Conversa', 'com você', 'com a IA (na próxima mensagem do lead)']], depois: recarregar }), 'sec'));
     if (!['saiu', 'cliente'].includes(l.situacao)) acoes.push(btn('Marcar', () => fazer('prosp_lead_marcar', { id: l.id }, { titulo: 'Marcar o lead ' + l.id,
       campos: [{ k: 'situacao', rot: 'Situação', opcoes: [['positivo', 'Positivo'], ['recusou', 'Recusou'], ['cadastrou', 'Cadastrou'], ['com_voce', 'Com você']] }], ok: 'Marcado.', depois: recarregar }), 'sec'));
+    // a demonstração para este lead, com a clínica, a cidade e o PX- já preenchidos.
+    if (ligada('editar_demonstracoes') && !['saiu'].includes(l.situacao)) acoes.push(btn('Criar demonstração', () => { est.demPrefill = { clinica: l.nome || '', cidade: l.cidade || '', lead_codigo: l.id }; ir('demonstracoes/novo'); }, 'sec', 'demonstracao'));
     if (l.situacao !== 'saiu') acoes.push(btn('Não contatar', () => fazer('prosp_lead_nao_contatar', { id: l.id }, { titulo: 'Não contatar ' + (l.nome || l.id), perigo: true, botao: 'Não contatar',
       linhas: [['Este número', 'pode receber', 'nunca mais, em nenhuma campanha']], texto: 'Guarda só o resumo do telefone (DEC-073). Os dados do lead saem em 30 dias.', ok: 'Não contatar.', depois: recarregar }), 'perigo-sec'));
   }
@@ -2596,9 +2712,17 @@ async function pBuscas(c) {
           Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') }) : null),
         el('div', { class: 'direita' }, etq(...(SITB[b.situacao] || [b.situacao, '']))))))) : vazio('Nenhuma busca ainda.', 'busca'))));
 }
+// Por que caiu: os motivos dos descartados, do maior para o menor, numa linha que abre ao tocar.
+const NAO_MOTIVO = ['achados', 'novos', 'ja_no_publico', 'de_outro_publico', 'fixo_conferir'];
+function porQueCaiu(cont) {
+  const m = Object.entries(cont || {}).filter(([k, v]) => !NAO_MOTIVO.includes(k) && Number(v) > 0).sort((a, b) => b[1] - a[1]);
+  if (!m.length) return null;
+  return el('details', { class: 'p-caiu' }, el('summary', { text: `por que caiu: ${fmtNum(m.reduce((s, [, v]) => s + Number(v), 0))} descartados` }),
+    el('ul', { class: 'p-caiu-lista' }, m.map(([k, v]) => el('li', {}, el('span', { text: MOTIVOS[k] || k.replace(/_/g, ' ') }), el('b', { class: 'num', text: fmtNum(v) })))));
+}
 // O que cada número das contagens da busca quer dizer (sql/032, sql/034 e sql/036).
 const MOTIVOS = { achados: 'achados', novos: 'novos', ja_no_publico: 'já no público', de_outro_publico: 'de outro público', outro_fuso: 'outro fuso', fixo: 'telefone fixo', invalido: 'sem telefone',
-  revisar: 'número antigo', fechado: 'fechado', nota: 'nota', avaliacoes: 'avaliações', categoria: 'categoria', palavra: 'palavra', site: 'site', rede: 'rede', concorrente: 'concorrente', repetido: 'repetido',
+  revisar: 'número antigo', fixo_conferir: 'fixo para conferir no WhatsApp', fechado: 'fechado', nota: 'nota', avaliacoes: 'avaliações', categoria: 'categoria', palavra: 'palavra', site: 'site', rede: 'rede', concorrente: 'concorrente', repetido: 'repetido',
   ja_na_base: 'já na base', cliente: 'cliente', demonstracao: 'pediu demonstração', nao_contatar: 'não contatar', orgao_publico: 'órgão público', fora_da_saude: 'fora da saúde', abordado: 'outra campanha', pontos: 'pontuação baixa',
   sem_creditos: 'sem créditos', paginas_com_erro: 'erro' };
 // Teto geral de créditos do SerpAPI no mês (todos os públicos juntos; nível 2).
@@ -2834,7 +2958,7 @@ TELAS.demonstracoes = async (c, [parte, a, b]) => {
 function avisoLinksDesligados() {
   if (ligada('demo_links')) return null;
   return el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, el('b', { text: 'Os links estão desligados. ' }),
-    ligada('demo_politica_v17') ? 'Quem abrir vê "não está mais ativo". Ligue em Ajustes da Central (Links de demonstração).'
+    ligada('demo_politica_v17') ? ['Quem abrir vê "não está mais ativo". ', ligada('editar_demonstracoes') ? btn('Ligar os links', async () => { await mudarChave('demo_links', 'SIM'); await rotear(); }, 'sec') : 'Ligue em Ajustes da Central (Links de demonstração).']
       : 'Quem abrir vê "não está mais ativo". Eles só ligam depois da Política v17 publicada (chave só por PR).'));
 }
 
@@ -2866,7 +2990,9 @@ async function dLista(c) {
 
 // ---------- formulário (criar e editar): os mesmos campos; a validade é em dias ao criar e em data ao editar
 function camposDem(l) {
-  const v = l || {};
+  // vindo do lead da prospecção, a clínica, a cidade e o PX- já vêm preenchidos (só no link novo).
+  const v = l || est.demPrefill || {};
+  if (!l) est.demPrefill = null;
   const entrada = (k, rot, props, ajuda) => { const i = el('input', { class: 'entrada', id: 'd-' + k, autocomplete: 'off', spellcheck: 'false', value: v[k] == null ? null : String(v[k]), ...props });
     return [i, el('label', { class: 'campo', for: 'd-' + k }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
   const [clinica, cClinica] = entrada('clinica', 'Nome da clínica', { maxlength: '60', required: true }, 'Aparece no app, na central e no escopo da demonstração.');
@@ -3206,7 +3332,7 @@ TELAS.metricas = async c => {
         el('div', { class: 'cartao kpi ia-mensagens' }, el('div', { class: 'rot', text: 'Mensagens do atendimento no mês' }), el('div', { class: 'val num', text: fmtNum(ci.mensagens_atendimento_mes) }),
           el('div', { class: 'var', text: 'todas as clínicas; fora do custo acima' }))),
       el('div', { class: 'aviso info mt' }, icone('info'), el('div', { text: ci.aviso || 'O atendimento das clínicas não entra: o banco só conta as mensagens, não os tokens.' })),
-      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Preencha o preço por mil tokens (entrada e saída) em Prospecção › Custos para ver o custo em reais.',
+      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída) em Custos (Prospecção › Mais).',
         ligada('tela_prospeccao') ? [' ', el('a', { href: '#prospeccao/custos', text: 'Abrir Custos' })] : null)))),
     cartao('Uso do assistente no mês', null, corpo(dados([['Perguntas', fmtNum(uso.perguntas)], ['Propostas', fmtNum(uso.propostas)], ['Confirmadas', fmtNum(uso.confirmadas)]])))));
 };

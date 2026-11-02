@@ -1,28 +1,33 @@
 // ---------------------------------------------------------------- casca: seções, menu, caminho, busca e rotas (DEC-068)
 ICONES.atualizar = 'M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v5h-5';
+// Pedidos do Jean de 01/11/2026 (DEC-191): o menu lateral em 4 grupos, na ordem do trabalho. A barra do iPad
+// em pé (trilho, 768 a 1023 px) e a do celular (< 768 px) têm cada uma a sua lista (TRILHO e BARRA); o resto fica em "Mais".
 const SECOES = [
-  { id: 'hoje', nome: 'Hoje', ic: 'hoje', grupo: 'Operação', aba: 1 },
-  { id: 'clientes', nome: 'Clientes', ic: 'clientes', grupo: 'Operação', aba: 1 },
-  { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', aba: 1, chave: 'tela_dinheiro' },
-  { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Operação', aba: 1, chave: 'tela_sistema' },
+  { id: 'hoje', nome: 'Hoje', ic: 'hoje', grupo: 'Operação' },
+  { id: 'clientes', nome: 'Clientes', ic: 'clientes', grupo: 'Operação' },
+  { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', chave: 'tela_dinheiro', desc: 'Receita, pagantes e cobranças' },
+  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Operação', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
+  { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Vendas', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
+  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
-  { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Análise', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'agregados', nome: 'Agregados de pacientes', ic: 'agregados', grupo: 'Análise', chave: 'tela_agregados_pacientes', escondeDesligada: true, desc: 'Contagens e médias por clínica' },
-  { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Marketing', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
-  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Marketing', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
-  { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Administração', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
-  { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Administração', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
-  { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Administração', desc: 'Liga e desliga telas e edições, aparência' }
+  { id: 'sistema', nome: 'Saúde do sistema', curto: 'Sistema', ic: 'sistema', grupo: 'Sistema', chave: 'tela_sistema', desc: 'Falhas, SQL aplicados, WhatsApp e integrações' },
+  { id: 'seguranca', nome: 'Segurança', ic: 'seguranca', grupo: 'Sistema', chave: 'tela_sessoes', desc: 'Aparelhos conectados e registro de 12 meses' },
+  { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Sistema', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
+  { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Sistema', desc: 'Liga e desliga telas e edições, aparência' }
 ];
+const TRILHO = ['hoje', 'clientes', 'prospeccao', 'demonstracoes', 'avisos', 'financeiro'];   // iPad em pé
+const BARRA = ['hoje', 'clientes', 'prospeccao', 'avisos'];                                     // celular
+const naLista = l => l.map(id => SECOES.find(s => s.id === id)).filter(s => s && visivel(s));
 const visivel = s => !(s.escondeDesligada && !ligada(s.chave));
 const TELAS = {};
 est.contadores = {};
 function ir(rota) { if (location.hash === '#' + rota) rotear(); else location.hash = rota; }
 function secaoAtiva() { const a = (location.hash || '#hoje').slice(1).split('/')[0]; return a === 'mais' ? 'mais' : (SECOES.find(s => s.id === a) || { id: 'hoje' }).id; }
 function montarNav() {
-  const ativa = secaoAtiva(); const naAba = SECOES.some(s => s.aba && s.id === ativa);
+  const ativa = secaoAtiva(); const trilho = naLista(TRILHO), barra = naLista(BARRA);
   const cont = id => est.contadores[id] ? el('span', { class: 'contador', text: est.contadores[id], 'aria-label': est.contadores[id] + ' pendências' }) : null;
   const lat = $('lateral');
   trocar(lat, el('div', { class: 'cab' }, el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32' }), el('div', { class: 'nome' }, 'Central RXSync', el('small', { text: 'Administração' })),
@@ -34,14 +39,13 @@ function montarNav() {
       icone(s.ic), el('span', { class: 'rotulo', text: s.nome }), cont(s.id)));
   }
   lat.append(el('div', { class: 'rodape' }, el('button', { class: 'item-nav', type: 'button', 'aria-label': est.recolhida ? 'Sair' : null, onclick: sair }, icone('sair'), el('span', { class: 'rotulo', text: 'Sair' }))));
-  const principais = SECOES.filter(s => s.aba);
   trocar($('trilho'), el('img', { class: 'marca', src: '/assets/icones/rxsync-192.png', alt: '', width: '32', height: '32', 'aria-hidden': 'true' }),
-    ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
-    el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
+    ...trilho.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) }, icone(s.ic, 'g'), s.curto || s.nome, cont(s.id))),
+    el('button', { type: 'button', 'aria-current': !trilho.some(s => s.id === ativa) ? 'page' : null, onclick: () => ir('mais') }, icone('mais', 'g'), 'Mais'), el('div', { class: 'espaco' }),
     el('button', { type: 'button', onclick: sair }, icone('sair', 'g'), 'Sair'));
-  trocar($('barra'), ...principais.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) },
+  trocar($('barra'), ...barra.map(s => el('button', { type: 'button', 'aria-current': ativa === s.id ? 'page' : null, onclick: () => ir(s.id) },
     el('span', { class: 'pilula' }, icone(s.ic)), s.curto || s.nome, cont(s.id))),
-    el('button', { type: 'button', 'aria-current': !naAba ? 'page' : null, onclick: () => ir('mais') }, el('span', { class: 'pilula' }, icone('mais')), 'Mais'));
+    el('button', { type: 'button', 'aria-current': !barra.some(s => s.id === ativa) ? 'page' : null, onclick: () => ir('mais') }, el('span', { class: 'pilula' }, icone('mais')), 'Mais'));
 }
 // Barra de cima: no celular, voltar + título; no iPad e no computador, o caminho e a busca.
 function topo(titulo, caminho, voltar) {

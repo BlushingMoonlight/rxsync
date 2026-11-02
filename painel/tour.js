@@ -7,21 +7,19 @@
   'use strict';
   const P = window.rxPainel; if (!P || !P.comSessao()) return;
   const { el, btn, c29 } = P;
-  // A ordem segue o primeiro dia da clínica (rxsync-sistema docs/mapa/jornadas.md). Cada passo: o que apontar e o texto.
+  // Um tour por tarefa, na ordem do primeiro dia da clínica (rxsync-sistema DEC-191; antes, DEC-178 explicava a tela): Hoje
+  // aponta para os "Primeiros passos"; cada passo leva à tela dele, com a parada daquela tarefa. Cada parada diz o que fazer.
+  // O que está escrito no botão não precisa de parada. Cada passo: o que apontar e o texto.
   const PASSOS = {
-    hoje: [['#btnEstadoIa', 'Aqui fica o estado da assistente: atendendo, pausada ou falta conectar o WhatsApp. Toque para testar, pausar ou retomar.'],
-      ['#hojeAtencao', '"Precisa de você" junta o que espera a equipe: quem pediu uma pessoa, urgências, consultas novas e documentos.'],
-      ['#hojeNumeros', 'Os números dos últimos 30 dias. "Ver resultados" abre os detalhes.'],
-      ['#btnBusca', 'A lupa acha telas, pacientes e consultas.']],
-    agenda: [['#agNovoTopo, #agNovo', '"Nova consulta" marca um horário pela equipe. A assistente marca sozinha pelo WhatsApp.'],
-      ['#calViews, #calVisao', 'Escolha ver o dia, a semana ou a lista. Toque numa consulta para remarcar, cancelar ou marcar "Chegou".'],
-      ['#agMais', 'Em "Mais": bloquear um horário, exportar a agenda e ver as canceladas.']],
-    'agenda/horarios': [['#horIndice', 'Aqui ficam os horários de atendimento, as regras da agenda, os médicos e tipos de consulta, os feriados e o "Receber dos pacientes".']],
-    assistente: [['#cardPausa', 'O estado da assistente, com "Testar a assistente" para conversar com ela como se fosse um paciente.'],
-      ['#conteudo .bloco h2', 'Cada assunto abre uma página: o que ela sabe, como ela fala e o que ela pode fazer. As mudanças valem na hora.']],
-    pacientes: [['#pacNovoTopo, #pacNovo', '"Novo paciente" cadastra alguém à mão; quem conversa com a assistente entra sozinho.'],
-      ['#pacLista', 'Toque num paciente para ver as consultas e o contato.']],
-    conta: [['#listaConta', 'Plano e pagamento, WhatsApp da clínica, equipe e os seus dados. Em Ajuda, "Rever o tour" mostra este tour de novo.']]
+    hoje: [['#hojePassos', 'Bem-vinda ao painel. Faltam 4 coisas para a assistente atender bem os seus pacientes. Vamos na ordem: toque na primeira.'],
+      ['#btnEstadoIa', 'Agora o teste de verdade: do seu celular, mande "oi" para o WhatsApp da clínica. Em segundos ela responde, e aqui aparece "Atendendo".'],
+      ['#hojeAtencao', 'Quando um paciente pede para falar com uma pessoa ou tem urgência, aparece aqui e no celular de avisos. Toque, resolva no WhatsApp e marque como visto.']],
+    'conta/whatsapp': [['#zapNumero', 'Este é o WhatsApp que a assistente usa. Se aparecer "Conectar", leia o QR com o celular da clínica, em Aparelhos conectados.']],
+    'agenda/horarios/grade': [['#gradeBox', 'A assistente só marca dentro destes horários. Confira os dias e o intervalo de almoço. Feriados ficam em Agenda › Horários › Feriados.']],
+    'assistente/automaticas': [['#fld_lembretes', 'Ligue os lembretes de consulta: o paciente recebe uma mensagem 24 horas e 2 horas antes, pedindo a confirmação. Isso ajuda a reduzir faltas.']],
+    assistente: [['#blocoSabe', 'Tudo o que ela responde vem daqui: preços, convênios, endereço e as perguntas frequentes do seu formulário. Mudou algo na clínica? Mude aqui; vale na hora.']],
+    agenda: [['#agNovoTopo, #agNovo', 'As consultas que ela marca aparecem sozinhas. Paciente ligou na recepção? Marque aqui.']],
+    'conta/equipe': [['#btnEquipeConvidar', 'Por último, convide a secretária: ela entra com o e-mail dela e vê a agenda e os pacientes, sem a parte de plano e pagamento.']]
   };
   // O estilo do tour fica num arquivo à parte (painel/tour.css), para o painel caber em 400 KB.
   document.head.append(el('link', { rel: 'stylesheet', href: '/painel/tour.css' }));

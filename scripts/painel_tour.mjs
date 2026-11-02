@@ -1,7 +1,8 @@
 // Painel (rxsync-sistema #225, item 23; DEC-178): o tour guiado, com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. na primeira vez em Hoje, o cartão do tour aparece (sem bloquear a tela) e aponta a área de cada passo;
 //      "Continuar" passa para o próximo; "Ver depois" fecha e grava "depois";
-//   2. na Agenda, aparece o tour da Agenda; "Pular" grava que a pessoa não quer mais ("*": "pulado");
+//   2. na Agenda, aparece o tour da Agenda; as telas de cada tarefa (lembretes, equipe, o que ela sabe) têm a parada delas;
+//      "Pular" grava que a pessoa não quer mais ("*": "pulado");
 //   3. Conta › "Rever o tour" recomeça (tour_marcar "*" "rever") e o tour de Hoje aparece de novo;
 //   4. sem o estado do tour vindo do servidor (servidor antigo), nada aparece.
 // Uso (precisa do Playwright): node scripts/painel_tour.mjs
@@ -39,7 +40,17 @@ await cartao.getByRole('button', { name: 'Ver depois' }).click();
 ok(!(await cartao.count()) && chamadas.some(x => x.acao === 'tour_marcar' && x.dados.tela === 'hoje' && x.dados.estado === 'depois'), '"Ver depois" fecha e grava "depois"');
 await page.goto(site.base + '/painel/#agenda'); await page.waitForTimeout(300);
 await page.locator('.tour-cartao').waitFor();
-ok((await page.locator('.tour-cartao').textContent()).includes('Nova consulta'), 'Agenda: o tour da Agenda');
+ok((await page.locator('.tour-cartao').textContent()).includes('Paciente ligou na recepção'), 'Agenda: o tour da Agenda (a tarefa: marcar quem ligou)');
+await page.locator('.tour-cartao').getByRole('button', { name: 'Entendi' }).click();
+// O tour por tarefa (DEC-191): cada tela da tarefa tem a sua parada, com o que fazer.
+for (const [rota, texto] of [['assistente/automaticas', 'Ligue os lembretes'], ['conta/equipe', 'convide a secretária'], ['assistente', 'Tudo o que ela responde vem daqui']]) {
+  await page.goto(site.base + '/painel/#' + rota); await page.waitForTimeout(300);
+  await page.locator('.tour-cartao').waitFor();
+  ok((await page.locator('.tour-cartao').textContent()).includes(texto), rota + ': a parada da tarefa (' + texto + ')');
+  await page.locator('.tour-cartao').getByRole('button', { name: 'Entendi' }).click();
+}
+await page.goto(site.base + '/painel/#agenda/horarios/grade'); await page.waitForTimeout(300);
+await page.locator('.tour-cartao').waitFor();
 await page.locator('.tour-cartao').getByRole('button', { name: 'Pular' }).click();
 ok(chamadas.some(x => x.acao === 'tour_marcar' && x.dados.tela === '*' && x.dados.estado === 'pulado'), '"Pular" grava que não quer mais o tour');
 await page.goto(site.base + '/painel/#conta'); await page.locator('#btnReverTour').click();
