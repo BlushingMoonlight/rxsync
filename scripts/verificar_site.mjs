@@ -6,7 +6,14 @@ const LIMITE_PAINEL_KB = 400;
 let erros = 0; const erro = m => { erros++; console.log('::error::' + m); };
 const todos = [];
 (function andar(d) { for (const f of fs.readdirSync(d)) { if (f.startsWith('.') || f === 'node_modules' || f === 'scripts') continue; const p = path.join(d, f); fs.statSync(p).isDirectory() ? andar(p) : todos.push(p); } })('.');
-const htmls = todos.filter(f => f.endsWith('.html'));
+// O arquivo de verificação do Google Search Console (google<código>.html, na raiz) não é uma página: fica fora de todas as
+// regras de página e é conferido à parte (uma linha só, a do Google, e fora do sitemap).
+const ARQ_GOOGLE = /^google[0-9a-f]{8,32}\.html$/;
+const htmls = todos.filter(f => f.endsWith('.html') && !ARQ_GOOGLE.test(f.split(path.sep).join('/').replace(/^\.\//, '')));
+for (const f of fs.readdirSync('.').filter(x => ARQ_GOOGLE.test(x))) {
+  if (fs.readFileSync(f, 'utf8').replace(/\n$/, '') !== `google-site-verification: ${f}`) erro(`${f}: o arquivo do Search Console tem só a linha "google-site-verification: ${f}"`);
+  if (fs.existsSync('sitemap.xml') && fs.readFileSync('sitemap.xml', 'utf8').includes(f)) erro(`sitemap.xml: o arquivo do Search Console (${f}) fica fora do sitemap`);
+}
 for (const f of htmls) {
   const s = fs.readFileSync(f, 'utf8');
   if (!/<title>[^<]+<\/title>/i.test(s)) erro(`${f}: página sem <title>`);
@@ -232,7 +239,7 @@ for (const arq of ['painel/index.html']) {
 // a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento; a 5: a Central,
 // com manifest branco, e a entrada, a central, o escopo e o manual da demonstração, cuja entrada tem a prévia própria).
 {
-  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html',
+  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html', 'assistente-whatsapp-clinica/index.html',
     ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
   const DEMO = ['index', 'central/index', 'escopo/index', 'manual/index'].map(f => `demo/clinica/${f}.html`);
   // Os guias (guias/, scripts/guias_montar.mjs) também, inclusive os rascunhos.
@@ -411,6 +418,19 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     if (JSON.stringify(demo.map(x => x[1])) !== JSON.stringify(central)) erro(`${itensArq}: os títulos não batem com os da Central (${centralArq}, DEM_ITENS)`);
   }
   if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');
+  // A página do anúncio tem noindex: fica fora do sitemap.
+  if (fs.existsSync('sitemap.xml') && /assistente-whatsapp-clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a página do anúncio (noindex) fica fora do sitemap');
+  if (fs.existsSync('assistente-whatsapp-clinica/index.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync('assistente-whatsapp-clinica/index.html', 'utf8'))) erro('assistente-whatsapp-clinica/index.html: a página do anúncio precisa do noindex');
+  // O lastmod do sitemap acompanha a página (menos os guias): só avisa (não bloqueia) quando o último commit da página é depois do lastmod.
+  if (fs.existsSync('sitemap.xml')) {
+    const { execSync } = await import('node:child_process');
+    for (const m of fs.readFileSync('sitemap.xml', 'utf8').matchAll(/<loc>https:\/\/rxsync\.com\.br\/([^<]*)<\/loc>\s*<lastmod>([0-9-]{10})<\/lastmod>/g)) {
+      const arq = !m[1] || m[1].endsWith('/') ? m[1] + 'index.html' : m[1];
+      if (!fs.existsSync(arq) || arq.startsWith('guias/')) continue;   // os guias usam a data de revisão (guias_montar.mjs)
+      let dia = ''; try { dia = execSync(`git log -1 --format=%cs -- "${arq}"`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { /* sem histórico */ }
+      if (dia && dia > m[2]) console.log(`::warning title=Sitemap::sitemap.xml: ${arq} mudou em ${dia}, mas o lastmod está em ${m[2]}; atualize o lastmod.`);
+    }
+  }
 }
 // O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
 // repositório privado).

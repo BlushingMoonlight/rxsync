@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://*.googletagmanager.com; style-src 'sha256-wIL6PbeWqC0SXvxBF1bQG1rxjIidO7jkZuLUzb6ByNY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RXSync">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://rxsync.com.br/assistente-whatsapp-clinica/">
+<meta property="og:title" content="Secretária virtual no WhatsApp para clínicas | RXSync">
+<meta property="og:description" content="Ela responde os pacientes no WhatsApp a qualquer hora, marca na agenda e manda os lembretes. 7 dias grátis, sem cartão.">
+<meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Secretária virtual no WhatsApp para clínicas | RXSync">
+<meta name="twitter:description" content="Ela responde os pacientes no WhatsApp a qualquer hora, marca na agenda e manda os lembretes. 7 dias grátis, sem cartão.">
+<meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<!-- Página do anúncio: fora do Google (noindex) para não competir com a página inicial. -->
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://rxsync.com.br/">
+<title>Secretária virtual no WhatsApp para clínicas | RXSync</title>
+<meta name="description" content="Ela responde os pacientes no WhatsApp a qualquer hora, marca na agenda e manda os lembretes. 7 dias grátis, sem cartão.">
+<link rel="stylesheet" href="/assets/fontes/fontes.css">
+<link rel="stylesheet" href="/assets/ancora/tokens.css">
+<link rel="stylesheet" href="/assets/ancora/site.css">
+<style>
+  body { margin: 0; background: var(--fundo); color: var(--texto); font-family: var(--fonte); }
+  .topo-an { border-bottom: 1px solid var(--borda); }
+  .topo-an .dentro { display: flex; align-items: center; justify-content: space-between; gap: var(--e-3); }
+  .topo-an a.marca { display: inline-flex; align-items: center; gap: var(--e-3); min-height: var(--barra-h); color: var(--texto); text-decoration: none; font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: var(--t-bloco); }
+  .topo-an img { width: 32px; height: 32px; }
+  .topo-an .planos { color: var(--texto-2); font-weight: 500; min-height: var(--alvo); display: inline-flex; align-items: center; }
+  .dentro { box-sizing: border-box; max-width: 960px; margin: 0 auto; padding: 0 var(--e-4); }
+  .heroi-an { padding: var(--e-10) 0 var(--e-8); }
+  .heroi-an h1 { font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: clamp(2rem, 1.5rem + 2.4vw, 3rem); line-height: 1.12; margin: 0 0 var(--e-4); max-width: 18ch; }
+  .heroi-an p.sub { font-size: 1.125rem; color: var(--texto-2); margin: 0 0 var(--e-6); max-width: 46ch; }
+  .chamada { display: inline-flex; align-items: center; justify-content: center; min-height: var(--alvo-principal); padding: 0 var(--e-6); border-radius: var(--r-botao); background: var(--primaria); color: var(--botao-texto); font-weight: 600; text-decoration: none; font-size: 1.0625rem; }
+  .chamada:hover { background: var(--primaria-forte); }
+  .nota-chamada { margin: var(--e-3) 0 0; color: var(--texto-2); font-size: var(--t-peq, .875rem); }
+  .nota-chamada a { color: var(--texto); }
+  .provas { list-style: none; margin: 0; padding: var(--e-8) 0; display: grid; gap: var(--e-4); border-top: 1px solid var(--borda); }
+  @media (min-width: 768px) { .provas { grid-template-columns: repeat(3, 1fr); } }
+  .provas li { border: 1px solid var(--borda); border-radius: var(--r-cartao); padding: var(--e-5); }
+  .provas strong { display: block; font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: 1.125rem; margin-bottom: var(--e-2); }
+  .provas span { color: var(--texto-2); }
+  .duvidas-an { padding: var(--e-8) 0; border-top: 1px solid var(--borda); }
+  .duvidas-an h2 { font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: var(--t-titulo); margin: 0 0 var(--e-4); }
+  .duvidas-an details { border-bottom: 1px solid var(--borda); }
+  .duvidas-an summary { cursor: pointer; min-height: var(--alvo); padding: var(--e-3) 0; font-weight: 600; display: flex; align-items: center; }
+  .duvidas-an details p { margin: 0 0 var(--e-4); color: var(--texto-2); }
+  .fim-an { padding: var(--e-8) 0 var(--e-12); text-align: center; border-top: 1px solid var(--borda); }
+  .fim-an p { color: var(--texto-2); margin: 0 0 var(--e-4); }
+  .rodape-an { border-top: 1px solid var(--borda); padding: var(--e-5) 0; color: var(--texto-2); font-size: var(--t-peq, .875rem); }
+  .rodape-an a { color: var(--texto-2); }
+</style>
+</head>
+<body>
+<header class="topo-an"><div class="dentro"><a class="marca" href="/"><img src="/assets/icones/rxsync-192.png" alt="" width="32" height="32">RXSync</a><a class="planos" href="/#planos">Ver os planos</a></div></header>
+<main>
+  <section class="heroi-an"><div class="dentro">
+    <h1>Secretária virtual no WhatsApp para clínicas</h1>
+    <p class="sub">Ela responde os pacientes a qualquer hora, marca na agenda da clínica e manda os lembretes. A sua equipe assume qualquer conversa quando quiser.</p>
+    <a class="chamada" href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=anuncio">Testar 7 dias grátis, sem cartão</a>
+    <p class="nota-chamada">Os 7 dias começam quando ela entra no ar. Quer ver antes? <a href="/#teste-ao-vivo">Converse com ela agora</a>.</p>
+  </div></section>
+  <div class="dentro">
+    <ul class="provas">
+      <li><strong>Responde 24 horas</strong><span>Valores, convênios, horários e endereço, com o que você cadastrou e aprovou. O que for clínico, ela passa para a equipe.</span></li>
+      <li><strong>Marca na agenda</strong><span>Ela marca, remarca e cancela dentro dos horários da clínica. A recepção vê tudo no painel e marca também.</span></li>
+      <li><strong>Lembra o paciente</strong><span>Lembretes nos horários que você escolher, com a confirmação ou o cancelamento pela própria resposta.</span></li>
+    </ul>
+  </div>
+  <section class="duvidas-an"><div class="dentro">
+    <h2>Dúvidas</h2>
+    <details><summary>O paciente percebe que fala com uma assistente virtual?</summary><p>Sim, de propósito: ela se apresenta como assistente virtual na primeira mensagem. O que o paciente nota, na prática, é a resposta rápida, a qualquer hora.</p></details>
+    <details><summary>Ela responde dúvidas médicas?</summary><p>Não. Ela cuida de agendamento, valores, convênios, horários e pedidos para a equipe. Não interpreta exames, não orienta tratamento e não responde dúvidas clínicas: avisa o paciente que a equipe vai responder.</p></details>
+    <details><summary>E quem prefere falar com uma pessoa?</summary><p>Quando o paciente pede uma pessoa, ou o assunto está na lista que você definiu, ela avisa a equipe e para de responder naquela conversa.</p></details>
+    <details><summary>Preciso trocar de sistema?</summary><p>Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Dá para exportar para Google Agenda, Outlook e iPhone e importar a agenda atual por planilha.</p></details>
+    <details><summary>Preciso entender de inteligência artificial?</summary><p>Não. Você responde um formulário guiado sobre a clínica, de cerca de 10 minutos, e a assistente sai configurada. Se preferir, preenchemos com você.</p></details>
+  </div></section>
+  <section class="fim-an"><div class="dentro">
+    <p>A partir de R$ 299 por mês, depois do teste. Sem fidelidade no plano mensal.</p>
+    <a class="chamada" href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=anuncio_fim">Testar 7 dias grátis, sem cartão</a>
+  </div></section>
+</main>
+<footer class="rodape-an"><div class="dentro">RXSync · <a href="/privacidade.html">Política de Privacidade</a> · <a href="/">Página inicial</a></div></footer>
+<script src="/assets/consentimento.js" data-chat-fora></script>
+</body>
+</html>

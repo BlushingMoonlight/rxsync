@@ -1,4 +1,4 @@
-// Aviso de cookies e chat sob demanda (rxsync-sistema DEC-112).
+// Aviso de cookies e chat sob demanda (rxsync-sistema DEC-112; Consent Mode básico e a chegada pelo anúncio, DEC-191).
 // - Google Analytics: só carrega depois de "Aceitar". Sem escolha, ou com "Só os necessários", o gtag() da página não faz
 //   nada (os eventos são descartados) e nenhum cookie do Google é gravado. A escolha fica no aparelho (localStorage
 //   'rx_cookies': 'sim' ou 'nao'); window.rxCookies.reabrir() mostra o aviso de novo ("Preferências de cookies").
@@ -17,6 +17,25 @@
   var temGA = !(tag.hasAttribute && tag.hasAttribute('data-sem-ga'));
   var semQuery = !!(tag.hasAttribute && tag.hasAttribute('data-ga-sem-query'));
   var chatFora = !!(tag.hasAttribute && tag.hasAttribute('data-chat-fora'));
+
+  // ---------- chegada pelo anúncio (rxsync-sistema DEC-190) ----------
+  // Ao abrir a página com o gclid ou as utm_*, guarda na aba (sessionStorage, como o rx_ref): o endereço de chegada, para o
+  // Google ler na primeira página vista depois do "Aceitar" (quem aceita na página seguinte não perde a campanha), e a
+  // origem curta ("utm_source / utm_medium / utm_campaign" ou "google / cpc"), que a contratação manda ao workflow 20.
+  // Nada disso vai a lugar nenhum sem o "Aceitar", menos a origem curta na contratação (sem o gclid nem o endereço).
+  function lerAba(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function gravarAba(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* aba privada */ } }
+  (function guardarChegada() {
+    var q; try { q = new URL(location.href).searchParams; } catch (e) { return; }
+    var gclid = q.get('gclid'), fonte = q.get('utm_source'), meio = q.get('utm_medium'), camp = q.get('utm_campaign');
+    if (!gclid && !fonte && !meio && !camp) return;
+    var limpa = function (v) { return String(v || '').toLowerCase().replace(/[^a-z0-9_.-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 38); };
+    var partes = fonte || meio || camp ? [limpa(fonte) || '(sem fonte)', limpa(meio) || '(sem meio)', limpa(camp)] : ['google', 'cpc'];
+    var origem = partes.filter(Boolean).join(' / ').replace(/[()]/g, '').slice(0, 120);
+    gravarAba('rx_chegada', semRef(location.href));
+    gravarAba('rx_origem_campanha', origem);
+  })();
+  window.rxOrigemCampanha = function () { var o = lerAba('rx_origem_campanha') || ''; return /^[a-z0-9_.\/ -]{2,120}$/.test(o) ? o : ''; };
 
   // ---------- Google Analytics ----------
   var gaLigado = false;
@@ -39,9 +58,18 @@
   function ligarGA() {
     if (gaLigado || !temGA) return;
     gaLigado = true;
+    // Consent Mode básico (rxsync-sistema DEC-191): o Google só carrega depois do "Aceitar" (como antes) e recebe o
+    // consentimento junto: negado por padrão; o "Aceitar" libera só o necessário para medir as visitas e as conversões
+    // dos anúncios (analytics_storage, ad_storage e ad_user_data). ad_personalization fica SEMPRE negado: sem anúncio
+    // personalizado nem remarketing (Política, seção 9). Sem "Aceitar", nada vai ao Google.
+    window.gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied' });
+    window.gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'denied', analytics_storage: 'granted' });
     window.gtag('js', new Date());
+    // A primeira página vista depois do "Aceitar" leva o endereço de chegada (com o gclid e as UTMs), uma vez por aba.
+    var chegada = lerAba('rx_chegada');
+    if (chegada && !semQuery) gravarAba('rx_chegada', '');
     window.gtag('config', GA_ID, semQuery ? { page_location: location.origin + location.pathname, page_path: location.pathname, page_referrer: semRef(document.referrer) }
-      : { page_location: semRef(location.href), page_referrer: semRef(document.referrer) });
+      : { page_location: chegada || semRef(location.href), page_referrer: semRef(document.referrer) });
     var s = document.createElement('script');
     s.async = true;
     s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
@@ -64,7 +92,7 @@
     aviso.setAttribute('role', 'region');
     aviso.setAttribute('aria-label', 'Aviso de cookies');
     var p = document.createElement('p');
-    p.appendChild(document.createTextNode('Usamos cookies do Google Analytics para medir as visitas, só se você aceitar. Veja a '));
+    p.appendChild(document.createTextNode('Usamos cookies do Google Analytics e do Google Ads para medir as visitas e os anúncios, só se você aceitar. Veja a '));
     var a = document.createElement('a'); a.href = '/privacidade.html'; a.target = '_blank'; a.rel = 'noopener'; a.textContent = 'Política de Privacidade';
     p.appendChild(a); p.appendChild(document.createTextNode('.'));
     var acoes = document.createElement('div'); acoes.className = 'rxc-acoes';

@@ -9,7 +9,7 @@ import crypto from 'node:crypto'; import fs from 'node:fs';
 import { contextoCsp, regraDa, provarBloqueio, conferidor } from './csp_teste.mjs';
 import { META_CSP } from './csp.mjs';
 const { ok, semBloqueio, falhas } = conferidor();
-const DOCUMENTOS = [['privacidade.html', /Versão 2026-11-v20<\/strong> · Vigente a partir de 1 de novembro de 2026/],
+const DOCUMENTOS = [['privacidade.html', /Versão 2026-11-v21<\/strong> · Vigente a partir de 2 de novembro de 2026/],
   ...[1, 2, 3, 4, 5, 6, 7].map(v => [`termos/2026-10-v${v}.html`, new RegExp(`Versão 2026-10-v${v}</strong>`)]), ['termos/2026-11-v8.html', /Versão 2026-11-v8<\/strong>/]];
 // O resumo (SHA-256) de cada Termos antigo antes da regra: o arquivo sem a linha da regra tem de dar o mesmo resumo.
 const ANTES = {
