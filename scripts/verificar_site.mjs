@@ -471,6 +471,36 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     if (telas.length && !preenchida) console.log(`::warning title=Método de produto::este PR muda ${telas.length} arquivo(s) de tela (${telas.slice(0, 5).join(', ')}${telas.length > 5 ? '…' : ''}) e a seção "Fluxo e design" do modelo de PR não está preenchida (marque os itens ou escreva "Não muda tela").`);
   }
 }
+// Método de produto (regra 22, P9): a linguagem do CFM em todo texto do site (as páginas de venda e de cadastro), do
+// painel e da demonstração. Os guias já são conferidos acima; os Termos e a Política ficam de fora (texto jurídico: "não
+// garante", "melhores esforços", "melhor interesse da criança"). As exceções são frases conferidas, com o motivo.
+{
+  const P9 = [[/\bmelhor(es)?\b/i, '"melhor"'], [/\bgarant(e|em|ido|ida|idos|idas|imos)\b/i, '"garante"'], [/\b100\s*%/, '"100%"'],
+    [/nunca erra/i, '"nunca erra"'], [/substitui a secret[aá]ria/i, '"substitui a secretária"'], [/sem risco de bloqueio/i, '"sem risco de bloqueio"'], [/aprovad[oa] pelo CFM/i, '"aprovado pelo CFM"']];
+  const EXCECOES = [
+    /Qual fica melhor\?/g,                       // a pergunta do paciente na conversa de exemplo da página inicial
+    /barato, promoção, garantido/g,               // painel: o exemplo de palavras que a assistente nunca usa
+    /80% e (em )?100%/g, /100%: pausa/g];         // demonstração: os avisos de consumo em 80% e 100% do teto
+  const semComentario = t => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1 ');
+  const strings = t => [...semComentario(t).matchAll(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g)].map(m => m[0]).join('\n');
+  const textoHtml = h => {
+    const scripts = [...h.matchAll(/<script(?![^>]*application\/ld\+json)[^>]*>([\s\S]*?)<\/script>/g)].map(m => strings(m[1])).join('\n');
+    return h.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<[^>]+>/g, ' ') + '\n' + scripts
+      + '\n' + [...h.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+  };
+  const fontes = [];
+  for (const f of ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', '404.html', 'assistente-whatsapp-clinica/index.html'])
+    if (fs.existsSync(f)) fontes.push([f, textoHtml(fs.readFileSync(f, 'utf8'))]);
+  for (const d of ['painel/fonte', 'demo/clinica/comum', 'demo/clinica/app', 'demo/clinica/central', 'demo/clinica/escopo', 'demo/clinica/manual'])
+    if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js'))) fontes.push([d + '/' + f, strings(fs.readFileSync(path.join(d, f), 'utf8'))]);
+  for (const [f, texto] of fontes) {
+    const t = EXCECOES.reduce((x, re) => x.replace(re, ' '), texto).replace(/\b(width|height|max-width|min-width|left|top|inset):\s*100%/g, ' ').replace(/translate[XY]?\([^)]*100%[^)]*\)/g, ' ');
+    for (const [re, nome] of P9) { const m = t.match(re); if (m) erro(`${f}: ${nome} no texto (achei "${m[0]}"); a linguagem do CFM não deixa prometer (método de produto, regra 22)`); }
+  }
+  // Gráficos de barra ou linha, nunca pizza nem rosca (P1, regra 23).
+  for (const d of ['painel/fonte', 'central/fonte']) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js')))
+    if (/type:\s*['"](pie|doughnut|polarArea)['"]/.test(fs.readFileSync(path.join(d, f), 'utf8'))) erro(`${d}/${f}: gráfico de pizza ou rosca; use barra ou linha (método de produto, regra 23)`);
+}
 // O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
 // repositório privado).
 for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f)), ...fs.readdirSync('scripts').map(f => path.join('scripts', f))]) {

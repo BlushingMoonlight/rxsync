@@ -26,6 +26,13 @@
 - [ ] Fotos a 390, 820 e 1024 px.
 - [ ] Testes de tela da área passam, sem aviso novo do `painel_alcance.mjs`.
 - [ ] Mapa e catálogo atualizados no par de PRs.
+- [ ] Abas só para visões do mesmo conteúdo; "‹ Voltar" visível fora do primeiro nível.
+- [ ] Página de ajuste com um assunto só (até cerca de 2 telas de rolagem no celular).
+- [ ] Agrupado por espaço; nenhum cartão dentro de cartão; densidade igual na tela.
+- [ ] Formulário em uma coluna; um jeito de salvar por seção.
+- [ ] Site: a ordem de página de venda e uma chamada só por página.
+- [ ] Texto na linguagem do CFM: sem "melhor", "garante", "100%" nem promessa de resultado.
+- [ ] Números tabulares; gráfico de barra ou linha; estado com cor, ícone e palavra; animação até 300 ms.
 
 ## Issue que resolve
 
