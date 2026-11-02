@@ -91,7 +91,12 @@
 
   window.DEMO_TUTORIAL = {
     // Chamado pelo app (tela Hoje) e pela central (aba Hoje) ao montar: abre só na primeira vez.
-    talvez(parte) { if (!visto[parte] && !aberto) { visto[parte] = true; abrir(parte); } },
+    // Se o aviso de privacidade ainda está aberto, espera o "Entendi" (os dois juntos cobrem a tela).
+    talvez(parte) {
+      if (visto[parte] || aberto) return;
+      if (DEMO.avisoAberto) { document.addEventListener('demo-aviso-visto', () => DEMO_TUTORIAL.talvez(parte), { once: true }); return; }
+      visto[parte] = true; abrir(parte);
+    },
     abrir,
     // O botão "?" no topo do produto.
     botao(parte) { return el('button', { type: 'button', class: 'botao-ajuda', 'aria-label': 'Ver o tutorial de novo', title: 'Tutorial', onclick: () => abrir(parte) }, '?'); },

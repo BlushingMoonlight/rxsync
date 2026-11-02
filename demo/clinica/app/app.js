@@ -635,12 +635,28 @@
       return el('button', { type: 'button', 'aria-current': ativa ? 'page' : null, onclick: () => irAba(k) }, ic(i, null, ativa), n);
     }));
     const rolagem = el('div', { class: 'rolagem' }, barraApp, telaApp);
-    trocar(raiz, el('div', { class: 'palco' }, el('div', { class: 'celular' }, rolagem, nav)));
+    trocar(raiz, el('div', { class: 'palco' }, el('div', { class: 'celular' }, rolagem, nav), ladoApp(tela)));
     DEMO.tela(tela === 'picadinha' ? 'aplicacoes' : tela);
     if (!mesma) window.scrollTo(0, 0);
     rolagem.scrollTop = topoAntes;
     // Tutorial de primeiro acesso: na 1ª vez que a tela Hoje aparece nesta página.
     if (tela === 'inicio' && !mesma) window.DEMO_TUTORIAL.talvez('app');
+  }
+
+  // Ao lado do celular (só a partir de 1024 px, fora da entrada): "O que o paciente faz aqui", 3 passos do Manual da tela.
+  const LARGO = window.matchMedia ? window.matchMedia('(min-width: 1024px)') : { matches: false };
+  function ladoApp(tela) {
+    if (DEMO.embed || document.documentElement.classList.contains('embutido') || !LARGO.matches || tela === 'boas-vindas') return null;
+    const lado = el('aside', { class: 'lado-app', 'aria-label': 'O que o paciente faz aqui' });
+    const encher = () => {
+      const t = (window.DEMO_MANUAL.partes.app.telas || []).find(x => x.tela === (tela === 'picadinha' ? 'aplicacoes' : tela) || x.tela === est.aba);
+      if (!t) return;
+      trocar(lado, el('h2', { text: 'O que o paciente faz aqui' }), el('p', { class: 'mudo peq', text: t.titulo }),
+        el('ol', { class: 'lado-passos' }, (t.passos || []).slice(0, 3).map(x => el('li', { text: x }))),
+        el('a', { class: 'peq', href: DEMO.link('manual', { tela: 'app' }), text: 'Ver tudo no Manual' }));
+    };
+    if (window.DEMO_MANUAL) encher(); else DEMO.comManual().then(encher, () => {});
+    return lado;
   }
 
   // Abre uma tela pelo nome (link …&tela=…, manual e respostas do assistente). Devolve false se o nome não existe.

@@ -231,10 +231,17 @@
   function faixaPrivacidade() {
     if (ler('localStorage', 'demo_aviso_visto') === '1' || est.ver || est.embed) return;
     const f = el('div', { class: 'faixa vidro', role: 'region', 'aria-label': 'Aviso de privacidade' },
-      el('p', {}, 'Esta demonstração registra como ela é usada (telas, toques e o que você marcar) para a RXSync preparar a conversa com você. Os pacientes são de mentira. Os registros são apagados 180 dias depois do último acesso. ',
+      el('p', {}, el('span', { class: 'faixa-longo', text: 'Esta demonstração registra como ela é usada (telas, toques e o que você marcar) para a RXSync preparar a conversa com você. Os pacientes são de mentira. Os registros são apagados 180 dias depois do último acesso. ' }),
+        el('span', { class: 'faixa-curto', text: 'Registramos o uso desta demonstração para preparar a conversa e apagamos 180 dias depois do último acesso. ' }),
         el('a', { href: raizSite() + 'privacidade.html#demonstracao' }, 'Privacidade')),
-      el('button', { class: 'botao', type: 'button', onclick: () => { gravar('localStorage', 'demo_aviso_visto', '1'); f.remove(); } }, 'Entendi'));
+      el('button', { class: 'botao', type: 'button', onclick: () => { gravar('localStorage', 'demo_aviso_visto', '1'); f.remove(); medir(); document.dispatchEvent(new Event('demo-aviso-visto')); } }, 'Entendi'));
+    // O tutorial de primeiro acesso espera este "Entendi" (DEMO.avisoAberto).
+    // A página reserva o espaço do aviso (nada fica por baixo dele, nem a barra de baixo do app).
+    const raizH = document.documentElement;
+    const medir = () => { if (f.isConnected) { raizH.classList.add('com-faixa'); raizH.style.setProperty('--faixa-h', f.offsetHeight + 'px'); } else { raizH.classList.remove('com-faixa'); raizH.style.removeProperty('--faixa-h'); } };
     document.body.append(f);
+    medir();
+    if (window.ResizeObserver) new ResizeObserver(medir).observe(f);
   }
 
   // ---------------------------------------------------------------- estados: sem código, inativo, limite, fora do ar
@@ -287,7 +294,7 @@
     destacar();
   }
   // Topo de cada página: as iniciais na cor e o nome da clínica.
-  // A faixa da demonstração: a ÚNICA parte "da demonstração" nas páginas (escura e separada do produto).
+  // A faixa da demonstração: a ÚNICA parte "da demonstração" nas páginas (branca, fina e separada do produto por uma linha).
   // atual: 'inicio' | 'app' | 'central' | 'escopo' | 'manual'. trocarVista: troca entre o app e a central na mesma página (sem recarregar).
   function faixaDemo(atual, trocarVista, opcoes) {
     if (est.embed) return null;
@@ -309,5 +316,5 @@
 
   window.DEMO = { raizSite, el, trocar, iniciar, carregar, comManual, comIA, semRede, faixaDemo, mudarPagina, marcarVisto, link, evento, tela, item, balao, rapida, janela, folha, confirmar, transicao, semMovimento, botaoTema,
     pedir, mensagemErro, nomeMedico, iniciais, vistos, escuro,
-    trocarTema, get dados() { return est.dados; }, get ver() { return est.ver; }, get embed() { return est.embed; }, extra };
+    trocarTema, get avisoAberto() { return !(ler('localStorage', 'demo_aviso_visto') === '1' || est.ver || est.embed); }, get dados() { return est.dados; }, get ver() { return est.ver; }, get embed() { return est.embed; }, extra };
 })();

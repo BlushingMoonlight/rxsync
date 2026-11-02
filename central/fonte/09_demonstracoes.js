@@ -46,7 +46,7 @@ TELAS.demonstracoes = async (c, [parte, a, b]) => {
 function avisoLinksDesligados() {
   if (ligada('demo_links')) return null;
   return el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, el('b', { text: 'Os links estão desligados. ' }),
-    ligada('demo_politica_v17') ? 'Quem abrir vê "não está mais ativo". Ligue em Ajustes da Central (Links de demonstração).'
+    ligada('demo_politica_v17') ? ['Quem abrir vê "não está mais ativo". ', ligada('editar_demonstracoes') ? btn('Ligar os links', async () => { await mudarChave('demo_links', 'SIM'); await rotear(); }, 'sec') : 'Ligue em Ajustes da Central (Links de demonstração).']
       : 'Quem abrir vê "não está mais ativo". Eles só ligam depois da Política v17 publicada (chave só por PR).'));
 }
 
@@ -78,7 +78,9 @@ async function dLista(c) {
 
 // ---------- formulário (criar e editar): os mesmos campos; a validade é em dias ao criar e em data ao editar
 function camposDem(l) {
-  const v = l || {};
+  // vindo do lead da prospecção, a clínica, a cidade e o PX- já vêm preenchidos (só no link novo).
+  const v = l || est.demPrefill || {};
+  if (!l) est.demPrefill = null;
   const entrada = (k, rot, props, ajuda) => { const i = el('input', { class: 'entrada', id: 'd-' + k, autocomplete: 'off', spellcheck: 'false', value: v[k] == null ? null : String(v[k]), ...props });
     return [i, el('label', { class: 'campo', for: 'd-' + k }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
   const [clinica, cClinica] = entrada('clinica', 'Nome da clínica', { maxlength: '60', required: true }, 'Aparece no app, na central e no escopo da demonstração.');

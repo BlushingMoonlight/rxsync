@@ -415,7 +415,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
 // O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
 // repositório privado).
 for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f)), ...fs.readdirSync('scripts').map(f => path.join('scripts', f))]) {
-  const m = fs.readFileSync(f, 'utf8').match(/\bN-[0-9]{2,3}\b/);
+  const m = fs.readFileSync(f, 'utf8').match(/\b(?:N|PJ)-[0-9]{2,3}\b/);
   if (m) erro(`${f}: cita um número de achado (${m[0]}); o site é público, deixe os detalhes no PR do sistema`);
 }
 // Guias do site (guias/, decisão da seção Guias no rxsync-sistema): as páginas são exatamente o que o

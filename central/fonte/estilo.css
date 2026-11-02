@@ -312,3 +312,11 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .aviso-dia { margin: 0; padding: var(--e-3) var(--e-4) var(--e-1); font-size: var(--t-2); line-height: var(--l-2); font-weight: 600; color: var(--texto-2); }
 .aviso-dia:not(:first-child) { border-top: 1px solid var(--borda); }
 .aviso-dia::first-letter { text-transform: uppercase; }
+
+/* Prospecção: "Para começar" e "por que caiu" */
+.icone-caixa.feito { background: var(--ok-fundo); color: var(--ok-texto); }
+.p-comecar button.linha { width: 100%; text-align: left; }
+.p-caiu { margin-top: var(--e-2); }
+.p-caiu > summary { cursor: pointer; color: var(--texto-2); font-size: var(--t-peq); min-height: var(--alvo); display: flex; align-items: center; }
+.p-caiu-lista { list-style: none; margin: 0; padding: 0 0 var(--e-2); }
+.p-caiu-lista li { display: flex; justify-content: space-between; gap: var(--e-3); padding: var(--e-1) 0; border-top: 1px solid var(--borda); font-size: var(--t-peq); }
