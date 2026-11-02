@@ -201,7 +201,7 @@ export const CFG = {
     frequencia: { max_mensagens: 3, intervalo_dias_uteis: 2 }, aprendizado_min: 100 },
   publico: { busca: { termos: ['dentista', 'ortodontista'], lugares: ['Curitiba'], coordenadas: '', zoom: 14, idioma: 'pt-br', pais: 'br', paginas: 3, nota_min: 4, nota_max: 5, sem_nota: 'descartar', avaliacoes_min: 10,
       categorias_aceitas: [], categorias_excluidas: [], palavras_excluem: ['hospital', 'rede', 'franquia', 'UBS'], tem_site: 'tanto_faz', so_celular: true, aceitar_wame: true, so_aberto: true,
-      repetir: { tipo: 'semanal', dia_semana: 'seg', hora: 8 }, creditos_busca: 10, nao_repetir_dias: 7 },
+      repetir: { tipo: 'semanal', dia_semana: 'seg', hora: 8 }, creditos_busca: 10, nao_repetir_dias: 7, telefone_fixo: 'descartar' },
     qualificacao: { pesos: { nota: 40, avaliacoes: 25, categoria: 20, site: 10, origem: 5 }, pontos_min: 50, revisar_numero: 'whatsapp' },
     exclusoes: { redes_palavras: [], rede_min_enderecos: 3, concorrentes: ['Concorrente X'] }, fuso: 'America/Sao_Paulo', creditos_mes: 120, novos_entram: 'selecionados' },
   anuncio: { abordagem: 'Oi! Aqui é a assistente virtual da {marca}. Vi a {nome} no Google Maps e queria saber: vocês respondem os pacientes no WhatsApp à noite?', tamanho_max: 400,

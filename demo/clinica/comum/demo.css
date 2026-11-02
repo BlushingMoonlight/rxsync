@@ -253,6 +253,15 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
   border-radius: var(--r-cartao); padding: var(--e-4) var(--e-5); display: grid; gap: var(--e-3); box-shadow: var(--sombra-3); font-size: .88rem; animation: subir .5s var(--mola) both; }
 .faixa .botao { justify-self: start; }
 @media (min-width: 640px) { .faixa { grid-template-columns: 1fr auto; align-items: center; } }
+.faixa-curto { display: none; }
+@media (max-width: 639px) {
+  /* celular: uma faixa de 2 linhas no rodapé, com "Entendi" à direita; a página reserva o espaço (sem cobrir conteúdo) */
+  .faixa { left: 0; right: 0; bottom: 0; border-radius: 0; box-shadow: none; border-top: 1px solid var(--linha); background: var(--superficie);
+    grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: var(--e-2) var(--e-4) calc(var(--e-2) + env(safe-area-inset-bottom)); font-size: var(--t-peq); }
+  .faixa p { margin: 0; } .faixa-longo { display: none; } .faixa-curto { display: inline; }
+}
+html.com-faixa body { padding-bottom: var(--faixa-h, 0px); }
+html.com-faixa .rapida { bottom: calc(108px + var(--faixa-h, 0px) + env(safe-area-inset-bottom)); }
 
 /* estados da página: carregando, inativo, fora do ar */
 .estado { min-height: 70vh; display: grid; place-items: center; text-align: center; padding: var(--e-5) var(--e-4); }
@@ -304,17 +313,16 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 
 
 /* ---------------------------------------------------------------- faixa da demonstração: a única parte "da demonstração" nas páginas.
-   Escura nos dois temas, fina e separada do produto (o app e a central abaixo dela são o produto, sem marcas de demonstração). */
-.faixa-demo { --fd-fundo: #15171b; --fd-texto: #f1f1f3; --fd-texto-2: #c4c7ce; --fd-linha: rgba(255, 255, 255, .14);
-  background: var(--fd-fundo); color: var(--fd-texto); border-bottom: 1px solid #000; font-size: .88rem; position: relative; z-index: 40; }
-:root[data-tema="escuro"] .faixa-demo { --fd-fundo: #22252c; border-bottom-color: #33373f; }
-@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .faixa-demo { --fd-fundo: #22252c; border-bottom-color: #33373f; } }
+   Branca como o resto (P12: escuro só pela escolha da pessoa), fina e separada do produto por uma linha
+   (o app e a central abaixo dela são o produto, sem marcas de demonstração). No tema escuro, segue o tema. */
+.faixa-demo { --fd-fundo: var(--superficie); --fd-texto: var(--tinta); --fd-texto-2: var(--tinta-2); --fd-linha: var(--linha);
+  background: var(--fd-fundo); color: var(--fd-texto); border-bottom: 1px solid var(--linha); font-size: .88rem; position: relative; z-index: 40; }
 .faixa-demo .dentro { width: min(1240px, 100%); margin: 0 auto; padding: 0 var(--e-4); display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--e-4); min-height: 48px; }
 @media (min-width: 768px) { .faixa-demo .dentro { padding: 0 var(--e-6); } }
 .fd-marca { display: flex; align-items: center; gap: var(--e-2); min-width: 0; flex: 1 1 0; margin: 0; }
 .fd-tag { flex: none; padding: 2px 8px; border: 1px solid var(--fd-linha); border-radius: 99px; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--fd-texto-2); }
 .fd-clinica { min-width: 0; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fd-ver { font-size: var(--t-mini); color: #f4c06a; }
+.fd-ver { font-size: var(--t-mini); color: var(--atencao); }
 .fd-nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
 .fd-nav::-webkit-scrollbar { display: none; }
 .fd-link { min-height: var(--alvo); display: inline-flex; align-items: center; padding: 0 var(--e-3); border: 0; background: none; color: var(--fd-texto-2); font: inherit; font-weight: 600;
@@ -322,20 +330,20 @@ button.linha, a.linha { transition: transform .18s var(--suave); } button.linha:
 .fd-link:hover { color: var(--fd-texto); }
 .fd-link[aria-current="page"] { color: var(--fd-texto); }
 .fd-link[aria-current="page"]::after { content: ''; position: absolute; left: var(--e-3); right: var(--e-3); bottom: 8px; height: 2px; border-radius: 2px; background: currentColor; }
-.fd-link:focus-visible, .faixa-demo .botao-tema:focus-visible, .faixa-demo .chave:focus-visible { outline-color: #fff; }
+.fd-link:focus-visible, .faixa-demo .botao-tema:focus-visible, .faixa-demo .chave:focus-visible { outline-color: var(--acento); }
 .fd-itens { display: inline-flex; align-items: center; gap: var(--e-2); flex: none; min-height: var(--alvo); }
 .fd-itens label { color: var(--fd-texto-2); font-weight: 600; cursor: pointer; }
 .fd-longo { display: none; }
 @media (min-width: 1100px) { .fd-longo { display: inline; } .fd-curto { display: none; } }
 .fd-marca .fd-clinica { min-width: 4em; }
-.faixa-demo .chave { width: 44px; height: 28px; background: #4a4f59; } .faixa-demo .chave::after { width: 22px; height: 22px; } .faixa-demo .chave[aria-checked="true"]::after { transform: translateX(16px); }
+.faixa-demo .chave { width: 44px; height: 28px; } .faixa-demo .chave::after { width: 22px; height: 22px; } .faixa-demo .chave[aria-checked="true"]::after { transform: translateX(16px); }
 .faixa-demo .chave::before { inset: -8px -2px; }
-.faixa-demo .chave[aria-checked="true"] { background: #e9eaee; } .faixa-demo .chave[aria-checked="true"]::after { background: var(--fd-fundo); }
 .faixa-demo .botao-tema { background: transparent; border-color: var(--fd-linha); color: var(--fd-texto); }
 @media (max-width: 719px) {
   /* celular: a marca, os itens e o tema em cima; as 5 partes embaixo, na largura toda */
   .faixa-demo .dentro { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "marca itens tema" "nav nav nav"; column-gap: var(--e-2); }
-  .fd-marca { grid-area: marca; } .fd-tema { grid-area: tema; } .fd-itens { grid-area: itens; } .fd-ver { display: none; }
+  .fd-marca { grid-area: marca; } body:has(.barra-app) .fd-marca .fd-clinica { display: none; }   /* o nome da clínica já está no app logo abaixo */
+  .fd-tema { grid-area: tema; } .fd-itens { grid-area: itens; } .fd-ver { display: none; }
   .fd-nav { grid-area: nav; border-top: 1px solid var(--fd-linha); justify-content: space-between; }
   .fd-link { padding: 0 var(--e-2); flex: 1 1 auto; justify-content: center; } .fd-link[aria-current="page"]::after { left: var(--e-2); right: var(--e-2); }
 }
