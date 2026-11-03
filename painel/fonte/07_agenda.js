@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------- Agenda (molde B; o calendário é uma variante da Lista)
-// Uma fileira de controles antes da lista; "+ Nova consulta" fixo embaixo no celular; "Horários" ao lado do ⋯ (os
-// ajustes da agenda, #219); o raro no ⋯ (Bloquear horário, Exportar, Canceladas). A consulta abre numa folha (celular) ou ao lado da lista (iPad deitado e computador).
+// Uma fileira de controles antes da lista; "+ Nova consulta" fixo embaixo no celular; "Ajustes da agenda" ao lado do
+// ⋯ (#219; antes "Horários", DEC-197); o raro no ⋯ (Bloquear horário, Exportar, Canceladas). A consulta abre numa folha (celular) ou ao lado da lista (iPad deitado e computador).
 const AG = { dados: [], carregou: false, filtro: 'novos', naoPagas: null, visao: window.innerWidth < 768 ? 'dia' : 'semana', cal: [], calReq: 0, aberta: null };
 const MED = { dados: [], modo: false, reservio: false, padrao: { agendamento: true }, filtro: '' };   // agenda por médico (modo_medicos vem do servidor)
 const GRADE = { dados: [] };
@@ -43,9 +43,9 @@ function medPagaConsultorio(id) {
 }
 const podeLink = (medicoId, servico) => ligado('func_pagamento_link') && String(servico || '').trim().toUpperCase() !== 'BLOQUEIO' && !medPagaConsultorio(medicoId);
 
-// #219: o caminho de toque para Agenda › Horários (os ajustes da agenda), ao lado do ⋯ nas três visões. Não é aba: as
-// abas são só visões do mesmo conteúdo (painel-novo.md, seção 9, regra 5), e Horários é o índice de ajustes (molde D).
-const agHorariosBtn = () => el('button', { class: 'btn sec', type: 'button', 'data-ir': 'agenda/horarios' }, icone('relogio', 'p'), 'Horários');
+// #219: o caminho de toque para Agenda › Ajustes da agenda, ao lado do ⋯ nas três visões. Não é aba: as abas são
+// só visões do mesmo conteúdo (painel-novo.md, seção 9, regra 5), e os Ajustes da agenda são o índice de ajustes (molde D).
+const agHorariosBtn = () => el('button', { class: 'btn sec', type: 'button', 'data-ir': 'agenda/horarios' }, icone('ajustes', 'p'), 'Ajustes da agenda');
 tela('agenda', {
   montar: () => [cabTela('Agenda', { acao: acaoPrincipal('Nova consulta', () => consultaNova(), 'soma', 'agNovo'), extra: agHorariosBtn(), mais: { id: 'agMais', lista: [
     ['Bloquear horário', 'bloquear', () => bloquearForm()], ['Exportar para Google Agenda, Outlook ou iPhone', 'baixar', () => agExportar()],

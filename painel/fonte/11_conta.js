@@ -154,13 +154,14 @@ tela('conta/gestao', {
 const READONLY = [['razao_social', 'Razão social'], ['cnpj', 'CNPJ'], ['representante_nome', 'Representante'], ['representante_cpf', 'CPF do representante'], ['endereco_faturamento', 'Endereço de faturamento'], ['plano', 'Plano'], ['valor_mensal', 'Valor'], ['numero_whatsapp', 'WhatsApp que a assistente atende']];
 // O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel antigo. Nada muda no servidor.
 // caminhos-antigos: começo (a primeira coluna são os nomes de antes; a segunda, conferida, fica na tela abaixo)
-const MUDOU = [['Agenda › Integração', 'Agenda › Horários › Integração e planilhas', 'agenda/horarios/integracao'],
-  ['Agenda › Horários (a página longa)', 'Agenda › Horários: uma página por assunto (horários de atendimento, regras, médicos, perguntas, feriados, receber dos pacientes)', 'agenda/horarios'],
+const MUDOU = [['Agenda › Horários', 'Agenda › Ajustes da agenda', 'agenda/horarios'],
+  ['Agenda › Integração', 'Agenda › Ajustes da agenda › Integração e planilhas', 'agenda/horarios/integracao'],
+  ['Agenda › Horários (a página longa)', 'Agenda › Ajustes da agenda: uma página por assunto (horários de atendimento, regras, médicos, perguntas, feriados, receber dos pacientes)', 'agenda/horarios'],
   ['Funções da assistente', 'Assistente › O que ela faz', 'assistente/funcoes'],
-  ['Agenda por médico', 'Agenda › Horários › Médicos e tipos, no alto', 'agenda/horarios/medicos'],
-  ['"Bloquear feriados" e "Não atender em feriados"', 'Um controle só, em Agenda › Horários › Feriados', 'agenda/horarios/feriados'],
+  ['Agenda por médico', 'Agenda › Ajustes da agenda › Médicos e tipos, no alto', 'agenda/horarios/medicos'],
+  ['"Bloquear feriados" e "Não atender em feriados"', 'Um controle só, em Agenda › Ajustes da agenda › Feriados', 'agenda/horarios/feriados'],
   ['Lembretes (a chave e os horários)', 'Um controle só, em Assistente › Mensagens automáticas', 'assistente/automaticas'],
-  ['Agrupar pacientes', 'Agenda › Horários › Regras da agenda', 'agenda/horarios/regras'],
+  ['Agrupar pacientes', 'Agenda › Ajustes da agenda › Regras da agenda', 'agenda/horarios/regras'],
   ['Pacientes › importar e duplicados', 'Pacientes › ⋯ › Organizar', 'pacientes/organizar'],
   ['Resultados', 'Hoje › Ver resultados', 'resultados'],
   ['Assinatura', 'Conta › Plano e pagamento', 'conta/assinatura'],

@@ -15,7 +15,7 @@
       ['#btnEstadoIa', 'Agora o teste de verdade: do seu celular, mande "oi" para o WhatsApp da clínica. Em segundos ela responde, e aqui aparece "Atendendo".'],
       ['#hojeAtencao', 'Quando um paciente pede para falar com uma pessoa ou tem urgência, aparece aqui e no celular de avisos. Toque, resolva no WhatsApp e toque em "Resolvido".']],
     'conta/whatsapp': [['#zapNumero', 'Este é o WhatsApp que a assistente usa. Se ela parar de responder, toque em "Reconectar ou trocar o número" e leia o código com o celular da clínica, em Aparelhos conectados.']],
-    'agenda/horarios/grade': [['#gradeBox', 'A assistente só marca dentro destes horários. Confira os dias e o intervalo de almoço. Feriados ficam em Agenda › Horários › Feriados.']],
+    'agenda/horarios/grade': [['#gradeBox', 'A assistente só marca dentro destes horários. Confira os dias e o intervalo de almoço. Feriados ficam em Agenda › Ajustes da agenda › Feriados.']],
     'assistente/automaticas': [['#fld_lembretes', 'Ligue os lembretes de consulta: o paciente recebe uma mensagem 24 horas e 2 horas antes, pedindo a confirmação. Isso ajuda a reduzir faltas.']],
     assistente: [['#blocoSabe', 'Tudo o que ela responde vem daqui: preços, convênios, endereço e as perguntas frequentes do seu formulário. Mudou algo na clínica? Mude aqui; vale na hora.']],
     agenda: [['#agNovoTopo, #agNovo', 'As consultas que ela marca aparecem sozinhas. Paciente ligou na recepção? Marque aqui.']],

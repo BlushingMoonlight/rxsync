@@ -134,6 +134,8 @@ body.teclado .acao-fixa { display: none; }
 .seg button { min-height: var(--alvo); padding: 0 var(--e-3); border: 0; border-left: 1px solid var(--borda); background: var(--superficie); color: var(--texto); font-weight: 500; cursor: pointer; }
 .seg button:first-child { border-left: 0; }
 .seg button[aria-pressed="true"] { background: var(--primaria-suave); color: var(--primaria); font-weight: 600; }
+.seg.seg-plena { display: flex; width: 100%; }
+.seg.seg-plena button { flex: 1 1 0; padding: var(--e-2) var(--e-3); }
 .controles { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e-2); margin-bottom: var(--e-3); }
 .controles .cresce { flex: 1 1 auto; min-width: 0; }
 .filtros { display: flex; gap: var(--e-2); overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }

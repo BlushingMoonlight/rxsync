@@ -2,7 +2,7 @@
 // chega, só tocando (nada de lupa, de endereço digitado nem de atalho do teclado), a cada tela e folha. Falha se alguma tela
 // do painel (todas as rotas registradas em TELAS), alguma seção da Central ou alguma página da demonstração ficar de fora,
 // se um botão levar a uma tela que não existe, ou se o "voltar" de uma tela não subir um nível. Em 360, 820 e 1280 px.
-// Também grava a lista dos caminhos de toque ("Agenda › Horários › Feriados") em scripts/caminhos_validos.json, que o
+// Também grava a lista dos caminhos de toque ("Agenda › Ajustes da agenda › Feriados") em scripts/caminhos_validos.json, que o
 // verificar_site.mjs e o verificar.mjs do rxsync-sistema usam para conferir os caminhos escritos nos textos.
 // Com o n8n SIMULADO aqui (nada sai para a internet; dados inventados). Roda no Chrome e, com NAVEGADOR=webkit, no motor do
 // Safari. Uso (precisa do Playwright): node scripts/painel_alcance.mjs [painel|central|demo] [--gravar]
@@ -183,7 +183,7 @@ function avisarDisposicao(app, largura, disposicao) {
   }
 }
 // O caminho de toque de cada tela pelo diagrama: o caminho da tela de cima mais o nome do botão que leva dela até aqui
-// (com o ⋯ quando o botão está no Mais). Devolve { rota: ['Agenda', 'Horários', 'Feriados'] } e os que faltam ligação.
+// (com o ⋯ quando o botão está no Mais). Devolve { rota: ['Agenda', 'Ajustes da agenda', 'Feriados'] } e os que faltam ligação.
 function caminhosPeloDiagrama(rotas, arestas, pai, raizes, curto) {
   const cam = new Map(Object.entries(raizes)), semLigacao = [];
   const pendentes = rotas.filter(r => !cam.has(r));
