@@ -70,6 +70,12 @@ await proximo(5);
 const perguntas = await page.locator('#listaFaq > *').count();
 await page.click('#btnAddFaq');
 ok(await page.locator('#listaFaq > *').count() === perguntas + 1, 'etapa 6: "Adicionar pergunta" põe mais uma');
+// O que se escreve na pergunta nova fica no rascunho do navegador, como a página promete (pente fino da camada 3, I-10).
+await page.locator('#listaFaq .faq-p').last().fill('Atendem aos sábados?');
+await page.locator('#listaFaq .faq-r').last().fill('Sim, das 8h às 12h.');
+await page.locator('#listaFaq .faq-p').last().focus();   // sair da resposta (o "change")
+const rascunho = await page.evaluate(k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, 'rxsync_onb_' + TOKEN.slice(0, 8));
+ok(rascunho && (rascunho.faq || []).some(f => f.pergunta === 'Atendem aos sábados?' && f.resposta === 'Sim, das 8h às 12h.'), 'etapa 6: a pergunta nova fica no rascunho do navegador ao sair do campo');
 await proximo(6);   // Confira suas respostas (molde F)
 const resumo = await page.locator('#resumo').textContent();
 ok(/Dra\. Teste/.test(resumo) && /Primeira consulta \(1h\): R\$ 350,00/.test(resumo) && /crédito em até 3x/.test(resumo), 'etapa 7: Confira suas respostas mostra o que foi preenchido, com as listas');
