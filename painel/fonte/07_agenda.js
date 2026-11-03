@@ -118,7 +118,12 @@ function agRender() {
     const b = ev.currentTarget;
     if (!(await confirmar({ titulo: itens.length === 1 ? 'Excluir a consulta cancelada?' : 'Excluir as ' + itens.length + ' consultas canceladas?', texto: 'Saem de vez da agenda. Não dá para desfazer.', botao: 'Excluir ' + itens.length, perigo: true }))) return;
     b.disabled = true;
-    d24('agenda_excluir_cancelados').then(r => { rapida(pl(r && r.n ? r.n : 0, 'consulta excluída', 'consultas excluídas') + '.'); agCarregar(); }).catch(() => { b.disabled = false; rapida('Não consegui excluir. Tente de novo.'); });
+    // Só as canceladas que a lista mostra, uma a uma (pente fino da camada 3, I-04): o agenda_excluir_cancelados apagava
+    // todas as da clínica, também as de outro médico (com o filtro) e as que a lista não mostra.
+    let n = 0, falhou = false;
+    for (const a of itens) { try { const r = await d24('agenda_excluir', { id: a.id }); if (r && r.ok) n++; } catch (e) { falhou = true; } }
+    rapida(pl(n, 'consulta excluída', 'consultas excluídas') + '.' + (falhou ? ' Algumas não saíram: tente de novo.' : ''));
+    agCarregar();
   }, 'perigo-sec plena')));
   trocar(lista, topo, itens.length ? el('div', { class: 'lista' }, itens.map(a => consultaLinha(a))) : el('div', { class: 'cartao' }, vazio(null, AG.filtro === 'novos' ? 'Nenhuma consulta nova para ver.' : 'Nada por aqui.')));
 }
