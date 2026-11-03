@@ -2,13 +2,14 @@
 // (rxsync-sistema#203, S11), com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. a resposta que pede a confirmação (confirmar) ganha "Confirmar" e "Não"; "Confirmar" manda "Sim, confirmo." como a
 //      próxima mensagem, e os botões se desligam;
-//   2. depois, o "O que mudou" lista o que o workflow 13 mudou, e só a agenda é recarregada (areas: agenda).
+//   2. depois, o "O que mudou" lista o que o workflow 13 mudou, e só a agenda é recarregada (areas: agenda);
+//   3. sem conexão, a mensagem volta para o campo.
 // Uso (precisa do Playwright): node scripts/painel_chat_confirmar.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const SESSAO = 'a'.repeat(64);
-const chamadas = [];
+const chamadas = []; let semRede = false;
 function responder(url, h, b) {
   const caminho = url.slice(N8N.length);
   chamadas.push({ caminho, acao: b.acao, mensagem: b.mensagem });
@@ -27,6 +28,7 @@ await ctx.addInitScript(s => { try { sessionStorage.setItem('painel_sessao', s);
 await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
   const q = r.request();
   if (!q.url().startsWith(N8N)) return r.abort();
+  if (semRede && q.url().endsWith('assistente-dono')) return r.abort();
   if (q.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' } });
   let b = {}; try { b = JSON.parse(q.postData() || '{}'); } catch {}
   return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(responder(q.url(), q.headers(), b)) });
@@ -54,6 +56,16 @@ const mudou = page.locator('#chatMsgs .chat-cartao', { hasText: 'O que mudou' })
 ok((await mudou.textContent()).includes('Consulta marcada: Maria Souza, 28/10 às 14:00'), '"O que mudou" lista a consulta marcada');
 await page.waitForTimeout(400);
 ok(chamadas.filter(c => c.acao === 'agenda_listar').length > listasAntes, 'a agenda é recarregada (areas: agenda)');
+// 3. sem conexão (pente fino da camada 3, I-05): a mensagem volta para o campo, para mandar de novo sem digitar tudo.
+semRede = true;
+await page.locator('#chatTexto').fill('Bloqueia sexta de manhã');
+await page.locator('#chatEnviar').click();
+await page.locator('#chatMsgs', { hasText: 'Sua mensagem não foi enviada' }).waitFor();
+ok(await page.inputValue('#chatTexto') === 'Bloqueia sexta de manhã', 'sem conexão: o texto volta para o campo');
+semRede = false;
+await page.locator('#chatEnviar').click();
+await page.waitForFunction(() => !document.querySelector('#chatEnviar').disabled);
+ok(chamadas.filter(c => c.caminho === 'assistente-dono').pop().mensagem === 'Bloqueia sexta de manhã', 'com a conexão de volta, "Enviar" manda a mesma mensagem');
 ok(!erros.length, 'sem erro de script na página' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await browser.close(); site.fechar();
 console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: o cartão "Confirmar" e o "O que mudou" no chat.');

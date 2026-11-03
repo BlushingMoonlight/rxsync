@@ -82,6 +82,11 @@ function chatEnviar() {
     }
     if (!mudou || areas.includes('grade')) gradeCarregar();
     if (TELAS.resultados && TELAS.resultados.sec && !TELAS.resultados.sec.hidden) resultadosCarregar();
-  }).catch(() => { espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.'); })
+  }).catch(() => {
+    // Sem conexão: a mensagem volta para o campo e sai do histórico (pente fino da camada 3, I-05).
+    espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.');
+    if (CHAT.hist[CHAT.hist.length - 1] && CHAT.hist[CHAT.hist.length - 1].texto === txt) CHAT.hist.pop();
+    if (!caixa.value.trim()) { caixa.value = txt; cresce(caixa); }
+  })
     .then(() => { CHAT.ocupado = false; $('chatEnviar').disabled = false; caixa.focus(); });
 }
