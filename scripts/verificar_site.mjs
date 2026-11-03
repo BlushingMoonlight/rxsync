@@ -318,14 +318,32 @@ for (const arq of ['painel/index.html']) {
   for (const k of planos) if (!pares.includes(P[k].mensal + '|' + P[k].parcelado)) erro(`index.html: o card do ${k} não mostra R$ ${P[k].mensal} e 12x de R$ ${P[k].parcelado} (rxsync-sistema#79)`);
   for (const p of pares) if (!planos.some(k => p === P[k].mensal + '|' + P[k].parcelado)) erro(`index.html: card com preço que não é oficial (${p.replace('|', ' / ')}; rxsync-sistema#79)`);
   for (const m of ix.matchAll(/12x de R\$ ([\d,]+) ou R\$ ([\d.]+) à vista/g)) { const k = planos.find(k => P[k].parcelado === m[1]); if (!k) erro(`index.html: 12x de R$ ${m[1]} não é oficial`); else confere('index.html', m[2], P[k].avista.replace(/,00$/, ''), `o à vista do ${k}`); }
-  // Calculadora da página: "O plano Essencial custa R$ NNN por mês" e a conta Math.ceil(NNN / valor).
-  for (const m of ix.matchAll(/Essencial custa R\$ (\d+) por mês/g)) confere('index.html', m[1], P.essencial.mensal, 'o preço da calculadora');
+  // Calculadora da página: "1 consulta paga a mensalidade do Essencial (R$ NNN)" e a conta Math.ceil(NNN / valor). A frase
+  // precisa existir (antes a regra procurava "Essencial custa R$ NNN por mês", que saiu da página e deixou o preço sem conferência).
+  const calcTxt = [...ix.matchAll(/mensalidade do Essencial \(R\$ (\d+)\)/g)];
+  if (!calcTxt.length) erro('index.html: não achei "mensalidade do Essencial (R$ NNN)" na calculadora para conferir o preço');
+  for (const m of calcTxt) confere('index.html', m[1], P.essencial.mensal, 'o preço da calculadora');
   for (const m of ix.matchAll(/Math\.ceil\((\d+) \/ val\)/g)) confere('index.html', m[1], P.essencial.mensal, 'a conta da calculadora');
   // JSON-LD (rxsync-sistema DEC-117): só as mensalidades, o anual à vista e a implantação oficiais.
   const precoLd = t => num(t).toFixed(2);
   const oficiaisLd = new Set([...planos.flatMap(k => [precoLd(P[k].mensal), precoLd(P[k].avista)]), precoLd(P.implantacao)]);
   for (const m of ix.matchAll(/"price":\s*"([\d.]+)"/g)) if (!oficiaisLd.has(m[1])) erro(`index.html: o preço ${m[1]} do JSON-LD não é um preço oficial (rxsync-sistema#79)`);
   for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { JSON.parse(m[1]); } catch (e) { erro(`index.html: JSON-LD inválido (${e.message})`); } }
+  // As Dúvidas da página e o FAQPage dos dados estruturados dizem exatamente o mesmo, na mesma ordem: o Google só aceita
+  // no FAQPage o que está visível, e uma pergunta mudada num lugar só deixa os dois diferentes (levantamento de 03/11/2026).
+  {
+    const limpa = h => h.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
+    const naPagina = [...ix.matchAll(/<button[^>]*\sdata-faq(?=[\s>])[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-content"[^>]*><div>([\s\S]*?)<\/div><\/div>/g)].map(m => [limpa(m[1]), limpa(m[2])]);
+    let noLd = [];
+    for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+      try { const d = JSON.parse(m[1]); const f = (d['@graph'] || [d]).find(x => x['@type'] === 'FAQPage'); if (f) noLd = f.mainEntity.map(q => [q.name, q.acceptedAnswer.text]); } catch (e) { /* já acusado acima */ }
+    }
+    if (naPagina.length !== noLd.length) erro(`index.html: as Dúvidas têm ${naPagina.length} perguntas e o FAQPage tem ${noLd.length}; mude os dois juntos`);
+    else naPagina.forEach(([q, r], i) => {
+      if (q !== noLd[i][0]) erro(`index.html: a pergunta ${i + 1} das Dúvidas ("${q}") não é a do FAQPage ("${noLd[i][0]}")`);
+      else if (r !== noLd[i][1]) erro(`index.html: a resposta de "${q}" nas Dúvidas é diferente da do FAQPage; mude as duas juntas`);
+    });
+  }
 }
 // Fontes no próprio site (rxsync-sistema DEC-117): nenhuma página chama o Google Fonts, e todo arquivo citado no
 // assets/fontes/fontes.css existe.
