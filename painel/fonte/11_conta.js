@@ -95,7 +95,10 @@ function assinRender(a) {
       // Cancelar e excluir a conta (DEC-114): o servidor manda um link ao e-mail do dono; vale só quando ele confirma por lá.
       const teste = a.situacao === 'teste';
       blocos.push(el('div', { class: 'perigo-zona' },
-        el('p', { class: 'mudo peq', text: teste ? 'O teste grátis é encerrado na hora e nada é cobrado. Os dados são apagados 15 dias depois.' : a.forma === 'mensal' ? 'Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Os dados são apagados 15 dias depois. Você pode desistir até a data.' : 'Seu plano é anual, com permanência: o pedido vai para a nossa equipe, que fala com você sobre as condições.' }),
+        el('p', { class: 'mudo peq', text: teste ? 'O teste grátis é encerrado na hora e nada é cobrado. Os dados são apagados 15 dias depois.'
+          // Ainda sem ir ao ar, o servidor encerra no dia (rx_conta_exclusao_caso, sem_golive; D-01 do pente fino da camada 3).
+          : CONTA.no_ar === false ? 'A assistente ainda não foi ao ar: o contrato é encerrado no dia em que você confirmar, sem novas cobranças. Os dados são apagados 15 dias depois.'
+          : a.forma === 'mensal' ? 'Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Os dados são apagados 15 dias depois. Você pode desistir até a data.' : 'Seu plano é anual, com permanência: o pedido vai para a nossa equipe, que fala com você sobre as condições.' }),
         el('p', { class: 'mudo peq bloco', text: 'Mandamos um link para o seu e-mail; o pedido só vale quando você confirmar por ele (24 horas). Antes, baixe a agenda e os pacientes em Conta › Baixar meus dados.' }),
         btn('Cancelar e excluir a conta', ev => contaExcluirPedir(ev.currentTarget), 'perigo-sec plena')));
     }

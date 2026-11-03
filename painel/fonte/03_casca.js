@@ -249,13 +249,14 @@ function buscaAbrir() {
     const blocos = [];
     if (telas.length) blocos.push(el('p', { class: 'grupo-tit', text: 'Telas' }), el('div', { class: 'lista' }, telas.map(([n, r]) => linha(n, null, 'seta', () => ir(r)))));
     if (cons.length) blocos.push(el('p', { class: 'grupo-tit', text: 'Consultas' }), el('div', { class: 'lista' }, cons.map(a => linha(a.nome_paciente, fmt(a.inicio), 'agenda', () => { ir('agenda'); setTimeout(() => consultaAbrir(a), 50); }))));
-    const pac = el('div');
-    blocos.push(pac);
-    trocar(res, blocos.length > 1 ? blocos : vazio('Nada encontrado', 'Tente outro nome ou só um pedaço dele.'));
+    // O bloco dos pacientes entra sempre (pente fino da camada 3, I-01): quando a resposta do servidor chega, ele tira o "Nada encontrado".
+    const pac = el('div'), nada = blocos.length ? null : vazio('Nada encontrado', 'Tente outro nome ou só um pedaço dele.');
+    trocar(res, nada, ...blocos, pac);
     if (!sem('pacientes') && q.length >= 2) {
       const s = ++seq; clearTimeout(tm);
       tm = setTimeout(() => p24('paciente_listar', { busca: inp.value.trim(), filtro: 'todos', pagina: 0 }).then(d => {
         if (s !== seq || !d.ok || !(d.pacientes || []).length) return;
+        if (nada) nada.remove();
         trocar(pac, el('p', { class: 'grupo-tit', text: 'Pacientes' }), el('div', { class: 'lista' }, d.pacientes.slice(0, 6).map(p => linha(p.nome, pacTel(p.telefone), 'pacientes', () => ir('pacientes/ficha/' + p.paciente_id)))));
       }).catch(() => {}), 300);
     }

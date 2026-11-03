@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+MY/9TKkYcnKTPsPlnaLToZTRDDGNjXypjEg8EKFkpM=' 'self' https://*.googletagmanager.com; style-src 'sha256-hX6qAetGcqfTtvEfseTEXXj0BkU1SHY9spfLDAqpPQY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gwldi2Zb8bvIuaHg3j/vyCgHcWY6LsJN3NU8VfMi2aY=' 'self' https://*.googletagmanager.com; style-src 'sha256-hX6qAetGcqfTtvEfseTEXXj0BkU1SHY9spfLDAqpPQY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -751,6 +751,8 @@ function addFaq(p = '', r = '') {
   div.querySelector('.faq-p').value = p;
   div.querySelector('.faq-r').value = r;
   div.querySelector('button').onclick = () => { div.remove(); salvarRascunho(); };
+  // A pergunta nova também vai para o rascunho ao sair do campo (pente fino da camada 3, I-10).
+  div.querySelectorAll('.faq-p, .faq-r').forEach(x => x.addEventListener('change', salvarRascunho));
   $('listaFaq').appendChild(div);
   lucide.createIcons();
 }

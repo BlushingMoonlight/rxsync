@@ -92,7 +92,7 @@ TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
   const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
   const fn = telasP[parte] || pInicio;
-  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Marketing'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
+  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
 };
 
@@ -117,7 +117,7 @@ function cartaoMotor(m) {
 }
 
 async function pInicio(c) {
-  topo('Prospecção', [['Marketing'], ['Prospecção']]);
+  topo('Prospecção', [['Vendas'], ['Prospecção']]);
   const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Prospecção')) return;
   est.prosp = r.dados;
   const d = r.dados, res = d.resultados || {}, ch = d.chaves || {}, editar = ligada('editar_prospeccao');
@@ -329,7 +329,9 @@ async function pObjeto(c, tipo, id, pai) {
   if (ins['ia.prompt_texto'] && editar && o) {
     const caixa = ins['ia.prompt_texto'].i;
     caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
-      if (caixa.value.trim() && !confirm('Trocar o que está no campo pelo texto montado pelos campos de "IA de resposta"?')) return;
+      // A janela da Central, nunca a caixa do navegador (pente fino da camada 3, I-07).
+      if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
+        texto: 'O que está no campo "Texto do prompt" vira o texto montado pelos campos de "IA de resposta". Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
       const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
       if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
       caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();

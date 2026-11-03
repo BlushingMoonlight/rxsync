@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hUPMO7H0LEhBmDhLlIN+Lg21TFtOenvDWM+kvOpuo+0=' 'self'; style-src 'sha256-dd3f4XiyFWKx20wGC6MUkOPwebw9nGlYwZilfj0VTqg=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-12EiQ1+rNq09md+yo24jSXDUdbUFtA4BGjtgLxEKUPU=' 'self'; style-src 'sha256-dd3f4XiyFWKx20wGC6MUkOPwebw9nGlYwZilfj0VTqg=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1225,13 +1225,14 @@ function buscaAbrir() {
     const blocos = [];
     if (telas.length) blocos.push(el('p', { class: 'grupo-tit', text: 'Telas' }), el('div', { class: 'lista' }, telas.map(([n, r]) => linha(n, null, 'seta', () => ir(r)))));
     if (cons.length) blocos.push(el('p', { class: 'grupo-tit', text: 'Consultas' }), el('div', { class: 'lista' }, cons.map(a => linha(a.nome_paciente, fmt(a.inicio), 'agenda', () => { ir('agenda'); setTimeout(() => consultaAbrir(a), 50); }))));
-    const pac = el('div');
-    blocos.push(pac);
-    trocar(res, blocos.length > 1 ? blocos : vazio('Nada encontrado', 'Tente outro nome ou só um pedaço dele.'));
+    // O bloco dos pacientes entra sempre (pente fino da camada 3, I-01): quando a resposta do servidor chega, ele tira o "Nada encontrado".
+    const pac = el('div'), nada = blocos.length ? null : vazio('Nada encontrado', 'Tente outro nome ou só um pedaço dele.');
+    trocar(res, nada, ...blocos, pac);
     if (!sem('pacientes') && q.length >= 2) {
       const s = ++seq; clearTimeout(tm);
       tm = setTimeout(() => p24('paciente_listar', { busca: inp.value.trim(), filtro: 'todos', pagina: 0 }).then(d => {
         if (s !== seq || !d.ok || !(d.pacientes || []).length) return;
+        if (nada) nada.remove();
         trocar(pac, el('p', { class: 'grupo-tit', text: 'Pacientes' }), el('div', { class: 'lista' }, d.pacientes.slice(0, 6).map(p => linha(p.nome, pacTel(p.telefone), 'pacientes', () => ir('pacientes/ficha/' + p.paciente_id)))));
       }).catch(() => {}), 300);
     }
@@ -1355,7 +1356,8 @@ async function salvarCampo(k, valor, op) {
   estadoCampo(k, 'Salvando…');
   let r;
   try { r = await c24('salvar', { [k]: valor }); } catch (e) { estadoCampo(k, 'Não foi salvo: sem conexão. Tente de novo.', 'erro'); return false; }
-  if (!r.ok) { estadoCampo(k, 'Não foi salvo. ' + (r.mensagem || 'Confira o campo.'), 'erro'); sincronizarCampo(k); return false; }
+  // Recusado: chaves e escolhas voltam ao valor salvo; o texto digitado fica no campo para a pessoa corrigir (pente fino da camada 3, I-02).
+  if (!r.ok) { estadoCampo(k, 'Não foi salvo. ' + (r.mensagem || 'Confira o campo.'), 'erro'); sincronizarCampo(k, true); return false; }
   VAL[k] = valor; delete sujos[k];
   estadoCampo(k, 'Salvo', 'salvo');
   if (r.mensagem && r.mensagem !== 'Salvo!') rapida(r.mensagem);
@@ -1373,7 +1375,7 @@ async function salvarPendentes() {
   ks.forEach(k => { VAL[k] = dados[k]; delete sujos[k]; estadoCampo(k, 'Salvo', 'salvo'); });
   return true;
 }
-function sincronizarCampo(k) { document.querySelectorAll('[data-campo="' + k + '"]').forEach(x => { if (x._sinc) x._sinc(); }); }
+function sincronizarCampo(k, manterTexto) { document.querySelectorAll('[data-campo="' + k + '"]').forEach(x => { if (x._sinc && !(manterTexto && x._texto)) x._sinc(); }); }
 function dependenciasAplicar() {
   document.querySelectorAll('[data-depende]').forEach(d => {
     const ks = d.getAttribute('data-depende').split(',');
@@ -1458,6 +1460,7 @@ function campoEl(k, op) {
       input = el(area ? 'textarea' : 'input', { class: 'entrada', id: 'campo_' + k, 'data-campo': k, disabled: travado, placeholder: c.ph || null, rows: area ? '3' : null,
         maxlength: LIMITES_CAMPOS[k] ? String(LIMITES_CAMPOS[k]) : null, type: area ? null : (c.tipo === 'tel' ? 'tel' : 'text'),
         inputmode: c.tipo === 'number' ? 'numeric' : c.tipo === 'tel' ? 'tel' : k === 'email' ? 'email' : /link|https/.test(k) ? 'url' : null, autocomplete: k === 'email' ? 'email' : 'off' });
+      input._texto = true;
       input._sinc = () => { input.value = VAL[k] == null ? '' : VAL[k]; if (area) setTimeout(() => cresce(input), 0); contar(k, input, cont); };
       input.addEventListener('input', () => { if (input.value !== (VAL[k] || '')) sujos[k] = input.value; else delete sujos[k]; if (area) cresce(input); contar(k, input, cont); });
       input.addEventListener('blur', () => { if (input.value !== (VAL[k] == null ? '' : VAL[k])) salvarCampo(k, input.value); });
@@ -1845,7 +1848,12 @@ function agRender() {
     const b = ev.currentTarget;
     if (!(await confirmar({ titulo: itens.length === 1 ? 'Excluir a consulta cancelada?' : 'Excluir as ' + itens.length + ' consultas canceladas?', texto: 'Saem de vez da agenda. Não dá para desfazer.', botao: 'Excluir ' + itens.length, perigo: true }))) return;
     b.disabled = true;
-    d24('agenda_excluir_cancelados').then(r => { rapida(pl(r && r.n ? r.n : 0, 'consulta excluída', 'consultas excluídas') + '.'); agCarregar(); }).catch(() => { b.disabled = false; rapida('Não consegui excluir. Tente de novo.'); });
+    // Só as canceladas que a lista mostra, uma a uma (pente fino da camada 3, I-04): o agenda_excluir_cancelados apagava
+    // todas as da clínica, também as de outro médico (com o filtro) e as que a lista não mostra.
+    let n = 0, falhou = false;
+    for (const a of itens) { try { const r = await d24('agenda_excluir', { id: a.id }); if (r && r.ok) n++; } catch (e) { falhou = true; } }
+    rapida(pl(n, 'consulta excluída', 'consultas excluídas') + '.' + (falhou ? ' Algumas não saíram: tente de novo.' : ''));
+    agCarregar();
   }, 'perigo-sec plena')));
   trocar(lista, topo, itens.length ? el('div', { class: 'lista' }, itens.map(a => consultaLinha(a))) : el('div', { class: 'cartao' }, vazio(null, AG.filtro === 'novos' ? 'Nenhuma consulta nova para ver.' : 'Nada por aqui.')));
 }
@@ -3720,7 +3728,10 @@ function assinRender(a) {
       // Cancelar e excluir a conta (DEC-114): o servidor manda um link ao e-mail do dono; vale só quando ele confirma por lá.
       const teste = a.situacao === 'teste';
       blocos.push(el('div', { class: 'perigo-zona' },
-        el('p', { class: 'mudo peq', text: teste ? 'O teste grátis é encerrado na hora e nada é cobrado. Os dados são apagados 15 dias depois.' : a.forma === 'mensal' ? 'Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Os dados são apagados 15 dias depois. Você pode desistir até a data.' : 'Seu plano é anual, com permanência: o pedido vai para a nossa equipe, que fala com você sobre as condições.' }),
+        el('p', { class: 'mudo peq', text: teste ? 'O teste grátis é encerrado na hora e nada é cobrado. Os dados são apagados 15 dias depois.'
+          // Ainda sem ir ao ar, o servidor encerra no dia (rx_conta_exclusao_caso, sem_golive; D-01 do pente fino da camada 3).
+          : CONTA.no_ar === false ? 'A assistente ainda não foi ao ar: o contrato é encerrado no dia em que você confirmar, sem novas cobranças. Os dados são apagados 15 dias depois.'
+          : a.forma === 'mensal' ? 'Pelo contrato, o aviso é de 30 dias: a assistente funciona até lá e depois é desligada, sem novas cobranças. Os dados são apagados 15 dias depois. Você pode desistir até a data.' : 'Seu plano é anual, com permanência: o pedido vai para a nossa equipe, que fala com você sobre as condições.' }),
         el('p', { class: 'mudo peq bloco', text: 'Mandamos um link para o seu e-mail; o pedido só vale quando você confirmar por ele (24 horas). Antes, baixe a agenda e os pacientes em Conta › Baixar meus dados.' }),
         btn('Cancelar e excluir a conta', ev => contaExcluirPedir(ev.currentTarget), 'perigo-sec plena')));
     }
@@ -3975,7 +3986,12 @@ function chatEnviar() {
     }
     if (!mudou || areas.includes('grade')) gradeCarregar();
     if (TELAS.resultados && TELAS.resultados.sec && !TELAS.resultados.sec.hidden) resultadosCarregar();
-  }).catch(() => { espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.'); })
+  }).catch(() => {
+    // Sem conexão: a mensagem volta para o campo e sai do histórico (pente fino da camada 3, I-05).
+    espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.');
+    if (CHAT.hist[CHAT.hist.length - 1] && CHAT.hist[CHAT.hist.length - 1].texto === txt) CHAT.hist.pop();
+    if (!caixa.value.trim()) { caixa.value = txt; cresce(caixa); }
+  })
     .then(() => { CHAT.ocupado = false; $('chatEnviar').disabled = false; caixa.focus(); });
 }
 

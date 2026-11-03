@@ -49,7 +49,9 @@
   // Tema: segue o aparelho; a troca manual vale só nesta aba (sessionStorage).
   const temaGuardado = ler('sessionStorage', 'demo_tema');
   if (temaGuardado === 'claro' || temaGuardado === 'escuro') document.documentElement.dataset.tema = temaGuardado;
-  const escuro = () => document.documentElement.dataset.tema === 'escuro' || (document.documentElement.dataset.tema !== 'claro' && matchMedia('(prefers-color-scheme: dark)').matches);
+  // O tema de verdade da página (pente fino da camada 3, I-12): o app do paciente segue o aparelho, mas a entrada, a central,
+  // o escopo e o manual (comum/ancora.css) ficam claros com o aparelho escuro; só a escolha da pessoa os escurece.
+  const escuro = () => document.documentElement.dataset.tema === 'escuro' || (document.documentElement.dataset.tema !== 'claro' && /dark/.test(getComputedStyle(document.documentElement).colorScheme || '') && !/only light/.test(getComputedStyle(document.documentElement).colorScheme || ''));
   function trocarTema() {
     const novo = escuro() ? 'claro' : 'escuro';
     transicao(() => { document.documentElement.dataset.tema = novo; document.querySelectorAll('.botao-tema').forEach(desenharBotaoTema); });

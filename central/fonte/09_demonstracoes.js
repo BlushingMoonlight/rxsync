@@ -34,7 +34,7 @@ async function copiar(texto, ok) {
 }
 
 TELAS.demonstracoes = async (c, [parte, a, b]) => {
-  if (!ligada('tela_demonstracoes')) { topo('Demonstrações', [['Marketing'], ['Demonstrações']]); falhou(c, { desligada: true, chave: 'tela_demonstracoes' }, 'Demonstrações'); return; }
+  if (!ligada('tela_demonstracoes')) { topo('Demonstrações', [['Vendas'], ['Demonstrações']]); falhou(c, { desligada: true, chave: 'tela_demonstracoes' }, 'Demonstrações'); return; }
   if (parte === 'novo') return dForm(c, null);
   if (parte === 'link' && b === 'editar') return dEditar(c, a);
   if (parte === 'link') return dLink(c, a);
@@ -52,7 +52,7 @@ function avisoLinksDesligados() {
 
 // ---------- lista
 async function dLista(c) {
-  topo('Demonstrações', [['Marketing'], ['Demonstrações']]);
+  topo('Demonstrações', [['Vendas'], ['Demonstrações']]);
   est.demFiltro = est.demFiltro || { filtro: 'todos', busca: '', pagina: 1 };
   const f = est.demFiltro;
   const r = await chamar('dem_lista', { filtro: f.filtro, busca: f.busca, pagina: f.pagina }); if (falhou(c, r, 'Demonstrações')) return;

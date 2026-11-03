@@ -94,7 +94,7 @@
         cartao('Metas e plano alimentar', 43, el('p', { class: 'mudo peq', text: 'A equipe define. O paciente vê no app, na tela Hoje, com quem definiu e quando.' }),
           el('label', { class: 'campo', for: 'metas-paciente' }, el('span', { text: 'Paciente' }), pac),
           el('div', { class: 'form-2' }, kcal[0], prot[0], agua[0]),
-          el('label', { class: 'campo', for: 'm-plano' }, el('span', { text: 'Plano alimentar' }), el('textarea', { class: 'entrada', id: 'm-plano', rows: '4' }, 'Café: ovos mexidos, pão integral e fruta.\nAlmoço: arroz, feijão, frango e salada.')),
+          // Sem o campo "Plano alimentar": o "Enviar ao app" só manda as metas (D-04 do pente fino da camada 3).
           r, el('button', { type: 'button', class: 'botao', onclick: () => {
             if (!salvarMetas(p, kcal[1].value, prot[1].value, agua[1].value, r)) return;
             ok(r, 'Enviado ao app de ' + p.nome + '. As metas novas já aparecem na tela Hoje.'); DEMO.confirmar('Metas enviadas');

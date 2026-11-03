@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9S1iy6urNFtzm/F7/KUI2C6L8TQVS/2HSkCzc0yO1Hg='; style-src 'sha256-bW6ujR3VTZxPW32DR6Gc0KqvrTOuCI39Ajst0UjkkzI=' 'self'; font-src 'self'; img-src 'self'; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-97QkPqouyFwFmmo/ykwU8OoHLEXCllzXqtHHKcVNMZc='; style-src 'sha256-bW6ujR3VTZxPW32DR6Gc0KqvrTOuCI39Ajst0UjkkzI=' 'self'; font-src 'self'; img-src 'self'; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
 <meta name="theme-color" content="#FFFFFF">
@@ -98,9 +98,10 @@
     el("pedido").hidden = false;
   });
   el("confirmar").addEventListener("click", function () {
-    var b = el("confirmar"); b.disabled = true;
+    var b = el("confirmar"); b.disabled = true; el("erro").hidden = true;
     chamar("conta_exclusao_confirmar").then(function (r) {
-      if (!r || !r.ok) { b.disabled = false; erro((r && r.mensagem) || "Não consegui confirmar agora. Tente de novo."); return; }
+      // Recusado: a mensagem aparece e o pedido e o botão ficam, para tentar de novo (o link já saiu do endereço).
+      if (!r || !r.ok) { b.disabled = false; el("erro").textContent = (r && r.mensagem) || "Não consegui confirmar agora. Tente de novo."; el("erro").hidden = false; return; }
       el("pedido").hidden = true; el("titulo").textContent = "Pedido confirmado";
       el("feito").textContent = r.mensagem || "Pronto.";
       el("feito").hidden = false;

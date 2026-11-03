@@ -116,7 +116,8 @@ function conferirP12(nome, css, pagina) {
         'teste_estender', 'link_painel_novo', 'chave_api_revogar', 'cobranca_teste_definir', 'prosp_encerrar', 'prosp_numero_apagar',
         'dem_apagar'] };
     // proposta_confirmar (IA da Central, sql/061, DEC-145): o nível é o da ação proposta, que o servidor manda com a proposta.
-    const conhecidas = new Set([...Object.values(NIVEIS).flat(), 'proposta_confirmar']);
+    // pagina_confirmar: só a confirmação na tela, nada vai ao servidor (o "Começar do texto atual" da prospecção).
+    const conhecidas = new Set([...Object.values(NIVEIS).flat(), 'proposta_confirmar', 'pagina_confirmar']);
     // O assistente espera as 4 rodadas do 06 (até 60 segundos cada) com folga, e só então diz que não respondeu.
     const espera = Number((s.match(/const ESPERA_ASSISTENTE = (\d+);/) || [])[1]);
     if (!(espera >= 240000 && espera <= 300000)) erro(`${arq}: ESPERA_ASSISTENTE precisa ficar entre 4 e 5 minutos (o 06 faz até 4 rodadas de 60 segundos)`);
@@ -501,6 +502,23 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   for (const d of ['painel/fonte', 'central/fonte']) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js')))
     if (/type:\s*['"](pie|doughnut|polarArea)['"]/.test(fs.readFileSync(path.join(d, f), 'utf8'))) erro(`${d}/${f}: gráfico de pizza ou rosca; use barra ou linha (método de produto, regra 23)`);
 }
+// O mesmo atributo duas vezes na mesma tag: o navegador usa só o primeiro e ignora o resto (o destaque some calado).
+for (const f of todos.filter(f => /\.html$/.test(f) && !/^demo\/drandrepontes\//.test(f))) {
+  const h = fs.readFileSync(f, 'utf8').replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ');
+  for (const t of h.matchAll(/<[a-z][a-z0-9-]*\s([^<>]*)>/gi)) {
+    const nomes = [...t[1].matchAll(/(?:^|\s)([a-z][a-z0-9:-]*)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+)/gi)].map(m => m[1].toLowerCase());
+    const rep = nomes.find((n, i) => nomes.indexOf(n) !== i);
+    if (rep) { erro(`${f}: o atributo ${rep} aparece duas vezes na mesma tag (${t[0].slice(0, 80)}); o navegador ignora o segundo`); break; }
+  }
+}
+// Confirmação pelos níveis de 0 a 3, nunca a caixa do navegador (método de produto, regra de confirmação): sem confirm(),
+// alert() nem prompt() no painel, na Central e na demonstração (a do Dr. André, que não muda, fica de fora; DEC-153).
+for (const d of ['painel/fonte', 'central/fonte', 'demo/clinica/comum', 'demo/clinica/app', 'demo/clinica/central', 'demo/clinica/escopo', 'demo/clinica/manual', 'demo/clinica'])
+  if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js'))) {
+    const s = fs.readFileSync(path.join(d, f), 'utf8').replace(/\/\/.*$/gm, ' ');
+    const m = s.match(/(?<![\w.$])(?:window\.)?(confirm|alert|prompt)\(/);
+    if (m) erro(`${d}/${f}: usa ${m[1]}() do navegador; confirme pela janela da tela (níveis 0 a 3, método de produto)`);
+  }
 // O site é público: nenhum número de achado de auditoria no código, nos comentários ou nos testes (os detalhes ficam no
 // repositório privado).
 for (const f of [...todos.filter(f => /\.(html|css|js|mjs|md|xml|txt)$/.test(f)), ...fs.readdirSync('scripts').map(f => path.join('scripts', f))]) {

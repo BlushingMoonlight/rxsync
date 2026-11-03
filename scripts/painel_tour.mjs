@@ -1,7 +1,8 @@
 // Painel (rxsync-sistema #225, item 23; DEC-178): o tour guiado, com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. na primeira vez em Hoje, o cartão do tour aparece (sem bloquear a tela) e aponta a área de cada passo;
 //      "Continuar" passa para o próximo; "Ver depois" fecha e grava "depois";
-//   2. na Agenda, aparece o tour da Agenda; as telas de cada tarefa (lembretes, equipe, o que ela sabe) têm a parada delas;
+//   2. na Agenda, aparece o tour da Agenda; as telas de cada tarefa (lembretes, equipe, o que ela sabe) têm a parada delas,
+//      e o nome de botão que a parada cita existe na tela;
 //      "Pular" grava que a pessoa não quer mais ("*": "pulado");
 //   3. Conta › "Rever o tour" recomeça (tour_marcar "*" "rever") e o tour de Hoje aparece de novo;
 //   4. sem o estado do tour vindo do servidor (servidor antigo), nada aparece.
@@ -48,6 +49,23 @@ for (const [rota, texto] of [['assistente/automaticas', 'Ligue os lembretes'], [
   await page.locator('.tour-cartao').waitFor();
   ok((await page.locator('.tour-cartao').textContent()).includes(texto), rota + ': a parada da tarefa (' + texto + ')');
   await page.locator('.tour-cartao').getByRole('button', { name: 'Entendi' }).click();
+}
+// Pente fino da camada 3 (I-06): o nome de botão que a parada cita entre aspas existe como botão naquela tela.
+await page.goto(site.base + '/painel/#conta/whatsapp'); await page.waitForTimeout(300);
+await page.locator('.tour-cartao').waitFor();
+{
+  const nomes = [...(await page.locator('.tour-cartao').textContent()).matchAll(/"([^"]+)"/g)].map(m => m[1]);
+  const faltam = [];
+  for (const n of nomes) if (!(await page.locator('#app').getByRole('button', { name: n, exact: true }).count())) faltam.push(n);
+  ok(nomes.length && !faltam.length, 'conta/whatsapp: a parada cita um botão que existe na tela' + (faltam.length ? ' (não existe: "' + faltam.join('", "') + '")' : ''));
+}
+await page.locator('.tour-cartao').getByRole('button', { name: 'Entendi' }).click();
+// Hoje, "Precisa de você": a parada diz o nome do botão de cada chamado ("Resolvido", em painel/fonte/06_hoje.js).
+{
+  const fs = await import('node:fs');
+  const tour = fs.readFileSync('painel/tour.js', 'utf8'), hoje = fs.readFileSync('painel/fonte/06_hoje.js', 'utf8');
+  const parada = (tour.match(/\['#hojeAtencao', '([^']+)'\]/) || [])[1] || '';
+  ok(/btn\('Resolvido'/.test(hoje) && parada.includes('"Resolvido"'), 'Hoje: a parada de "Precisa de você" cita o botão "Resolvido"');
 }
 await page.goto(site.base + '/painel/#agenda/horarios/grade'); await page.waitForTimeout(300);
 await page.locator('.tour-cartao').waitFor();
