@@ -1,6 +1,7 @@
 // Página conta-excluir.html (rxsync-sistema DEC-114), com o n8n SIMULADO aqui (nada sai para a internet):
 //   1. abrir com o link mostra o que vai acontecer e NÃO confirma (só conta_exclusao_ver); o link sai do endereço;
-//   2. "Confirmar o cancelamento" manda conta_exclusao_confirmar com o mesmo link e mostra o resultado;
+//   2. "Confirmar o cancelamento" manda conta_exclusao_confirmar com o mesmo link e mostra o resultado; recusado, o botão
+//      continua para tentar de novo;
 //   3. link usado (ok: false) mostra a mensagem do servidor; link incompleto nem chama o servidor;
 //   4. nada de fora além do n8n, nada guardado no navegador;
 //   5. a regra de segurança (CSP) está ligada, bloqueia de verdade e não bloqueia nada do uso normal.
@@ -10,7 +11,7 @@ import { bloqueios, regraDa, provarBloqueio } from './csp_teste.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const LINK = 'ab'.repeat(32); const chamadas = []; const fora = [];
-const estado = { usado: false };
+const estado = { usado: false, falhaConfirmar: false };
 const site = await servirSite(); const browser = await abrirNavegador();
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
 await ctx.addInitScript(() => { window.__bloqueios = []; document.addEventListener('securitypolicyviolation', e => window.__bloqueios.push(e.violatedDirective + ' ' + (e.blockedURI || 'inline'))); });
@@ -22,6 +23,7 @@ await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => {
   const b = JSON.parse(q.postData() || '{}'); chamadas.push(b);
   let resp;
   if (estado.usado) resp = { ok: false, usado: true, mensagem: 'Este link já foi usado.' };
+  else if (b.acao === 'conta_exclusao_confirmar' && estado.falhaConfirmar) resp = { ok: false, mensagem: 'Não consegui confirmar agora. Tente de novo.' };
   else if (b.acao === 'conta_exclusao_ver') resp = { ok: true, clinica: 'Clínica Painel A', caso: 'mensal', texto: 'Aviso de 30 dias (cláusula 18.1).', fim: '19/11/2026', apagar: '04/12/2026', vale_ate: '21/10/2026 às 10:57' };
   else resp = { ok: true, caso: 'mensal', resultado: 'cancelar_em', mensagem: 'Cancelamento agendado para 19/11/2026. Enviamos a confirmação por e-mail.' };
   return r.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(resp) });
@@ -33,9 +35,17 @@ await p.getByText('Aviso de 30 dias').waitFor();
 ok(chamadas.length === 1 && chamadas[0].acao === 'conta_exclusao_ver' && chamadas[0].dados.link === LINK, 'abrir: só conta_exclusao_ver, com o link');
 ok(!p.url().includes(LINK), 'o link sai do endereço');
 ok(await p.getByText('19/11/2026').isVisible() && await p.getByText('04/12/2026').isVisible(), 'mostra o fim do contrato e quando os dados são apagados');
+// O servidor recusa na primeira vez: a mensagem aparece e o botão continua, para tentar de novo (pente fino da camada 3, I-11;
+// antes, o pedido e o botão sumiam e o link já tinha saído do endereço).
+estado.falhaConfirmar = true;
+await p.getByRole('button', { name: 'Confirmar o cancelamento' }).click();
+await p.getByText('Não consegui confirmar agora. Tente de novo.').waitFor();
+ok(await p.getByRole('button', { name: 'Confirmar o cancelamento' }).isVisible() && await p.getByRole('button', { name: 'Confirmar o cancelamento' }).isEnabled(), 'confirmar recusado: a mensagem aparece e o botão continua para tentar de novo');
+estado.falhaConfirmar = false;
 await p.getByRole('button', { name: 'Confirmar o cancelamento' }).click();
 await p.getByText('Cancelamento agendado para 19/11/2026').waitFor();
-ok(chamadas.length === 2 && chamadas[1].acao === 'conta_exclusao_confirmar' && chamadas[1].dados.link === LINK, 'confirmar: conta_exclusao_confirmar com o mesmo link');
+const conf = chamadas.filter(c => c.acao === 'conta_exclusao_confirmar');
+ok(conf.length === 2 && conf.every(c => c.dados.link === LINK) && chamadas[0].acao === 'conta_exclusao_ver', 'confirmar: conta_exclusao_confirmar com o mesmo link (também na segunda tentativa)');
 comBloqueio.push(...await bloqueios(p));
 ok(/default-src 'none'/.test(await regraDa(p)) && await provarBloqueio(p), 'a regra de segurança está na página e bloqueia de verdade (um script escrito depois não roda)');
 ok(await p.evaluate(() => localStorage.length + sessionStorage.length + document.cookie.length) === 0, 'nada guardado no navegador');
