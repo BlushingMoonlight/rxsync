@@ -122,7 +122,7 @@ TELAS.uso = async c => {
 // a busca, marcar como lidos e apagar. Agrupados por dia, 50 de cada vez (auditoria de 01/11/2026, FD-24); o "Mandar alerta
 // de teste" fica em Mais › Segurança, junto das notificações (FD-23).
 TELAS.avisos = async (c, [cat]) => {
-  topo('Avisos', [['Análise'], ['Avisos']]);
+  topo('Avisos', [['Operação'], ['Avisos']]);
   cat = CATEGORIAS.includes(cat) ? cat : '';
   est.avisos = est.avisos || { nao_lidos: false, busca: '', ver: 50 };   // o filtro vale nesta aba, só na memória
   const filtro = { categoria: cat, nao_lidos: est.avisos.nao_lidos, busca: est.avisos.busca };

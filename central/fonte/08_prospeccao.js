@@ -92,7 +92,7 @@ TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
   const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
   const fn = telasP[parte] || pInicio;
-  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Marketing'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
+  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
 };
 
@@ -117,7 +117,7 @@ function cartaoMotor(m) {
 }
 
 async function pInicio(c) {
-  topo('Prospecção', [['Marketing'], ['Prospecção']]);
+  topo('Prospecção', [['Vendas'], ['Prospecção']]);
   const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Prospecção')) return;
   est.prosp = r.dados;
   const d = r.dados, res = d.resultados || {}, ch = d.chaves || {}, editar = ligada('editar_prospeccao');

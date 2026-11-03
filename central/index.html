@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+pbvBI5ZBcR1sBD+wDnXWRALhBXI0v4VT2gr6bzFpIw='; style-src 'sha256-ub6XCu+5L89EYLvNr/5CpA2nL+8qsGrp+unOb9cqoIQ='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-eA+nat3v1ZKGRUSv5V8sehEnjb803cSwtQq1lI/jdEc='; style-src 'sha256-ub6XCu+5L89EYLvNr/5CpA2nL+8qsGrp+unOb9cqoIQ='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -1716,7 +1716,7 @@ TELAS.uso = async c => {
 // a busca, marcar como lidos e apagar. Agrupados por dia, 50 de cada vez (auditoria de 01/11/2026, FD-24); o "Mandar alerta
 // de teste" fica em Mais › Segurança, junto das notificações (FD-23).
 TELAS.avisos = async (c, [cat]) => {
-  topo('Avisos', [['Análise'], ['Avisos']]);
+  topo('Avisos', [['Operação'], ['Avisos']]);
   cat = CATEGORIAS.includes(cat) ? cat : '';
   est.avisos = est.avisos || { nao_lidos: false, busca: '', ver: 50 };   // o filtro vale nesta aba, só na memória
   const filtro = { categoria: cat, nao_lidos: est.avisos.nao_lidos, busca: est.avisos.busca };
@@ -1787,7 +1787,7 @@ const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p
 
 TELAS.seguranca = async (c, [aba]) => {
   const registro = aba === 'registro';
-  topo('Segurança', [['Administração'], ['Segurança', registro ? 'seguranca' : null], registro ? ['Registro'] : null].filter(Boolean));
+  topo('Segurança', [['Sistema'], ['Segurança', registro ? 'seguranca' : null], registro ? ['Registro'] : null].filter(Boolean));
   const abas = el('div', { class: 'filtros', role: 'tablist', 'aria-label': 'Segurança' }, el('button', { type: 'button', role: 'tab', 'aria-selected': String(!registro), 'aria-pressed': String(!registro), onclick: () => ir('seguranca') }, 'Aparelhos'),
     el('button', { type: 'button', role: 'tab', 'aria-selected': String(registro), 'aria-pressed': String(registro), onclick: () => ir('seguranca/registro') }, 'Registro'));
   if (registro) {
@@ -1823,7 +1823,7 @@ TELAS.seguranca = async (c, [aba]) => {
 };
 
 TELAS.api = async c => {
-  topo('API (Enterprise)', [['Administração'], ['API (Enterprise)']]);
+  topo('API (Enterprise)', [['Sistema'], ['API (Enterprise)']]);
   const r = await chamar('chaves_api'); if (falhou(c, r, 'API (Enterprise)')) return;
   const d = r.dados, editar = ligada('editar_chaves_api');
   const lista = d.chaves.length ? el('ul', { class: 'lista' }, d.chaves.map(k => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
@@ -1893,7 +1893,7 @@ async function mudarChave(chave, valor, desfazendo, pedido) {
   rapida(nome + (r.depois === 'SIM' ? ' ligada.' : ' desligada.') + ' Aviso em Avisos.', desfazendo || SEM_DESFAZER.includes(chave) ? null : () => mudarChave(chave, r.antes, true).then(() => rotear()));
 }
 TELAS.ajustes = async c => {
-  topo('Ajustes da Central', [['Administração'], ['Ajustes da Central']]);
+  topo('Ajustes da Central', [['Sistema'], ['Ajustes da Central']]);
   const r = await carregarConfig(); if (falhou(c, r, 'Ajustes da Central')) return;
   const todas = est.listaChaves;
   const usadas = new Set();
@@ -2045,7 +2045,7 @@ TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
   const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
   const fn = telasP[parte] || pInicio;
-  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Marketing'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
+  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
 };
 
@@ -2070,7 +2070,7 @@ function cartaoMotor(m) {
 }
 
 async function pInicio(c) {
-  topo('Prospecção', [['Marketing'], ['Prospecção']]);
+  topo('Prospecção', [['Vendas'], ['Prospecção']]);
   const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Prospecção')) return;
   est.prosp = r.dados;
   const d = r.dados, res = d.resultados || {}, ch = d.chaves || {}, editar = ligada('editar_prospeccao');
@@ -2948,7 +2948,7 @@ async function copiar(texto, ok) {
 }
 
 TELAS.demonstracoes = async (c, [parte, a, b]) => {
-  if (!ligada('tela_demonstracoes')) { topo('Demonstrações', [['Marketing'], ['Demonstrações']]); falhou(c, { desligada: true, chave: 'tela_demonstracoes' }, 'Demonstrações'); return; }
+  if (!ligada('tela_demonstracoes')) { topo('Demonstrações', [['Vendas'], ['Demonstrações']]); falhou(c, { desligada: true, chave: 'tela_demonstracoes' }, 'Demonstrações'); return; }
   if (parte === 'novo') return dForm(c, null);
   if (parte === 'link' && b === 'editar') return dEditar(c, a);
   if (parte === 'link') return dLink(c, a);
@@ -2966,7 +2966,7 @@ function avisoLinksDesligados() {
 
 // ---------- lista
 async function dLista(c) {
-  topo('Demonstrações', [['Marketing'], ['Demonstrações']]);
+  topo('Demonstrações', [['Vendas'], ['Demonstrações']]);
   est.demFiltro = est.demFiltro || { filtro: 'todos', busca: '', pagina: 1 };
   const f = est.demFiltro;
   const r = await chamar('dem_lista', { filtro: f.filtro, busca: f.busca, pagina: f.pagina }); if (falhou(c, r, 'Demonstrações')) return;

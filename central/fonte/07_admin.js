@@ -19,7 +19,7 @@ const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p
 
 TELAS.seguranca = async (c, [aba]) => {
   const registro = aba === 'registro';
-  topo('Segurança', [['Administração'], ['Segurança', registro ? 'seguranca' : null], registro ? ['Registro'] : null].filter(Boolean));
+  topo('Segurança', [['Sistema'], ['Segurança', registro ? 'seguranca' : null], registro ? ['Registro'] : null].filter(Boolean));
   const abas = el('div', { class: 'filtros', role: 'tablist', 'aria-label': 'Segurança' }, el('button', { type: 'button', role: 'tab', 'aria-selected': String(!registro), 'aria-pressed': String(!registro), onclick: () => ir('seguranca') }, 'Aparelhos'),
     el('button', { type: 'button', role: 'tab', 'aria-selected': String(registro), 'aria-pressed': String(registro), onclick: () => ir('seguranca/registro') }, 'Registro'));
   if (registro) {
@@ -55,7 +55,7 @@ TELAS.seguranca = async (c, [aba]) => {
 };
 
 TELAS.api = async c => {
-  topo('API (Enterprise)', [['Administração'], ['API (Enterprise)']]);
+  topo('API (Enterprise)', [['Sistema'], ['API (Enterprise)']]);
   const r = await chamar('chaves_api'); if (falhou(c, r, 'API (Enterprise)')) return;
   const d = r.dados, editar = ligada('editar_chaves_api');
   const lista = d.chaves.length ? el('ul', { class: 'lista' }, d.chaves.map(k => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' },
@@ -125,7 +125,7 @@ async function mudarChave(chave, valor, desfazendo, pedido) {
   rapida(nome + (r.depois === 'SIM' ? ' ligada.' : ' desligada.') + ' Aviso em Avisos.', desfazendo || SEM_DESFAZER.includes(chave) ? null : () => mudarChave(chave, r.antes, true).then(() => rotear()));
 }
 TELAS.ajustes = async c => {
-  topo('Ajustes da Central', [['Administração'], ['Ajustes da Central']]);
+  topo('Ajustes da Central', [['Sistema'], ['Ajustes da Central']]);
   const r = await carregarConfig(); if (falhou(c, r, 'Ajustes da Central')) return;
   const todas = est.listaChaves;
   const usadas = new Set();
