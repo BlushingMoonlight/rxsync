@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rYCU8ir3twr2JpQrnvghh2RydVZo0kgUoy/G5YMfRPo=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QfRFBEIogHpH1BwH9GhBKBvJg3s/Y9W3c9xfqwUvoeY=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
     <meta name="theme-color" content="#FFFFFF">
@@ -494,6 +494,8 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .rec-grupo { font-size: 14px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 16px; }
 .rec-grupo + .recursos { margin-top: 0; }
 .recursos + .rec-grupo { margin-top: 40px; }
+.rec-nota { margin: -8px 0 16px; font-size: 15.5px; color: var(--ink-2); }
+#calculadora .numeros { margin-bottom: 24px; }
 .sec-escura .lead a { color: #6ee7b7; }
 .implant { max-width: 760px; margin: 28px auto 0; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 24px; }
 .implant h3 { font-size: 17px; letter-spacing: -0.01em; }
@@ -772,31 +774,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Preciso trocar de sistema?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Dá para exportar para Google Agenda, Outlook e iPhone e importar a agenda atual por planilha."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Ela respeita tempos de consulta diferentes?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Sim. Você define a duração padrão, o intervalo entre consultas e a antecedência mínima. No Gestão Inteligente, com a agenda por profissional, cada tipo de consulta tem a sua duração."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Ela envia lembrete de consulta?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Sim, nos horários que você escolher: 48 horas antes, na véspera, na manhã do dia ou 3, 2 ou 1 hora antes. O paciente confirma ou cancela respondendo, e o horário cancelado volta a ficar livre. No Gestão Inteligente, a vaga vai para quem está na lista de espera."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Consigo trazer os pacientes do sistema que uso hoje?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No Gestão Inteligente, sim: o painel, em Pacientes, importa a planilha que o seu sistema exporta, mostra uma prévia, não duplica ninguém e permite desfazer em até 7 dias. Paciente importado só recebe mensagem automática depois de escrever para a clínica."
+            "text": "Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Se a sua agenda online tem integração com a RXSync, ela se conecta a ela. Se não tem, ela pode enviar ao paciente o link de agendamento do seu sistema."
           }
         },
         {
@@ -817,14 +795,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         },
         {
           "@type": "Question",
-          "name": "Como faço ajustes depois que ela estiver no ar?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Você mesmo ajusta pelo painel, que salva cada mudança na hora. Com a nossa equipe, você tem uma rodada de ajustes no 1º mês; depois, os ajustes são pelo painel. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "Serve para dentista, psicólogo, fisioterapeuta ou estética?",
           "acceptedAnswer": {
             "@type": "Answer",
@@ -833,26 +803,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         },
         {
           "@type": "Question",
-          "name": "Divido o consultório com outros profissionais. Ela pode atender só o meu número?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Pode. Ela atende só o número conectado, e você pode listar números que ela não deve responder."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "O que é a Implantação completa?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "É um serviço opcional, de R$ 999, uma vez só, nos planos mensal e anual: fazemos as perguntas, configuramos a assistente com você até ficar do seu jeito, conectamos o WhatsApp da clínica, deixamos o painel pronto para você criar a sua senha e damos 1 ano de suporte no WhatsApp para mudanças na configuração da assistente. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar, junto com a primeira mensalidade."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "O que acontece no fim dos 7 dias?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Nada é cobrado sozinho. Avisamos antes por e-mail. Para continuar, você paga a primeira mensalidade (e a Implantação completa, se você a contratou). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados."
+            "text": "Durante o teste, você usa tudo do Gestão Inteligente. No fim, nada é cobrado sozinho: avisamos antes por e-mail, inclusive o que o plano que você escolheu não inclui. Para continuar, você paga a primeira mensalidade (e a Implantação completa, se você a contratou). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados."
           }
         },
         {
@@ -860,7 +814,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Como cancelo?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No anual, o contrato é de 12 meses; se sair antes, paga a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou."
+            "text": "No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No mensal, se a assistente ainda não entrou no ar, o contrato termina no dia em que você confirma. No anual, o contrato é de 12 meses; se sair antes, paga a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou."
           }
         },
         {
@@ -873,34 +827,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         },
         {
           "@type": "Question",
-          "name": "Posso começar no Essencial e mudar depois?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Sim, pelo painel."
-          }
-        },
-        {
-          "@type": "Question",
           "name": "Posso perder o meu número?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, em horário comercial. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Quem é o dono dos dados dos pacientes?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "A sua clínica. Pela LGPD, a clínica é a controladora e a RXSync, a operadora: usamos os dados só para prestar o serviço."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Por onde os dados passam?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Para responder, o trecho necessário da conversa vai ao provedor do modelo de IA, no exterior, como está descrito nos Termos e na Política de Privacidade."
+            "text": "Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, entre 8h e 20h, no fuso da clínica. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho."
           }
         },
         {
@@ -964,7 +894,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <div>
       <span class="selo">Assistente virtual para clínicas e consultórios</span>
       <h1 id="titulo-hero">Sua clínica responde e marca consultas no WhatsApp, <em>mesmo quando a recepção está ocupada.</em></h1>
-      <p class="lead">A assistente da RXSync responde valores, convênios e horários, marca a consulta e manda os lembretes, de dia, de noite e no fim de semana. Quando o paciente pede uma pessoa, ela passa a conversa para a sua equipe.</p>
+      <p class="lead">A assistente da RXSync responde valores, convênios e horários e marca a consulta a qualquer hora, também à noite e no fim de semana. Ela manda os lembretes e passa para a sua equipe quem pede uma pessoa.</p>
       <div class="hero-ctas">
         <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="gestao" data-origem="hero">Testar 7 dias grátis, sem cartão <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
         <a href="#teste-ao-vivo" class="link-demo" data-cta="hero_testar_assistente">Ou converse com a assistente agora <svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></a>
@@ -1005,10 +935,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 <!-- ===================== FATOS ===================== -->
 <div class="fatos" aria-label="Em resumo">
   <ul class="wrap">
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Responde 24 horas, também no fim de semana</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Passa para a equipe quando o paciente pede uma pessoa</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>LGPD: os dados são da sua clínica</li>
-    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>Só o administrativo: não orienta tratamento</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Responde 24 horas, todos os dias</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Passa para a equipe quem pede uma pessoa</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>Os dados são da sua clínica (LGPD)</li>
+    <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>Só o administrativo, nada clínico</li>
   </ul>
 </div>
 
@@ -1106,14 +1036,15 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
   </div>
 </section>
 
-<!-- ===================== PROBLEMA ===================== -->
-<section class="sec" id="problema" aria-labelledby="titulo-problema">
+<!-- ===================== CALCULADORA ===================== -->
+<section class="sec sec-alt" id="calculadora" aria-labelledby="titulo-calc">
+  <span id="problema" class="ancora"></span>
   <span id="dores" class="ancora"></span>
   <div class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">O problema</span>
-      <h2 class="h2" id="titulo-problema">Mensagem sem resposta é paciente que marca em outro lugar.</h2>
-      <p class="lead">A recepção atende o balcão e o telefone, e o WhatsApp acumula. Quando a resposta chega, o paciente já marcou com outra clínica.</p>
+      <span class="eyebrow">Faça a conta</span>
+      <h2 class="h2" id="titulo-calc">Quanto custa deixar mensagem sem resposta?</h2>
+      <p class="lead">A recepção atende o balcão e o telefone, e o WhatsApp acumula. Quando a resposta chega, o paciente já marcou em outro lugar. Mexa nos números com a realidade da sua clínica.</p>
     </div>
     <div class="numeros">
       <article class="numero">
@@ -1129,17 +1060,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <p class="fonte">Fonte: <a href="https://bmjopen.bmj.com/content/6/10/e012116" target="_blank" rel="noopener">revisão sistemática publicada na BMJ Open, 2016</a></p>
       </article>
     </div>
-  </div>
-</section>
 
-<!-- ===================== CALCULADORA ===================== -->
-<section class="sec sec-alt" id="calculadora" aria-labelledby="titulo-calc">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Faça a conta</span>
-      <h2 class="h2" id="titulo-calc">Quanto custa deixar mensagem sem resposta?</h2>
-      <p class="lead">Mexa nos números com a realidade da sua clínica. A conta fica toda aqui.</p>
-    </div>
     <div class="calc">
       <div class="calc-ent">
         <div class="campo-r">
@@ -1161,7 +1082,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <span class="rot">Consultas que podem estar ficando para trás</span>
         <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
         <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299).</p>
-        <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis no Essencial</a>
+        <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis</a>
         <p class="aviso">É uma estimativa com os números que você escolheu, não uma promessa de resultado.</p>
       </div>
     </div>
@@ -1180,19 +1101,19 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <li class="passo">
         <span class="n">1</span>
         <h3>Escolha o plano e comece o teste</h3>
-        <p>Preencha os dados da clínica e aceite os Termos. Não pedimos cartão.</p>
+        <p>Preencha os dados da clínica e aceite os Termos. Sem cartão.</p>
         <span class="tempo"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Poucos minutos</span>
       </li>
       <li class="passo">
         <span class="n">2</span>
         <h3>Conte como a clínica funciona</h3>
-        <p>Um formulário guiado: serviços, valores, convênios, horários e jeito de falar. O responsável técnico da clínica aprova o conteúdo. Se preferir, preenchemos com você.</p>
+        <p>Um formulário guiado sobre serviços, valores, convênios, horários e jeito de falar. O responsável técnico aprova. Se preferir, preenchemos com você.</p>
         <span class="tempo"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Cerca de 10 minutos</span>
       </li>
       <li class="passo">
         <span class="n">3</span>
         <h3>Conecte o WhatsApp da clínica</h3>
-        <p>Leia um QR Code com o celular da clínica. Antes, se quiser, converse com ela num ambiente de teste. Os 7 dias grátis começam quando ela entra no ar.</p>
+        <p>Leia um QR Code com o celular da clínica. Antes, se quiser, converse com ela num ambiente de teste.</p>
         <span class="tempo"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>Com o número da clínica</span>
       </li>
     </ol>
@@ -1215,21 +1136,24 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <h3 class="rec-grupo">Em todos os planos</h3>
     <div class="recursos">
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span><h3>Responde na hora, 24 horas</h3><p>Valores, convênios, endereço e horários, também à noite, no fim de semana e no feriado.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><h3>Marca e remarca no chat</h3><p>Oferece os horários livres mais próximos e confirma ali mesmo. O paciente não precisa abrir link nem baixar aplicativo.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span><h3>Lembra e confirma presença</h3><p>Manda lembretes nos horários que você escolher. O paciente confirma ou cancela respondendo, e o horário volta a ficar livre.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg></span><h3>Entende áudio</h3><p>O paciente pode mandar áudio, como faz com a recepção. Ela entende e responde por escrito.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span><h3>Retoma conversas paradas</h3><p>Se o paciente para antes de marcar, ela manda uma mensagem para retomar, uma vez só.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><h3>Urgência vai para a equipe</h3><p>Quando o paciente relata algo que você definiu como urgência, ela para, manda a orientação que você cadastrou e avisa a equipe na hora.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg></span><h3>Link de pagamento</h3><p>Se você quiser, ela manda o link de pagamento depois de marcar a consulta.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><h3>Marca e remarca no chat</h3><p>Oferece os horários livres e confirma ali mesmo, sem link nem aplicativo.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span><h3>Lembra e confirma presença</h3><p>Lembretes nos horários que você escolher. O paciente confirma ou cancela respondendo.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg></span><h3>Entende áudio</h3><p>O paciente manda áudio, e ela responde por escrito.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span><h3>Retoma conversas paradas</h3><p>Se o paciente para antes de marcar, ela retoma uma vez só.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><h3>Urgência vai para a equipe</h3><p>Quando aparece o que você definiu como urgência, ela manda a sua orientação e avisa a equipe na hora.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg></span><h3>Link de pagamento</h3><p>Se você quiser, ela manda o link de pagamento depois de marcar.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><h3>A equipe assume quando quiser</h3><p>Basta responder o paciente: ela fica em silêncio na conversa (o padrão é 2 horas). No WhatsApp da clínica, com o histórico de sempre. Você também lista números que ela não responde, como família e fornecedores.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><h3>Sua agenda ou a nossa</h3><p>A agenda vem pronta no painel. Se a sua agenda online tem integração com a RXSync, ela se conecta a ela. Se não tem, ela pode enviar ao paciente o link de agendamento do seu sistema.</p></article>
     </div>
     <h3 class="rec-grupo">No plano Gestão Inteligente</h3>
+    <p class="rec-nota">No teste grátis, você usa tudo isso também.</p>
     <div class="recursos">
       <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg></span><h3>Lista de espera <span class="tag tag-g">Gestão</span></h3><p>Quando alguém cancela, ela oferece o horário para quem espera uma vaga.</p></article>
-      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.17.76a.53.53 0 0 1 .29.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .29-.9l5.17-.76a2.12 2.12 0 0 0 1.6-1.16z"/></svg></span><h3>Avaliação no Google <span class="tag tag-g">Gestão</span></h3><p>Depois da consulta, pergunta como foi e convida o paciente a avaliar a clínica no Google, qualquer que seja a nota. Nota baixa avisa você na hora.</p></article>
-      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></span><h3>Retornos e quem sumiu <span class="tag tag-g">Gestão</span></h3><p>Avisa quem passou do prazo de retorno e convida quem não volta há um tempo, com limite por dia e opção de sair.</p></article>
+      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.17.76a.53.53 0 0 1 .29.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .29-.9l5.17-.76a2.12 2.12 0 0 0 1.6-1.16z"/></svg></span><h3>Avaliação no Google <span class="tag tag-g">Gestão</span></h3><p>Depois da consulta, pergunta como foi e convida a avaliar no Google, qualquer que seja a nota. Nota baixa avisa você.</p></article>
+      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></span><h3>Retornos e quem sumiu <span class="tag tag-g">Gestão</span></h3><p>Avisa quem passou do prazo de retorno e convida quem não volta há um tempo, com limite por dia.</p></article>
       <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h3>Agenda por profissional <span class="tag tag-g">Gestão</span></h3><p>Cada profissional com seus horários, e cada tipo de consulta com a sua duração.</p></article>
-      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span><h3>Perguntas antes de marcar <span class="tag tag-g">Gestão</span></h3><p>Faz as perguntas que você cadastrar e anota as respostas para a equipe.</p></article>
-      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span><h3>Lê fotos e PDFs <span class="tag tag-g">Gestão</span></h3><p>Pedido de exame, carteirinha e guia: ela organiza os dados administrativos para a equipe, sem interpretar conteúdo clínico.</p></article>
+      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span><h3>Perguntas antes de agendar <span class="tag tag-g">Gestão</span></h3><p>Faz as perguntas que você cadastrar e anota as respostas para a equipe.</p></article>
+      <article class="recurso gestao"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg></span><h3>Lê fotos e PDFs <span class="tag tag-g">Gestão</span></h3><p>Pedido de exame, carteirinha e guia: organiza os dados administrativos, sem interpretar o conteúdo clínico.</p></article>
     </div>
   </div>
 </section>
@@ -1255,7 +1179,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <div class="pm-kpi"><span>Conversas atendidas</span><b>312</b></div>
           <div class="pm-kpi"><span>Consultas marcadas</span><b>74</b></div>
           <div class="pm-kpi"><span>Presenças confirmadas</span><b>88%</b></div>
-          <div class="pm-kpi"><span>Fora do horário comercial</span><b>41%</b></div>
+          <div class="pm-kpi"><span>Tempo da 1ª resposta</span><b>8 s</b></div>
         </div>
         <div class="pm-graf">
           <div class="tit">Consultas marcadas pela assistente</div>
@@ -1276,23 +1200,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
   </div>
 </section>
 
-<!-- ===================== EQUIPE NO CONTROLE ===================== -->
-<section class="sec sec-alt" id="controle" aria-labelledby="titulo-controle">
-  <span id="integracoes" class="ancora"></span>
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Sua equipe no controle</span>
-      <h2 class="h2" id="titulo-controle">A recepção continua no comando. Só deixa de correr atrás do WhatsApp.</h2>
-    </div>
-    <div class="controle">
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><div><h3>Sua equipe assume quando quiser</h3><p>Basta responder o paciente. A assistente percebe e fica em silêncio nessa conversa pelo tempo que você escolher (o padrão é 2 horas).</p></div></div>
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><div><h3>A secretária ganha tempo, não perde a função</h3><p>A assistente responde o que se repete o dia todo e passa para a equipe o que precisa de uma pessoa: casos delicados, reclamações e tudo o que você definir.</p></div></div>
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span><div><h3>O número da clínica, o histórico de sempre</h3><p>As conversas continuam no WhatsApp da clínica. Dá para listar números que ela não deve responder, como família e fornecedores.</p></div></div>
-      <div class="ctrl"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><div><h3>Sem trocar de sistema</h3><p>A agenda da RXSync vem pronta no painel, exporta para Google Agenda, Outlook e iPhone e importa a sua agenda atual por planilha.</p></div></div>
-    </div>
-  </div>
-</section>
-
 <!-- ===================== SEGURANÇA ===================== -->
 <section class="sec sec-escura" id="seguranca" aria-labelledby="titulo-seg">
   <div class="wrap">
@@ -1302,10 +1209,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <p class="lead">Explicamos tudo antes de você contratar. Os <a href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> são públicos.</p>
     </div>
     <div class="seg">
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><h3>Só o administrativo</h3><p>Ela se apresenta como assistente virtual, não interpreta exames, não orienta tratamento e passa para a equipe tudo o que precisa do profissional.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg></span><h3>Pronta para a Resolução CFM nº 2.454/2026</h3><p>A resolução, em vigor desde agosto de 2026, classifica a IA de agendamento como de baixo risco e pede que o paciente saiba que não fala com uma pessoa: a assistente avisa na primeira mensagem que é um atendimento automatizado. Em outras áreas da saúde, valem também as regras do seu conselho.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span><h3>Os dados são da sua clínica</h3><p>Pela LGPD, a clínica é a controladora e a RXSync, a operadora: usamos os dados só para prestar o serviço, e eles são apagados 15 dias depois do fim do contrato ou do teste.</p></article>
-      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><h3>IA com transferência informada</h3><p>Para responder, só o trecho necessário da conversa vai ao provedor do modelo de IA, no exterior. Isso está descrito nos Termos e na Política de Privacidade.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><h3>Só o administrativo</h3><p>Não interpreta exames, não orienta tratamento e passa para a equipe o que precisa do profissional.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 2v2"/><path d="M5 2v2"/><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"/><path d="M8 15a6 6 0 0 0 12 0v-3"/><circle cx="20" cy="10" r="2"/></svg></span><h3>Pronta para a Resolução CFM nº 2.454/2026</h3><p>Em vigor desde agosto de 2026, ela classifica a IA de agendamento como de baixo risco e pede que o paciente saiba que não fala com uma pessoa. A assistente se apresenta como assistente virtual na primeira mensagem. Nas outras áreas da saúde, valem também as regras do seu conselho.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg></span><h3>Os dados são da sua clínica</h3><p>Pela LGPD, a clínica é a controladora e a RXSync, a operadora: usamos os dados só para prestar o serviço. Eles são apagados 15 dias depois do fim do contrato ou do teste.</p></article>
+      <article class="seg-item"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><h3>IA com transferência informada</h3><p>Só o trecho necessário da conversa vai ao provedor de IA, no exterior, como dizem os Termos e a Política de Privacidade.</p></article>
     </div>
   </div>
 </section>
@@ -1317,7 +1224,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <div class="sec-head centro">
       <span class="eyebrow">Planos e preços</span>
       <h2 class="h2" id="titulo-planos">Preço fixo por mês, sem cobrança por mensagem.</h2>
-      <p class="lead">Comece com 7 dias grátis em qualquer plano. Você só paga se decidir continuar.</p>
+      <p class="lead">Comece com 7 dias grátis. No teste, você usa tudo do Gestão Inteligente e só paga se decidir continuar.</p>
       <div class="ciclo" role="group" aria-label="Forma de pagamento">
         <button type="button" data-ciclo="mensal" aria-pressed="true">Mensal</button>
         <button type="button" data-ciclo="anual" aria-pressed="false">Anual <span class="tag tag-v">até 2 meses grátis</span></button>
@@ -1335,15 +1242,12 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <ul class="inc">
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Atendimento 24 horas por texto e áudio</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Agenda da RXSync, com exportação e importação por planilha</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Integração com o Reservio</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Lembretes com confirmação e cancelamento</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Retomada de conversas paradas</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Urgências avisadas na hora</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Link de pagamento depois de marcar</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Painel com resultados</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Até 3 pessoas da equipe no painel, cada uma com o próprio acesso</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Espaço para instruções extras: até 500 letras</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Até 5.000 mensagens por mês</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Profissional da RXSync responsável pela sua conta</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Treinamento da equipe (até 90 minutos)</li>
         </ul>
@@ -1364,13 +1268,11 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Avaliação no Google para todos os pacientes</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Avisos de retorno e convite para quem sumiu</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Agenda por profissional e duração por tipo de consulta</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Perguntas antes de marcar</li>
+          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Perguntas antes de agendar</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Leitura de fotos e PDFs, só dados administrativos</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Aba Pacientes, com importação por planilha</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Assistente de gestão no painel e no seu WhatsApp</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Até 3 pessoas da equipe no painel, cada uma com o próprio acesso</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Instruções extras: até 2.000 letras</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Até 5.000 mensagens por mês</li>
           <li class="breve"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Em implantação, sem custo extra quando chegar: integração com o sistema de gestão que tenha API aberta e acompanhamento de orçamentos.</li>
         </ul>
         </details>
@@ -1388,13 +1290,13 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>API para o sistema da clínica ler a agenda e pedir mensagens</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Envio pelo WhatsApp da clínica das mensagens pedidas pela API</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Avisos automáticos para o sistema da clínica quando a assistente marca, remarca ou cancela</li>
-          <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Até 3 pessoas da equipe no painel, cada uma com o próprio acesso</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Escopo e prazos de atendimento na proposta</li>
           <li><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Instruções extras: até 10.000 letras</li>
         </ul>
         </details>
       </article>
     </div>
+    <p class="nota-msg planos-todos">Em todos os planos: até 3 pessoas da equipe no painel, cada uma com o próprio acesso. No Essencial e no Gestão: até 5.000 mensagens por mês.</p>
 
     <div class="comparar">
       <table>
@@ -1416,11 +1318,11 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <div class="implant">
       <h3>Implantação completa (opcional): R$ 999, uma vez só</h3>
       <ul>
-        <li>Fazemos as perguntas e configuramos a assistente com você, até ficar do seu jeito.</li>
-        <li>Conectamos o WhatsApp da clínica e deixamos o painel pronto para você criar a sua senha.</li>
-        <li>1 ano de suporte no WhatsApp para mudanças na configuração da assistente (valores, horários, regras e mensagens).</li>
+        <li>Configuramos a assistente com você, até ficar do seu jeito.</li>
+        <li>Conectamos o WhatsApp e deixamos o painel pronto.</li>
+        <li>1 ano de suporte no WhatsApp, em dias úteis, para mudanças na configuração.</li>
       </ul>
-      <p>Você escolhe na contratação, nos planos mensal e anual. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar, junto com a primeira mensalidade.</p>
+      <p>Você escolhe na contratação, nos planos mensal e anual. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, ela é feita durante o teste e só é cobrada se você continuar, junto com a primeira mensalidade.</p>
     </div>
 
     <div class="planos-rodape">
@@ -1497,19 +1399,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <div class="faq-panel hidden" id="faq-panel-1" role="tabpanel" aria-labelledby="faq-tab-1">
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-0">Preciso trocar de sistema?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-1-0"><div><p>Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Dá para exportar para Google Agenda, Outlook e iPhone e importar a agenda atual por planilha.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-1">Ela respeita tempos de consulta diferentes?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-1-1"><div><p>Sim. Você define a duração padrão, o intervalo entre consultas e a antecedência mínima. No Gestão Inteligente, com a agenda por profissional, cada tipo de consulta tem a sua duração.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-2">Ela envia lembrete de consulta?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-1-2"><div><p>Sim, nos horários que você escolher: 48 horas antes, na véspera, na manhã do dia ou 3, 2 ou 1 hora antes. O paciente confirma ou cancela respondendo, e o horário cancelado volta a ficar livre. No Gestão Inteligente, a vaga vai para quem está na lista de espera.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-3">Consigo trazer os pacientes do sistema que uso hoje?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-1-3"><div><p>No Gestão Inteligente, sim: o painel, em Pacientes, importa a planilha que o seu sistema exporta, mostra uma prévia, não duplica ninguém e permite desfazer em até 7 dias. Paciente importado só recebe mensagem automática depois de escrever para a clínica.</p></div></div>
+          <div class="faq-content" id="faq-r-1-0"><div><p>Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Se a sua agenda online tem integração com a RXSync, ela se conecta a ela. Se não tem, ela pode enviar ao paciente o link de agendamento do seu sistema.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-2" role="tabpanel" aria-labelledby="faq-tab-2">
@@ -1522,56 +1412,32 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <div class="faq-content" id="faq-r-2-1"><div><p>Sim, de três jeitos: aqui na página, com 5 mensagens; no ambiente de teste, antes de conectar; e por 7 dias no WhatsApp da clínica, sem cartão, contados a partir do dia em que ela entra no ar.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-2">Como faço ajustes depois que ela estiver no ar?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-2"><div><p>Você mesmo ajusta pelo painel, que salva cada mudança na hora. Com a nossa equipe, você tem uma rodada de ajustes no 1º mês; depois, os ajustes são pelo painel. No plano Gestão Inteligente, você também pode só pedir ao seu assistente de gestão, por exemplo: “a consulta agora custa R$ 380”.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-3">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-3"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho. Você define o que ela responde, e ela passa para a equipe quando o paciente pede uma pessoa.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-4">Divido o consultório com outros profissionais. Ela pode atender só o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-4"><div><p>Pode. Ela atende só o número conectado, e você pode listar números que ela não deve responder.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-2">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-2-2"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho. Você define o que ela responde, e ela passa para a equipe quando o paciente pede uma pessoa.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-3" role="tabpanel" aria-labelledby="faq-tab-3">
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-0">O que é a Implantação completa?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-0"><div><p>É um serviço opcional, de R$ 999, uma vez só, nos planos mensal e anual: fazemos as perguntas, configuramos a assistente com você até ficar do seu jeito, conectamos o WhatsApp da clínica, deixamos o painel pronto para você criar a sua senha e damos 1 ano de suporte no WhatsApp para mudanças na configuração da assistente. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar, junto com a primeira mensalidade.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-0">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-3-0"><div><p>Durante o teste, você usa tudo do Gestão Inteligente. No fim, nada é cobrado sozinho: avisamos antes por e-mail, inclusive o que o plano que você escolheu não inclui. Para continuar, você paga a primeira mensalidade (e a Implantação completa, se você a contratou). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-1">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-1"><div><p>Nada é cobrado sozinho. Avisamos antes por e-mail. Para continuar, você paga a primeira mensalidade (e a Implantação completa, se você a contratou). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-1">Como cancelo?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-3-1"><div><p>No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No mensal, se a assistente ainda não entrou no ar, o contrato termina no dia em que você confirma. No anual, o contrato é de 12 meses; se sair antes, paga a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-2">Como cancelo?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-2"><div><p>No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No anual, o contrato é de 12 meses; se sair antes, paga a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-3">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-3"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; se passar, avisamos e só cobramos a mais com o seu aceite por escrito.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-4">Posso começar no Essencial e mudar depois?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-4"><div><p>Sim, pelo painel.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-2">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-3-2"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; se passar, avisamos e só cobramos a mais com o seu aceite por escrito.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-4" role="tabpanel" aria-labelledby="faq-tab-4">
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-0">Posso perder o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-0"><div><p>Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, em horário comercial. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho.</p></div></div>
+          <div class="faq-content" id="faq-r-4-0"><div><p>Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, entre 8h e 20h, no fuso da clínica. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-1">Quem é o dono dos dados dos pacientes?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-1"><div><p>A sua clínica. Pela LGPD, a clínica é a controladora e a RXSync, a operadora: usamos os dados só para prestar o serviço.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-2">Por onde os dados passam?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-2"><div><p>Para responder, o trecho necessário da conversa vai ao provedor do modelo de IA, no exterior, como está descrito nos Termos e na Política de Privacidade.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-3">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-3"><div><p>Ela foi feita para elas: se apresenta na primeira mensagem como atendimento automatizado, não como pessoa, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. Pela Resolução CFM nº 2.454/2026, uma IA que só agenda e dá informações gerais é de baixo risco. O que a clínica divulga continua sendo responsabilidade do médico.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-1">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-4-1"><div><p>Ela foi feita para elas: se apresenta na primeira mensagem como atendimento automatizado, não como pessoa, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. Pela Resolução CFM nº 2.454/2026, uma IA que só agenda e dá informações gerais é de baixo risco. O que a clínica divulga continua sendo responsabilidade do médico.</p></div></div>
         </div>
       </div>
       <p class="faq-mais">Não achou sua pergunta? <button type="button" data-cta="faq_perguntar_chat" data-abre-chat>Pergunte no chat.</button></p>
@@ -1587,7 +1453,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <p class="lead">A assistente atende seus pacientes de verdade, com os seus horários, valores e convênios. Se não fizer diferença, você não paga nada.</p>
       <ul class="lista-check">
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Sem cartão de crédito</strong> para começar.</span></li>
-        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Os 7 dias contam</strong> a partir do dia em que ela entra no ar.</span></li>
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Suporte da nossa equipe</strong> pelo WhatsApp, de segunda a sexta, das 9h às 18h.</span></li>
       </ul>
       <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="gestao" data-origem="final">Começar 7 dias grátis <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
@@ -1602,16 +1467,18 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <div class="campo"><label for="clinica">Nome da clínica</label><input type="text" id="clinica" name="clinica" required autocomplete="organization" placeholder="Ex.: Clínica Bem Estar"></div>
         <div class="campo"><label for="email">E-mail</label><input type="email" id="email" name="email" required autocomplete="email" inputmode="email" placeholder="voce@suaclinica.com.br"></div>
         <div class="campo"><label for="telefone">WhatsApp</label><input type="tel" id="telefone" name="telefone" required autocomplete="tel" inputmode="tel" placeholder="(48) 99999-9999"></div>
-        <div class="campo"><label for="software">Sistema de gestão <span class="opc">(opcional)</span></label>
+        <div class="campo"><label for="software">Sistema de agenda ou de gestão <span class="opc">(opcional)</span></label>
           <select id="software" name="software_gestao">
             <option value="" selected>Selecione</option>
-            <option value="iClinic">iClinic</option>
             <option value="Amplimed">Amplimed</option>
+            <option value="ClinicaNasNuvens">Clínica nas Nuvens</option>
+            <option value="Clinicorp">Clinicorp</option>
             <option value="Doctoralia">Doctoralia (Agenda)</option>
             <option value="Feegow">Feegow</option>
-            <option value="ClinicaNasNuvens">Clínica nas Nuvens</option>
-            <option value="Nenhum">Não uso nenhum sistema</option>
+            <option value="iClinic">iClinic</option>
+            <option value="Reservio">Reservio</option>
             <option value="Outro">Outro sistema</option>
+            <option value="Nenhum">Não uso nenhum sistema</option>
           </select></div>
         <div class="campo"><label for="plano">Plano de interesse <span class="opc">(opcional)</span></label>
           <select id="plano" name="plano_interesse">
@@ -1704,7 +1571,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         if (!/[?&]ref=/.test(a.getAttribute('href'))) a.href = a.getAttribute('href') + '&ref=' + REF_PROSP;
     });
 
-    // Leva para a contratação com 7 dias grátis. Marque "iniciar_teste" como conversão no Google Ads.
+    // Leva para a contratação com 7 dias grátis. A conversão principal do Google Ads é o sign_up, na contratação (rxsync-sistema DEC-191).
     function iniciarTeste(plano, origem, ev) {
         var url = urlContratar(plano, origem);
         trackCta(origem + '_testar_gratis');
