@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4R70wnASMx7FFoyizjvM/vvpnVJHxc+01RFnsPLYWy4='; style-src 'sha256-ub6XCu+5L89EYLvNr/5CpA2nL+8qsGrp+unOb9cqoIQ='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+pbvBI5ZBcR1sBD+wDnXWRALhBXI0v4VT2gr6bzFpIw='; style-src 'sha256-ub6XCu+5L89EYLvNr/5CpA2nL+8qsGrp+unOb9cqoIQ='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -2282,7 +2282,9 @@ async function pObjeto(c, tipo, id, pai) {
   if (ins['ia.prompt_texto'] && editar && o) {
     const caixa = ins['ia.prompt_texto'].i;
     caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
-      if (caixa.value.trim() && !confirm('Trocar o que está no campo pelo texto montado pelos campos de "IA de resposta"?')) return;
+      // A janela da Central, nunca a caixa do navegador (pente fino da camada 3, I-07).
+      if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
+        texto: 'O que está no campo "Texto do prompt" vira o texto montado pelos campos de "IA de resposta". Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
       const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
       if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
       caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();

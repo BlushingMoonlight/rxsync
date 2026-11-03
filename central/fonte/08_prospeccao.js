@@ -329,7 +329,9 @@ async function pObjeto(c, tipo, id, pai) {
   if (ins['ia.prompt_texto'] && editar && o) {
     const caixa = ins['ia.prompt_texto'].i;
     caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
-      if (caixa.value.trim() && !confirm('Trocar o que está no campo pelo texto montado pelos campos de "IA de resposta"?')) return;
+      // A janela da Central, nunca a caixa do navegador (pente fino da camada 3, I-07).
+      if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
+        texto: 'O que está no campo "Texto do prompt" vira o texto montado pelos campos de "IA de resposta". Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
       const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
       if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
       caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();
