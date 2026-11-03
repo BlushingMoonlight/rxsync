@@ -221,7 +221,7 @@ function termosAceitar(b) {
 const BUSCA_TELAS = [
   ['Hoje', 'hoje', 'início'], ['Resultados', 'resultados', 'números indicadores relatório avaliações nota'], ['Agenda', 'agenda', 'consultas calendário marcar remarcar cancelar'],
   ['Lista de espera', 'agenda/espera', 'espera fila'], ['Documentos recebidos', 'agenda/documentos', 'documentos fotos pdf exame receita carteirinha'],
-  ['Agenda › Horários', 'agenda/horarios', 'ajustes da agenda configurar agenda'], ['Horários de atendimento', 'agenda/horarios/grade', 'grade dias horário atendimento'],
+  ['Ajustes da agenda', 'agenda/horarios', 'horários configurar agenda'], ['Horários de atendimento', 'agenda/horarios/grade', 'grade dias horário atendimento'],
   ['Regras da agenda', 'agenda/horarios/regras', 'duração intervalo antecedência janela fuso agrupar empilhamento'], ['Médicos e tipos', 'agenda/horarios/medicos', 'médicos profissionais tipos de consulta agenda por médico'],
   ['Perguntas antes de agendar', 'agenda/horarios/perguntas', 'pré-consulta perguntas'], ['Feriados', 'agenda/horarios/feriados', 'feriado cidade facultativo'],
   ['Receber dos pacientes', 'agenda/horarios/pagamento', 'pagamento link de pagamento asaas cobrar valor da consulta'], ['Integração e planilhas', 'agenda/horarios/integracao', 'integração reservio importar agenda planilha link de agendamento'],

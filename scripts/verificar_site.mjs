@@ -588,7 +588,7 @@ if (fs.existsSync('guias/_fonte')) {
   if (!/prefers-reduced-motion:\s*reduce/.test(css)) erro('assets/ancora/guias.css: falta a regra de "Reduzir movimento"');
 }
 if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não bloqueia).`);
-// #219: todo caminho escrito ("Agenda › Horários › Feriados") nos textos do site, do painel, da Central e dos guias é um
+// #219: todo caminho escrito ("Agenda › Ajustes da agenda › Feriados") nos textos do site, do painel, da Central e dos guias é um
 // caminho de toque que existe. A lista vem do scripts/painel_alcance.mjs --gravar (scripts/caminhos_validos.json), a
 // mesma que o verificar.mjs do rxsync-sistema usa (cópia lá). Os index.html montados do painel e da Central ficam de fora
 // (as fontes são conferidas).

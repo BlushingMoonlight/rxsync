@@ -1,7 +1,7 @@
 // Revisitar (rxsync-sistema, defeito de 28/10): passa por todas as telas do painel, sai para Hoje, volta e confere que o
 // conteúdo aparece em todas as vezes, em 820 e 1180 px (iPad em pé e deitado). Roda duas vezes: com as listas do servidor
 // como listas e como o workflow 24 publicado no #221 as mandava por engano (a lista virava um objeto: {"0": …, "1": …}),
-// que deixava Agenda › Horários vazia ao voltar. Nenhuma tela pode ficar só com o título; a tela que falhar tem de mostrar
+// que deixava Agenda › Ajustes da agenda vazia ao voltar. Nenhuma tela pode ficar só com o título; a tela que falhar tem de mostrar
 // "Não consegui abrir esta tela." (a rede de segurança do rotear). Com o n8n SIMULADO; NAVEGADOR=webkit roda no Safari.
 // Uso (precisa do Playwright): node scripts/painel_revisitar.mjs
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
@@ -107,7 +107,7 @@ for (const formato of OBJETO ? ['objeto'] : ['lista', 'objeto']) for (const larg
       if (x.falhou) falhas2.push(`${rota} (${vez})`); else if (x.n < 5) vazias.push(`${rota} (${vez})`);
     }
   }
-  // Agenda › Horários, o caso visto pelo Jean: os 7 itens toda vez, também depois de passar pelas subtelas e pelo menu.
+  // Agenda › Ajustes da agenda, o caso visto pelo Jean: os 7 itens toda vez, também depois de passar pelas subtelas e pelo menu.
   const itens = async () => page.locator('[data-tela="agenda/horarios"] #horIndice .linha').count();
   const contagens = [];
   for (const passo of ['agenda/horarios', 'agenda/horarios/feriados', 'agenda/horarios', 'pacientes', 'agenda/horarios', 'conta', 'agenda/horarios', 'agenda', 'agenda/horarios']) {
@@ -116,7 +116,7 @@ for (const formato of OBJETO ? ['objeto'] : ['lista', 'objeto']) for (const larg
   }
   ok(!vazias.length, `${formato}, ${largura} px: nenhuma tela fica só com o título, na 1ª vez, ao voltar e no voltar do navegador` + (vazias.length ? ': ' + vazias.join(', ') : ''));
   ok(!falhas2.length, `${formato}, ${largura} px: nenhuma tela cai na rede de segurança` + (falhas2.length ? ': ' + falhas2.join(', ') : ''));
-  ok(contagens.every(n => n === 7), `${formato}, ${largura} px: Agenda › Horários mostra os 7 itens toda vez (${contagens.join(', ')})`);
+  ok(contagens.every(n => n === 7), `${formato}, ${largura} px: Agenda › Ajustes da agenda mostra os 7 itens toda vez (${contagens.join(', ')})`);
   ok(!erros.length, `${formato}, ${largura} px: nenhum erro de JavaScript` + (erros.length ? ': ' + erros.slice(0, 3).join(' | ') : ''));
   await ctx.close();
 }

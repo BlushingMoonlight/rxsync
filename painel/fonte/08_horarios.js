@@ -1,8 +1,9 @@
-// ---------------------------------------------------------------- Agenda › Horários (molde D): os ajustes da agenda, uma página por assunto
-// O nome "Agenda › Horários" continua porque o servidor o cita (workflows 12, 13 e 32).
-const VOLTA_HOR = ['agenda/horarios', 'Horários'];
+// ---------------------------------------------------------------- Agenda › Ajustes da agenda (molde D): uma página por assunto
+// Antes "Agenda › Horários" (rxsync-sistema DEC-197; caminhos-antigos): o servidor cita o caminho (workflows 12, 13 e 32, sql/092); o
+// endereço continua #agenda/horarios, para os links antigos abrirem.
+const VOLTA_HOR = ['agenda/horarios', 'Ajustes da agenda'];
 tela('agenda/horarios', {
-  montar: () => [cabTela('Horários', { voltar: ['agenda', 'Agenda'], sub: 'Como a assistente marca as consultas: os dias e horários, as regras, os médicos, os feriados e como os pacientes pagam.' }),
+  montar: () => [cabTela('Ajustes da agenda', { voltar: ['agenda', 'Agenda'], sub: 'Como a assistente marca as consultas: os dias e horários, as regras, os médicos, os feriados e como os pacientes pagam.' }),
     el('div', { id: 'horIndice' }),
     el('div', { class: 'bloco pilha' }, el('p', { class: 'mudo peq', text: 'Ficou alguma dúvida? A equipe da RXSync ajuda a deixar a agenda do jeito da clínica.' }),
       el('button', { class: 'btn sec plena', type: 'button', id: 'btnPedirAjudaAgendamento', text: 'Pedir ajuda para configurar', onclick: e => pedirAjuda(e.currentTarget) }),
@@ -87,7 +88,7 @@ function medCarregar() {
   return d24('agenda_medicos_listar').then(r => {
     MED.dados = (r && r.medicos) || []; MED.padrao = (r && r.funcoes_padrao) || MED.padrao;
     const antes = MED.modo; MED.modo = !!(r && r.modo_medicos); MED.reservio = !!(r && r.reservio_ativo);
-    medAvisos(); medLista(); if (MED.redesenhar) MED.redesenhar();   // a folha aberta mostra o que o servidor guardou
+    medAvisos(); medLista(); pagResumo(); if (MED.redesenhar) MED.redesenhar();   // a folha aberta mostra o que o servidor guardou
     if (AG.carregou) { agMostrar(); if (antes !== MED.modo) calCarregar(); }
   }).catch(() => { const l = $('medLista'); if (l) trocar(l, el('div', { class: 'cartao' }, vazio('Não deu para carregar', 'Os médicos não carregaram agora.'))); });
 }
@@ -100,7 +101,7 @@ tela('agenda/horarios/medicos', {
       el('h2', { class: 'tit-bloco pilha', text: 'Médicos' }), el('div', { id: 'medLista' }, el('div', { class: 'cartao' }, esqueleto())),
       el('div', { class: 'cartao pad bloco pilha' }, el('div', { class: 'campo form' }, el('label', { for: 'medNovoNome', text: 'Adicionar médico' }),
         el('input', { class: 'entrada', id: 'medNovoNome', type: 'text', maxlength: '80', placeholder: 'Nome do médico (ex.: Dra. Ana Souza)' })), btn('Adicionar', medAdicionar, 'sec plena', 'soma', { id: 'medNovoBtn' })))],
-  entrar: (p, sec) => { const avs = sec.querySelectorAll('.pilha > .aviso'); if (avs.length === 3) { avs[0].id = 'medModoAviso'; avs[1].id = 'medDesligadoAviso'; avs[2].id = 'medPausaReservio'; } medAvisos(); medCarregar(); }
+  entrar: (p, sec) => { const avs = sec.querySelectorAll('.pilha > .aviso'); if (avs.length === 3) { avs[0].id = 'medModoAviso'; avs[1].id = 'medDesligadoAviso'; avs[2].id = 'medPausaReservio'; } medAvisos(); medCarregar(); asaasCarregar(); }
 });
 AO_SALVAR.push(k => { if (k === 'func_medicos') medCarregar(); });
 function medAvisos() {
@@ -185,7 +186,7 @@ function tipoForm(m, t) {
   const erro = el('div', { 'aria-live': 'polite' });
   const salvar = el('button', { class: 'btn pri', type: 'button', text: 'Salvar' });
   const f = folha(t ? 'Editar tipo de consulta' : 'Novo tipo de consulta', el('div', { class: 'form' }, campo('Nome (ex.: Primeira consulta, Retorno)', nome), campo('Duração (minutos, de 5 a 480)', dur),
-    campo('Prazo de retorno (dias; vazio se não tiver retorno)', pr), campo('Link de pagamento deste tipo (opcional; vazio = o link geral da clínica)', lk), campo('Valor deste tipo, para o Asaas (opcional; vazio = o valor padrão da clínica)', vl), erro,
+    campo('Prazo de retorno (dias; vazio se não tiver retorno)', pr), campo('Link de pagamento deste tipo (opcional; vazio = o link geral da clínica)', lk), asaasLigado() ? campo('Valor deste tipo, para o Asaas (opcional; vazio = o valor padrão da clínica)', vl) : null, erro,
     t ? el('div', { class: 'perigo-zona' }, btn('Remover este tipo', () => medAcao('agenda_tipo_ativo', { id: t.id, ativo: false }, () => { f.limpar(); f.fechar(); rapida('Tipo removido.', { desfazer: () => medAcao('agenda_tipo_ativo', { id: t.id, ativo: true }) }); if (MED.redesenhar) MED.redesenhar(); }), 'perigo-sec plena')) : null),
   { pe: [btn('Cancelar', () => f.fechar(), 'sec'), salvar] });
   salvar.addEventListener('click', () => {
@@ -323,40 +324,72 @@ function ferRender() {
   });
 }
 
-// ---------------------------------------------------------------- Receber dos pacientes (E): o link, a frase e o valor, no lembrete, o Asaas da clínica
+// ---------------------------------------------------------------- Receber dos pacientes (E): a chave, como a clínica recebe
+// (DEC-197: "Meus links de pagamento" ou "Asaas da clínica"; a escolha é o próprio estado do Asaas, sem nada novo no
+// servidor), o link geral, a frase, o lembrete e o link (ou o valor, no Asaas) de cada tipo de consulta num lugar só.
+const PAG = { asaas: null };   // a situação do Asaas (workflow 32), lida ao abrir esta tela ou Médicos e tipos
 tela('agenda/horarios/pagamento', {
   montar: () => [cabTela('Receber dos pacientes', { voltar: VOLTA_HOR, sub: 'Depois de marcar a consulta, a assistente manda ao paciente o link de pagamento da clínica. Nada é cancelado sozinho.' }),
-    el('div', { id: 'pagQuemMarca' }), blocoCampos(['func_pagamento_link', 'pagamento_link', 'pagamento_texto', 'pagamento_valor_padrao', 'pagamento_no_lembrete']),
-    el('div', { id: 'pagMedResumo' }), el('h2', { class: 'tit-bloco pilha', text: 'Asaas da clínica (opcional)' }), el('div', { id: 'asaasBox' }, el('div', { class: 'cartao' }, esqueleto()))],
+    blocoCampos(['func_pagamento_link']),
+    el('h2', { class: 'tit-bloco pilha', id: 'pagEscolhaTit', text: 'Como a clínica recebe' }), el('div', { id: 'pagEscolha' }, el('div', { class: 'cartao' }, esqueleto())),
+    el('div', { id: 'pagAsaas', hidden: true }, el('div', { id: 'asaasBox' }), el('div', { class: 'pilha' }, blocoCampos(['pagamento_valor_padrao']))),
+    el('div', { class: 'pilha' }, blocoCampos(['pagamento_link', 'pagamento_texto', 'pagamento_no_lembrete'])),
+    el('div', { id: 'pagMedResumo' })],
   entrar: () => { dependenciasAplicar(); asaasCarregar(); pagResumo(); if (!sem('medicos')) medCarregar().then(pagResumo); }
 });
+const asaasLigado = () => !!(PAG.asaas && PAG.asaas.conectado);
+// Por tipo de consulta (só com agenda por médico: os tipos são de cada médico). Um toque abre o mesmo "Editar tipo de consulta".
 function pagResumo() {
   const box = $('pagMedResumo'); if (!box) return;
-  const pc = MED.dados.filter(m => m.ativo && medPagaConsultorio(m.id)).length, tv = MED.dados.reduce((n, m) => n + (m.tipos || []).filter(t => t.ativo && t.valor).length, 0);
-  trocar(box, MED.modo ? el('div', { class: 'lista bloco pilha' }, linhaLink((pc === 1 ? '1 médico recebe' : pc + ' médicos recebem') + ' no consultório · ' + pl(tv, 'tipo', 'tipos') + ' com valor próprio', 'Cada tipo pode ter o próprio link e valor', 'agenda/horarios/medicos', 'medico')) : null);
+  if (!MED.modo) { trocar(box); return; }
+  const linhas = [];
+  MED.dados.filter(m => m.ativo).forEach(m => {
+    if (medPagaConsultorio(m.id)) { linhas.push(el('div', { class: 'linha' }, el('span', { class: 'ic' }, icone('medico')), el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: 'Recebe no consultório: a assistente não manda link' })))); return; }
+    const tipos = (m.tipos || []).filter(t => t.ativo);
+    if (!tipos.length) { linhas.push(el('div', { class: 'linha' }, el('span', { class: 'ic' }, icone('medico')), el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: 'Sem tipos de consulta: usa o link geral' })))); return; }
+    tipos.forEach(t => {
+      const dinheiro = t.valor ? 'R$ ' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '';
+      const link = t.link_pagamento ? t.link_pagamento.replace(/^https:\/\//i, '') : 'usa o link geral';
+      linhas.push(el('button', { class: 'linha', type: 'button', onclick: () => tipoForm(m, t) }, el('span', { class: 'ic' }, icone('dinheiro')),
+        el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome + ' · ' + t.nome }), el('span', { class: 't2 quebra', text: asaasLigado() ? (dinheiro ? dinheiro + ' pelo Asaas' : 'Sem valor: ' + link) : link })),
+        el('span', { class: 'seta' }, icone('seta'))));
+    });
+  });
+  trocar(box, el('h2', { class: 'tit-bloco pilha', text: 'Por tipo de consulta' }),
+    el('p', { class: 'dica bloco', text: asaasLigado() ? 'Cada tipo pode ter o próprio valor no Asaas. Tipo sem valor recebe o link do tipo ou, sem ele, o link geral.' : 'Cada tipo pode ter o próprio link. Vazio, vale o link geral da clínica.' }),
+    linhas.length ? el('div', { class: 'lista' }, linhas) : el('p', { class: 'mudo', text: 'Nenhum médico ativo.' }));
+}
+// A escolha: "Meus links de pagamento" ou "Asaas da clínica". Escolher o Asaas abre o "Conectar o Asaas"; voltar aos
+// links com o Asaas conectado pede para desconectar. Só o dono troca (como o conectar do Asaas).
+function pagEscolha() {
+  const box = $('pagEscolha'); if (!box) return;
+  const asa = asaasLigado();
+  const bt = (v, t) => el('button', { type: 'button', 'data-v': v, text: t, 'aria-pressed': String(v === 'asaas' ? asa : !asa), disabled: !ehDono() || null,
+    onclick: () => { if ((v === 'asaas') === asa) return; if (v === 'asaas') asaasConectar(); else asaasDesconectar(); } });
+  trocar(box, el('div', { class: 'seg seg-plena', role: 'group', 'aria-labelledby': 'pagEscolhaTit', id: 'pagModo' }, bt('links', 'Meus links de pagamento'), bt('asaas', 'Asaas da clínica')),
+    el('p', { class: 'dica pilha', text: asa ? 'O Asaas da clínica cria um link para cada consulta com valor e marca a consulta como paga sozinho, quando o paciente paga.' : 'A assistente manda o seu link. A RXSync não confere esse pagamento: a equipe marca a consulta como paga na Agenda.' }),
+    !ehDono() ? el('p', { class: 'dica', text: 'Só o dono da conta troca como a clínica recebe.' }) : null);
+  const a = $('pagAsaas'); if (a) a.hidden = !asa;
 }
 function asaasCarregar() {
-  const box = $('asaasBox'); if (!box) return;
-  c32('situacao').then(r => asaasRender(r)).catch(() => trocar(box, aviso('perigo', 'Não consegui ver a situação do Asaas agora. Tente de novo em instantes.')));
+  return c32('situacao').then(r => asaasRender(r)).catch(() => { const box = $('pagEscolha'); if (box) trocar(box, aviso('perigo', 'Não consegui ver se o Asaas da clínica está conectado. Tente de novo em instantes.')); });
 }
 function asaasRender(r) {
   const box = $('asaasBox'), sit = (r && r.situacao) || {};
-  // Qual dos dois marca "Paga": pelo Asaas, sozinho; pelo link fixo, a equipe marca na consulta.
-  const q = $('pagQuemMarca'); if (q) trocar(q, aviso('', sit.conectado ? 'Pelo Asaas da clínica: cada consulta com valor recebe um link próprio e fica paga sozinha quando o paciente paga.' : 'Pelo seu link fixo: a RXSync não confere esse pagamento; a equipe marca a consulta como paga na Agenda.'));
+  PAG.asaas = sit; pagEscolha(); pagResumo();
+  if (!box) return;
   if (sit.conectado) {
-    trocar(box, el('div', { class: 'cartao pad' }, el('p', { class: 'etqs' }, etq('Conectado', 'ok', 'ok')), el('p', { text: (sit.conta_nome ? 'Conta ' + sit.conta_nome : 'Conta Asaas') + (sit.ambiente === 'sandbox' ? ' (conta de testes)' : '') + (sit.desde ? ', desde ' + new Date(sit.desde).toLocaleDateString('pt-BR') : '') + '.' }),
+    trocar(box, el('h2', { class: 'tit-bloco pilha', text: 'Asaas da clínica' }), el('div', { class: 'cartao pad' }, el('p', { class: 'etqs' }, etq('Conectado', 'ok', 'ok')), el('p', { text: (sit.conta_nome ? 'Conta ' + sit.conta_nome : 'Conta Asaas') + (sit.ambiente === 'sandbox' ? ' (conta de testes)' : '') + (sit.desde ? ', desde ' + new Date(sit.desde).toLocaleDateString('pt-BR') : '') + '.' }),
       el('p', { class: 'dica', text: pl(sit.links_abertos, 'link aberto', 'links abertos') + ' · ' + pl(sit.pagos_30_dias, 'pago', 'pagos') + ' nos últimos 30 dias.' }),
-      sit.status === 'erro' && sit.ultimo_erro ? aviso('atencao', 'Último aviso do Asaas: ' + sit.ultimo_erro) : null,
-      ehDono() ? el('div', { class: 'perigo-zona' }, btn('Desconectar o Asaas', async ev => {
-        const b = ev.currentTarget;
-        if (!(await confirmar({ titulo: 'Desconectar o Asaas?', texto: 'A chave é apagada da RXSync e os links abertos são desativados. As consultas voltam a receber o link fixo (se houver).', botao: 'Desconectar', perigo: true }))) return;
-        b.disabled = true; c32('desconectar').then(x => { rapida((x && x.mensagem) || 'Pronto.'); asaasRender(x); }).catch(() => { b.disabled = false; rapida('Não consegui desconectar. Tente de novo.'); });
-      }, 'perigo-sec plena')) : null));
+      sit.status === 'erro' && sit.ultimo_erro ? aviso('atencao', 'Último aviso do Asaas: ' + sit.ultimo_erro) : null));
     return;
   }
-  if (!ehDono()) { trocar(box, el('div', { class: 'cartao pad' }, el('p', { class: 'mudo', text: 'Não conectado. Só o dono da conta conecta o Asaas da clínica.' }))); return; }
-  trocar(box, el('div', { class: 'cartao pad' }, el('p', { class: 'mudo', text: 'Com a conta Asaas da clínica conectada, cada consulta com valor recebe um link de pagamento próprio e fica paga sozinha quando o paciente paga. O dinheiro cai direto na conta da clínica: a RXSync não recebe, não vê o saldo e não faz transferências.' }),
-    el('div', { class: 'pilha' }, btn('Conectar o Asaas', asaasConectar, 'sec plena'))));
+  trocar(box);
+}
+// Voltar aos links com o Asaas conectado (nível 2): a chave é apagada e os links abertos são desativados.
+async function asaasDesconectar() {
+  if (!(await confirmar({ titulo: 'Desconectar o Asaas?', texto: 'A chave é apagada da RXSync e os links abertos são desativados. As consultas voltam a receber o seu link de pagamento (se houver).', botao: 'Desconectar', perigo: true }))) return;
+  c32('desconectar').then(x => { rapida((x && x.mensagem) || 'Pronto.'); asaasRender(x); }).catch(() => rapida('Não consegui desconectar. Tente de novo.'));
 }
 // Conectar o Asaas (molde F): a chave e o aceite dos Termos; a chave vai uma vez e nunca volta à tela.
 function asaasConectar() {
@@ -395,7 +428,7 @@ function intIndice() {
     linhaLink('Importações da agenda', 'Ver e desfazer em até 7 dias', 'agenda/horarios/integracao/importacoes', 'notas')));
 }
 tela('agenda/horarios/integracao/link', {
-  montar: () => [cabTela('Link de agendamento do seu sistema', { voltar: VOLTA_INT, sub: 'Para quem agenda por iClinic, Doctoralia, Feegow ou outro sistema com página de agendamento. Em vez de marcar, a assistente envia o link.' }),
+  montar: () => [cabTela('Link de agendamento do seu sistema', { voltar: VOLTA_INT, sub: 'Para quem agenda por iClinic, Doctoralia, Feegow, Clinicorp ou outro sistema com página de agendamento. Em vez de marcar, a assistente envia o link.' }),
     blocoCampos(['link_agendamento_ativo', 'link_agendamento'])],
   entrar: () => dependenciasAplicar()
 });
@@ -409,6 +442,8 @@ function intHa(iso) {
   if (min < 1) return 'agora há pouco'; if (min < 60) return 'há ' + min + ' min';
   const hr = Math.round(min / 60); return hr < 24 ? 'há ' + hr + ' h' : fmt(iso);
 }
+// DEC-197: os sistemas que a clínica pode escolher e que não conectam por token (só o link de agendamento deles).
+const OUTRAS_PLAT = [['iclinic', 'iClinic'], ['doctoralia', 'Doctoralia'], ['feegow', 'Feegow'], ['clinicorp', 'Clinicorp'], ['outro', 'Outro']];
 const DIAS_CURTOS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
 function intHorariosResumo(faixas) { const por = {}; (faixas || []).forEach(f => { (por[f.dia] = por[f.dia] || []).push(f.inicio + '–' + f.fim); }); return [1, 2, 3, 4, 5, 6, 0].filter(d => por[d]).map(d => DIAS_CURTOS[d] + ' ' + por[d].join(', ')).join('; '); }
 function intRender(r, ultimo) {
@@ -416,30 +451,44 @@ function intRender(r, ultimo) {
   const nomePlat = r.plataforma_nome || 'Reservio';
   const sel = (id, ops, v) => { const s = el('select', { class: 'entrada', id }, ops.map(([a, b]) => el('option', { value: a, text: b }))); s.value = v || ''; return s; };
   const campo = (rot, i, dica) => el('div', { class: 'campo' }, el('label', { for: i.id, text: rot }), i, dica ? el('p', { class: 'dica', text: dica }) : null);
-  const msg = r.mensagem ? aviso(r.ok === false ? 'perigo' : 'ok', r.mensagem) : null;
+  // Vermelho só para erro de verdade; "o token foi aceito, falta o negócio" (token_ok, workflow 12) vem em tom neutro.
+  const msg = r.mensagem ? aviso(r.ok === false ? (r.token_ok ? '' : 'perigo') : 'ok', r.mensagem) : null;
   const ocupado = (b, t) => { b.disabled = true; b.textContent = t; };
   // R-08 (DEC-173): token recusado: a integração está parada; conectar de novo abre o formulário com o token novo.
   if (!r.conectado || ultimo === 'reconectar') {
-    const plats = Object.keys(r.plataformas || { reservio: 'Reservio' }).map(k => [k, (r.plataformas || {})[k] || 'Reservio']);
+    // DEC-197: só o que o servidor conecta (hoje, o Reservio) pede token; os outros sistemas levam ao link de agendamento.
+    const conecta = r.plataformas || { reservio: 'Reservio' };
+    const plats = Object.keys(conecta).map(k => [k, conecta[k] || 'Reservio']).concat(OUTRAS_PLAT.filter(([k]) => !conecta[k]));
     const sPlat = sel('intPlat', plats, (ultimo && ultimo.plataforma) || 'reservio');
     const tok = el('input', { class: 'entrada', id: 'intToken', type: 'password', autocomplete: 'off', spellcheck: 'false', placeholder: 'Cole aqui o token da API', value: ultimo && ultimo.token ? ultimo.token : null });
-    let neg = null;
-    if (r.escolher_negocio && r.escolher_negocio.length) neg = sel('intNeg', r.escolher_negocio.map(x => [x.id, x.nome || x.id]), '');
-    else if (r.pedir_negocio) neg = el('input', { class: 'entrada', id: 'intNeg', type: 'text', placeholder: 'Ex.: b04965e6-a9bb-591f-8f8a-1adcb2c8dc39' });
+    // O ID do negócio desde o começo, opcional: vazio, o servidor procura pelo token (um negócio: conecta; mais de um: a lista).
+    const neg = r.escolher_negocio && r.escolher_negocio.length ? sel('intNeg', r.escolher_negocio.map(x => [x.id, x.nome || x.id]), '')
+      : el('input', { class: 'entrada', id: 'intNeg', type: 'text', autocomplete: 'off', spellcheck: 'false', placeholder: 'Ex.: b04965e6-a9bb-591f-8f8a-1adcb2c8dc39', value: ultimo && ultimo.business_id ? ultimo.business_id : null });
     // R-12: a clínica de teste só conecta uma conta do Reservio que seja só de teste, nunca a de uma clínica.
     const teste = r.pedir_confirmacao_teste ? el('input', { type: 'checkbox', id: 'intTeste' }) : null;
     const bt = el('button', { class: 'btn pri plena', type: 'button', text: 'Conectar' });
     bt.addEventListener('click', () => {
-      const dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg ? neg.value.trim() : '', teste_confirmado: !!(teste && teste.checked) };
+      const dados = { plataforma: sPlat.value, token: tok.value.trim(), business_id: neg.value.trim(), teste_confirmado: !!(teste && teste.checked) };
       if (!dados.token) { tok.focus(); rapida('Cole o token da API.'); return; }
       if (teste && !teste.checked) { teste.focus(); rapida('Confirme que a conta do Reservio é só de teste.'); return; }
       ocupado(bt, 'Conectando…');
       c12('conectar', dados).then(x => intRender(x, x.ok ? null : dados)).catch(() => intRender({ ok: false, mensagem: 'Não consegui conectar agora. Tente de novo em instantes.', plataformas: r.plataformas, pedir_confirmacao_teste: r.pedir_confirmacao_teste }, dados));
     });
+    const comToken = el('div', { id: 'intComToken' }, campo('Token da API', tok, 'No Reservio, a API faz parte do plano Pro: peça o token ao suporte do Reservio e cole aqui. Ele fica guardado com criptografia e não aparece de novo.'),
+      r.escolher_negocio && r.escolher_negocio.length ? campo('Negócio', neg, 'Sua conta tem mais de um negócio. Escolha o desta clínica.')
+        : campo('ID do negócio (opcional)', neg, 'Vem junto com o token, no e-mail do suporte do ' + nomePlat + '. Se ficar vazio, a RXSync procura o negócio pelo token.'),
+      teste ? el('label', { class: 'marcar' }, teste, el('span', { text: 'Esta conta do ' + nomePlat + ' é só de teste (nunca a de uma clínica).' })) : null, bt);
+    const semToken = el('div', { id: 'intSemToken' });
+    const trocarPlat = () => {
+      const k = sPlat.value, nome = (plats.find(x => x[0] === k) || [])[1] || '';
+      comToken.hidden = !conecta[k]; semToken.hidden = !!conecta[k];
+      if (!conecta[k]) trocar(semToken, el('p', { class: 'dica bloco', text: (k === 'outro' ? 'Com outro sistema' : 'Com o ' + nome) + ', a assistente pode enviar aos pacientes o link de agendamento do seu sistema, em vez de marcar a consulta.' }),
+        el('button', { class: 'btn sec plena', type: 'button', 'data-ir': 'agenda/horarios/integracao/link' }, icone('link', 'p'), 'Link de agendamento do seu sistema'));
+    };
+    sPlat.addEventListener('change', trocarPlat);
     trocar(box, msg, el('div', { class: 'cartao pad molde-f' }, el('p', { class: 'tit-bloco', text: r.token_recusado ? 'Conectar de novo' : 'Conectar a agenda que você já usa' }),
-      campo('Plataforma', sPlat, 'Por enquanto, a integração funciona com o Reservio.'), campo('Token da API', tok, 'No Reservio, a API faz parte do plano Pro: peça o token ao suporte do Reservio e cole aqui. Ele fica guardado com criptografia e não aparece de novo.'),
-      neg ? campo(r.escolher_negocio ? 'Negócio' : 'ID do negócio', neg, r.escolher_negocio ? 'Sua conta tem mais de um negócio. Escolha o desta clínica.' : 'O suporte do ' + nomePlat + ' informa junto com o token.') : null,
-      teste ? el('label', { class: 'marcar' }, teste, el('span', { text: 'Esta conta do ' + nomePlat + ' é só de teste (nunca a de uma clínica).' })) : null, bt));
+      campo('Plataforma', sPlat), comToken, semToken));
+    trocarPlat();
     return;
   }
   const { sw } = chaveEl('func_reservio', 'Integração com o ' + nomePlat, { semId: false });
@@ -488,7 +537,7 @@ function intRender(r, ultimo) {
       'A cada 2 minutos, as consultas do ' + nomePlat + ' aparecem aqui e ocupam o horário do profissional.',
       'A assistente pergunta ao ' + nomePlat + ' os horários livres na hora, cria a reserva lá e só então confirma ao paciente.',
       'Nova consulta, Remarcar e Bloquear horário na Agenda também vão para o ' + nomePlat + '. Cancelar e bloquear você faz também lá: a lista "Para fazer" acima e o WhatsApp de avisos lembram.',
-      'Feriados seguem o que estiver em Agenda › Horários › Feriados.'
+      'Feriados seguem o que estiver em Agenda › Ajustes da agenda › Feriados.'
     ].map(t => el('p', { class: 'dica', text: t }))),
     el('div', { class: 'perigo-zona' }, btn('Desconectar do ' + nomePlat, async ev => {
       const b = ev.currentTarget;

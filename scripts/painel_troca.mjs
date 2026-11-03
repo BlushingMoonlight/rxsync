@@ -36,7 +36,7 @@ page.on('response', r => { if (r.url().startsWith(site.base) && r.status() >= 40
 const passa = async (de, para) => { if (page.url().startsWith(site.base)) await juntarBloqueios(); await page.goto(site.base + de); await page.waitForURL(u => u.pathname === '/painel/'); await page.locator('#app').waitFor({ state: 'visible' }); const u = new URL(page.url()); return u.pathname + u.search + u.hash === para; };
 ok(await passa('/autoedicao.html?t=' + TOKEN + '#agenda/integracao', '/painel/?t=' + TOKEN + '#agenda/horarios/integracao'), 'autoedicao.html?t=…#agenda/integracao leva a /painel/?t=…#agenda/horarios/integracao');
 ok(chamadas.some(c => c.acao === 'abrir' && c.token === TOKEN) && await page.locator('#faixaSenha').isVisible(), 'o link antigo abre o painel novo pelo token, com a faixa "Crie sua senha"');
-ok(await page.locator('section[data-tela="agenda/horarios/integracao"]').isVisible(), 'e cai em Agenda › Horários › Integração e planilhas');
+ok(await page.locator('section[data-tela="agenda/horarios/integracao"]').isVisible(), 'e cai em Agenda › Ajustes da agenda › Integração e planilhas');
 ok(await passa('/autoedicao.html?t=' + TOKEN + '#pacientes/editar', '/painel/?t=' + TOKEN + '#pacientes'), '#pacientes/editar leva a #pacientes');
 ok(await passa('/autoedicao.html?t=' + TOKEN + '#conta/dados', '/painel/?t=' + TOKEN + '#conta/dados'), 'os outros # continuam iguais (#conta/dados)');
 

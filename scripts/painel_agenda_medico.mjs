@@ -1,6 +1,6 @@
 // Painel (painel/, DEC-156): testa pela tela o botão "Agenda por médico" (DEC-103, rxsync-sistema#77), com o n8n
 // SIMULADO aqui (nada sai para a internet):
-//   1. Gestão: o botão aparece no alto de Agenda › Horários › Médicos e tipos, desligado, e ligar manda func_medicos = SIM ao 24;
+//   1. Gestão: o botão aparece no alto de Agenda › Ajustes da agenda › Médicos e tipos, desligado, e ligar manda func_medicos = SIM ao 24;
 //   2. Médicos e tipos com médico cadastrado e o botão desligado: aviso "A agenda por médico está desligada", e a
 //      grade da clínica continua valendo (Horários de atendimento, sem o aviso dos médicos); ligado (o 24 devolve
 //      modo_medicos), o aviso verde do modo médicos, e Horários de atendimento aponta para Médicos e tipos;

@@ -61,9 +61,9 @@ const erros = [];
 const page = await ctx.newPage(); page.setDefaultTimeout(8000); page.on('pageerror', e => erros.push(String(e)));
 const ultima = acao => chamadas.filter(c => c.acao === acao).pop();
 
-// 1. tela da integração, só tocando: Agenda › Horários › Integração e planilhas › Reservio (R-13)
+// 1. tela da integração, só tocando: Agenda › Ajustes da agenda › Integração e planilhas › Reservio (R-13)
 await page.goto(site.base + '/painel/#agenda');
-await page.locator('.cab-tela').getByRole('button', { name: 'Horários' }).click();
+await page.locator('.cab-tela').getByRole('button', { name: 'Ajustes da agenda' }).click();
 await page.getByText('Integração e planilhas').first().click();
 await page.locator('#intIndice').getByText('1 para fazer no Reservio').waitFor();
 ok(true, 'a tela da integração abre só tocando, a partir da Agenda, e o índice mostra o que há para fazer no Reservio');
