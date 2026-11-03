@@ -25,6 +25,7 @@ const AGENDA = [];
 let id = 100;
 for (const dia of [2, 3, 4, 5, 6]) for (const [h, m, i] of [[8, 0, 0], [9, 0, 1], [10, 0, 2], [11, 0, 3], [14, 0, 4], [15, 0, 5], [16, 0, 6]]) {
   if ((dia + i) % 4 === 3) continue;   // a agenda cheia, com alguns horários livres
+  if (dia === 6 && h < 12) continue;   // sexta de manhã livre: é o horário que o chat da página bloqueia
   const k = (dia * 3 + i) % NOMES.length, med = MEDICOS[(dia + i) % 2];
   AGENDA.push({ id: id++, nome_paciente: NOMES[k], telefone_paciente: tel(k), servico: i % 3 === 0 ? 'Retorno' : 'Consulta', inicio: em(dia, h, m), fim: em(dia, h, m + (med.id === 1 ? 50 : 40)),
     status: 'agendado', visto: !(dia === 4 && i < 2), criado_por: i % 2 ? 'ia' : 'manual', presenca: dia === 4 && i < 4 ? 'confirmada' : null, medico_id: med.id, pago_em: i % 3 === 1 ? em(dia - 1, 18) : null });

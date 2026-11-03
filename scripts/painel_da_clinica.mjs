@@ -6,7 +6,8 @@
 //   3. o chat do assistente de gestão: com "reduzir movimento", aparece inteiro na hora; sem, se escreve sozinho, a
 //      confirmação é o toque no botão "Confirmar" (nunca uma mensagem digitada) e termina com o resumo da agenda;
 //   4. os botões levam a origem do clique ao contratar (painel_pagina_topo e painel_pagina_final);
-//   5. nenhum telefone completo na página, e a página inicial tem o link no rodapé.
+//   5. nenhum telefone completo na página, e a página inicial tem o link no rodapé;
+//   6. o resumo da manhã do chat diz quantas consultas há e lista exatamente essas.
 // Uso (precisa do Playwright): node scripts/painel_da_clinica.mjs   (NAVEGADOR=webkit roda no motor do Safari)
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
@@ -54,6 +55,10 @@ for (const w of [390, 820, 1024]) {
   ok(!/sim, confirmo/i.test(textos), 'nenhuma mensagem digitada de confirmação ("Sim, confirmo")');
   ok(/O que mudou\s*Horário bloqueado: 06\/11 às 08:00/.test(textos) && /Bom dia! Agenda de hoje/.test(textos), 'o cartão "O que mudou" e o resumo da agenda aparecem no fim');
   ok(await p.getByText('Conversa ilustrativa.').isVisible(), 'a legenda "Conversa ilustrativa."');
+  // O resumo da manhã diz "N consultas" e lista exatamente N (as mesmas do print da Hoje, da clínica inventada).
+  const resumo = textos.slice(textos.indexOf('Bom dia! Agenda de hoje'));
+  const n = +((resumo.match(/(\d+) consultas?/) || [])[1] || -1), linhas = (resumo.match(/^\d{2}:\d{2} – /gm) || []).length;
+  ok(n === linhas, `o resumo da manhã diz ${n} consultas e lista ${linhas}`);
   // botões e telefones
   const hrefs = await p.evaluate(() => [...document.querySelectorAll('a[data-origem]')].map(a => [a.dataset.origem, a.getAttribute('href')]));
   ok(hrefs.length === 2 && hrefs.every(([o, h]) => h.includes('origem=' + o)) && hrefs.map(x => x[0]).join() === 'painel_pagina_topo,painel_pagina_final', 'os botões levam a origem do clique (painel_pagina_topo e painel_pagina_final)');
