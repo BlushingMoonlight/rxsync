@@ -11,13 +11,13 @@ import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const SESSAO = 'a'.repeat(64);
-const chamadas = []; const estado = { papel: 'dono' };
+const chamadas = []; const estado = { papel: 'dono', noAr: true };
 const AGENDA = n => Array.from({ length: n }, (_, i) => ({ codigo: i + 1, inicio: '2026-11-01 10:00', fim: '2026-11-01 10:30', situacao: 'confirmado', paciente: i === 0 ? '=HIPERLINK("x")' : 'Paciente ' + (i + 1), telefone: '41999990000' }));
 function responder(url, h, b) {
   const caminho = url.slice(N8N.length);
   chamadas.push({ caminho, acao: b.acao, sessao: h['x-rxsync-painel'] || '', dados: b.dados || {} });
   if (caminho === 'autoedicao' && b.acao === 'abrir') return { ok: true, papel: estado.papel, editaveis: { nome_exibicao: 'Clínica Painel A', fuso_horario: 'America/Sao_Paulo', email: 'dono@clinica-a.test' }, somenteLeitura: { plano: 'Essencial' },
-    recursos: Object.fromEntries(['documentos', 'fila', 'pesquisa', 'reconhecer', 'tipo_visita', 'empilhamento', 'preconsulta', 'medicos', 'relacionamento', 'assistente_dono', 'pacientes'].map(k => [k, false])), limite_catalogo: 500 };
+    recursos: Object.fromEntries(['documentos', 'fila', 'pesquisa', 'reconhecer', 'tipo_visita', 'empilhamento', 'preconsulta', 'medicos', 'relacionamento', 'assistente_dono', 'pacientes'].map(k => [k, false])), limite_catalogo: 500, conta: { situacao: '', no_ar: estado.noAr } };
   if (caminho === 'autoedicao' && b.acao === 'assinatura_ver') return { ok: true, assinatura: { situacao: 'em_dia', plano_chave: 'essencial', plano_nome: 'Essencial', forma: 'mensal', valor: '299', abertas: [], pagas: [] } };
   if (caminho === 'painel-entrada' && b.acao === 'termos_estado') return { ok: true, pendente: false, papel: estado.papel };
   if (caminho === 'painel-entrada' && b.acao === 'equipe_listar') return { ok: true, limite: 3, pessoas: [
@@ -65,6 +65,14 @@ ok(linhasCsv.length === 2004 && /^Código,Início/.test(linhasCsv[0]), 'CSV com 
 ok(linhasCsv[1].includes(`"'=HIPERLINK(""x"")"`), 'CSV: valor que começa com = vira texto (a planilha não executa)');
 ok(/^rxsync-agenda-\d{4}-\d{2}-\d{2}\.csv$/.test(download.suggestedFilename()), 'nome do arquivo: rxsync-agenda-AAAA-MM-DD.csv');
 await page.goto(site.base + '/painel/#conta/assinatura');
+await page.locator('#assinConteudo .perigo-zona').waitFor();
+ok(/aviso é de 30 dias/.test(await page.locator('#assinConteudo .perigo-zona').textContent()), 'mensal no ar: "Cancelar e excluir" explica o aviso de 30 dias');
+// D-01 do pente fino da camada 3: quem ainda não foi ao ar tem o contrato encerrado no dia (rx_conta_exclusao_caso, sem_golive).
+estado.noAr = false;
+await page.reload(); await page.locator('#assinConteudo .perigo-zona').waitFor();
+const zona = await page.locator('#assinConteudo .perigo-zona').textContent();
+ok(/ainda não foi ao ar/.test(zona) && !/aviso é de 30 dias/.test(zona), 'mensal ainda sem ir ao ar: diz que o contrato termina no dia, sem o aviso de 30 dias');
+estado.noAr = true;
 await page.locator('#assinConteudo').getByRole('button', { name: 'Cancelar e excluir a conta' }).click();
 await page.click('#confOk');
 await page.waitForTimeout(300);
