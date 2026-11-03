@@ -32,7 +32,8 @@ async function salvarCampo(k, valor, op) {
   estadoCampo(k, 'Salvando…');
   let r;
   try { r = await c24('salvar', { [k]: valor }); } catch (e) { estadoCampo(k, 'Não foi salvo: sem conexão. Tente de novo.', 'erro'); return false; }
-  if (!r.ok) { estadoCampo(k, 'Não foi salvo. ' + (r.mensagem || 'Confira o campo.'), 'erro'); sincronizarCampo(k); return false; }
+  // Recusado: chaves e escolhas voltam ao valor salvo; o texto digitado fica no campo para a pessoa corrigir (pente fino da camada 3, I-02).
+  if (!r.ok) { estadoCampo(k, 'Não foi salvo. ' + (r.mensagem || 'Confira o campo.'), 'erro'); sincronizarCampo(k, true); return false; }
   VAL[k] = valor; delete sujos[k];
   estadoCampo(k, 'Salvo', 'salvo');
   if (r.mensagem && r.mensagem !== 'Salvo!') rapida(r.mensagem);
@@ -50,7 +51,7 @@ async function salvarPendentes() {
   ks.forEach(k => { VAL[k] = dados[k]; delete sujos[k]; estadoCampo(k, 'Salvo', 'salvo'); });
   return true;
 }
-function sincronizarCampo(k) { document.querySelectorAll('[data-campo="' + k + '"]').forEach(x => { if (x._sinc) x._sinc(); }); }
+function sincronizarCampo(k, manterTexto) { document.querySelectorAll('[data-campo="' + k + '"]').forEach(x => { if (x._sinc && !(manterTexto && x._texto)) x._sinc(); }); }
 function dependenciasAplicar() {
   document.querySelectorAll('[data-depende]').forEach(d => {
     const ks = d.getAttribute('data-depende').split(',');
@@ -135,6 +136,7 @@ function campoEl(k, op) {
       input = el(area ? 'textarea' : 'input', { class: 'entrada', id: 'campo_' + k, 'data-campo': k, disabled: travado, placeholder: c.ph || null, rows: area ? '3' : null,
         maxlength: LIMITES_CAMPOS[k] ? String(LIMITES_CAMPOS[k]) : null, type: area ? null : (c.tipo === 'tel' ? 'tel' : 'text'),
         inputmode: c.tipo === 'number' ? 'numeric' : c.tipo === 'tel' ? 'tel' : k === 'email' ? 'email' : /link|https/.test(k) ? 'url' : null, autocomplete: k === 'email' ? 'email' : 'off' });
+      input._texto = true;
       input._sinc = () => { input.value = VAL[k] == null ? '' : VAL[k]; if (area) setTimeout(() => cresce(input), 0); contar(k, input, cont); };
       input.addEventListener('input', () => { if (input.value !== (VAL[k] || '')) sujos[k] = input.value; else delete sujos[k]; if (area) cresce(input); contar(k, input, cont); });
       input.addEventListener('blur', () => { if (input.value !== (VAL[k] == null ? '' : VAL[k])) salvarCampo(k, input.value); });
