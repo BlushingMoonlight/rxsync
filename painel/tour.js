@@ -13,8 +13,8 @@
   const PASSOS = {
     hoje: [['#hojePassos', 'Bem-vinda ao painel. Faltam 4 coisas para a assistente atender bem os seus pacientes. Vamos na ordem: toque na primeira.'],
       ['#btnEstadoIa', 'Agora o teste de verdade: do seu celular, mande "oi" para o WhatsApp da clínica. Em segundos ela responde, e aqui aparece "Atendendo".'],
-      ['#hojeAtencao', 'Quando um paciente pede para falar com uma pessoa ou tem urgência, aparece aqui e no celular de avisos. Toque, resolva no WhatsApp e marque como visto.']],
-    'conta/whatsapp': [['#zapNumero', 'Este é o WhatsApp que a assistente usa. Se aparecer "Conectar", leia o QR com o celular da clínica, em Aparelhos conectados.']],
+      ['#hojeAtencao', 'Quando um paciente pede para falar com uma pessoa ou tem urgência, aparece aqui e no celular de avisos. Toque, resolva no WhatsApp e toque em "Resolvido".']],
+    'conta/whatsapp': [['#zapNumero', 'Este é o WhatsApp que a assistente usa. Se ela parar de responder, toque em "Reconectar ou trocar o número" e leia o código com o celular da clínica, em Aparelhos conectados.']],
     'agenda/horarios/grade': [['#gradeBox', 'A assistente só marca dentro destes horários. Confira os dias e o intervalo de almoço. Feriados ficam em Agenda › Horários › Feriados.']],
     'assistente/automaticas': [['#fld_lembretes', 'Ligue os lembretes de consulta: o paciente recebe uma mensagem 24 horas e 2 horas antes, pedindo a confirmação. Isso ajuda a reduzir faltas.']],
     assistente: [['#blocoSabe', 'Tudo o que ela responde vem daqui: preços, convênios, endereço e as perguntas frequentes do seu formulário. Mudou algo na clínica? Mude aqui; vale na hora.']],
