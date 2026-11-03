@@ -5,7 +5,7 @@
 // Uso (precisa do Playwright): node scripts/site_identidade.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
-const PAGINAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html',
+const PAGINAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html', 'painel-da-clinica/index.html',
   ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
 const INTERNAS = ['central/', ...['', 'central/', 'escopo/', 'manual/'].map(f => 'demo/clinica/' + f)];
 const PREVIA = { 'demo/clinica/': 'https://rxsync.com.br/demo/clinica/comum/previa.png' };
