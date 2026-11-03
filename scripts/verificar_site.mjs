@@ -240,7 +240,7 @@ for (const arq of ['painel/index.html']) {
 // a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento; a 5: a Central,
 // com manifest branco, e a entrada, a central, o escopo e o manual da demonstração, cuja entrada tem a prévia própria).
 {
-  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html', 'assistente-whatsapp-clinica/index.html',
+  const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html', 'assistente-whatsapp-clinica/index.html', 'painel-da-clinica/index.html',
     ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
   const DEMO = ['index', 'central/index', 'escopo/index', 'manual/index'].map(f => `demo/clinica/${f}.html`);
   // Os guias (guias/, scripts/guias_montar.mjs) também, inclusive os rascunhos.
@@ -439,6 +439,26 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');
   // A página do anúncio tem noindex: fica fora do sitemap.
   if (fs.existsSync('sitemap.xml') && /assistente-whatsapp-clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a página do anúncio (noindex) fica fora do sitemap');
+  // A página do painel (/painel-da-clinica/, rxsync-sistema DEC-199): os prints do próprio painel (scripts/painel_prints.mjs)
+  // existem, nas duas larguras, com texto alternativo, largura e altura (a página não pula ao carregar); e um aviso quando o
+  // painel mudou depois dos prints (o resumo do painel/index.html do prints.json).
+  if (fs.existsSync('painel-da-clinica/index.html')) {
+    const pg = fs.readFileSync('painel-da-clinica/index.html', 'utf8');
+    if (!fs.existsSync('sitemap.xml') || !fs.readFileSync('sitemap.xml', 'utf8').includes('<loc>https://rxsync.com.br/painel-da-clinica/</loc>')) erro('sitemap.xml: falta a página do painel (/painel-da-clinica/)');
+    const imgs = [...pg.matchAll(/<img\b[^>]*>/g)].map(m => m[0]).filter(t => /src="\/assets\/painel-da-clinica\//.test(t));
+    if (!imgs.length) erro('painel-da-clinica/index.html: nenhum print do painel');
+    for (const t of imgs) {
+      const arqs = [...t.matchAll(/\/assets\/painel-da-clinica\/[\w.-]+\.webp/g)].map(m => m[0].slice(1));
+      for (const f of arqs) if (!fs.existsSync(f)) erro(`painel-da-clinica/index.html: o print ${f} não existe (rode node scripts/painel_prints.mjs)`);
+      if (!/\balt="[^"]{20,}"/.test(t)) erro(`painel-da-clinica/index.html: print sem texto alternativo que diga o que mostra (${arqs[0]})`);
+      if (!/\bwidth="\d+"/.test(t) || !/\bheight="\d+"/.test(t)) erro(`painel-da-clinica/index.html: print sem largura e altura (${arqs[0]})`);
+    }
+    try {
+      const pj = JSON.parse(fs.readFileSync('assets/painel-da-clinica/prints.json', 'utf8'));
+      const agora = (await import('node:crypto')).createHash('sha256').update(fs.readFileSync('painel/index.html')).digest('hex');
+      if (pj.painel_sha256 !== agora) console.log('::warning title=Prints do painel::o painel mudou depois dos prints da página do painel; rode node scripts/painel_prints.mjs e confira as fotos no PR.');
+    } catch (e) { erro('assets/painel-da-clinica/prints.json: não consegui ler (rode node scripts/painel_prints.mjs)'); }
+  }
   if (fs.existsSync('assistente-whatsapp-clinica/index.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync('assistente-whatsapp-clinica/index.html', 'utf8'))) erro('assistente-whatsapp-clinica/index.html: a página do anúncio precisa do noindex');
   // O lastmod do sitemap acompanha a página (menos os guias): só avisa (não bloqueia) quando o último commit da página é depois do lastmod.
   if (fs.existsSync('sitemap.xml')) {
@@ -508,7 +528,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
       + '\n' + [...h.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
   };
   const fontes = [];
-  for (const f of ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', '404.html', 'assistente-whatsapp-clinica/index.html'])
+  for (const f of ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', '404.html', 'assistente-whatsapp-clinica/index.html', 'painel-da-clinica/index.html'])
     if (fs.existsSync(f)) fontes.push([f, textoHtml(fs.readFileSync(f, 'utf8'))]);
   for (const d of ['painel/fonte', 'demo/clinica/comum', 'demo/clinica/app', 'demo/clinica/central', 'demo/clinica/escopo', 'demo/clinica/manual'])
     if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js'))) fontes.push([d + '/' + f, strings(fs.readFileSync(path.join(d, f), 'utf8'))]);

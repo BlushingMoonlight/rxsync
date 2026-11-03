@@ -1,0 +1,69 @@
+{
+  "_sobre": "Gerado por node scripts/painel_prints.mjs. painel_sha256 é o painel/index.html do dia dos prints: o verificar_site.mjs avisa quando o painel mudar.",
+  "painel_sha256": "116dba65c441b582ae2ddcb96b3021ace4f856a4052295ebd4ebc0cf8b978a33",
+  "prints": [
+    {
+      "nome": "hoje-celular",
+      "tela": "hoje",
+      "largura": 390,
+      "altura": 844,
+      "alt": "Tela Hoje do painel no celular: Precisa de você, com um pedido de pessoa, e as consultas do dia"
+    },
+    {
+      "nome": "agenda-ipad",
+      "tela": "agenda",
+      "largura": 820,
+      "altura": 1000,
+      "alt": "Agenda do painel no iPad: a semana com as consultas de dois médicos, o filtro por médico e o botão Nova consulta"
+    },
+    {
+      "nome": "precisa-de-voce",
+      "tela": "hoje",
+      "largura": 390,
+      "altura": 560,
+      "alt": "Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido"
+    },
+    {
+      "nome": "agenda-celular",
+      "tela": "agenda",
+      "largura": 390,
+      "altura": 844,
+      "alt": "Agenda do painel no celular: as consultas do dia, de quem a assistente marcou e de quem a equipe marcou"
+    },
+    {
+      "nome": "assistente-valores",
+      "tela": "assistente/valores",
+      "largura": 390,
+      "altura": 844,
+      "alt": "Tela Assistente, Valores, convênios e regras: os preços, as formas de pagamento e os convênios que a assistente usa nas respostas"
+    },
+    {
+      "nome": "resultados",
+      "tela": "resultados",
+      "largura": 390,
+      "altura": 844,
+      "alt": "Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior"
+    },
+    {
+      "nome": "pacientes",
+      "tela": "pacientes",
+      "largura": 390,
+      "altura": 700,
+      "alt": "Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos"
+    },
+    {
+      "nome": "equipe",
+      "tela": "conta/equipe",
+      "largura": 390,
+      "altura": 700,
+      "alt": "Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail"
+    },
+    {
+      "nome": "receber",
+      "tela": "agenda/horarios/pagamento",
+      "largura": 390,
+      "altura": 1040,
+      "alt": "Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta"
+    }
+  ]
+}

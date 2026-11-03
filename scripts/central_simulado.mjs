@@ -11,7 +11,7 @@ export async function abrirNavegador() {
   return pw.chromium.launch().catch(() => pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }));
 }
 // Servidor local só com os arquivos do site (127.0.0.1).
-const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.png': 'image/png', '.PNG': 'image/png', '.webmanifest': 'application/manifest+json' };
+const TIPOS = { '.webp': 'image/webp', '.json': 'application/json', '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.png': 'image/png', '.PNG': 'image/png', '.webmanifest': 'application/manifest+json' };
 export async function servirSite() {
   const srv = http.createServer((q, s) => { let f = path.join(RAIZ, decodeURIComponent(q.url.split('?')[0])); if (!f.startsWith(RAIZ)) { s.writeHead(403); return s.end(); } if (f.endsWith('/')) f += 'index.html';
     if (!fs.existsSync(f)) { s.writeHead(404); return s.end(); } s.writeHead(200, { 'Content-Type': TIPOS[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(s); });

@@ -5,7 +5,7 @@
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 import { paginasExistentes } from './guias_montar.mjs';
 const PAGINAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html',
-  ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`), 'termos/2026-11-v8.html', '404.html',
+  ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`), 'termos/2026-11-v8.html', '404.html', 'painel-da-clinica/index.html',
   'demo/clinica/index.html', 'demo/clinica/escopo/index.html', 'demo/clinica/manual/index.html', 'demo/clinica/central/index.html',
   ...paginasExistentes()];   // os guias (guias/, scripts/guias_montar.mjs), inclusive os rascunhos
 let falhas = 0;

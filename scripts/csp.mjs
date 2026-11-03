@@ -57,6 +57,7 @@ export const PAGINAS = {
     { script: "'self'", estilo: "'self'", img: "'self'", connect: N8N, ...(f === 'index' ? { frame: "'self'" } : {}) }])),
   // - página do anúncio (noindex): o aviso de cookies (arquivo do site) e o Google Analytics; o
   //   resto é texto. O chat e o teste ao vivo ficam na página inicial (links).
+  'painel-da-clinica/index.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self'", GA.img), connect: GA.connect },
   'assistente-whatsapp-clinica/index.html': { script: juntar("'self'", GA.script), estilo: "'self'", img: juntar("'self'", GA.img), connect: GA.connect },
   // - página 404 (DEC-156, entrega 4): só o estilo, as fontes e o ícone do site; nada roda.
   '404.html': { estilo: "'self'", img: "'self'", connect: "'none'" },

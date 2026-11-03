@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-oSE2t6Ib0VWIwCHXXdoI0aR4BgdvoGoNcN51MfCwCmQ=' 'self' https://*.googletagmanager.com; style-src 'sha256-eVdYlvqHJT9oReicSAG/Rk3Dxoov6e61NS1VJqdaVsY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/icones/rxsync-180.png">
+<title>Painel da clínica: agenda, pacientes e resultados | RXSync</title>
+<meta name="description" content="Veja por dentro o painel da RXSync: a agenda, o que precisa de você hoje, os resultados da assistente e o assistente de gestão no WhatsApp. Teste 7 dias grátis.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://rxsync.com.br/painel-da-clinica/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RXSync">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://rxsync.com.br/painel-da-clinica/">
+<meta property="og:title" content="Painel da clínica: agenda, pacientes e resultados | RXSync">
+<meta property="og:description" content="A agenda, os pacientes e a assistente da clínica, num lugar só. Veja o painel por dentro e teste 7 dias grátis.">
+<meta property="og:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RXSync: a assistente da clínica que responde e marca consultas no WhatsApp, 24 horas">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Painel da clínica: agenda, pacientes e resultados | RXSync">
+<meta name="twitter:description" content="A agenda, os pacientes e a assistente da clínica, num lugar só. Veja o painel por dentro e teste 7 dias grátis.">
+<meta name="twitter:image" content="https://rxsync.com.br/assets/og-rxsync.png">
+<link rel="preload" as="image" href="/assets/painel-da-clinica/hoje-celular-1x.webp" imagesrcset="/assets/painel-da-clinica/hoje-celular-1x.webp 1x, /assets/painel-da-clinica/hoje-celular-2x.webp 2x">
+<link rel="stylesheet" href="/assets/fontes/fontes.css">
+<link rel="stylesheet" href="/assets/ancora/tokens.css">
+<link rel="stylesheet" href="/assets/ancora/site.css">
+<style>
+  body { margin: 0; background: var(--fundo); color: var(--texto); font-family: var(--fonte); font-size: var(--t-corpo); line-height: var(--l-corpo); }
+  .dentro { box-sizing: border-box; max-width: 1080px; margin: 0 auto; padding: 0 var(--e-4); }
+  h1, h2, h3 { font-family: 'Figtree', var(--fonte); font-weight: 600; color: var(--texto); }
+  .topo-pc { border-bottom: 1px solid var(--borda); }
+  .topo-pc .dentro { display: flex; align-items: center; justify-content: space-between; gap: var(--e-3); }
+  .topo-pc a.marca { display: inline-flex; align-items: center; gap: var(--e-3); min-height: var(--barra-h); color: var(--texto); text-decoration: none; font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: var(--t-bloco); }
+  .topo-pc img { width: 32px; height: 32px; }
+  .topo-pc .planos { color: var(--texto-2); font-weight: 500; min-height: var(--alvo); display: inline-flex; align-items: center; }
+  .rotulo { display: inline-block; color: var(--primaria); font-weight: 600; font-size: var(--t-peq); margin: 0 0 var(--e-3); }
+  .tag-g { display: inline-flex; align-items: center; min-height: 24px; padding: 0 var(--e-2); border-radius: var(--r-capsula); background: var(--primaria-suave); color: var(--primaria); font-family: var(--fonte); font-size: var(--t-peq); font-weight: 600; vertical-align: middle; }
+  .chamada { display: inline-flex; align-items: center; justify-content: center; min-height: var(--alvo-principal); padding: 0 var(--e-6); border-radius: var(--r-botao); background: var(--primaria); color: var(--botao-texto); font-weight: 600; text-decoration: none; }
+  .chamada:hover { background: var(--primaria-forte); }
+  .link-sec { display: inline-flex; align-items: center; min-height: var(--alvo); color: var(--texto); font-weight: 500; }
+  .lead { font-size: var(--t-bloco); line-height: var(--l-bloco); color: var(--texto-2); margin: 0 0 var(--e-6); max-width: 52ch; }
+  section { padding: var(--e-12) 0; }
+  section + section { border-top: 1px solid var(--borda); }
+  h2 { font-size: var(--t-titulo); line-height: var(--l-titulo); margin: 0 0 var(--e-3); }
+  .print { display: block; height: auto; max-width: 100%; border: 1px solid var(--borda); border-radius: var(--r-cartao); background: var(--superficie); }
+  /* 1. Abertura: no celular, só a Hoje; do iPad em diante, a Agenda no iPad ao lado */
+  .heroi { padding-top: var(--e-10); }
+  .heroi h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); line-height: 1.12; margin: 0 0 var(--e-4); max-width: 22ch; }
+  .heroi .acoes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e-3) var(--e-6); }
+  .heroi .nota { margin: var(--e-4) 0 0; color: var(--texto-2); font-size: var(--t-2); }
+  .heroi .telas { display: flex; align-items: flex-start; justify-content: center; gap: var(--e-6); margin-top: var(--e-8); }
+  .heroi .telas .cel { flex: none; width: 260px; }
+  .heroi .telas .ipad { display: none; flex: 1 1 auto; min-width: 0; width: 520px; }
+  @media (min-width: 820px) { .heroi .telas .ipad { display: block; } }
+  /* 2. Assistente de gestão: o chat em texto */
+  .gestao-grade { display: grid; gap: var(--e-8); align-items: start; }
+  @media (min-width: 900px) { .gestao-grade { grid-template-columns: 1fr 1fr; } }
+  .pontos { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--e-3); }
+  .pontos li { display: flex; gap: var(--e-3); align-items: flex-start; }
+  .pontos li::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: 0.6em; border-radius: 50%; background: var(--primaria); }
+  .chat { border: 1px solid var(--borda); border-radius: var(--r-cartao); background: var(--superficie-2); padding: var(--e-4); display: flex; flex-direction: column; gap: var(--e-3); }
+  .chat .quando { align-self: center; color: var(--texto-2); font-size: var(--t-peq); }
+  .chat .msg { max-width: 86%; padding: var(--e-3) var(--e-4); border-radius: var(--r-cartao); white-space: pre-line; font-size: var(--t-2); line-height: var(--l-2); }
+  .chat .eu { align-self: flex-end; background: var(--primaria); color: var(--botao-texto); }
+  .chat .ele { align-self: flex-start; background: var(--superficie); border: 1px solid var(--borda); }
+  .chat .botoes { align-self: flex-start; display: flex; gap: var(--e-2); }
+  .chat .botoes span { display: inline-flex; align-items: center; min-height: var(--alvo); padding: 0 var(--e-4); border-radius: var(--r-botao); border: 1px solid var(--borda-campo); background: var(--superficie); font-weight: 600; font-size: var(--t-2); }
+  .chat .botoes .confirmar { background: var(--primaria); border-color: var(--primaria); color: var(--botao-texto); }
+  .chat .botoes .confirmar.tocado { background: var(--primaria-forte); outline: 3px solid var(--foco); outline-offset: 2px; }
+  .chat .mudou { align-self: flex-start; max-width: 86%; padding: var(--e-3) var(--e-4); border-radius: var(--r-cartao); background: var(--ok-fundo); color: var(--ok-texto); font-size: var(--t-2); }
+  .chat .mudou strong { display: block; font-weight: 600; }
+  .legenda { margin: var(--e-3) 0 0; color: var(--texto-2); font-size: var(--t-peq); }
+  .chat.anima .passo { opacity: 0; transform: translateY(6px); transition: opacity 220ms ease, transform 220ms ease; }
+  .chat.anima .passo.vis { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .chat.anima .passo { opacity: 1; transform: none; transition: none; } }
+  /* 3. Um dia na clínica: texto e print lado a lado a partir do iPad */
+  .dia { list-style: none; margin: var(--e-8) 0 0; padding: 0; display: grid; gap: var(--e-12); }
+  .dia li { display: grid; gap: var(--e-5); align-items: center; }
+  @media (min-width: 820px) { .dia li { grid-template-columns: 1fr 1fr; gap: var(--e-10); } .dia li:nth-child(even) .texto { order: 2; } }
+  .dia h3 { font-size: var(--t-bloco); line-height: var(--l-bloco); margin: 0 0 var(--e-2); }
+  .dia p { margin: 0; color: var(--texto-2); }
+  .dia .print { width: 300px; margin: 0 auto; }
+  /* 4. Para a clínica inteira */
+  .tres { list-style: none; margin: var(--e-8) 0 0; padding: 0; display: grid; gap: var(--e-8); }
+  @media (min-width: 820px) { .tres { grid-template-columns: repeat(3, 1fr); gap: var(--e-6); } }
+  .tres h3 { font-size: var(--t-bloco); line-height: var(--l-bloco); margin: var(--e-4) 0 var(--e-2); }
+  .tres p { margin: 0; color: var(--texto-2); }
+  .tres .print { width: 260px; max-width: 100%; }
+  /* 5. Planos */
+  .tabela { overflow-x: auto; margin: var(--e-6) 0 var(--e-4); }
+  table { border-collapse: collapse; width: 100%; min-width: 300px; font-size: var(--t-2); }
+  th, td { text-align: left; padding: var(--e-3); border-bottom: 1px solid var(--borda); vertical-align: top; }
+  thead th { font-weight: 600; color: var(--texto-2); }
+  td { font-variant-numeric: tabular-nums; }
+  tbody th { font-weight: 500; width: 55%; }
+  .sim { color: var(--ok-texto); font-weight: 600; }
+  .nao { color: var(--texto-2); }
+  /* 6. Chamada final */
+  .fim { text-align: center; }
+  .fim p { color: var(--texto-2); margin: 0 auto var(--e-6); max-width: 46ch; }
+  .fim .ver-antes { margin: var(--e-4) 0 0; }
+  .rodape-pc { border-top: 1px solid var(--borda); padding: var(--e-5) 0; color: var(--texto-2); font-size: var(--t-peq); }
+  .rodape-pc a { color: var(--texto-2); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header class="topo-pc"><div class="dentro"><a class="marca" href="/"><img src="/assets/icones/rxsync-192.png" alt="" width="32" height="32">RXSync</a><a class="planos" href="/#planos">Ver os planos</a></div></header>
+<main>
+  <!-- 1. Abertura -->
+  <section class="heroi"><div class="dentro">
+    <span class="rotulo">Painel da clínica</span>
+    <h1>A agenda, os pacientes e a assistente da clínica, num lugar só.</h1>
+    <p class="lead">No painel, a clínica vê a agenda, o que precisa de atenção hoje e os resultados, e muda na hora o que a assistente responde.</p>
+    <div class="acoes">
+      <a class="chamada" href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=painel_pagina_topo" data-origem="painel_pagina_topo">Começar 7 dias grátis</a>
+      <a class="link-sec" href="#assistente-de-gestao">Ver o painel por dentro</a>
+    </div>
+    <p class="nota">Funciona no celular, no iPad e no computador, sem instalar nada.</p>
+    <div class="telas">
+      <img class="print cel" src="/assets/painel-da-clinica/hoje-celular-1x.webp" srcset="/assets/painel-da-clinica/hoje-celular-1x.webp 1x, /assets/painel-da-clinica/hoje-celular-2x.webp 2x" width="390" height="844" fetchpriority="high" alt="Tela Hoje do painel no celular: Precisa de você, com um pedido de pessoa, e as consultas do dia">
+      <img class="print ipad" src="/assets/painel-da-clinica/agenda-ipad-1x.webp" srcset="/assets/painel-da-clinica/agenda-ipad-1x.webp 1x, /assets/painel-da-clinica/agenda-ipad-2x.webp 2x" width="820" height="1000" loading="lazy" alt="Agenda do painel no iPad: a semana com as consultas de dois médicos, o filtro por médico e o botão Nova consulta">
+    </div>
+  </div></section>
+
+  <!-- 2. Assistente de gestão (Gestão) -->
+  <section id="assistente-de-gestao"><div class="dentro gestao-grade">
+    <div>
+      <span class="rotulo">Assistente de gestão <span class="tag-g">Gestão</span></span>
+      <h2>Peça ao assistente de gestão, em palavras normais.</h2>
+      <p class="lead">Pelo painel ou pelo seu WhatsApp, ele responde sobre a agenda e os números e, se você deixar, faz a mudança.</p>
+      <ul class="pontos">
+        <li>No painel e no seu WhatsApp, de até 3 números autorizados.</li>
+        <li>Antes de mudar algo, ele mostra o que vai mudar e pede a sua confirmação. Ele só muda com "Pode fazer alterações" ligado.</li>
+        <li>O resumo da agenda chega no WhatsApp, no horário que você escolher.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="chat" id="chatGestao" aria-label="Conversa ilustrativa com o assistente de gestão">
+        <div class="passo msg eu">Bloqueia sexta de manhã</div>
+        <div class="passo msg ele">Vou bloquear sexta, 06/11, das 8h às 12h. Não há consultas marcadas nesse horário. Confirma?</div>
+        <div class="passo botoes" aria-label="Botões do painel"><span class="confirmar" data-toque>Confirmar</span><span>Não</span></div>
+        <div class="passo mudou"><strong>O que mudou</strong>Horário bloqueado: 06/11 às 08:00</div>
+        <div class="passo msg eu">Quantas consultas a assistente marcou esta semana?</div>
+        <div class="passo msg ele">Esta semana:
+• 9 marcadas pela assistente 🤖
+• 14 marcadas pela equipe
+• nenhum cancelamento</div>
+        <div class="passo quando">Às 7h, no seu WhatsApp</div>
+        <div class="passo msg ele"><strong>☀️ Bom dia! Agenda de hoje, qua 04/11</strong> — Clínica Exemplo
+
+<strong>6 consultas</strong>
+08:00 – Ana R. (Retorno) ✅
+09:00 – Bruno C. (Consulta) ✅ 🤖
+10:00 – Carla M. (Consulta) ✅
+14:00 – Elisa P. (Consulta)
+15:00 – Fábio N. (Consulta) 🤖
+16:00 – Gabriela L. (Retorno)
+<em>✅ confirmou presença · 🤖 marcada pela assistente</em>
+
+Responda aqui para perguntar ou mudar algo na agenda.</div>
+      </div>
+      <p class="legenda">Conversa ilustrativa.</p>
+    </div>
+  </div></section>
+
+  <!-- 3. Um dia na clínica -->
+  <section id="um-dia"><div class="dentro">
+    <h2>Um dia na clínica, pelo painel</h2>
+    <ul class="dia">
+      <li><div class="texto"><h3>Hoje</h3><p>Comece o dia pelo Hoje: as consultas do dia e, no alto, o que precisa de você, como quem pediu uma pessoa e as urgências.</p></div>
+        <img class="print" src="/assets/painel-da-clinica/precisa-de-voce-1x.webp" srcset="/assets/painel-da-clinica/precisa-de-voce-1x.webp 1x, /assets/painel-da-clinica/precisa-de-voce-2x.webp 2x" width="390" height="560" loading="lazy" alt="Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido"></li>
+      <li><div class="texto"><h3>Agenda com a recepção</h3><p>A assistente e a recepção usam a mesma agenda. A equipe vê o que ela marcou, marca também e acompanha as canceladas. Agenda por profissional: <span class="tag-g">Gestão</span></p></div>
+        <img class="print" src="/assets/painel-da-clinica/agenda-celular-1x.webp" srcset="/assets/painel-da-clinica/agenda-celular-1x.webp 1x, /assets/painel-da-clinica/agenda-celular-2x.webp 2x" width="390" height="844" loading="lazy" alt="Agenda do painel no celular: as consultas do dia, de quem a assistente marcou e de quem a equipe marcou"></li>
+      <li><div class="texto"><h3>O que a assistente responde</h3><p>Mudou um valor ou um horário? Você altera no painel, e a assistente já responde com a informação nova.</p></div>
+        <img class="print" src="/assets/painel-da-clinica/assistente-valores-1x.webp" srcset="/assets/painel-da-clinica/assistente-valores-1x.webp 1x, /assets/painel-da-clinica/assistente-valores-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Assistente, Valores, convênios e regras: os preços, as formas de pagamento e os convênios que a assistente usa nas respostas"></li>
+      <li><div class="texto"><h3>Resultados</h3><p>Conversas, consultas marcadas pela assistente e pela equipe, presenças confirmadas e o tempo da 1ª resposta, comparados com o período anterior.</p></div>
+        <img class="print" src="/assets/painel-da-clinica/resultados-1x.webp" srcset="/assets/painel-da-clinica/resultados-1x.webp 1x, /assets/painel-da-clinica/resultados-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior"></li>
+    </ul>
+  </div></section>
+
+  <!-- 4. Para a clínica inteira -->
+  <section id="clinica-inteira"><div class="dentro">
+    <h2>Para a clínica inteira</h2>
+    <ul class="tres">
+      <li><img class="print" src="/assets/painel-da-clinica/pacientes-1x.webp" srcset="/assets/painel-da-clinica/pacientes-1x.webp 1x, /assets/painel-da-clinica/pacientes-2x.webp 2x" width="390" height="700" loading="lazy" alt="Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos">
+        <h3>Pacientes <span class="tag-g">Gestão</span></h3><p>Busque pelo nome ou pelo telefone, veja as consultas de cada um e traga a lista de uma planilha.</p></li>
+      <li><img class="print" src="/assets/painel-da-clinica/equipe-1x.webp" srcset="/assets/painel-da-clinica/equipe-1x.webp 1x, /assets/painel-da-clinica/equipe-2x.webp 2x" width="390" height="700" loading="lazy" alt="Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail">
+        <h3>Equipe</h3><p>Até 3 pessoas da equipe, cada uma com o próprio e-mail e a própria senha.</p></li>
+      <li><img class="print" src="/assets/painel-da-clinica/receber-1x.webp" srcset="/assets/painel-da-clinica/receber-1x.webp 1x, /assets/painel-da-clinica/receber-2x.webp 2x" width="390" height="1040" loading="lazy" alt="Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta">
+        <h3>Receber dos pacientes</h3><p>A assistente manda o seu link de pagamento depois de marcar, ou um link do Asaas da clínica. Com agenda por profissional, cada tipo de consulta pode ter o próprio link.</p></li>
+    </ul>
+  </div></section>
+
+  <!-- 5. O que vem em cada plano -->
+  <section id="planos"><div class="dentro">
+    <h2>O que vem em cada plano</h2>
+    <div class="tabela">
+      <table>
+        <thead><tr><th scope="col">No painel</th><th scope="col">Essencial</th><th scope="col">Gestão</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Hoje e Resultados</th><td class="sim">Sim</td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Agenda com a recepção</th><td class="sim">Sim</td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Mudar o que a assistente responde</th><td class="sim">Sim</td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Equipe com até 3 pessoas</th><td class="sim">Sim</td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Receber dos pacientes</th><td class="sim">Sim</td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Link de pagamento por tipo de consulta</th><td class="nao"><span aria-hidden="true">—</span><span class="sr">Não</span></td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Agenda por profissional e Lista de espera</th><td class="nao"><span aria-hidden="true">—</span><span class="sr">Não</span></td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Pacientes</th><td class="nao"><span aria-hidden="true">—</span><span class="sr">Não</span></td><td class="sim">Sim</td></tr>
+          <tr><th scope="row">Assistente de gestão</th><td class="nao"><span aria-hidden="true">—</span><span class="sr">Não</span></td><td class="sim">Sim</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>No teste grátis, você usa tudo do Gestão Inteligente. <a href="/#planos">Ver os planos e os preços</a></p>
+  </div></section>
+
+  <!-- 6. Chamada final -->
+  <section class="fim"><div class="dentro">
+    <h2>Teste o painel com a sua clínica por 7 dias.</h2>
+    <p>Sem cartão. Os 7 dias contam a partir do dia em que a assistente entra no ar.</p>
+    <a class="chamada" href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=painel_pagina_final" data-origem="painel_pagina_final">Começar 7 dias grátis</a>
+    <p class="ver-antes">Prefere ver antes? <a href="/#contato">Peça uma demonstração</a></p>
+  </div></section>
+</main>
+<footer class="rodape-pc"><div class="dentro">RXSync · <a href="/privacidade.html">Política de Privacidade</a> · <a href="/">Página inicial</a></div></footer>
+<script src="/assets/consentimento.js" data-chat-fora></script>
+<script>
+// Página do painel (rxsync-sistema DEC-199). O chat se escreve sozinho quando aparece na tela: as falas uma a uma, o
+// toque em "Confirmar" e o cartão "O que mudou". Com "reduzir movimento" ou sem este script, a conversa aparece inteira.
+(function () {
+  var chat = document.getElementById('chatGestao');
+  var reduzir = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (chat && !reduzir && 'IntersectionObserver' in window) {
+    var passos = chat.querySelectorAll('.passo'), toque = chat.querySelector('[data-toque]'), i = 0;
+    chat.classList.add('anima');
+    var proximo = function () {
+      if (i >= passos.length) return;
+      var p = passos[i++]; p.classList.add('vis');
+      if (p.classList.contains('botoes')) { setTimeout(function () { toque.classList.add('tocado'); setTimeout(proximo, 500); }, 700); return; }
+      setTimeout(proximo, p.classList.contains('eu') ? 700 : 1000);
+    };
+    // Só depois que a página carregou (antes, a altura dos prints ainda não está certa e o chat parece estar na tela).
+    var observar = function () {
+      var io = new IntersectionObserver(function (e) { if (e[0].isIntersecting) { io.disconnect(); proximo(); } }, { threshold: 0.3 });
+      io.observe(chat);
+    };
+    if (document.readyState === 'complete') observar(); else window.addEventListener('load', observar);
+  }
+  // A origem do clique vai no endereço do contratar (cadastro.origem_clique) e no Google Analytics, só depois do "Aceitar".
+  document.querySelectorAll('a[data-origem]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      if (typeof window.gtag === 'function') window.gtag('event', 'iniciar_teste', { plan_selected: 'gestao', ciclo: 'mensal', origem: a.getAttribute('data-origem'), transport_type: 'beacon' });
+    });
+  });
+})();
+</script>
+</body>
+</html>
