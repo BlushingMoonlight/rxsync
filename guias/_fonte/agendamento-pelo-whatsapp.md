@@ -5,7 +5,7 @@ endereco: agendamento-pelo-whatsapp
 tema: agenda
 pesquisa-alvo: agendamento de consultas pelo WhatsApp
 publicado-em: 2026-10-28
-revisado-em: 2026-10-28
+revisado-em: 2026-11-03
 rascunho: não
 relacionados: reduzir-faltas-consultorio, ia-whatsapp-clinica-cfm, mensagens-prontas-recepcao
 perguntas:
@@ -71,7 +71,7 @@ Marcar mais perto da data também ajuda: numa revisão de 16 estudos sobre agend
 Uma assistente automática ligada à agenda pode oferecer os horários livres, marcar e confirmar à noite e no fim de semana. Ela precisa seguir as mesmas regras da recepção (horários, feriados, intervalo entre consultas) e passar para uma pessoa o que não souber resolver. Pelas regras do CFM para inteligência artificial, sistemas de IA para agendamento de consultas são exemplo de baixo risco ([fonte: Resolução CFM nº 2.454/2026, Anexo II](https://sistemas.cfm.org.br/normas/arquivos/resolucoes/BR/2026/2454_2026.pdf)).
 
 :::na-rxsync
-Na RXSync, a assistente vê os horários livres na agenda da clínica, com as regras e os feriados, marca e confirma na hora. Ela remarca a mesma consulta, desmarca só a consulta do próprio paciente e confirma a presença. A agenda pode começar com uma planilha importada ou ficar ligada ao Reservio.
+Na RXSync, a assistente vê os horários livres na agenda da clínica, com as regras e os feriados, marca e confirma na hora. Ela remarca a mesma consulta, desmarca só a consulta do próprio paciente e confirma a presença. A agenda pode começar com uma planilha importada ou ficar ligada à agenda online que a clínica já usa, quando ela tem integração com a RXSync.
 :::
 
 :::perguntas
