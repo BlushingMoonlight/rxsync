@@ -502,6 +502,15 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   for (const d of ['painel/fonte', 'central/fonte']) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js')))
     if (/type:\s*['"](pie|doughnut|polarArea)['"]/.test(fs.readFileSync(path.join(d, f), 'utf8'))) erro(`${d}/${f}: gráfico de pizza ou rosca; use barra ou linha (método de produto, regra 23)`);
 }
+// O mesmo atributo duas vezes na mesma tag: o navegador usa só o primeiro e ignora o resto (o destaque some calado).
+for (const f of todos.filter(f => /\.html$/.test(f) && !/^demo\/drandrepontes\//.test(f))) {
+  const h = fs.readFileSync(f, 'utf8').replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ');
+  for (const t of h.matchAll(/<[a-z][a-z0-9-]*\s([^<>]*)>/gi)) {
+    const nomes = [...t[1].matchAll(/(?:^|\s)([a-z][a-z0-9:-]*)\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+)/gi)].map(m => m[1].toLowerCase());
+    const rep = nomes.find((n, i) => nomes.indexOf(n) !== i);
+    if (rep) { erro(`${f}: o atributo ${rep} aparece duas vezes na mesma tag (${t[0].slice(0, 80)}); o navegador ignora o segundo`); break; }
+  }
+}
 // Confirmação pelos níveis de 0 a 3, nunca a caixa do navegador (método de produto, regra de confirmação): sem confirm(),
 // alert() nem prompt() no painel, na Central e na demonstração (a do Dr. André, que não muda, fica de fora; DEC-153).
 for (const d of ['painel/fonte', 'central/fonte', 'demo/clinica/comum', 'demo/clinica/app', 'demo/clinica/central', 'demo/clinica/escopo', 'demo/clinica/manual', 'demo/clinica'])
