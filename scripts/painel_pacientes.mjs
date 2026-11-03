@@ -1,6 +1,6 @@
 // Painel (painel/, DEC-156): testa pela tela a aba Pacientes, com o n8n SIMULADO aqui (nada sai para a internet; pacientes
 // inventados):
-//   1. a lista e a busca (que espera a segunda letra);
+//   1. a lista e a busca (que espera a segunda letra); a busca do topo acha o paciente;
 //   2. a ficha, com os possíveis duplicados, e juntar dois cadastros (com a confirmação);
 //   3. "Não quer receber avisos" (com a confirmação) e voltar a enviar só com a frase exata;
 //   4. excluir a pedido do paciente: recusado com consulta futura; depois, excluído e fora da lista;
@@ -98,6 +98,13 @@ await page.fill('#pacBusca', 'Bruno');
 await page.waitForFunction(() => document.querySelectorAll('#pacLista .linha').length === 1);
 ok(ultima('paciente_listar').dados.busca === 'Bruno' && (await nomes(page)).join() === 'Bruno Teste' && ultima('paciente_listar').sessao === SESSAO, 'busca "Bruno": pede ao servidor com a sessão e mostra só ele');
 await page.fill('#pacBusca', '');
+// 1b. A busca do topo acha o paciente mesmo sem tela nem consulta com o nome (pente fino da camada 3, I-01: antes, o bloco
+// "Pacientes" não entrava na página quando nada mais combinava, e a busca mostrava "Nada encontrado").
+await page.click('#btnBusca'); await page.fill('#buscaTexto', 'Bruno');
+ok(await page.locator('.busca-res .linha', { hasText: 'Bruno Teste' }).waitFor({ timeout: 5000 }).then(() => true, () => false), 'busca do topo: "Bruno" mostra o paciente em Pacientes');
+ok(await page.locator('.busca-res', { hasText: 'Nada encontrado' }).count() === 0, 'busca do topo: com o paciente achado, sem "Nada encontrado"');
+await page.locator('.busca-res .linha', { hasText: 'Bruno Teste' }).click();
+await page.locator('#pacFicha h2.titulo', { hasText: 'Bruno Teste' }).waitFor();
 
 // 2. Ficha e juntar duplicados
 await page.evaluate(() => { location.hash = 'pacientes/ficha/PAC-0001'; });
