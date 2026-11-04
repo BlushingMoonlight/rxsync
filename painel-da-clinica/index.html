@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-oSE2t6Ib0VWIwCHXXdoI0aR4BgdvoGoNcN51MfCwCmQ=' 'self' https://*.googletagmanager.com; style-src 'sha256-eVdYlvqHJT9oReicSAG/Rk3Dxoov6e61NS1VJqdaVsY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o9aO2ZRhgp2xLXnQPLotWHoyJ/pam7GIHHVM92nGXUM=' 'self' https://*.googletagmanager.com; style-src 'sha256-i2QSHYZJR2lPjchk4OOkAOjl+XiEAlnbqjrsd3JRjDY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/assets/icones/rxsync-512.png">
@@ -29,25 +30,22 @@
 <link rel="preload" as="image" href="/assets/painel-da-clinica/hoje-celular-1x.webp" imagesrcset="/assets/painel-da-clinica/hoje-celular-1x.webp 1x, /assets/painel-da-clinica/hoje-celular-2x.webp 2x">
 <link rel="stylesheet" href="/assets/fontes/fontes.css">
 <link rel="stylesheet" href="/assets/ancora/tokens.css">
+<link rel="stylesheet" href="/assets/ancora/guias.css">
 <link rel="stylesheet" href="/assets/ancora/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://rxsync.com.br/#organizacao", "name": "RXSync", "alternateName": "RXSync Tecnologia e Automação em Saúde", "url": "https://rxsync.com.br/", "logo": "https://rxsync.com.br/assets/logo-rxsync.png"}, {"@type": "WebPage", "@id": "https://rxsync.com.br/painel-da-clinica/", "url": "https://rxsync.com.br/painel-da-clinica/", "name": "Painel da clínica: agenda, pacientes e resultados", "description": "Veja por dentro o painel da RXSync: a agenda, o que precisa de você hoje, os resultados da assistente e o assistente de gestão no WhatsApp. Teste 7 dias grátis.", "inLanguage": "pt-BR", "isPartOf": {"@id": "https://rxsync.com.br/#site"}, "publisher": {"@id": "https://rxsync.com.br/#organizacao"}, "breadcrumb": {"@id": "https://rxsync.com.br/painel-da-clinica/#caminho"}}, {"@type": "BreadcrumbList", "@id": "https://rxsync.com.br/painel-da-clinica/#caminho", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://rxsync.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Painel da clínica", "item": "https://rxsync.com.br/painel-da-clinica/"}]}]}</script>
 <style>
   body { margin: 0; background: var(--fundo); color: var(--texto); font-family: var(--fonte); font-size: var(--t-corpo); line-height: var(--l-corpo); }
   .dentro { box-sizing: border-box; max-width: 1080px; margin: 0 auto; padding: 0 var(--e-4); }
   h1, h2, h3 { font-family: 'Figtree', var(--fonte); font-weight: 600; color: var(--texto); }
-  .topo-pc { border-bottom: 1px solid var(--borda); }
-  .topo-pc .dentro { display: flex; align-items: center; justify-content: space-between; gap: var(--e-3); }
-  .topo-pc a.marca { display: inline-flex; align-items: center; gap: var(--e-3); min-height: var(--barra-h); color: var(--texto); text-decoration: none; font-family: 'Figtree', var(--fonte); font-weight: 600; font-size: var(--t-bloco); }
-  .topo-pc img { width: 32px; height: 32px; }
-  .topo-pc .planos { color: var(--texto-2); font-weight: 500; min-height: var(--alvo); display: inline-flex; align-items: center; }
   .rotulo { display: inline-block; color: var(--primaria); font-weight: 600; font-size: var(--t-peq); margin: 0 0 var(--e-3); }
   .tag-g { display: inline-flex; align-items: center; min-height: 24px; padding: 0 var(--e-2); border-radius: var(--r-capsula); background: var(--primaria-suave); color: var(--primaria); font-family: var(--fonte); font-size: var(--t-peq); font-weight: 600; vertical-align: middle; }
   .chamada { display: inline-flex; align-items: center; justify-content: center; min-height: var(--alvo-principal); padding: 0 var(--e-6); border-radius: var(--r-botao); background: var(--primaria); color: var(--botao-texto); font-weight: 600; text-decoration: none; }
   .chamada:hover { background: var(--primaria-forte); }
   .link-sec { display: inline-flex; align-items: center; min-height: var(--alvo); color: var(--texto); font-weight: 500; }
   .lead { font-size: var(--t-bloco); line-height: var(--l-bloco); color: var(--texto-2); margin: 0 0 var(--e-6); max-width: 52ch; }
-  section { padding: var(--e-12) 0; }
-  section + section { border-top: 1px solid var(--borda); }
-  h2 { font-size: var(--t-titulo); line-height: var(--l-titulo); margin: 0 0 var(--e-3); }
+  main section { padding: var(--e-12) 0; }
+  main section + section { border-top: 1px solid var(--borda); }
+  main h2 { font-size: var(--t-titulo); line-height: var(--l-titulo); margin: 0 0 var(--e-3); }
   .print { display: block; height: auto; max-width: 100%; border: 1px solid var(--borda); border-radius: var(--r-cartao); background: var(--superficie); }
   /* 1. Abertura: no celular, só a Hoje; do iPad em diante, a Agenda no iPad ao lado */
   .heroi { padding-top: var(--e-10); }
@@ -76,8 +74,9 @@
   .chat .mudou { align-self: flex-start; max-width: 86%; padding: var(--e-3) var(--e-4); border-radius: var(--r-cartao); background: var(--ok-fundo); color: var(--ok-texto); font-size: var(--t-2); }
   .chat .mudou strong { display: block; font-weight: 600; }
   .legenda { margin: var(--e-3) 0 0; color: var(--texto-2); font-size: var(--t-peq); }
-  .chat.anima .passo { opacity: 0; transform: translateY(6px); transition: opacity 220ms ease, transform 220ms ease; }
-  .chat.anima .passo.vis { opacity: 1; transform: none; }
+  /* a transição só ao aparecer: esconder é na hora (o navegador pode ter desenhado a conversa antes de o script rodar) */
+  .chat.anima .passo { opacity: 0; transform: translateY(6px); }
+  .chat.anima .passo.vis { opacity: 1; transform: none; transition: opacity 220ms ease, transform 220ms ease; }
   @media (prefers-reduced-motion: reduce) { .chat.anima .passo { opacity: 1; transform: none; transition: none; } }
   /* 3. Um dia na clínica: texto e print lado a lado a partir do iPad */
   .dia { list-style: none; margin: var(--e-8) 0 0; padding: 0; display: grid; gap: var(--e-12); }
@@ -105,14 +104,47 @@
   .fim { text-align: center; }
   .fim p { color: var(--texto-2); margin: 0 auto var(--e-6); max-width: 46ch; }
   .fim .ver-antes { margin: var(--e-4) 0 0; }
-  .rodape-pc { border-top: 1px solid var(--borda); padding: var(--e-5) 0; color: var(--texto-2); font-size: var(--t-peq); }
-  .rodape-pc a { color: var(--texto-2); }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 </head>
 <body>
-<header class="topo-pc"><div class="dentro"><a class="marca" href="/"><img src="/assets/icones/rxsync-192.png" alt="" width="32" height="32">RXSync</a><a class="planos" href="/#planos">Ver os planos</a></div></header>
-<main>
+<!-- topo do site: montado pelo scripts/guias_montar.mjs a partir do guias/_fonte/molde.html (não edite à mão) -->
+<a href="#conteudo" class="pular">Pular para o conteúdo</a>
+
+<!-- ===================== topo: o mesmo do site (index.html), sem JavaScript; no celular, o menu abre com details ===================== -->
+<header class="topo">
+  <div class="topo-faixa">
+    <a href="/" class="marca" aria-label="RXSync, página inicial"><span class="marca-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>RXSync</a>
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="/#teste-ao-vivo">Converse agora</a>
+      <a href="/#como-funciona">Como funciona</a>
+      <a href="/#recursos">O que faz</a>
+      <a href="/#seguranca">Segurança</a>
+      <a href="/#planos">Preços</a>
+      <a href="/#duvidas">Dúvidas</a>
+      <a href="/guias/">Guias</a>
+    </nav>
+    <div class="topo-acoes">
+      <a href="/painel/" class="link-entrar">Já sou cliente</a>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=painel_pagina_menu" class="btn btn-prim topo-cta" data-origem="painel_pagina_menu">Começar grátis</a>
+      <details class="menu-m">
+        <summary aria-label="Abrir menu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg><span class="sr">Menu</span></summary>
+        <div class="menu-m-lista">
+          <a href="/#teste-ao-vivo">Converse agora</a>
+          <a href="/#como-funciona">Como funciona</a>
+          <a href="/#recursos">O que faz</a>
+          <a href="/painel-da-clinica/">O painel da clínica</a>
+          <a href="/#seguranca">Segurança</a>
+          <a href="/#planos">Preços</a>
+          <a href="/#duvidas">Dúvidas</a>
+          <a href="/guias/">Guias</a>
+          <a href="/painel/">Já sou cliente: entrar no painel</a>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+<!-- /topo do site -->
+<main id="conteudo">
   <!-- 1. Abertura -->
   <section class="heroi"><div class="dentro">
     <span class="rotulo">Painel da clínica</span>
@@ -228,7 +260,45 @@ Responda aqui para perguntar ou mudar algo na agenda.</div>
     <p class="ver-antes">Prefere ver antes? <a href="/#contato">Peça uma demonstração</a></p>
   </div></section>
 </main>
-<footer class="rodape-pc"><div class="dentro">RXSync · <a href="/privacidade.html">Política de Privacidade</a> · <a href="/">Página inicial</a></div></footer>
+<!-- rodapé do site: montado pelo scripts/guias_montar.mjs a partir do guias/_fonte/molde.html (não edite à mão) -->
+<footer class="rodape">
+  <div class="rodape-faixa">
+    <div class="rodape-grade">
+      <div>
+        <a href="/" class="marca"><span class="marca-ic"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>RXSync</a>
+        <p class="rodape-desc">Assistente virtual que atende e marca consultas pelo WhatsApp de clínicas e consultórios.</p>
+      </div>
+      <div>
+        <h2 class="rodape-tit">Navegação</h2>
+        <ul>
+          <li><a href="/#teste-ao-vivo">Converse agora</a></li>
+          <li><a href="/#como-funciona">Como funciona</a></li>
+          <li><a href="/#recursos">O que faz</a></li>
+          <li><a href="/painel-da-clinica/">O painel da clínica</a></li>
+          <li><a href="/#seguranca">Segurança</a></li>
+          <li><a href="/#planos">Planos e preços</a></li>
+          <li><a href="/#duvidas">Dúvidas</a></li>
+          <li><a href="/guias/">Guias</a></li>
+          <li><a href="/painel/">Já é cliente? Entrar no painel</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="rodape-tit">Contato e legal</h2>
+        <ul>
+          <li><a href="mailto:contato@rxsync.com.br">contato@rxsync.com.br</a></li>
+          <li><a href="/termos/2026-11-v8.html">Termos de Uso</a></li>
+          <li><a href="/privacidade.html">Política de Privacidade</a></li>
+          <li><button type="button" class="link-rodape" data-cookies>Preferências de cookies</button></li>
+        </ul>
+      </div>
+    </div>
+    <div class="rodape-base">
+      <span>© 2026 RXSync Tecnologia e Automação em Saúde — CNPJ 52.970.673/0001-78 · contato@rxsync.com.br</span>
+      <span>Feita em Florianópolis/SC</span>
+    </div>
+  </div>
+</footer>
+<!-- /rodapé do site -->
 <script src="/assets/consentimento.js" data-chat-fora></script>
 <script>
 // Página do painel (rxsync-sistema DEC-199). O chat se escreve sozinho quando aparece na tela: as falas uma a uma, o
@@ -252,6 +322,24 @@ Responda aqui para perguntar ou mudar algo na agenda.</div>
     };
     if (document.readyState === 'complete') observar(); else window.addEventListener('load', observar);
   }
+  // A profundidade de leitura (scroll_depth, como na página inicial): 25, 50, 75 e 90% da página, uma vez cada. Só vai ao
+  // Google Analytics depois do "Aceitar" (sem ele, o gtag não existe e nada é enviado).
+  (function () {
+    var marcos = [25, 50, 75, 90], vistos = {}, travado = false;
+    window.addEventListener('scroll', function () {
+      if (travado) return; travado = true;
+      window.requestAnimationFrame(function () {
+        var doc = document.documentElement, total = doc.scrollHeight - window.innerHeight;
+        if (total > 0) marcos.forEach(function (m) {
+          if (window.scrollY / total * 100 >= m && !vistos[m]) {
+            vistos[m] = true;
+            if (typeof window.gtag === 'function') window.gtag('event', 'scroll_depth', { event_category: 'engajamento', event_label: m + '%', value: m });
+          }
+        });
+        travado = false;
+      });
+    }, { passive: true });
+  })();
   // A origem do clique vai no endereço do contratar (cadastro.origem_clique) e no Google Analytics, só depois do "Aceitar".
   document.querySelectorAll('a[data-origem]').forEach(function (a) {
     a.addEventListener('click', function () {
