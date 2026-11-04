@@ -482,9 +482,9 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     if (sec && !/<a href="\/painel-da-clinica\/"[^>]*data-cta="painel_ver_por_dentro"/.test(sec)) erro('index.html: falta o link "Ver o painel por dentro" (data-cta="painel_ver_por_dentro") na seção do painel');
   }
   // As páginas de venda com Google Analytics têm o botão "Preferências de cookies" (data-cookies), que o consentimento.js
-  // abre (rxsync-sistema DEC-200). O contratar.html e o onboarding.html ficam para outro PR.
-  for (const f of ['index.html', 'painel-da-clinica/index.html', 'assistente-whatsapp-clinica/index.html'])
-    if (fs.existsSync(f) && !/<button[^>]*data-cookies[^>]*>Preferências de cookies<\/button>/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta o botão "Preferências de cookies" (data-cookies) no rodapé`);
+  // abre (rxsync-sistema DEC-200; o contratar.html e o onboarding.html desde a nota de 04/11/2026 na mesma decisão).
+  for (const f of ['index.html', 'painel-da-clinica/index.html', 'assistente-whatsapp-clinica/index.html', 'contratar.html', 'onboarding.html'])
+    if (fs.existsSync(f) && !/<button type="button"[^>]*data-cookies[^>]*>Preferências de cookies<\/button>/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta o botão "Preferências de cookies" (data-cookies) no rodapé`);
   if (fs.existsSync('assistente-whatsapp-clinica/index.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync('assistente-whatsapp-clinica/index.html', 'utf8'))) erro('assistente-whatsapp-clinica/index.html: a página do anúncio precisa do noindex');
   // O lastmod do sitemap acompanha a página (menos os guias): só avisa (não bloqueia) quando o último commit da página é depois do lastmod.
   if (fs.existsSync('sitemap.xml')) {
