@@ -3,6 +3,12 @@
 // de cadastro da Central (DEC-186; sem app autenticador e sem Telegram). "Criar senha" e "Esqueci a senha" usam o mesmo código.
 function telaEntrada(...filhos) { $('app').hidden = true; $('entrada').hidden = false; trocar($('entrada-corpo'), ...filhos); const i = $('entrada-corpo').querySelector('input:not([hidden])'); if (i) i.focus(); }
 const msgErro = () => el('p', { class: 'erro', role: 'alert' });
+// Mostrar ou esconder a senha: um botão dentro do campo, que troca o tipo do campo (DEC-203, o mesmo do painel).
+function senhaVisivel(input) {
+  const b = el('button', { class: 'mostrar-senha', type: 'button', text: 'Mostrar', 'aria-pressed': 'false' });
+  b.onclick = e => { e.preventDefault(); const ver = input.type === 'password'; input.type = ver ? 'text' : 'password'; b.textContent = ver ? 'Esconder' : 'Mostrar'; b.setAttribute('aria-pressed', String(ver)); };
+  return el('span', { class: 'senha-caixa' }, input, b);
+}
 const soDigitos = v => String(v || '').replace(/\D/g, '');
 const campoE = (rot, input) => el('label', { class: 'campo' }, el('span', { class: 'rot', text: rot }), input);
 const campoEmail = valor => el('input', { class: 'entrada', type: 'email', inputmode: 'email', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', required: true, enterkeyhint: 'next', value: valor || null });
@@ -38,15 +44,15 @@ function formEntrada(mensagem, emailAntes) {
   const erro = msgErro(); erro.textContent = mensagem || '';
   const botao = el('button', { class: 'btn pri plena', type: 'submit', text: 'Continuar' });
   const enviar = async e => {
-    e.preventDefault(); botao.disabled = true; erro.textContent = '';
-    const r = await chamar('entrar', { email: email.value.trim(), senha: senha.value }); botao.disabled = false;
+    e.preventDefault(); botao.disabled = true; botao.textContent = 'Entrando…'; erro.textContent = '';
+    const r = await chamar('entrar', { email: email.value.trim(), senha: senha.value }); botao.disabled = false; botao.textContent = 'Continuar';
     if (r.ok && r.desafio) return formCodigo(r.desafio, r.mensagem, email.value.trim());
     // A tela de criar a senha já explica; a frase do banco ("Toque em Criar senha") não se repete aqui (auditoria de 01/11/2026).
     if (r.criar_senha) return pedirCodigoSenha(true);
     erro.textContent = r.mensagem || 'Não consegui entrar.'; senha.value = ''; senha.focus();
   };
-  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Entrar' }), campoE('E-mail', email), campoE('Senha', senha), erro, botao,
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Esqueci a senha', onclick: () => pedirCodigoSenha(false, '', email.value.trim()) }))));
+  telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Entrar' }), campoE('E-mail', email), campoE('Senha', senhaVisivel(senha)), erro, botao,
+    el('div', { class: 'acoes' }, el('button', { class: 'link-entrada', type: 'button', text: 'Esqueci a senha', onclick: () => pedirCodigoSenha(false, '', email.value.trim()) }))));
 }
 // "Mandar outro código" só libera depois de 1 minuto (o servidor também limita).
 function esperarUmMinuto(b, texto) {
@@ -58,7 +64,7 @@ const codigoValido = v => { const d = soDigitos(v); return d.length === 6 ? d : 
 function formCodigo(desafio, aviso, email) {
   const codigo = campoCodigo();
   const erro = msgErro(); const botao = el('button', { class: 'btn pri plena', type: 'submit', text: 'Entrar' });
-  const outro = el('button', { class: 'btn sec plena', type: 'button', text: 'Mandar outro código', onclick: () => formEntrada('Digite a senha de novo para receber outro código.', email) });
+  const outro = el('button', { class: 'link-entrada', type: 'button', text: 'Mandar outro código', onclick: () => formEntrada('Digite a senha de novo para receber outro código.', email) });
   const enviar = async e => {
     e.preventDefault(); const c = codigoValido(codigo.value); if (!c) { codigo.focus(); return; }
     botao.disabled = true; erro.textContent = '';
@@ -70,7 +76,7 @@ function formCodigo(desafio, aviso, email) {
   telaEntrada(el('form', { onsubmit: enviar }, el('h2', { text: 'Código de entrada' }),
     el('p', { class: 'mudo', text: aviso || 'Digite o código de 6 dígitos que chegou no seu e-mail.' }),
     campoE('Código de 6 dígitos', codigo), erro, botao,
-    el('div', { class: 'acoes' }, outro, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email) }))));
+    el('div', { class: 'acoes' }, outro, el('button', { class: 'link-entrada', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email) }))));
   esperarUmMinuto(outro, 'Mandar outro código');
 }
 // Primeira senha (primeira = true) ou "Esqueci a senha": com o código que chega no e-mail de cadastro (DEC-186).
@@ -88,7 +94,7 @@ function pedirCodigoSenha(primeira, mensagem, emailAntes) {
     el('p', { class: 'mudo', text: primeira ? 'A Central ainda não tem senha. Digite o seu e-mail; depois, o código de 6 dígitos.'
       : 'Digite o seu e-mail; depois, o código de 6 dígitos que chega nele. Com o código, você cria uma senha nova.' }),
     campoE('E-mail', email), erro, botao,
-    primeira ? null : el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email.value.trim()) }))));
+    primeira ? null : el('div', { class: 'acoes' }, el('button', { class: 'link-entrada', type: 'button', text: 'Voltar', onclick: () => formEntrada('', email.value.trim()) }))));
 }
 function formSenhaNova(desafio, aviso, primeira, email) {
   // O e-mail vai num campo escondido só para o iPad guardar a senha nova junto com ele.
@@ -109,9 +115,9 @@ function formSenhaNova(desafio, aviso, primeira, email) {
   };
   telaEntrada(el('form', { onsubmit: enviar }, usuario, el('h2', { text: primeira ? 'Criar senha' : 'Senha nova' }),
     el('p', { class: 'mudo', text: aviso || 'Digite o código de 6 dígitos que chegou no seu e-mail.' }),
-    campoE('Código de 6 dígitos', codigo), campoE('Senha nova (12 caracteres ou mais)', s1), campoE('Repita a senha', s2), erro, botao,
+    campoE('Código de 6 dígitos', codigo), campoE('Senha nova (12 caracteres ou mais)', senhaVisivel(s1)), campoE('Repita a senha', senhaVisivel(s2)), erro, botao,
     el('p', { class: 'mudo peq mt', text: 'Ao salvar, todos os outros aparelhos saem da Central (e deixam de ser lembrados) e chega um aviso em Avisos.' }),
-    el('div', { class: 'acoes' }, el('button', { class: 'btn sec plena', type: 'button', text: 'Voltar', onclick: () => primeira ? pedirCodigoSenha(true, '', email) : formEntrada('', email) }))));
+    el('div', { class: 'acoes' }, el('button', { class: 'link-entrada', type: 'button', text: 'Voltar', onclick: () => primeira ? pedirCodigoSenha(true, '', email) : formEntrada('', email) }))));
 }
 async function carregarConfig() {
   const r = await chamar('config');

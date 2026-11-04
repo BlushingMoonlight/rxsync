@@ -1,0 +1,37 @@
+/* A entrada do painel e da Central (rxsync-sistema DEC-203): o mesmo layout nas duas, montado junto com o estilo de cada
+   uma (painel_montar.mjs e central_montar.mjs). Só aparência: a forma de entrar não muda.
+   No celular, o cartão fica no alto (o teclado não cobre o botão); do iPad em diante, no meio da tela. */
+#entrada.porta-entrada { box-sizing: border-box; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: calc(env(safe-area-inset-top, 0px) + var(--e-6)) var(--e-4) calc(env(safe-area-inset-bottom, 0px) + var(--e-6)); background: var(--superficie-2); }
+@media (min-width: 768px) and (min-height: 640px) { #entrada.porta-entrada { justify-content: center; padding-top: var(--e-10); padding-bottom: var(--e-10); } }
+#entrada .cartao-entrada { box-sizing: border-box; width: 100%; max-width: 420px; margin: 0; padding: var(--e-6); background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--r-janela); box-shadow: none; }
+@media (min-width: 768px) { #entrada .cartao-entrada { padding: var(--e-8); } }
+#entrada .marca-entrada { display: flex; align-items: center; gap: var(--e-3); margin: 0 0 var(--e-6); }
+#entrada .marca-entrada img { display: block; width: 40px; height: 40px; flex: none; }
+#entrada .marca-entrada .nome { font-weight: 600; font-size: var(--t-bloco); line-height: var(--l-bloco); color: var(--texto); }
+#entrada .marca-entrada .sub { font-size: var(--t-2); line-height: var(--l-2); color: var(--texto-2); }
+#entrada h1, #entrada h2 { margin: 0 0 var(--e-2); font-size: var(--t-titulo); line-height: var(--l-titulo); font-weight: 600; color: var(--texto); }
+#entrada .sub-entrada { margin: 0 0 var(--e-5); color: var(--texto-2); }
+#entrada form { display: flex; flex-direction: column; gap: var(--e-4); }
+#entrada form > h2 { margin-bottom: 0; }
+#entrada form > .campo, #entrada label.campo { display: flex; flex-direction: column; gap: var(--e-2); margin: 0; padding: 0; }
+#entrada .campo > label, #entrada .campo > .rot { font-weight: 500; font-size: var(--t-2); line-height: var(--l-2); color: var(--texto); }
+#entrada .entrada { box-sizing: border-box; width: 100%; min-height: var(--alvo-principal); padding: 0 var(--e-4); font: inherit; font-size: var(--t-corpo); color: var(--texto);
+  background: var(--superficie); border: 1px solid var(--borda-campo); border-radius: var(--r-botao); }
+#entrada .entrada:focus { border-color: var(--primaria); }
+#entrada .senha-caixa { position: relative; display: block; }
+#entrada .senha-caixa .entrada { padding-right: 104px; }
+#entrada .mostrar-senha { position: absolute; top: 2px; right: 2px; min-width: var(--alvo); min-height: calc(var(--alvo-principal) - 4px); padding: 0 var(--e-3);
+  border: 0; border-radius: var(--r-botao); background: none; color: var(--primaria); font: inherit; font-size: var(--t-2); font-weight: 600; cursor: pointer; }
+#entrada .marcar { margin: 0; padding: 0; }
+#entrada .btn.pri { width: 100%; min-height: var(--alvo-principal); }
+#entrada .btn.pri:disabled { opacity: 1; background: var(--primaria-forte); cursor: progress; }
+/* a mensagem fica logo acima do botão; o erro, com fundo, ícone e palavra */
+#entrada .msg, #entrada p.erro { margin: 0; font-size: var(--t-2); line-height: var(--l-2); color: var(--texto-2); }
+#entrada .msg:empty, #entrada p.erro:empty { display: none; }
+#entrada .msg.erro, #entrada p.erro { display: flex; align-items: flex-start; gap: var(--e-2); padding: var(--e-3); border-radius: var(--r-botao); background: var(--perigo-fundo); color: var(--perigo-texto); font-weight: 500; }
+#entrada .msg.erro::before, #entrada p.erro::before { content: "!"; flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--perigo-texto); color: var(--perigo-botao-texto); font-size: var(--t-peq); font-weight: 600; }
+#entrada .links, #entrada .acoes { display: flex; flex-flow: row wrap; justify-content: space-between; gap: var(--e-2) var(--e-4); margin: 0; }
+#entrada .link-entrada { min-height: var(--alvo); padding: 0; border: 0; background: none; color: var(--primaria); font: inherit; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+#entrada .legenda { margin: var(--e-5) 0 0; font-size: var(--t-peq); line-height: var(--l-peq); color: var(--texto-2); }
+#entrada :focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }

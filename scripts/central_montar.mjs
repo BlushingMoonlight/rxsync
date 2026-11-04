@@ -11,11 +11,13 @@ const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const FONTE = path.join(RAIZ, 'central', 'fonte');
 export const DESTINO = path.join(RAIZ, 'central', 'index.html');
 export const TOKENS = path.join(RAIZ, 'assets', 'ancora', 'tokens.css');
+// A entrada (o login) igual no painel e na Central (rxsync-sistema DEC-203).
+export const ENTRADA = path.join(RAIZ, 'assets', 'ancora', 'entrada.css');
 
 export function montar() {
   const ler = f => fs.readFileSync(path.isAbsolute(f) ? f : path.join(FONTE, f), 'utf8').replace(/\r\n/g, '\n').trimEnd();
   const lista = ext => fs.readdirSync(FONTE).filter(f => f.endsWith(ext)).sort();
-  const css = [ler(TOKENS), ...lista('.css').map(ler)].join('\n');
+  const css = [ler(TOKENS), ler(ENTRADA), ...lista('.css').map(ler)].join('\n');
   const js = "'use strict';\n(function () {\n" + lista('.js').map(f => '// ==== ' + f + '\n' + ler(f)).join('\n\n') + '\n})();';
   for (const [nome, txt] of [['estilo', css], ['código', js]]) if (/<\/(script|style)/i.test(txt)) throw new Error(`O ${nome} da Central não pode conter "</script" nem "</style".`);
   let html = ler('pagina.html') + '\n';

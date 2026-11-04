@@ -81,13 +81,13 @@ function mascarar() {
 const PRINTS = [
   { nome: 'hoje-celular', rota: 'hoje', largura: 390, altura: 844, alt: 'Tela Hoje do painel no celular: Precisa de você, com um pedido de pessoa, e as consultas do dia' },
   { nome: 'agenda-ipad', rota: 'agenda', largura: 820, altura: 1000, alt: 'Agenda do painel no iPad: a semana com as consultas de dois médicos, o filtro por médico e o botão Nova consulta' },
-  { nome: 'precisa-de-voce', rota: 'hoje', largura: 390, altura: 560, alt: 'Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido' },
+  { nome: 'precisa-de-voce', rota: 'hoje', largura: 390, altura: 844, alt: 'Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido' },
   { nome: 'agenda-celular', rota: 'agenda', largura: 390, altura: 844, antes: async p => { const v = p.locator('#calVisao'); if (await v.count()) await v.selectOption('dia'); }, alt: 'Agenda do painel no celular: as consultas do dia, de quem a assistente marcou e de quem a equipe marcou' },
   { nome: 'assistente-valores', rota: 'assistente/valores', largura: 390, altura: 844, alt: 'Tela Assistente, Valores, convênios e regras: os preços, as formas de pagamento e os convênios que a assistente usa nas respostas' },
   { nome: 'resultados', rota: 'resultados', largura: 390, altura: 844, alt: 'Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior' },
-  { nome: 'pacientes', rota: 'pacientes', largura: 390, altura: 700, alt: 'Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos' },
-  { nome: 'equipe', rota: 'conta/equipe', largura: 390, altura: 700, alt: 'Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail' },
-  { nome: 'receber', rota: 'agenda/horarios/pagamento', largura: 390, altura: 1040, rolar: '#pagEscolhaTit', alt: 'Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta' }
+  { nome: 'pacientes', rota: 'pacientes', largura: 390, altura: 844, alt: 'Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos' },
+  { nome: 'equipe', rota: 'conta/equipe', largura: 390, altura: 844, alt: 'Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail' },
+  { nome: 'receber', rota: 'agenda/horarios/pagamento', largura: 390, altura: 844, rolar: '#pagEscolhaTit', alt: 'Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta' }
 ];
 
 const site = await servirSite(); const browser = await abrirNavegador();
