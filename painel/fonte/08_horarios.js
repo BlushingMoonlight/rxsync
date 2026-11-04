@@ -151,7 +151,7 @@ function medAbrir(m0) {
       el('p', { class: 'dica bloco', text: 'A assistente confirma o tipo com o paciente e usa a duração dele para oferecer os horários. Os horários começam de ' + duracaoPadrao() + ' em ' + duracaoPadrao() + ' minutos (a duração padrão da clínica). Com tipos cadastrados, toda consulta deste médico precisa de um tipo.' }),
       (m.tipos || []).length ? el('div', { class: 'lista bloco' }, m.tipos.map(t => el('button', { class: 'linha', type: 'button', onclick: () => t.ativo ? tipoForm(m, t) : medAcao('agenda_tipo_ativo', { id: t.id, ativo: true }, () => rapida('Tipo reativado.')) },
         el('span', { class: 'tx' }, el('span', { class: 't1', text: t.nome + (t.ativo ? '' : ' (removido)') }), el('span', { class: 't2', text: [t.duracao_min + ' min', t.prazo_retorno_dias ? 'retorno em até ' + t.prazo_retorno_dias + ' dias' : null, t.link_pagamento ? 'link de pagamento próprio' : null,
-          t.valor ? 'R$ ' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : null].filter(Boolean).join(' · ') })), el('span', { class: 'valor', text: t.ativo ? 'Editar' : 'Reativar' }))))
+          t.valor ? 'R$\u00a0' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : null].filter(Boolean).join(' · ') })), el('span', { class: 'valor', text: t.ativo ? 'Editar' : 'Reativar' }))))
         : el('p', { class: 'mudo bloco', text: 'Nenhum tipo cadastrado.' }),
       el('div', { class: 'bloco' }, btn('Tipo de consulta', () => tipoForm(m, null), 'sec', 'soma')),
       el('h2', { class: 'tit-bloco', text: 'Horários de ' + m.nome }), el('p', { class: 'dica bloco', text: 'Sem faixas, este médico fica sem atendimento: a assistente não marca consultas com ele.' }), gradeBox,
@@ -348,7 +348,7 @@ function pagResumo() {
     const tipos = (m.tipos || []).filter(t => t.ativo);
     if (!tipos.length) { linhas.push(el('div', { class: 'linha' }, el('span', { class: 'ic' }, icone('medico')), el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: 'Sem tipos de consulta: usa o link geral' })))); return; }
     tipos.forEach(t => {
-      const dinheiro = t.valor ? 'R$ ' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '';
+      const dinheiro = t.valor ? 'R$\u00a0' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '';
       const link = t.link_pagamento ? t.link_pagamento.replace(/^https:\/\//i, '') : 'usa o link geral';
       linhas.push(el('button', { class: 'linha', type: 'button', onclick: () => tipoForm(m, t) }, el('span', { class: 'ic' }, icone('dinheiro')),
         el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome + ' · ' + t.nome }), el('span', { class: 't2 quebra', text: asaasLigado() ? (dinheiro ? dinheiro + ' pelo Asaas' : 'Sem valor: ' + link) : link })),

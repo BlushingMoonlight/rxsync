@@ -8,10 +8,25 @@ function entTela(id, titulo, sub, msg, erro) {
   ENT_TELAS.forEach(t => { $(t).hidden = t !== id; });
   $('entTitulo').textContent = titulo; $('entSub').textContent = sub;
   entMsg(msg || '', erro);
+  // a mensagem fica logo acima do botão da tela que está aberta (DEC-203)
+  const bt = $(id).querySelector('button[type=submit]'); if (bt) $(id).insertBefore($('entMsg'), bt);
   // o cursor vai já para o primeiro campo, e nunca sai de um campo que a pessoa já começou a usar
   const p = $(id).querySelector('input'); if (p && !$(id).contains(document.activeElement)) { try { p.focus(); } catch (e) {} }
 }
-function entOcupado(form, sim) { form.querySelectorAll('button, input').forEach(x => { x.disabled = sim; }); }
+function entOcupado(form, sim) {
+  form.querySelectorAll('button, input').forEach(x => { x.disabled = sim; });
+  // o botão Entrar mostra que está entrando (DEC-203)
+  const b = form.querySelector('button[type=submit]'); if (form.id === 'entEntrar' && b) b.textContent = sim ? 'Entrando…' : 'Entrar';
+}
+// Mostrar ou esconder a senha: um botão dentro do campo, que troca o tipo do campo (DEC-203).
+function senhaVisivel(input) {
+  const caixa = document.createElement('span'); caixa.className = 'senha-caixa';
+  input.parentNode.insertBefore(caixa, input); caixa.appendChild(input);
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'mostrar-senha'; b.textContent = 'Mostrar'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-controls', input.id);
+  b.addEventListener('click', () => { const ver = input.type === 'password'; input.type = ver ? 'text' : 'password'; b.textContent = ver ? 'Esconder' : 'Mostrar'; b.setAttribute('aria-pressed', String(ver)); });
+  caixa.appendChild(b);
+}
+['entSenha', 'entSenhaNova', 'entSenhaNova2'].forEach(k => senhaVisivel($(k)));
 function entInicio(msg, erro) { entTela('entEntrar', 'Entrar no painel', 'Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.', msg, erro); }
 function entNovaTela(msg, termos) {
   ['entCodNova', 'entSenhaNova', 'entSenhaNova2'].forEach(k => { $(k).value = ''; });

@@ -47,6 +47,7 @@
 
     <!-- Fonte (a mesma do painel) -->
     <link rel="stylesheet" href="/assets/fontes/fontes.css">
+    <link rel="stylesheet" href="/assets/ancora/moldura.css">
 
     <style>
 :root {
@@ -147,8 +148,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* Celular */
 .palco { position: relative; display: flex; justify-content: center; }
-.celular { position: relative; width: 100%; max-width: 360px; border-radius: 44px; background: #0b1220; padding: 10px; box-shadow: var(--sh-3); }
-.celular-tela { border-radius: 36px; overflow: hidden; background: #efeae2; display: flex; flex-direction: column; }
+.celular-tela { overflow: hidden; background: #efeae2; display: flex; flex-direction: column; }
 .wa-topo { background: #f0f2f5; padding: 34px 14px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e3e6e8; }
 .wa-av { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
 .wa-nome { font-weight: 700; font-size: 15px; line-height: 1.2; }
@@ -578,21 +578,16 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .print-painel figcaption { font-size: 13px; color: var(--ink-3); }
 #gestao .link-demo { margin-top: 20px; }
 
-/* Moldura de celular (as proporções do iPhone 18 Pro Max: tela de 440×956 pt, cantos arredondados e a ilha no alto; sem marca).
-   Um componente só: o tamanho vem de --mw (a largura da moldura). */
-.moldura { --mw: 360px; position: relative; width: var(--mw); max-width: 100%; aspect-ratio: 440 / 956; box-sizing: border-box; padding: calc(var(--mw) * .03); border-radius: calc(var(--mw) * .15); background: #0b1220; }
-.moldura::before { content: ""; position: absolute; z-index: 2; top: calc(var(--mw) * .055); left: 50%; transform: translateX(-50%); width: calc(var(--mw) * .284); height: calc(var(--mw) * .084); border-radius: 999px; background: #0b1220; }
-.moldura-tela { box-sizing: border-box; width: 100%; height: 100%; border-radius: calc(var(--mw) * .12); overflow: hidden; display: flex; flex-direction: column; background: #fff; }
-.moldura-tela:has(> img) { padding-top: calc(var(--mw) * .14); }
-.moldura-tela > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.moldura .wa-topo { padding-top: calc(var(--mw) * .16); }
-/* o topo: a moldura no lugar da altura fixa */
+/* o topo e a seção do painel com a moldura comum (assets/ancora/moldura.css, DEC-203): a coluna do celular do tamanho da
+   moldura, o texto ocupa o resto */
 .celular.moldura { box-shadow: var(--sh-3); }
 .celular.moldura .celular-tela { height: 100%; border-radius: calc(var(--mw) * .12); }
-@media (max-width: 767px) { .celular.moldura { --mw: 320px; } }
-/* a seção do painel (rxsync-sistema DEC-202, opção A): o texto mais largo e a moldura de 340 px no computador */
-.print-painel .moldura { --mw: 260px; }
-@media (min-width: 1024px) { #gestao .dono { grid-template-columns: 1.15fr .85fr; gap: 80px; } #gestao .print-painel .moldura { --mw: 340px; } }
+.celular.moldura .wa-topo { padding-top: calc(var(--mw) * .16); }
+.palco .cf-2 { top: -12px; }   /* o cartão "Resposta em segundos" no canto, fora do cabeçalho da conversa */
+@media (min-width: 1024px) {
+  .hero-grid, #gestao .dono { grid-template-columns: minmax(0, 1fr) auto; gap: 72px; }
+  .hero-grid > :last-child, #gestao .print-painel { padding-right: 24px; }
+}
     </style>
 
     <!-- ===================== DADOS ESTRUTURADOS (SCHEMA.ORG) ===================== -->

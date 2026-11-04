@@ -408,11 +408,11 @@ let avisosTermos = 0;
   }
 }
 // Preços do site com espaço fixo entre "R$" e o número (rxsync-sistema DEC-202): "R$&nbsp;299" no texto e 'R$\u00a0' nos
-// scripts, para o valor nunca quebrar a linha longe do "R$". Ficam de fora o app do painel e a Central, os Termos (texto
-// jurídico, com versão própria) e as demonstrações.
+// scripts, para o valor nunca quebrar a linha longe do "R$"; desde a DEC-203, também no app do painel. Ficam de fora a
+// Central, os Termos (texto jurídico, com versão própria) e as demonstrações.
 for (const f of htmls) {
   const g = f.split(path.sep).join('/').replace(/^\.\//, '');
-  if (/^(painel|central|termos|demo)\//.test(g)) continue;
+  if (/^(central|termos|demo)\//.test(g)) continue;   // o painel entra desde a DEC-203
   const n = (fs.readFileSync(f, 'utf8').match(/R\$ /g) || []).length;
   if (n) erro(`${g}: ${n} preço(s) com "R$ " e espaço comum; use "R$&nbsp;" no texto e 'R$\\u00a0' nos scripts (DEC-202)`);
 }

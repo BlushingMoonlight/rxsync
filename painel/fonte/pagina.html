@@ -19,27 +19,27 @@
 <!-- Página montada por scripts/painel_montar.mjs a partir de painel/fonte/. Não edite este arquivo à mão. -->
 <div id="carregando" class="boot">Abrindo seu painel…</div>
 
-<div id="entrada" class="porta" hidden>
-  <div class="cartao" role="main">
-    <div class="marca-p">RXSync · Painel da clínica</div>
+<div id="entrada" class="porta porta-entrada" hidden>
+  <div class="cartao cartao-entrada" role="main">
+    <div class="marca-entrada"><img src="/assets/icones/rxsync-192.png" alt="" width="40" height="40"><div><div class="nome">RXSync</div><div class="sub">Painel da clínica</div></div></div>
     <h1 id="entTitulo">Entrar no painel</h1>
-    <p class="mudo" id="entSub">Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.</p>
+    <p class="sub-entrada" id="entSub">Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.</p>
     <form id="entEntrar" novalidate>
       <div class="campo"><label for="entEmail">E-mail</label><input class="entrada" id="entEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></div>
       <div class="campo"><label for="entSenha">Senha</label><input class="entrada" id="entSenha" type="password" autocomplete="current-password"></div>
       <label class="marcar"><input id="entLembrar" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Entrar</button>
-      <div class="links"><button type="button" class="link" data-ent="criar">Criar senha</button><button type="button" class="link" data-ent="esqueci">Esqueci a senha</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="criar">Criar senha</button><button type="button" class="link link-entrada" data-ent="esqueci">Esqueci a senha</button></div>
     </form>
     <form id="entCodigo" novalidate hidden>
       <div class="campo"><label for="entCod">Código de 6 dígitos</label><input class="entrada codigo" id="entCod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
       <button class="btn pri plena" type="submit">Confirmar</button>
-      <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
     </form>
     <form id="entPedir" novalidate hidden>
       <div class="campo"><label for="entEmailPedir">E-mail da clínica (o do cadastro)</label><input class="entrada" id="entEmailPedir" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></div>
       <button class="btn pri plena" type="submit">Mandar o código</button>
-      <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
     </form>
     <form id="entNova" novalidate hidden>
       <div class="campo"><label for="entCodNova">Código de 6 dígitos (chegou no e-mail)</label><input class="entrada codigo" id="entCodNova" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
@@ -48,7 +48,7 @@
       <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a id="entTermosLink" href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a>, versão <span id="entTermosVer">2026-11-v8</span>.</span></label>
       <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Salvar a senha e entrar</button>
-      <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
     </form>
     <div id="entMsg" class="msg" role="status" aria-live="polite"></div>
     <p class="legenda">A sessão fica só nesta aba: abrir o painel em outra aba pede a entrada de novo, a não ser que você marque "Lembrar este aparelho".</p>

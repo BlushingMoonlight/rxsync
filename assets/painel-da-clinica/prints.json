@@ -1,6 +1,6 @@
 {
   "_sobre": "Gerado por node scripts/painel_prints.mjs. painel_sha256 é o painel/index.html do dia dos prints: o verificar_site.mjs avisa quando o painel mudar.",
-  "painel_sha256": "116dba65c441b582ae2ddcb96b3021ace4f856a4052295ebd4ebc0cf8b978a33",
+  "painel_sha256": "8a98336a5d4dc5db87f9a7d0fdc8c82a1cefe4e88d1b47c4dd653a1d81955bf4",
   "prints": [
     {
       "nome": "hoje-celular",
@@ -20,7 +20,7 @@
       "nome": "precisa-de-voce",
       "tela": "hoje",
       "largura": 390,
-      "altura": 560,
+      "altura": 844,
       "alt": "Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido"
     },
     {
@@ -48,21 +48,21 @@
       "nome": "pacientes",
       "tela": "pacientes",
       "largura": 390,
-      "altura": 700,
+      "altura": 844,
       "alt": "Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos"
     },
     {
       "nome": "equipe",
       "tela": "conta/equipe",
       "largura": 390,
-      "altura": 700,
+      "altura": 844,
       "alt": "Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail"
     },
     {
       "nome": "receber",
       "tela": "agenda/horarios/pagamento",
       "largura": 390,
-      "altura": 1040,
+      "altura": 844,
       "alt": "Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta"
     }
   ]

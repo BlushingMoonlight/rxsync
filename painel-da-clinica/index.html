@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o9aO2ZRhgp2xLXnQPLotWHoyJ/pam7GIHHVM92nGXUM=' 'self' https://*.googletagmanager.com; style-src 'sha256-i2QSHYZJR2lPjchk4OOkAOjl+XiEAlnbqjrsd3JRjDY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o9aO2ZRhgp2xLXnQPLotWHoyJ/pam7GIHHVM92nGXUM=' 'self' https://*.googletagmanager.com; style-src 'sha256-Z5TMAdoCPSaK04J/q4Hyiv87+Olzax0dCwMluMRNwl0=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="only light">
 <meta name="theme-color" content="#FFFFFF">
@@ -32,6 +32,7 @@
 <link rel="stylesheet" href="/assets/ancora/tokens.css">
 <link rel="stylesheet" href="/assets/ancora/guias.css">
 <link rel="stylesheet" href="/assets/ancora/site.css">
+<link rel="stylesheet" href="/assets/ancora/moldura.css">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://rxsync.com.br/#organizacao", "name": "RXSync", "alternateName": "RXSync Tecnologia e Automação em Saúde", "url": "https://rxsync.com.br/", "logo": "https://rxsync.com.br/assets/logo-rxsync.png"}, {"@type": "WebPage", "@id": "https://rxsync.com.br/painel-da-clinica/", "url": "https://rxsync.com.br/painel-da-clinica/", "name": "Painel da clínica: agenda, pacientes e resultados", "description": "Veja por dentro o painel da RXSync: a agenda, o que precisa de você hoje, os resultados da assistente e o assistente de gestão no WhatsApp. Teste 7 dias grátis.", "inLanguage": "pt-BR", "isPartOf": {"@id": "https://rxsync.com.br/#site"}, "publisher": {"@id": "https://rxsync.com.br/#organizacao"}, "breadcrumb": {"@id": "https://rxsync.com.br/painel-da-clinica/#caminho"}}, {"@type": "BreadcrumbList", "@id": "https://rxsync.com.br/painel-da-clinica/#caminho", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://rxsync.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Painel da clínica", "item": "https://rxsync.com.br/painel-da-clinica/"}]}]}</script>
 <style>
   body { margin: 0; background: var(--fundo); color: var(--texto); font-family: var(--fonte); font-size: var(--t-corpo); line-height: var(--l-corpo); }
@@ -52,8 +53,8 @@
   .heroi h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); line-height: 1.12; margin: 0 0 var(--e-4); max-width: 22ch; }
   .heroi .acoes { display: flex; flex-wrap: wrap; align-items: center; gap: var(--e-3) var(--e-6); }
   .heroi .nota { margin: var(--e-4) 0 0; color: var(--texto-2); font-size: var(--t-2); }
-  .heroi .telas { display: flex; align-items: flex-start; justify-content: center; gap: var(--e-6); margin-top: var(--e-8); }
-  .heroi .telas .cel { flex: none; width: 260px; }
+  .heroi .telas { display: flex; align-items: center; justify-content: center; gap: var(--e-8); margin-top: var(--e-8); }
+  .heroi .telas .moldura { margin: 0; }
   .heroi .telas .ipad { display: none; flex: 1 1 auto; min-width: 0; width: 520px; }
   @media (min-width: 820px) { .heroi .telas .ipad { display: block; } }
   /* 2. Assistente de gestão: o chat em texto */
@@ -81,16 +82,15 @@
   /* 3. Um dia na clínica: texto e print lado a lado a partir do iPad */
   .dia { list-style: none; margin: var(--e-8) 0 0; padding: 0; display: grid; gap: var(--e-12); }
   .dia li { display: grid; gap: var(--e-5); align-items: center; }
-  @media (min-width: 820px) { .dia li { grid-template-columns: 1fr 1fr; gap: var(--e-10); } .dia li:nth-child(even) .texto { order: 2; } }
+  @media (min-width: 820px) { .dia li { grid-template-columns: minmax(0, 1fr) auto; gap: var(--e-12); } .dia li:nth-child(even) { grid-template-columns: auto minmax(0, 1fr); } .dia li:nth-child(even) .texto { order: 2; } }
   .dia h3 { font-size: var(--t-bloco); line-height: var(--l-bloco); margin: 0 0 var(--e-2); }
   .dia p { margin: 0; color: var(--texto-2); }
-  .dia .print { width: 300px; margin: 0 auto; }
   /* 4. Para a clínica inteira */
   .tres { list-style: none; margin: var(--e-8) 0 0; padding: 0; display: grid; gap: var(--e-8); }
   @media (min-width: 820px) { .tres { grid-template-columns: repeat(3, 1fr); gap: var(--e-6); } }
   .tres h3 { font-size: var(--t-bloco); line-height: var(--l-bloco); margin: var(--e-4) 0 var(--e-2); }
   .tres p { margin: 0; color: var(--texto-2); }
-  .tres .print { width: 260px; max-width: 100%; }
+  .tres li { container-type: inline-size; }
   /* 5. Planos */
   .tabela { overflow-x: auto; margin: var(--e-6) 0 var(--e-4); }
   table { border-collapse: collapse; width: 100%; min-width: 300px; font-size: var(--t-2); }
@@ -156,7 +156,7 @@
     </div>
     <p class="nota">Funciona no celular, no iPad e no computador, sem instalar nada.</p>
     <div class="telas">
-      <img class="print cel" src="/assets/painel-da-clinica/hoje-celular-1x.webp" srcset="/assets/painel-da-clinica/hoje-celular-1x.webp 1x, /assets/painel-da-clinica/hoje-celular-2x.webp 2x" width="390" height="844" fetchpriority="high" alt="Tela Hoje do painel no celular: Precisa de você, com um pedido de pessoa, e as consultas do dia">
+      <div class="moldura"><div class="moldura-tela"><img class="print cel" src="/assets/painel-da-clinica/hoje-celular-1x.webp" srcset="/assets/painel-da-clinica/hoje-celular-1x.webp 1x, /assets/painel-da-clinica/hoje-celular-2x.webp 2x" width="390" height="844" fetchpriority="high" alt="Tela Hoje do painel no celular: Precisa de você, com um pedido de pessoa, e as consultas do dia"></div></div>
       <img class="print ipad" src="/assets/painel-da-clinica/agenda-ipad-1x.webp" srcset="/assets/painel-da-clinica/agenda-ipad-1x.webp 1x, /assets/painel-da-clinica/agenda-ipad-2x.webp 2x" width="820" height="1000" loading="lazy" alt="Agenda do painel no iPad: a semana com as consultas de dois médicos, o filtro por médico e o botão Nova consulta">
     </div>
   </div></section>
@@ -207,13 +207,13 @@ Responda aqui para perguntar ou mudar algo na agenda.</div>
     <h2>Um dia na clínica, pelo painel</h2>
     <ul class="dia">
       <li><div class="texto"><h3>Hoje</h3><p>Comece o dia pelo Hoje: as consultas do dia e, no alto, o que precisa de você, como quem pediu uma pessoa e as urgências.</p></div>
-        <img class="print" src="/assets/painel-da-clinica/precisa-de-voce-1x.webp" srcset="/assets/painel-da-clinica/precisa-de-voce-1x.webp 1x, /assets/painel-da-clinica/precisa-de-voce-2x.webp 2x" width="390" height="560" loading="lazy" alt="Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido"></li>
+        <div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/precisa-de-voce-1x.webp" srcset="/assets/painel-da-clinica/precisa-de-voce-1x.webp 1x, /assets/painel-da-clinica/precisa-de-voce-2x.webp 2x" width="390" height="844" loading="lazy" alt="Bloco Precisa de você em Hoje: um paciente que pediu para falar com uma pessoa, com os botões Abrir no WhatsApp e Resolvido"></div></div></li>
       <li><div class="texto"><h3>Agenda com a recepção</h3><p>A assistente e a recepção usam a mesma agenda. A equipe vê o que ela marcou, marca também e acompanha as canceladas. Agenda por profissional: <span class="tag-g">Gestão</span></p></div>
-        <img class="print" src="/assets/painel-da-clinica/agenda-celular-1x.webp" srcset="/assets/painel-da-clinica/agenda-celular-1x.webp 1x, /assets/painel-da-clinica/agenda-celular-2x.webp 2x" width="390" height="844" loading="lazy" alt="Agenda do painel no celular: as consultas do dia, de quem a assistente marcou e de quem a equipe marcou"></li>
+        <div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/agenda-celular-1x.webp" srcset="/assets/painel-da-clinica/agenda-celular-1x.webp 1x, /assets/painel-da-clinica/agenda-celular-2x.webp 2x" width="390" height="844" loading="lazy" alt="Agenda do painel no celular: as consultas do dia, de quem a assistente marcou e de quem a equipe marcou"></div></div></li>
       <li><div class="texto"><h3>O que a assistente responde</h3><p>Mudou um valor ou um horário? Você altera no painel, e a assistente já responde com a informação nova.</p></div>
-        <img class="print" src="/assets/painel-da-clinica/assistente-valores-1x.webp" srcset="/assets/painel-da-clinica/assistente-valores-1x.webp 1x, /assets/painel-da-clinica/assistente-valores-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Assistente, Valores, convênios e regras: os preços, as formas de pagamento e os convênios que a assistente usa nas respostas"></li>
+        <div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/assistente-valores-1x.webp" srcset="/assets/painel-da-clinica/assistente-valores-1x.webp 1x, /assets/painel-da-clinica/assistente-valores-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Assistente, Valores, convênios e regras: os preços, as formas de pagamento e os convênios que a assistente usa nas respostas"></div></div></li>
       <li><div class="texto"><h3>Resultados</h3><p>Conversas, consultas marcadas pela assistente e pela equipe, presenças confirmadas e o tempo da 1ª resposta, comparados com o período anterior.</p></div>
-        <img class="print" src="/assets/painel-da-clinica/resultados-1x.webp" srcset="/assets/painel-da-clinica/resultados-1x.webp 1x, /assets/painel-da-clinica/resultados-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior"></li>
+        <div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/resultados-1x.webp" srcset="/assets/painel-da-clinica/resultados-1x.webp 1x, /assets/painel-da-clinica/resultados-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior"></div></div></li>
     </ul>
   </div></section>
 
@@ -221,11 +221,11 @@ Responda aqui para perguntar ou mudar algo na agenda.</div>
   <section id="clinica-inteira"><div class="dentro">
     <h2>Para a clínica inteira</h2>
     <ul class="tres">
-      <li><img class="print" src="/assets/painel-da-clinica/pacientes-1x.webp" srcset="/assets/painel-da-clinica/pacientes-1x.webp 1x, /assets/painel-da-clinica/pacientes-2x.webp 2x" width="390" height="700" loading="lazy" alt="Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos">
+      <li><div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/pacientes-1x.webp" srcset="/assets/painel-da-clinica/pacientes-1x.webp 1x, /assets/painel-da-clinica/pacientes-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Pacientes: a busca e a lista de pacientes com a próxima consulta, com os telefones escondidos"></div></div>
         <h3>Pacientes <span class="tag-g">Gestão</span></h3><p>Busque pelo nome ou pelo telefone, veja as consultas de cada um e traga a lista de uma planilha.</p></li>
-      <li><img class="print" src="/assets/painel-da-clinica/equipe-1x.webp" srcset="/assets/painel-da-clinica/equipe-1x.webp 1x, /assets/painel-da-clinica/equipe-2x.webp 2x" width="390" height="700" loading="lazy" alt="Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail">
+      <li><div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/equipe-1x.webp" srcset="/assets/painel-da-clinica/equipe-1x.webp 1x, /assets/painel-da-clinica/equipe-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Equipe: o dono e duas pessoas da equipe, cada uma com o próprio e-mail"></div></div>
         <h3>Equipe</h3><p>Até 3 pessoas da equipe, cada uma com o próprio e-mail e a própria senha.</p></li>
-      <li><img class="print" src="/assets/painel-da-clinica/receber-1x.webp" srcset="/assets/painel-da-clinica/receber-1x.webp 1x, /assets/painel-da-clinica/receber-2x.webp 2x" width="390" height="1040" loading="lazy" alt="Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta">
+      <li><div class="moldura"><div class="moldura-tela"><img class="print" src="/assets/painel-da-clinica/receber-1x.webp" srcset="/assets/painel-da-clinica/receber-1x.webp 1x, /assets/painel-da-clinica/receber-2x.webp 2x" width="390" height="844" loading="lazy" alt="Tela Receber dos pacientes: a escolha entre Meus links de pagamento e Asaas da clínica, o link da clínica e o link de cada tipo de consulta"></div></div>
         <h3>Receber dos pacientes</h3><p>A assistente manda o seu link de pagamento depois de marcar, ou um link do Asaas da clínica. Com agenda por profissional, cada tipo de consulta pode ter o próprio link.</p></li>
     </ul>
   </div></section>

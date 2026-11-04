@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-0k7gIbm2os/IyPUks8jtSE6ah04/d1U3OcyXJX2jJbU=' 'self'; style-src 'sha256-XBaWAhPF2f5gmC1nIEj7Fe3CBXlt/2Tfb9nAxdxoZKc=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fV7IndI3UfZ0bqhgXM8E6MoYMx/uKENOYM2GUj9Nqo8=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -64,6 +64,43 @@
   --sombra-menu: none; --sombra-janela: none; --veu: rgba(0, 0, 0, .6);
   color-scheme: dark;
 }
+/* A entrada do painel e da Central (rxsync-sistema DEC-203): o mesmo layout nas duas, montado junto com o estilo de cada
+   uma (painel_montar.mjs e central_montar.mjs). Só aparência: a forma de entrar não muda.
+   No celular, o cartão fica no alto (o teclado não cobre o botão); do iPad em diante, no meio da tela. */
+#entrada.porta-entrada { box-sizing: border-box; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: calc(env(safe-area-inset-top, 0px) + var(--e-6)) var(--e-4) calc(env(safe-area-inset-bottom, 0px) + var(--e-6)); background: var(--superficie-2); }
+@media (min-width: 768px) and (min-height: 640px) { #entrada.porta-entrada { justify-content: center; padding-top: var(--e-10); padding-bottom: var(--e-10); } }
+#entrada .cartao-entrada { box-sizing: border-box; width: 100%; max-width: 420px; margin: 0; padding: var(--e-6); background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--r-janela); box-shadow: none; }
+@media (min-width: 768px) { #entrada .cartao-entrada { padding: var(--e-8); } }
+#entrada .marca-entrada { display: flex; align-items: center; gap: var(--e-3); margin: 0 0 var(--e-6); }
+#entrada .marca-entrada img { display: block; width: 40px; height: 40px; flex: none; }
+#entrada .marca-entrada .nome { font-weight: 600; font-size: var(--t-bloco); line-height: var(--l-bloco); color: var(--texto); }
+#entrada .marca-entrada .sub { font-size: var(--t-2); line-height: var(--l-2); color: var(--texto-2); }
+#entrada h1, #entrada h2 { margin: 0 0 var(--e-2); font-size: var(--t-titulo); line-height: var(--l-titulo); font-weight: 600; color: var(--texto); }
+#entrada .sub-entrada { margin: 0 0 var(--e-5); color: var(--texto-2); }
+#entrada form { display: flex; flex-direction: column; gap: var(--e-4); }
+#entrada form > h2 { margin-bottom: 0; }
+#entrada form > .campo, #entrada label.campo { display: flex; flex-direction: column; gap: var(--e-2); margin: 0; padding: 0; }
+#entrada .campo > label, #entrada .campo > .rot { font-weight: 500; font-size: var(--t-2); line-height: var(--l-2); color: var(--texto); }
+#entrada .entrada { box-sizing: border-box; width: 100%; min-height: var(--alvo-principal); padding: 0 var(--e-4); font: inherit; font-size: var(--t-corpo); color: var(--texto);
+  background: var(--superficie); border: 1px solid var(--borda-campo); border-radius: var(--r-botao); }
+#entrada .entrada:focus { border-color: var(--primaria); }
+#entrada .senha-caixa { position: relative; display: block; }
+#entrada .senha-caixa .entrada { padding-right: 104px; }
+#entrada .mostrar-senha { position: absolute; top: 2px; right: 2px; min-width: var(--alvo); min-height: calc(var(--alvo-principal) - 4px); padding: 0 var(--e-3);
+  border: 0; border-radius: var(--r-botao); background: none; color: var(--primaria); font: inherit; font-size: var(--t-2); font-weight: 600; cursor: pointer; }
+#entrada .marcar { margin: 0; padding: 0; }
+#entrada .btn.pri { width: 100%; min-height: var(--alvo-principal); }
+#entrada .btn.pri:disabled { opacity: 1; background: var(--primaria-forte); cursor: progress; }
+/* a mensagem fica logo acima do botão; o erro, com fundo, ícone e palavra */
+#entrada .msg, #entrada p.erro { margin: 0; font-size: var(--t-2); line-height: var(--l-2); color: var(--texto-2); }
+#entrada .msg:empty, #entrada p.erro:empty { display: none; }
+#entrada .msg.erro, #entrada p.erro { display: flex; align-items: flex-start; gap: var(--e-2); padding: var(--e-3); border-radius: var(--r-botao); background: var(--perigo-fundo); color: var(--perigo-texto); font-weight: 500; }
+#entrada .msg.erro::before, #entrada p.erro::before { content: "!"; flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--perigo-texto); color: var(--perigo-botao-texto); font-size: var(--t-peq); font-weight: 600; }
+#entrada .links, #entrada .acoes { display: flex; flex-flow: row wrap; justify-content: space-between; gap: var(--e-2) var(--e-4); margin: 0; }
+#entrada .link-entrada { min-height: var(--alvo); padding: 0; border: 0; background: none; color: var(--primaria); font: inherit; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+#entrada .legenda { margin: var(--e-5) 0 0; font-size: var(--t-peq); line-height: var(--l-peq); color: var(--texto-2); }
+#entrada :focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
 /* =====================================================================================================
    Painel da clínica (painel/, rxsync-sistema DEC-156). Cores e tamanhos: assets/ancora/tokens.css (o Âncora).
    Moldes de tela: A Início · B Lista · C Item · D Índice de ajustes · E Página de ajuste · F Passos · G Relatório · H Folha
@@ -533,27 +570,27 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 <!-- Página montada por scripts/painel_montar.mjs a partir de painel/fonte/. Não edite este arquivo à mão. -->
 <div id="carregando" class="boot">Abrindo seu painel…</div>
 
-<div id="entrada" class="porta" hidden>
-  <div class="cartao" role="main">
-    <div class="marca-p">RXSync · Painel da clínica</div>
+<div id="entrada" class="porta porta-entrada" hidden>
+  <div class="cartao cartao-entrada" role="main">
+    <div class="marca-entrada"><img src="/assets/icones/rxsync-192.png" alt="" width="40" height="40"><div><div class="nome">RXSync</div><div class="sub">Painel da clínica</div></div></div>
     <h1 id="entTitulo">Entrar no painel</h1>
-    <p class="mudo" id="entSub">Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.</p>
+    <p class="sub-entrada" id="entSub">Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.</p>
     <form id="entEntrar" novalidate>
       <div class="campo"><label for="entEmail">E-mail</label><input class="entrada" id="entEmail" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></div>
       <div class="campo"><label for="entSenha">Senha</label><input class="entrada" id="entSenha" type="password" autocomplete="current-password"></div>
       <label class="marcar"><input id="entLembrar" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Entrar</button>
-      <div class="links"><button type="button" class="link" data-ent="criar">Criar senha</button><button type="button" class="link" data-ent="esqueci">Esqueci a senha</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="criar">Criar senha</button><button type="button" class="link link-entrada" data-ent="esqueci">Esqueci a senha</button></div>
     </form>
     <form id="entCodigo" novalidate hidden>
       <div class="campo"><label for="entCod">Código de 6 dígitos</label><input class="entrada codigo" id="entCod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
       <button class="btn pri plena" type="submit">Confirmar</button>
-      <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
     </form>
     <form id="entPedir" novalidate hidden>
       <div class="campo"><label for="entEmailPedir">E-mail da clínica (o do cadastro)</label><input class="entrada" id="entEmailPedir" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false"></div>
       <button class="btn pri plena" type="submit">Mandar o código</button>
-      <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
     </form>
     <form id="entNova" novalidate hidden>
       <div class="campo"><label for="entCodNova">Código de 6 dígitos (chegou no e-mail)</label><input class="entrada codigo" id="entCodNova" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
@@ -562,7 +599,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
       <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a id="entTermosLink" href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a>, versão <span id="entTermosVer">2026-11-v8</span>.</span></label>
       <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Salvar a senha e entrar</button>
-      <div class="links"><button type="button" class="link" data-ent="voltar">Voltar</button></div>
+      <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
     </form>
     <div id="entMsg" class="msg" role="status" aria-live="polite"></div>
     <p class="legenda">A sessão fica só nesta aba: abrir o painel em outra aba pede a entrada de novo, a não ser que você marque "Lembrar este aparelho".</p>
@@ -835,9 +872,21 @@ function entTela(id, titulo, sub, msg, erro) {
   ENT_TELAS.forEach(t => { $(t).hidden = t !== id; });
   $('entTitulo').textContent = titulo; $('entSub').textContent = sub;
   entMsg(msg || '', erro);
+  const bt = $(id).querySelector('button[type=submit]'); if (bt) $(id).insertBefore($('entMsg'), bt);
   const p = $(id).querySelector('input'); if (p && !$(id).contains(document.activeElement)) { try { p.focus(); } catch (e) {} }
 }
-function entOcupado(form, sim) { form.querySelectorAll('button, input').forEach(x => { x.disabled = sim; }); }
+function entOcupado(form, sim) {
+  form.querySelectorAll('button, input').forEach(x => { x.disabled = sim; });
+  const b = form.querySelector('button[type=submit]'); if (form.id === 'entEntrar' && b) b.textContent = sim ? 'Entrando…' : 'Entrar';
+}
+function senhaVisivel(input) {
+  const caixa = document.createElement('span'); caixa.className = 'senha-caixa';
+  input.parentNode.insertBefore(caixa, input); caixa.appendChild(input);
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'mostrar-senha'; b.textContent = 'Mostrar'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-controls', input.id);
+  b.addEventListener('click', () => { const ver = input.type === 'password'; input.type = ver ? 'text' : 'password'; b.textContent = ver ? 'Esconder' : 'Mostrar'; b.setAttribute('aria-pressed', String(ver)); });
+  caixa.appendChild(b);
+}
+['entSenha', 'entSenhaNova', 'entSenhaNova2'].forEach(k => senhaVisivel($(k)));
 function entInicio(msg, erro) { entTela('entEntrar', 'Entrar no painel', 'Com o e-mail e a senha da clínica. Depois, um código chega no e-mail.', msg, erro); }
 function entNovaTela(msg, termos) {
   ['entCodNova', 'entSenhaNova', 'entSenhaNova2'].forEach(k => { $(k).value = ''; });
@@ -1203,7 +1252,7 @@ const CAMPOS = [
   {"key": "horario_humano", "grupo": "conversa", "tipo": "text", "label": "Horário da equipe", "hint": "Quando há alguém da equipe para responder no WhatsApp.", "ph": "Segunda a sexta, das 8h às 17h"},
   {"key": "mensagem_fora_horario", "grupo": "conversa", "tipo": "textarea", "label": "Fora do horário da equipe", "hint": "O que ela diz quando o paciente pede uma pessoa fora desse horário.", "ph": "Nossa equipe volta amanhã às 8h e responde você por aqui."},
   {"key": "link_privacidade", "grupo": "conversa", "tipo": "text", "label": "Política de privacidade da clínica", "hint": "Link que ela envia na primeira conversa, como pede a LGPD.", "ph": "https://suaclinica.com.br/privacidade"},
-  {"key": "politica_precos", "grupo": "valores", "tipo": "textarea", "label": "Preços", "hint": "Valores que ela pode informar. Ela só fala de preço quando o paciente pergunta.", "ph": "Consulta particular: R$ 350\nRetorno em até 30 dias: sem custo"},
+  {"key": "politica_precos", "grupo": "valores", "tipo": "textarea", "label": "Preços", "hint": "Valores que ela pode informar. Ela só fala de preço quando o paciente pergunta.", "ph": "Consulta particular: R$\u00a0350\nRetorno em até 30 dias: sem custo"},
   {"key": "formas_pagamento", "grupo": "valores", "tipo": "textarea", "label": "Formas de pagamento", "hint": "", "ph": "Pix, cartão de crédito em até 3 vezes e dinheiro"},
   {"key": "convenios_parcerias", "grupo": "valores", "tipo": "textarea", "label": "Convênios", "hint": "Quais vocês aceitam e com que regras.", "ph": "Unimed e Bradesco Saúde, só para consultas"},
   {"key": "politica_agendamento", "grupo": "valores", "tipo": "textarea", "label": "Regras de agendamento", "hint": "Prazo para desmarcar, tolerância de atraso, documentos para levar.", "ph": "Desmarcar com 24 horas de antecedência. Tolerância de 15 minutos."},
@@ -2353,7 +2402,7 @@ function medAbrir(m0) {
       el('p', { class: 'dica bloco', text: 'A assistente confirma o tipo com o paciente e usa a duração dele para oferecer os horários. Os horários começam de ' + duracaoPadrao() + ' em ' + duracaoPadrao() + ' minutos (a duração padrão da clínica). Com tipos cadastrados, toda consulta deste médico precisa de um tipo.' }),
       (m.tipos || []).length ? el('div', { class: 'lista bloco' }, m.tipos.map(t => el('button', { class: 'linha', type: 'button', onclick: () => t.ativo ? tipoForm(m, t) : medAcao('agenda_tipo_ativo', { id: t.id, ativo: true }, () => rapida('Tipo reativado.')) },
         el('span', { class: 'tx' }, el('span', { class: 't1', text: t.nome + (t.ativo ? '' : ' (removido)') }), el('span', { class: 't2', text: [t.duracao_min + ' min', t.prazo_retorno_dias ? 'retorno em até ' + t.prazo_retorno_dias + ' dias' : null, t.link_pagamento ? 'link de pagamento próprio' : null,
-          t.valor ? 'R$ ' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : null].filter(Boolean).join(' · ') })), el('span', { class: 'valor', text: t.ativo ? 'Editar' : 'Reativar' }))))
+          t.valor ? 'R$\u00a0' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : null].filter(Boolean).join(' · ') })), el('span', { class: 'valor', text: t.ativo ? 'Editar' : 'Reativar' }))))
         : el('p', { class: 'mudo bloco', text: 'Nenhum tipo cadastrado.' }),
       el('div', { class: 'bloco' }, btn('Tipo de consulta', () => tipoForm(m, null), 'sec', 'soma')),
       el('h2', { class: 'tit-bloco', text: 'Horários de ' + m.nome }), el('p', { class: 'dica bloco', text: 'Sem faixas, este médico fica sem atendimento: a assistente não marca consultas com ele.' }), gradeBox,
@@ -2543,7 +2592,7 @@ function pagResumo() {
     const tipos = (m.tipos || []).filter(t => t.ativo);
     if (!tipos.length) { linhas.push(el('div', { class: 'linha' }, el('span', { class: 'ic' }, icone('medico')), el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome }), el('span', { class: 't2', text: 'Sem tipos de consulta: usa o link geral' })))); return; }
     tipos.forEach(t => {
-      const dinheiro = t.valor ? 'R$ ' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '';
+      const dinheiro = t.valor ? 'R$\u00a0' + Number(t.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '';
       const link = t.link_pagamento ? t.link_pagamento.replace(/^https:\/\//i, '') : 'usa o link geral';
       linhas.push(el('button', { class: 'linha', type: 'button', onclick: () => tipoForm(m, t) }, el('span', { class: 'ic' }, icone('dinheiro')),
         el('span', { class: 'tx' }, el('span', { class: 't1', text: m.nome + ' · ' + t.nome }), el('span', { class: 't2 quebra', text: asaasLigado() ? (dinheiro ? dinheiro + ' pelo Asaas' : 'Sem valor: ' + link) : link })),
@@ -3564,29 +3613,29 @@ function assinRender(a) {
   const sit = SIT[a.situacao] || SIT.em_dia, encerrada = a.situacao === 'cancelada' || a.situacao === 'teste_encerrado';
   const abertas = (a.abertas && a.abertas.length) ? a.abertas : (a.proxima ? [a.proxima] : []);
   const blocos = [el('div', { class: 'cartao pad bloco' }, el('div', { class: 'item-cab' }, el('div', { class: 'tx' }, el('p', { class: 'legenda', text: 'Sua assinatura RXSync' }), el('h2', { text: a.plano || '—' }),
-    el('p', { class: 'mudo', text: 'R$ ' + (a.valor || '—') + assinSufixo(a.forma) + ' · ' + assinForma(a.forma) }),
+    el('p', { class: 'mudo', text: 'R$\u00a0' + (a.valor || '—') + assinSufixo(a.forma) + ' · ' + assinForma(a.forma) }),
     a.implantacao_suporte_ate ? el('p', { class: 'mudo', text: 'Implantação completa: suporte no WhatsApp até ' + String(a.implantacao_suporte_ate).split('-').reverse().join('/') + '.' }) : null), etq(sit[0], sit[1])),
     a.cancelar_em ? aviso('atencao', 'Cancelamento agendado para ' + a.cancelar_em + '. Até lá tudo funciona normalmente.') : null,
     a.situacao === 'teste' ? el('p', { class: 'dica', text: a.trial_fim ? 'O teste grátis vai até ' + a.trial_fim + '. Nada é cobrado sem você confirmar.' : 'Os 7 dias grátis começam quando a assistente entrar no ar, depois que você conectar o WhatsApp.' }) : null,
     a.situacao === 'teste_encerrado' ? el('p', { class: 'dica', text: 'O teste terminou e a assistente está parada. Pague abaixo para ela voltar ao ar.' }) : null)];
   abertas.forEach(p => blocos.push(el('div', { class: 'cartao pad bloco' }, el('p', { class: 'legenda', text: p.vencida ? 'Cobrança vencida' : 'Cobrança em aberto' }),
-    el('p', { class: 'tit-bloco', text: 'R$ ' + p.valor + ' · ' + (p.vencida ? 'venceu em ' : 'vence em ') + p.vencimento }), p.descricao ? el('p', { class: 'mudo peq', text: p.descricao }) : null,
+    el('p', { class: 'tit-bloco', text: 'R$\u00a0' + p.valor + ' · ' + (p.vencida ? 'venceu em ' : 'vence em ') + p.vencimento }), p.descricao ? el('p', { class: 'mudo peq', text: p.descricao }) : null,
     p.link ? el('div', { class: 'pilha' }, el('a', { class: 'btn pri plena', href: p.link, target: '_blank', rel: 'noopener', text: 'Pagar agora' }), el('p', { class: 'dica', text: 'Pix, boleto ou cartão, na página segura do Asaas.' })) : null)));
   if (!abertas.length && a.proximo_vencimento) blocos.push(el('p', { class: 'mudo bloco', text: 'Próxima cobrança: ' + a.proximo_vencimento + '. O link chega por e-mail alguns dias antes.' }));
   if ((a.situacao === 'teste' || a.situacao === 'teste_encerrado') && !abertas.length && !a.cobranca_gerada) blocos.push(el('div', { class: 'cartao pad bloco' },
     el('p', { class: 'tit-bloco', text: a.situacao === 'teste' ? 'Gostou? Garanta a continuidade agora' : 'Quer reativar a assistente?' }),
-    el('p', { class: 'mudo', text: 'Geramos o pagamento do plano ' + (a.plano || '') + ' (R$ ' + (a.valor || '—') + assinSufixo(a.forma) + (Number(String(a.valor_setup || '').replace(/\D/g, '')) > 0 ? ', mais a Implantação completa de R$ ' + a.valor_setup + ', uma única vez' : '') + '). ' + (a.situacao === 'teste' && a.trial_fim ? 'O primeiro vencimento fica para o fim do teste, ' + a.trial_fim + ', e a assistente segue sem interrupção.' : 'Assim que o pagamento for confirmado, a assistente volta ao ar.') }),
+    el('p', { class: 'mudo', text: 'Geramos o pagamento do plano ' + (a.plano || '') + ' (R$\u00a0' + (a.valor || '—') + assinSufixo(a.forma) + (Number(String(a.valor_setup || '').replace(/\D/g, '')) > 0 ? ', mais a Implantação completa de R$\u00a0' + a.valor_setup + ', uma única vez' : '') + '). ' + (a.situacao === 'teste' && a.trial_fim ? 'O primeiro vencimento fica para o fim do teste, ' + a.trial_fim + ', e a assistente segue sem interrupção.' : 'Assim que o pagamento for confirmado, a assistente volta ao ar.') }),
     el('div', { class: 'pilha' }, btn(a.situacao === 'teste' ? 'Quero continuar: gerar pagamento' : 'Pagar o teste agora', ev => assinAcao('assinatura_pagar_teste', {}, { titulo: 'Gerar o pagamento agora?', texto: 'Para continuar com a RXSync depois do teste.', botao: 'Gerar pagamento' }, ev.currentTarget), 'pri plena'))));
   if (a.historico && a.historico.length) blocos.push(el('h2', { class: 'tit-bloco', text: 'Histórico de cobranças' }), el('div', { class: 'lista bloco' }, a.historico.map(x => el('div', { class: 'linha' },
-    el('span', { class: 'tx' }, el('span', { class: 't1', text: x.vencimento + ' · R$ ' + x.valor }), el('span', { class: 't2', text: (x.descricao ? x.descricao + ' · ' : '') + x.status + (x.pago_em ? ' em ' + x.pago_em : '') })),
+    el('span', { class: 'tx' }, el('span', { class: 't1', text: x.vencimento + ' · R$\u00a0' + x.valor }), el('span', { class: 't2', text: (x.descricao ? x.descricao + ' · ' : '') + x.status + (x.pago_em ? ' em ' + x.pago_em : '') })),
     x.link ? el('a', { class: 'btn fant', href: x.link, target: '_blank', rel: 'noopener', text: x.aberta ? 'Pagar' : 'Recibo' }) : null))));
   else if (a.asaas_ok === false) blocos.push(el('p', { class: 'dica bloco', text: 'O histórico de cobranças aparece aqui depois da primeira cobrança.' }));
   if (!encerrada && ASSIN_PRECOS[a.plano_chave]) blocos.push(el('h2', { class: 'tit-bloco', text: 'Mudar de plano' }), el('p', { class: 'dica bloco', text: 'O novo valor vale a partir da próxima cobrança em aberto.' }),
     el('div', { class: 'duas-ipad bloco' }, ['essencial', 'gestao'].map(k => {
       const P = ASSIN_PRECOS[k], atual = k === a.plano_chave, bloqueado = a.cancelar_em || a.situacao === 'suspensa' || (a.forma !== 'mensal' && k === 'essencial');
-      return el('div', { class: 'cartao pad bloco' + (atual ? ' selecionada' : '') }, el('p', { class: 'tit-bloco' }, P.nome, atual ? etq('Seu plano', 'marca') : null), el('p', { class: 'num', text: 'R$ ' + P[a.forma] + assinSufixo(a.forma) }),
+      return el('div', { class: 'cartao pad bloco' + (atual ? ' selecionada' : '') }, el('p', { class: 'tit-bloco' }, P.nome, atual ? etq('Seu plano', 'marca') : null), el('p', { class: 'num', text: 'R$\u00a0' + P[a.forma] + assinSufixo(a.forma) }),
         el('ul', { class: 'peq mudo' }, P.itens.map(i => el('li', { text: i }))),
-        atual ? null : el('div', { class: 'pilha' }, btn('Mudar para ' + P.nome, ev => assinAcao('assinatura_trocar_plano', { plano: k }, { titulo: 'Mudar para o plano ' + P.nome + '?', texto: ['Hoje: R$ ' + (a.valor || '—') + assinSufixo(a.forma) + '. Depois: R$ ' + P[a.forma] + assinSufixo(a.forma) + ', a partir da próxima cobrança.'], botao: 'Mudar de plano' }, ev.currentTarget), 'sec plena', null, { disabled: !!bloqueado }),
+        atual ? null : el('div', { class: 'pilha' }, btn('Mudar para ' + P.nome, ev => assinAcao('assinatura_trocar_plano', { plano: k }, { titulo: 'Mudar para o plano ' + P.nome + '?', texto: ['Hoje: R$\u00a0' + (a.valor || '—') + assinSufixo(a.forma) + '. Depois: R$\u00a0' + P[a.forma] + assinSufixo(a.forma) + ', a partir da próxima cobrança.'], botao: 'Mudar de plano' }, ev.currentTarget), 'sec plena', null, { disabled: !!bloqueado }),
           bloqueado ? el('p', { class: 'dica', text: a.situacao === 'suspensa' ? 'Regularize o pagamento para mudar de plano.' : a.cancelar_em ? 'Há um cancelamento agendado.' : 'No plano anual, a troca para um plano menor vale na renovação.' }) : null));
     })));
   if (!encerrada) {
@@ -3646,7 +3695,7 @@ function reconectar() {
 tela('conta/contato', { montar: () => [cabTela('Contato e responsável técnico', { voltar: VOLTA_CONTA, sub: 'Quem responde pela clínica na RXSync e pelo conteúdo da assistente. Mudar o e-mail atualiza o cliente no Asaas.' }),
   blocoCampos(CAMPOS_DA('contato'), { oQue: 'o e-mail, os telefones e o responsável técnico' })] });
 tela('conta/gestao', {
-  montar: () => [cabTela('Assistente de gestão', { voltar: VOLTA_CONTA, sub: 'Pergunte sobre a agenda, os resultados e os documentos. Se você permitir, ele também marca, remarca, bloqueia horários ("dia 20 não vou atender"), muda a grade ("quarta não atendo mais de manhã"), atualiza o que a assistente diz aos pacientes ("a consulta agora custa R$ 380") e avisa os pacientes do dia ("vou atrasar 30 minutos").' }),
+  montar: () => [cabTela('Assistente de gestão', { voltar: VOLTA_CONTA, sub: 'Pergunte sobre a agenda, os resultados e os documentos. Se você permitir, ele também marca, remarca, bloqueia horários ("dia 20 não vou atender"), muda a grade ("quarta não atendo mais de manhã"), atualiza o que a assistente diz aos pacientes ("a consulta agora custa R$\u00a0380") e avisa os pacientes do dia ("vou atrasar 30 minutos").' }),
     blocoCampos(CAMPOS_DA('gestao'), { oQue: 'o assistente de gestão e os números autorizados', beneficio: 'Pergunte sobre a clínica e peça mudanças por aqui ou pelo seu WhatsApp, sem abrir o painel.' }),
     el('p', { class: 'legenda pilha', text: 'Até 60 perguntas por dia. Elas não contam na franquia de mensagens.' })],
   entrar: () => dependenciasAplicar()

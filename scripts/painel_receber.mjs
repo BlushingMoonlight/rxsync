@@ -88,7 +88,7 @@ await page.goto(site.base + '/painel/#agenda/horarios/pagamento'); await page.lo
 await page.waitForFunction(() => document.querySelector('#pagModo button[data-v="asaas"]').getAttribute('aria-pressed') === 'true');
 ok(await visivel(page.locator('#pagAsaas')) && await visivel(page.locator('#campo_pagamento_valor_padrao')), '2. com o Asaas, aparecem o bloco do Asaas e o valor da consulta');
 await page.locator('#pagMedResumo .linha', { hasText: 'Retorno' }).waitFor();
-ok(/R\$ 200,00 pelo Asaas/.test(await page.locator('#pagMedResumo .linha', { hasText: 'Retorno' }).textContent()), '2. com o Asaas, o tipo mostra o valor');
+ok(/R\$\s200,00 pelo Asaas/.test(await page.locator('#pagMedResumo .linha', { hasText: 'Retorno' }).textContent()), '2. com o Asaas, o tipo mostra o valor');
 await page.locator('#pagMedResumo .linha', { hasText: 'Retorno' }).click();
 ok(await visivel(page.locator('#tpValor')), '2. com o Asaas, o "Editar tipo de consulta" tem o valor do tipo');
 await page.getByRole('button', { name: 'Cancelar', exact: true }).click();
