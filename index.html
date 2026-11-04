@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QfRFBEIogHpH1BwH9GhBKBvJg3s/Y9W3c9xfqwUvoeY=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xwlrHl++w7fIgDZfFfbYL/SJKHQ8mu1rIdJW591XyRg=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
     <meta name="theme-color" content="#FFFFFF">
@@ -12,7 +12,7 @@
 
     <!-- ===================== SEO BÁSICO ===================== -->
     <title>Secretária virtual com IA no WhatsApp para clínicas | RXSync</title>
-    <meta name="description" content="Assistente virtual com IA que atende pacientes no WhatsApp 24h, marca consultas e manda lembretes. 7 dias grátis, sem cartão. A partir de R$ 299/mês.">
+    <meta name="description" content="Assistente virtual com IA que atende pacientes no WhatsApp 24h, marca consultas e manda lembretes. 7 dias grátis, sem cartão. A partir de R$&nbsp;299/mês.">
     <meta name="author" content="RXSync Tecnologia e Automação em Saúde">
     <meta name="robots" content="index, follow">
 
@@ -148,8 +148,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* Celular */
 .palco { position: relative; display: flex; justify-content: center; }
 .celular { position: relative; width: 100%; max-width: 360px; border-radius: 44px; background: #0b1220; padding: 10px; box-shadow: var(--sh-3); }
-.celular-tela { border-radius: 36px; overflow: hidden; background: #efeae2; display: flex; flex-direction: column; height: 600px; }
-@media (max-width: 400px) { .celular-tela { height: 560px; } }
+.celular-tela { border-radius: 36px; overflow: hidden; background: #efeae2; display: flex; flex-direction: column; }
 .wa-topo { background: #f0f2f5; padding: 34px 14px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e3e6e8; }
 .wa-av { width: 36px; height: 36px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 14px; }
 .wa-nome { font-weight: 700; font-size: 15px; line-height: 1.2; }
@@ -565,9 +564,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .topo-cta { white-space: nowrap; line-height: 1; }
 @media (max-width: 767px) {
   .hero-grid { gap: 32px; }
-  .celular { max-width: 330px; }
-  .celular-tela { height: 440px; }
-  .wa-topo { padding-top: 22px; }
   .cartao-flut { display: none; }
 }
 @media (max-width: 1023px) { .planos-rodape { display: grid; justify-content: center; justify-items: start; gap: 8px; } .planos-rodape span { align-items: flex-start; } .planos-rodape .ic-s { margin-top: 3px; } }
@@ -579,9 +575,24 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 /* O painel da clínica (#gestao): o print da tela Resultados (rxsync-sistema DEC-201) */
 .print-painel { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.print-painel img { width: 280px; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
 .print-painel figcaption { font-size: 13px; color: var(--ink-3); }
 #gestao .link-demo { margin-top: 20px; }
+
+/* Moldura de celular (as proporções do iPhone 18 Pro Max: tela de 440×956 pt, cantos arredondados e a ilha no alto; sem marca).
+   Um componente só: o tamanho vem de --mw (a largura da moldura). */
+.moldura { --mw: 360px; position: relative; width: var(--mw); max-width: 100%; aspect-ratio: 440 / 956; box-sizing: border-box; padding: calc(var(--mw) * .03); border-radius: calc(var(--mw) * .15); background: #0b1220; }
+.moldura::before { content: ""; position: absolute; z-index: 2; top: calc(var(--mw) * .055); left: 50%; transform: translateX(-50%); width: calc(var(--mw) * .284); height: calc(var(--mw) * .084); border-radius: 999px; background: #0b1220; }
+.moldura-tela { box-sizing: border-box; width: 100%; height: 100%; border-radius: calc(var(--mw) * .12); overflow: hidden; display: flex; flex-direction: column; background: #fff; }
+.moldura-tela:has(> img) { padding-top: calc(var(--mw) * .14); }
+.moldura-tela > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.moldura .wa-topo { padding-top: calc(var(--mw) * .16); }
+/* o topo: a moldura no lugar da altura fixa */
+.celular.moldura { box-shadow: var(--sh-3); }
+.celular.moldura .celular-tela { height: 100%; border-radius: calc(var(--mw) * .12); }
+@media (max-width: 767px) { .celular.moldura { --mw: 320px; } }
+/* a seção do painel (rxsync-sistema DEC-202, opção A): o texto mais largo e a moldura de 340 px no computador */
+.print-painel .moldura { --mw: 260px; }
+@media (min-width: 1024px) { #gestao .dono { grid-template-columns: 1.15fr .85fr; gap: 80px; } #gestao .print-painel .moldura { --mw: 340px; } }
     </style>
 
     <!-- ===================== DADOS ESTRUTURADOS (SCHEMA.ORG) ===================== -->
@@ -800,7 +811,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Como as mensagens são contadas?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; se passar, avisamos e só cobramos a mais com o seu aceite por escrito."
+            "text": "Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; avisamos perto do limite e, se passar, só cobramos a mais com o seu aceite por escrito."
           }
         },
         {
@@ -880,14 +891,14 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       </div>
       <div class="hero-micro">
         <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Os 7 dias contam a partir do dia em que ela entra no ar</span>
-        <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Planos a partir de R$ 299/mês</span>
+        <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Planos a partir de R$&nbsp;299/mês</span>
       </div>
     </div>
 
     <div>
       <div class="palco" id="palco">
-        <div class="celular" role="img" aria-label="Exemplo de conversa: às 23h47 uma paciente pede horário pelo WhatsApp e a assistente oferece duas opções e confirma a consulta.">
-          <div class="celular-tela" aria-hidden="true">
+        <div class="celular moldura" role="img" aria-label="Exemplo de conversa: às 23h47 uma paciente pede horário pelo WhatsApp e a assistente oferece duas opções e confirma a consulta.">
+          <div class="celular-tela moldura-tela" aria-hidden="true">
             <div class="wa-topo">
               <span class="wa-av">BE</span>
               <div><div class="wa-nome">Clínica Bem Estar</div><div class="wa-sub">online</div></div>
@@ -1053,14 +1064,14 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <input type="range" id="c-taxa" min="5" max="80" step="5" value="30">
         </div>
         <div class="campo-r">
-          <label for="c-valor">Valor médio da consulta <output id="o-valor" for="c-valor">R$ 300</output></label>
+          <label for="c-valor">Valor médio da consulta <output id="o-valor" for="c-valor">R$&nbsp;300</output></label>
           <input type="range" id="c-valor" min="100" max="1500" step="50" value="300">
         </div>
       </div>
       <div class="calc-res" aria-live="polite">
         <span class="rot">Consultas que podem estar ficando para trás</span>
-        <div class="grande"><span id="r-valor">R$ 3.900</span> <small>por mês</small></div>
-        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$ 299).</p>
+        <div class="grande"><span id="r-valor">R$&nbsp;3.900</span> <small>por mês</small></div>
+        <p class="comp">São cerca de <b id="r-cons">13 consultas</b> por mês (pacientes por semana × 4,3 semanas × a porcentagem). <b id="r-paga">1 consulta paga</b> a mensalidade do Essencial (R$&nbsp;299).</p>
         <a href="/contratar.html?plano=essencial&amp;ciclo=mensal" class="btn btn-prim btn-lg" data-teste="essencial" data-origem="calculadora">Começar 7 dias grátis</a>
         <p class="aviso">É uma estimativa com os números que você escolheu, não uma promessa de resultado.</p>
       </div>
@@ -1153,7 +1164,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <a href="/painel-da-clinica/" class="link-demo" data-cta="painel_ver_por_dentro">Ver o painel por dentro <svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
     </div>
     <figure class="print-painel">
-      <img src="/assets/painel-da-clinica/resultados-1x.webp" srcset="/assets/painel-da-clinica/resultados-1x.webp 1x, /assets/painel-da-clinica/resultados-2x.webp 2x" width="390" height="844" loading="lazy" decoding="async" alt="Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior">
+      <div class="moldura"><div class="moldura-tela"><img src="/assets/painel-da-clinica/resultados-1x.webp" srcset="/assets/painel-da-clinica/resultados-1x.webp 1x, /assets/painel-da-clinica/resultados-2x.webp 2x" width="390" height="844" loading="lazy" decoding="async" alt="Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior"></div></div>
       <figcaption>A tela Resultados de uma clínica de exemplo.</figcaption>
     </figure>
   </div>
@@ -1195,7 +1206,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <h3>Essencial</h3>
         <p class="para">Para consultórios que querem parar de perder pacientes no WhatsApp.</p>
         <div class="preco"><span class="moeda">R$</span><span class="val" data-mensal="299" data-anual="269,10">299</span><span class="per">/mês</span></div>
-        <p class="preco-sub" data-mensal="Sem fidelidade · Implantação completa opcional" data-anual="12x de R$ 269,10 ou R$ 2.990 à vista (12 meses pelo preço de 10) · contrato de 12 meses">Sem fidelidade · Implantação completa opcional</p>
+        <p class="preco-sub" data-mensal="Sem fidelidade · Implantação completa opcional" data-anual="12x de R$&nbsp;269,10 ou R$&nbsp;2.990 à vista (12 meses pelo preço de 10) · contrato de 12 meses">Sem fidelidade · Implantação completa opcional</p>
         <button type="button" class="btn btn-sec btn-full" data-contratar="essencial" data-rotulo="Essencial">Testar o Essencial grátis</button>
         <details class="inc-det"><summary>Ver tudo o que inclui</summary>
         <ul class="inc">
@@ -1218,7 +1229,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         <h3>Gestão Inteligente</h3>
         <p class="para">Para clínicas que querem encher a agenda e gastar menos tempo com gestão.</p>
         <div class="preco"><span class="moeda">R$</span><span class="val" data-mensal="599" data-anual="539,10">599</span><span class="per">/mês</span></div>
-        <p class="preco-sub" data-mensal="Sem fidelidade · Implantação completa opcional" data-anual="12x de R$ 539,10 ou R$ 5.990 à vista (12 meses pelo preço de 10) · contrato de 12 meses">Sem fidelidade · Implantação completa opcional</p>
+        <p class="preco-sub" data-mensal="Sem fidelidade · Implantação completa opcional" data-anual="12x de R$&nbsp;539,10 ou R$&nbsp;5.990 à vista (12 meses pelo preço de 10) · contrato de 12 meses">Sem fidelidade · Implantação completa opcional</p>
         <button type="button" class="btn btn-prim btn-full" data-contratar="gestao" data-rotulo="Gestão Inteligente">Testar o Gestão grátis</button>
         <details class="inc-det"><summary>Ver tudo o que inclui</summary>
         <ul class="inc">
@@ -1275,23 +1286,21 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     </div>
 
     <div class="implant">
-      <h3>Implantação completa (opcional): R$ 999, uma vez só</h3>
+      <h3>Implantação completa (opcional): R$&nbsp;999, uma vez só</h3>
       <ul>
-        <li>Configuramos a assistente com você, até ficar do seu jeito.</li>
-        <li>Conectamos o WhatsApp e deixamos o painel pronto.</li>
+        <li>Configuramos a assistente com você e deixamos o WhatsApp e o painel prontos.</li>
         <li>1 ano de suporte no WhatsApp, em dias úteis, para mudanças na configuração.</li>
       </ul>
-      <p>Você escolhe na contratação, nos planos mensal e anual. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, ela é feita durante o teste e só é cobrada se você continuar, junto com a primeira mensalidade.</p>
+      <p>No teste grátis, só é cobrada se você continuar. Sem ela, você configura pelo formulário e pelo painel.</p>
     </div>
 
     <div class="planos-rodape">
       <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>7 dias grátis, sem cartão</span>
       <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>7 dias para desistir, com devolução do que pagou</span>
-      <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Troca de plano pelo painel</span>
       <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Mensal: cancele com 30 dias de aviso, sem multa</span>
-      <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Ajustes a qualquer hora, pelo painel</span>
+      <span><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Troca de plano e ajustes pelo painel</span>
     </div>
-    <p class="nota-msg">Contamos cada mensagem enviada ou recebida pela assistente. 5.000 por mês dão cerca de 166 por dia. Se a clínica chegar perto do limite, avisamos; só cobramos a mais se você aceitar por escrito.</p>
+    <p class="nota-msg">Contamos cada mensagem enviada ou recebida pela assistente (cerca de 166 por dia nas 5.000 do mês). Avisamos perto do limite e, se passar, só cobramos a mais com o seu aceite por escrito.</p>
   </div>
 </section>
 
@@ -1386,7 +1395,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         </div>
         <div class="faq-item">
           <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-2">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-2"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; se passar, avisamos e só cobramos a mais com o seu aceite por escrito.</p></div></div>
+          <div class="faq-content" id="faq-r-3-2"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; avisamos perto do limite e, se passar, só cobramos a mais com o seu aceite por escrito.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-4" role="tabpanel" aria-labelledby="faq-tab-4">
@@ -1748,7 +1757,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     (function () {
         var msgs = document.getElementById('c-msgs'), taxa = document.getElementById('c-taxa'), valor = document.getElementById('c-valor');
         if (!msgs) return;
-        var brl = function (n) { return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); };
+        var brl = function (n) { return 'R$\u00a0' + Math.round(n).toLocaleString('pt-BR'); };
         var usou = false;
         function calcular(ev) {
             var m = +msgs.value, t = +taxa.value, val = +valor.value;

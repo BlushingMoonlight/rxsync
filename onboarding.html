@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="scroll-smooth">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gwldi2Zb8bvIuaHg3j/vyCgHcWY6LsJN3NU8VfMi2aY=' 'self' https://*.googletagmanager.com; style-src 'sha256-hX6qAetGcqfTtvEfseTEXXj0BkU1SHY9spfLDAqpPQY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-b6GsGtrZTe6wnfBROzzE6LRm0xZIG6nnosmVd8OZAUE=' 'self' https://*.googletagmanager.com; style-src 'sha256-hX6qAetGcqfTtvEfseTEXXj0BkU1SHY9spfLDAqpPQY=' 'self'; font-src 'self'; img-src 'self' https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -759,7 +759,7 @@ function addFaq(p = '', r = '') {
 }
 
 /* ===================== LISTAS (rxsync-sistema #225, item 18) ===================== */
-// Escrever › Adicionar › próximo. Os tipos de consulta têm nome, duração (hh:mm) e valor (R$ 0,00, sem custo ou pelo
+// Escrever › Adicionar › próximo. Os tipos de consulta têm nome, duração (hh:mm) e valor (em reais, sem custo ou pelo
 // convênio). O servidor monta com as listas os mesmos textos que a assistente lê.
 const LISTAS_SIMPLES = ['convenios', 'profissionais', 'servicos', 'nao_oferecemos'];
 const minDe = v => { const m = /^(\d{1,2}):(\d{2})$/.exec(v || ''); return m ? (+m[1]) * 60 + (+m[2]) : 0; };
@@ -774,7 +774,7 @@ function addTipo(t = {}) {
   const preco = document.createElement('select'); preco.className = 'campo tl-preco'; preco.setAttribute('aria-label', 'Como é o valor');
   [['valor', 'Valor'], ['sem_custo', 'Sem custo'], ['convenio', 'Pelo convênio']].forEach(([v, r]) => { const o = document.createElement('option'); o.value = v; o.textContent = r; preco.append(o); });
   preco.value = t.preco || 'valor';
-  const val = document.createElement('input'); val.className = 'campo tl-valor'; val.inputMode = 'decimal'; val.placeholder = 'R$ 0,00'; val.setAttribute('aria-label', 'Valor em reais'); val.value = valorTxt(t.valor);
+  const val = document.createElement('input'); val.className = 'campo tl-valor'; val.inputMode = 'decimal'; val.placeholder = 'R$\u00a00,00'; val.setAttribute('aria-label', 'Valor em reais'); val.value = valorTxt(t.valor);
   const rem = document.createElement('button'); rem.type = 'button'; rem.className = 'btn-rem'; rem.textContent = 'Remover';
   const ajustar = () => { val.classList.toggle('hidden', preco.value !== 'valor'); };
   preco.addEventListener('change', () => { ajustar(); salvarRascunho(); });
@@ -819,7 +819,7 @@ function iniciarListas() {
 function resumoListas() {
   const L = coletarListas(), dur = n => n ? (n >= 60 ? Math.floor(n / 60) + 'h' + (n % 60 ? String(n % 60).padStart(2, '0') : '') : n + ' min') : '';
   const partes = [];
-  if (L.tipos.length) partes.push('Tipos de consulta: ' + L.tipos.map(t => t.nome + (t.duracao_min ? ' (' + dur(t.duracao_min) + ')' : '') + ': ' + (t.preco === 'sem_custo' ? 'sem custo' : t.preco === 'convenio' ? 'pelo convênio' : t.valor ? 'R$ ' + valorTxt(t.valor) : 'valor a confirmar')).join('; '));
+  if (L.tipos.length) partes.push('Tipos de consulta: ' + L.tipos.map(t => t.nome + (t.duracao_min ? ' (' + dur(t.duracao_min) + ')' : '') + ': ' + (t.preco === 'sem_custo' ? 'sem custo' : t.preco === 'convenio' ? 'pelo convênio' : t.valor ? 'R$\u00a0' + valorTxt(t.valor) : 'valor a confirmar')).join('; '));
   if (L.formas.length) partes.push('Pagamento: ' + L.formas.map(f => ({ pix: 'Pix', dinheiro: 'dinheiro', debito: 'débito', credito: 'crédito' + (L.parcelas > 1 ? ' em até ' + L.parcelas + 'x' : ''), boleto: 'boleto' })[f]).join(', '));
   [['convenios', 'Convênios'], ['profissionais', 'Quem atende'], ['servicos', 'O que atendem'], ['nao_oferecemos', 'O que não fazem']].forEach(([k, r]) => { if (L[k].length) partes.push(r + ': ' + L[k].join(', ')); });
   return partes;

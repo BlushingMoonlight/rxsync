@@ -279,6 +279,8 @@ for (const arq of ['painel/index.html']) {
     if (String(m.theme_color).toUpperCase() !== '#FFFFFF' || String(m.background_color).toUpperCase() !== '#FFFFFF') erro(`${mf}: theme_color e background_color brancos (#FFFFFF, o Âncora)`);
     const tam = (m.icons || []).filter(i => existe(i.src)).map(i => i.sizes);
     if (!tam.includes('192x192') || !tam.includes('512x512')) erro(`${mf}: precisa dos ícones de 192 e 512 px (arquivos que existam)`);
+    // DEC-202: o 192 e o 512 em "any" (com margem) e em "maskable" (fundo inteiro, desenho nos 80% centrais), cada um no seu arquivo.
+    for (const p of ['any', 'maskable']) for (const t of ['192x192', '512x512']) if (!(m.icons || []).some(i => existe(i.src) && i.sizes === t && i.purpose === p)) erro(`${mf}: falta o ícone ${t} com "purpose": "${p}" (DEC-202)`);
   }
   }
 }
@@ -293,7 +295,7 @@ for (const arq of ['painel/index.html']) {
   const confere = (f, achou, esperado, oque) => { if (String(achou) !== String(esperado)) erro(`${f}: ${oque} é ${achou}, mas o preço oficial é ${esperado} (scripts/precos_oficiais.json, rxsync-sistema#79)`); };
   // Implantação completa (rxsync-sistema DEC-182, opcional): toda menção "R$ NNN" junto de "Implantação completa" e o valor
   // que a contratação manda quando a caixa vem marcada (const IMPLANTACAO).
-  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/Implantação completa[^<"]{0,80}?R\$\s*([\d.]+)/gi)) confere(f, m[1], P.implantacao, 'a Implantação completa');
+  for (const f of ['index.html', 'contratar.html']) for (const m of ler(f).matchAll(/Implantação completa[^<"]{0,80}?R\$(?:\s|&nbsp;|\\u00a0)*([\d.]+)/gi)) confere(f, m[1], P.implantacao, 'a Implantação completa');
   confere('contratar.html', (ler('contratar.html').match(/const IMPLANTACAO = '([\d.]+)';/) || [])[1], P.implantacao, 'a Implantação completa (IMPLANTACAO)');
   // contratar.html: o objeto PLANOS.
   const c = ler('contratar.html');
@@ -317,10 +319,10 @@ for (const arq of ['painel/index.html']) {
   const pares = [...ix.matchAll(/data-mensal="(\d+)" data-anual="([\d,]+)"/g)].map(m => m[1] + '|' + m[2]);
   for (const k of planos) if (!pares.includes(P[k].mensal + '|' + P[k].parcelado)) erro(`index.html: o card do ${k} não mostra R$ ${P[k].mensal} e 12x de R$ ${P[k].parcelado} (rxsync-sistema#79)`);
   for (const p of pares) if (!planos.some(k => p === P[k].mensal + '|' + P[k].parcelado)) erro(`index.html: card com preço que não é oficial (${p.replace('|', ' / ')}; rxsync-sistema#79)`);
-  for (const m of ix.matchAll(/12x de R\$ ([\d,]+) ou R\$ ([\d.]+) à vista/g)) { const k = planos.find(k => P[k].parcelado === m[1]); if (!k) erro(`index.html: 12x de R$ ${m[1]} não é oficial`); else confere('index.html', m[2], P[k].avista.replace(/,00$/, ''), `o à vista do ${k}`); }
+  for (const m of ix.matchAll(/12x de R\$(?:&nbsp;| )([\d,]+) ou R\$(?:&nbsp;| )([\d.]+) à vista/g)) { const k = planos.find(k => P[k].parcelado === m[1]); if (!k) erro(`index.html: 12x de R$ ${m[1]} não é oficial`); else confere('index.html', m[2], P[k].avista.replace(/,00$/, ''), `o à vista do ${k}`); }
   // Calculadora da página: "1 consulta paga a mensalidade do Essencial (R$ NNN)" e a conta Math.ceil(NNN / valor). A frase
   // precisa existir (antes a regra procurava "Essencial custa R$ NNN por mês", que saiu da página e deixou o preço sem conferência).
-  const calcTxt = [...ix.matchAll(/mensalidade do Essencial \(R\$ (\d+)\)/g)];
+  const calcTxt = [...ix.matchAll(/mensalidade do Essencial \(R\$(?:&nbsp;| )(\d+)\)/g)];
   if (!calcTxt.length) erro('index.html: não achei "mensalidade do Essencial (R$ NNN)" na calculadora para conferir o preço');
   for (const m of calcTxt) confere('index.html', m[1], P.essencial.mensal, 'o preço da calculadora');
   for (const m of ix.matchAll(/Math\.ceil\((\d+) \/ val\)/g)) confere('index.html', m[1], P.essencial.mensal, 'a conta da calculadora');
@@ -332,7 +334,7 @@ for (const arq of ['painel/index.html']) {
   // As Dúvidas da página e o FAQPage dos dados estruturados dizem exatamente o mesmo, na mesma ordem: o Google só aceita
   // no FAQPage o que está visível, e uma pergunta mudada num lugar só deixa os dois diferentes (levantamento de 03/11/2026).
   {
-    const limpa = h => h.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
+    const limpa = h => h.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
     const naPagina = [...ix.matchAll(/<button[^>]*\sdata-faq(?=[\s>])[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-content"[^>]*><div>([\s\S]*?)<\/div><\/div>/g)].map(m => [limpa(m[1]), limpa(m[2])]);
     let noLd = [];
     for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
@@ -405,6 +407,15 @@ let avisosTermos = 0;
     }
   }
 }
+// Preços do site com espaço fixo entre "R$" e o número (rxsync-sistema DEC-202): "R$&nbsp;299" no texto e 'R$\u00a0' nos
+// scripts, para o valor nunca quebrar a linha longe do "R$". Ficam de fora o app do painel e a Central, os Termos (texto
+// jurídico, com versão própria) e as demonstrações.
+for (const f of htmls) {
+  const g = f.split(path.sep).join('/').replace(/^\.\//, '');
+  if (/^(painel|central|termos|demo)\//.test(g)) continue;
+  const n = (fs.readFileSync(f, 'utf8').match(/R\$ /g) || []).length;
+  if (n) erro(`${g}: ${n} preço(s) com "R$ " e espaço comum; use "R$&nbsp;" no texto e 'R$\\u00a0' nos scripts (DEC-202)`);
+}
 if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos que não são a versão mais nova (só aviso, não bloqueia).`);
 // Demonstração por link (demo/clinica/, DEC-125; ajuste C do plano): nenhum preço, prazo de projeto ou valor, nada da
 // demonstração do Dr. André, noindex, nenhum WhatsApp nem telefone, e os itens iguais aos da Central (numerados de 1 em diante, sem buraco, até 99:
@@ -413,7 +424,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   const pasta = path.join('demo', 'clinica');
   const arqs = todos.filter(f => f.startsWith(pasta + path.sep) && /\.(html|js|css)$/.test(f));
   if (fs.existsSync(pasta) && !arqs.length) erro(`${pasta}: sem arquivos`);
-  const PROIBIDOS = [[/R\$\s*\d/, 'valor em reais'], [/\bpreços?\b/i, '"preço"'], [/\bmensalidades?\b/i, '"mensalidade"'], [/\bparcelas?\b/i, '"parcela"'],
+  const PROIBIDOS = [[/R\$(?:\s|&nbsp;|\\u00a0)*\d/, 'valor em reais'], [/\bpreços?\b/i, '"preço"'], [/\bmensalidades?\b/i, '"mensalidade"'], [/\bparcelas?\b/i, '"parcela"'],
     [/\b\d+\s+semanas?\b/i, 'prazo em semanas'], [/prazo de entrega/i, '"prazo de entrega"'], [/dias [úu]teis/i, '"dias úteis"'],
     [/\bAndr[ée](?![a-zà-ÿ])/i, 'André'], [/\bPontes\b/, 'Pontes'], [/Gon[çc]alves/i, 'Gonçalves'], [/Melhor Vers[ãa]o/i, '"Melhor Versão"'], [/Evoluir/i, 'Evoluir'], [/drandre/i, 'drandre'], [/\bAG\./, 'AG.'],
     [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone'],
