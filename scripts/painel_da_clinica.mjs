@@ -9,7 +9,7 @@
 //   5. nenhum telefone completo na página, e a página inicial tem o link no rodapé;
 //   6. o resumo da manhã do chat diz quantas consultas há e lista exatamente essas;
 //   7. o topo e o rodapé do site (DEC-200): o menu do celular abre sem script e tem "O painel da clínica"; o rodapé tem o link,
-//      a Navegação, os Termos e a Política; "Preferências de cookies" reabre o aviso (aqui e na página do anúncio);
+//      a Navegação, os Termos e a Política; "Preferências de cookies" reabre o aviso (aqui, no anúncio, no contratar e no onboarding);
 //   8. o scroll_depth (25, 50, 75 e 90%) vai ao Google Analytics simulado depois do "Aceitar";
 //   9. a seção "O painel da clínica" da página inicial (DEC-201): o print só ao chegar, o link e o scroll_depth de lá.
 // Uso (precisa do Playwright): node scripts/painel_da_clinica.mjs   (NAVEGADOR=webkit roda no motor do Safari)
@@ -84,7 +84,7 @@ for (const w of [390, 820, 1024]) {
   ok(await p.locator('.menu-m-lista a[href="/painel-da-clinica/"]').isVisible(), 'o menu do celular abre e tem "O painel da clínica"');
   const rod = await p.locator('footer.rodape').innerText();
   ok(/O painel da clínica/.test(rod) && /Termos de Uso/.test(rod) && /Política de Privacidade/.test(rod) && /contato@rxsync\.com\.br/.test(rod) && /Guias/.test(rod), 'o rodapé do site completo, com "O painel da clínica"');
-  for (const [url, nome] of [['/painel-da-clinica/', 'página do painel'], ['/assistente-whatsapp-clinica/', 'página do anúncio']]) {
+  for (const [url, nome] of [['/painel-da-clinica/', 'página do painel'], ['/assistente-whatsapp-clinica/', 'página do anúncio'], ['/contratar.html?plano=gestao&ciclo=mensal', 'contratar'], ['/onboarding.html', 'onboarding']]) {
     await p.goto(site.base + url, { waitUntil: 'load' });
     ok(!(await p.locator('.rxc-aviso').count()), `${nome}: com a escolha feita, o aviso de cookies não aparece`);
     await p.getByRole('button', { name: 'Preferências de cookies' }).click();
