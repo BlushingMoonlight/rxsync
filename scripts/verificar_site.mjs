@@ -468,6 +468,19 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
       if (pj.painel_sha256 !== agora) console.log('::warning title=Prints do painel::o painel mudou depois dos prints da página do painel; rode node scripts/painel_prints.mjs e confira as fotos no PR.');
     } catch (e) { erro('assets/painel-da-clinica/prints.json: não consegui ler (rode node scripts/painel_prints.mjs)'); }
   }
+  // A seção "O painel da clínica" (#gestao) da página inicial (rxsync-sistema DEC-201): os prints do painel que ela mostra
+  // existem, têm texto alternativo, largura e altura, e só carregam quando a pessoa chega na seção (loading="lazy": a
+  // abertura da página não pesa mais); e o link "Ver o painel por dentro" leva à página do painel, com o data-cta.
+  {
+    const ix = fs.readFileSync('index.html', 'utf8');
+    const ini = ix.indexOf('id="gestao"'), sec = ini < 0 ? '' : ix.slice(ini, ix.indexOf('</section>', ini));
+    if (!sec) erro('index.html: falta a seção #gestao (O painel da clínica)');
+    for (const t of sec.match(/<img\b[^>]*>/g) || []) {
+      for (const f of [...t.matchAll(/\/assets\/painel-da-clinica\/[\w.-]+\.webp/g)].map(m => m[0].slice(1))) if (!fs.existsSync(f)) erro(`index.html: o print ${f} da seção do painel não existe`);
+      if (!/\balt="[^"]{20,}"/.test(t) || !/\bwidth="\d+"/.test(t) || !/\bheight="\d+"/.test(t) || !/\bloading="lazy"/.test(t)) erro('index.html: o print da seção do painel precisa de texto alternativo, largura, altura e loading="lazy"');
+    }
+    if (sec && !/<a href="\/painel-da-clinica\/"[^>]*data-cta="painel_ver_por_dentro"/.test(sec)) erro('index.html: falta o link "Ver o painel por dentro" (data-cta="painel_ver_por_dentro") na seção do painel');
+  }
   // As páginas de venda com Google Analytics têm o botão "Preferências de cookies" (data-cookies), que o consentimento.js
   // abre (rxsync-sistema DEC-200). O contratar.html e o onboarding.html ficam para outro PR.
   for (const f of ['index.html', 'painel-da-clinica/index.html', 'assistente-whatsapp-clinica/index.html'])
