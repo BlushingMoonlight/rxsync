@@ -10,7 +10,8 @@
 //   6. o resumo da manhã do chat diz quantas consultas há e lista exatamente essas;
 //   7. o topo e o rodapé do site (DEC-200): o menu do celular abre sem script e tem "O painel da clínica"; o rodapé tem o link,
 //      a Navegação, os Termos e a Política; "Preferências de cookies" reabre o aviso (aqui e na página do anúncio);
-//   8. o scroll_depth (25, 50, 75 e 90%) vai ao Google Analytics simulado depois do "Aceitar".
+//   8. o scroll_depth (25, 50, 75 e 90%) vai ao Google Analytics simulado depois do "Aceitar";
+//   9. a seção "O painel da clínica" da página inicial (DEC-201): o print só ao chegar, o link e o scroll_depth de lá.
 // Uso (precisa do Playwright): node scripts/painel_da_clinica.mjs   (NAVEGADOR=webkit roda no motor do Safari)
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
@@ -101,6 +102,39 @@ for (const w of [390, 820, 1024]) {
   await p.waitForTimeout(400);
   const marcos = await p.evaluate(() => (window.dataLayer || []).filter(a => a[0] === 'event' && a[1] === 'scroll_depth').map(a => a[2].value));
   ok(marcos.join() === '25,50,75,90', `scroll_depth vai ao Google depois do "Aceitar" (${marcos.join(', ') || 'nenhum'})`);
+  await ctx.close();
+}
+// 9. A seção "O painel da clínica" (#gestao) da página inicial (DEC-201): em 390, 820 e 1280 px, o rótulo, o print da tela
+//    Resultados só ao chegar na seção (a abertura não pesa mais), nada rola para o lado, sem o desenho de WhatsApp e sem o
+//    "sempre pede"; o link "Ver o painel por dentro" dispara o click_cta; o scroll_depth da página inicial continua igual.
+for (const w of [390, 820, 1280]) {
+  const ctx = await browser.newContext({ viewport: { width: w, height: w < 500 ? 844 : 1000 }, reducedMotion: 'reduce' });
+  await ctx.addInitScript(() => { try { localStorage.setItem('rx_cookies', 'nao'); } catch (e) { /* nada */ } });
+  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const p = await ctx.newPage(); const baixados = []; p.on('requestfinished', q => baixados.push(q.url()));
+  await p.goto(site.base + '/', { waitUntil: 'networkidle' });
+  ok(!baixados.some(u => u.includes('/assets/painel-da-clinica/')), `página inicial, ${w} px: o print do painel não é baixado na abertura`);
+  ok(await p.evaluate(() => document.documentElement.scrollWidth) <= w, `página inicial, ${w} px: nada rola para o lado`);
+  await p.locator('#gestao').scrollIntoViewIfNeeded(); await p.waitForTimeout(800);
+  ok(await p.evaluate(() => { const i = document.querySelector('#gestao .print-painel img'); return !!i && i.complete && i.naturalWidth > 0; }), `página inicial, ${w} px: o print da tela Resultados carrega ao chegar na seção`);
+  const sec = await p.locator('#gestao').innerText();
+  ok(/^O painel da clínica/.test(sec.trim()) && !/sempre pede/.test(sec) && !(await p.locator('#gestao .zap-dono, #gestao .painel-mock').count()), `página inicial, ${w} px: o rótulo "O painel da clínica", sem o desenho de WhatsApp nem o "sempre pede"`);
+  await ctx.close();
+}
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+  await ctx.addInitScript(() => { try { localStorage.setItem('rx_cookies', 'sim'); } catch (e) { /* nada */ } });
+  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const p = await ctx.newPage(); await p.goto(site.base + '/', { waitUntil: 'load' });
+  for (let y = 0; y < 60; y++) { await p.mouse.wheel(0, 500); await p.waitForTimeout(50); }
+  await p.waitForTimeout(400);
+  const ev = () => p.evaluate(() => (window.dataLayer || []).filter(a => a[0] === 'event').map(a => [a[1], (a[2] || {}).event_label || (a[2] || {}).value]));
+  const marcos = (await ev()).filter(e => e[0] === 'scroll_depth').map(e => e[1]);
+  ok(marcos.join() === '25%,50%,75%,90%', `página inicial: o scroll_depth continua igual (${marcos.join(', ') || 'nenhum'})`);
+  // o clique no link (a navegação é segurada aqui, para ler o que foi ao Google)
+  await p.evaluate(() => document.querySelector('#gestao a[href="/painel-da-clinica/"]').addEventListener('click', e => e.preventDefault()));
+  await p.locator('#gestao a[href="/painel-da-clinica/"]').click();
+  ok((await ev()).some(e => e[0] === 'click_cta' && e[1] === 'painel_ver_por_dentro'), 'página inicial: "Ver o painel por dentro" manda o click_cta (painel_ver_por_dentro)');
   await ctx.close();
 }
 await browser.close(); site.fechar();

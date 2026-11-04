@@ -247,32 +247,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .lista-check li strong { color: var(--ink); }
 .lista-check .ok { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; flex-shrink: 0; margin-top: 1px; }
 .lista-check .ok svg { width: 14px; height: 14px; }
-.mocks { position: relative; padding-bottom: 8px; }
-.painel-mock { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--sh-2); overflow: hidden; }
-.pm-barra { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line); }
-.pm-barra strong { font-size: 15px; }
-.pm-barra span { font-size: 13px; color: var(--ink-3); }
-.pm-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
-.pm-kpi { background: #fff; padding: 14px 18px; }
-.pm-kpi span { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
-.pm-kpi b { display: block; font-size: 24px; letter-spacing: -0.02em; margin-top: 2px; }
-.pm-kpi em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--brand); }
-.pm-graf { padding: 16px 18px 18px; }
-.pm-graf .tit { font-size: 13px; color: var(--ink-3); font-weight: 600; margin-bottom: 10px; }
-.barras { display: flex; align-items: flex-end; gap: 8px; height: 92px; }
-.barras i { flex: 1; background: var(--brand-200); border-radius: 6px 6px 2px 2px; }
-.barras i.alto { background: var(--brand); }
-.barras i.a30 { height: 30%; } .barras i.a38 { height: 38%; } .barras i.a47 { height: 47%; } .barras i.a52 { height: 52%; }
-.barras i.a58 { height: 58%; } .barras i.a66 { height: 66%; } .barras i.a81 { height: 81%; }
-.barras-leg { display: flex; gap: 8px; margin-top: 6px; }
-.barras-leg span { flex: 1; text-align: center; font-size: 11px; color: var(--ink-3); }
-.zap-dono { background: #efeae2; border-radius: var(--r-lg); box-shadow: var(--sh-3); border: 6px solid #0b1220; width: min(330px, 92%); margin: -40px 0 0 auto; position: relative; overflow: hidden; }
-.zap-dono .wa-topo { padding: 10px 12px; }
-.zap-dono .wa-corpo { padding: 12px 10px; }
-.zap-dono .b { font-size: 13.5px; max-width: 90%; }
-.acoes-b { display: flex; gap: 6px; margin-top: 8px; }
-.acoes-b span { flex: 1; text-align: center; font-weight: 700; font-size: 13px; padding: 7px 0; border-radius: 8px; background: #f0f2f5; color: #0369a1; }
-.acoes-b span.sim { background: var(--brand-h); color: #fff; }
 
 /* Equipe no controle */
 .controle { display: grid; gap: 16px; }
@@ -557,7 +531,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .nav a, .link-entrar { white-space: nowrap; }
 @media (min-width: 1024px) and (max-width: 1199px) { .nav { gap: 0; } .nav a { padding: 8px 8px; font-size: 14px; } }
 /* ---- Página inicial pela P7 (rxsync-sistema docs/auditorias/2026-10-26-landing-page.md) ---- */
-.pular:focus, .eyebrow, .btn, .marca, .wa-av, .wa-nome, .numero .valor, .ao-vivo, .passo .n, .tag, .pm-kpi em, .acoes-b span,
+.pular:focus, .eyebrow, .btn, .marca, .wa-av, .wa-nome, .numero .valor, .ao-vivo, .passo .n, .tag,
 .campo-r label output, .calc-res .grande, .ciclo button, .plano .fita, .preco .moeda, .preco .val, .plano .inc li.forte,
 .faq-tab, .faq-item > button, .faq-mais button, .rodape h4, .mt-passos li span, .mt-cont, .mt-link, .mt-dias button,
 .mt-grade th, .mt-grade td.ia, .rec-grupo, b, strong, th { font-weight: 600; }
@@ -596,7 +570,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
   .wa-topo { padding-top: 22px; }
   .cartao-flut { display: none; }
 }
-@media (max-width: 1023px) { .zap-dono { margin: 16px auto 0; } }
 @media (max-width: 1023px) { .planos-rodape { display: grid; justify-content: center; justify-items: start; gap: 8px; } .planos-rodape span { align-items: flex-start; } .planos-rodape .ic-s { margin-top: 3px; } }
 .hero { isolation: isolate; }
 .hero > .wrap { position: relative; z-index: 1; }
@@ -604,6 +577,11 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .hero h1 em .l { opacity: 0; transition: opacity .12s; }
 .hero h1 em .l.vis { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+/* O painel da clínica (#gestao): o print da tela Resultados (rxsync-sistema DEC-201) */
+.print-painel { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.print-painel img { width: 280px; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+.print-painel figcaption { font-size: 13px; color: var(--ink-3); }
+#gestao .link-demo { margin-top: 20px; }
     </style>
 
     <!-- ===================== DADOS ESTRUTURADOS (SCHEMA.ORG) ===================== -->
@@ -1159,45 +1137,25 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
   </div>
 </section>
 
-<!-- ===================== PARA O DONO ===================== -->
+<!-- ===================== O PAINEL DA CLÍNICA (#gestao; leva a /painel-da-clinica/, rxsync-sistema DEC-201) ===================== -->
 <section class="sec" id="gestao" aria-labelledby="titulo-dono">
   <div class="wrap dono">
     <div>
-      <span class="eyebrow">Para você</span>
+      <span class="eyebrow">O painel da clínica</span>
       <h2 class="h2" id="titulo-dono">Você acompanha tudo sem abrir conversa por conversa.</h2>
       <p class="lead">O painel, um site incluso em todos os planos, mostra a agenda e os resultados e deixa você mudar na hora o que a assistente responde.</p>
       <ul class="lista-check">
-        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Resultados com gráficos:</strong> conversas, consultas marcadas, confirmações, cancelamentos e tempo de resposta.</span></li>
+        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Resultados com gráficos:</strong> conversas, consultas marcadas, confirmações, cancelamentos e tempo da 1ª resposta.</span></li>
         <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Agenda no painel,</strong> que a recepção também usa.</span></li>
-        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Ajustes na hora:</strong> mudou um valor ou um horário, você altera e a assistente já responde com a informação nova.</span></li>
-        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Assistente de gestão</strong> <span class="tag tag-g">Gestão</span> pelo painel ou pelo seu WhatsApp: pergunte sobre a agenda, peça para bloquear horários ou mudar um preço e receba o resumo do dia. Ele sempre pede a sua confirmação antes de agir.</span></li>
+        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>O que a assistente responde:</strong> mudou um valor ou um horário, você altera e a assistente já responde com a informação nova.</span></li>
+        <li><span class="ok"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span><strong>Assistente de gestão</strong> <span class="tag tag-g">Gestão</span> pelo painel ou pelo seu WhatsApp: pergunte sobre a agenda, peça para bloquear horários ou mudar um preço e receba o resumo da agenda no horário que você escolher. Antes de mudar algo, ele mostra o que vai mudar e pede a sua confirmação.</span></li>
       </ul>
+      <a href="/painel-da-clinica/" class="link-demo" data-cta="painel_ver_por_dentro">Ver o painel por dentro <svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
     </div>
-    <div class="mocks" aria-hidden="true">
-      <div class="painel-mock">
-        <div class="pm-barra"><strong>Resultados</strong><span>Últimos 30 dias</span></div>
-        <div class="pm-kpis">
-          <div class="pm-kpi"><span>Conversas atendidas</span><b>312</b></div>
-          <div class="pm-kpi"><span>Consultas marcadas</span><b>74</b></div>
-          <div class="pm-kpi"><span>Presenças confirmadas</span><b>88%</b></div>
-          <div class="pm-kpi"><span>Tempo da 1ª resposta</span><b>8 s</b></div>
-        </div>
-        <div class="pm-graf">
-          <div class="tit">Consultas marcadas pela assistente</div>
-          <div class="barras"><i class="a38"></i><i class="a52"></i><i class="a47"></i><i class="a66"></i><i class="a58"></i><i class="a81 alto"></i><i class="a30"></i></div>
-          <div class="barras-leg"><span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sáb</span><span>dom</span></div>
-        </div>
-      </div>
-      <div class="zap-dono">
-        <div class="wa-topo"><span class="wa-av"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><div><div class="wa-nome">Assistente de gestão</div><div class="wa-sub">RXSync</div></div></div>
-        <div class="wa-corpo">
-          <div class="b b-in">Bom dia, Dra. Ana! Hoje são 9 consultas, a primeira às 8h. Duas pacientes ainda não confirmaram e há um horário livre às 16h.<small>07:30</small></div>
-          <div class="b b-out">Bloqueia sexta de manhã pra mim<small>07:41</small></div>
-          <div class="b b-in">Vou bloquear sexta-feira, das 8h às 12h. Não há consultas marcadas nesse período. Posso confirmar?<div class="acoes-b"><span class="sim">Confirmar</span><span>Cancelar</span></div><small>07:41</small></div>
-        </div>
-      </div>
-      <p class="legenda-mock">Números ilustrativos</p>
-    </div>
+    <figure class="print-painel">
+      <img src="/assets/painel-da-clinica/resultados-1x.webp" srcset="/assets/painel-da-clinica/resultados-1x.webp 1x, /assets/painel-da-clinica/resultados-2x.webp 2x" width="390" height="844" loading="lazy" decoding="async" alt="Tela Resultados do painel: conversas, consultas marcadas pela assistente e pela equipe e a comparação com o período anterior">
+      <figcaption>A tela Resultados de uma clínica de exemplo.</figcaption>
+    </figure>
   </div>
 </section>
 
