@@ -78,7 +78,7 @@ const rascunho = await page.evaluate(k => { try { return JSON.parse(localStorage
 ok(rascunho && (rascunho.faq || []).some(f => f.pergunta === 'Atendem aos sábados?' && f.resposta === 'Sim, das 8h às 12h.'), 'etapa 6: a pergunta nova fica no rascunho do navegador ao sair do campo');
 await proximo(6);   // Confira suas respostas (molde F)
 const resumo = await page.locator('#resumo').textContent();
-ok(/Dra\. Teste/.test(resumo) && /Primeira consulta \(1h\): R\$ 350,00/.test(resumo) && /crédito em até 3x/.test(resumo), 'etapa 7: Confira suas respostas mostra o que foi preenchido, com as listas');
+ok(/Dra\. Teste/.test(resumo) && /Primeira consulta \(1h\): R\$\s350,00/.test(resumo) && /crédito em até 3x/.test(resumo), 'etapa 7: Confira suas respostas mostra o que foi preenchido, com as listas');
 await page.click('#btnEnviar');
 await page.locator('#erroDeclaracao.on').waitFor();
 ok(!chamadas.some(c => c.corpo.acao === 'salvar'), 'sem a aprovação do responsável técnico, não envia');

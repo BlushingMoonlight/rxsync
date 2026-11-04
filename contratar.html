@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-HM5Qex8IUOg13tCgOFKf63nVmPMu0k3TjUdR/APpjD4=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-y7AAVYmjpoev5HB47zO9T7YD7mIp5/+PGRMgAlFmXmk=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -105,7 +105,7 @@
     <div class="caixa-preco px-5 py-5">
       <div class="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <p id="precoPrincipal" class="text-3xl font-black leading-none">R$ 299<span class="text-base font-medium text-white/60">/mês</span></p>
+          <p id="precoPrincipal" class="text-3xl font-black leading-none">R$&nbsp;299<span class="text-base font-medium text-white/60">/mês</span></p>
           <p id="precoDetalhe" class="text-sm text-white/70 mt-2">Sem fidelidade</p>
         </div>
         <span id="selo" class="hidden text-xs font-bold bg-emerald-500 text-white rounded-full px-3 py-1.5 shrink-0"></span>
@@ -122,7 +122,7 @@
            se paga (auditoria de 01/11/2026, FD-33); o preço acima e o "Confira suas respostas" mostram quando marcada. -->
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mt-4 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="querImplantacao" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
-        <span class="text-sm text-slate-700"><strong>Quero a Implantação completa</strong> (opcional, R$ 999, uma vez só). Fazemos as perguntas, configuramos a assistente com você, conectamos o WhatsApp, deixamos o painel pronto e damos 1 ano de suporte no WhatsApp para mudanças na configuração. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar.</span>
+        <span class="text-sm text-slate-700"><strong>Quero a Implantação completa</strong> (opcional, R$&nbsp;999, uma vez só). Fazemos as perguntas, configuramos a assistente com você, conectamos o WhatsApp, deixamos o painel pronto e damos 1 ano de suporte no WhatsApp para mudanças na configuração. Sem ela, você mesmo configura pelo formulário e pelo painel. No teste grátis, só é cobrada se você continuar.</span>
       </label>
       <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
     </section>
@@ -443,16 +443,16 @@ function pintar() {
   const pp = document.getElementById('precoPrincipal');
   const pd = document.getElementById('precoDetalhe');
   if (ciclo === 'mensal') {
-    pp.innerHTML = 'R$ ' + P.mensal + '<span class="text-base font-medium text-white/60">/mês</span>';
+    pp.innerHTML = 'R$\u00a0' + P.mensal + '<span class="text-base font-medium text-white/60">/mês</span>';
     pd.textContent = 'Sem fidelidade';
   } else if (forma === 'parcelado') {
-    pp.innerHTML = '12x R$ ' + P.anual12 + '<span class="text-base font-medium text-white/60"> (R$ ' + P.anualTotal + ')</span>';
+    pp.innerHTML = '12x R$\u00a0' + P.anual12 + '<span class="text-base font-medium text-white/60"> (R$\u00a0' + P.anualTotal + ')</span>';
     pd.textContent = 'Permanência de 12 meses';
   } else {
-    pp.innerHTML = 'R$ ' + P.avista + '<span class="text-base font-medium text-white/60"> à vista</span>';
+    pp.innerHTML = 'R$\u00a0' + P.avista + '<span class="text-base font-medium text-white/60"> à vista</span>';
     pd.textContent = 'Equivale a 10 mensalidades, com 12 meses de serviço · permanência de 12 meses';
   }
-  if (querImplantacao()) pd.textContent += ' · + R$ ' + IMPLANTACAO + ' da Implantação completa, uma vez só';
+  if (querImplantacao()) pd.textContent += ' · + R$\u00a0' + IMPLANTACAO + ' da Implantação completa, uma vez só';
   const u = new URL(location);
   u.searchParams.set('plano', plano); u.searchParams.set('ciclo', ciclo);
   history.replaceState(null, '', u);
@@ -636,7 +636,7 @@ document.querySelectorAll('.voltar').forEach(b => b.onclick = () => mostrar(etap
 // Confira suas respostas (molde F): o que a pessoa escolheu e digitou, com "Alterar" que volta ao passo. Só texto.
 function montarResumo() {
   const v = id => (document.getElementById(id).value || '').trim();
-  const linhas = [['Plano', descricaoPlano(true), 1], ['Implantação completa', querImplantacao() ? 'Sim, R$ ' + IMPLANTACAO + ', uma vez só' : 'Não', 1], ['Seu nome', v('nome'), 2], ['Clínica', v('clinica'), 2], ['E-mail', v('email'), 2], ['WhatsApp', v('whatsapp'), 2],
+  const linhas = [['Plano', descricaoPlano(true), 1], ['Implantação completa', querImplantacao() ? 'Sim, R$\u00a0' + IMPLANTACAO + ', uma vez só' : 'Não', 1], ['Seu nome', v('nome'), 2], ['Clínica', v('clinica'), 2], ['E-mail', v('email'), 2], ['WhatsApp', v('whatsapp'), 2],
     tipo === 'pj' ? ['Empresa', v('razao') + ' · CNPJ ' + v('cnpj'), 3] : ['Titular', (v('titular') || v('nome')), 3],
     ['Endereço', enderecoCompleto(), 3], [tipo === 'pj' ? 'CPF de quem contrata' : 'CPF', v('cpf'), 3]];
   const dl = document.getElementById('resumo'); dl.replaceChildren();
@@ -651,10 +651,10 @@ function montarResumo() {
 
 function descricaoPlano(semImplantacao) {
   const P = PLANOS[plano];
-  const impl = !semImplantacao && querImplantacao() ? ', com a Implantação completa (R$ ' + IMPLANTACAO + ', uma vez só)' : '';
-  if (ciclo === 'mensal') return P.nome + ' — mensal, R$ ' + P.mensal + '/mês' + impl;
-  if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$ ' + P.anual12 + impl;
-  return P.nome + ' — anual à vista de R$ ' + P.avista + impl;
+  const impl = !semImplantacao && querImplantacao() ? ', com a Implantação completa (R$\u00a0' + IMPLANTACAO + ', uma vez só)' : '';
+  if (ciclo === 'mensal') return P.nome + ' — mensal, R$\u00a0' + P.mensal + '/mês' + impl;
+  if (forma === 'parcelado') return P.nome + ' — anual em 12x de R$\u00a0' + P.anual12 + impl;
+  return P.nome + ' — anual à vista de R$\u00a0' + P.avista + impl;
 }
 // Os termos aparecem preenchidos com os dados de quem contrata, mas os dados NUNCA vão no endereço da página (ficariam
 // nos registros do servidor e no histórico): a página dos termos abre limpa e esta página preenche os campos depois de
