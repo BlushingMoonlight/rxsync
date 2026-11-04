@@ -7,7 +7,10 @@
 //      confirmação é o toque no botão "Confirmar" (nunca uma mensagem digitada) e termina com o resumo da agenda;
 //   4. os botões levam a origem do clique ao contratar (painel_pagina_topo e painel_pagina_final);
 //   5. nenhum telefone completo na página, e a página inicial tem o link no rodapé;
-//   6. o resumo da manhã do chat diz quantas consultas há e lista exatamente essas.
+//   6. o resumo da manhã do chat diz quantas consultas há e lista exatamente essas;
+//   7. o topo e o rodapé do site (DEC-200): o menu do celular abre sem script e tem "O painel da clínica"; o rodapé tem o link,
+//      a Navegação, os Termos e a Política; "Preferências de cookies" reabre o aviso (aqui e na página do anúncio);
+//   8. o scroll_depth (25, 50, 75 e 90%) vai ao Google Analytics simulado depois do "Aceitar".
 // Uso (precisa do Playwright): node scripts/painel_da_clinica.mjs   (NAVEGADOR=webkit roda no motor do Safari)
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
@@ -46,7 +49,8 @@ for (const w of [390, 820, 1024]) {
 // O chat se escrevendo sozinho
 {
   const { ctx, p } = await abrir(390, false);
-  ok(await p.evaluate(() => [...document.querySelectorAll('#chatGestao .passo')].every(e => getComputedStyle(e).opacity === '0')), 'o chat começa vazio enquanto não aparece na tela');
+  const inicio = await p.evaluate(() => ({ ops: [...document.querySelectorAll('#chatGestao .passo')].map(e => getComputedStyle(e).opacity).join(''), vis: document.querySelectorAll('#chatGestao .vis').length, mm: matchMedia('(prefers-reduced-motion: reduce)').matches, anima: document.getElementById('chatGestao').className, topo: Math.round(document.getElementById('chatGestao').getBoundingClientRect().top), y: Math.round(scrollY) }));
+  ok(/^0+$/.test(inicio.ops), 'o chat começa vazio enquanto não aparece na tela' + (/^0+$/.test(inicio.ops) ? '' : ' ' + JSON.stringify(inicio)));
   await p.locator('#chatGestao').scrollIntoViewIfNeeded();
   await p.waitForFunction(() => document.querySelector('#chatGestao [data-toque]').classList.contains('tocado'), null, { timeout: 15000 });
   ok(true, 'a confirmação é o toque em "Confirmar"');
@@ -61,7 +65,7 @@ for (const w of [390, 820, 1024]) {
   ok(n === linhas, `o resumo da manhã diz ${n} consultas e lista ${linhas}`);
   // botões e telefones
   const hrefs = await p.evaluate(() => [...document.querySelectorAll('a[data-origem]')].map(a => [a.dataset.origem, a.getAttribute('href')]));
-  ok(hrefs.length === 2 && hrefs.every(([o, h]) => h.includes('origem=' + o)) && hrefs.map(x => x[0]).join() === 'painel_pagina_topo,painel_pagina_final', 'os botões levam a origem do clique (painel_pagina_topo e painel_pagina_final)');
+  ok(hrefs.length === 3 && hrefs.every(([o, h]) => h.includes('origem=' + o)) && hrefs.map(x => x[0]).join() === 'painel_pagina_menu,painel_pagina_topo,painel_pagina_final', 'os botões levam a origem do clique (painel_pagina_menu, painel_pagina_topo e painel_pagina_final)');
   const corpo = await p.evaluate(() => document.body.innerText);
   ok(!/\(?\b\d{2}\)?\s?9?\d{4}-?\d{4}\b/.test(corpo), 'nenhum telefone completo no texto da página');
   await ctx.close();
@@ -70,6 +74,33 @@ for (const w of [390, 820, 1024]) {
   const { ctx, p } = await abrir(390, true);
   await p.goto(site.base + '/', { waitUntil: 'load' });
   ok(await p.locator('footer a[href="/painel-da-clinica/"]').count() === 1, 'a página inicial tem o link no rodapé');
+  await ctx.close();
+}
+// 7. topo e rodapé do site
+{
+  const { ctx, p } = await abrir(390, true);
+  await p.locator('details.menu-m > summary').click();
+  ok(await p.locator('.menu-m-lista a[href="/painel-da-clinica/"]').isVisible(), 'o menu do celular abre e tem "O painel da clínica"');
+  const rod = await p.locator('footer.rodape').innerText();
+  ok(/O painel da clínica/.test(rod) && /Termos de Uso/.test(rod) && /Política de Privacidade/.test(rod) && /contato@rxsync\.com\.br/.test(rod) && /Guias/.test(rod), 'o rodapé do site completo, com "O painel da clínica"');
+  for (const [url, nome] of [['/painel-da-clinica/', 'página do painel'], ['/assistente-whatsapp-clinica/', 'página do anúncio']]) {
+    await p.goto(site.base + url, { waitUntil: 'load' });
+    ok(!(await p.locator('.rxc-aviso').count()), `${nome}: com a escolha feita, o aviso de cookies não aparece`);
+    await p.getByRole('button', { name: 'Preferências de cookies' }).click();
+    ok(await p.locator('.rxc-aviso').isVisible(), `${nome}: "Preferências de cookies" mostra o aviso de novo`);
+  }
+  await ctx.close();
+}
+// 8. scroll_depth com o Google simulado (o "Aceitar" já dado; o script do Google é bloqueado, só a fila de comandos conta)
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+  await ctx.addInitScript(() => { try { localStorage.setItem('rx_cookies', 'sim'); } catch (e) { /* nada */ } });
+  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const p = await ctx.newPage(); await p.goto(site.base + '/painel-da-clinica/', { waitUntil: 'load' });
+  for (let y = 0; y < 40; y++) { await p.mouse.wheel(0, 500); await p.waitForTimeout(60); }
+  await p.waitForTimeout(400);
+  const marcos = await p.evaluate(() => (window.dataLayer || []).filter(a => a[0] === 'event' && a[1] === 'scroll_depth').map(a => a[2].value));
+  ok(marcos.join() === '25,50,75,90', `scroll_depth vai ao Google depois do "Aceitar" (${marcos.join(', ') || 'nenhum'})`);
   await ctx.close();
 }
 await browser.close(); site.fechar();

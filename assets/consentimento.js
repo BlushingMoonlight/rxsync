@@ -157,6 +157,9 @@
   }
 
   window.rxCookies = { reabrir: function () { fecharAviso(); mostrarAviso(); } };
+  // "Preferências de cookies" (data-cookies) em qualquer página com este script: o rodapé da página do painel e o da página do
+  // anúncio usam só isto (rxsync-sistema DEC-200). Chamar duas vezes dá no mesmo (fecha e mostra o aviso de novo).
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-cookies]')) window.rxCookies.reabrir(); });
   window.rxChat = { abrir: function () { carregarChat(true); } };
 
   function iniciar() {

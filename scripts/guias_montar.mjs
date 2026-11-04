@@ -199,9 +199,10 @@ function paginaGuia(g, ctx) {
   return pagina(ctx, { TITULO_PAGINA: esc(textoPuro(cab.titulo)) + ' | Guias RXSync', TITULO: esc(textoPuro(cab.titulo)), DESCRICAO: esc(textoPuro(cab.descricao)), ROBOTS: cab.rascunho ? 'noindex, nofollow' : 'index, follow',
     URL: url, OG_TIPO: 'article', DADOS: dados, CONTEUDO: conteudo });
 }
+const linksSite = ctx => ({ MENU_GUIAS: ctx.temPublicado ? '<a href="/guias/">Guias</a>' : '', RODAPE_GUIAS: ctx.temPublicado ? '<li><a href="/guias/">Guias</a></li>' : '' });
 function pagina(ctx, v) {
   const html = preencher(ctx.molde.pagina, { ...v, DADOS_ESTRUTURADOS: `<script type="application/ld+json">${JSON.stringify(v.DADOS).replace(/</g, '\\u003c')}</script>`,
-    MENU_GUIAS: ctx.temPublicado ? '<a href="/guias/">Guias</a>' : '', RODAPE_GUIAS: ctx.temPublicado ? '<li><a href="/guias/">Guias</a></li>' : '', CSP: '{{CSP}}' });
+    ...linksSite(ctx), ORIGEM_TOPO: 'topo', RODAPE_COOKIES: '', CSP: '{{CSP}}' });
   return html.replace("default-src 'none'; {{CSP}}", () => cspPagina(html, PAGINA_GUIA));
 }
 function paginaGuias(ctx) {
@@ -244,6 +245,26 @@ export function menuSiteCom(html, tem) {
   return s;
 }
 
+// O topo e o rodapé do site na página do painel (/painel-da-clinica/, rxsync-sistema DEC-200): os mesmos do molde, entre as
+// marcas "topo do site" e "rodapé do site", com a origem própria no "Começar grátis" (a Central conta os cadastros vindos
+// dali) e o botão "Preferências de cookies" (a página tem Google Analytics; os guias não). O resto da página não muda.
+export const PAGINA_PAINEL = 'painel-da-clinica/index.html';
+export function topoRodapeCom(html, ctx) {
+  const v = { ...linksSite(ctx), ORIGEM_TOPO: 'painel_pagina_menu',
+    RODAPE_COOKIES: '<li><button type="button" class="link-rodape" data-cookies>Preferências de cookies</button></li>' };
+  const molde = ctx.molde.pagina;
+  const trecho = (ini, fim) => { const a = molde.indexOf(ini), b = molde.indexOf(fim, a); if (a < 0 || b < 0) throw new Error(`molde: não achei ${ini}`); return molde.slice(a, b + fim.length); };
+  const topo = preencher(trecho('<a href="#conteudo" class="pular">', '</header>'), v);
+  const rodape = preencher(trecho('<footer class="rodape">', '</footer>'), v);
+  const trocar = (s, nome, novo) => {
+    const ini = `<!-- ${nome} do site: montado pelo scripts/guias_montar.mjs a partir do guias/_fonte/molde.html (não edite à mão) -->`, fim = `<!-- /${nome} do site -->`;
+    const a = s.indexOf(ini), b = s.indexOf(fim);
+    if (a < 0 || b < a) throw new Error(`${PAGINA_PAINEL}: faltam as marcas do ${nome} do site`);
+    return s.slice(0, a + ini.length) + '\n' + novo + '\n' + s.slice(b);
+  };
+  return trocar(trocar(html, 'topo', topo), 'rodapé', rodape);
+}
+
 // ---------------------------------------------------------------- montar tudo
 // previa: trata os rascunhos como publicados (só para o teste de tela ver a página Guias e o menu; nada é gravado).
 export function montar({ previa = false } = {}) {
@@ -255,6 +276,7 @@ export function montar({ previa = false } = {}) {
   if (lista.length) arquivos['guias/index.html'] = paginaGuias(ctx);
   arquivos['sitemap.xml'] = sitemapCom(fs.readFileSync(path.join(RAIZ, 'sitemap.xml'), 'utf8'), lista);
   arquivos['index.html'] = menuSiteCom(fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8'), lista.length > 0);
+  if (fs.existsSync(path.join(RAIZ, PAGINA_PAINEL))) arquivos[PAGINA_PAINEL] = topoRodapeCom(fs.readFileSync(path.join(RAIZ, PAGINA_PAINEL), 'utf8'), ctx);
   return { arquivos, guias, publicados: lista };
 }
 // As páginas de guia que existem no repositório (para achar as que sobraram sem fonte).

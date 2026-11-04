@@ -453,12 +453,25 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
       if (!/\balt="[^"]{20,}"/.test(t)) erro(`painel-da-clinica/index.html: print sem texto alternativo que diga o que mostra (${arqs[0]})`);
       if (!/\bwidth="\d+"/.test(t) || !/\bheight="\d+"/.test(t)) erro(`painel-da-clinica/index.html: print sem largura e altura (${arqs[0]})`);
     }
+    // DEC-200: os dados estruturados com o caminho Início › Painel da clínica (BreadcrumbList), sem FAQ.
+    try {
+      const ld = JSON.parse((pg.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1] || '{}');
+      const g = ld['@graph'] || [], cam = g.find(x => x['@type'] === 'BreadcrumbList');
+      const nomes = cam ? cam.itemListElement.map(i => i.name).join(' › ') : '';
+      if (nomes !== 'Início › Painel da clínica') erro(`painel-da-clinica/index.html: o caminho dos dados estruturados é "${nomes}" (esperado: Início › Painel da clínica)`);
+      if (!g.some(x => x['@type'] === 'WebPage')) erro('painel-da-clinica/index.html: falta o WebPage nos dados estruturados');
+      if (g.some(x => x['@type'] === 'FAQPage')) erro('painel-da-clinica/index.html: sem FAQPage (a página não tem perguntas)');
+    } catch (e) { erro(`painel-da-clinica/index.html: dados estruturados inválidos (${e.message})`); }
     try {
       const pj = JSON.parse(fs.readFileSync('assets/painel-da-clinica/prints.json', 'utf8'));
       const agora = (await import('node:crypto')).createHash('sha256').update(fs.readFileSync('painel/index.html')).digest('hex');
       if (pj.painel_sha256 !== agora) console.log('::warning title=Prints do painel::o painel mudou depois dos prints da página do painel; rode node scripts/painel_prints.mjs e confira as fotos no PR.');
     } catch (e) { erro('assets/painel-da-clinica/prints.json: não consegui ler (rode node scripts/painel_prints.mjs)'); }
   }
+  // As páginas de venda com Google Analytics têm o botão "Preferências de cookies" (data-cookies), que o consentimento.js
+  // abre (rxsync-sistema DEC-200). O contratar.html e o onboarding.html ficam para outro PR.
+  for (const f of ['index.html', 'painel-da-clinica/index.html', 'assistente-whatsapp-clinica/index.html'])
+    if (fs.existsSync(f) && !/<button[^>]*data-cookies[^>]*>Preferências de cookies<\/button>/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta o botão "Preferências de cookies" (data-cookies) no rodapé`);
   if (fs.existsSync('assistente-whatsapp-clinica/index.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync('assistente-whatsapp-clinica/index.html', 'utf8'))) erro('assistente-whatsapp-clinica/index.html: a página do anúncio precisa do noindex');
   // O lastmod do sitemap acompanha a página (menos os guias): só avisa (não bloqueia) quando o último commit da página é depois do lastmod.
   if (fs.existsSync('sitemap.xml')) {

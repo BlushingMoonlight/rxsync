@@ -53,13 +53,14 @@
     </nav>
     <div class="topo-acoes">
       <a href="/painel/" class="link-entrar">Já sou cliente</a>
-      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem=topo" class="btn btn-prim topo-cta" data-origem="topo">Começar grátis</a>
+      <a href="/contratar.html?plano=gestao&amp;ciclo=mensal&amp;origem={{ORIGEM_TOPO}}" class="btn btn-prim topo-cta" data-origem="{{ORIGEM_TOPO}}">Começar grátis</a>
       <details class="menu-m">
         <summary aria-label="Abrir menu"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg><span class="sr">Menu</span></summary>
         <div class="menu-m-lista">
           <a href="/#teste-ao-vivo">Converse agora</a>
           <a href="/#como-funciona">Como funciona</a>
           <a href="/#recursos">O que faz</a>
+          <a href="/painel-da-clinica/">O painel da clínica</a>
           <a href="/#seguranca">Segurança</a>
           <a href="/#planos">Preços</a>
           <a href="/#duvidas">Dúvidas</a>
@@ -75,7 +76,7 @@
 {{CONTEUDO}}
 </main>
 
-<!-- ===================== rodapé: o mesmo do site (sem o botão de cookies: os guias não guardam nada nem têm Google Analytics) ===================== -->
+<!-- ===================== rodapé: o mesmo do site (o botão de cookies só nas páginas com Google Analytics, como a do painel; os guias não guardam nada) ===================== -->
 <footer class="rodape">
   <div class="rodape-faixa">
     <div class="rodape-grade">
@@ -89,6 +90,7 @@
           <li><a href="/#teste-ao-vivo">Converse agora</a></li>
           <li><a href="/#como-funciona">Como funciona</a></li>
           <li><a href="/#recursos">O que faz</a></li>
+          <li><a href="/painel-da-clinica/">O painel da clínica</a></li>
           <li><a href="/#seguranca">Segurança</a></li>
           <li><a href="/#planos">Planos e preços</a></li>
           <li><a href="/#duvidas">Dúvidas</a></li>
@@ -102,6 +104,7 @@
           <li><a href="mailto:contato@rxsync.com.br">contato@rxsync.com.br</a></li>
           <li><a href="/termos/2026-11-v8.html">Termos de Uso</a></li>
           <li><a href="/privacidade.html">Política de Privacidade</a></li>
+          {{RODAPE_COOKIES}}
         </ul>
       </div>
     </div>
