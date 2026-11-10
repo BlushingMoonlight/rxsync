@@ -670,10 +670,14 @@ if (avisosGuias) console.log(`⚠️ ${avisosGuias} aviso(s) dos guias (não blo
 {
   const { arvoreDosCaminhos, caminhosQuebrados } = await import('./caminhos_conferir.mjs');
   const v = JSON.parse(fs.readFileSync('scripts/caminhos_validos.json', 'utf8'));
-  const raiz = arvoreDosCaminhos(v.painel, v.central);
+  const raiz = arvoreDosCaminhos(v.painel, v.central, v.botoes);   // com os botões de cada tela: o nome entre aspas no fim é conferido
   const textos = todos.filter(f => /\.(html|js|md|css)$/.test(f) && !/^(scripts|node_modules)\//.test(f) && !/^(painel|central)\/index\.html$/.test(f) && !/^guias\/[^_][^/]*\/index\.html$/.test(f));
   for (const f of textos) for (const q of caminhosQuebrados(fs.readFileSync(f, 'utf8'), raiz))
-    erro(`${f}: o caminho "${q.caminho}" não existe como toque ("${q.onde}" não está ali). Confira no painel ou na Central e corrija o texto (lista: scripts/caminhos_validos.json)`);
+    erro(`${f}: o caminho "${q.caminho}" não existe como toque (${q.onde.startsWith('"') ? q.onde + ' não é um botão daquela tela' : '"' + q.onde + '" não está ali'}). Confira no painel ou na Central e corrija o texto (lista: scripts/caminhos_validos.json)`);
+  // A descrição do PR (no GitHub) também é conferida: os caminhos que o PR passa ao Jean existem como toque.
+  const evPr = process.env.GITHUB_EVENT_PATH && fs.existsSync(process.env.GITHUB_EVENT_PATH) ? JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')).pull_request : null;
+  if (evPr) for (const q of caminhosQuebrados(String(evPr.title || '') + '\n' + String(evPr.body || ''), raiz))
+    erro(`descrição do PR: o caminho "${q.caminho}" não existe como toque (${q.onde.startsWith('"') ? q.onde + ' não é um botão daquela tela' : '"' + q.onde + '" não está ali'}). Corrija a descrição (lista: scripts/caminhos_validos.json)`);
 }
 for (const f of todos.filter(f => f.endsWith('.json'))) { try { JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { erro(`${f}: JSON inválido`); } }
 // Os arquivos à parte do painel e da Central (rxsync-sistema DEC-178 e DEC-181): carregados só quando precisam, cada um até

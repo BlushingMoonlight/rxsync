@@ -31,7 +31,7 @@ function chatAbrir() {
       el('div', { class: 'chat-msgs', id: 'chatMsgs', role: 'log', 'aria-live': 'polite' }),
       el('div', { class: 'chat-sug', id: 'chatSugestoes' }, CHAT_SUGESTOES.map(t => el('button', { type: 'button', text: t, onclick: () => { txt.value = t; chatEnviar(); } }))),
       el('div', { class: 'chat-in' }, txt, el('button', { class: 'btn pri', type: 'button', id: 'chatEnviar', text: 'Enviar', onclick: chatEnviar })));
-    chatBalao('assistente', 'Oi! Pergunte sobre a agenda, os resultados ou os documentos dos pacientes.' + (ligado('dono_pode_editar') ? ' Também posso marcar, remarcar e bloquear horários. Sempre mostro o que vou fazer e peço sua confirmação antes.' : ''));
+    chatBalao('assistente', 'Oi! Pergunte sobre a agenda, os resultados ou os documentos dos pacientes.' + (ligado('dono_pode_editar') ? ' Também posso marcar, remarcar e bloquear horários, e mudar os ajustes do painel. Sempre mostro o que vou fazer e peço sua confirmação antes.' : ''));
   }
   p.hidden = false;
   const origem = document.activeElement;
@@ -53,6 +53,25 @@ function chatConfirmacao() {
   botoes.push(btn('Confirmar', () => responder('Sim, confirmo.'), 'pri', 'ok'), btn('Não', () => responder('Não, deixa como está.'), 'sec', 'fechar'));
   const cartao = el('div', { class: 'chat-cartao', role: 'group', 'aria-label': 'Confirmar a mudança' }, el('div', { class: 'linha-botoes' }, botoes));
   const m = $('chatMsgs'); m.append(cartao); m.scrollTop = m.scrollHeight;
+}
+// rxsync-sistema DEC-209: o assistente mudou um ajuste do painel (depois da sua confirmação). Os campos são lidos de novo
+// do servidor, para a tela aberta mostrar o valor novo; o que você estava digitando e ainda não salvou fica como está.
+function chatAjustesRecarregar() {
+  c24('abrir').then(resp => {
+    if (!resp || !resp.ok) return;
+    let mudou = false;
+    CAMPOS.forEach(c => {
+      if (Object.prototype.hasOwnProperty.call(sujos, c.key)) return;
+      let v = (resp.editaveis || {})[c.key]; if (v == null) v = ''; if (c.key === 'fuso_horario' && !v) v = 'America/Sao_Paulo';
+      if (VAL[c.key] === String(v)) return;
+      VAL[c.key] = String(v); mudou = true; sincronizarCampo(c.key);
+      AO_SALVAR.forEach(f => { try { f(c.key, String(v)); } catch (e) {} });
+    });
+    if (!mudou) return;
+    dependenciasAplicar(); aplicarFuso(VAL.fuso_horario);
+    document.querySelectorAll('[data-nome-clinica]').forEach(x => { x.textContent = VAL.nome_exibicao || 'Sua clínica'; });
+  }).catch(() => {});
+  if (!sem('medicos')) medCarregar();
 }
 function chatMudou(lista) {
   const cartao = el('div', { class: 'chat-cartao' }, el('p', { class: 'legenda', text: 'O que mudou' }), el('ul', {}, lista.map(t => el('li', {}, icone('ok', 'p'), ' ' + t))));
@@ -81,6 +100,7 @@ function chatEnviar() {
       Promise.resolve(agCarregar()).then(() => { if (JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status])) !== antes) rapida('A agenda foi atualizada.'); }).catch(() => {});
     }
     if (!mudou || areas.includes('grade')) gradeCarregar();
+    if (areas.includes('ajustes')) chatAjustesRecarregar();
     if (TELAS.resultados && TELAS.resultados.sec && !TELAS.resultados.sec.hidden) resultadosCarregar();
   }).catch(() => {
     // Sem conexão: a mensagem volta para o campo e sai do histórico (pente fino da camada 3, I-05).

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fV7IndI3UfZ0bqhgXM8E6MoYMx/uKENOYM2GUj9Nqo8=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mJvspF9qvJhEL+oAisNYoGZYSUbuk4BtdvpBVn4Kumc=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1293,7 +1293,7 @@ const CAMPOS = [
   {"key": "sistema_gestao", "grupo": "contato", "tipo": "text", "label": "Sistema de gestão que vocês usam", "hint": "", "ph": "Feegow, iClinic, planilha..."},
   {"key": "assistente_dono_ativa", "grupo": "gestao", "tipo": "switch", "gestao": true, "label": "Assistente de gestão", "hint": "Converse com ele aqui no painel, pelo ícone de conversa no alto, ou pelo WhatsApp da clínica, a partir dos números abaixo."},
   {"key": "dono_whatsapp", "grupo": "gestao", "tipo": "text", "gestao": true, "depende": "assistente_dono_ativa", "label": "Números autorizados", "hint": "Até 3 celulares, separados por vírgula. Quem escreve desses números vê a agenda e os dados dos pacientes, então cadastre só pessoas de confiança.", "ph": "(48) 99999-0000"},
-  {"key": "dono_pode_editar", "grupo": "gestao", "tipo": "switch", "gestao": true, "depende": "assistente_dono_ativa", "label": "Pode fazer alterações", "hint": "Marcar, remarcar, bloquear horários, mudar a grade, atualizar o que a assistente diz aos pacientes e avisar pacientes. Ele sempre mostra o que vai fazer e pede sua confirmação."},
+  {"key": "dono_pode_editar", "grupo": "gestao", "tipo": "switch", "gestao": true, "depende": "assistente_dono_ativa", "label": "Pode fazer alterações", "hint": "Marcar, remarcar, bloquear horários, mudar a grade, mudar os ajustes do painel (o que a assistente sabe e faz, as regras da agenda, as mensagens automáticas) e avisar pacientes. Ele sempre mostra o que vai mudar e só muda depois da sua confirmação. Ficam só no painel: este assistente, o link de pagamento, o telefone de urgência, o WhatsApp dos avisos, o e-mail da conta, o responsável técnico, a equipe, o plano e o WhatsApp da clínica."},
   {"key": "briefing_horario", "grupo": "gestao", "tipo": "select", "gestao": true, "depende": "assistente_dono_ativa", "label": "Resumo da agenda no WhatsApp", "hint": "Chega nos números autorizados.", "opcoes": [["", "Não enviar"], ["6", "Às 6h, com a agenda do dia"], ["7", "Às 7h, com a agenda do dia"], ["8", "Às 8h, com a agenda do dia"], ["9", "Às 9h, com a agenda do dia"], ["10", "Às 10h, com a agenda do dia"], ["12", "Às 12h, com a agenda do dia"], ["18", "Às 18h, com a agenda de amanhã"], ["19", "Às 19h, com a agenda de amanhã"], ["20", "Às 20h, com a agenda de amanhã"], ["21", "Às 21h, com a agenda de amanhã"]]},
   {"key": "briefing_dias", "grupo": "gestao", "tipo": "select", "gestao": true, "depende": "assistente_dono_ativa", "label": "Dias do resumo", "hint": "", "opcoes": [["", "Segunda a sexta"], ["todos", "Todos os dias"], ["com_consulta", "Só quando houver consulta"]]},
   {"key": "func_documentos", "grupo": "funcoes", "tipo": "switch", "gestao": true, "label": "Leitura de fotos e PDFs", "hint": "A assistente entende documentos que o paciente envia, como pedido de exame e receita."},
@@ -3842,7 +3842,7 @@ function chatAbrir() {
       el('div', { class: 'chat-msgs', id: 'chatMsgs', role: 'log', 'aria-live': 'polite' }),
       el('div', { class: 'chat-sug', id: 'chatSugestoes' }, CHAT_SUGESTOES.map(t => el('button', { type: 'button', text: t, onclick: () => { txt.value = t; chatEnviar(); } }))),
       el('div', { class: 'chat-in' }, txt, el('button', { class: 'btn pri', type: 'button', id: 'chatEnviar', text: 'Enviar', onclick: chatEnviar })));
-    chatBalao('assistente', 'Oi! Pergunte sobre a agenda, os resultados ou os documentos dos pacientes.' + (ligado('dono_pode_editar') ? ' Também posso marcar, remarcar e bloquear horários. Sempre mostro o que vou fazer e peço sua confirmação antes.' : ''));
+    chatBalao('assistente', 'Oi! Pergunte sobre a agenda, os resultados ou os documentos dos pacientes.' + (ligado('dono_pode_editar') ? ' Também posso marcar, remarcar e bloquear horários, e mudar os ajustes do painel. Sempre mostro o que vou fazer e peço sua confirmação antes.' : ''));
   }
   p.hidden = false;
   const origem = document.activeElement;
@@ -3861,6 +3861,23 @@ function chatConfirmacao() {
   botoes.push(btn('Confirmar', () => responder('Sim, confirmo.'), 'pri', 'ok'), btn('Não', () => responder('Não, deixa como está.'), 'sec', 'fechar'));
   const cartao = el('div', { class: 'chat-cartao', role: 'group', 'aria-label': 'Confirmar a mudança' }, el('div', { class: 'linha-botoes' }, botoes));
   const m = $('chatMsgs'); m.append(cartao); m.scrollTop = m.scrollHeight;
+}
+function chatAjustesRecarregar() {
+  c24('abrir').then(resp => {
+    if (!resp || !resp.ok) return;
+    let mudou = false;
+    CAMPOS.forEach(c => {
+      if (Object.prototype.hasOwnProperty.call(sujos, c.key)) return;
+      let v = (resp.editaveis || {})[c.key]; if (v == null) v = ''; if (c.key === 'fuso_horario' && !v) v = 'America/Sao_Paulo';
+      if (VAL[c.key] === String(v)) return;
+      VAL[c.key] = String(v); mudou = true; sincronizarCampo(c.key);
+      AO_SALVAR.forEach(f => { try { f(c.key, String(v)); } catch (e) {} });
+    });
+    if (!mudou) return;
+    dependenciasAplicar(); aplicarFuso(VAL.fuso_horario);
+    document.querySelectorAll('[data-nome-clinica]').forEach(x => { x.textContent = VAL.nome_exibicao || 'Sua clínica'; });
+  }).catch(() => {});
+  if (!sem('medicos')) medCarregar();
 }
 function chatMudou(lista) {
   const cartao = el('div', { class: 'chat-cartao' }, el('p', { class: 'legenda', text: 'O que mudou' }), el('ul', {}, lista.map(t => el('li', {}, icone('ok', 'p'), ' ' + t))));
@@ -3888,6 +3905,7 @@ function chatEnviar() {
       Promise.resolve(agCarregar()).then(() => { if (JSON.stringify((AG.dados || []).map(a => [a.id, a.inicio, a.status])) !== antes) rapida('A agenda foi atualizada.'); }).catch(() => {});
     }
     if (!mudou || areas.includes('grade')) gradeCarregar();
+    if (areas.includes('ajustes')) chatAjustesRecarregar();
     if (TELAS.resultados && TELAS.resultados.sec && !TELAS.resultados.sec.hidden) resultadosCarregar();
   }).catch(() => {
     espera.remove(); chatBalao('assistente', 'Sem conexão agora. Sua mensagem não foi enviada; tente de novo.');

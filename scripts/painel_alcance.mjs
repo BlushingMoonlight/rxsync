@@ -110,6 +110,28 @@ async function tocaveis(page, dentroDe) {
         voltar: e.classList.contains('voltar') }));
   }, { visivelSrc: visivelJs, dentroDe });
 }
+// #219 (revisão completa): os nomes dos botões à vista (botões, links, abas e chaves; na janela aberta, só os dela) e os
+// campos do catálogo que moram na tela (data-estado-campo, mesmo os que a chave desligada esconde). Vão para a lista
+// gravada: o nome de botão entre aspas no fim de um caminho passa a ser conferido, e cada campo ganha o lugar dele.
+async function botoesECampos(page, naJanela) {
+  return page.evaluate(({ visivelSrc, naJanela }) => {
+    const visivel = eval(visivelSrc);
+    const jan = [...document.querySelectorAll('.janela[role=dialog], .janela[role=alertdialog]')].filter(visivel).pop();
+    if (naJanela && !jan) return { botoes: [], campos: [] };
+    const raiz = naJanela ? jan : document;
+    const nome = e => {
+      const t1 = e.querySelector('.t1, .nome-linha'); let t = t1 && t1.textContent.trim() ? t1.textContent : '';
+      if (!t) { const c = e.cloneNode(true); c.querySelectorAll('.selo, .contador, [data-selo-agenda], .t2, .valor, .estado, .estado-campo, svg, .sr').forEach(x => x.remove()); t = c.textContent; }
+      if (!t.trim()) t = e.getAttribute('aria-label') || (e.getAttribute('aria-labelledby') || '').split(/\s+/).map(i => (document.getElementById(i) || {}).textContent || '').join(' ');
+      return String(t || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+    };
+    const fora = e => e.closest('#painelChat, #chatCentral, .chat-lado') || (!naJanela && jan && jan.contains(e));
+    const botoes = [...new Set([...raiz.querySelectorAll('button, a[href], [role=tab], [role=switch], [role=option], summary')].filter(e => visivel(e) && !fora(e)).map(nome).filter(Boolean))];
+    const tela = e => { const s = e.closest('section[data-tela], .tela, main'); return !s || visivel(s); };
+    const campos = naJanela ? [] : [...new Set([...document.querySelectorAll('[data-estado-campo]')].filter(tela).map(e => e.getAttribute('data-estado-campo')))];
+    return { botoes, campos };
+  }, { visivelSrc: visivelJs, naJanela: !!naJanela });
+}
 async function janelaAberta(page) {
   return page.evaluate(visivelSrc => { const visivel = eval(visivelSrc); const j = [...document.querySelectorAll('.janela[role=dialog], .janela[role=alertdialog]')].filter(visivel).pop();
     if (!j) return null; const h = j.querySelector('h2, h1'); return (j.getAttribute('aria-label') || (h && h.textContent) || 'Janela').trim(); }, visivelJs);
@@ -123,6 +145,7 @@ async function tocar(page, i, naJanela) {
 // { de, para, rotulo, grupo, via } (via = o item do ⋯ ou da folha que levou). op: { inicio, rotaDe(page, hash?), repor(page, hash) }
 async function explorar(page, op) {
   const arestas = [], alcancadas = new Set(), quebrados = [], voltas = [], disposicao = new Map();
+  const naTela = new Map(), naFolha = new Map();   // rota → { botoes, campos }; "rota|toque" → botões da janela que o toque abre
   const inicio = await op.rotaDe(page); alcancadas.add(inicio);
   const fila = [op.inicio], hashes = new Map([[inicio, op.inicio]]);
   const novo = (rota, hash) => { if (!alcancadas.has(rota)) { alcancadas.add(rota); hashes.set(rota, hash); fila.push(hash); } };
@@ -138,6 +161,7 @@ async function explorar(page, op) {
       const pri = [...document.querySelectorAll('.btn.pri')].filter(e => visivel(e) && fora(e)).map(e => e.textContent.replace(/\s+/g, ' ').trim());
       const rapidas = Math.max(0, ...[...document.querySelectorAll('.rapidas')].filter(visivel).map(r => [...r.querySelectorAll('button')].filter(visivel).length));
       return { pri: [...new Set(pri)], rapidas }; }, visivelJs));
+    if (!naTela.has(rota)) naTela.set(rota, await botoesECampos(page));
     for (const t of await tocaveis(page)) {
       if (process.env.ALCANCE_DEBUG2) console.log('  cand', rota, JSON.stringify(t));
       if (t.fora || !t.rotulo) continue;
@@ -157,6 +181,7 @@ async function explorar(page, op) {
       if (process.env.ALCANCE_DEBUG) console.log('  tocou', rota, '|', t.rotulo, '→', depois, jan || '');
       if (!jan) { if (depois != null && depois !== rota) { arestas.push({ de: rota, para: depois, rotulo: t.rotulo, grupo: t.grupo }); novo(depois, hashDepois); } continue; }
       arestas.push({ de: rota, para: 'folha: ' + jan, rotulo: t.rotulo, grupo: t.grupo });
+      naFolha.set(rota + '|' + t.rotulo, (await botoesECampos(page, true)).botoes);
       // Um nível dentro da janela (o ⋯ Mais e as folhas de escolha): o que cada item abre.
       const dentro = (await tocaveis(page, '.janela[role=dialog]')).filter(x => x.rotulo && !NAO_TOCAR.test(x.rotulo) && !/^(fechar|cancelar)$/i.test(x.rotulo));
       for (const d of dentro.slice(0, 12)) {
@@ -169,11 +194,11 @@ async function explorar(page, op) {
         await tocar(page, d2.i, true);
         const r3 = await op.rotaDe(page), j3 = await janelaAberta(page), h3 = await page.evaluate(() => location.hash.slice(1));
         if (r3 != null && r3 !== rota) { arestas.push({ de: rota, para: r3, rotulo: d.rotulo, via: t.rotulo }); novo(r3, h3); }
-        else if (j3 && j3 !== jan) arestas.push({ de: rota, para: 'folha: ' + j3, rotulo: d.rotulo, via: t.rotulo });
+        else if (j3 && j3 !== jan) { arestas.push({ de: rota, para: 'folha: ' + j3, rotulo: d.rotulo, via: t.rotulo }); naFolha.set(rota + '|' + t.rotulo + '|' + d.rotulo, (await botoesECampos(page, true)).botoes); }
       }
     }
   }
-  return { arestas, alcancadas, quebrados, voltas, disposicao };
+  return { arestas, alcancadas, quebrados, voltas, disposicao, naTela, naFolha };
 }
 // Avisos do método de produto (não contam como falha): mais de uma ação principal na tela; mais de 3 ações rápidas no item.
 function avisarDisposicao(app, largura, disposicao) {
@@ -202,21 +227,33 @@ function caminhosPeloDiagrama(rotas, arestas, pai, raizes, curto) {
   return { cam, semLigacao };
 }
 // Variantes com o título do grupo ("Conta › Assinatura e WhatsApp › Plano e pagamento"), que os textos às vezes usam.
-function comGrupos(cam, arestas, pai) {
+// Com r (o resultado do explorador), junta em "botoes" os botões de cada caminho: os da tela em todas as formas de
+// escrever o caminho dela, e os da folha no caminho da folha.
+function comGrupos(cam, arestas, pai, r, botoes) {
   const out = new Set();
-  for (const [r, c] of cam) {
+  const guardar = (c, lista) => { if (!botoes || !lista || !lista.length) return; botoes[c] = [...new Set([...(botoes[c] || []), ...lista])]; };
+  for (const [rota, c] of cam) {
     if (!c || !c.length) continue;
-    out.add(c.join(' › '));
-    const a = arestas.find(x => x.de === pai(r) && x.para === r && x.grupo);
-    if (a && cam.get(pai(r))) out.add([...cam.get(pai(r)), a.grupo, a.rotulo].join(' › '));
+    const daTela = r && r.naTela.get(rota) ? r.naTela.get(rota).botoes : [];
+    out.add(c.join(' › ')); guardar(c.join(' › '), daTela);
+    const a = arestas.find(x => x.de === pai(rota) && x.para === rota && x.grupo);
+    if (a && cam.get(pai(rota))) { const v = [...cam.get(pai(rota)), a.grupo, a.rotulo].join(' › '); out.add(v); guardar(v, daTela); }
   }
   // As folhas e as ações do ⋯ Mais ("Agenda › Mais › Bloquear horário"): também são caminhos de toque.
-  for (const a of arestas) if (String(a.para).startsWith('folha: ') && cam.get(a.de)) out.add([...cam.get(a.de), ...(a.via ? [a.via] : []), a.rotulo].join(' › '));
+  for (const a of arestas) if (String(a.para).startsWith('folha: ') && cam.get(a.de)) {
+    const c = [...cam.get(a.de), ...(a.via ? [a.via] : []), a.rotulo].join(' › '); out.add(c);
+    if (r) guardar(c, r.naFolha.get(a.de + '|' + (a.via ? a.via + '|' : '') + a.rotulo));
+  }
   return out;
 }
 
 const site = await servirSite(); const browser = await abrirNavegador();
 const todosCaminhos = { painel: new Set(), central: new Set(), demo: new Set() };
+const todosBotoes = { painel: {}, central: {} }, lugarDoCampo = new Map(), todasTelas = { painel: new Set(), central: new Set() };
+// Nomes que só existem nos dados inventados deste teste (o paciente, o médico, a clínica): no caminho, valem por
+// "qualquer nome daquele lugar". As assistentes (rxsync-sistema, workflows 06 e 13) recebem a lista para não citá-los.
+const EXEMPLOS = ['Maria Souza', 'João Lima', 'Dra. Ana', 'Clínica interna', 'Clínica Desativada', 'Odonto Sul', '1 consulta nova para ver'];
+const semExemplo = c => !c.split(' › ').some(x => EXEMPLOS.includes(x));
 const lista = l => l.length ? ':\n    ' + l.slice(0, 30).join('\n    ') + (l.length > 30 ? `\n    … e mais ${l.length - 30}` : '') : '';
 
 // ---------------------------------------------------------------- 1. painel
@@ -262,7 +299,13 @@ if (!SO || SO === 'painel') for (const largura of LARGURAS) {
   const folhasEsperadas = ['Nova consulta', 'Bloquear horário', 'Mais'];
   const semFolha = folhasEsperadas.filter(f => !r.arestas.some(x => x.para === 'folha: ' + f));
   ok(!semFolha.length, `painel, ${largura} px: as folhas ${folhasEsperadas.join(', ')} abrem só tocando` + lista(semFolha));
-  for (const c of comGrupos(cam, r.arestas, paiPainel)) todosCaminhos.painel.add(c);
+  for (const c of comGrupos(cam, r.arestas, paiPainel, r, todosBotoes.painel)) todosCaminhos.painel.add(c);
+  for (const c of cam.values()) if (c && c.length && semExemplo(c.join(' › '))) todasTelas.painel.add(c.join(' › '));
+  // O lugar de cada campo do catálogo: a tela mais funda em que ele aparece (o índice de cima só mostra o resumo).
+  // Duas chaves só aparecem com os dados carregados (a de Feriados, com a cidade; a do Reservio, com a conta conectada):
+  // o lugar delas é a tela que as mostra.
+  for (const [k, rota] of Object.entries({ func_feriados: 'agenda/horarios/feriados', func_reservio: 'agenda/horarios/integracao/reservio' })) if (cam.get(rota) && !lugarDoCampo.has(k)) lugarDoCampo.set(k, cam.get(rota));
+  for (const [rota, t] of r.naTela) for (const k of t.campos) { const c = cam.get(rota); if (c && c.length && (!lugarDoCampo.has(k) || c.length > lugarDoCampo.get(k).length)) lugarDoCampo.set(k, c); }
   if (process.env.ALCANCE_MOSTRAR) console.log([...cam].map(([k, v]) => '  ' + k + ' ← ' + (v ? v.join(' › ') : '(sem ligação)')).join('\n'));
   await ctx.close();
 }
@@ -299,7 +342,8 @@ if (!SO || SO === 'central') for (const largura of LARGURAS_CENTRAL) {
   const paiCentral = x => x.includes('/') ? x.split('/')[0] : 'hoje';
   const raizesC = Object.fromEntries([['hoje', []]]);
   const { cam } = caminhosPeloDiagrama([...r.alcancadas].filter(x => x !== 'hoje'), r.arestas, x => (x.includes('/') ? x.split('/')[0] : (r.arestas.some(a => a.de === 'mais' && a.para === x) && !r.arestas.some(a => a.de === 'hoje' && a.para === x) ? 'mais' : 'hoje')), raizesC, true);
-  for (const c of comGrupos(cam, r.arestas, paiCentral)) todosCaminhos.central.add(c);
+  for (const c of comGrupos(cam, r.arestas, paiCentral, r, todosBotoes.central)) todosCaminhos.central.add(c);
+  if (largura >= 1024 || LARGURAS_CENTRAL.length === 1) for (const c of cam.values()) if (c && c.length && semExemplo(c.join(' › '))) todasTelas.central.add(c.join(' › '));
   if (process.env.ALCANCE_MOSTRAR) console.log([...cam].map(([k, v]) => '  ' + k + ' ← ' + (v ? v.join(' › ') : '(sem ligação)')).join('\n'));
   await ctx.close();
 }
@@ -331,14 +375,29 @@ if (!SO || SO === 'demo') for (const largura of LARGURAS) {
 }
 
 await browser.close(); site.fechar();
+if (process.env.ALCANCE_MOSTRAR_CAMPOS) console.log([...lugarDoCampo].map(([k, c]) => '  ' + k + ' → ' + c.join(' › ')).join('\n'), '\n  campos com lugar:', lugarDoCampo.size);
 // Os caminhos de toque, para a conferência dos caminhos escritos (verificar_site.mjs e, no rxsync-sistema, verificar.mjs).
 if (GRAVAR && !SO) {
   const arq = path.join(RAIZ, 'scripts', 'caminhos_validos.json');
   // Fora da lista: o estado da assistente ("Atendendo", que abre em toda tela) e os avisos do início da Central ("Informação: 3 …").
   const ruido = c => /(^| › )(Atendendo|Pausada|Em teste)( › |$)/.test(c) || /^[^›]*: \d/.test(c);
   const ordenar = s => [...s].filter(c => c && !c.includes('folha:') && !ruido(c)).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  fs.writeFileSync(arq, JSON.stringify({ _sobre: 'Caminhos de toque do painel e da Central, gravados pelo scripts/painel_alcance.mjs --gravar (não edite à mão). O verificar_site.mjs e o verificar.mjs do rxsync-sistema conferem que todo "X › Y" escrito nos textos é um destes caminhos (ou o começo de um).', painel: ordenar(todosCaminhos.painel), central: ordenar(todosCaminhos.central) }, null, 1) + '\n');
-  console.log('Gravado: scripts/caminhos_validos.json');
+  // Os botões de cada caminho (para conferir o nome de botão entre aspas) e o catálogo dos campos do painel com o lugar
+  // de cada um (para as assistentes dizerem onde fica cada ajuste; rxsync-sistema, workflows 06 e 13).
+  const limpar = o => Object.fromEntries(Object.keys(o).filter(c => !c.includes('folha:') && !ruido(c)).sort((x, y) => x.localeCompare(y, 'pt-BR')).map(c => [c, o[c].filter(b => !ruido(b)).sort((x, y) => x.localeCompare(y, 'pt-BR'))]));
+  const pedaco = (nome, fim) => { const i = FONTE_PAINEL.indexOf('const ' + nome + ' = '); const j = FONTE_PAINEL.indexOf(fim, i); return FONTE_PAINEL.slice(i + nome.length + 9, j + fim.length - 1); };
+  const CAMPOS = JSON.parse(pedaco('CAMPOS', '\n];')), LIMITES = JSON.parse(pedaco('LIMITES_CAMPOS', '};'));
+  const RECURSO = new Function('return ' + pedaco('CAMPO_RECURSO', '};'))(), SO_DONO = new Function('return ' + pedaco('SO_DONO', '];'))();
+  const semLugar = CAMPOS.filter(c => !lugarDoCampo.has(c.key)).map(c => c.key);
+  ok(!semLugar.length, `painel: os ${CAMPOS.length} campos do catálogo aparecem em alguma tela` + lista(semLugar));
+  const campos = CAMPOS.map(c => Object.assign({ chave: c.key, nome: c.label, tipo: c.tipo, lugar: (lugarDoCampo.get(c.key) || []).join(' › ') },
+    c.opcoes ? { opcoes: c.opcoes } : {}, c.padrao ? { padrao: c.padrao } : {}, LIMITES[c.key] ? { limite: LIMITES[c.key] } : {}, c.gestao ? { recurso: RECURSO[c.key] || 'gestao' } : {},
+    c.depende ? { depende: [].concat(c.depende) } : {}, SO_DONO.includes(c.key) ? { so_dono: true } : {}));
+  if (!falhas) fs.writeFileSync(arq, JSON.stringify({ _sobre: 'Caminhos de toque do painel e da Central, gravados pelo scripts/painel_alcance.mjs --gravar (não edite à mão). O verificar_site.mjs e o verificar.mjs do rxsync-sistema conferem que todo "X › Y" escrito nos textos é um destes caminhos (ou o começo de um) e que o nome de botão entre aspas no fim está em "botoes" naquele caminho. "campos" é o catálogo dos campos do painel (painel/fonte/04_campos_dados.js) com o lugar de cada um; "telas" é o caminho mais curto de cada tela (no computador, para a Central) e "exemplos" são os nomes inventados do teste, que valem por qualquer nome daquele lugar.',
+    painel: ordenar(todosCaminhos.painel), central: ordenar(todosCaminhos.central), botoes: { painel: limpar(todosBotoes.painel), central: limpar(todosBotoes.central) },
+    telas: { painel: ordenar(todasTelas.painel), central: ordenar(todasTelas.central) }, exemplos: EXEMPLOS, campos }, null, 1) + '\n');
+  else console.log('Lista NÃO gravada: há falha acima.');
+  if (!falhas) console.log('Gravado: scripts/caminhos_validos.json');
 }
 console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: tudo alcançável só tocando.');
 process.exit(falhas ? 1 : 0);
