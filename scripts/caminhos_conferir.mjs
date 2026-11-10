@@ -9,13 +9,20 @@
 // pode ser escrito "⋯", "⋯ Mais" ou "Mais"; um item do ⋯ pode ser escrito só até os dois-pontos ("Organizar" vale por
 // "Organizar: duplicados e importação"); um pedaço entre parênteses vale por qualquer nome daquele lugar ("Clientes ›
 // (a clínica) › …"); um pedaço entre aspas no fim é o nome de um botão daquela tela ("Segurança › "Sair de todos os
-// aparelhos""). "Central › …" só vale com uma seção da Central logo depois. Linhas com a marca "caminhos-antigos" ficam
-// de fora (as listas do que mudou de nome).
-export function arvoreDosCaminhos(painel, central) {
+// aparelhos""). Com os botões gravados (a lista "botoes" do caminhos_validos.json), esse nome é conferido: tem de ser um
+// botão, um link, uma aba ou uma chave daquela tela (maiúsculas, o ponto final e as reticências não contam).
+// "Central › …" só vale com uma seção da Central logo depois. Linhas com a marca "caminhos-antigos" ficam
+// de fora (as listas do que mudou de nome e os documentos históricos, que guardam os caminhos da época).
+const normal = t => String(t || '').toLowerCase().replace(/[.…⋯!:]+$/, '').replace(/\s+/g, ' ').trim();
+export function arvoreDosCaminhos(painel, central, botoes) {
   const raiz = new Map();
-  for (const cam of [...painel, ...central, ...central.map(c => 'Central › ' + c)]) {
-    let no = raiz;
-    for (const parte of cam.split(' › ')) { if (!no.has(parte)) no.set(parte, new Map()); no = no.get(parte); }
+  const andar = cam => { let no = raiz; for (const parte of cam.split(' › ')) { if (!no.has(parte)) no.set(parte, new Map()); no = no.get(parte); } return no; };
+  for (const cam of [...painel, ...central, ...central.map(c => 'Central › ' + c)]) andar(cam);
+  if (botoes) {
+    raiz.comBotoes = true;
+    const por = (cam, lista) => { const no = andar(cam); no.botoes = no.botoes || new Set(); for (const b of lista) no.botoes.add(normal(b)); };
+    for (const [cam, lista] of Object.entries(botoes.painel || {})) por(cam, lista);
+    for (const [cam, lista] of Object.entries(botoes.central || {})) { por(cam, lista); por('Central › ' + cam, lista); }
   }
   return raiz;
 }
@@ -32,12 +39,16 @@ export function caminhosQuebrados(texto, raiz) {
     const antes = s.slice(Math.max(0, i - 60), i).replace(/\s+$/, '');
     const area = nomesRaiz.find(n => antes.endsWith(n) && !/[\p{L}\p{N}]/u.test(antes.charAt(antes.length - n.length - 1) || ' '));
     if (!area) { i = s.indexOf('›', i + 1); continue; }
-    let no = raiz.get(area), caminho = area, pos = i, quebrou = null;
+    let no = raiz.get(area), caminho = area, pos = i, quebrou = null, fimDoCaminho = i + 1;
     while (pos >= 0 && s[pos] === '›') {
       const resto = s.slice(pos + 1).replace(/^\s+/, ''), desloc = s.length - (pos + 1) - resto.length;
       const fim = n => !/[\p{L}\p{N}]/u.test(resto.charAt(n.length) || ' ');
       const mais = resto.match(/^⋯(\s+Mais)?/), coringa = resto.match(/^\([^)\n]{1,40}\)/);
-      if (/^["“]/.test(resto)) break;   // o nome de um botão, entre aspas
+      const aspas = resto.match(/^["“]([^"”\n]{1,80})["”]/);
+      if (aspas || /^["“]/.test(resto)) {   // o nome de um botão, entre aspas: conferido quando a lista traz os botões
+        if (aspas && raiz.comBotoes && !(no.botoes && no.botoes.has(normal(aspas[1]))) && ![...no.keys()].some(k => normal(k) === normal(aspas[1]) || normal(k.split(':')[0]) === normal(aspas[1]))) { quebrou = '"' + aspas[1] + '"'; caminho += ' › ' + quebrou; }
+        break;
+      }
       let filho = null, escrito = '';
       if (mais && no.has('Mais')) { filho = 'Mais'; escrito = mais[0]; }
       else if (coringa) { if (!no.size) break; filho = [...no.keys()][0]; escrito = coringa[0]; }   // a ficha de um cliente, de um paciente…
@@ -48,12 +59,13 @@ export function caminhosQuebrados(texto, raiz) {
       }
       if (!filho) { quebrou = (resto.match(/^[^.,;:!?)"”\n]{0,50}/) || [''])[0].trim(); caminho += ' › ' + quebrou; break; }
       caminho += ' › ' + escrito; no = no.get(filho);
-      pos = pos + 1 + desloc + escrito.length;
+      pos = pos + 1 + desloc + escrito.length; fimDoCaminho = pos;
       const depois = s.slice(pos).match(/^\s*›/);
       pos = depois ? pos + depois[0].length - 1 : -1;
     }
     if (quebrou !== null && !vistos.has(caminho)) { vistos.add(caminho); achados.push({ caminho, onde: quebrou }); }
-    const prox = pos >= 0 ? pos + 1 : i + 1;
+    // Depois de um caminho, a busca segue do fim dele: um pedaço do meio com nome de área ("Prospecção › Mais › Buscas") não é outro caminho.
+    const prox = Math.max(pos >= 0 ? pos + 1 : i + 1, fimDoCaminho);
     i = s.indexOf('›', Math.max(prox, i + 1));
   }
   return achados;
