@@ -529,6 +529,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     const { execSync } = await import('node:child_process');
     const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
     const git = c => { try { return execSync(c, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
+    const rasoArq = git('git rev-parse --git-path shallow'), rasos = new Set(rasoArq && fs.existsSync(rasoArq) ? fs.readFileSync(rasoArq, 'utf8').split('\n').filter(Boolean) : []);
     const sm = fs.readFileSync('sitemap.xml', 'utf8'), noMapa = new Set();
     for (const m of sm.matchAll(/<loc>https:\/\/rxsync\.com\.br\/([^<]*)<\/loc>\s*<lastmod>([0-9-]{10})<\/lastmod>/g)) {
       const arq = !m[1] || m[1].endsWith('/') ? m[1] + 'index.html' : m[1];
@@ -536,7 +537,9 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
       if (m[2] > hoje) erro(`sitemap.xml: o lastmod de ${arq} (${m[2]}) está no futuro`);
       if (!fs.existsSync(arq) || arq.startsWith('guias/')) continue;
       const mudouAgora = git(`git status --porcelain -- "${arq}"`) !== '';
-      const dia = mudouAgora ? hoje : git(`git log -1 --format=%cs -- "${arq}"`);
+      // Numa cópia rasa (git clone --depth), o commit da borda parece mudar todos os arquivos: a data dele não vale.
+      const [hash, data] = mudouAgora ? ['', hoje] : git(`git log -1 --format=%H\ %cs -- "${arq}"`).split(' ');
+      const dia = rasos.has(hash) ? '' : data;
       if (dia && dia > m[2]) erro(`sitemap.xml: ${arq} mudou em ${dia}, mas o lastmod está em ${m[2]}; atualize o lastmod`);
     }
     for (const f of todos.filter(f => f.endsWith('.html') && !/^(demo|scripts|node_modules)\//.test(f) && !/(^|\/)_fonte\/|\/fonte\//.test(f)))
