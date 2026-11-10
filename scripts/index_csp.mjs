@@ -51,9 +51,9 @@ await ctx.close();
 ({ ctx, page, erros, chamadas } = await contextoCsp(browser, { responder, antes: { fn: () => { try { localStorage.setItem('rx_cookies', 'nao'); } catch (e) {} } } }));
 await page.goto(INICIO);
 // As Dúvidas: as abas e as respostas
-await page.locator('#faq-tab-3').click();
-ok(await page.locator('#faq-tab-3').getAttribute('aria-selected') === 'true' && await page.locator('#faq-panel-3').isVisible(), 'Dúvidas: a aba "Preço e contrato" abre');
-const resposta = page.locator('#faq-panel-3 [data-faq]').first();
+await page.locator('#faq-tab-4').click();
+ok(await page.locator('#faq-tab-4').getAttribute('aria-selected') === 'true' && await page.locator('#faq-panel-4').isVisible(), 'Dúvidas: a aba "Preço e contrato" abre');
+const resposta = page.locator('#faq-panel-4 [data-faq]').first();
 await resposta.click();
 ok(await resposta.getAttribute('aria-expanded') === 'true', 'Dúvidas: a resposta abre ao toque');
 await resposta.click();

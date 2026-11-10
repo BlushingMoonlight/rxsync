@@ -326,10 +326,35 @@ for (const arq of ['painel/index.html']) {
   if (!calcTxt.length) erro('index.html: não achei "mensalidade do Essencial (R$ NNN)" na calculadora para conferir o preço');
   for (const m of calcTxt) confere('index.html', m[1], P.essencial.mensal, 'o preço da calculadora');
   for (const m of ix.matchAll(/Math\.ceil\((\d+) \/ val\)/g)) confere('index.html', m[1], P.essencial.mensal, 'a conta da calculadora');
-  // JSON-LD (rxsync-sistema DEC-117): só as mensalidades, o anual à vista e a implantação oficiais.
+  // JSON-LD (rxsync-sistema DEC-117 e DEC-210): uma oferta para cada preço oficial, pelo nome (mensal, anual parcelado em
+  // 12 vezes, anual à vista de cada plano e a Implantação completa como oferta própria), e nenhum preço fora delas.
   const precoLd = t => num(t).toFixed(2);
-  const oficiaisLd = new Set([...planos.flatMap(k => [precoLd(P[k].mensal), precoLd(P[k].avista)]), precoLd(P.implantacao)]);
+  const nomesLd = { essencial: 'Essencial', gestao: 'Gestão Inteligente' };
+  const esperadasLd = new Map([
+    ...planos.flatMap(k => [[`${nomesLd[k]} (mensal)`, precoLd(P[k].mensal)], [`${nomesLd[k]} (anual parcelado em 12 vezes)`, precoLd(P[k].parcelado)], [`${nomesLd[k]} (anual à vista)`, precoLd(P[k].avista)]]),
+    ['Implantação completa (opcional, uma vez só)', precoLd(P.implantacao)],
+  ]);
+  const oficiaisLd = new Set(esperadasLd.values());
   for (const m of ix.matchAll(/"price":\s*"([\d.]+)"/g)) if (!oficiaisLd.has(m[1])) erro(`index.html: o preço ${m[1]} do JSON-LD não é um preço oficial (rxsync-sistema#79)`);
+  {
+    let ofertas = null;
+    for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+      try { const d = JSON.parse(m[1]); const app = (d['@graph'] || [d]).find(x => x['@type'] === 'SoftwareApplication'); if (app) ofertas = [].concat(app.offers || []); } catch (e) { /* acusado abaixo */ }
+    }
+    if (!ofertas) erro('index.html: o JSON-LD não tem o SoftwareApplication com as ofertas (rxsync-sistema DEC-210)');
+    else {
+      const achadas = new Map(ofertas.map(o => [o.name, o]));
+      for (const [nome, preco] of esperadasLd) {
+        const o = achadas.get(nome);
+        if (!o) { erro(`index.html: falta no JSON-LD a oferta "${nome}" (R$ ${preco}; rxsync-sistema DEC-210)`); continue; }
+        if (o.price !== preco) erro(`index.html: a oferta "${nome}" do JSON-LD diz ${o.price}, mas o preço oficial é ${preco} (scripts/precos_oficiais.json)`);
+        if (o.priceCurrency !== 'BRL') erro(`index.html: a oferta "${nome}" do JSON-LD precisa de priceCurrency BRL`);
+        const esp = [].concat(o.priceSpecification || []);
+        for (const e of esp) if (e.price !== preco) erro(`index.html: o priceSpecification da oferta "${nome}" diz ${e.price}, mas o preço oficial é ${preco}`);
+      }
+      for (const o of ofertas) if (!esperadasLd.has(o.name)) erro(`index.html: oferta "${o.name}" no JSON-LD sem preço oficial correspondente (rxsync-sistema DEC-210)`);
+    }
+  }
   for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) { try { JSON.parse(m[1]); } catch (e) { erro(`index.html: JSON-LD inválido (${e.message})`); } }
   // As Dúvidas da página e o FAQPage dos dados estruturados dizem exatamente o mesmo, na mesma ordem: o Google só aceita
   // no FAQPage o que está visível, e uma pergunta mudada num lugar só deixa os dois diferentes (levantamento de 03/11/2026).
@@ -338,7 +363,7 @@ for (const arq of ['painel/index.html']) {
     const naPagina = [...ix.matchAll(/<button[^>]*\sdata-faq(?=[\s>])[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-content"[^>]*><div>([\s\S]*?)<\/div><\/div>/g)].map(m => [limpa(m[1]), limpa(m[2])]);
     let noLd = [];
     for (const m of ix.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
-      try { const d = JSON.parse(m[1]); const f = (d['@graph'] || [d]).find(x => x['@type'] === 'FAQPage'); if (f) noLd = f.mainEntity.map(q => [q.name, q.acceptedAnswer.text]); } catch (e) { /* já acusado acima */ }
+      try { const d = JSON.parse(m[1]); const f = (d['@graph'] || [d]).find(x => x['@type'] === 'FAQPage'); if (f) noLd = f.mainEntity.map(q => [q.name, q.acceptedAnswer.text].map(t => t.replace(/\s+/g, ' ').trim())); } catch (e) { /* já acusado acima */ }
     }
     if (naPagina.length !== noLd.length) erro(`index.html: as Dúvidas têm ${naPagina.length} perguntas e o FAQPage tem ${noLd.length}; mude os dois juntos`);
     else naPagina.forEach(([q, r], i) => {
@@ -497,16 +522,51 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   for (const f of ['index.html', 'painel-da-clinica/index.html', 'assistente-whatsapp-clinica/index.html', 'contratar.html', 'onboarding.html'])
     if (fs.existsSync(f) && !/<button type="button"[^>]*data-cookies[^>]*>Preferências de cookies<\/button>/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta o botão "Preferências de cookies" (data-cookies) no rodapé`);
   if (fs.existsSync('assistente-whatsapp-clinica/index.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync('assistente-whatsapp-clinica/index.html', 'utf8'))) erro('assistente-whatsapp-clinica/index.html: a página do anúncio precisa do noindex');
-  // O lastmod do sitemap acompanha a página (menos os guias): só avisa (não bloqueia) quando o último commit da página é depois do lastmod.
+  // O lastmod do sitemap acompanha a página (rxsync-sistema DEC-210; antes só avisava). Bloqueia: a página mudou depois do
+  // lastmod (o último commit dela, ou uma mudança ainda não gravada, conta como hoje), lastmod no futuro e página que
+  // pede para ser indexada (index, follow) fora do sitemap. Os guias usam a data de revisão (guias_montar.mjs).
   if (fs.existsSync('sitemap.xml')) {
     const { execSync } = await import('node:child_process');
-    for (const m of fs.readFileSync('sitemap.xml', 'utf8').matchAll(/<loc>https:\/\/rxsync\.com\.br\/([^<]*)<\/loc>\s*<lastmod>([0-9-]{10})<\/lastmod>/g)) {
+    const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+    const git = c => { try { return execSync(c, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
+    const rasoArq = git('git rev-parse --git-path shallow'), rasos = new Set(rasoArq && fs.existsSync(rasoArq) ? fs.readFileSync(rasoArq, 'utf8').split('\n').filter(Boolean) : []);
+    const sm = fs.readFileSync('sitemap.xml', 'utf8'), noMapa = new Set();
+    for (const m of sm.matchAll(/<loc>https:\/\/rxsync\.com\.br\/([^<]*)<\/loc>\s*<lastmod>([0-9-]{10})<\/lastmod>/g)) {
       const arq = !m[1] || m[1].endsWith('/') ? m[1] + 'index.html' : m[1];
-      if (!fs.existsSync(arq) || arq.startsWith('guias/')) continue;   // os guias usam a data de revisão (guias_montar.mjs)
-      let dia = ''; try { dia = execSync(`git log -1 --format=%cs -- "${arq}"`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { /* sem histórico */ }
-      if (dia && dia > m[2]) console.log(`::warning title=Sitemap::sitemap.xml: ${arq} mudou em ${dia}, mas o lastmod está em ${m[2]}; atualize o lastmod.`);
+      noMapa.add(arq);
+      if (m[2] > hoje) erro(`sitemap.xml: o lastmod de ${arq} (${m[2]}) está no futuro`);
+      if (!fs.existsSync(arq) || arq.startsWith('guias/')) continue;
+      const mudouAgora = git(`git status --porcelain -- "${arq}"`) !== '';
+      // Numa cópia rasa (git clone --depth), o commit da borda parece mudar todos os arquivos: a data dele não vale.
+      const [hash, data] = mudouAgora ? ['', hoje] : git(`git log -1 --format=%H\ %cs -- "${arq}"`).split(' ');
+      const dia = rasos.has(hash) ? '' : data;
+      if (dia && dia > m[2]) erro(`sitemap.xml: ${arq} mudou em ${dia}, mas o lastmod está em ${m[2]}; atualize o lastmod`);
     }
+    for (const f of todos.filter(f => f.endsWith('.html') && !/^(demo|scripts|node_modules)\//.test(f) && !/(^|\/)_fonte\/|\/fonte\//.test(f)))
+      if (/<meta name="robots" content="index/.test(fs.readFileSync(f, 'utf8')) && !noMapa.has(f)) erro(`sitemap.xml: ${f} pede para ser indexada (index) e não está no sitemap`);
   }
+  // robots.txt (rxsync-sistema DEC-210, GEO): os buscadores, as buscas dos assistentes de IA e os robôs de treino escolhidos
+  // pelo Jean liberados pelo nome; o Bytespider barrado; as páginas de uso (todas com noindex) fora; o sitemap no fim.
+  if (fs.existsSync('robots.txt')) {
+    const r = fs.readFileSync('robots.txt', 'utf8'), grupos = r.split(/\n\s*\n/).map(g => g.replace(/#[^\n]*/g, ''));
+    const grupoDe = bot => grupos.find(g => new RegExp(`^User-agent:\\s*${bot.replace('*', '\\*')}\\s*$`, 'im').test(g)) || '';
+    for (const bot of ['Googlebot', 'Bingbot', 'OAI-SearchBot', 'PerplexityBot', 'Claude-SearchBot', 'GPTBot', 'ClaudeBot', 'Google-Extended', 'Applebot-Extended', 'CCBot', 'Meta-ExternalAgent', '*']) {
+      const g = grupoDe(bot);
+      if (!g) erro(`robots.txt: falta o robô ${bot}, liberado pelo nome`);
+      else if (/^Disallow:\s*\/\s*$/m.test(g) || !/^Allow:\s*\/\s*$/m.test(g)) erro(`robots.txt: ${bot} precisa ficar liberado (Allow: /)`);
+    }
+    if (!/^Disallow:\s*\/\s*$/m.test(grupoDe('Bytespider'))) erro('robots.txt: o Bytespider fica barrado (Disallow: /)');
+    const fora = [...grupoDe('*').matchAll(/^Disallow:\s*(\S+)/gm)].map(m => m[1]);
+    for (const p of ['/painel/', '/central/', '/demo/', '/onboarding.html', '/conectar.html', '/contratar.html', '/conta-excluir.html', '/autoedicao.html', '/teste.html'])
+      if (!fora.includes(p)) erro(`robots.txt: ${p} (página de uso) fica fora (Disallow) para todos`);
+    for (const p of fora) {   // tudo o que fica fora também tem noindex (vale para quem chega por um link de fora)
+      const arq = p.endsWith('/') ? p.slice(1) + (fs.existsSync(p.slice(1) + 'index.html') ? 'index.html' : '') : p.slice(1);
+      if (arq && fs.existsSync(arq) && arq.endsWith('.html') && !/<meta name="robots" content="noindex/.test(fs.readFileSync(arq, 'utf8'))) erro(`robots.txt: ${arq} fica fora e precisa do noindex também`);
+      if (fs.existsSync('sitemap.xml') && fs.readFileSync('sitemap.xml', 'utf8').includes('<loc>https://rxsync.com.br' + p)) erro(`robots.txt: ${p} fica fora e não pode estar no sitemap`);
+    }
+    if (!/^Sitemap:\s*https:\/\/rxsync\.com\.br\/sitemap\.xml\s*$/m.test(r)) erro('robots.txt: falta a linha do Sitemap');
+    if (fs.existsSync('llms.txt')) erro('llms.txt: fica de fora (GEO é SEO bem feito, sem arquivo à parte; DEC-210)');
+  } else erro('robots.txt: falta o arquivo');
 }
 // Método de produto (rxsync-sistema docs/front/metodo.md; o resumo público está no CLAUDE.md): o que dá para conferir
 // lendo o código. A ação principal única e as até 3 ações rápidas são conferidas na tela, pelo painel_alcance.mjs (aviso).

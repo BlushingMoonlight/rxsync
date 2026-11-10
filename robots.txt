@@ -1,4 +1,36 @@
+# RXSync: o site público (página inicial, painel da clínica, guias e Política) é aberto a buscadores e assistentes
+# de IA. As páginas de uso (painel, Central, demonstração, contratação e conexão) ficam fora.
+
+# Buscadores, as buscas dos assistentes de IA e os robôs de treino liberados
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Applebot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Meta-ExternalAgent
 User-agent: *
+Disallow: /painel/
+Disallow: /central/
+Disallow: /demo/
+Disallow: /autoedicao.html
+Disallow: /onboarding.html
+Disallow: /conectar.html
+Disallow: /contratar.html
+Disallow: /conta-excluir.html
+Disallow: /teste.html
 Allow: /
+
+# Robô de treino barrado
+User-agent: Bytespider
+Disallow: /
 
 Sitemap: https://rxsync.com.br/sitemap.xml
