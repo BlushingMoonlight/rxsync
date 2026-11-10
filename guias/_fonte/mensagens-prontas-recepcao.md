@@ -5,7 +5,7 @@ endereco: mensagens-prontas-recepcao
 tema: atendimento
 pesquisa-alvo: mensagens prontas para recepção de clínica
 publicado-em: 2026-10-28
-revisado-em: 2026-10-28
+revisado-em: 2026-11-10
 rascunho: não
 relacionados: paciente-sem-resposta-whatsapp, reduzir-faltas-consultorio, agendamento-pelo-whatsapp
 perguntas:
@@ -21,7 +21,7 @@ chamada-titulo: A assistente usa as mensagens que a clínica escreve
 chamada-texto: No teste grátis, você escreve a primeira mensagem, a resposta fora do horário e os lembretes, e vê a assistente usar cada uma.
 ---
 :::resposta-curta
-Mensagens prontas poupam tempo e deixam a recepção falando do mesmo jeito. As que mais ajudam: boas-vindas, fora do horário, valor e formas de pagamento, confirmação, lembrete na véspera, remarcação, pedido de orientação médica e urgência. Todas podem dizer valor, horário e como marcar; nenhuma pode prometer resultado nem orientar tratamento.
+Abaixo estão os modelos prontos para copiar, do primeiro contato ao depois da consulta; os que mais ajudam são boas-vindas, fora do horário, valor e formas de pagamento, confirmação, lembrete na véspera, remarcação, pedido de orientação médica e urgência. Eles poupam tempo e deixam a recepção falando do mesmo jeito. Todos podem dizer valor, horário e como marcar; nenhum pode prometer resultado nem orientar tratamento.
 :::
 
 ## As regras antes dos modelos
