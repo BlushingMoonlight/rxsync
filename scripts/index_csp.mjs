@@ -5,17 +5,20 @@
 //   3. os botões: o menu do celular, as abas e as respostas das Dúvidas, mensal e anual, "Falar com a equipe" e
 //      "Peça uma demonstração" (levam ao formulário), o "Testar grátis" da calculadora e o "Começar" dos planos (levam
 //      à contratação, com o plano e o ciclo);
-//   4. o teste ao vivo (começar e mandar uma mensagem) e o formulário de demonstração;
+//   4. o teste ao vivo (começar, mandar uma mensagem, marcar uma consulta só na conversa, sem a agenda de exemplo
+//      que saiu em 10/11/2026) e o formulário de demonstração;
 //   5. o chat: abre ao toque (no botão e no "Pergunte no chat") e sozinho com ?suporte=1;
 //   em todos, nenhum bloqueio da regra.
 // Uso (precisa do Playwright): node scripts/index_csp.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 import { contextoCsp, regraDa, provarBloqueio, conferidor } from './csp_teste.mjs';
 const { ok, semBloqueio, falhas } = conferidor();
-const AGENDA = { dias: [{ id: 'd1', rotulo: 'Seg' }, { id: 'd2', rotulo: 'Ter' }], horas: ['09:00', '10:00'], ocupados: ['d1|09:00|0'] };
+let mensagens = 0;
 const responder = caminho => {
-  if (caminho === 'mini-teste-iniciar') return { ok: true, sessao: 's'.repeat(32), restantes: 5, agenda: AGENDA, profissionais: ['Dra. Teste'], clinica: 'Clínica Teste', especialidade: 'Pediatria' };
-  if (caminho === 'mini-teste-mensagem') return { ok: true, resposta: 'Olá! Posso ajudar a marcar uma consulta.', restantes: 4 };
+  // O que o workflow 40 devolve desde 10/11/2026: sem a agenda de exemplo (ela fica só no servidor, para a IA).
+  if (caminho === 'mini-teste-iniciar') return { ok: true, sessao: 's'.repeat(32), restantes: 5, clinica: 'Clínica Teste', especialidade: 'Pediatria' };
+  if (caminho === 'mini-teste-mensagem') return ++mensagens === 1 ? { ok: true, resposta: 'Olá! Posso ajudar a marcar uma consulta.', restantes: 4 }
+    : { ok: true, resposta: 'Pronto, Maria! Consulta marcada para terça às 10h.', restantes: 3, agendamento: { dia: 'd1', hora: '10:00', prof: 0, paciente: 'Maria', servico: 'Consulta' }, novo_agendamento: true };
   if (caminho === 'formulario-site') return { ok: true };
   return { ok: false };
 };
@@ -79,6 +82,14 @@ await page.locator('#mtTeste').waitFor({ state: 'visible' });
 await page.fill('#mtTexto', 'Quero marcar uma consulta'); await page.click('#mtEnv');
 await page.getByText('Olá! Posso ajudar a marcar uma consulta.').waitFor();
 ok(chamadas.some(c => c.caminho === 'mini-teste-mensagem'), 'o teste ao vivo começa e responde (n8n simulado)');
+await page.fill('#mtTexto', 'Pode ser terça às 10h, meu nome é Maria'); await page.click('#mtEnv');
+await page.getByText('Pronto, Maria! Consulta marcada para terça às 10h.').waitFor();
+ok(await page.locator('.mt-agenda, #mtGrade, #mtToast').count() === 0 && await page.locator('.mt-msgs .b-sis').filter({ hasText: 'agenda' }).count() === 0,
+  'o teste ao vivo marca a consulta só na conversa: sem a agenda de exemplo nem o aviso "na agenda"');
+const conversa = await page.evaluate(() => { const c = document.querySelector('.mt-card').getBoundingClientRect(), m = document.getElementById('mtMsgs').getBoundingClientRect();
+  return { cartao: c.width, conversa: m.width, alto: m.height, tela: innerWidth }; });
+ok(conversa.conversa >= conversa.cartao - 2 && conversa.cartao <= 762 && conversa.alto >= 320 && conversa.cartao <= conversa.tela,
+  `a conversa ocupa o cartão (${Math.round(conversa.conversa)} de ${Math.round(conversa.cartao)} px, ${Math.round(conversa.alto)} px de altura)`);
 await semBloqueio(page, 'o teste ao vivo');
 // O formulário de demonstração
 await page.fill('#nome', 'Maria Teste'); await page.fill('#clinica', 'Clínica Teste'); await page.fill('#email', 'maria@exemplo.test'); await page.fill('#telefone', '41999990000');

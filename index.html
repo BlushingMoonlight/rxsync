@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xwlrHl++w7fIgDZfFfbYL/SJKHQ8mu1rIdJW591XyRg=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Aj6QKUfBC+OFM5TLY6hldeuJwj98aZFT2/u0NksDecU=' 'self' https://*.googletagmanager.com https://app.rxsync.com.br; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://app.rxsync.com.br; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://app.rxsync.com.br wss://app.rxsync.com.br; frame-src https://app.rxsync.com.br; base-uri 'none'; form-action 'none'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
     <meta name="theme-color" content="#FFFFFF">
@@ -408,16 +408,13 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .mt-campos .privac { margin-top: 0; }
 .mt-campos .erro-form { margin-top: 0; }
 
-.mt-teste { display: grid; }
+.mt-card.conversa { max-width: 760px; margin-inline: auto; }
 .mt-teste[hidden], .mt-form[hidden] { display: none; }
-@media (min-width: 1024px) { .mt-teste { grid-template-columns: 1fr 1fr; } }
-.mt-chat { display: flex; flex-direction: column; background: #efeae2; border-bottom: 1px solid var(--line); position: relative; min-width: 0; }
-@media (min-width: 1024px) { .mt-chat { border-bottom: 0; border-right: 1px solid var(--line); } }
+.mt-chat { display: flex; flex-direction: column; background: #efeae2; position: relative; min-width: 0; }
 .mt-chat .wa-topo { padding: 12px 14px; }
 .mt-cont { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--brand-ink); background: var(--brand-soft); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
 .mt-cont.pouco { background: var(--amber-soft); color: var(--amber-ink); }
-.mt-msgs { height: 420px; overflow-y: auto; flex: none; }
-@media (max-width: 639px) { .mt-msgs { height: 360px; } }
+.mt-msgs { height: min(64vh, 560px); min-height: 320px; overflow-y: auto; flex: none; }
 .mt-msgs .b { white-space: pre-wrap; word-wrap: break-word; }
 .mt-msgs .b-sis { align-self: center; background: #fff8d6; color: #5c4a00; font-size: 12.5px; max-width: 92%; text-align: center; border-radius: 8px; padding: 6px 10px; box-shadow: 0 1px .5px rgba(11,20,26,.13); }
 .mt-sug { display: flex; gap: 8px; padding: 0 10px 8px; overflow-x: auto; scrollbar-width: none; background: #efeae2; }
@@ -435,32 +432,6 @@ input[type=range] { width: 100%; margin-top: 12px; accent-color: var(--brand); h
 .mt-fim .btn { margin-top: 6px; }
 .mt-link { background: none; border: 0; color: var(--brand-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; padding: 6px; font-size: 14.5px; }
 
-.mt-agenda { padding: 18px; position: relative; min-width: 0; }
-@media (min-width: 640px) { .mt-agenda { padding: 24px; } }
-.mt-ag-topo strong { display: block; font-size: 17px; }
-.mt-ag-topo span { font-size: 13px; color: var(--ink-3); }
-.mt-dias { display: flex; gap: 6px; margin-top: 14px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.mt-dias::-webkit-scrollbar { display: none; }
-.mt-dias button { flex-shrink: 0; border: 1px solid var(--line-2); background: #fff; color: var(--ink-2); font-weight: 700; font-size: 13.5px; padding: 7px 12px; border-radius: 10px; min-height: 38px; position: relative; }
-.mt-dias button[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
-.mt-dias button.tem::after { content: ""; position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
-.mt-grade-wrap { margin-top: 12px; overflow-x: auto; }
-.mt-grade { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; }
-.mt-grade th { font-size: 12.5px; font-weight: 700; color: var(--ink-2); text-align: left; padding: 2px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mt-grade th.h { width: 48px; }
-.mt-grade td { height: 34px; border-radius: 7px; font-size: 12px; padding: 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mt-grade td.hora { color: var(--ink-3); font-weight: 600; padding: 0; }
-.mt-grade td.livre { background: #f3f7f5; border: 1px dashed #cfdcd6; }
-.mt-grade td.ocup { background: #e6eaee; color: #7a8794; }
-.mt-grade td.ia { background: var(--brand); color: #fff; font-weight: 700; animation: mtPop .6s ease; }
-@keyframes mtPop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: none; } }
-.mt-leg { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 12.5px; color: var(--ink-3); }
-.mt-leg span { display: inline-flex; align-items: center; gap: 6px; }
-.mt-leg i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
-.l-livre { background: #f3f7f5; border: 1px dashed #cfdcd6; } .l-ocup { background: #e6eaee; } .l-ia { background: var(--brand); }
-.mt-toast { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--navy); color: #fff; border-radius: 12px; padding: 10px 14px; display: flex; gap: 10px; align-items: center; font-size: 14px; font-weight: 600; box-shadow: var(--sh-3); width: max-content; max-width: calc(100% - 32px); animation: mtPop .4s ease; }
-.mt-toast[hidden] { display: none; }
-.mt-toast .ic { color: #6ee7b7; }
 
 /* Barra fixa no celular */
 
@@ -520,7 +491,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 .plano.dest { box-shadow: none; }
 .form-card { box-shadow: none; border: 1px solid var(--line); }
 .campo input:focus, .campo select:focus { box-shadow: 0 0 0 3px #E7F1EF; }
-.mt-toast .ic { color: #A3E8BE; }
 .rodape { background: var(--bg); color: var(--ink-2); border-top: 1px solid var(--line); }
 .rodape .marca, .rodape h4 { color: var(--ink); }
 .rodape a, .link-rodape { color: var(--ink-2); }
@@ -532,8 +502,8 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
 /* ---- Página inicial pela P7 (rxsync-sistema docs/auditorias/2026-10-26-landing-page.md) ---- */
 .pular:focus, .eyebrow, .btn, .marca, .wa-av, .wa-nome, .numero .valor, .ao-vivo, .passo .n, .tag,
 .campo-r label output, .calc-res .grande, .ciclo button, .plano .fita, .preco .moeda, .preco .val, .plano .inc li.forte,
-.faq-tab, .faq-item > button, .faq-mais button, .rodape h4, .mt-passos li span, .mt-cont, .mt-link, .mt-dias button,
-.mt-grade th, .mt-grade td.ia, .rec-grupo, b, strong, th { font-weight: 600; }
+.faq-tab, .faq-item > button, .faq-mais button, .rodape h4, .mt-passos li span, .mt-cont, .mt-link,
+.rec-grupo, b, strong, th { font-weight: 600; }
 .link-demo { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 4px; color: var(--brand); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 767px) {
   .hero { padding-bottom: 24px; }
@@ -933,7 +903,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     <div class="sec-head centro">
       <span class="eyebrow"><svg class="ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.13-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.13a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.13 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.13a.5.5 0 0 1-.96 0z"/></svg>Teste agora, aqui na página</span>
       <h2 class="h2" id="titulo-mt">Converse com a assistente como se fosse um paciente da sua clínica.</h2>
-      <p class="lead">Escolha a especialidade e diga o nome da clínica e de quem atende. Em segundos, ela responde e marca consultas numa agenda de exemplo. Você tem 5 mensagens.</p>
+      <p class="lead">Escolha a especialidade e diga o nome da clínica e de quem atende. Em segundos, ela responde, oferece horários e marca a consulta na conversa. Você tem 5 mensagens.</p>
     </div>
 
     <div class="mt-card">
@@ -945,7 +915,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           <ul class="mt-passos">
             <li><span>1</span>Preencha os dados.</li>
             <li><span>2</span>Escreva como um paciente: pergunte o valor, o convênio ou peça para marcar.</li>
-            <li><span>3</span>Veja a consulta aparecer na agenda, como no painel da RXSync.</li>
+            <li><span>3</span>Veja a assistente marcar a consulta.</li>
           </ul>
         </div>
         <div class="mt-campos">
@@ -976,7 +946,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         </div>
       </form>
 
-      <!-- Etapa 2: conversa + agenda -->
+      <!-- Etapa 2: a conversa -->
       <div id="mtTeste" class="mt-teste" hidden>
         <div class="mt-chat">
           <div class="wa-topo">
@@ -1003,16 +973,6 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
             <a href="/contratar.html?plano=gestao&amp;ciclo=mensal" class="btn btn-prim btn-full" data-teste="gestao" data-origem="mini_teste">Começar 7 dias grátis</a>
             <button type="button" class="mt-link" data-form-plano="">Prefiro falar com uma pessoa</button>
           </div>
-        </div>
-
-        <div class="mt-agenda">
-          <div class="mt-ag-topo">
-            <div><strong>Agenda da clínica</strong><span>Exemplo, como no painel da RXSync</span></div>
-          </div>
-          <div class="mt-dias" id="mtDias" role="tablist" aria-label="Dias da agenda"></div>
-          <div class="mt-grade-wrap"><table class="mt-grade" id="mtGrade"></table></div>
-          <div class="mt-leg"><span><i class="l-livre"></i>Livre</span><span><i class="l-ocup"></i>Ocupado</span><span><i class="l-ia"></i>Marcado pela assistente</span></div>
-          <div class="mt-toast" id="mtToast" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg><span id="mtToastTxt">Consulta marcada</span></div>
         </div>
       </div>
     </div>
@@ -1122,10 +1082,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><h3>Marca e remarca no chat</h3><p>Oferece os horários livres e confirma ali mesmo, sem link nem aplicativo.</p></article>
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></span><h3>Lembra e confirma presença</h3><p>Lembretes nos horários que você escolher. O paciente confirma ou cancela respondendo.</p></article>
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg></span><h3>Entende áudio</h3><p>O paciente manda áudio, e ela responde por escrito.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span><h3>Retoma conversas paradas</h3><p>Se o paciente para antes de marcar, ela retoma uma vez só.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></span><h3>Retoma conversas paradas</h3><p>Se o paciente para antes de marcar, ela retoma.</p></article>
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><h3>Urgência vai para a equipe</h3><p>Quando aparece o que você definiu como urgência, ela manda a sua orientação e avisa a equipe na hora.</p></article>
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg></span><h3>Link de pagamento</h3><p>Se você quiser, ela manda o link de pagamento depois de marcar.</p></article>
-      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><h3>A equipe assume quando quiser</h3><p>Basta responder o paciente: ela fica em silêncio na conversa (o padrão é 2 horas). No WhatsApp da clínica, com o histórico de sempre. Você também lista números que ela não responde, como família e fornecedores.</p></article>
+      <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><h3>A equipe assume quando quiser</h3><p>Basta responder o paciente: ela fica em silêncio na conversa. No WhatsApp da clínica, com o histórico de sempre. Você também lista números que ela não responde, como família e fornecedores.</p></article>
       <article class="recurso"><span class="ico"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg></span><h3>Sua agenda ou a nossa</h3><p>A agenda vem pronta no painel. Se a sua agenda online tem integração com a RXSync, ela se conecta a ela. Se não tem, ela pode enviar ao paciente o link de agendamento do seu sistema.</p></article>
     </div>
     <h3 class="rec-grupo">No plano Gestão Inteligente</h3>
@@ -1876,7 +1836,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     // Conversa de verdade com a IA, limitada a 5 mensagens. Backend: workflow 40 do n8n.
     // O cabeçalho x-rxsync-origem só filtra robôs simples (ele está neste código público); a proteção são os limites no servidor.
     var MT_API = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
-    var mt = { sessao: null, restantes: 5, agenda: null, profs: [], agendamento: null, dia: 'd1', enviando: false };
+    var mt = { sessao: null, restantes: 5, agendamento: null, enviando: false };
 
     function mtPost(rota, dados) {
         return fetch(MT_API + rota, {
@@ -1906,7 +1866,7 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
                 telefone: v('mt_telefone'), empresa_site: v('mt_empresa_site'), pagina: location.href
             });
             if (!d.ok) throw new Error(d.mensagem || 'Não conseguimos começar o teste agora. Tente de novo em instantes.');
-            mt.sessao = d.sessao; mt.restantes = d.restantes; mt.agenda = d.agenda; mt.profs = d.profissionais || [];
+            mt.sessao = d.sessao; mt.restantes = d.restantes;
             evento('mini_teste_inicio', { 'especialidade': v('mt_especialidade') });
             // O mini teste é só mini_teste_inicio; o generate_lead fica para o formulário (rxsync-sistema DEC-191).
             mtAbrir(d);
@@ -1924,8 +1884,8 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         mtEl('mtAv').textContent = nome.replace(/^(cl[ií]nica|consult[óo]rio|centro)\s+(de\s+|do\s+|da\s+)?/i, '').split(/\s+/).slice(0, 2).map(function (p) { return p.charAt(0); }).join('').toUpperCase() || 'CL';
         mtEl('mtForm').hidden = true;
         mtEl('mtTeste').hidden = false;
+        mtEl('mtTeste').closest('.mt-card').classList.add('conversa');
         mtContador();
-        mtDias();
         mtSistema('Escreva como se fosse um paciente da ' + nome + '. Você tem 5 mensagens.');
         document.querySelectorAll('#mtSug [data-sug]').forEach(function (b) {
             b.addEventListener('click', function () { mtEl('mtTexto').value = b.dataset.sug; mtEnviar(); });
@@ -2003,49 +1963,10 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
         mtContador();
     }
 
-    function mtDias() {
-        var box = mtEl('mtDias');
-        box.innerHTML = '';
-        (mt.agenda.dias || []).forEach(function (d) {
-            var b = document.createElement('button');
-            b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.dia = d.id; b.textContent = d.rotulo;
-            b.addEventListener('click', function () { mt.dia = d.id; mtDias(); });
-            b.setAttribute('aria-selected', d.id === mt.dia ? 'true' : 'false');
-            if (mt.agendamento && mt.agendamento.dia === d.id) b.classList.add('tem');
-            box.appendChild(b);
-        });
-        mtGrade();
-    }
-
-    function mtGrade() {
-        var t = mtEl('mtGrade'), ag = mt.agenda, ocup = {};
-        (ag.ocupados || []).forEach(function (o) { ocup[o] = 1; });
-        var h = '<thead><tr><th class="h"></th>' + mt.profs.map(function (p) { return '<th title="' + mtEsc(p) + '">' + mtEsc(p) + '</th>'; }).join('') + '</tr></thead><tbody>';
-        (ag.horas || []).forEach(function (hr) {
-            h += '<tr><td class="hora">' + hr + '</td>';
-            mt.profs.forEach(function (p, i) {
-                var a = mt.agendamento;
-                if (a && a.dia === mt.dia && a.hora === hr && Number(a.prof) === i) h += '<td class="ia" title="' + mtEsc(a.paciente + ' · ' + a.servico) + '">' + mtEsc(a.paciente) + '</td>';
-                else if (ocup[mt.dia + '|' + hr + '|' + i]) h += '<td class="ocup">Ocupado</td>';
-                else h += '<td class="livre"><span class="sr">Livre</span></td>';
-            });
-            h += '</tr>';
-        });
-        t.innerHTML = h + '</tbody>';
-    }
-    function mtEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-
+    // A consulta marcada fica só na conversa (a resposta da assistente confirma); aqui só conta para a medição.
     function mtMarcar(a) {
         mt.agendamento = a;
-        mt.dia = a.dia;
-        mtDias();
         evento('mini_teste_agendou', { 'especialidade': (mtEl('mt_especialidade') || {}).value || '' });
-        var toast = mtEl('mtToast');
-        mtEl('mtToastTxt').textContent = 'Consulta marcada: ' + a.rotulo_dia + ', ' + a.hora + ' · ' + a.paciente;
-        toast.hidden = false;
-        clearTimeout(mtMarcar._t);
-        mtMarcar._t = setTimeout(function () { toast.hidden = true; }, 5000);
-        mtSistema('📅 Consulta marcada na agenda' + (window.innerWidth < 1024 ? ', logo abaixo.' : ', ao lado.'));
     }
     </script>
 
