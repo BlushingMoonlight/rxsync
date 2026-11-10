@@ -5,7 +5,9 @@
 //   2. depois, o "O que mudou" lista o que o workflow 13 mudou, e só a agenda é recarregada (areas: agenda);
 //   3. sem conexão, a mensagem volta para o campo;
 //   4. quando o assistente muda um ajuste do painel (rxsync-sistema DEC-209; areas: ajustes), os campos são lidos de novo
-//      e a tela mostra o valor novo.
+//      e a tela mostra o valor novo;
+//   5. depois do ajuste confirmado, Conta › Acessos recentes mostra a mudança como "pelo assistente de gestão" (o texto
+//      que o servidor manda para o registro).
 // Uso (precisa do Playwright): node scripts/painel_chat_confirmar.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
@@ -22,6 +24,10 @@ function responder(url, h, b) {
     if (/^Sim, confirmo/.test(b.mensagem)) return { ok: true, resposta: 'Pronto! Marquei a Maria Souza na quarta às 14:00.', confirmar: false, mudou: ['Consulta marcada: Maria Souza, 28/10 às 14:00'], areas: ['agenda'] };
     return { ok: true, resposta: 'Vou marcar *Maria Souza* na quarta, 28/10, às 14:00. Confirma?', confirmar: true, mudou: [], areas: [] };
   }
+  // O registro do painel: depois do ajuste confirmado, o servidor manda a linha "pelo assistente de gestão" (o mesmo texto da rx_painel_acessos).
+  if (caminho === 'painel-entrada' && b.acao === 'acessos_recentes') return { ok: true, acessos: [
+    ...(duracao === '45' ? [{ quando: new Date().toISOString(), evento: 'acao', o_que: 'Mudou: salvar (pelo assistente de gestão)', quem: 'dono · d•••@clinica-a.test', aparelho: 'iPad · Safari' }] : []),
+    { quando: new Date(Date.now() - 3600000).toISOString(), evento: 'entrada', o_que: 'Entrou', quem: 'dono · d•••@clinica-a.test', aparelho: 'iPad · Safari' }] };
   if (caminho === 'autoedicao' && b.acao === 'agenda_medicos_listar') return { ok: true, data: { medicos: [] } };
   if (caminho === 'integracao-agenda') return { ok: true, conectado: false };
   return { ok: true, data: [] };
@@ -85,6 +91,13 @@ ok(chamadas.filter(c => c.acao === 'abrir').length > abrirAntes, 'os ajustes sã
 await page.evaluate(() => { document.querySelector('#painelChat [aria-label="Fechar"]').click(); location.hash = 'agenda/horarios/regras'; });
 await page.locator('#campo_duracao_padrao_min').waitFor();
 ok(await page.inputValue('#campo_duracao_padrao_min') === '45', 'a tela do ajuste mostra o valor novo (45)');
+// 5. o registro: Conta › Acessos recentes mostra o ajuste como "pelo assistente de gestão"
+await page.evaluate(() => { location.hash = 'conta/acessos'; });
+await page.locator('#acessosLista .linha').first().waitFor();
+const linhas = await page.locator('#acessosLista .linha .t1').allTextContents();
+ok(linhas[0] === 'Mudou: salvar (pelo assistente de gestão)', 'Conta › Acessos recentes mostra a mudança como "pelo assistente de gestão", no alto da lista');
+ok((await page.locator('#acessosLista .linha').first().textContent()).includes('dono'), 'a linha diz quem confirmou (o dono) e o aparelho');
+ok(linhas.filter(t => /pelo assistente de gestão/.test(t)).length === 1 && linhas.includes('Entrou'), 'as outras linhas do registro continuam como eram');
 ok(!erros.length, 'sem erro de script na página' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await browser.close(); site.fechar();
 console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: o cartão "Confirmar" e o "O que mudou" no chat.');
