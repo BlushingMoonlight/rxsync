@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-IdP4kntpdC8idDuc4ry8cb2Pk0N3zN8/Of8szsZubpg='; style-src 'sha256-q9G0HrzQof55sqkY8kcHjtTWUfn3HjXBann4V5wuGE8='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-JKJygf2ZNLFf4NC/tirDk/IR8TTLXh1ytltDVYYm2D8='; style-src 'sha256-q9G0HrzQof55sqkY8kcHjtTWUfn3HjXBann4V5wuGE8='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -1270,10 +1270,17 @@ function formGrupo(x, grupo, valores, acao, titulo, aberto) {
 }
 
 // ---------- lista
-const FILTROS_CLI = [['todos', 'Todas', () => true], ['ar', 'No ar', x => x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => x.ativo && x.modalidade === 'teste'],
-  ['implantacao', 'Implantação', x => ['Pago', 'Aguardando dados', 'Em implantação', 'Aceite registrado'].includes(x.status)], ['suspensas', 'Suspensas', x => x.status === 'Suspenso'],
-  ['fora', 'Saíram', x => /Cancelado|apagados|encerrado/i.test(x.status)],
+// rxsync-sistema DEC-206 (sql/093): as que saíram (canceladas, com os dados apagados, sendo excluídas ou com o encerramento
+// para hoje ou antes, "saiu" do servidor) ficam fora de "Todas" e só no filtro delas. Pausadas e congeladas continuam, com selo.
+const FILTROS_CLI = [['todos', 'Todas', x => !x.saiu], ['ar', 'No ar', x => !x.saiu && x.ativo && x.modalidade === 'contratado'], ['teste', 'Em teste', x => !x.saiu && x.ativo && x.modalidade === 'teste'],
+  ['implantacao', 'Implantação', x => !x.saiu && ['Pago', 'Aguardando dados', 'Em implantação', 'Aceite registrado'].includes(x.status)], ['suspensas', 'Suspensas', x => !x.saiu && x.status === 'Suspenso'],
+  ['congeladas', 'Congeladas', x => x.status === 'Congelado'],
+  ['fora', 'Canceladas e excluídas', x => !!x.saiu],
   ['interna', 'De teste', x => !!x.interna && !['Excluir agora', 'Dados apagados'].includes(x.status)]];
+// O selo da clínica: "Pausada" (no ar, com a assistente parada) e "Congelada" no lugar do status do cadastro.
+const saiuHoje = x => !!x.saiu || (!!x.cancelar_em && String(x.cancelar_em) <= hojeISO());
+const rotuloStatus = x => x.status === 'Congelado' ? 'Congelada' : x.status === 'Ativo' && !x.ativo && !saiuHoje(x) ? 'Pausada' : (x.status || '—');
+const tomDe = x => x.status === 'Congelado' ? 'info' : x.status === 'Ativo' && !x.ativo && !saiuHoje(x) ? 'atencao' : tomStatus(x.status);
 est.filtroCli = 'todos'; est.buscaCli = '';
 function listaDeClientes(todos, selecionado) {
   const lista = el('ul', { class: 'lista' }); const filtros = el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Filtrar clínicas' }); const acoesLote = el('div', { class: 'acoes' });
@@ -1281,7 +1288,8 @@ function listaDeClientes(todos, selecionado) {
   const desenhar = () => {
     trocar(filtros, ...FILTROS_CLI.map(([k, n, fn]) => el('button', { type: 'button', 'aria-pressed': String(est.filtroCli === k), onclick: () => { est.filtroCli = k; desenhar(); } }, n, el('span', { class: 'n', text: todos.filter(fn).length }))));
     const fn = FILTROS_CLI.find(f => f[0] === est.filtroCli)[2], q = semAcento(busca.value);
-    const vis = todos.filter(x => fn(x) && (!q || semAcento(x.nome + ' ' + x.cliente_id).includes(q)));
+    // Com a busca em "Todas", as que saíram também aparecem (com o selo), para achar uma clínica pelo nome.
+    const vis = todos.filter(x => (fn(x) || (q && est.filtroCli === 'todos')) && (!q || semAcento(x.nome + ' ' + x.cliente_id).includes(q)));
     // DEC-190: só no filtro "De teste", "Selecionar" mostra uma caixa em cada linha e "Excluir as selecionadas".
     const sel = est.filtroCli === 'interna' && est.selCli ? est.selCli : null;
     trocar(acoesLote, ...(est.filtroCli === 'interna' && vis.length && ligada('editar_situacao') ? [
@@ -1291,9 +1299,9 @@ function listaDeClientes(todos, selecionado) {
       onchange: e => { if (e.target.checked) sel.add(x.cliente_id); else sel.delete(x.cliente_id); desenhar(); } }),
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: x.cliente_id + ' · ' + (x.status || '—') })))))); return; }
     trocar(lista, ...vis.map(x => el('li', {}, el('button', { class: 'linha cli', type: 'button', 'aria-current': selecionado === x.cliente_id ? 'true' : null, onclick: () => irCliente(x.cliente_id) },
-      el('span', { class: 'avatar ' + tomStatus(x.status), text: iniciais(x.nome), 'aria-hidden': 'true' }),
+      el('span', { class: 'avatar ' + tomDe(x), text: iniciais(x.nome), 'aria-hidden': 'true' }),
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: x.nome }), el('div', { class: 't2', text: `${x.cliente_id} · ${x.plano || '—'} · ${fmtNum(x.mensagens_mes)} de ${fmtNum(x.franquia)}` + (x.whatsapp && x.whatsapp !== 'open' ? ' · WhatsApp fora' : '') }), barraUso(x.mensagens_mes, x.franquia)),
-      el('div', { class: 'direita' }, x.interna ? etq('interna', '', true) : null, etq(x.status || '—', tomStatus(x.status)))))));
+      el('div', { class: 'direita' }, x.interna ? etq('interna', '', true) : null, etq(rotuloStatus(x), tomDe(x)))))));
     if (!vis.length) trocar(lista, el('li', {}, vazio('Nenhuma clínica com esse filtro.', 'clientes')));
   };
   busca.oninput = () => { est.buscaCli = busca.value; desenhar(); };
@@ -1313,7 +1321,8 @@ TELAS.clientes = async (c, [id, aba]) => {
     topo('Clientes', id ? [['Clientes', 'clientes'], ['…']] : [['Clientes']]);
     if (!ligada('tela_clientes')) { if (falhou(c, { desligada: true, chave: 'tela_clientes' }, 'Clientes')) return; }
     const todos = await listaClientes();
-    const cab = cabecalho('Clientes', `${fmtNum(todos.length)} clínicas · ${fmtNum(todos.filter(x => x.ativo && x.modalidade === 'contratado').length)} no ar`);
+    const ativas = todos.filter(x => !x.saiu);
+    const cab = cabecalho('Clientes', `${fmtNum(ativas.length)} ${ativas.length === 1 ? 'clínica' : 'clínicas'} · ${fmtNum(ativas.filter(x => x.ativo && x.modalidade === 'contratado').length)} no ar`);
     if (!id) { trocar(c, cab, largo ? el('div', { class: 'mestre-detalhe' }, listaDeClientes(todos), cartao(null, null, vazio('Escolha uma clínica na lista para ver a ficha.', 'clientes'))) : listaDeClientes(todos)); return; }
     const detalhe = el('div', { class: 'pilha' }, esqueleto());
     trocar(c, cab, el('div', { class: 'mestre-detalhe' }, listaDeClientes(todos, id), detalhe));
@@ -1335,9 +1344,9 @@ async function ficha(alvo, id, aba, embutida) {
   topo(x.nome, [['Clientes', 'clientes'], [x.nome, 'clientes/' + encodeURIComponent(x.cliente_id)], [nomeAba]], embutida ? null : 'clientes');
   const pode = podeEm(x);
   const cab = cartao(null, null, corpo(
-    el('div', { class: 'ficha-cab' }, el('span', { class: 'avatar ' + tomStatus(x.status), text: iniciais(x.nome), 'aria-hidden': 'true' }),
+    el('div', { class: 'ficha-cab' }, el('span', { class: 'avatar ' + tomDe(x), text: iniciais(x.nome), 'aria-hidden': 'true' }),
       el('div', { class: 'texto' }, el(embutida ? 'h2' : 'h1', { class: 'nome-ficha', text: x.nome }),
-        el('div', { class: 'etqs' }, etq(x.status || '—', tomStatus(x.status)), etq(x.plano || '—', 'info', true), etq(x.cliente_id, '', true), x.interna ? etq('clínica interna', '', true) : null, ehTesteCobranca(x) ? etq('teste da cobrança', 'atencao') : null)),
+        el('div', { class: 'etqs' }, etq(rotuloStatus(x), tomDe(x)), etq(x.plano || '—', 'info', true), etq(x.cliente_id, '', true), x.interna ? etq('clínica interna', '', true) : null, ehTesteCobranca(x) ? etq('teste da cobrança', 'atencao') : null)),
       el('div', { class: 'acoes' }, ligada('tela_assistente') ? btn('Perguntar ao assistente', () => abrirAssistente('Sobre a ' + x.cliente_id + ' (' + x.nome + '): '), 'sec', 'assistente') : null,
         btn('Ações', () => menuAcoes(x), 'sec', 'mais'))),
     el('div', { class: 'abas', role: 'tablist', 'aria-label': 'Partes da ficha' }, ABAS.map(([k, n]) => el('button', { role: 'tab', type: 'button', 'aria-selected': String(aba === k), onclick: () => irCliente(x.cliente_id, k) }, n)))));
@@ -1352,6 +1361,9 @@ function abaGeral(c, x) {
   if (ehTesteCobranca(x)) avisos.push(el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, el('b', { text: 'Clínica de teste da cobrança. ' }), 'Plano, cobrança e situação mudam mesmo com as chaves desligadas.')));
   if (x.status === 'Suspenso') avisos.push(el('div', { class: 'aviso perigo' }, icone('alerta'), el('div', {}, el('b', { text: 'Suspensa' + (x.suspenso_em ? ' desde ' + fmtData(x.suspenso_em) : '') + '. ' }),
     x.suspensao_motivo === 'equipe' ? 'Pela equipe: só volta pela Central.' : 'Por inadimplência: volta sozinha quando pagar.')));
+  // rxsync-sistema DEC-206 (sql/093): congelada (sem cobrança, painel nem assistente; os dados ficam). Renovar ou reativar em Ações.
+  if (x.congelado) avisos.push(el('div', { class: 'aviso info' }, icone('info'), el('div', {}, el('b', { text: 'Congelada desde ' + fmtData(x.congelado.desde) + ' até ' + fmtData(x.congelado.ate) + '. ' }),
+    'Sem cobrança, painel e assistente; os dados ficam. Para renovar ou reativar, toque em Ações.')));
   if (x.aviso_atraso_em) avisos.push(el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, el('b', { text: 'Aviso de atraso em ' + fmtData(x.aviso_atraso_em) + '. ' }), 'O 31 suspende no 10º dia de atraso (cláusula 11.7).')));
   if (x.cancelar_em) avisos.push(el('div', { class: 'aviso atencao' }, icone('relogio'), el('div', {}, el('b', { text: 'Cancelamento agendado para ' + fmtData(x.cancelar_em) + '.' }))));
   // Pausa feita pelo painel da clínica (sql/061, DEC-147): quando e o papel de quem pausou, nunca o nome nem o e-mail.
@@ -1515,25 +1527,71 @@ function abaCadastro(c, x) {
         el('h3', { class: 'mt', text: 'Registro do aceite (não editável)' }), dados([['Data do aceite', a.data_aceite], ['Versão dos termos', a.versao_termos], ['IP do aceite', a.ip_aceite], ['Acordo de tratamento (DPA)', a.aceite_dpa]]),
         el('h3', { class: 'mt', text: 'Cópia fixa do aceite' }), cp ? dados([['Guardada em', fmtHora(cp.copiado_em)], ['Razão social', cp.razao_social], ['CNPJ', cp.cnpj], ['Representante', cp.representante_nome], ['CPF', cp.representante_cpf], ['E-mail', cp.email], ['Telefone', cp.telefone], ['Data do aceite', cp.data_aceite], ['Versão', cp.versao_termos], ['IP', cp.ip_aceite]])
           : el('p', { class: 'mudo', text: 'Ainda sem cópia: ela é guardada antes da primeira edição dos dados da empresa.' }),
-        ligada('editar_empresa') ? el('div', { class: 'mt' }, formGrupo({ cliente_id: d.cliente_id, nome: d.nome }, 'empresa', e, 'cliente_editar_empresa', 'Editar os dados da empresa')) : null,
         el('div', { class: 'acoes mt' }, btn('Esconder os dados protegidos', esconder, 'sec', 'cadeado')));
     };
     const esconder = () => trocar(area, el('div', { class: 'acoes' }, btn('Mostrar os dados protegidos', mostrar, 'sec', 'cadeado')));
     esconder();
     anexar(c, cartao('Dados protegidos', etq('CPF, CNPJ e faturamento', '', true), corpo(area)));
   }
-  // sql/086 (DEC-190): o e-mail de entrada do dono no painel (nível 3; o aviso vai ao antigo e ao novo) e, só na
-  // clínica de teste, a modalidade. O código da clínica (cliente_id) não muda: está nas consultas, nos avisos e nos links.
-  if (ligada('editar_empresa')) {
-    const acoesEnt = [btn('Trocar o e-mail de entrada do dono', () => fazer('cliente_editar_login', { cliente_id: x.cliente_id }, {
-      titulo: 'E-mail de entrada de ' + x.nome, nome: x.nome, botao: 'Trocar o e-mail', ok: 'E-mail de entrada trocado.',
-      texto: 'O dono entra no painel com o e-mail novo e a mesma senha. As sessões e os aparelhos lembrados dele saem. O aviso vai ao e-mail antigo e ao novo.',
-      campos: [{ k: 'email', rot: 'E-mail novo', tipo: 'email', inputmode: 'email', obrig: true }] }), 'sec', 'usuario')];
-    if (x.interna) acoesEnt.push(btn('Trocar a modalidade', () => fazer('cliente_editar_modalidade', { cliente_id: x.cliente_id }, {
-      titulo: 'Modalidade de ' + x.nome, ok: 'Modalidade trocada.', botao: 'Salvar',
-      campos: [{ k: 'modalidade', rot: 'Modalidade', valor: x.modalidade, opcoes: [['teste', 'Teste grátis'], ['contratado', 'Contratada']] }] }), 'sec', 'ajustes'));
-    anexar(c, cartao('Entrada no painel', x.interna ? etq('clínica de teste', '', true) : null, corpo(el('p', { class: 'mudo peq', text: 'O código da clínica (' + x.cliente_id + ') não muda.' }), el('div', { class: 'acoes mt' }, acoesEnt))));
+  // rxsync-sistema DEC-206 (sql/093): o e-mail de entrada do dono só para ler aqui; para mudar (com o contato, a empresa e,
+  // na clínica de teste, a modalidade), Ações › "Editar o cadastro".
+  anexar(c, cartao('Entrada no painel', x.interna ? etq('clínica de teste', '', true) : null, corpo(dados([['E-mail de entrada do dono', x.email_entrada || 'ainda sem conta no painel'],
+    ['Código da clínica', x.cliente_id + ' (não muda)']]), ligada('editar_empresa') ? el('div', { class: 'acoes mt' }, btn('Editar o cadastro', () => editarCadastro(x), 'sec', 'ajustes')) : null)));
+}
+// ---------- a folha "Editar o cadastro" (rxsync-sistema DEC-206, sql/093)
+// Um formulário só, em uma coluna: o contato e a empresa (os dados protegidos, carregados ao abrir, ficam no registro), o
+// e-mail de entrada do dono e, na clínica de teste, a modalidade. "Salvar" mostra o antes e depois e pede a confirmação do
+// nível maior entre o que mudou: 2; 3 (o nome da clínica) quando o e-mail de entrada muda. O código da clínica não muda.
+async function editarCadastro(x) {
+  const sens = ligada('tela_cliente_sensivel');
+  let e = { email: x.email || '', telefone: x.telefone || '' };
+  if (sens) {
+    const r = await chamar('cliente_sensivel', { cliente_id: x.cliente_id });
+    if (!r.ok) { rapida(r.mensagem || 'Não consegui carregar os dados protegidos.'); return; }
+    e = (r.dados && r.dados.empresa) || e;
   }
+  const ins = {}, campo = (k, rot, valor, extra) => {
+    const id = 'ed-' + k;
+    const i = extra && extra.opcoes ? el('select', { class: 'entrada', id }, extra.opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(valor || '') === v })))
+      : el('input', { class: 'entrada', id, type: (extra && extra.tipo) || 'text', inputmode: extra && extra.inputmode, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', value: valor == null ? null : String(valor) });
+    ins[k] = { i, antes: valor == null ? '' : String(valor), rot };
+    return el('label', { class: 'campo', for: id }, el('span', { class: 'rot', text: rot }), i, extra && extra.ajuda ? el('span', { class: 'ajuda', text: extra.ajuda }) : null);
+  };
+  const contato = ['email', 'telefone'], empresa = sens ? GRUPOS.empresa.filter(k => !contato.includes(k) && Object.prototype.hasOwnProperty.call(e, k)) : [];
+  const erro = el('p', { class: 'erro', role: 'alert' });
+  let fechar;
+  const salvar = ev => {
+    ev.preventDefault(); erro.textContent = '';
+    const campos = {}, linhas = [];
+    for (const k of [...contato, ...empresa]) { const v = ins[k].i.value.trim(); if (v !== ins[k].antes) { campos[k] = v; linhas.push([ins[k].rot, ins[k].antes, v]); } }
+    const login = ins.email_entrada ? ins.email_entrada.i.value.trim().toLowerCase() : '';
+    const loginMuda = !!ins.email_entrada && login !== ins.email_entrada.antes.toLowerCase();
+    if (loginMuda) linhas.push(['E-mail de entrada do dono', ins.email_entrada.antes, login]);
+    const modalidade = ins.modalidade ? ins.modalidade.i.value : '';
+    if (ins.modalidade && modalidade !== ins.modalidade.antes) linhas.push(['Modalidade', ins.modalidade.antes, modalidade]);
+    if (!linhas.length) { erro.textContent = 'Nada mudou.'; return; }
+    fechar();
+    fazer('cliente_editar_cadastro', { cliente_id: x.cliente_id, campos, ...(loginMuda ? { login_email: login } : {}), ...(ins.modalidade && modalidade !== ins.modalidade.antes ? { modalidade } : {}) }, {
+      titulo: 'Editar o cadastro de ' + x.nome, nome: x.nome, nivel: loginMuda ? 3 : 2, linhas, ok: 'Salvo.',
+      texto: (loginMuda ? 'O dono entra no painel com o e-mail novo e a mesma senha; as sessões e os aparelhos lembrados dele saem, e o aviso vai ao e-mail antigo e ao novo. ' : '')
+        + (Object.keys(campos).length ? 'Antes da primeira edição da empresa, o servidor guarda a cópia fixa do aceite. Esta edição não tem "desfazer".' : '') });
+  };
+  const blocos = [el('h3', { text: 'Contato' }), campo('email', 'E-mail do cadastro', e.email, { tipo: 'email', inputmode: 'email' }), campo('telefone', 'Telefone (só números)', e.telefone, { inputmode: 'numeric' })];
+  if (x.email_entrada) blocos.push(el('h3', { class: 'mt', text: 'Entrada no painel' }),
+    campo('email_entrada', 'E-mail de entrada do dono', x.email_entrada, { tipo: 'email', inputmode: 'email', ajuda: 'Trocar pede o nome da clínica para confirmar; o aviso vai ao e-mail antigo e ao novo.' }));
+  if (empresa.length) blocos.push(el('h3', { class: 'mt', text: 'Empresa (dados protegidos)' }), ...empresa.map(k => campo(k, ROTULOS[k] || k, e[k])));
+  else if (!sens) blocos.push(nota('Para editar a empresa (CNPJ, razão social, endereço), ligue os dados protegidos em Ajustes.', true));
+  if (x.interna) blocos.push(el('h3', { class: 'mt', text: 'Clínica de teste' }), campo('modalidade', 'Modalidade', x.modalidade, { opcoes: [['teste', 'Teste grátis'], ['contratado', 'Contratada']] }));
+  const form = el('form', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-cadastro', onsubmit: salvar },
+    el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-cadastro', text: 'Editar o cadastro' }), el('span', { class: 'mudo peq', text: x.nome + ' · ' + x.cliente_id + ' (o código não muda)' })),
+      el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' }, el('div', { class: 'pilha' }, ...blocos), erro),
+    el('div', { class: 'pe' }, el('button', { class: 'btn sec', type: 'button', text: 'Cancelar', onclick: () => fechar() }), el('button', { class: 'btn pri', type: 'submit', text: 'Salvar' })));
+  // Os dados protegidos somem da tela quando a Central vai para o fundo, como na aba Cadastro: a folha fecha.
+  const fundo = () => { if (document.visibilityState === 'hidden') fechar(); };
+  document.addEventListener('visibilitychange', fundo);
+  fechar = janela(form, { aoFechar: () => document.removeEventListener('visibilitychange', fundo) });
 }
 // A Central foi para o fundo: tira da tela os dados protegidos (voltam com "Mostrar").
 document.addEventListener('visibilitychange', () => {
@@ -1574,8 +1632,11 @@ function abaHistorico(c, x) {
 // ---------- menu Ações (situação, links, onboarding, teste da cobrança)
 function menuAcoes(x) {
   const pode = podeEm(x), itens = [];
-  const st = x.status, parada = ['Suspenso', 'Cancelado', 'Teste encerrado'].includes(st);
+  const st = x.status, parada = ['Suspenso', 'Cancelado', 'Teste encerrado', 'Congelado'].includes(st);
   const item = (t, s, fn, perigoso) => itens.push(el('li', {}, el('button', { type: 'button', class: perigoso ? 'perigoso' : null, onclick: () => { fechar(); fn(); } }, el('div', {}, t, el('span', { class: 't2', text: s })))));
+  // rxsync-sistema DEC-206 (sql/093): o cadastro numa folha só (contato, empresa, e-mail de entrada do dono e, na de teste,
+  // a modalidade), no lugar dos botões soltos da aba Cadastro.
+  if (ligada('editar_empresa') && !['Excluir agora', 'Dados apagados'].includes(st)) item('Editar o cadastro', 'Contato, empresa e o e-mail de entrada do dono.', () => editarCadastro(x));
   if (pode('editar_situacao')) {
     if (st === 'Suspenso') item('Reativar', 'A assistente volta a atender na hora.', () => fazer('situacao_reativar', { cliente_id: x.cliente_id }, { titulo: 'Reativar ' + x.nome, linhas: [['Situação', 'Suspenso', 'Ativo']], ok: 'Reativada.' }));
     if (x.ativo && !parada) item('Pausar a pedido da clínica', 'Cláusula 8.4: a assistente para; a mensalidade continua.', () => fazer('situacao_pausar', { cliente_id: x.cliente_id }, { titulo: 'Pausar a assistente de ' + x.nome, linhas: [['Assistente', 'atendendo', 'pausada']], ok: 'Pausada.' }));
@@ -1583,6 +1644,24 @@ function menuAcoes(x) {
     if (!parada) item('Suspender', 'Nível 3. Equipe: só volta pela Central. Inadimplência: volta ao pagar.', () => fazer('situacao_suspender', { cliente_id: x.cliente_id }, { titulo: 'Suspender ' + x.nome, nome: x.nome, botao: 'Suspender a clínica', ok: 'Suspensa.',
       texto: 'A assistente para de atender os pacientes desta clínica na hora. O aviso vai para Avisos (sem dados pessoais).', linhas: [['Situação', st, 'Suspenso'], ['Assistente', x.ativo ? 'atendendo' : 'parada', 'parada']],
       campos: [{ k: 'suspensao_motivo', rot: 'Por quê?', opcoes: [['equipe', 'Decisão da equipe (só volta pela Central)'], ['inadimplencia', 'Inadimplência (volta sozinha ao pagar)']] }, MOTIVO] }), true);
+    // rxsync-sistema DEC-206 (sql/093): congelar (90 dias, renovável), renovar e reativar.
+    if (st === 'Congelado') {
+      item('Reativar', 'Nível 3. Volta ao normal com uma assinatura nova no Asaas; a clínica conecta o WhatsApp pelo painel.', () => fazer('cliente_descongelar', { cliente_id: x.cliente_id }, {
+        titulo: 'Reativar ' + x.nome, nome: x.nome, botao: 'Reativar', ok: 'Reativada.',
+        texto: 'A clínica volta ao que era e a cobrança recomeça com uma assinatura nova no Asaas (em até 15 minutos), no vencimento abaixo. O sugerido é o vencimento que ela tinha mais os dias congelados. A clínica recebe um e-mail com o passo para conectar o WhatsApp.',
+        linhas: [['Situação', 'Congelada', 'Ativo']],
+        campos: [{ k: 'vencimento', rot: 'Próximo vencimento', tipo: 'date', valor: x.congelado && x.congelado.sugerido, min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 90), obrig: true },
+          { k: 'motivo', rot: 'Motivo (fica no registro)', longo: true }] }));
+      item('Renovar o congelamento', 'Nível 2. Mais 90 dias, sem cobrança.', () => fazer('cliente_congelar_renovar', { cliente_id: x.cliente_id }, {
+        titulo: 'Renovar o congelamento de ' + x.nome, ok: 'Congelamento renovado.',
+        linhas: [['Congelada até', x.congelado ? fmtData(x.congelado.ate) : '—', '90 dias depois']],
+        campos: [{ k: 'combinado', rot: 'Como foi combinado com a clínica', ph: 'Ex.: e-mail de 10/11' }] }));
+    }
+    if (st === 'Ativo' && x.modalidade === 'contratado' && !x.cancelar_em) item('Congelar', 'Nível 3. Para a cobrança, o painel, a assistente e o WhatsApp; os dados ficam. Por 90 dias.', () => fazer('cliente_congelar', { cliente_id: x.cliente_id }, {
+      titulo: 'Congelar ' + x.nome, nome: x.nome, botao: 'Congelar a clínica', ok: 'Congelada.',
+      texto: 'A assinatura do Asaas é cancelada (em até 15 minutos), o painel fecha, a assistente e as rotinas param e o WhatsApp é desconectado agora. A agenda, os pacientes, as conversas e a configuração ficam guardados. Vale 90 dias, renovável; a Central avisa 7 dias antes. A clínica recebe um e-mail.',
+      linhas: [['Situação', st, 'Congelada'], ['Cobrança', 'mensal', 'parada']],
+      campos: [MOTIVO, { k: 'combinado', rot: 'Como foi combinado com a clínica', obrig: true, minimo: 5, erro: 'Escreva como foi combinado (5 letras ou mais).', ph: 'Ex.: e-mail de 10/11' }] }), true);
     if (!x.cancelar_em && st !== 'Cancelado') item('Agendar o cancelamento', 'Nível 3. No dia, o 31 cancela a assinatura e desconecta o WhatsApp.', () => fazer('cancelamento_agendar', { cliente_id: x.cliente_id }, { titulo: 'Agendar o cancelamento de ' + x.nome, nome: x.nome, botao: 'Agendar o cancelamento', ok: 'Cancelamento agendado.',
       texto: 'A clínica recebe um e-mail agora.', campos: [{ k: 'data', rot: 'Data', tipo: 'date', min: somaDias(hojeISO(), 1), obrig: true }, MOTIVO] }), true);
     if (x.cancelar_em) item('Desfazer o cancelamento', 'A clínica recebe um e-mail.', () => fazer('cancelamento_desfazer', { cliente_id: x.cliente_id }, { titulo: 'Desfazer o cancelamento de ' + x.nome, linhas: [['Cancelamento', fmtData(x.cancelar_em), '(nenhum)']], ok: 'Cancelamento desfeito.' }));
@@ -1595,9 +1674,10 @@ function menuAcoes(x) {
   }
   // Histórico das conversas a pedido da clínica (sql/059, DEC-131, #67; cláusula 19.2): o 31 monta o CSV e manda direto
   // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.
-  if (st !== 'Dados apagados') item('Enviar as conversas ao e-mail do cadastro', 'Nível 2. Só a pedido da clínica; o arquivo não passa pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
-    titulo: 'Enviar as conversas de ' + x.nome, ok: 'Pedido na fila.',
-    texto: 'Em até 15 minutos, o histórico das conversas (CSV, uma linha por mensagem, sem as notas internas) vai para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + '. O arquivo não passa pela Central nem pelo banco; a Central avisa em Avisos quando sair ou se falhar.' }));
+  // rxsync-sistema DEC-206 (sql/093): junto com as conversas, a agenda e os pacientes (cláusula 19.2); vale também congelada.
+  if (!['Dados apagados', 'Excluir agora'].includes(st)) item('Enviar os dados ao e-mail do cadastro', 'Nível 2. Conversas, agenda e pacientes, só a pedido da clínica; os arquivos não passam pela Central.', () => fazer('conversas_enviar', { cliente_id: x.cliente_id }, {
+    titulo: 'Enviar os dados de ' + x.nome, ok: 'Pedido na fila.',
+    texto: 'Em até 15 minutos, três planilhas (CSV) vão para o e-mail do cadastro' + (x.email ? ' (' + x.email + ')' : '') + ': o histórico das conversas (uma linha por mensagem, sem as notas internas), a agenda e os pacientes. Os arquivos não passam pela Central nem pelo banco; a Central avisa em Avisos quando sair ou se falhar.' }));
   if (ligada('editar_onboarding') && x.pode_reenviar_onboarding) item('Reenviar o onboarding', 'O workflow 21 manda o link novo em até 10 minutos.', () => fazer('reenviar_onboarding', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o onboarding de ' + x.nome, linhas: [['Link atual', 'vale', 'deixa de valer']] }));
   if (est.chaves.asaas_ambiente === 'sandbox' && !x.interna) {
     if (ehTesteCobranca(x)) item('Deixar de ser a clínica de teste da cobrança', 'As edições de dinheiro voltam a depender das chaves.', async () => {
@@ -1617,11 +1697,14 @@ function menuAcoes(x) {
       texto: 'Use para as clínicas que você criou para testar. O servidor recusa quem já pagou alguma vez.', linhas: [['Clínica de teste', 'não', 'sim']] }), true);
     if (x.interna) item('Excluir a clínica', 'Nível 3. Clínica de teste: apaga tudo agora.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
       titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Excluir agora', ok: 'Clínica de teste excluída.', depois: () => { est.clientes = null; ir('clientes'); },
-      texto: 'É uma clínica de teste: a agenda, os pacientes, o painel e as conversas saem agora. O WhatsApp e o Chatwoot dela saem na rodada das 8h10. Não tem volta.' }), true);
-    else if (st !== 'Cancelado') item('Excluir a clínica', 'Nível 3. Encerra o contrato hoje; os dados saem em 15 dias.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
-      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Encerrar hoje', ok: 'Contrato encerrado hoje.',
-      texto: 'É uma clínica de verdade: o contrato termina hoje e a assistente para na rodada das 8h10. Os dados de atendimento saem em 15 dias. O cadastro e o aceite ficam 5 anos, como a lei pede. A clínica recebe um e-mail.',
-      linhas: [['Contrato', x.cancelar_em ? 'encerra em ' + fmtData(x.cancelar_em) : 'ativo', 'encerra hoje']], campos: [MOTIVO] }), true);
+      texto: 'É uma clínica de teste: a agenda, os pacientes, o painel, as conversas, o WhatsApp e o Chatwoot dela saem agora. Não tem volta.' }), true);
+    // rxsync-sistema DEC-205 (sql/093): a clínica de verdade sai na hora só se ela pediu e abriu mão dos 15 dias (cláusula
+    // 19.2); sem o pedido, encerra hoje (a assistente para e o WhatsApp desconecta agora) e os dados saem em 15 dias.
+    else if (st !== 'Cancelado') item('Excluir a clínica', 'Nível 3. A pedido dela, apaga agora; sem o pedido, encerra hoje e os dados saem em 15 dias.', () => fazer('cliente_excluir', { cliente_id: x.cliente_id }, {
+      titulo: 'Excluir ' + x.nome, nome: x.nome, botao: 'Excluir', ok: 'Pronto.', depois: () => { est.clientes = null; ir('clientes'); },
+      texto: 'Pedido da clínica: a agenda, os pacientes, o painel, as conversas, o WhatsApp e o Chatwoot saem agora; ficam só o cadastro, o aceite e o pedido, por 5 anos. Sem o pedido: o contrato termina hoje, a assistente para e o WhatsApp desconecta agora, e os dados saem em 15 dias. Nos dois casos, a clínica recebe um e-mail e ela some da lista.',
+      campos: [{ k: 'a_pedido', rot: 'A clínica pediu para apagar agora?', opcoes: [['false', 'Não: encerrar hoje, dados saem em 15 dias'], ['true', 'Sim: ela pediu e abriu mão dos 15 dias']], valor: 'false' },
+        MOTIVO, { k: 'combinado', rot: 'Como a clínica pediu (se pediu)', ph: 'Ex.: e-mail do dono de 10/11' }] }), true);
   }
   const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-menu' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-menu', text: 'Ações · ' + x.nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),

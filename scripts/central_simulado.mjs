@@ -27,7 +27,7 @@ export const CHAVES = ['tela_inicio', 'tela_clientes', 'tela_dinheiro', 'tela_us
   'editar_situacao', 'editar_links', 'tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia',
   'tela_demonstracoes', 'editar_demonstracoes', 'tela_assistente', 'tela_metricas'];
 export const cli = (id, nome, plano, status, extra) => ({ cliente_id: id, nome, plano, status, ativo: status === 'Ativo', modalidade: 'contratado', mensagens_mes: 1800, franquia: 5000, whatsapp: 'open', interna: false, ...extra });
-export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', razao_social: 'Sorriso Ltda', representante: 'Ana', email: 'ana@exemplo.com', telefone: '48999990001',
+export const ficha = () => ({ cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', razao_social: 'Sorriso Ltda', representante: 'Ana', email: 'ana@exemplo.com', telefone: '48999990001', email_entrada: 'dono@clinica-sorriso.com.br',
   plano: 'Essencial', status: 'Ativo', modalidade: 'teste', ativo: true, interna: false, valor_mensal: 299, valor_setup: 999, ciclo: 'mensal', forma_pagamento: 'boleto', aceite: '2026-10-01',
   versao_termos: '2026-10-v3', go_live: '2026-10-05', fim_teste: '2026-10-20', onboarding: 'concluido', ultimo_pagamento: null, origem: 'site', sistema_gestao: 'Clinicorp', cidade: 'Florianópolis/SC',
   limites: { franquia_mensagens: '', limitar_franquia: '', dono_limite_dia: '', relac_limite_dia: '' }, funcoes: { fila: 'SIM', documentos: '', lembretes: 'SIM', agendamento: 'SIM' }, franquia: 5000,
@@ -75,7 +75,10 @@ export const DADOS = {
     funil_30d: { totais: { pedidos_demonstracao: 9, mini_testes: 41, mini_testes_com_consulta: 12, cadastros_teste: 7, cadastros_contratacao: 3, go_lives: 4 }, por_dia: dias(30, (d, i) => ({ dia: d, pedidos: i % 3, mini_testes: i % 5, cadastros: i % 2 })) },
     ultimos_avisos: [{ recebido_em: '2026-10-15T10:00:00Z', categoria: 'vendas', tipo: 'pedido_demonstracao', cliente_id: '' }, { recebido_em: '2026-10-15T09:00:00Z', categoria: 'financeiro', tipo: 'mensalidade_recebida', cliente_id: 'CLI-001', nome: 'Clínica Sorriso' }] } },
   clientes: { dados: { clientes: [cli('CLI-001', 'Clínica Sorriso Odontologia Integrada', 'Essencial', 'Ativo', { modalidade: 'teste' }), cli('CLI-002', 'Clínica Vida', 'Gestao', 'Ativo', { whatsapp: 'close' }),
-    cli('CLI-003', 'Odonto Mais', 'Gestao', 'Suspenso'), cli('CLI-004', 'Derma Sul', 'Enterprise', 'Aguardando dados'), cli('RX-TESTE-INTERNA', 'Clínica interna', 'Gestao', 'Ativo', { interna: true })] } },
+    cli('CLI-003', 'Odonto Mais', 'Gestao', 'Suspenso'), cli('CLI-004', 'Derma Sul', 'Enterprise', 'Aguardando dados'), cli('RX-TESTE-INTERNA', 'Clínica interna', 'Gestao', 'Ativo', { interna: true }),
+    // sql/093 (DEC-206): pausada e congelada continuam em "Todas"; a cancelada só em "Canceladas e excluídas"
+    cli('CLI-005', 'Instituto Pele', 'Gestao', 'Ativo', { ativo: false }), cli('CLI-006', 'Psico Centro', 'Gestao', 'Congelado', { congelado_ate: '2027-01-20' }),
+    cli('CLI-007', 'Consultório Antigo', 'Essencial', 'Cancelado', { saiu: true })] } },
   dinheiro: { dados: { asaas_ambiente: 'sandbox', pagantes_no_ar: 12, receita_mensal: 5388, em_teste: 4, em_implantacao: 2, receita_12_meses: dias(12, (d, i) => ({ dia: d, receita_mensal: 300 * i })),
     pagantes: [{ cliente_id: 'CLI-002', nome: 'Clínica Vida', valor_no_mes: 599, plano: 'Gestao' }], testes: [{ cliente_id: 'CLI-001', nome: 'Clínica Sorriso', fim_teste: '2026-10-20' }],
     aviso_atraso: [], suspensos: [{ cliente_id: 'CLI-003', nome: 'Odonto Mais', desde: '2026-10-01' }], cancelamentos: [{ cliente_id: 'CLI-004', nome: 'Derma Sul', em: '2026-11-01' }] } },
@@ -111,7 +114,7 @@ export const DADOS = {
 // Níveis das ações (cópia do sql/030, rx_central_niveis): 1 = sem confirmação, 2 = CONFIRMAR, 3 = CONFIRMAR + nome da clínica.
 export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuracoes: 1, cliente_editar_recursos: 1, editar_limites: 1, franquia_aviso_registrar: 1, chave_api_limites: 1, asaas_foto_atualizar: 1,
   situacao_pausar: 2, situacao_retomar: 2, situacao_reativar: 2, cancelamento_desfazer: 2, link_painel_reenviar: 2, link_conectar_reenviar: 2, reenviar_onboarding: 2, recurso_liberar: 2, recurso_revogar: 2,
-  cliente_editar_empresa: 2, chave_api_criar: 2, aviso_destino_definir: 2, aviso_destino_desligar: 2, desfazer: 2,
+  chave_api_criar: 2, aviso_destino_definir: 2, aviso_destino_desligar: 2, desfazer: 2,
   plano_trocar: 3, situacao_suspender: 3, cancelamento_agendar: 3, preco_especial: 3, cobranca_proxima_data: 3, cobranca_vencimento: 3, implantacao_isentar: 3, pagamento_receber_dinheiro: 3,
   teste_estender: 3, link_painel_novo: 3, chave_api_revogar: 3, cobranca_teste_definir: 3,
   // prospecção (sql/031, rx_central_niveis): prosp_ligar e prosp_regra_ligar mudam com o valor (rx_central_nivel)
@@ -128,8 +131,10 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3,
   // histórico das conversas ao e-mail do cadastro (sql/059, DEC-131)
   conversas_enviar: 2,
-  // excluir e marcar clínicas, o e-mail de entrada do dono e a modalidade (sql/086, DEC-190)
-  cliente_excluir: 3, cliente_excluir_lote: 3, cliente_marcar_teste: 3, cliente_editar_login: 3, cliente_editar_modalidade: 1 };
+  // excluir e marcar clínicas (sql/086, DEC-190; o e-mail de entrada do dono e a modalidade vão pelo cliente_editar_cadastro desde o sql/093)
+  cliente_excluir: 3, cliente_excluir_lote: 3, cliente_marcar_teste: 3,
+  // congelar, renovar, reativar e o cadastro numa folha só (sql/093, DEC-205 e DEC-206)
+  cliente_congelar: 3, cliente_congelar_renovar: 2, cliente_descongelar: 3, cliente_editar_cadastro: 2 };
 export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', painel_link_antigo: 'SIM', assistente_politica: 'SIM' });
 const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17', 'assistente_politica'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
