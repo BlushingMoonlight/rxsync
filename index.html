@@ -611,50 +611,70 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Essencial (mensal)",
           "price": "299.00",
           "priceCurrency": "BRL",
-          "priceSpecification": [
-            {
-              "@type": "UnitPriceSpecification",
-              "price": "299.00",
-              "priceCurrency": "BRL",
-              "unitCode": "MON",
-              "referenceQuantity": {
-                "@type": "QuantitativeValue",
-                "value": 1,
-                "unitCode": "MON"
-              }
-            },
-            {
-              "@type": "UnitPriceSpecification",
-              "name": "Implantação completa (opcional, uma vez só)",
-              "price": "999.00",
-              "priceCurrency": "BRL"
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "299.00",
+            "priceCurrency": "BRL",
+            "unitCode": "MON",
+            "referenceQuantity": {
+              "@type": "QuantitativeValue",
+              "value": 1,
+              "unitCode": "MON"
             }
-          ]
+          }
         },
         {
           "@type": "Offer",
           "name": "Gestão Inteligente (mensal)",
           "price": "599.00",
           "priceCurrency": "BRL",
-          "priceSpecification": [
-            {
-              "@type": "UnitPriceSpecification",
-              "price": "599.00",
-              "priceCurrency": "BRL",
-              "unitCode": "MON",
-              "referenceQuantity": {
-                "@type": "QuantitativeValue",
-                "value": 1,
-                "unitCode": "MON"
-              }
-            },
-            {
-              "@type": "UnitPriceSpecification",
-              "name": "Implantação completa (opcional, uma vez só)",
-              "price": "999.00",
-              "priceCurrency": "BRL"
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "599.00",
+            "priceCurrency": "BRL",
+            "unitCode": "MON",
+            "referenceQuantity": {
+              "@type": "QuantitativeValue",
+              "value": 1,
+              "unitCode": "MON"
             }
-          ]
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Essencial (anual parcelado em 12 vezes)",
+          "price": "269.10",
+          "priceCurrency": "BRL",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "269.10",
+            "priceCurrency": "BRL",
+            "unitCode": "MON",
+            "billingDuration": 12,
+            "referenceQuantity": {
+              "@type": "QuantitativeValue",
+              "value": 1,
+              "unitCode": "MON"
+            }
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Gestão Inteligente (anual parcelado em 12 vezes)",
+          "price": "539.10",
+          "priceCurrency": "BRL",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "539.10",
+            "priceCurrency": "BRL",
+            "unitCode": "MON",
+            "billingDuration": 12,
+            "referenceQuantity": {
+              "@type": "QuantitativeValue",
+              "value": 1,
+              "unitCode": "MON"
+            }
+          }
         },
         {
           "@type": "Offer",
@@ -667,12 +687,50 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
           "name": "Gestão Inteligente (anual à vista)",
           "price": "5990.00",
           "priceCurrency": "BRL"
+        },
+        {
+          "@type": "Offer",
+          "name": "Implantação completa (opcional, uma vez só)",
+          "price": "999.00",
+          "priceCurrency": "BRL"
         }
       ]
     },
     {
       "@type": "FAQPage",
       "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "O que é a RXSync?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A RXSync é uma assistente virtual com inteligência artificial que atende os pacientes da clínica pelo WhatsApp, a qualquer hora. Ela responde valores, convênios e horários, marca e remarca consultas na agenda inclusa, manda lembretes com confirmação de presença e passa para a equipe quem pede uma pessoa."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Para quem é?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "É para clínicas e consultórios com hora marcada que recebem pacientes pelo WhatsApp: médicos, dentistas, psicólogos, fisioterapeutas e clínicas de estética, entre outros. Serve para quem atende sozinho e para clínicas com recepção."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanto custa?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "O Essencial custa R$\u00a0299 por mês, e o Gestão Inteligente, R$\u00a0599 por mês. No anual, o Essencial sai por 12x de R$\u00a0269,10 ou R$\u00a02.990 à vista, e o Gestão Inteligente, por 12x de R$\u00a0539,10 ou R$\u00a05.990 à vista. A Implantação completa, opcional, custa R$\u00a0999, uma vez só. Os primeiros 7 dias são grátis, sem cartão."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Como funciona?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Você escolhe o plano, conta como a clínica funciona num formulário guiado de cerca de 10 minutos e conecta o WhatsApp da clínica lendo um QR Code. A partir daí, a assistente responde os pacientes com o que você cadastrou, marca na agenda da RXSync e avisa a equipe quando o paciente precisa de uma pessoa. Pelo painel, você acompanha tudo e muda o que ela responde."
+          }
+        },
         {
           "@type": "Question",
           "name": "O paciente percebe que fala com uma assistente virtual?",
@@ -1285,80 +1343,99 @@ h1, h2, h3, h4, .h2, .marca { font-family: 'Figtree', 'Inter', -apple-system, 'S
     </div>
     <div class="faq-wrap">
       <div class="faq-tabs" role="tablist" aria-label="Categorias de perguntas">
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-0" data-faq-tab="0" aria-controls="faq-panel-0" aria-selected="true" tabindex="0">Atendimento</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-1" data-faq-tab="1" aria-controls="faq-panel-1" aria-selected="false" tabindex="-1">Agenda</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-2" data-faq-tab="2" aria-controls="faq-panel-2" aria-selected="false" tabindex="-1">Começar</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-3" data-faq-tab="3" aria-controls="faq-panel-3" aria-selected="false" tabindex="-1">Preço e contrato</button>
-        <button type="button" role="tab" class="faq-tab" id="faq-tab-4" data-faq-tab="4" aria-controls="faq-panel-4" aria-selected="false" tabindex="-1">WhatsApp e dados</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-0" data-faq-tab="0" aria-controls="faq-panel-0" aria-selected="true" tabindex="0">A RXSync</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-1" data-faq-tab="1" aria-controls="faq-panel-1" aria-selected="false" tabindex="-1">Atendimento</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-2" data-faq-tab="2" aria-controls="faq-panel-2" aria-selected="false" tabindex="-1">Agenda</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-3" data-faq-tab="3" aria-controls="faq-panel-3" aria-selected="false" tabindex="-1">Começar</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-4" data-faq-tab="4" aria-controls="faq-panel-4" aria-selected="false" tabindex="-1">Preço e contrato</button>
+        <button type="button" role="tab" class="faq-tab" id="faq-tab-5" data-faq-tab="5" aria-controls="faq-panel-5" aria-selected="false" tabindex="-1">WhatsApp e dados</button>
       </div>
       <div class="faq-panel" id="faq-panel-0" role="tabpanel" aria-labelledby="faq-tab-0">
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-0">O paciente percebe que fala com uma assistente virtual?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-0-0"><div><p>Sim, de propósito: ela se apresenta como assistente virtual na primeira mensagem. O que o paciente nota, na prática, é a resposta rápida, a qualquer hora.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-0">O que é a RXSync?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-0-0"><div><p>A RXSync é uma assistente virtual com inteligência artificial que atende os pacientes da clínica pelo WhatsApp, a qualquer hora. Ela responde valores, convênios e horários, marca e remarca consultas na agenda inclusa, manda lembretes com confirmação de presença e passa para a equipe quem pede uma pessoa.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-1">E se ela responder algo errado para um paciente?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-0-1"><div><p>Ela só responde com o que você cadastrou e aprovou. Antes de entrar no ar, você conversa com ela num ambiente de teste. Depois, sua equipe pode assumir qualquer conversa na hora, e você corrige a informação no painel, que vale para a próxima resposta. O que for clínico ou delicado, ela passa para a equipe.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-1">Para quem é?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-0-1"><div><p>É para clínicas e consultórios com hora marcada que recebem pacientes pelo WhatsApp: médicos, dentistas, psicólogos, fisioterapeutas e clínicas de estética, entre outros. Serve para quem atende sozinho e para clínicas com recepção.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-2">O que ela faz quando chega uma urgência?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-0-2"><div><p>Na configuração, você define o que é urgência para a sua clínica (por exemplo, sangramento ou falta de ar). Quando isso aparece, ela para, manda ao paciente a orientação que você cadastrou e avisa a equipe na hora pelo WhatsApp. Ela não substitui um serviço de emergência.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-2">Quanto custa?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-0-2"><div><p>O Essencial custa R$&nbsp;299 por mês, e o Gestão Inteligente, R$&nbsp;599 por mês. No anual, o Essencial sai por 12x de R$&nbsp;269,10 ou R$&nbsp;2.990 à vista, e o Gestão Inteligente, por 12x de R$&nbsp;539,10 ou R$&nbsp;5.990 à vista. A Implantação completa, opcional, custa R$&nbsp;999, uma vez só. Os primeiros 7 dias são grátis, sem cartão.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-3">Ela responde dúvidas médicas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-0-3"><div><p>Não. Ela cuida de agendamento, valores, convênios, horários e pedidos para a equipe. Não interpreta exames, não orienta tratamento e não responde dúvidas clínicas: avisa o paciente que a equipe vai responder.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-4">Minha secretária vai ficar sem função?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-0-4"><div><p>Não. A assistente tira da secretária as perguntas que se repetem o dia todo e as mensagens fora do horário. O atendimento de quem está na clínica, os casos delicados e as decisões continuam com a equipe, que assume qualquer conversa quando quiser.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-5">E quem prefere falar com uma pessoa?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-0-5"><div><p>Quando o paciente pede uma pessoa, ou o assunto está na lista que você definiu, ela avisa a equipe e para de responder naquela conversa.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-0-3">Como funciona?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-0-3"><div><p>Você escolhe o plano, conta como a clínica funciona num formulário guiado de cerca de 10 minutos e conecta o WhatsApp da clínica lendo um QR Code. A partir daí, a assistente responde os pacientes com o que você cadastrou, marca na agenda da RXSync e avisa a equipe quando o paciente precisa de uma pessoa. Pelo painel, você acompanha tudo e muda o que ela responde.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-1" role="tabpanel" aria-labelledby="faq-tab-1">
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-0">Preciso trocar de sistema?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-1-0"><div><p>Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Se a sua agenda online tem integração com a RXSync, ela se conecta a ela. Se não tem, ela pode enviar ao paciente o link de agendamento do seu sistema.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-0">O paciente percebe que fala com uma assistente virtual?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-1-0"><div><p>Sim, de propósito: ela se apresenta como assistente virtual na primeira mensagem. O que o paciente nota, na prática, é a resposta rápida, a qualquer hora.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-1">E se ela responder algo errado para um paciente?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-1-1"><div><p>Ela só responde com o que você cadastrou e aprovou. Antes de entrar no ar, você conversa com ela num ambiente de teste. Depois, sua equipe pode assumir qualquer conversa na hora, e você corrige a informação no painel, que vale para a próxima resposta. O que for clínico ou delicado, ela passa para a equipe.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-2">O que ela faz quando chega uma urgência?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-1-2"><div><p>Na configuração, você define o que é urgência para a sua clínica (por exemplo, sangramento ou falta de ar). Quando isso aparece, ela para, manda ao paciente a orientação que você cadastrou e avisa a equipe na hora pelo WhatsApp. Ela não substitui um serviço de emergência.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-3">Ela responde dúvidas médicas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-1-3"><div><p>Não. Ela cuida de agendamento, valores, convênios, horários e pedidos para a equipe. Não interpreta exames, não orienta tratamento e não responde dúvidas clínicas: avisa o paciente que a equipe vai responder.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-4">Minha secretária vai ficar sem função?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-1-4"><div><p>Não. A assistente tira da secretária as perguntas que se repetem o dia todo e as mensagens fora do horário. O atendimento de quem está na clínica, os casos delicados e as decisões continuam com a equipe, que assume qualquer conversa quando quiser.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-1-5">E quem prefere falar com uma pessoa?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-1-5"><div><p>Quando o paciente pede uma pessoa, ou o assunto está na lista que você definiu, ela avisa a equipe e para de responder naquela conversa.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-2" role="tabpanel" aria-labelledby="faq-tab-2">
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-0">Preciso entender de inteligência artificial?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-0"><div><p>Não. Você responde um formulário guiado sobre a clínica, de cerca de 10 minutos, e a assistente sai configurada. Se preferir, preenchemos com você.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-1">Posso testar antes de colocar no WhatsApp da clínica?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-1"><div><p>Sim, de três jeitos: aqui na página, com 5 mensagens; no ambiente de teste, antes de conectar; e por 7 dias no WhatsApp da clínica, sem cartão, contados a partir do dia em que ela entra no ar.</p></div></div>
-        </div>
-        <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-2">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-2-2"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho. Você define o que ela responde, e ela passa para a equipe quando o paciente pede uma pessoa.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-2-0">Preciso trocar de sistema?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-2-0"><div><p>Não. A agenda da RXSync vem com todos os planos: a assistente marca ali, e a recepção acompanha e marca também. Se a sua agenda online tem integração com a RXSync, ela se conecta a ela. Se não tem, ela pode enviar ao paciente o link de agendamento do seu sistema.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-3" role="tabpanel" aria-labelledby="faq-tab-3">
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-0">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-0"><div><p>Durante o teste, você usa tudo do Gestão Inteligente. No fim, nada é cobrado sozinho: avisamos antes por e-mail, inclusive o que o plano que você escolheu não inclui. Para continuar, você paga a primeira mensalidade (e a Implantação completa, se você a contratou). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-0">Preciso entender de inteligência artificial?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-3-0"><div><p>Não. Você responde um formulário guiado sobre a clínica, de cerca de 10 minutos, e a assistente sai configurada. Se preferir, preenchemos com você.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-1">Como cancelo?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-1"><div><p>No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No mensal, se a assistente ainda não entrou no ar, o contrato termina no dia em que você confirma. No anual, o contrato é de 12 meses; se sair antes, paga a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-1">Posso testar antes de colocar no WhatsApp da clínica?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-3-1"><div><p>Sim, de três jeitos: aqui na página, com 5 mensagens; no ambiente de teste, antes de conectar; e por 7 dias no WhatsApp da clínica, sem cartão, contados a partir do dia em que ela entra no ar.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-2">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-3-2"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; avisamos perto do limite e, se passar, só cobramos a mais com o seu aceite por escrito.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-3-2">Serve para dentista, psicólogo, fisioterapeuta ou estética?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-3-2"><div><p>Serve: ela cuida do atendimento administrativo de qualquer clínica ou consultório com hora marcada. As regras de IA do CFM valem para médicos; nas outras áreas, valem também as regras do seu conselho. Você define o que ela responde, e ela passa para a equipe quando o paciente pede uma pessoa.</p></div></div>
         </div>
       </div>
       <div class="faq-panel hidden" id="faq-panel-4" role="tabpanel" aria-labelledby="faq-tab-4">
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-0">Posso perder o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-0"><div><p>Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, entre 8h e 20h, no fuso da clínica. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-0">O que acontece no fim dos 7 dias?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-4-0"><div><p>Durante o teste, você usa tudo do Gestão Inteligente. No fim, nada é cobrado sozinho: avisamos antes por e-mail, inclusive o que o plano que você escolheu não inclui. Para continuar, você paga a primeira mensalidade (e a Implantação completa, se você a contratou). Se não continuar, a assistente para e o atendimento volta a ser só da equipe; seus dados ficam guardados por 15 dias, para você voltar se quiser, e depois são apagados.</p></div></div>
         </div>
         <div class="faq-item">
-          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-1">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="faq-content" id="faq-r-4-1"><div><p>Ela foi feita para elas: se apresenta na primeira mensagem como atendimento automatizado, não como pessoa, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. Pela Resolução CFM nº 2.454/2026, uma IA que só agenda e dá informações gerais é de baixo risco. O que a clínica divulga continua sendo responsabilidade do médico.</p></div></div>
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-1">Como cancelo?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-4-1"><div><p>No plano mensal, pelo painel, a qualquer momento e sem multa, com 30 dias de aviso. No mensal, se a assistente ainda não entrou no ar, o contrato termina no dia em que você confirma. No anual, o contrato é de 12 meses; se sair antes, paga a diferença para o preço do mensal nos meses usados. Em qualquer caso, você tem 7 dias para desistir, com devolução do que pagou.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-4-2">Como as mensagens são contadas?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-4-2"><div><p>Conta cada mensagem enviada ou recebida pela assistente. As 5.000 do mês dão cerca de 166 por dia. O consumo aparece no painel; avisamos perto do limite e, se passar, só cobramos a mais com o seu aceite por escrito.</p></div></div>
+        </div>
+      </div>
+      <div class="faq-panel hidden" id="faq-panel-5" role="tabpanel" aria-labelledby="faq-tab-5">
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-5-0">Posso perder o meu número?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-5-0"><div><p>Existe risco. A conexão do número à RXSync não é a oficial do WhatsApp, e o WhatsApp pode restringir ou bloquear números conectados assim, mesmo seguindo as boas práticas. Para reduzir o risco, nunca fazemos disparo em massa e as mensagens automáticas vão só para quem já conversou com a clínica, entre 8h e 20h, no fuso da clínica. Recomendamos um número reserva: se houver bloqueio, começamos a reconexão nele em até 1 dia útil depois de termos acesso ao aparelho.</p></div></div>
+        </div>
+        <div class="faq-item">
+          <button type="button" data-faq aria-expanded="false" aria-controls="faq-r-5-1">A assistente segue as regras do CFM?<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-content" id="faq-r-5-1"><div><p>Ela foi feita para elas: se apresenta na primeira mensagem como atendimento automatizado, não como pessoa, cuida só do administrativo e passa para a equipe tudo o que exige o profissional. Pela Resolução CFM nº 2.454/2026, uma IA que só agenda e dá informações gerais é de baixo risco. O que a clínica divulga continua sendo responsabilidade do médico.</p></div></div>
         </div>
       </div>
       <p class="faq-mais">Não achou sua pergunta? <button type="button" data-cta="faq_perguntar_chat" data-abre-chat>Pergunte no chat.</button></p>
