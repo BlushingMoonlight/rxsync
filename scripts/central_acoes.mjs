@@ -84,6 +84,14 @@ const grupo = (titulo, campo, valor) => async () => {
   await g.getByRole('button', { name: 'Salvar' }).click();
 };
 
+// A folha "Editar o cadastro" (DEC-206): abre pelo menu Ações (ou pelo botão da aba Cadastro), muda os campos e toca Salvar.
+const folha = (mudar, abrirFolha) => async () => {
+  await (abrirFolha ? abrirFolha() : menu('Editar o cadastro'));
+  await page.waitForSelector('#camada form[aria-labelledby="tit-cadastro"]');
+  for (const [k, v] of Object.entries(mudar)) { const i = page.locator('#ed-' + k); if (await i.evaluate(e => e.tagName) === 'SELECT') await i.selectOption(v); else await i.fill(v); }
+  await page.locator('#camada form[aria-labelledby="tit-cadastro"] button[type=submit]').click();
+};
+
 const CASOS = [
   // Cobrança (nível 3, menos a foto)
   { acao: 'plano_trocar', rota: F + '/cobranca', abrirCom: () => botao('Trocar o plano').click(), campos: { plano: 'gestao', motivo: M }, nome: NOME, espera: { ...C, plano: 'gestao', valor: '', motivo: M, combinado: '' } },
@@ -107,8 +115,11 @@ const CASOS = [
   { acao: 'cliente_editar_assistente', rota: F + '/cadastro', abrirCom: grupo('Assistente', 'servicos', 'Limpeza, clareamento e canal'), espera: { ...C, campos: { servicos: 'Limpeza, clareamento e canal' } } },
   { acao: 'cliente_editar_configuracoes', rota: F + '/cadastro', abrirCom: grupo('Configurações', 'fuso_horario', 'America/Manaus'), espera: { ...C, campos: { fuso_horario: 'America/Manaus' } } },
   { acao: 'reenviar_onboarding', rota: F + '/cadastro', abrirCom: () => botao('Reenviar o link de onboarding').click(), espera: C },
-  { acao: 'cliente_editar_empresa', rota: F + '/cadastro', antes: async () => { await botao('Mostrar os dados protegidos').click(); await page.waitForSelector('[data-sensivel]'); },
-    abrirCom: grupo('Editar os dados da empresa', 'razao_social', 'Sorriso Odontologia Ltda'), espera: { ...C, campos: { razao_social: 'Sorriso Odontologia Ltda' } } },
+  // O cadastro numa folha só (rxsync-sistema DEC-206): Ações › "Editar o cadastro"; trocar o e-mail de entrada sobe para o nível 3.
+  { acao: 'cliente_editar_cadastro', rota: F, abrirCom: folha({ razao_social: 'Sorriso Odontologia Ltda' }), espera: { ...C, campos: { razao_social: 'Sorriso Odontologia Ltda' } } },
+  { acao: 'cliente_editar_cadastro', nivel: 3, rota: F + '/cadastro', abrirCom: folha({ email_entrada: 'novo@exemplo.com', telefone: '48999990777' }, () => botao('Editar o cadastro').click()), nome: NOME,
+    espera: { ...C, campos: { telefone: '48999990777' }, login_email: 'novo@exemplo.com' } },
+  { acao: 'cliente_editar_cadastro', rota: F, extra: { interna: true }, abrirCom: folha({ modalidade: 'contratado' }), espera: { ...C, campos: {}, modalidade: 'contratado' } },
   // Menu "Ações" da ficha
   { acao: 'situacao_pausar', rota: F, abrirCom: () => menu('Pausar'), espera: C },
   { acao: 'situacao_retomar', rota: F, extra: { ativo: false }, abrirCom: () => menu('Retomar'), espera: C },
@@ -118,18 +129,23 @@ const CASOS = [
   { acao: 'cancelamento_desfazer', rota: F, extra: { cancelar_em: daqui(15) }, abrirCom: () => menu('Desfazer o cancelamento'), espera: C },
   { acao: 'link_painel_reenviar', rota: F, abrirCom: () => menu('Reenviar o link do painel'), espera: C },
   { acao: 'link_conectar_reenviar', rota: F, abrirCom: () => menu('Reenviar o link de conexão'), espera: C },
-  { acao: 'conversas_enviar', rota: F, abrirCom: () => menu('Enviar as conversas ao e-mail do cadastro'), espera: C },
+  { acao: 'conversas_enviar', rota: F, abrirCom: () => menu('Enviar os dados ao e-mail do cadastro'), espera: C },
   { acao: 'link_painel_novo', rota: F, abrirCom: () => menu('Gerar um link novo do painel'), nome: NOME, espera: C },
   { acao: 'cobranca_teste_definir', rota: F, abrirCom: () => menu('Usar como clínica de teste'), nome: NOME, espera: C },
   // Excluir e marcar clínicas (sql/086, DEC-190): de verdade encerra hoje (com o motivo); de teste, na hora; várias de teste pela lista
   { acao: 'cliente_marcar_teste', rota: F, abrirCom: () => menu('É uma clínica de teste'), nome: NOME, espera: C },
-  { acao: 'cliente_excluir', rota: F, abrirCom: () => menu('Excluir a clínica'), campos: { motivo: M }, nome: NOME, espera: { ...C, motivo: M } },
+  // DEC-205: a de verdade sem o pedido encerra hoje; a pedido dela (e como pediu), apaga na hora
+  { acao: 'cliente_excluir', rota: F, abrirCom: () => menu('Excluir a clínica'), campos: { motivo: M }, nome: NOME, espera: { ...C, a_pedido: 'false', motivo: M, combinado: '' } },
+  { acao: 'cliente_excluir', rota: F, abrirCom: () => menu('Excluir a clínica'), campos: { a_pedido: 'true', motivo: M, combinado: 'e-mail do dono' }, nome: NOME, espera: { ...C, a_pedido: 'true', motivo: M, combinado: 'e-mail do dono' } },
+  // Congelar, renovar e reativar (DEC-206)
+  { acao: 'cliente_congelar', rota: F, extra: { modalidade: 'contratado' }, abrirCom: () => menu('Congelar'), campos: { motivo: M, combinado: 'e-mail de 10/11' }, nome: NOME, espera: { ...C, motivo: M, combinado: 'e-mail de 10/11' } },
+  { acao: 'cliente_congelar_renovar', rota: F, extra: { status: 'Congelado', ativo: false, congelado: { desde: daqui(-10), ate: daqui(80), sugerido: daqui(5) } }, abrirCom: () => menu('Renovar o congelamento'), espera: { ...C, combinado: '' } },
+  { acao: 'cliente_descongelar', rota: F, extra: { status: 'Congelado', ativo: false, congelado: { desde: daqui(-10), ate: daqui(80), sugerido: daqui(5) } }, abrirCom: () => menu('Reativar'), campos: { vencimento: daqui(7) }, nome: NOME,
+    espera: { ...C, vencimento: daqui(7), motivo: '' } },
   { acao: 'cliente_excluir', rota: F, extra: { interna: true }, abrirCom: () => menu('Excluir a clínica'), nome: NOME, espera: C },
   { acao: 'cliente_excluir_lote', rota: 'clientes', antes: async () => { await page.locator('.filtros button', { hasText: 'De teste' }).click(); await botao('Selecionar').click();
       await page.locator('.linha.cli.sel input[type=checkbox]').first().check(); }, abrirCom: () => botao(/^Excluir as selecionadas/).click(), campos: { quantas: '1' }, nome: 'EXCLUIR',
     espera: { ids: ['RX-TESTE-INTERNA'], quantas: '1' } },
-  { acao: 'cliente_editar_login', rota: F + '/cadastro', abrirCom: () => botao('Trocar o e-mail de entrada do dono').click(), campos: { email: 'novo@exemplo.com' }, nome: NOME, espera: { ...C, email: 'novo@exemplo.com' } },
-  { acao: 'cliente_editar_modalidade', rota: F + '/cadastro', extra: { interna: true }, abrirCom: () => botao('Trocar a modalidade').click(), campos: { modalidade: 'teste' }, espera: { ...C, modalidade: 'teste' } },
   { acao: 'cobranca_teste_definir', nivel: 2, rota: F, antes: async () => { chaves.cobranca_teste_cliente = 'CLI-001'; await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange'))); await page.waitForTimeout(300); await abrir(F); },
     abrirCom: () => menu('Deixar de ser a clínica de teste'), espera: { cliente_id: '' } },
   // API (Enterprise)
@@ -224,6 +240,26 @@ for (const a of Object.keys(NIVEIS)) ok(testadas.has(a), `${a}: ação sem teste
 await page.fill('input[type=email]', 'jean@exemplo.com'); await page.fill('input[type=password]', 'senha-de-teste-123'); await page.click('button[type=submit]');
 await page.fill('input.codigo', '123456'); await page.click('button[type=submit]'); await page.waitForSelector('#conteudo h1');
 
+// A lista (rxsync-sistema DEC-206): "Todas" sem as que saíram; pausada e congelada com selo; a cancelada só no filtro
+// "Canceladas e excluídas"; com a busca em "Todas", a cancelada aparece (para achar pelo nome).
+{
+  await abrir('clientes');
+  const lista = page.locator('#conteudo ul.lista').first(), linha = nome => lista.locator('li', { hasText: nome });
+  await page.locator('.filtros button', { hasText: 'Todas' }).click();   // o filtro escolhido antes fica guardado
+  ok(await linha('Consultório Antigo').count() === 0, 'lista: "Todas" não mostra a cancelada');
+  ok(/Pausada/.test(await linha('Instituto Pele').innerText()) && /Congelada/.test(await linha('Psico Centro').innerText()), 'lista: pausada e congelada continuam, com selo');
+  ok(/7 clínicas/.test(await page.locator('#conteudo').innerText()), 'lista: o topo conta só as que não saíram (7 de 8)');
+  await page.locator('.filtros button', { hasText: 'Canceladas e excluídas' }).click();
+  ok(await linha('Consultório Antigo').count() === 1 && await linha('Clínica Vida').count() === 0, 'lista: a cancelada fica no filtro "Canceladas e excluídas"');
+  await page.locator('.filtros button', { hasText: 'Congeladas' }).click();
+  ok(await linha('Psico Centro').count() === 1 && await linha('Clínica Vida').count() === 0, 'lista: o filtro "Congeladas"');
+  await page.locator('.filtros button', { hasText: 'Todas' }).click();
+  await page.fill('#conteudo input[type=search]', 'antigo');
+  ok(await linha('Consultório Antigo').count() === 1, 'lista: a busca em "Todas" acha também a cancelada');
+  await page.fill('#conteudo input[type=search]', '');
+  feitos += 6;
+}
+
 // Ajustes: um toque desliga (sem janela, sem CONFIRMAR) e o Desfazer liga de novo.
 {
   await abrir('ajustes'); const desde = chamadas.length;
@@ -247,7 +283,11 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
 }
 // Mensagem rápida com Desfazer depois de uma edição de nível 1.
 {
-  await abrir(F + '/recursos'); await grupo('Limites e franquia', 'dono_limite_dia', '30')(); await page.waitForSelector('#rapida:not([hidden])');
+  // Espera a aba da ficha: a troca de aparência logo antes redesenha Ajustes depois da mudança de endereço, e Ajustes também
+  // tem um h1. Se Ajustes ganhou a corrida, abre de novo (uma vez).
+  await abrir(F + '/recursos');
+  await page.waitForSelector('#conteudo details.grupo', { timeout: 3000 }).catch(async () => { await abrir(F + '/recursos'); await page.waitForSelector('#conteudo details.grupo'); });
+  await grupo('Limites e franquia', 'dono_limite_dia', '30')(); await page.waitForSelector('#rapida:not([hidden])');
   const desde = chamadas.length; await page.locator('#rapida').getByRole('button', { name: 'Desfazer' }).click();
   await page.waitForSelector(janela); await page.locator(`${janela} button[type=submit]`).click();
   const d = await chamada('desfazer', desde);
