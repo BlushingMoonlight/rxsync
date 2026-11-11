@@ -176,16 +176,12 @@ const CASOS = [
   { acao: 'prosp_numero_webhook', rota: P + '/numeros', abrirCom: () => botao('Webhook de novo').click(), espera: { id: 1 } },
   { acao: 'prosp_numero_apagar', rota: P + '/numeros', abrirCom: () => botao('Apagar').click(), nome: 'prospec-01', espera: { id: 1 } },
   { acao: 'prosp_exportar', rota: P + '/leads', abrirCom: () => botao('Exportar CSV').click(), espera: { conjunto_id: '', situacao: '' } },
-  { acao: 'prosp_leads_aprovar_todos', rota: P + '/leads', antes: async () => { await page.selectOption('#conteudo select[aria-label="Conjunto"]', 'CJ-0001'); await page.waitForFunction(() => !document.querySelector('#conteudo .esq')); await page.waitForTimeout(200); },
-    abrirCom: () => botao('Aprovar os 6 "para aprovar" deste conjunto').click(), espera: { conjunto_id: 'CJ-0001' } },
-  { acao: 'prosp_lead_aprovar', rota: P + '/lead/PX-CCCCC', abrirCom: () => botao('Aprovar').click(), espera: { id: 'PX-CCCCC', valor: 'SIM' } },
   { acao: 'prosp_lead_assumir', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Assumir a conversa').click(), espera: { id: 'PX-AAAAA' } },
   { acao: 'prosp_lead_devolver', rota: P + '/lead/PX-DDDDD', abrirCom: () => botao('Devolver à IA').click(), espera: { id: 'PX-DDDDD' } },
   { acao: 'prosp_lead_marcar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Marcar').click(), campos: { situacao: 'recusou' }, espera: { id: 'PX-AAAAA', situacao: 'recusou' } },
   { acao: 'prosp_lead_nao_contatar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Não contatar').click(), espera: { id: 'PX-AAAAA' } },
   { acao: 'prosp_anotar', rota: P + '/relatorios', abrirCom: () => botao('Anotar').click(), campos: { texto: 'Liguei o anúncio C' }, espera: { campanha_id: '', dia: hoje, texto: 'Liguei o anúncio C' } },
   { acao: 'prosp_relatorio_salvar', rota: P + '/relatorios', abrirCom: () => botao('Guardar como padrão').click(), espera: { nome: 'Padrão', config: { visao: 'desempenho' } } },
-  { acao: 'prosp_buscar_agora', rota: P + '/buscas', abrirCom: () => botao('Buscar agora').click(), campos: { publico_id: 'PB-0002' }, espera: { publico_id: 'PB-0002' } },
   // Públicos (sql/036, DEC-088): o conjunto escolhe; o público guarda a busca e os contatos
   { acao: 'prosp_conjunto_salvar', nivel: 3, rota: P + '/conjunto/CJ-0001', antes: () => page.locator('#conteudo .p-pub[data-id="PB-0002"]').click(), abrirCom: () => botao('Salvar a versão nova').click(), nome: 'Dentistas Curitiba',
     espera: { id: 'CJ-0001', nome: 'Dentistas Curitiba', config: { ...CFG.conjunto, publicos: ['PB-0001', 'PB-0002'] }, numero_id: '1' } },
@@ -210,10 +206,6 @@ const CASOS = [
   { acao: 'prosp_regra_ligar', nivel: 2, rota: P + '/regras', abrirCom: () => chave('Desligar a regra 7').click(), espera: { id: 7, valor: 'NAO' } },
   { acao: 'prosp_custos_salvar', rota: P + '/custos', antes: () => page.fill('#cu-preco_mil_tokens_entrada', '0,02'), abrirCom: () => botao('Salvar').click(),
     espera: { itens: [{ tipo: 'preco_credito_serpapi', valor: '0.075', descricao: 'plano de 5.000 buscas' }, { tipo: 'preco_mil_tokens_entrada', valor: '0.02', descricao: '' }, { tipo: 'fixo_mensal', valor: '60', descricao: 'chip' }] } },
-  // Sugerir melhorias (sql/043, DEC-098): nível 2, com a quantidade e o filtro da tela
-  { acao: 'prosp_sugerir', rota: P + '/conversas', antes: async () => { await page.selectOption('#conteudo select[aria-label="Campanha"]', 'CMP-0001'); await botao('Sugerir melhorias').waitFor(); },
-    abrirCom: () => botao('Sugerir melhorias').click(), campos: { quantidade: '10' },
-    espera: { resultado: '', campanha_id: 'CMP-0001', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0, quantidade: '10' } },
   // Demonstrações por link (sql/056, DEC-125): criar (1), editar (2, antes e depois), desativar e reativar (1), ver (1), apagar (3, o nome da clínica do link)
   { acao: 'dem_criar', rota: 'demonstracoes/novo', antes: async () => { await page.fill('#d-clinica', 'Clínica Nova'); await page.selectOption('#d-tratamento', 'Dra.'); await page.fill('#d-medico', 'Ana Costa');
       await page.getByRole('radio', { name: 'Roxo' }).click(); await page.fill('#d-lead_codigo', 'px-acde3'); }, abrirCom: () => botao('Criar o link').click(),
@@ -323,7 +315,6 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   const filtrou = async (rota, sel, valor, acao, campo) => { await abrir(rota); const desde = chamadas.length; await page.selectOption(sel, valor);
     for (let i = 0; i < 60; i++) { const c = chamadas.slice(desde).find(x => x.acao === acao); if (c) return c.dados[campo]; await page.waitForTimeout(50); } return null; };
   ok(await filtrou(P + '/leads', '#conteudo select[aria-label="Público"]', 'PB-0001', 'prosp_leads', 'publico_id') === 'PB-0001', 'leads: filtro por público');
-  ok(await filtrou(P + '/buscas', '#conteudo select[aria-label="Público"]', 'PB-0002', 'prosp_buscas', 'publico_id') === 'PB-0002', 'buscas: filtro por público');
   await abrir(P + '/relatorios'); const desde = chamadas.length; await page.locator('#conteudo label', { hasText: 'Nível' }).locator('select').selectOption('publico');
   const d = await chamada('prosp_relatorio', desde);
   ok(d && d.nivel === 'publico', `relatórios: nível público (${JSON.stringify(d)})`);

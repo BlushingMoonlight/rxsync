@@ -119,14 +119,12 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   teste_estender: 3, link_painel_novo: 3, chave_api_revogar: 3, cobranca_teste_definir: 3,
   // prospecção (sql/031, rx_central_niveis): prosp_ligar e prosp_regra_ligar mudam com o valor (rx_central_nivel)
   prosp_campanha_salvar: 1, prosp_conjunto_salvar: 1, prosp_anuncio_salvar: 1, prosp_duplicar: 1, prosp_regra_salvar: 1, prosp_regra_ligar: 1, prosp_anotar: 1, prosp_custos_salvar: 1,
-  prosp_relatorio_salvar: 1, prosp_numero_situacao: 1, prosp_lead_aprovar: 1, prosp_lead_marcar: 1, prosp_lead_assumir: 1, prosp_ligar: 2, prosp_apagar_rascunho: 2, prosp_numero_criar: 2,
-  prosp_numero_qr: 2, prosp_numero_desconectar: 2, prosp_numero_webhook: 2, prosp_numero_teto: 2, prosp_buscar_agora: 2, prosp_leads_aprovar_todos: 2, prosp_lead_nao_contatar: 2,
+  prosp_relatorio_salvar: 1, prosp_numero_situacao: 1, prosp_lead_marcar: 1, prosp_lead_assumir: 1, prosp_ligar: 2, prosp_apagar_rascunho: 2, prosp_numero_criar: 2,
+  prosp_numero_qr: 2, prosp_numero_desconectar: 2, prosp_numero_webhook: 2, prosp_numero_teto: 2, prosp_lead_nao_contatar: 2,
   prosp_lead_devolver: 2, prosp_exportar: 2, prosp_encerrar: 3, prosp_numero_apagar: 3,
   // públicos (sql/036): salvar em uso, pôr de volta em uso e pôr um público num conjunto ativo sobem de nível (rx_central_nivel)
   prosp_publico_salvar: 1, prosp_publico_renomear: 1, prosp_publico_duplicar: 1, prosp_publico_contato_marcar: 1, prosp_publico_buscar: 2, prosp_publico_contatos_lote: 2,
   prosp_publico_arquivar: 2, prosp_creditos_teto_salvar: 2,
-  // sugestões da IA para o prompt (sql/043, DEC-098)
-  prosp_sugerir: 2,
   // demonstrações por link (sql/056, DEC-125)
   dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3,
   // histórico das conversas ao e-mail do cadastro (sql/059, DEC-131)
@@ -230,7 +228,7 @@ const linhaRel = (chave, valor, n) => ({ chave, valor, numeros: { enviados: n, e
 const LEADS = [
   { id: 'PX-AAAAA', nome: 'Clínica Sorriso Batel', telefone_fim: '•••• 0001', cidade: 'Curitiba', bairro: 'Batel', nicho: 'dentista', nota: 4.8, avaliacoes: 120, categoria: 'Dentista', pontos: 82, situacao: 'positivo', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', publico_id: 'PB-0001', anuncio_id: 'AN-0002', anuncio_versao: 1, numero: 'prospec-01', origem_telefone: 'maps', mensagens_enviadas: 1, ia_mensagens: 3, criado_em: '2026-10-10T12:00:00Z', ultimo_contato_em: '2026-10-15T11:00:00Z', apagar_em: '2027-04-13', cliente_id: '', numero_revisar: false,
     funil: { enviada: '2026-10-13T12:40:00Z', entregue: '2026-10-13T12:41:00Z', lida: '2026-10-13T13:00:00Z', respondeu: '2026-10-13T13:05:00Z', positiva: '2026-10-13T13:20:00Z' } },
-  { id: 'PX-CCCCC', nome: 'Odonto Centro', telefone_fim: '•••• 0002', cidade: 'Curitiba', bairro: 'Centro', nicho: 'dentista', nota: 4.2, avaliacoes: 30, categoria: 'Dentista', pontos: 61, situacao: 'para_aprovar', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: null, numero: 'prospec-01', origem_telefone: 'wame', mensagens_enviadas: 0, ia_mensagens: 0, criado_em: '2026-10-15T10:00:00Z', apagar_em: '2027-01-13', cliente_id: '', numero_revisar: true, funil: {} },
+  { id: 'PX-CCCCC', nome: 'Odonto Centro', telefone_fim: '•••• 0002', cidade: 'Curitiba', bairro: 'Centro', nicho: 'dentista', nota: 4.2, avaliacoes: 30, categoria: 'Dentista', pontos: 61, situacao: 'na_fila', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: null, numero: 'prospec-01', origem_telefone: 'wame', mensagens_enviadas: 0, ia_mensagens: 0, criado_em: '2026-10-15T10:00:00Z', apagar_em: '2027-01-13', cliente_id: '', numero_revisar: true, funil: {} },
   { id: 'PX-DDDDD', nome: 'Dente Feliz', telefone_fim: '•••• 0003', cidade: 'Curitiba', bairro: 'Água Verde', nicho: 'dentista', nota: 4.6, avaliacoes: 80, categoria: 'Dentista', pontos: 75, situacao: 'com_voce', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: 'AN-0001', numero: 'prospec-01', origem_telefone: 'maps', mensagens_enviadas: 1, ia_mensagens: 2, criado_em: '2026-10-09T12:00:00Z', assumido_em: '2026-10-15T10:00:00Z', apagar_em: '2027-04-13', cliente_id: '', numero_revisar: false,
     funil: { enviada: '2026-10-12T12:40:00Z', entregue: '2026-10-12T12:41:00Z', respondeu: '2026-10-12T14:00:00Z', pediu_link: '2026-10-12T14:10:00Z' } }];
 const MSGS = [{ id: 1, direcao: 'saiu', autor: 'disparo', texto: 'Oi! Aqui é a assistente virtual da RXSync. Vi a Clínica Sorriso Batel no Google Maps e queria saber: vocês respondem os pacientes no WhatsApp à noite?\n\nSe não quiser receber mensagens, responda SAIR.', tipo: 'texto', situacao: 'enviada', criada_em: '2026-10-13T12:40:00Z', entregue_em: '2026-10-13T12:41:00Z', lida_em: '2026-10-13T13:00:00Z' },
@@ -261,15 +259,15 @@ export const CONTATOS = () => [
 export const CREDITOS_MES = { gastos: 41, teto: 300 };
 const pubObj = id => PUBS().find(p => p.id === id);
 export const PROSP = {
-  // Revisar conversas (sql/043, DEC-098): resposta direta (sem "dados"), com as sugestões liberadas para o teste do botão.
-  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, sugestoes_liberadas: true, versoes_prompt: [],
+  // Revisar conversas (sql/043, DEC-098): resposta direta (sem "dados") (o "Sugerir melhorias" saiu, rxsync-sistema DEC-211).
+  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, versoes_prompt: [],
     conversas: [{ lead_id: 'PX-AAAAA', nome: 'Sorriso Batel', nicho: 'dentista', cidade: 'Curitiba', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: 'AN-0001', situacao: 'recusou',
       resultado: 'recusou', ultimo_contato_em: '2026-10-15T12:00:00Z', ia_mensagens: 0, passou_para_voce: false,
       mensagens: [{ direcao: 'saiu', autor: 'disparo', texto: 'Oi! Vi a Sorriso Batel no Maps.', quando: '2026-10-15T11:00:00Z', prompt_id: null }, { direcao: 'entrou', autor: 'lead', texto: 'Não, obrigado.', quando: '2026-10-15T12:00:00Z', prompt_id: null }] }] }),
   prosp_inicio: () => okD({ campanhas: ARVORE(), numeros: [N1, N2].map(({ id, instancia, nome, situacao, ligado, teto_hoje }) => ({ id, instancia, nome, situacao, ligado, teto_hoje })),
     chaves: ESTADO.segurado ? { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'SIM', prosp_politica_v10: 'SIM', prosp_balanceamento: 'SIM' }
       : { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' }, nao_contatar: 14, travas: TRAVAS,
-    resultados: { ultimos_7_dias: [linhaRel('CMP-0001', '', 180)], para_aprovar: 6, com_voce: 1, na_fila: 40, avisos_na_fila: 3, disparo_liberado: false, motor: motorDe(),
+    resultados: { ultimos_7_dias: [linhaRel('CMP-0001', '', 180)], com_voce: 1, na_fila: 40, avisos_na_fila: 3, disparo_liberado: false, motor: motorDe(),
       custos: { preco_credito_serpapi: { valor: 0.075, descricao: 'plano de 5.000 buscas' }, fixo_mensal: { valor: 60, descricao: 'chip' } } } }),
   prosp_objeto: d => { if (d.tipo === 'publico') { const p = pubObj(d.id); if (!d.id) return okD({ objeto: null, config: CFG.publico, versoes: [], travas: TRAVAS });
       return p ? okD({ objeto: { tipo: 'publico', id: p.id, nome: p.nome, situacao: p.situacao, versao: p.versao, pai: '' }, config: { ...CFG.publico, novos_entram: p.novos_entram, fuso: p.fuso }, travas: TRAVAS,
@@ -294,7 +292,7 @@ export const PROSP = {
   prosp_regras: () => okD({ regras: [{ id: 1, fixa: true, ligada: true, nivel: 'anuncio', alvo_id: '', metrica: 'pare', operador: '>', valor: 5, depois_de: 20, janela_dias: 0, acao: 'pausar', disparos_30d: 1 },
     { id: 3, fixa: true, ligada: true, nivel: 'numero', alvo_id: '', metrica: 'desconectado', operador: '>', valor: 0, depois_de: 0, janela_dias: 0, acao: 'pausar', disparos_30d: 0 },
     { id: 7, fixa: false, ligada: true, nivel: 'anuncio', alvo_id: '', metrica: 'recusa', operador: '>', valor: 15, depois_de: 50, janela_dias: 7, acao: 'avisar', disparos_30d: 2 }] }),
-  prosp_leads: d => okD({ pagina: d.pagina || 1, total: 62, por_situacao: { para_aprovar: 6, na_fila: 40, enviado: 9, respondeu: 3, positivo: 2, com_voce: 1, saiu: 1 },
+  prosp_leads: d => okD({ pagina: d.pagina || 1, total: 62, por_situacao: { na_fila: 40, enviado: 9, respondeu: 3, positivo: 2, com_voce: 1, saiu: 1 },
     leads: LEADS.filter(l => !d.situacao || l.situacao === d.situacao) }),
   prosp_lead: d => { const l = LEADS.find(x => x.id === d.id); return l ? okD({ lead: l, mensagens: l.id === 'PX-AAAAA' ? MSGS : [] }) : { ok: false, mensagem: 'Lead não encontrado.' }; },
   prosp_relatorio: d => okD({ de: dia(29), ate: dia(0), nivel: d.nivel || 'campanha', detalhar: d.detalhar || '',
@@ -302,9 +300,6 @@ export const PROSP = {
     vencedores: [{ conjunto_id: 'CJ-0001', objetivo: 'positiva', primeiro: 'AN-0002', segundo: 'AN-0001', taxa_primeiro: 9.6, taxa_segundo: 5.0, envios_primeiro: 115, envios_segundo: 120, p: 0.17, situacao: 'empate', faltam: 290 }],
     classificacao: { etapas: { conversou: 9, recusou: 4, interessado: 3, saiu: 2 }, objecoes: { preco: 5, ja_tem_secretaria: 3 }, motivos_recusa: { preco: 2, nao_precisa: 2 } },
     anotacoes: [{ dia: dia(3), texto: 'Liguei o anúncio B (agenda cheia).', campanha_id: 'CMP-0001' }], colunas_salvas: {}, publicos: Object.fromEntries(PUBS().map(p => [p.id, p.nome])) }),
-  prosp_buscas: () => okD({ busca_ligada: true, creditos_mes: [{ publico_id: 'PB-0001', gastos: 34, limite: 120 }, { publico_id: 'PB-0002', gastos: 7, limite: 60 }], creditos_total: CREDITOS_MES,
-    buscas: [{ id: 12, publico_id: 'PB-0001', conjunto_id: 'CJ-0001', versao: 2, termo: 'dentista', lugar: 'Curitiba', paginas: 3, paginas_feitas: 2, creditos: 2, situacao: 'feita', pedida_por: 'agenda', pedida_em: '2026-10-13T11:00:00Z', feita_em: '2026-10-13T11:10:00Z',
-      contagens: { achados: 40, novos: 12, de_outro_publico: 3, ja_no_publico: 5, outro_fuso: 1, fixo: 9, cliente: 1, palavra: 4, nota: 6 } }, { id: 13, publico_id: 'PB-0001', conjunto_id: null, versao: 2, termo: 'ortodontista', lugar: 'Curitiba', paginas: 3, paginas_feitas: 0, creditos: 0, situacao: 'pedida', pedida_por: 'central iPad', pedida_em: '2026-10-15T11:00:00Z', contagens: {} }] }),
   prosp_numero_qr: d => ({ ok: true, numero: { id: d.id, instancia: d.id === 1 ? 'prospec-01' : 'prospec-02' }, situacao: 'aguardando_qr', qr: qrDeMentira() }),
   prosp_numero_criar: () => ({ ok: true, numero: { id: 3, instancia: 'prospec-03' }, mensagem: 'Número prospec-03 criado. Leia o código no celular.', situacao: 'aguardando_qr', qr: qrDeMentira() }),
   prosp_numero_situacao: () => ({ ok: true, numero: { id: 2, instancia: 'prospec-02' }, situacao: 'aguardando_qr' }),
