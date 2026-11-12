@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Tz/O7+aLIwwqIoMtEi50SMcBBBCsUQQXekjrQxeWQrQ='; style-src 'sha256-E/SO/uf8+XHyUriQ9HOVNes2GkZ4EFBDNEzpoW7eJ3E='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QsZ4OA5lB2nLaTNz9AoTKc62mVQaWhL8/4tuNGGkTgc='; style-src 'sha256-E/SO/uf8+XHyUriQ9HOVNes2GkZ4EFBDNEzpoW7eJ3E='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -2082,7 +2082,7 @@ ICONES.mais_um = 'M12 5v14M5 12h14';
 
 // Pedidos do Jean: as abas na ordem do trabalho; o que é semanal ou raro fica no "Mais" da própria Prospecção.
 const P_ABAS = [['', 'Início'], ['publicos', 'Públicos'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['numeros', 'Números']];
-const P_MAIS = [['relatorio', 'Relatório', 'Os números do período e onde as conversas pararam'], ['regras', 'Regras de segurança', 'As 4 regras fixas, só para leitura']];
+const P_MAIS = [['prompt', 'Prompt da IA', 'O texto que a IA usa, as regras fixas e o teste'], ['relatorio', 'Relatório', 'Os números do período e onde as conversas pararam'], ['regras', 'Regras de segurança', 'As 4 regras fixas, só para leitura']];
 const P_SIT = { rascunho: ['rascunho', ''], ativa: ['ativa', 'ok'], ativo: ['ativo', 'ok'], pausada: ['pausada', 'atencao'], pausado: ['pausado', 'atencao'], cortado: ['cortado pela regra', 'perigo'],
   encerrada: ['encerrada', ''], encerrado: ['encerrado', ''], arquivado: ['arquivado', ''] };
 const etqSit = s => { const [t, tom] = P_SIT[s] || [s || '—', '']; return etq(t, tom); };
@@ -2159,7 +2159,7 @@ function interruptorP(tipo, o) {
 // ---------------------------------------------------------------- telas
 TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
-  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorio: pRelatorio, relatorios: pRelatorio, regras: pRegras, custos: pInicio };
+  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, prompt: pPrompt, relatorio: pRelatorio, relatorios: pRelatorio, regras: pRegras, custos: pInicio };
   const fn = telasP[parte] || pInicio;
   if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
@@ -2261,10 +2261,8 @@ const ESQUEMA = {
       ['ia.passar_para_voce', 'Quando passar para você', 'texto'], ['ia.nunca_dizer', 'Nunca dizer (os fixos ficam)', 'lista'], ['ia.regras_escrita', 'Regras de escrita', 'lista'],
       ['ia.tamanho_max', 'Tamanho máximo da resposta (letras)', 'num', { trava: 'resposta_max' }], ['ia.max_mensagens', 'Mensagens da IA antes de passar para você', 'num', { trava: 'ia_mensagens_max' }],
       ['ia.hora_inicio', 'IA responde a partir de (hora)', 'num', { trava: 'ia_hora_inicio_min', min: true }], ['ia.hora_fim', 'IA responde até (hora)', 'num', { trava: 'ia_hora_fim_max' }],
-      ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]],
-    // Texto inteiro do prompt (sql/041, DEC-096): vazio = o texto montado pelos campos acima. As regras fixas entram sempre.
-    ['Prompt da IA (texto inteiro)', [['ia.prompt_texto', 'Texto do prompt (vazio = o montado pelos campos de "IA de resposta")', 'longo',
-      { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]]],
+      ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]]],
+    // O texto inteiro do prompt fica na página Prompt da IA (rxsync-sistema DEC-211).
   conjunto: [
     ['Públicos', [['publicos', 'Públicos que o conjunto usa (só do fuso da entrega)', 'publicos', { ajuda: 'até 10; pôr um público num conjunto ativo = nível 3' }]]],
     ['Exclusões', [['exclusoes.outra_campanha_dias', 'Abordado por outra campanha há menos de (dias)', 'num', { trava: 'outra_campanha_dias_min', min: true }]]],
@@ -2300,8 +2298,8 @@ const ESQUEMA = {
       ['tamanho_max', 'Tamanho máximo com o texto de saída', 'num', { trava: 'mensagem_max' }], ['texto_saida', 'Texto de saída (precisa ter SAIR)', 'texto'],
       ['texto_confirmacao', 'Confirmação quando pedem para sair', 'longo'], ['palavras_proibidas', 'Palavras proibidas a mais', 'lista']]],
     ['Follow-ups (no máximo 2)', [['followups.0.dias_uteis', '1º follow-up: depois de (dias úteis)', 'num'], ['followups.0.texto', '1º follow-up: texto', 'longo'],
-      ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]],
-    ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; sem preço e sem link de fora; as regras fixas (assistente virtual, preços, SAIR) entram sempre', linhas: 10 }]]]]
+      ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]]]
+    // O prompt próprio do anúncio saiu (rxsync-sistema DEC-211): vale o prompt da campanha.
 };
 // Modelos do público novo (DEC-189): só preenchem o formulário; o servidor confere tudo ao salvar.
 const MODELOS_PUB = { medicos: { 'busca.avaliacoes_min': '0', 'busca.sem_nota': 'aceitar', 'busca.nota_min': '4', 'busca.nota_max': '5', 'busca.telefone_fixo': 'conferir' } };
@@ -2386,24 +2384,9 @@ async function pObjeto(c, tipo, id, pai) {
   // O fuso da entrega decide quais públicos o conjunto pode escolher (conferido de novo no servidor).
   if (ins.publicos && ins['entrega.fuso']) { const f = ins['entrega.fuso'].i; ins.publicos.i.conferirFuso(f.value); f.addEventListener('change', () => ins.publicos.i.conferirFuso(f.value)); }
   const prev = tipo === 'anuncio' ? previaAnuncio(ins.abordagem.i, ins.texto_saida.i, ins.tamanho_max.i, marca) : null;
-  // Prompt da IA (DEC-096): o alvo é a campanha (e o anúncio), com o que está na tela por cima do que foi salvo.
+  // Prompt da IA (DEC-096): a página própria, da campanha (rxsync-sistema DEC-211).
   const campanhaDoAlvo = tipo === 'campanha' ? (o && o.id) : tipo === 'anuncio' ? ((conjuntosP().find(x => x.id === paiId) || {}).campanha || {}).id : null;
-  const alvoPrompt = () => {
-    const { nova } = ler();
-    return { campanha_id: campanhaDoAlvo, anuncio_id: tipo === 'anuncio' && o ? o.id : '',
-      rascunho: tipo === 'campanha' ? { ia: { prompt_texto: (nova.ia || {}).prompt_texto || '' } } : tipo === 'anuncio' && o ? { prompt_proprio: nova.prompt_proprio || '' } : {} };
-  };
-  if (ins['ia.prompt_texto'] && editar && o) {
-    const caixa = ins['ia.prompt_texto'].i;
-    caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
-      // A janela da Central, nunca a caixa do navegador (pente fino da camada 3, I-07).
-      if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
-        texto: 'O que está no campo "Texto do prompt" vira o texto montado pelos campos de "IA de resposta". Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
-      const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
-      if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
-      caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();
-    }, 'sec')));
-  }
+
   if (prev) blocos[0].querySelector('.corpo-grupo').append(el('h3', { text: 'Como o lead vai ver' }), prev);
   const ler = () => {
     const nova = JSON.parse(JSON.stringify(cfg)), linhas = [];
@@ -2462,10 +2445,8 @@ async function pObjeto(c, tipo, id, pai) {
           numeroSel ? el('label', { class: 'campo', for: 'p-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), numeroSel, el('span', { class: 'ajuda', text: 'trocar o número de um conjunto = nível 3' })) : null)),
         ...blocos, el('div', { class: 'corpo' }, erro, editar ? el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: o ? 'Salvar a versão nova' : 'Criar' })) : null)),
       acoesObj ? cartao('Mais', null, corpo(acoesObj)) : null,
-      campanhaDoAlvo && o && (tipo === 'campanha' || tipo === 'anuncio') ? cartao('Prompt da IA', el('span', { class: 'mudo peq', text: 'com o que está na tela, mesmo sem salvar' }),
-        corpo(el('p', { class: 'mudo peq', text: 'O texto exato que vai para a OpenAI (as regras fixas travadas) e uma conversa de teste, sem WhatsApp e sem lead.' }),
-          el('div', { class: 'acoes' }, btn('Ver prompt completo', () => verPrompt(alvoPrompt()), 'sec', 'info'),
-            ligada('editar_prospeccao') ? btn('Testar conversa', () => testarConversa(alvoPrompt(), o.nome), 'sec', 'conversa') : null))) : null,
+      campanhaDoAlvo && o ? cartao('Prompt da IA', null, corpo(el('p', { class: 'mudo peq', text: 'O texto que a IA usa, as regras fixas, o teste e as versões ficam numa página só.' }),
+        el('div', { class: 'acoes' }, btn('Abrir o Prompt da IA', () => irP('prompt', campanhaDoAlvo), 'sec', 'conversa')))) : null,
       versoes.length ? cartao('Versões', el('span', { class: 'mudo peq', text: 'cada salvar cria uma versão (nunca editada)' }), el('ul', { class: 'lista' }, versoes.map(v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => verVersao(tipo, o.id, v.versao) },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Versão ' + v.versao }), el('div', { class: 't2', text: `${fmtHora(v.criada_em)}${v.criada_por ? ' · ' + v.criada_por : ''}${v.motivo ? ' · ' + v.motivo : ''}` })), icone('seta')))))) : null));
 }
@@ -2806,10 +2787,76 @@ async function pRegras(c) {
   trocar(c, cabecalho('Regras de segurança', 'pausam ou reduzem sozinhas quando algo vai mal; nunca aumentam nada'), el('div', { class: 'pilha' }, abasP('regras'), cartaoRegras(r.dados.regras)));
 }
 
+// ---------- Prompt da IA (DEC-096; num lugar só desde a DEC-211 do rxsync-sistema): um prompt por campanha. O texto, as
+// regras fixas travadas, "Testar conversa" (folha), as versões com "Voltar a esta versão" e as conversas de cada versão.
+// Salvar cria uma versão nova (DEC-070): por isso esta página tem o botão "Salvar a versão nova" (exceção ao molde E
+// registrada na DEC-211, como a grade de horários).
+const resumoTxt = t => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s ? (s.length > 90 ? s.slice(0, 90) + '…' : s) : '(o texto montado pelos campos)'; };
+async function pPrompt(c, parte, id) {
+  topo('Prompt da IA', [['Prospecção', 'prospeccao'], ['Prompt da IA']], 'prospeccao');
+  const a = await arvoreP(true);
+  const camps = ((a && a.campanhas) || []).filter(x => !/^encerrad/.test(x.situacao));
+  const cid = id && camps.some(x => x.id === id) ? id : (camps[0] || {}).id;
+  if (!cid) {
+    trocar(c, cabecalho('Prompt da IA', 'um prompt por campanha'), el('div', { class: 'pilha' }, abasP('prompt'),
+      cartao(null, null, vazio('Crie uma campanha primeiro: o prompt é de cada campanha.', 'conversa'))));
+    return;
+  }
+  const [ro, rv, rh, rc] = await Promise.all([chamar('prosp_objeto', { tipo: 'campanha', id: cid }), chamar('prosp_prompt_ver', { campanha_id: cid }),
+    chamar('prosp_prompt_ver', { campanha_id: cid, versoes: 'SIM' }), chamar('prosp_conversas', { campanha_id: cid, dias: '90', pagina: 0 })]);
+  if (falhou(c, ro, 'Prompt da IA')) return;
+  const o = ro.dados.objeto, cfg = ro.dados.config || {}, editar = ligada('editar_prospeccao');
+  const atual = (cfg.ia || {}).prompt_texto || '';
+  const erro = el('p', { class: 'erro', role: 'alert' });
+  const caixa = el('textarea', { class: 'entrada p-prompt-campo', id: 'p-prompt', rows: '14', maxlength: '8000', autocomplete: 'off', value: atual || (rv.ok ? rv.montado || '' : ''), disabled: !editar });
+  const alvo = () => ({ campanha_id: cid, rascunho: { ia: { prompt_texto: caixa.value.trim() } } });
+  const salvar = (texto, titulo) => {
+    const nova = JSON.parse(JSON.stringify(cfg)); nova.ia = { ...(nova.ia || {}), prompt_texto: texto };
+    return fazer('prosp_campanha_salvar', { id: cid, nome: o.nome, config: nova }, { titulo, nivel: ativo(o.situacao) ? 2 : 1, linhas: [['Texto do prompt', resumoTxt(atual), resumoTxt(texto)]],
+      texto: 'Vira uma versão nova: as próximas respostas da IA usam este texto (as regras fixas continuam no fim).', ok: 'Versão nova salva.',
+      erro: x => { erro.textContent = x.mensagem || 'Não consegui salvar.'; }, depois: () => { est.prosp = null; rotear(); } });
+  };
+  const salvarTela = () => {
+    erro.textContent = '';
+    const t = caixa.value.trim();
+    if (t === atual.trim()) { rapida('Nada mudou.'); return; }
+    if (t && (t.length < 50 || t.length > 8000)) { erro.textContent = 'O texto tem de 50 a 8.000 letras (ou fica vazio para usar o montado pelos campos).'; caixa.focus(); return; }
+    salvar(t, 'Salvar o prompt de ' + o.nome);
+  };
+  const comecar = async () => {
+    if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
+      texto: 'O que está no campo vira o texto montado pelos campos da campanha. Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
+    caixa.value = rv.ok ? rv.montado || '' : ''; caixa.focus();
+  };
+  const versoes = (rh.ok && rh.versoes) || [], porPrompt = (rc.ok && rc.versoes_prompt) || [];
+  const selCamp = camps.length > 1 ? el('label', { class: 'campo' }, el('span', { class: 'rot', text: 'Campanha' }),
+    el('select', { class: 'entrada', id: 'p-prompt-campanha', onchange: e => irP('prompt', e.target.value) }, camps.map(x => el('option', { value: x.id, text: x.nome, selected: x.id === cid })))) : null;
+  trocar(c, cabecalho('Prompt da IA', `${o.nome} · versão ${o.versao}`, etqSit(o.situacao)),
+    el('div', { class: 'pilha' }, abasP('prompt'), selCamp,
+      cartao('Texto do prompt', el('span', { class: 'mudo peq', text: 'o que a IA sabe e como conversa' }), corpo(
+        el('label', { class: 'campo largo', for: 'p-prompt' }, el('span', { class: 'rot', text: 'Texto (de 50 a 8.000 letras; vazio = o montado pelos campos da campanha)' }), caixa,
+          el('span', { class: 'ajuda', text: 'Sem preço e sem link de fora: os preços oficiais, o link de contratação e o SAIR entram sempre, nas regras fixas.' })),
+        erro, el('div', { class: 'acoes' }, editar ? btn('Salvar a versão nova', salvarTela, 'pri') : null,
+          editar ? btn('Testar conversa', () => testarConversa(alvo(), o.nome), 'sec', 'conversa') : null,
+          editar ? btn('Começar do texto montado', comecar, 'sec') : null,
+          btn('Ver o prompt inteiro', () => verPrompt(alvo()), 'fant', 'info')))),
+      el('details', { class: 'grupo' }, el('summary', { text: 'As regras que nunca mudam' }), el('div', { class: 'corpo-grupo' }, blocoPrompt('Regras fixas (Política v10)', rv.ok ? rv.fixas : '', true))),
+      cartao('Versões', el('span', { class: 'mudo peq', text: 'cada salvar cria uma versão (nunca editada)' }), versoes.length ? el('ul', { class: 'lista' }, versoes.map(v => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Versão ' + v.versao + (v.versao === o.versao ? ' (a de agora)' : '') }), el('div', { class: 't2', text: `${fmtHora(v.criada_em)} · ${resumoTxt(v.texto)}` })),
+        el('div', { class: 'direita acoes' }, btn('O que mudou', () => verVersao('campanha', cid, v.versao), 'fant'),
+          editar && v.versao !== o.versao && (v.texto || '') !== atual ? btn('Voltar a esta versão', () => salvar(v.texto || '', 'Voltar à versão ' + v.versao), 'sec') : null)))))
+        : vazio('Nenhuma versão ainda.', 'relogio')),
+      cartao('Conversas de cada versão', el('span', { class: 'mudo peq', text: 'últimos 90 dias' }), porPrompt.length ? el('ul', { class: 'lista' }, porPrompt.map(p => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Prompt nº ' + p.prompt_id }), el('div', { class: 't2', text: `desde ${fmtData(p.desde)} · ${pl(p.respostas, 'resposta', 'respostas')} da IA` })),
+        el('div', { class: 'direita acoes' }, btn('Ver o texto', () => verPromptUsado(p.prompt_id), 'fant'),
+          btn('Ver as conversas', () => { est.convP = { resultado: '', campanha_id: cid, conjunto_id: '', anuncio_id: '', prompt_id: String(p.prompt_id), dias: '90', pagina: 0 }; irP('conversas'); }, 'sec'))))))
+        : vazio('Nenhuma resposta da IA ainda.', 'conversa'))));
+}
+
 // ---------- Prompt da IA: ver inteiro e testar a conversa (sql/041, DEC-096)
 // Ver: a parte editável (do anúncio, da campanha ou montada pelos campos) e as regras fixas, travadas (o servidor sempre
 // põe; a página nunca manda). Sem dado de lead: a 2ª mensagem aparece com marcas no lugar dos dados.
-const ORIGEM_PROMPT = { anuncio: 'prompt próprio do anúncio', campanha: 'texto do prompt da campanha', montado: 'montado pelos campos de "IA de resposta"' };
+const ORIGEM_PROMPT = { campanha: 'texto do prompt da campanha', montado: 'montado pelos campos de "IA de resposta"' };
 const blocoPrompt = (titulo, texto, travado) => el('div', { class: 'p-prompt' + (travado ? ' travado' : '') }, el('div', { class: 'p-prompt-cab' }, travado ? icone('cadeado', 'p') : null, el('b', { text: titulo })), el('pre', { text: texto || '' }));
 async function verPrompt(alvo) {
   const r = await chamar('prosp_prompt_ver', alvo);
@@ -2860,10 +2907,12 @@ function testarConversa(alvo, nome) {
   };
   const fechar = janela(el('form', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-teste', onsubmit: enviar }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-teste', text: 'Testar conversa · ' + nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
-    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'Usa o prompt que está na tela (mesmo sem salvar), a mesma montagem e a mesma limpeza das respostas de verdade. Nada vai para o WhatsApp e nada fica guardado além do registro.' }),
+    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'Usa o texto que está na tela (mesmo sem salvar), a mesma montagem e a mesma limpeza das respostas de verdade. Nada vai para o WhatsApp e nada fica guardado além do registro.' }),
       el('div', { class: 'form-2' }, el('label', { class: 'campo', for: 't-nome' }, el('span', { class: 'rot', text: 'Negócio (de mentira)' }), nomeIn),
         el('label', { class: 'campo', for: 't-nicho' }, el('span', { class: 'rot', text: 'Nicho' }), nichoIn), el('label', { class: 'campo', for: 't-cidade' }, el('span', { class: 'rot', text: 'Cidade' }), cidadeIn)),
-      lista, el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
+      lista, el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Mensagens prontas' }, ['Quanto custa?', 'Já tenho secretária', 'Quero falar com uma pessoa', 'SAIR']
+        .map(x => el('button', { type: 'button', onclick: () => { msgIn.value = x; enviar({ preventDefault() {} }); } }, x))),
+      el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
     el('div', { class: 'pe' }, btn('Limpar a conversa', () => { hist.length = 0; desenhar(); }, 'sec'), mandar)));
   desenhar();
 }

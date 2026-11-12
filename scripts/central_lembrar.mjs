@@ -5,7 +5,8 @@
 //      (lembranca_usada); lembrança que o servidor não aceita é esquecida e volta a pedir senha + código;
 //   3. Segurança mostra os aparelhos lembrados, sem nada de Face ID; "Sair" esquece este aparelho;
 //   4. o nível 3 que pede a senha de novo abre a janela da senha e repete a ação uma vez;
-//   5. Marketing: "Ver prompt completo" mostra as regras fixas travadas; "Testar conversa" mostra a resposta e "seria barrada".
+//   5. Prospecção › Prompt da IA (rxsync-sistema DEC-211): "Ver o prompt inteiro" mostra as regras fixas travadas; "Testar
+//      conversa" (com a mensagem pronta "Quanto custa?") mostra a resposta e "seria barrada".
 // No localStorage, só a aparência e a lembrança; no sessionStorage, só a sessão.
 // Uso (precisa do Playwright): node scripts/central_lembrar.mjs
 import { abrirNavegador, servirSite, servidor, N8N, CHAVES_LIGADAS } from './central_simulado.mjs';
@@ -60,13 +61,13 @@ await page.locator('#c-senha-de-novo').fill('senha-de-teste-123'); await page.ge
 await page.waitForFunction(() => /o link vai para o e-mail/.test(document.getElementById('rapida').textContent || ''));
 ok(nivel3 === 2 && chamadas.some(c => c.acao === 'senha_reconfirmar'), 'nível 3: pediu a senha, conferiu e repetiu a ação uma vez');
 // 5. prompt da campanha
-await page.evaluate(() => { location.hash = 'prospeccao/campanha/CMP-0001'; });
-await page.getByRole('button', { name: 'Ver prompt completo' }).click();
-await page.getByText('Regras que nunca mudam').first().waitFor();
+await page.evaluate(() => { location.hash = 'prospeccao/prompt/CMP-0001'; });
+await page.getByRole('button', { name: 'Ver o prompt inteiro' }).click();
+await page.locator('#camada .p-prompt.travado').first().waitFor();
 ok(await page.locator('#camada .p-prompt.travado').count() >= 1, 'Ver prompt: as regras fixas aparecem travadas');
 await page.locator('#camada .pe').getByRole('button', { name: 'Fechar' }).click();
 await page.getByRole('button', { name: 'Testar conversa' }).click();
-await page.locator('#t-msg').fill('Quanto custa?'); await page.getByRole('button', { name: 'Mandar' }).click();
+await page.locator('#camada').getByRole('button', { name: 'Quanto custa?' }).click();
 await page.getByText('seria barrada: preço fora dos oficiais').waitFor();
 const sim = chamadas.find(c => c.acao === 'prosp_simular');
 ok(sim && sim.dados.campanha_id === 'CMP-0001' && sim.dados.historico.length === 1 && sim.dados.historico[0].role === 'user', 'Testar conversa: manda a campanha e a conversa, e mostra "seria barrada"');

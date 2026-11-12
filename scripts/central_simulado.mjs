@@ -260,7 +260,13 @@ export const CREDITOS_MES = { gastos: 41, teto: 300 };
 const pubObj = id => PUBS().find(p => p.id === id);
 export const PROSP = {
   // Revisar conversas (sql/043, DEC-098): resposta direta (sem "dados") (o "Sugerir melhorias" saiu, rxsync-sistema DEC-211).
-  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, versoes_prompt: [],
+  // Prompt da IA (rxsync-sistema DEC-211): o texto, as regras fixas e as versões do texto da campanha.
+  prosp_prompt_ver: d => d.versoes === 'SIM' ? { ok: true, versoes: [{ versao: 2, criada_em: '2026-10-14T12:00:00Z', criada_por: 'central iPad', motivo: '', texto: 'Você é a assistente virtual da RXSync. Fale curto e ofereça o teste grátis de 7 dias.', montado: false },
+      { versao: 1, criada_em: '2026-10-10T12:00:00Z', criada_por: 'central iPad', motivo: '', texto: '', montado: true }] }
+    : { ok: true, editavel: { texto: 'Você é a assistente virtual da RXSync…', origem: 'campanha' }, montado: 'Você é a assistente virtual da RXSync (montado pelos campos).',
+      fixas: 'REGRAS QUE NUNCA MUDAM:\n- Você é uma assistente virtual (inteligência artificial)…', completo: 'tudo', contato_modelo: 'Dados do contato: negócio "[negócio]"…', modelo: 'gpt-x', max_tokens: 400, memoria: 20, aviso: '' },
+  prosp_simular: () => ({ ok: true, texto: 'O Essencial custa R$ 299 por mês, e os primeiros 7 dias são grátis.', marca: 'INTERESSE', barrada: null, origem: 'campanha' }),
+  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, versoes_prompt: [{ prompt_id: 7, desde: '2026-10-10T10:00:00Z', respostas: 12 }],
     conversas: [{ lead_id: 'PX-AAAAA', nome: 'Sorriso Batel', nicho: 'dentista', cidade: 'Curitiba', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: 'AN-0001', situacao: 'recusou',
       resultado: 'recusou', ultimo_contato_em: '2026-10-15T12:00:00Z', ia_mensagens: 0, passou_para_voce: false,
       mensagens: [{ direcao: 'saiu', autor: 'disparo', texto: 'Oi! Vi a Sorriso Batel no Maps.', quando: '2026-10-15T11:00:00Z', prompt_id: null }, { direcao: 'entrou', autor: 'lead', texto: 'Não, obrigado.', quando: '2026-10-15T12:00:00Z', prompt_id: null }] }] }),
