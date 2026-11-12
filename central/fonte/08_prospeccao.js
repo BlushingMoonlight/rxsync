@@ -89,7 +89,7 @@ function interruptorP(tipo, o) {
 // ---------------------------------------------------------------- telas
 TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
-  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, prompt: pPrompt, relatorio: pRelatorio, relatorios: pRelatorio, regras: pRegras, custos: pInicio };
+  const telasP = { '': pInicio, campanha: pCampanha, editar: (cc, p, a) => pObjeto(cc, 'campanha', a), conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, prompt: pPrompt, relatorio: pRelatorio, relatorios: pRelatorio, regras: pRegras, custos: pInicio };
   const fn = telasP[parte] || pInicio;
   if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
@@ -173,6 +173,165 @@ async function pInicio(c) {
       cartaoMotor(motor),
       editar ? null : nota('Criar, editar, ligar e pausar estão desligados (editar_prospeccao).', true),
       ...arvore));
+}
+
+// ---------- A campanha (rxsync-sistema DEC-211): nasce em 5 passos (molde F) e tem uma tela própria (molde C). Por trás,
+// o banco continua com as camadas (campanha, conjunto, mensagem e público); elas ficam no "Avançado".
+// "Ligar a campanha" liga tudo numa confirmação só (nível 3, o nome da campanha): a campanha, os conjuntos, as mensagens,
+// os números e as chaves de busca, IA e disparo que faltarem. Pausar é um toque.
+function ligarCampanha(cp, depois) {
+  return fazer('prosp_ligar_tudo', { campanha_id: cp.id }, { titulo: 'Ligar a campanha ' + cp.nome, nivel: 3, nome: cp.nome, rotuloNome: 'o nome da campanha', rotuloNivel: 'manda mensagens de verdade',
+    texto: 'Liga a campanha, a mensagem, o número e, se faltarem, a busca, a IA e o disparo. As mensagens saem só de segunda a sexta, nas janelas, com o aquecimento do número (cerca de 10 por dia na 1ª semana).',
+    botao: 'Ligar a campanha', depois: async () => { est.prosp = null; if (depois) await depois(); else await rotear(); } });
+}
+function pausarCampanha(cp) {
+  return fazer('prosp_ligar', { tipo: 'campanha', id: cp.id, valor: 'NAO' }, { titulo: 'Pausar ' + cp.nome, linhas: [['Situação', 'ativa', 'pausada']], ok: 'Pausada.',
+    depois: async () => { est.prosp = null; await rotear(); } });
+}
+// Número novo, de qualquer tela: cria a instância "prospec-…" e mostra o código (o QR só na tela, DEC-071).
+function criarNumero() {
+  return fazer('prosp_numero_criar', {}, { titulo: 'Novo número de prospecção', texto: 'Cria a instância "prospec-…" na Evolution (a mesma das clínicas, DEC-071) e mostra o código para ler no celular do chip novo.',
+    campos: [{ k: 'nome', rot: 'Nome (ex.: Prospecção 1)', obrig: true, minimo: 3, erro: 'Nome: de 3 a 40 letras.' }], ok: 'Número criado.',
+    silencioso: true, depois: async x => { est.prosp = null; await rotear(); if (x.qr) mostrarQR(x.numero || {}, x.qr); else rapida('Criado. Toque em "Mostrar o código" para conectar.'); } });
+}
+
+// Os 5 passos: quem recebe, a mensagem, o que a IA conta, número e horário, confira e ligar. As respostas ficam só na
+// memória da página (est.nova) até "Ligar a campanha" ou "Salvar sem ligar"; o servidor confere tudo de novo.
+const PASSOS_NOVA = ['Quem recebe', 'A mensagem', 'O que a IA conta', 'Número e horário', 'Confira e ligar'];
+const SAIDA_PADRAO = 'Se não quiser receber mensagens, responda SAIR.';
+const linhasDe = v => String(v || '').split('\n').map(x => x.trim()).filter(Boolean);
+async function pNova(c) {
+  topo('Nova campanha', [['Prospecção', 'prospeccao'], ['Nova campanha']], 'prospeccao');
+  if (!ligada('editar_prospeccao')) { trocar(c, cabecalho('Nova campanha'), nota('Criar está desligado (editar_prospeccao).', true)); return; }
+  const a = await arvoreP(true);
+  est.nova = est.nova || { passo: 0, termos: '', lugares: '', modelo: 'medicos', fuso: 'America/Sao_Paulo', marca: 'RXSync', abordagem: '', saida: SAIDA_PADRAO, fu: false, fuTexto: '', fuDias: '3', produto: '', numero: '', nome: '' };
+  const n = est.nova, erro = el('p', { class: 'erro', role: 'alert' });
+  const irPasso = k => { n.passo = Math.max(0, Math.min(PASSOS_NOVA.length - 1, k)); rotear(); };
+  const area = (id, rot, v, ajuda, linhas) => { const i = el('textarea', { class: 'entrada', id, rows: String(linhas || 4), autocomplete: 'off', value: v || null });
+    return [i, el('label', { class: 'campo largo', for: id }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
+  const linha = (id, rot, v, ajuda) => { const i = el('input', { class: 'entrada', id, autocomplete: 'off', value: v || null });
+    return [i, el('label', { class: 'campo', for: id }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
+  let conteudo, ler = () => true;
+  if (n.passo === 0) {
+    const [t, tc] = area('n-termos', 'Especialidades (uma por linha)', n.termos, 'ex.: cardiologista, dermatologista');
+    const [l, lc] = area('n-lugares', 'Cidades ou bairros (um por linha)', n.lugares, 'para uma cidade grande, ponha os bairros: cada bairro é uma busca');
+    const m = el('select', { class: 'entrada', id: 'n-modelo' }, [['medicos', 'Médicos (aceita poucas avaliações e confere o fixo no WhatsApp)'], ['padrao', 'Dentistas e clínicas']].map(([v, x]) => el('option', { value: v, text: x, selected: n.modelo === v })));
+    const fz = el('select', { class: 'entrada', id: 'n-fuso' }, FUSOS.map(([v, x]) => el('option', { value: v, text: x, selected: n.fuso === v })));
+    conteudo = [tc, lc, el('label', { class: 'campo', for: 'n-modelo' }, el('span', { class: 'rot', text: 'Tipo de profissional' }), m),
+      el('label', { class: 'campo', for: 'n-fuso' }, el('span', { class: 'rot', text: 'Fuso das cidades' }), fz, el('span', { class: 'ajuda', text: 'uma campanha só junta cidades do mesmo fuso' }))];
+    ler = () => { n.termos = t.value; n.lugares = l.value; n.modelo = m.value; n.fuso = fz.value;
+      if (!linhasDe(n.termos).length || !linhasDe(n.lugares).length) { erro.textContent = 'Escreva pelo menos uma especialidade e uma cidade ou bairro.'; return false; } return true; };
+  } else if (n.passo === 1) {
+    const [mc, mcc] = linha('n-marca', 'Marca (vai na mensagem)', n.marca, 'até 40 letras; na mensagem, escreva {marca}');
+    const [ab, abc] = area('n-abordagem', 'Primeira mensagem', n.abordagem, 'campos: {nome} {cidade} {bairro} {nicho} {marca}; diga "assistente virtual", a marca e de onde veio o contato (Google Maps)', 5);
+    const [sd, sdc] = linha('n-saida', 'Texto de saída (precisa ter SAIR)', n.saida);
+    const tam = el('input', { type: 'hidden', value: '400' });
+    const prev = previaAnuncio(ab, sd, tam, mc.value);
+    mc.addEventListener('input', () => { n.marca = mc.value; });
+    const [ft, ftc] = area('n-fu-texto', 'Texto do follow-up', n.fuTexto, 'sai só para quem não respondeu', 3);
+    const [fd, fdc] = linha('n-fu-dias', 'Depois de (dias úteis)', n.fuDias);
+    const fuBox = el('div', { class: 'pilha', hidden: !n.fu }, ftc, fdc);
+    conteudo = [mcc, abc, sdc, el('h3', { text: 'Como o contato vai ver' }), prev,
+      n.fu ? fuBox : el('div', { class: 'acoes' }, btn('Adicionar follow-up', () => { n.fu = true; n.marca = mc.value; n.abordagem = ab.value; n.saida = sd.value; rotear(); }, 'fant', 'mais_um'))];
+    ler = () => { n.marca = mc.value.trim(); n.abordagem = ab.value.trim(); n.saida = sd.value.trim(); n.fuTexto = ft.value.trim(); n.fuDias = fd.value.trim();
+      if (!n.marca || !n.abordagem) { erro.textContent = 'Escreva a marca e a primeira mensagem.'; return false; }
+      if (!/\bSAIR\b/.test(n.saida)) { erro.textContent = 'O texto de saída precisa ter a palavra SAIR.'; return false; } return true; };
+  } else if (n.passo === 2) {
+    const [pr, prc] = area('n-produto', 'O que a IA conta sobre o produto', n.produto, 'de 20 a 1.500 letras; sem preço (os preços oficiais entram sozinhos, nas regras fixas)', 7);
+    conteudo = [prc, nota('Depois de criar, o texto inteiro da IA fica na página Prompt da IA, com "Testar conversa".')];
+    ler = () => { n.produto = pr.value.trim(); if (n.produto.length < 20) { erro.textContent = 'Conte o produto em pelo menos 20 letras.'; return false; } return true; };
+  } else if (n.passo === 3) {
+    const nums = ((a && a.numeros) || []).filter(x => x.situacao !== 'apagado');
+    const sel = el('select', { class: 'entrada', id: 'n-numero' }, el('option', { value: '', text: nums.length ? '(escolha)' : '(nenhum número ainda)' }),
+      nums.map(x => el('option', { value: String(x.id), text: `${x.instancia} · ${x.nome} (${(P_NUM[x.situacao] || [x.situacao])[0]})`, selected: n.numero === String(x.id) })));
+    const escolhido = nums.find(x => String(x.id) === n.numero);
+    conteudo = [el('label', { class: 'campo', for: 'n-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), sel, el('span', { class: 'ajuda', text: 'use um chip só para a prospecção' })),
+      ligada('editar_numeros_prospeccao') ? el('div', { class: 'acoes' }, btn('Novo número', () => { n.numero = sel.value; criarNumero(); }, 'sec', 'mais_um'),
+        escolhido && escolhido.situacao !== 'conectado' ? btn('Mostrar o código', () => pedirQR(escolhido), 'sec') : null) : null,
+      el('div', { class: 'aviso info' }, icone('relogio'), el('div', {}, el('b', { text: 'Quando sai: ' }), 'de segunda a sexta, das 9h às 11h30 e das 14h às 17h30, uma mensagem a cada 3 a 9 minutos. Número novo começa devagar: cerca de 10 por dia na 1ª semana, 20 na 2ª, 30 na 3ª e 40 depois.'))];
+    ler = () => { n.numero = sel.value; if (!n.numero) { erro.textContent = 'Escolha o número que envia (ou crie um).'; return false; } return true; };
+  } else {
+    const termos = linhasDe(n.termos), lugares = linhasDe(n.lugares), num = ((a && a.numeros) || []).find(x => String(x.id) === n.numero);
+    if (!n.nome) n.nome = (termos[0] || 'Campanha') + ' ' + (lugares[0] || '');
+    const [nm, nmc] = linha('n-nome', 'Nome da campanha', n.nome);
+    const resumo = (passo, texto) => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => { n.nome = nm.value; irPasso(passo); } },
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: PASSOS_NOVA[passo] }), el('div', { class: 't2', text: texto })), el('span', { class: 'mudo peq', text: 'Mudar' })));
+    conteudo = [nmc, el('ul', { class: 'lista' },
+      resumo(0, `${termos.join(', ')} em ${lugares.join(', ')} · ${n.modelo === 'medicos' ? 'médicos' : 'dentistas e clínicas'} · ${fusoNome(n.fuso)}`),
+      resumo(1, n.abordagem.slice(0, 120) + (n.fu ? ' · com follow-up' : '')),
+      resumo(2, n.produto.slice(0, 120)),
+      resumo(3, num ? `${num.instancia} (${(P_NUM[num.situacao] || [num.situacao])[0]})` : '(sem número)')),
+      el('p', { class: 'mudo peq', text: `Gasta no máximo ${fmtNum(termos.length * lugares.length * 3)} créditos do SerpAPI na primeira busca (${pl(termos.length * lugares.length, 'busca', 'buscas')} de até 3 páginas).` }),
+      num && num.situacao !== 'conectado' ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, 'O número ainda não está conectado: dá para salvar sem ligar e ligar depois de ler o código.')) : null];
+    ler = () => { n.nome = nm.value.trim(); if (n.nome.length < 3) { erro.textContent = 'Nome da campanha: de 3 a 80 letras.'; return false; } return true; };
+  }
+  const criar = async ligar => {
+    erro.textContent = ''; if (!ler()) return;
+    const busca = { termos: linhasDe(n.termos), lugares: linhasDe(n.lugares) };
+    if (n.modelo === 'medicos') Object.assign(busca, { avaliacoes_min: 0, sem_nota: 'aceitar', nota_min: 4, nota_max: 5, telefone_fixo: 'conferir' });
+    const anuncio = { abordagem: n.abordagem, texto_saida: n.saida, followups: n.fu && n.fuTexto ? [{ dias_uteis: Number(n.fuDias) || 3, texto: n.fuTexto }] : [] };
+    const r = await fazer('prosp_campanha_nova', { nome: n.nome, publico: { config: { busca, fuso: n.fuso } }, campanha: { config: { marca: n.marca, produto: n.produto } },
+      conjunto: { numero_id: n.numero, config: {} }, anuncio: { config: anuncio } }, { silencioso: true, erro: x => { erro.textContent = x.mensagem || 'Não consegui criar.'; }, depois: () => {} });
+    if (!r) return;
+    est.nova = null; est.prosp = null; est.publicos = null;
+    if (ligar) await ligarCampanha({ id: r.campanha_id, nome: n.nome }, () => irP('campanha', r.campanha_id));
+    else { rapida('Campanha salva em rascunho. Ligue quando quiser.'); irP('campanha', r.campanha_id); }
+  };
+  const ultimo = n.passo === PASSOS_NOVA.length - 1;
+  trocar(c, cabecalho(PASSOS_NOVA[n.passo], `Nova campanha · passo ${n.passo + 1} de ${PASSOS_NOVA.length}`),
+    el('div', { class: 'pilha p-nova' }, el('form', { class: 'cartao', novalidate: true, onsubmit: e => { e.preventDefault(); erro.textContent = ''; if (ultimo) criar(true); else if (ler()) irPasso(n.passo + 1); } },
+      el('div', { class: 'corpo pilha' }, ...conteudo, erro,
+        el('div', { class: 'acoes' }, n.passo > 0 ? btn('Voltar', () => { ler(); irPasso(n.passo - 1); }, 'sec') : btn('Cancelar', () => { est.nova = null; irP(''); }, 'sec'),
+          ultimo ? btn('Salvar sem ligar', () => criar(false), 'sec') : null,
+          el('button', { class: 'btn pri', type: 'submit', text: ultimo ? 'Ligar a campanha' : 'Continuar' }))))));
+}
+
+// A tela da campanha (molde C): o estado e a ação principal (ligar ou pausar), até 3 ações rápidas, quem recebe, a
+// mensagem, o número, os números da semana, o "Avançado" (fechado) e o perigo no fim.
+async function pCampanha(c, parte, id) {
+  if (!id || id === 'novo') return pNova(c);
+  const a = await arvoreP(true);
+  const cp = ((a && a.campanhas) || []).find(x => x.id === id);
+  topo(cp ? cp.nome : 'Campanha', [['Prospecção', 'prospeccao'], [cp ? cp.nome : 'Campanha']], 'prospeccao');
+  if (!cp) { falhou(c, { ok: false, mensagem: 'Campanha não encontrada.' }, 'Campanha'); return; }
+  await publicosP(true);
+  const editar = ligada('editar_prospeccao') && !/^encerrad/.test(cp.situacao);
+  const cjs = (cp.conjuntos || []).filter(j => !/^encerrad/.test(j.situacao));
+  const pubs = [...new Set(cjs.flatMap(j => j.publicos || []))].map(pid => ((est.publicos && est.publicos.publicos) || []).find(p => p.id === pid)).filter(Boolean);
+  const msgs = cjs.flatMap(j => (j.anuncios || []).filter(n => !/^encerrad/.test(n.situacao)).map(n => ({ ...n, conjunto: j })));
+  const nums = cjs.map(j => j.numero).filter(Boolean);
+  const semana = ((a.resultados || {}).ultimos_7_dias || []).filter(x => x.chave === cp.id);
+  const soma = k => semana.reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
+  const principal = !editar ? null : ativo(cp.situacao) ? btn('Pausar a campanha', () => pausarCampanha(cp), 'sec') : btn('Ligar a campanha', () => ligarCampanha(cp), 'pri');
+  const pendencias = [!pubs.length ? 'falta o público' : null, !msgs.length ? 'falta a mensagem' : null, !nums.length ? 'falta o número' : null,
+    nums.some(nn => nn.situacao !== 'conectado') ? 'o número não está conectado' : null].filter(Boolean);
+  trocar(c, cabecalho(cp.nome, `campanha · ${cp.id} · versão ${cp.versao}`, etqSit(cp.situacao), principal),
+    el('div', { class: 'pilha' },
+      pendencias.length && !ativo(cp.situacao) && editar ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, 'Antes de ligar: ' + pendencias.join(', ') + '.')) : null,
+      cp.pausa_motivo ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', { text: 'Pausada sozinha: ' + cp.pausa_motivo })) : null,
+      el('div', { class: 'acoes' }, btn('Prompt da IA', () => irP('prompt', cp.id), 'sec', 'conversa'), btn('Leads', () => { est.leadsFiltro = { conjunto_id: cjs.length === 1 ? cjs[0].id : '', publico_id: '', busca: '', pagina: 1 }; irP('leads'); }, 'sec', 'clientes'),
+        editar ? btn('Duplicar', () => fazer('prosp_duplicar', { tipo: 'campanha', id: cp.id }, { ok: 'Cópia criada em rascunho.', depois: x => { est.prosp = null; irP('campanha', x.id); } }), 'sec') : null),
+      el('div', { class: 'kpis' }, kpi('Enviadas (7 dias)', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
+      cartao('Quem recebe', null, pubs.length ? el('ul', { class: 'lista' }, pubs.map(p => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('publico', p.id) },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: p.nome }), el('div', { class: 't2', text: `${resumoBusca(p)} · ${fmtNum((p.numeros || {}).disponiveis)} disponíveis de ${fmtNum((p.numeros || {}).tamanho)}` })), icone('seta')))))
+        : vazio('Sem público ainda.', 'clientes')),
+      cartao('A mensagem', null, msgs.length ? el('ul', { class: 'lista' }, msgs.map(m => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('anuncio', m.id) },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: m.nome }), el('div', { class: 't2', text: `${m.id} · versão ${m.versao}${m.pausa_motivo ? ' · ' + m.pausa_motivo : ''}` })), el('div', { class: 'direita' }, etqSit(m.situacao)), icone('seta')))),
+          msgs.length > 1 ? el('li', {}, nota('Mais de uma mensagem: elas são sorteadas em partes iguais (de antes da DEC-211).')) : null) : vazio('Sem mensagem ainda.', 'conversa')),
+      cartao('Número e horário', null, cjs.length ? el('ul', { class: 'lista' }, cjs.map(j => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('conjunto', j.id) },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: j.numero ? j.numero.instancia : 'sem número' }), el('div', { class: 't2', text: `conjunto ${j.nome} · a entrega (dias, janelas e tetos)` })),
+        el('div', { class: 'direita' }, j.numero ? etqNum(j.numero.situacao) : etq('sem número', 'atencao')), icone('seta'))))) : vazio('Sem número ainda.', 'telefone')),
+      el('details', { class: 'grupo' }, el('summary', { text: 'Avançado' }), el('div', { class: 'corpo-grupo pilha' },
+        el('ul', { class: 'lista' },
+          el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('editar', cp.id) }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'A campanha' }), el('div', { class: 't2', text: 'marca, produto, orçamento, datas e a IA de resposta' })), icone('seta'))),
+          ...(cp.conjuntos || []).map(j => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('conjunto', j.id) }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Conjunto ' + j.nome }), el('div', { class: 't2', text: `${(j.publicos || []).length ? pl(j.publicos.length, 'público', 'públicos') : 'sem público'} · ${j.id}` })), el('div', { class: 'direita' }, etqSit(j.situacao)), icone('seta')))),
+          ...pubs.map(p => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('publico', p.id, 'configuracao') }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Filtros do público ' + p.nome }), el('div', { class: 't2', text: 'nota, avaliações, categorias, redes, qualificação, coordenadas' })), icone('seta'))))),
+        editar ? el('div', { class: 'acoes' }, btn('Novo conjunto', () => irP('conjunto', 'novo', cp.id), 'fant', 'mais_um'),
+          cjs.length ? btn('Exportar planilha', () => fazer('prosp_exportar', { conjunto_id: cjs.length === 1 ? cjs[0].id : '', situacao: '' }, { titulo: 'Exportar os leads (CSV)', texto: 'O arquivo sai SEM telefone (DEC-079). Fica no registro da Central.', botao: 'Exportar',
+            depois: x => { baixar(x.arquivo || 'leads.csv', x.csv || ''); }, ok: 'Arquivo pronto.' }), 'sec') : null) : null)),
+      editar ? el('div', { class: 'acoes perigo-fim' }, cp.situacao === 'rascunho' ? btn('Apagar o rascunho', () => fazer('prosp_apagar_rascunho', { tipo: 'campanha', id: cp.id }, { titulo: 'Apagar o rascunho ' + cp.nome, linhas: [['Rascunho', cp.nome, '(apagado)']], botao: 'Apagar', perigo: true, ok: 'Rascunho apagado.', depois: () => { est.prosp = null; ir('prospeccao'); } }), 'perigo-sec') : null,
+        btn('Encerrar', () => fazer('prosp_encerrar', { tipo: 'campanha', id: cp.id }, { titulo: 'Encerrar ' + cp.nome, nome: cp.nome, rotuloNome: 'o nome da campanha', rotuloNivel: 'não volta', botao: 'Encerrar',
+          texto: 'Encerra a campanha com os conjuntos e as mensagens dela. Não volta: para usar de novo, duplique.', ok: 'Encerrada.', depois: () => { est.prosp = null; ir('prospeccao'); } }), 'perigo-sec')) : null));
 }
 
 // ---------- editor de uma camada (campanha, conjunto ou anúncio)

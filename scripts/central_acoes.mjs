@@ -155,12 +155,24 @@ const CASOS = [
   // Segurança
   { acao: 'desfazer', rota: 'seguranca/registro', abrirCom: () => botao('Desfazer').click(), espera: { registro_id: 50 } },
   // Prospecção (sql/031 e sql/032): camadas, números, leads, relatórios, buscas, regras e custos
-  { acao: 'prosp_campanha_salvar', nivel: 2, rota: P + '/campanha/CMP-0001', antes: () => page.fill('#p-marca', 'RXSync Saúde'), abrirCom: () => botao('Salvar a versão nova').click(),
+  { acao: 'prosp_campanha_salvar', nivel: 2, rota: P + '/editar/CMP-0001', antes: () => page.fill('#p-marca', 'RXSync Saúde'), abrirCom: () => botao('Salvar a versão nova').click(),
     espera: { id: 'CMP-0001', nome: 'Odonto Sul', config: { ...CFG.campanha, marca: 'RXSync Saúde' } } },
   { acao: 'prosp_conjunto_salvar', nivel: 3, rota: P + '/conjunto/CJ-0001', antes: () => page.selectOption('#p-numero', '2'), abrirCom: () => botao('Salvar a versão nova').click(), nome: 'Dentistas Curitiba',
     espera: { id: 'CJ-0001', nome: 'Dentistas Curitiba', config: CFG.conjunto, numero_id: '2' } },
   { acao: 'prosp_anuncio_salvar', rota: P + '/anuncio/novo/CJ-0001', antes: async () => { await page.fill('#p-nome', 'D · Teste'); await page.fill('#p-abordagem', ABORD); }, abrirCom: () => botao('Criar').click(),
     espera: { id: '', nome: 'D · Teste', config: { ...CFG.anuncio, abordagem: ABORD }, conjunto_id: 'CJ-0001' } },
+  // A campanha em 5 passos e "Ligar a campanha" (rxsync-sistema DEC-211).
+  { acao: 'prosp_campanha_nova', rota: P + '/campanha/novo', antes: async () => {
+      const seguir = () => page.locator('#conteudo button[type=submit]').click();
+      await page.fill('#n-termos', 'cardiologista'); await page.fill('#n-lugares', 'Florianópolis'); await seguir();
+      await page.waitForSelector('#n-abordagem'); await page.fill('#n-abordagem', ABORD); await seguir();
+      await page.waitForSelector('#n-produto'); await page.fill('#n-produto', 'Assistente virtual que atende pacientes no WhatsApp e marca consultas.'); await seguir();
+      await page.waitForSelector('#n-numero'); await page.selectOption('#n-numero', '1'); await seguir();
+      await page.waitForSelector('#n-nome'); }, abrirCom: () => botao('Salvar sem ligar').click(),
+    espera: { nome: 'cardiologista Florianópolis', publico: { config: { busca: { termos: ['cardiologista'], lugares: ['Florianópolis'], avaliacoes_min: 0, sem_nota: 'aceitar', nota_min: 4, nota_max: 5, telefone_fixo: 'conferir' }, fuso: 'America/Sao_Paulo' } },
+      campanha: { config: { marca: 'RXSync', produto: 'Assistente virtual que atende pacientes no WhatsApp e marca consultas.' } }, conjunto: { numero_id: '1', config: {} },
+      anuncio: { config: { abordagem: ABORD, texto_saida: 'Se não quiser receber mensagens, responda SAIR.', followups: [] } } } },
+  { acao: 'prosp_ligar_tudo', rota: P + '/campanha/CMP-0002', abrirCom: () => botao('Ligar a campanha').click(), nome: 'Dermatologia (rascunho)', espera: { campanha_id: 'CMP-0002' } },
   { acao: 'prosp_duplicar', rota: P + '/campanha/CMP-0001', abrirCom: () => botao('Duplicar').click(), espera: { tipo: 'campanha', id: 'CMP-0001' } },
   { acao: 'prosp_apagar_rascunho', rota: P + '/campanha/CMP-0002', abrirCom: () => botao('Apagar o rascunho').click(), espera: { tipo: 'campanha', id: 'CMP-0002' } },
   { acao: 'prosp_encerrar', rota: P + '/campanha/CMP-0001', abrirCom: () => botao('Encerrar').click(), nome: 'Odonto Sul', espera: { tipo: 'campanha', id: 'CMP-0001' } },

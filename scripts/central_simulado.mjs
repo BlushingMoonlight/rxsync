@@ -125,6 +125,8 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   // públicos (sql/036): salvar em uso, pôr de volta em uso e pôr um público num conjunto ativo sobem de nível (rx_central_nivel)
   prosp_publico_salvar: 1, prosp_publico_renomear: 1, prosp_publico_duplicar: 1, prosp_publico_contato_marcar: 1, prosp_publico_buscar: 2, prosp_publico_contatos_lote: 2,
   prosp_publico_arquivar: 2, prosp_creditos_teto_salvar: 2,
+  // a campanha em 5 passos e "Ligar a campanha" (rxsync-sistema DEC-211)
+  prosp_campanha_nova: 1, prosp_ligar_tudo: 3,
   // demonstrações por link (sql/056, DEC-125)
   dem_criar: 1, dem_desativar: 1, dem_reativar: 1, dem_ver: 1, dem_editar: 2, dem_apagar: 3,
   // histórico das conversas ao e-mail do cadastro (sql/059, DEC-131)
@@ -260,6 +262,8 @@ export const CREDITOS_MES = { gastos: 41, teto: 300 };
 const pubObj = id => PUBS().find(p => p.id === id);
 export const PROSP = {
   // Revisar conversas (sql/043, DEC-098): resposta direta (sem "dados") (o "Sugerir melhorias" saiu, rxsync-sistema DEC-211).
+  prosp_campanha_nova: d => ({ ok: true, id: 'CMP-0003', campanha_id: 'CMP-0003', conjunto_id: 'CJ-0004', anuncio_id: 'AN-0009', publico_id: 'PB-0004', mensagem: 'Campanha criada em rascunho. Confira e toque em "Ligar a campanha".' }),
+  prosp_ligar_tudo: d => d.confirmacao === 'CONFIRMAR' && d.confirmacao_nome ? { ok: true, ligou: ['campanha', '1 mensagem', 'chave prosp_disparo'], mensagem: 'Ligado: campanha, 1 mensagem, chave prosp_disparo.' } : { ok: false, nivel: 3, mensagem: 'Confirme.' },
   // Prompt da IA (rxsync-sistema DEC-211): o texto, as regras fixas e as versões do texto da campanha.
   prosp_prompt_ver: d => d.versoes === 'SIM' ? { ok: true, versoes: [{ versao: 2, criada_em: '2026-10-14T12:00:00Z', criada_por: 'central iPad', motivo: '', texto: 'Você é a assistente virtual da RXSync. Fale curto e ofereça o teste grátis de 7 dias.', montado: false },
       { versao: 1, criada_em: '2026-10-10T12:00:00Z', criada_por: 'central iPad', motivo: '', texto: '', montado: true }] }
