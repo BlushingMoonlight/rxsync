@@ -86,9 +86,7 @@ function lembrancaLer() { try { return localStorage.getItem('painel_lembranca') 
 function lembrancaGuardar(v) { try { if (v && /^[0-9a-f]{64}$/.test(v)) localStorage.setItem('painel_lembranca', v); else localStorage.removeItem('painel_lembranca'); } catch (e) {} }
 let sessao = sessaoLer();
 if (!/^[0-9a-f]{64}$/.test(sessao)) sessao = '';
-// rxsync-sistema DEC-212: o painel só abre pela sessão (e-mail, senha e código). Quem chega por um link de antes, com ?t=,
-// vê a entrada com o aviso "Este link não vale mais"; o valor não é lido nem mandado a lugar nenhum, e sai do endereço.
-if (new URLSearchParams(location.search).has('t')) { try { history.replaceState(null, '', location.pathname + (sessao ? location.hash : '#link')); } catch (e) {} }
+// rxsync-sistema DEC-212 e DEC-213: o painel só abre pela sessão (e-mail, senha e código); nada do endereço é lido.
 const ua = navigator.userAgent;
 const APARELHO = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
 const EH_APP = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;

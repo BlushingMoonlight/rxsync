@@ -437,7 +437,7 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   ok(await linha.getByText('fora da saúde').count() >= 1, 'públicos: a situação "fora da saúde" com nome');
   ok(await linha.getByRole('button', { name: /Pôr de volta|Tirar/ }).count() === 0, 'públicos: "fora da saúde" sem botão de tirar ou pôr de volta');
   await abrir('ajustes');
-  ok(await page.getByRole('switch', { name: /link antigo/ }).count() === 0 && await page.getByRole('switch').count() > 5, 'ajustes: a chave do link do painel saiu, e as outras continuam');
+  ok(await page.getByRole('switch', { name: /link\s+antigo/ }).count() === 0 && await page.getByRole('switch').count() > 5, 'ajustes: a chave do link do painel saiu, e as outras continuam');
   feitos += 4;
 }
 // Chaves com nível do servidor (rxsync-sistema sql/063): ligar a termos_v7 abre a janela do nível 3 ("Termos v7"),

@@ -21,7 +21,6 @@ User-agent: *
 Disallow: /painel/
 Disallow: /central/
 Disallow: /demo/
-Disallow: /autoedicao.html
 Disallow: /onboarding.html
 Disallow: /conectar.html
 Disallow: /contratar.html

@@ -12,7 +12,6 @@ Os workflows do n8n e o banco ficam no repositório privado `rxsync-sistema`.
 | `onboarding.html` | formulário de implantação do cliente |
 | `conectar.html` | conexão do WhatsApp da clínica |
 | `painel/` | painel da clínica (montado de `painel/fonte/`) |
-| `autoedicao.html` | endereço antigo do painel: leva para `painel/` |
 | `conta-excluir.html` | confirmação do pedido de exclusão da conta |
 | `teste.html` | conversa de teste com a assistente |
 | `central/` | área administrativa da RXSync (com login; montada de `central/fonte/`) |

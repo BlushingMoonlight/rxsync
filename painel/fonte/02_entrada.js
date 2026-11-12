@@ -47,7 +47,7 @@ function entradaMostrar(msg, erro) {
   entInicio(msg, erro);
 }
 function entradaAbrir() {
-  const avisoH = location.hash === '#venceu' ? 'Sua entrada venceu. Entre de novo.' : location.hash === '#link' ? 'Este link não vale mais. Entre com o e-mail e a senha (no primeiro acesso, toque em "Criar senha").' : '';
+  const avisoH = location.hash === '#venceu' ? 'Sua entrada venceu. Entre de novo.' : '';
   if (location.hash) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   const lem = lembrancaLer();
   if (!/^[0-9a-f]{64}$/.test(lem)) { if (lem) lembrancaGuardar(''); entradaMostrar(avisoH, !!avisoH); return; }

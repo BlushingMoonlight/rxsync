@@ -1,6 +1,6 @@
 {
   "_sobre": "Gerado por node scripts/painel_prints.mjs. painel_sha256 é o painel/index.html do dia dos prints: o verificar_site.mjs avisa quando o painel mudar.",
-  "painel_sha256": "a21f9d16f4af7e10f411f195287131c95b5378764b2b665a89ceba7e10c59848",
+  "painel_sha256": "dcf2d4d6b6be4e08aec745cd002037e30d2bfe182ccfb6c274becf92577cbd25",
   "prints": [
     {
       "nome": "hoje-celular",

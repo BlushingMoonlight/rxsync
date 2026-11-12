@@ -32,9 +32,7 @@ const paginasGuias = () => !fs.existsSync(GUIAS) ? [] : [
   ...(fs.existsSync(path.join(GUIAS, 'index.html')) ? ['guias/index.html'] : [])];
 export const PAGINAS = {
   ...Object.fromEntries(paginasGuias().map(f => [f, PAGINA_GUIA])),
-  // - painel antigo: desde a entrega 3 (DEC-156) só leva para /painel/, com o mesmo ?t= e o mesmo #; nada de fora.
-  'autoedicao.html': { img: "'self'", connect: "'none'" },
-  // - painel novo (DEC-156): o mesmo do painel antigo. Gravada pelo painel_montar.mjs (não pelo node scripts/csp.mjs).
+  // - painel (DEC-156): só o próprio site e o n8n. Gravada pelo painel_montar.mjs (não pelo node scripts/csp.mjs).
   'painel/index.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: `'self' ${N8N}`, manifest: "'self'", montada: true },
   // - exclusão da conta: só o próprio código, as fontes do site e o n8n.
   'conta-excluir.html': { estilo: "'self'", img: "'self'", connect: N8N },

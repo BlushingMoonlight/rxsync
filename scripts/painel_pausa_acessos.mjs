@@ -111,7 +111,7 @@ await ctx.close();
 const antes = chamadas.length;
 ({ ctx, p } = await abrir('assistente', false));
 await p.waitForTimeout(300);
-ok(await p.locator('#app').isHidden() && /Este link não vale mais/.test(await p.locator('#entMsg').textContent()), 'sem sessão: o painel não abre (a entrada avisa que o link não vale mais)');
+ok(await p.locator('#app').isHidden() && await p.locator('#entrada').isVisible() && !/link/i.test(await p.locator('#entMsg').textContent()), 'sem sessão: o painel não abre (a entrada normal, sem aviso de link)');
 ok(!chamadas.slice(antes).some(c => /^assistente_/.test(c.acao)), 'sem sessão: nada de pausa vai ao 29');
 await ctx.close();
 
