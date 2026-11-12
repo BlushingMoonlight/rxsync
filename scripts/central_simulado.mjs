@@ -277,7 +277,7 @@ export const PROSP = {
   prosp_inicio: () => okD({ campanhas: ARVORE(), numeros: [N1, N2].map(({ id, instancia, nome, situacao, ligado, teto_hoje }) => ({ id, instancia, nome, situacao, ligado, teto_hoje })),
     chaves: ESTADO.segurado ? { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'SIM', prosp_politica_v10: 'SIM', prosp_balanceamento: 'SIM' }
       : { prosp_busca: 'SIM', prosp_ia: 'SIM', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO' }, nao_contatar: 14, travas: TRAVAS,
-    resultados: { ultimos_7_dias: [linhaRel('CMP-0001', '', 180)], com_voce: 1, na_fila: 40, avisos_na_fila: 3, disparo_liberado: false, motor: motorDe(),
+    resultados: { ultimos_7_dias: [linhaRel('CMP-0001', '', 180)], com_voce: 1, na_fila: 40, ultimo_envio_em: '2026-09-02T14:00:00Z', contatos: 0, contatos_vencendo_7d: 0, avisos_na_fila: 3, disparo_liberado: false, motor: motorDe(),
       custos: { preco_credito_serpapi: { valor: 0.075, descricao: 'plano de 5.000 buscas' }, fixo_mensal: { valor: 60, descricao: 'chip' } } } }),
   prosp_objeto: d => { if (d.tipo === 'publico') { const p = pubObj(d.id); if (!d.id) return okD({ objeto: null, config: CFG.publico, versoes: [], travas: TRAVAS });
       return p ? okD({ objeto: { tipo: 'publico', id: p.id, nome: p.nome, situacao: p.situacao, versao: p.versao, pai: '' }, config: { ...CFG.publico, novos_entram: p.novos_entram, fuso: p.fuso }, travas: TRAVAS,
