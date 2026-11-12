@@ -242,7 +242,7 @@ async function chamada(page, chamadas, acao, desde) {
   ok(/Travado até a Política v18/.test(await linha.innerText()) && await linha.getByRole('switch').count() === 0, 'Ajustes: sem a assistente_politica, o assistente aparece travado');
   await page.evaluate(() => { location.hash = 'metricas'; });
   await page.getByText('Preencha o preço por mil tokens').waitFor();
-  ok(await page.getByRole('link', { name: 'Abrir Custos' }).count() === 1, 'Métricas sem o preço: a nota do J-37 com o link para Custos');
+  ok(await page.getByRole('button', { name: 'Preencher o preço' }).count() === 1 && await page.getByRole('link', { name: 'Abrir Custos' }).count() === 0, 'Métricas sem o preço: a nota do J-37 e o "Preencher o preço" ali mesmo (a página Custos saiu, DEC-211)');
   await ctx.close();
 }
 

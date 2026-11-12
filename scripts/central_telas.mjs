@@ -16,7 +16,7 @@ const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', 
   // Marketing › Prospecção (sql/031 e sql/032)
   ['prospeccao', 'Prospecção'], ['prospeccao/campanha/CMP-0001', 'Odonto Sul'], ['prospeccao/conjunto/CJ-0001', 'Dentistas Curitiba'], ['prospeccao/anuncio/AN-0001', 'A · Pergunta do WhatsApp'],
   ['prospeccao/campanha/novo', 'Nova campanha'], ['prospeccao/numeros', 'Números de WhatsApp'], ['prospeccao/numeros', 'Números de WhatsApp', 'qr'], ['prospeccao/leads', 'Leads'], ['prospeccao/conversas', 'Conversas'],
-  ['prospeccao/lead/PX-AAAAA', 'Clínica Sorriso Batel'], ['prospeccao/relatorios', 'Relatórios'], ['prospeccao/regras', 'Regras'], ['prospeccao/custos', 'Custos'],
+  ['prospeccao/lead/PX-AAAAA', 'Clínica Sorriso Batel'], ['prospeccao/relatorio', 'Relatório'], ['prospeccao/regras', 'Regras de segurança'],
   ['prospeccao', 'Prospecção', 'segurado'], ['ajustes', 'Ajustes da Central', 'segurado'],
   // Públicos (sql/036, DEC-088)
   ['prospeccao/publicos', 'Públicos'], ['prospeccao/publico/PB-0001', 'Dentistas Curitiba'], ['prospeccao/publico/PB-0001/configuracao', 'Dentistas Curitiba'], ['prospeccao/publico/novo', 'Novo público'],

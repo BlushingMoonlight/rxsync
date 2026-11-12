@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NbMaFmT2PlM342yNZ/ALTZnFczh9dFVjqA+K+G82V3s='; style-src 'sha256-E/SO/uf8+XHyUriQ9HOVNes2GkZ4EFBDNEzpoW7eJ3E='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Tz/O7+aLIwwqIoMtEi50SMcBBBCsUQQXekjrQxeWQrQ='; style-src 'sha256-E/SO/uf8+XHyUriQ9HOVNes2GkZ4EFBDNEzpoW7eJ3E='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -755,7 +755,6 @@ function nivelDe(acao, d) {
   // Termos v7 (sql/063): ligar a termos_v7 é nível 3. Chave que o servidor sobe sem estar aqui: mudarChave pergunta de novo.
   if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : NIVEL_CHAVE[d.chave] || 1;
   if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
-  if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
   // Públicos (sql/036, DEC-088): tirar um contato é um toque (pôr de volta num público em uso: a página passa o nível 2).
   if (acao === 'prosp_publico_contato_marcar' && d.valor === 'NAO') return 1;
   if (acao === 'cobranca_teste_definir' && !d.cliente_id) return 2;
@@ -2083,8 +2082,7 @@ ICONES.mais_um = 'M12 5v14M5 12h14';
 
 // Pedidos do Jean: as abas na ordem do trabalho; o que é semanal ou raro fica no "Mais" da própria Prospecção.
 const P_ABAS = [['', 'Início'], ['publicos', 'Públicos'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['numeros', 'Números']];
-const P_MAIS = [['relatorios', 'Relatórios', 'Resultados por campanha, conjunto e anúncio'],
-  ['regras', 'Regras', 'Pausar ou reduzir quando algo vai mal'], ['custos', 'Custos', 'Preços do SerpAPI e da OpenAI']];
+const P_MAIS = [['relatorio', 'Relatório', 'Os números do período e onde as conversas pararam'], ['regras', 'Regras de segurança', 'As 4 regras fixas, só para leitura']];
 const P_SIT = { rascunho: ['rascunho', ''], ativa: ['ativa', 'ok'], ativo: ['ativo', 'ok'], pausada: ['pausada', 'atencao'], pausado: ['pausado', 'atencao'], cortado: ['cortado pela regra', 'perigo'],
   encerrada: ['encerrada', ''], encerrado: ['encerrado', ''], arquivado: ['arquivado', ''] };
 const etqSit = s => { const [t, tom] = P_SIT[s] || [s || '—', '']; return etq(t, tom); };
@@ -2161,7 +2159,7 @@ function interruptorP(tipo, o) {
 // ---------------------------------------------------------------- telas
 TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
-  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorios: pRelatorios, regras: pRegras, custos: pCustos };
+  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorio: pRelatorio, relatorios: pRelatorio, regras: pRegras, custos: pInicio };
   const fn = telasP[parte] || pInicio;
   if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
   await fn(c, parte, a, b);
@@ -2226,7 +2224,9 @@ async function pInicio(c) {
   const novoBtn = (texto, tipo, pai) => el('li', {}, el('div', { class: 'p-novo' }, btn(texto, () => irP(tipo, 'novo', pai), 'fant', 'mais_um')));
   const anuncios = j => el('ul', { class: 'lista p-filhos p-anuncios' },
     (j.anuncios || []).map(n => el('li', {}, camada('anuncio', n, `${n.id} · versão ${n.versao}${n.pausa_motivo ? ' · ' + n.pausa_motivo : ''}`))),
-    editar && !/^encerrad/.test(j.situacao) ? novoBtn('Novo anúncio', 'anuncio', j.id) : null);
+    editar && !/^encerrad/.test(j.situacao) && !(j.anuncios || []).some(n => !/^encerrad/.test(n.situacao)) ? novoBtn('Nova mensagem', 'anuncio', j.id) : null,
+    // O teste A/B saiu da tela (rxsync-sistema DEC-211): uma mensagem por conjunto; o conjunto antigo com duas continua sorteando.
+    (j.anuncios || []).filter(n => !/^encerrad/.test(n.situacao)).length > 1 ? el('li', {}, nota('Este conjunto tem mais de uma mensagem: elas são sorteadas em partes iguais (de antes da DEC-211).')) : null);
   const conjuntos = cp => el('ul', { class: 'lista p-filhos' },
     (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? pl(j.publicos.length, 'público', 'públicos') : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
     editar && !/^encerrad/.test(cp.situacao) ? novoBtn('Novo conjunto', 'conjunto', cp.id) : null);
@@ -2254,10 +2254,9 @@ const FUSOS = ['America/Sao_Paulo', 'America/Manaus', 'America/Cuiaba', 'America
 const ESQUEMA = {
   campanha: [
     ['Marca e produto', [['marca', 'Marca (vai na mensagem)', 'texto', { ajuda: 'até 40 letras; use {marca} no anúncio' }], ['produto', 'O que a IA conta sobre o produto', 'longo', { ajuda: '20 a 1.500 letras' }],
-      ['objetivo', 'Objetivo (decide o vencedor)', 'sel', { op: [['resposta', 'Resposta'], ['positiva', 'Resposta positiva'], ['cadastro', 'Cadastro'], ['pagamento', 'Pagamento']] }],
       ['link_agenda', 'Link da sua agenda (opcional)', 'texto', { ajuda: 'começa com https://' }]]],
     ['Orçamento e datas', [['orcamento_msgs_dia', 'Mensagens por dia (campanha)', 'num', { ajuda: 'o teto de cada número vale por cima' }], ['limite_total', 'Limite total de mensagens', 'num', { ajuda: '0 = sem limite' }],
-      ['inicio', 'Começa em', 'data'], ['fim', 'Termina em', 'data'], ['atribuicao_dias', 'Janela de atribuição (dias)', 'num', { ajuda: 'cadastro conta até N dias depois da 1ª mensagem' }]]],
+      ['inicio', 'Começa em', 'data'], ['fim', 'Termina em', 'data']]],
     ['IA de resposta', [['ia.ligada', 'IA ligada nesta campanha', 'simnao'], ['ia.tom', 'Tom', 'texto'], ['ia.objetivo_texto', 'Objetivo da conversa', 'texto'], ['ia.objecoes', 'Como responder às objeções', 'lista'],
       ['ia.passar_para_voce', 'Quando passar para você', 'texto'], ['ia.nunca_dizer', 'Nunca dizer (os fixos ficam)', 'lista'], ['ia.regras_escrita', 'Regras de escrita', 'lista'],
       ['ia.tamanho_max', 'Tamanho máximo da resposta (letras)', 'num', { trava: 'resposta_max' }], ['ia.max_mensagens', 'Mensagens da IA antes de passar para você', 'num', { trava: 'ia_mensagens_max' }],
@@ -2265,9 +2264,7 @@ const ESQUEMA = {
       ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]],
     // Texto inteiro do prompt (sql/041, DEC-096): vazio = o texto montado pelos campos acima. As regras fixas entram sempre.
     ['Prompt da IA (texto inteiro)', [['ia.prompt_texto', 'Texto do prompt (vazio = o montado pelos campos de "IA de resposta")', 'longo',
-      { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]],
-    ['Avisos na Central (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
-      ['ia.avisar.recusou', 'Recusou', 'simnao'], ['ia.avisar.saiu', 'Pediu para sair', 'simnao']]]],
+      { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]]],
   conjunto: [
     ['Públicos', [['publicos', 'Públicos que o conjunto usa (só do fuso da entrega)', 'publicos', { ajuda: 'até 10; pôr um público num conjunto ativo = nível 3' }]]],
     ['Exclusões', [['exclusoes.outra_campanha_dias', 'Abordado por outra campanha há menos de (dias)', 'num', { trava: 'outra_campanha_dias_min', min: true }]]],
@@ -2276,8 +2273,8 @@ const ESQUEMA = {
       ['entrega.pausa_min_s', 'Pausa mínima entre lotes (s)', 'num', { trava: 'pausa_min_s', min: true }], ['entrega.pausa_max_s', 'Pausa máxima entre lotes (s)', 'num'],
       ['entrega.ordem', 'Ordem', 'sel', { op: [['pontuacao', 'Maior pontuação primeiro'], ['sorteio', 'Sorteio']] }], ['entrega.tentativas', 'Tentativas se falhar', 'num', { trava: 'tentativas_max' }],
       ['entrega.intervalo_tentativa_dias', 'Tentar de novo depois de (dias úteis)', 'num']]],
-    ['Frequência e aprendizado', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
-      ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }], ['aprendizado_min', 'Fase de aprendizado (envios por anúncio)', 'num']]]],
+    ['Frequência', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
+      ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }]]]],
   publico: [
     ['Busca no Google Maps', [['busca.termos', 'Termos (um por linha)', 'lista', { ajuda: 'ex.: cardiologista, dermatologista (uma especialidade por linha)' }],
       ['busca.lugares', 'Cidades ou bairros (um por linha)', 'lista', { ajuda: 'para cobrir uma cidade grande, ponha os bairros: cada bairro é uma busca de até 120' }],
@@ -2733,66 +2730,41 @@ async function pLead(c, parte, id) {
             ['Cliente', l.cliente_id], ['Achado em', fmtData(l.criado_em)], ['Sai em', fmtData(l.apagar_em)]])))))));
 }
 
-// ---------- Relatórios (DEC-082): taxas com margem de erro, custos, vencedor por conjunto, classificações e anotações
-const VISOES = { desempenho: ['enviados', 'entrega', 'resposta', 'positiva', 'cadastros', 'saida'], funil: ['enviados', 'entregues', 'lidos', 'responderam', 'positivas', 'pediram_link', 'abriram_link', 'cadastros', 'pagamentos'],
-  custos: ['enviados', 'custo', 'por_resposta', 'por_positiva', 'por_cadastro', 'mensagens_ia'] };
-const COLUNAS = { enviados: 'Enviadas', entregues: 'Entregues', lidos: 'Lidas', responderam: 'Respostas', positivas: 'Positivas', pediram_link: 'Pediram link', abriram_link: 'Abriram link', cadastros: 'Cadastros',
-  pagamentos: 'Pagamentos', mensagens_ia: 'Mensagens da IA', entrega: 'Entrega', resposta: 'Resposta', positiva: 'Positiva', saida: 'Saída', custo: 'Custo', por_resposta: 'Por resposta', por_positiva: 'Por positiva', por_cadastro: 'Por cadastro' };
-const DETALHES = [['', 'Sem detalhar'], ['dia', 'Dia'], ['hora', 'Hora da 1ª mensagem'], ['dia_semana', 'Dia da semana'], ['nicho', 'Nicho'], ['cidade', 'Cidade'], ['faixa_nota', 'Faixa da nota'], ['categoria', 'Categoria']];
-const DIAS_NOMES = { 1: 'segunda', 2: 'terça', 3: 'quarta', 4: 'quinta', 5: 'sexta', 6: 'sábado', 7: 'domingo' };
+// ---------- Relatório (DEC-082; simples desde a DEC-211 do rxsync-sistema): os números do período, um gráfico por dia, as
+// campanhas e onde as conversas pararam. O detalhado (níveis, detalhamentos, margem de erro, vencedor) fica no banco.
 const ETAPAS = { so_leu: 'só leu', respondeu_curto: 'respondeu curto', conversou: 'conversou', interessado: 'interessado', pediu_link: 'pediu o link', cadastrou: 'cadastrou', recusou: 'recusou', saiu: 'saiu',
   preco: 'preço', ja_tem_secretaria: 'já tem secretária', ja_tem_sistema: 'já tem sistema', sem_tempo: 'sem tempo', desconfianca_ia: 'desconfia de IA', pouco_paciente: 'poucos pacientes', nao_decide: 'não é quem decide',
   momento_ruim: 'momento ruim', outro: 'outro', nao_precisa: 'não precisa', ja_tem_solucao: 'já tem solução', nao_gosta_de_ia: 'não gosta de IA', nao_e_o_responsavel: 'não é o responsável', sem_interesse: 'sem interesse' };
 // Barra de proporção (neutra: maior não quer dizer ruim, ao contrário da barra da franquia).
 const barraP = (v, max) => { const b = el('div', { class: 'uso', role: 'img', 'aria-label': fmtNum(v) + ' de ' + fmtNum(max) }); const i = el('i'); i.style.width = Math.round(v / Math.max(1, max) * 100) + '%'; b.append(i); return b; };
-async function pRelatorios(c) {
-  topo('Relatórios', [['Prospecção', 'prospeccao'], ['Relatórios']], 'prospeccao');
-  await arvoreP(); await publicosP();
-  est.relP = est.relP || { dias: 30, nivel: 'anuncio', detalhar: '', conjunto_id: '', publico_id: '', visao: '' };
-  const f = est.relP;
-  const r = await chamar('prosp_relatorio', { de: somaDias(hojeISO(), 1 - f.dias), nivel: f.nivel, detalhar: f.detalhar, conjunto_id: f.conjunto_id, publico_id: f.publico_id || '' });
-  if (falhou(c, r, 'Relatórios')) return;
-  const d = r.dados;
-  const visao = f.visao || ((d.colunas_salvas || {})['Padrão'] || {}).visao || 'desempenho';
-  const cols = VISOES[visao] || VISOES.desempenho;
-  const valor = (x, k) => { const n = x.numeros || {}, t = x.taxas || {}, cu = x.custos || {};
-    if (k === 'entrega' || k === 'saida') return pct(t[k]);
-    if (k === 'resposta' || k === 'positiva') return t[k] == null ? '—' : pct(t[k]) + (t[k + '_margem'] != null ? ' ± ' + String(t[k + '_margem']).replace('.', ',') : '');
-    if (k === 'custo') return fmtReal(cu.total); if (/^por_/.test(k)) return cu[k] == null ? '—' : fmtReal(cu[k]);
-    return fmtNum(n[k]); };
-  const nomeLinha = x => { const base = d.nivel === 'numero' ? nomeP('numero', x.chave) : d.nivel === 'publico' ? ((d.publicos || {})[x.chave] || (x.chave ? nomePub(x.chave) : '(sem público)')) : nomeP(d.nivel, x.chave);
-    if (!d.detalhar) return base; const v = d.detalhar === 'dia_semana' ? DIAS_NOMES[x.valor] || x.valor : d.detalhar === 'hora' ? x.valor + 'h' : d.detalhar === 'dia' ? fmtData(x.valor) : x.valor; return base + ' · ' + v; };
-  const filtro = (rot, atual, opcoes, mudar) => el('label', { class: 'campo' }, el('span', { class: 'rot', text: rot }),
-    el('select', { class: 'entrada', onchange: e => { mudar(e.target.value); rotear(); } }, opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(atual) === v }))));
-  const venc = d.vencedores || [];
-  const SITV = { vencedor: ['vencedor', 'ok'], empate: ['ainda empatados', 'atencao'], aprendendo: ['aprendendo', 'info'], um_anuncio: ['um anúncio só', ''] };
-  const cls = d.classificacao || {};
-  const barras = obj => { const ent = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]); const max = Math.max(1, ...ent.map(e => e[1]));
-    return ent.length ? el('ul', { class: 'lista' }, ent.map(([k, v]) => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: ETAPAS[k] || k.replace(/_/g, ' ') }), barraP(v, max)), el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: fmtNum(v) })))))) : vazio('Nenhuma conversa classificada no período.', 'conversa'); };
-  trocar(c, cabecalho('Relatórios', `${fmtData(d.de)} a ${fmtData(d.ate)} · margem de erro de 95%`, btn('Anotar', () => fazer('prosp_anotar', { campanha_id: '' }, { titulo: 'Anotar na linha do tempo',
-      campos: [{ k: 'dia', rot: 'Dia', tipo: 'date', valor: hojeISO(), obrig: true }, { k: 'texto', rot: 'O que aconteceu (ex.: troquei o anúncio B)', longo: true, obrig: true, minimo: 3, max: 500 }], ok: 'Anotado.' }), 'sec')),
-    el('div', { class: 'pilha' }, abasP('relatorios'),
+const barrasP = obj => { const ent = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]); const max = Math.max(1, ...ent.map(e => e[1]));
+  return ent.length ? el('ul', { class: 'lista' }, ent.map(([k, v]) => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: ETAPAS[k] || k.replace(/_/g, ' ') }), barraP(v, max)), el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: fmtNum(v) })))))) : vazio('Nenhuma conversa classificada no período.', 'conversa'); };
+async function pRelatorio(c) {
+  topo('Relatório', [['Prospecção', 'prospeccao'], ['Relatório']], 'prospeccao');
+  await arvoreP();
+  est.relP = est.relP || { dias: 30 };
+  const f = est.relP, de = somaDias(hojeISO(), 1 - f.dias);
+  const [r, rd] = await Promise.all([chamar('prosp_relatorio', { de, nivel: 'campanha' }), chamar('prosp_relatorio', { de, nivel: 'campanha', detalhar: 'dia' })]);
+  if (falhou(c, r, 'Relatório')) return;
+  const d = r.dados, linhas = d.linhas || [], cls = d.classificacao || {};
+  const soma = k => linhas.reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
+  const porDia = {};
+  for (const x of (rd.ok && rd.dados && rd.dados.linhas) || []) { const n = x.numeros || {}, p = porDia[x.valor] = porDia[x.valor] || { enviados: 0, responderam: 0 };
+    p.enviados += Number(n.enviados) || 0; p.responderam += Number(n.responderam) || 0; }
+  const dias = Object.keys(porDia).sort(), maxDia = Math.max(1, ...dias.map(k => porDia[k].enviados));
+  trocar(c, cabecalho('Relatório', `${fmtData(d.de)} a ${fmtData(d.ate)}`),
+    el('div', { class: 'pilha' }, abasP('relatorio'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Período' }, [7, 30, 90].map(n => el('button', { type: 'button', 'aria-pressed': String(f.dias === n), onclick: () => { f.dias = n; rotear(); } }, n + ' dias'))),
-      el('div', { class: 'form-2 p-filtros' }, filtro('Nível', f.nivel, [['campanha', 'Campanha'], ['conjunto', 'Conjunto'], ['anuncio', 'Anúncio'], ['publico', 'Público'], ['numero', 'Número']], v => { f.nivel = v; }),
-        filtro('Detalhar por', f.detalhar, DETALHES, v => { f.detalhar = v; }),
-        filtro('Conjunto', f.conjunto_id, [['', 'Todos'], ...conjuntosP().map(j => [j.id, j.campanha.nome + ' › ' + j.nome])], v => { f.conjunto_id = v; }),
-        filtro('Público', f.publico_id || '', [['', 'Todos'], ...(est.publicos.publicos || []).map(p => [p.id, p.nome])], v => { f.publico_id = v; })),
-      el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Colunas' }, Object.keys(VISOES).map(v => el('button', { type: 'button', 'aria-pressed': String(visao === v), onclick: () => { f.visao = v; rotear(); } }, { desempenho: 'Desempenho', funil: 'Funil', custos: 'Custos' }[v])),
-        btn('Guardar como padrão', () => fazer('prosp_relatorio_salvar', { nome: 'Padrão', config: { visao } }, { ok: 'Visão guardada (no servidor, não no navegador).' }), 'fant')),
-      cartao(null, null, (d.linhas || []).length ? el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Tabela do relatório (role para o lado)' }, el('table', { class: 'dados-t' },
-        el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: { campanha: 'Campanha', conjunto: 'Conjunto', anuncio: 'Anúncio', publico: 'Público', numero: 'Número' }[d.nivel] }), cols.map(k => el('th', { scope: 'col', text: COLUNAS[k] })))),
-        el('tbody', {}, d.linhas.map(x => el('tr', {}, el('th', { scope: 'row', text: nomeLinha(x) }), cols.map(k => el('td', { class: 'num', text: valor(x, k) }))))))) : vazio('Nada no período ainda (nenhuma mensagem saiu).', 'agregados')),
-      el('p', { class: 'mudo peq', text: '"12% ± 4" quer dizer: com 95% de confiança, a taxa de verdade está entre 8% e 16%. Com poucos envios, a margem é grande: não decida por ela.' }),
-      el('div', { class: 'grade-2 iguais' },
-        cartao('Vencedor de cada conjunto', el('span', { class: 'mudo peq', text: 'pelo objetivo da campanha' }), venc.length ? el('ul', { class: 'lista' }, venc.map(v => el('li', {}, el('div', { class: 'linha' },
-          el('div', { class: 'cresce' }, el('div', { class: 't1', text: nomeP('conjunto', v.conjunto_id) }),
-            el('div', { class: 't2', text: v.segundo ? `${nomeP('anuncio', v.primeiro)} ${pct(v.taxa_primeiro)} (${fmtNum(v.envios_primeiro)}) × ${nomeP('anuncio', v.segundo)} ${pct(v.taxa_segundo)} (${fmtNum(v.envios_segundo)})${v.p != null ? ' · p = ' + String(v.p).replace('.', ',') : ''}`
-              : 'Só um anúncio ativo: ligue outro para comparar.' }),
-            v.situacao !== 'vencedor' && v.faltam ? el('div', { class: 't2', text: `faltam cerca de ${fmtNum(v.faltam)} envios por anúncio para decidir` }) : null),
-          el('div', { class: 'direita' }, etq(...(SITV[v.situacao] || [v.situacao, ''])))))) ) : vazio('Sem anúncios com envios no período.', 'agregados')),
-        cartao('Linha do tempo', null, (d.anotacoes || []).length ? el('ul', { class: 'lista' }, d.anotacoes.map(a => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: a.texto }), el('div', { class: 't2', text: fmtData(a.dia) + (a.campanha_id ? ' · ' + nomeP('campanha', a.campanha_id) : '') })))))) : vazio('Nenhuma anotação no período.', 'relogio'))),
-      el('div', { class: 'grade-2 iguais' }, cartao('Onde as conversas pararam', el('span', { class: 'mudo peq', text: 'sem telefone, nome ou código' }), barras(cls.etapas)),
-        cartao('Objeções e motivos da recusa', null, barras({ ...(cls.objecoes || {}), ...Object.fromEntries(Object.entries(cls.motivos_recusa || {}).map(([k, v]) => ['recusa: ' + (ETAPAS[k] || k.replace(/_/g, ' ')), v])) })))));
+      el('div', { class: 'kpis' }, kpi('Enviadas', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
+      cartao('Enviadas por dia', el('span', { class: 'mudo peq', text: 'e quantas responderam' }), dias.length ? el('ul', { class: 'lista' }, dias.map(k => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: fmtData(k) }), barraP(porDia[k].enviados, maxDia)),
+        el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: `${fmtNum(porDia[k].enviados)} · ${fmtNum(porDia[k].responderam)} responderam` })))))) : vazio('Nada no período ainda (nenhuma mensagem saiu).', 'agregados')),
+      cartao('Campanhas', null, linhas.length ? el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Campanhas do período (role para o lado)' }, el('table', { class: 'dados-t' },
+        el('thead', {}, el('tr', {}, ['Campanha', 'Enviadas', 'Responderam', 'Positivas', 'Cadastros'].map((h, k) => el('th', { scope: 'col', text: h, class: k ? 'num' : null })))),
+        el('tbody', {}, linhas.map(x => { const n = x.numeros || {}; return el('tr', {}, el('th', { scope: 'row', text: nomeP('campanha', x.chave) }),
+          ['enviados', 'responderam', 'positivas', 'cadastros'].map(k => el('td', { class: 'num', text: fmtNum(n[k]) }))); })))) : vazio('Nenhuma campanha com envios no período.', 'agregados')),
+      el('div', { class: 'grade-2 iguais' }, cartao('Onde as conversas pararam', el('span', { class: 'mudo peq', text: 'sem telefone, nome ou código' }), barrasP(cls.etapas)),
+        cartao('Objeções e motivos da recusa', null, barrasP({ ...(cls.objecoes || {}), ...Object.fromEntries(Object.entries(cls.motivos_recusa || {}).map(([k, v]) => ['recusa: ' + (ETAPAS[k] || k.replace(/_/g, ' ')), v])) })))));
 }
 
 // Por que caiu: os motivos dos descartados, do maior para o menor, numa linha que abre ao tocar.
@@ -2816,59 +2788,22 @@ function kpiTeto(tot, editar) {
   return kpi('Teto geral do mês', `${fmtNum(tot.gastos)} de ${fmtNum(tot.teto)}`, 'créditos do SerpAPI, todos os públicos', el('div', { class: 'p-teto' }, barraUso(tot.gastos, tot.teto), editar ? btn('Mudar o teto', mudar, 'sec') : null));
 }
 
-// ---------- Regras automáticas (nunca aumentam nada; as fixas não mudam)
-const METRICAS = [['pare', '"Pare" (pediu para sair) %'], ['recusa', 'Recusa %'], ['sem_entrega', 'Sem entrega %'], ['falhas_seguidas', 'Falhas seguidas'], ['resposta', 'Resposta %'], ['positiva', 'Positiva %'],
-  ['custo_resposta', 'Custo por resposta (R$)'], ['custo_cadastro', 'Custo por cadastro (R$)']];
-const NIVEIS_R = [['anuncio', 'Anúncio'], ['conjunto', 'Conjunto'], ['campanha', 'Campanha'], ['numero', 'Número']];
-const ACOES_R = [['pausar', 'Pausar (anúncio: cortar)'], ['reduzir', 'Reduzir o teto pela metade'], ['avisar', 'Só avisar']];
-async function pRegras(c) {
-  topo('Regras', [['Prospecção', 'prospeccao'], ['Regras']], 'prospeccao');
-  const r = await chamar('prosp_regras'); if (falhou(c, r, 'Regras')) return;
-  const regras = r.dados.regras || [], editar = ligada('editar_prospeccao');
-  const nomeM = k => (METRICAS.find(m => m[0] === k) || [k, k === 'desconectado' ? 'Número caiu' : k])[1];
-  const form = g => fazer('prosp_regra_salvar', g ? { id: g.id } : {}, { titulo: g ? 'Mudar a regra ' + g.id : 'Nova regra', ok: 'Regra salva.',
-    texto: 'SE a métrica passar do valor (depois de N envios) ENTÃO pausar, reduzir ou avisar. Nunca aumenta nada. Age no máximo uma vez por dia em cada alvo.',
-    campos: [{ k: 'nivel', rot: 'Onde mede', opcoes: NIVEIS_R, valor: g ? g.nivel : 'anuncio' }, { k: 'alvo_id', rot: 'Só este código (vazio = todos)', valor: g ? g.alvo_id : '', ph: 'AN-0001' },
-      { k: 'metrica', rot: 'Métrica', opcoes: METRICAS, valor: g ? g.metrica : 'recusa' }, { k: 'operador', rot: 'Quando', opcoes: [['>', 'passar de'], ['<', 'ficar abaixo de']], valor: g ? g.operador : '>' },
-      { k: 'valor', rot: 'Valor', inputmode: 'decimal', valor: g ? String(g.valor) : '', obrig: true }, { k: 'depois_de', rot: 'Depois de N envios', inputmode: 'numeric', valor: g ? String(g.depois_de) : '30' },
-      { k: 'janela_dias', rot: 'Nos últimos N dias (0 = desde o começo)', inputmode: 'numeric', valor: g ? String(g.janela_dias) : '7' }, { k: 'acao', rot: 'Então', opcoes: ACOES_R, valor: g ? g.acao : 'avisar' }] });
-  trocar(c, cabecalho('Regras automáticas', 'nunca aumentam nada · as fixas de segurança não mudam', editar ? btn('Nova regra', () => form(null), 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, abasP('regras'),
-      cartao(null, null, el('ul', { class: 'lista' }, regras.map(g => el('li', {}, el('div', { class: 'linha' },
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${nomeM(g.metrica)} ${g.operador === '>' ? 'passar de' : 'abaixo de'} ${String(g.valor).replace('.', ',')}` }),
-          el('div', { class: 't2', text: `${(NIVEIS_R.find(n => n[0] === g.nivel) || [, g.nivel])[1]}${g.alvo_id ? ' ' + g.alvo_id : ' (todos)'} · depois de ${fmtNum(g.depois_de)} envios · ${g.janela_dias ? g.janela_dias + ' dias' : 'desde o começo'} · ${(ACOES_R.find(a => a[0] === g.acao) || [, g.acao])[1]} · agiu ${fmtNum(g.disparos_30d)}× em 30 dias` })),
-        el('div', { class: 'direita' }, g.fixa ? etq('fixa', 'info') : null, !g.fixa && editar ? btn('Mudar', () => form(g), 'sec') : null,
-          !g.fixa && editar ? el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(!!g.ligada), 'aria-label': (g.ligada ? 'Desligar' : 'Ligar') + ' a regra ' + g.id,
-            onclick: async e => { const t = e.currentTarget; t.setAttribute('aria-checked', String(!g.ligada));
-              const x = await fazer('prosp_regra_ligar', { id: g.id, valor: g.ligada ? 'NAO' : 'SIM' }, { titulo: 'Desligar a regra ' + g.id, linhas: [['Regra', 'ligada', 'desligada']], ok: g.ligada ? 'Regra desligada.' : 'Regra ligada.' });
-              if (!x) t.setAttribute('aria-checked', String(!!g.ligada)); } }) : g.fixa ? null : etq(g.ligada ? 'ligada' : 'desligada', g.ligada ? 'ok' : ''))))))),
-      el('p', { class: 'mudo peq', text: 'As fixas: "pare" acima de 5% depois de 20 envios corta o anúncio; "pare" acima de 3% em 7 dias reduz o número; número caiu pausa tudo o que usa ele; 5 falhas seguidas pausam o conjunto.' })));
+// ---------- Regras de segurança (as 4 fixas, só para leitura; rxsync-sistema DEC-211). As regras próprias saíram da tela
+// e ficaram desligadas no banco (sql/096).
+const METRICAS = { pare: '"Pare" (pediu para sair)', recusa: 'Recusa', sem_entrega: 'Sem entrega', falhas_seguidas: 'Falhas seguidas', desconectado: 'Número caiu' };
+const ACOES_R = { pausar: 'pausa (a mensagem: corta)', reduzir: 'reduz o teto do número pela metade', avisar: 'só avisa' };
+const NIVEIS_R = { anuncio: 'mensagem', conjunto: 'conjunto', campanha: 'campanha', numero: 'número' };
+function cartaoRegras(regras) {
+  const fixas = (regras || []).filter(g => g.fixa);
+  return cartao('Regras de segurança', el('span', { class: 'mudo peq', text: 'fixas: não mudam nem desligam' }), fixas.length ? el('ul', { class: 'lista' }, fixas.map(g => el('li', {}, el('div', { class: 'linha' },
+    el('div', { class: 'cresce' }, el('div', { class: 't1', text: g.metrica === 'desconectado' ? 'Número caiu' : `${METRICAS[g.metrica] || g.metrica} ${g.operador === '>' ? 'acima de' : 'abaixo de'} ${String(g.valor).replace('.', ',')}${/^(pare|recusa|sem_entrega)$/.test(g.metrica) ? '%' : ''}` }),
+      el('div', { class: 't2', text: `${NIVEIS_R[g.nivel] || g.nivel}${g.depois_de ? ' · depois de ' + fmtNum(g.depois_de) + ' envios' : ''}${g.janela_dias ? ' · em ' + g.janela_dias + ' dias' : ''} · ${ACOES_R[g.acao] || g.acao} · agiu ${fmtNum(g.disparos_30d)}× em 30 dias` })),
+    el('div', { class: 'direita' }, etq('fixa', 'info')))))) : vazio('Sem regras.', 'info'));
 }
-
-// ---------- Custos (para custo por resposta, positiva e cadastro)
-const CUSTOS = [['preco_credito_serpapi', 'Preço de 1 crédito do SerpAPI (R$)'], ['preco_mil_tokens_entrada', 'OpenAI: 1.000 tokens de entrada (R$)'], ['preco_mil_tokens_saida', 'OpenAI: 1.000 tokens de saída (R$)'],
-  ['fixo_mensal', 'Fixo por mês (chip, plano do SerpAPI…) (R$)']];
-async function pCustos(c) {
-  topo('Custos', [['Prospecção', 'prospeccao'], ['Custos']], 'prospeccao');
-  const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Custos')) return;
-  est.prosp = r.dados;
-  const atuais = ((r.dados.resultados || {}).custos) || null, editar = ligada('editar_prospeccao');
-  const ins = {}; const erro = el('p', { class: 'erro', role: 'alert' });
-  const campos = CUSTOS.map(([k, rot]) => { const v = atuais && atuais[k] ? atuais[k] : {};
-    ins[k] = { valor: el('input', { class: 'entrada', id: 'cu-' + k, inputmode: 'decimal', autocomplete: 'off', value: v.valor != null ? String(v.valor).replace('.', ',') : null, disabled: !editar }),
-      descricao: el('input', { class: 'entrada', id: 'cu-d-' + k, autocomplete: 'off', value: v.descricao || null, placeholder: 'de onde vem (opcional)', disabled: !editar }) };
-    return el('div', { class: 'p-custo' }, el('label', { class: 'campo', for: 'cu-' + k }, el('span', { class: 'rot', text: rot }), ins[k].valor), el('label', { class: 'campo', for: 'cu-d-' + k }, el('span', { class: 'rot', text: 'Descrição' }), ins[k].descricao)); });
-  const salvar = async e => {
-    e.preventDefault(); erro.textContent = '';
-    const itens = CUSTOS.filter(([k]) => ins[k].valor.value.trim() !== '').map(([k]) => ({ tipo: k, valor: ins[k].valor.value.trim().replace(/\./g, '').replace(',', '.'), descricao: ins[k].descricao.value.trim() }));
-    if (!itens.length) { erro.textContent = 'Preencha pelo menos um valor.'; return; }
-    if (itens.some(x => isNaN(Number(x.valor)) || Number(x.valor) < 0)) { erro.textContent = 'Valor em reais, como 0,05.'; return; }
-    await fazer('prosp_custos_salvar', { itens }, { ok: 'Custos salvos.', erro: x => { erro.textContent = x.mensagem || 'Não consegui.'; } });
-  };
-  trocar(c, cabecalho('Custos', 'entram no relatório: custo por resposta, positiva e cadastro'),
-    el('div', { class: 'pilha' }, abasP('custos'),
-      atuais ? null : nota('Os valores guardados aparecem aqui depois do sql/033 (rxsync-sistema). Salvar já funciona.'),
-      el('form', { class: 'cartao', onsubmit: salvar }, el('div', { class: 'corpo p-topo-form' }, campos, erro, editar ? el('button', { class: 'btn pri', type: 'submit', text: 'Salvar' }) : nota('Editar está desligado (editar_prospeccao).', true)))));
+async function pRegras(c) {
+  topo('Regras de segurança', [['Prospecção', 'prospeccao'], ['Regras de segurança']], 'prospeccao');
+  const r = await chamar('prosp_regras'); if (falhou(c, r, 'Regras de segurança')) return;
+  trocar(c, cabecalho('Regras de segurança', 'pausam ou reduzem sozinhas quando algo vai mal; nunca aumentam nada'), el('div', { class: 'pilha' }, abasP('regras'), cartaoRegras(r.dados.regras)));
 }
 
 // ---------- Prompt da IA: ver inteiro e testar a conversa (sql/041, DEC-096)
@@ -3371,6 +3306,17 @@ async function descartarProposta(p) {
 }
 
 // ---------------------------------------------------------------- Análise › Métricas (DEC-146)
+// Preço da OpenAI por mil tokens (entrada e saída), para o custo de IA em reais. Grava pela mesma ação de antes da página
+// Custos da Prospecção (prosp_custos_salvar), só com os 2 preços (rxsync-sistema DEC-211).
+const precoReais = v => String(v || '').trim().replace(/\./g, '').replace(',', '.');
+function precoOpenAI() {
+  return fazer('prosp_custos_salvar', {}, { titulo: 'Preço da OpenAI', texto: 'Por mil tokens, em reais (ex.: 0,0015). Vale para o custo de IA da Central e da prospecção.',
+    campos: [{ k: 'entrada', rot: 'Mil tokens de entrada (R$)', inputmode: 'decimal', obrig: true, erro: 'Digite o preço (ex.: 0,0015).' },
+      { k: 'saida', rot: 'Mil tokens de saída (R$)', inputmode: 'decimal', obrig: true, erro: 'Digite o preço (ex.: 0,006).' }],
+    preparar: v => { const { entrada, saida, ...resto } = v;
+      return { ...resto, itens: [{ tipo: 'preco_mil_tokens_entrada', valor: precoReais(entrada), descricao: '' }, { tipo: 'preco_mil_tokens_saida', valor: precoReais(saida), descricao: '' }] }; },
+    ok: 'Preço salvo.' });
+}
 TELAS.metricas = async c => {
   topo('Métricas', [['Análise'], ['Métricas']]);
   const r = await chamar('metricas'); if (falhou(c, r, 'Métricas')) return;
@@ -3392,8 +3338,9 @@ TELAS.metricas = async c => {
         el('div', { class: 'cartao kpi ia-mensagens' }, el('div', { class: 'rot', text: 'Mensagens do atendimento no mês' }), el('div', { class: 'val num', text: fmtNum(ci.mensagens_atendimento_mes) }),
           el('div', { class: 'var', text: 'todas as clínicas; fora do custo acima' }))),
       el('div', { class: 'aviso info mt' }, icone('info'), el('div', { text: ci.aviso || 'O atendimento das clínicas não entra: o banco só conta as mensagens, não os tokens.' })),
-      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída) em Custos (Prospecção › Mais).',
-        ligada('tela_prospeccao') ? [' ', el('a', { href: '#prospeccao/custos', text: 'Abrir Custos' })] : null)))),
+      // O preço da OpenAI (rxsync-sistema DEC-211: a página Custos da Prospecção saiu): uma folha só com os 2 preços.
+      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída).')),
+      ligada('editar_prospeccao') ? el('div', { class: 'acoes mt' }, btn(ci.preco_preenchido ? 'Mudar o preço' : 'Preencher o preço', precoOpenAI, 'sec')) : null)),
     cartao('Uso do assistente no mês', null, corpo(dados([['Perguntas', fmtNum(uso.perguntas)], ['Propostas', fmtNum(uso.propostas)], ['Confirmadas', fmtNum(uso.confirmadas)]])))));
 };
 
