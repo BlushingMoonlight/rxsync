@@ -83,7 +83,7 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
   tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
-  painel_link_antigo: 'Painel: o link antigo (?t=) ainda abre', termos_v7: 'Termos v7 para quem já é cliente', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
+  termos_v7: 'Termos v7 para quem já é cliente', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && !['tela_cliente_sensivel', 'tela_assistente'].includes(k.chave)],
   ['IA da Central', k => k.chave === 'tela_assistente'],

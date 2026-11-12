@@ -476,10 +476,10 @@ function menuAcoes(x) {
     if (x.cancelar_em) item('Desfazer o cancelamento', 'A clínica recebe um e-mail.', () => fazer('cancelamento_desfazer', { cliente_id: x.cliente_id }, { titulo: 'Desfazer o cancelamento de ' + x.nome, linhas: [['Cancelamento', fmtData(x.cancelar_em), '(nenhum)']], ok: 'Cancelamento desfeito.' }));
   }
   if (ligada('editar_links')) {
-    item('Reenviar o link do painel', 'Vai para o e-mail do cadastro; o link não aparece aqui.', () => fazer('link_painel_reenviar', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o link do painel', texto: 'Vai para o e-mail do cadastro de ' + x.nome + '.' }));
+    item('Reenviar o endereço do painel', 'Vai para o e-mail do cadastro, com o endereço e como entrar.', () => fazer('link_painel_reenviar', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o endereço do painel', texto: 'Vai para o e-mail do cadastro de ' + x.nome + ', com o endereço do painel e como entrar. Nada muda no acesso.' }));
     item('Reenviar o link de conexão', 'Para conectar o WhatsApp.', () => fazer('link_conectar_reenviar', { cliente_id: x.cliente_id }, { titulo: 'Reenviar o link de conexão do WhatsApp', texto: 'Vai para o e-mail do cadastro de ' + x.nome + '.' }));
-    item('Gerar um link novo do painel', 'Nível 3. O link antigo para de funcionar.', () => fazer('link_painel_novo', { cliente_id: x.cliente_id }, { titulo: 'Gerar um link novo do painel', nome: x.nome, botao: 'Gerar o link novo',
-      linhas: [['Link atual', 'vale', 'deixa de valer']], texto: 'Use se o link vazou. O novo vai para o e-mail do cadastro.' }), true);
+    item('Encerrar todos os acessos', 'Nível 3. Quem está no painel sai e os aparelhos lembrados não valem mais.', () => fazer('link_painel_novo', { cliente_id: x.cliente_id }, { titulo: 'Encerrar todos os acessos ao painel', nome: x.nome, botao: 'Encerrar os acessos',
+      linhas: [['Quem está no painel', 'dentro', 'sai'], ['Aparelhos lembrados', 'valem', 'não valem mais']], texto: 'Use se alguém que não devia está com acesso. A senha continua a mesma, e a clínica recebe um e-mail avisando.' }), true);
   }
   // Histórico das conversas a pedido da clínica (sql/059, DEC-131, #67; cláusula 19.2): o 31 monta o CSV e manda direto
   // ao e-mail do cadastro. O arquivo não passa pela Central. Nível 2.

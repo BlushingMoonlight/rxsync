@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------- entrada (DEC-097, workflow 29)
 // E-mail + senha + código no e-mail. A sessão fica só nesta aba; "Lembrar este aparelho" guarda só a lembrança, que muda
-// a cada uso. O link antigo (?t=) ainda abre o painel, com a faixa "Crie sua senha", até a clínica criar a senha.
+// a cada uso. Sem a sessão, o painel não abre (rxsync-sistema DEC-212): quem chega com ?t= vê esta entrada, com um aviso.
 const ENT = { desafio: '', modo: '', lembrar: false };
 const ENT_TELAS = ['entEntrar', 'entCodigo', 'entPedir', 'entNova'];
 function entMsg(t, erro) { const m = $('entMsg'); m.textContent = t || ''; m.className = 'msg' + (erro ? ' erro' : ''); }
@@ -84,7 +84,6 @@ $('entCodigo').addEventListener('submit', ev => {
 document.querySelectorAll('[data-ent]').forEach(b => b.addEventListener('click', () => {
   const o = b.getAttribute('data-ent');
   if (o === 'voltar') {
-    if (ENT.modo === 'link') { $('entrada').hidden = true; $('app').hidden = false; ENT.modo = ''; return; }
     entInicio(''); return;
   }
   ENT.modo = o; $('entEmailPedir').value = $('entEmail').value.trim();
@@ -115,21 +114,10 @@ $('entNova').addEventListener('submit', ev => {
     entOcupado(f, false);
     if (r.ok && r.sessao) { entMsg('Senha salva! Abrindo o painel…'); entEntrou(r); return; }
     if (r.termos) { $('entTermosRot').hidden = false; entMsg(r.mensagem, true); return; }
-    if (r.recomecar) { if (ENT.modo === 'link') { entNovaTela(r.mensagem + ' Toque em Voltar e em "Criar minha senha" de novo.', true); return; } entInicio(r.mensagem, true); return; }
+    if (r.recomecar) { entInicio(r.mensagem, true); return; }
     entMsg(r.mensagem || 'Não consegui salvar a senha.', true);
   });
 });
-// Faixa "Crie sua senha" (link antigo): o código vai para o e-mail do cadastro da clínica do link.
-function criarSenhaPeloLink(b) {
-  b.disabled = true;
-  c29('senha_pedir_link', { token }).then(r => {
-    b.disabled = false;
-    if (!r.ok || !r.desafio) { rapida(r.mensagem || 'Não consegui mandar o código.'); return; }
-    ENT.desafio = r.desafio; ENT.modo = 'link';
-    $('app').hidden = true; $('entrada').hidden = false; window.scrollTo(0, 0);
-    entNovaTela(r.mensagem, true);
-  });
-}
 // Sair: encerra a sessão e esquece este aparelho (na próxima vez, e-mail, senha e código).
 function sairPainel(b) {
   const fim = () => { sessaoGuardar(''); lembrancaGuardar(''); location.replace(location.pathname); };

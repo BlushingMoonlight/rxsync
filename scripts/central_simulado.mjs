@@ -135,7 +135,7 @@ export const NIVEIS = { cliente_editar_assistente: 1, cliente_editar_configuraco
   cliente_excluir: 3, cliente_excluir_lote: 3, cliente_marcar_teste: 3,
   // congelar, renovar, reativar e o cadastro numa folha só (sql/093, DEC-205 e DEC-206)
   cliente_congelar: 3, cliente_congelar_renovar: 2, cliente_descongelar: 3, cliente_editar_cadastro: 2 };
-export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', painel_link_antigo: 'SIM', assistente_politica: 'SIM' });
+export const CHAVES_LIGADAS = () => ({ ...Object.fromEntries(CHAVES.map(k => [k, 'SIM'])), asaas_ambiente: 'sandbox', cobranca_teste_cliente: '', prosp_disparo: 'NAO', prosp_politica_v10: 'NAO', prosp_balanceamento: 'NAO', demo_links: 'NAO', demo_politica_v17: 'NAO', assistente_politica: 'SIM' });
 const SO_POR_SQL = ['cobranca_teste_cliente', 'asaas_ambiente', 'prosp_politica_v10', 'prosp_balanceamento', 'demo_politica_v17', 'assistente_politica'];
 export const SENSIVEL = { ok: true, dados: { cliente_id: 'CLI-001', nome: 'Clínica Sorriso Odontologia Integrada', empresa: { razao_social: 'Sorriso Ltda', cnpj: '11222333000181', representante_nome: 'Ana Souza', representante_cpf: '11122233344', email: 'ana@exemplo.com', telefone: '48999990001' },
   aceite: { data_aceite: '01/10/2026, 10:00:00', versao_termos: '2026-10-v3', ip_aceite: '10.0.0.9', aceite_dpa: 'SIM' }, copia_do_aceite: null } };

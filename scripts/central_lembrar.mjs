@@ -55,8 +55,8 @@ ok((await page.locator('#conteudo').innerText()).includes('Mac · Chrome (este a
 // 4. nível 3 com a senha de novo
 await page.evaluate(() => { location.hash = 'clientes/CLI-001'; });
 await page.locator('#conteudo').getByRole('button', { name: 'Ações', exact: true }).first().click();
-await page.locator('#camada .menu-acoes button', { hasText: 'Gerar um link novo do painel' }).first().click();
-await page.locator('#c-nome-clinica').fill('Clínica Sorriso Odontologia Integrada'); await page.getByRole('button', { name: 'Gerar o link novo' }).click();
+await page.locator('#camada .menu-acoes button', { hasText: 'Encerrar todos os acessos' }).first().click();
+await page.locator('#c-nome-clinica').fill('Clínica Sorriso Odontologia Integrada'); await page.getByRole('button', { name: 'Encerrar os acessos' }).click();
 await page.locator('#c-senha-de-novo').fill('senha-de-teste-123'); await page.getByRole('button', { name: 'Continuar' }).click();
 await page.waitForFunction(() => /o link vai para o e-mail/.test(document.getElementById('rapida').textContent || ''));
 ok(nivel3 === 2 && chamadas.some(c => c.acao === 'senha_reconfirmar'), 'nível 3: pediu a senha, conferiu e repetiu a ação uma vez');
