@@ -23,8 +23,7 @@ function assistenteEstadoRender() {
   document.querySelectorAll('#cardPausa [data-ponto]').forEach(p => { p.className = 'ponto ' + e.ponto; });
   document.querySelectorAll('#cardPausa [data-estado-curto]').forEach(p => { p.textContent = e.curto; });
   let t = e.t2;
-  if (!sessao) t = 'Para pausar pelo painel, crie sua senha (a faixa no alto da tela).';
-  else if (!PAUSA) t = 'Não consegui ver a situação da assistente agora. Abra o painel de novo em instantes.';
+  if (!PAUSA) t = 'Não consegui ver a situação da assistente agora. Abra o painel de novo em instantes.';
   else if (PAUSA.pode_pausar) t = 'A assistente está atendendo. Pausar faz ela parar de responder os pacientes no WhatsApp: as mensagens continuam chegando para a equipe responder, e os lembretes e avisos automáticos também param. Dá para retomar aqui a qualquer momento.';
   else if (PAUSA.pode_retomar) t = 'Pausada pelo painel' + (desde ? ' desde ' + desde : '') + '. As mensagens chegam para a equipe responder.';
   else if (pausada()) t = 'Pausada pela RXSync. Para ela voltar, fale com a RXSync respondendo um e-mail nosso.';
@@ -53,7 +52,6 @@ function assistenteResumos() {
 AO_SALVAR.push(() => { if (TELAS.assistente && TELAS.assistente.sec) assistenteResumos(); });
 // Pausar e retomar (DEC-136): dono e equipe, pelo 29, com a sessão. Pausar é o mesmo que a pausa da Central (cláusula 8.4).
 function pausaCarregar() {
-  if (!sessao) { assistenteEstadoRender(); estadoMostrar(); return; }
   c29('assistente_estado').then(r => { if (r && r.sair) { location.reload(); return; } PAUSA = r && r.ok ? r : null; estadoMostrar(); });
 }
 async function pausaAgir(acao) {

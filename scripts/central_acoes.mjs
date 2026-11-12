@@ -127,10 +127,10 @@ const CASOS = [
   { acao: 'situacao_suspender', rota: F, abrirCom: () => menu('Suspender'), campos: { suspensao_motivo: 'inadimplencia', motivo: M }, nome: NOME, espera: { ...C, suspensao_motivo: 'inadimplencia', motivo: M } },
   { acao: 'cancelamento_agendar', rota: F, abrirCom: () => menu('Agendar o cancelamento'), campos: { data: daqui(15), motivo: M }, nome: NOME, espera: { ...C, data: daqui(15), motivo: M } },
   { acao: 'cancelamento_desfazer', rota: F, extra: { cancelar_em: daqui(15) }, abrirCom: () => menu('Desfazer o cancelamento'), espera: C },
-  { acao: 'link_painel_reenviar', rota: F, abrirCom: () => menu('Reenviar o link do painel'), espera: C },
+  { acao: 'link_painel_reenviar', rota: F, abrirCom: () => menu('Reenviar o endereço do painel'), espera: C },
   { acao: 'link_conectar_reenviar', rota: F, abrirCom: () => menu('Reenviar o link de conexão'), espera: C },
   { acao: 'conversas_enviar', rota: F, abrirCom: () => menu('Enviar os dados ao e-mail do cadastro'), espera: C },
-  { acao: 'link_painel_novo', rota: F, abrirCom: () => menu('Gerar um link novo do painel'), nome: NOME, espera: C },
+  { acao: 'link_painel_novo', rota: F, abrirCom: () => menu('Encerrar todos os acessos'), nome: NOME, espera: C },
   { acao: 'cobranca_teste_definir', rota: F, abrirCom: () => menu('Usar como clínica de teste'), nome: NOME, espera: C },
   // Excluir e marcar clínicas (sql/086, DEC-190): de verdade encerra hoje (com o motivo); de teste, na hora; várias de teste pela lista
   { acao: 'cliente_marcar_teste', rota: F, abrirCom: () => menu('É uma clínica de teste'), nome: NOME, espera: C },
@@ -420,7 +420,7 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   feitos += 3;
 }
 // PR 2 de 22/10/2026 (DEC-131, DEC-133, DEC-134, DEC-136): Histórico do painel na ficha (com IP), mini testes no
-// Funil, "fora da saúde" nos públicos (sem "pôr de volta") e o nome da chave painel_link_antigo nos Ajustes.
+// Funil e "fora da saúde" nos públicos (sem "pôr de volta"). A chave do link do painel saiu dos Ajustes (rxsync-sistema DEC-212).
 {
   await abrir('clientes/CLI-001/historico');
   const hist = page.locator('#conteudo .cartao', { has: page.getByRole('heading', { name: 'Acessos recentes' }) });
@@ -437,7 +437,7 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   ok(await linha.getByText('fora da saúde').count() >= 1, 'públicos: a situação "fora da saúde" com nome');
   ok(await linha.getByRole('button', { name: /Pôr de volta|Tirar/ }).count() === 0, 'públicos: "fora da saúde" sem botão de tirar ou pôr de volta');
   await abrir('ajustes');
-  ok(await page.getByRole('switch', { name: 'Painel: o link antigo (?t=) ainda abre', exact: true }).count() === 1, 'ajustes: a chave painel_link_antigo com nome legível');
+  ok(await page.getByRole('switch', { name: /link antigo/ }).count() === 0 && await page.getByRole('switch').count() > 5, 'ajustes: a chave do link do painel saiu, e as outras continuam');
   feitos += 4;
 }
 // Chaves com nível do servidor (rxsync-sistema sql/063): ligar a termos_v7 abre a janela do nível 3 ("Termos v7"),

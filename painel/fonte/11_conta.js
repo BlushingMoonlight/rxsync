@@ -106,7 +106,6 @@ function assinRender(a) {
   trocar($('assinConteudo'), blocos);
 }
 async function contaExcluirPedir(b) {
-  if (!sessao) { rapida('Crie a senha do painel antes (a faixa no alto da tela).'); return; }
   if (!(await confirmar({ titulo: 'Mandar o link de cancelamento?', texto: ['Vai um link para o e-mail do dono da conta. Nada muda até você confirmar pelo link, em até 24 horas.'], botao: 'Mandar o link', perigo: true }))) return;
   b.disabled = true;
   const r = await c29('conta_exclusao_pedir'); b.disabled = false;
@@ -130,9 +129,8 @@ function zapQr(r) {
   clearInterval(zapEspera); zapEspera = null; img.hidden = true; $('btnReconectar').disabled = false;
   msg.textContent = (r && r.mensagem) || 'Não consegui gerar o código. Tente de novo.';
 }
-// O código aparece aqui mesmo; a página confere a situação a cada 4 segundos, por até 3 minutos. Pelo link antigo, pede para criar a senha antes.
+// O código aparece aqui mesmo; a página confere a situação a cada 4 segundos, por até 3 minutos.
 function reconectar() {
-  if (!sessao) { rapida('Para reconectar, crie sua senha primeiro (a faixa no alto da tela).'); return; }
   let voltas = 0; const b = $('btnReconectar');
   b.disabled = true; $('zapQrBox').hidden = false; $('zapQrImg').hidden = true; $('zapQrMsg').textContent = 'Gerando o código…';
   c23('qr').then(r => {
@@ -171,7 +169,7 @@ const MUDOU = [['Agenda › Horários', 'Agenda › Ajustes da agenda', 'agenda/
   ['Conta › Equipe e Acessos recentes', 'Conta › Pessoas', 'conta/equipe'],
   ['Conta › Baixar meus dados', 'Conta › Dados e contrato › Baixar meus dados', 'conta/dados']];
 // caminhos-antigos: fim
-tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
+tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas.' }),
   el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
     el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),
     el('li', { text: 'O estado da assistente fica sempre no alto ("Atendendo"). Tocar nele mostra o que está acontecendo e os botões de pausar e testar.' }),

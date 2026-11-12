@@ -41,6 +41,5 @@ function abrirPainel(termos) {
     if (novo) ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); });
   }).catch(() => { $('carregando').hidden = true; mostrarErro('Sem conexão. Confira a internet e abra o painel de novo.'); });
 }
-if (!token && !sessao) entradaAbrir();
-else if (sessao) c29('termos_estado').then(r => { if (r && r.so_baixar === true) fimContratoMostrar(r.papel); else abrirPainel(r); });
-else abrirPainel(null);
+if (!sessao) entradaAbrir();
+else c29('termos_estado').then(r => { if (r && r.so_baixar === true) fimContratoMostrar(r.papel); else abrirPainel(r); });

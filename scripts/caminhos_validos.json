@@ -68,7 +68,12 @@
   "Conta › WhatsApp da clínica",
   "Hoje",
   "Hoje › Instalar o painel",
-  "Hoje › Nova consulta",
+  "Hoje › João Lima",
+  "Hoje › João Lima › Cancelar consulta",
+  "Hoje › João Lima › Remarcar",
+  "Hoje › Maria Souza",
+  "Hoje › Maria Souza › Cancelar consulta",
+  "Hoje › Maria Souza › Remarcar",
   "Hoje › Precisa de você › 1 consulta nova para ver",
   "Hoje › Últimos 30 dias › Ver resultados",
   "Hoje › Ver resultados",
@@ -165,7 +170,7 @@
     "Não paga",
     "Não pagas (2)",
     "Nova consulta",
-    "Novos (1)",
+    "Novos (0)",
     "Pacientes",
     "Paga",
     "Passados (0)",
@@ -1341,15 +1346,50 @@
     "Conta",
     "Hoje",
     "Instalar o painel",
-    "Nova consulta",
+    "João Lima",
+    "Maria Souza",
+    "Não paga",
     "Pacientes",
+    "Paga",
     "Ver resultados"
    ],
    "Hoje › Instalar o painel": [
     "Agora não",
     "Fechar"
    ],
-   "Hoje › Nova consulta": [
+   "Hoje › João Lima": [
+    "Abrir no WhatsApp",
+    "Cancelar consulta",
+    "Desmarcar paga",
+    "Fechar",
+    "Marcar como não vista",
+    "Remarcar",
+    "Ver a conversa"
+   ],
+   "Hoje › João Lima › Cancelar consulta": [
+    "Cancelar",
+    "Cancelar consulta"
+   ],
+   "Hoje › João Lima › Remarcar": [
+    "Cancelar",
+    "Fechar",
+    "Salvar"
+   ],
+   "Hoje › Maria Souza": [
+    "Abrir no WhatsApp",
+    "Cancelar consulta",
+    "Enviar link agora",
+    "Fechar",
+    "Marcar como não vista",
+    "Marcar como paga",
+    "Remarcar",
+    "Ver a conversa"
+   ],
+   "Hoje › Maria Souza › Cancelar consulta": [
+    "Cancelar",
+    "Cancelar consulta"
+   ],
+   "Hoje › Maria Souza › Remarcar": [
     "Cancelar",
     "Fechar",
     "Salvar"
@@ -1376,7 +1416,7 @@
     "Não paga",
     "Não pagas (2)",
     "Nova consulta",
-    "Novos (1)",
+    "Novos (0)",
     "Pacientes",
     "Paga",
     "Passados (0)",
@@ -1558,7 +1598,6 @@
     "Limites e franquia",
     "Links da clínica",
     "Métricas",
-    "Painel: o link antigo (?t=) ainda abre",
     "Plano",
     "Preço especial",
     "Prospecção",
@@ -1730,13 +1769,13 @@
     "Agendar o cancelamento",
     "É uma clínica de teste",
     "Editar o cadastro",
+    "Encerrar todos os acessos",
     "Enviar os dados ao e-mail do cadastro",
     "Excluir a clínica",
     "Fechar",
-    "Gerar um link novo do painel",
     "Pausar a pedido da clínica",
+    "Reenviar o endereço do painel",
     "Reenviar o link de conexão",
-    "Reenviar o link do painel",
     "Reenviar o onboarding",
     "Suspender",
     "Usar como clínica de teste da cobrança"
@@ -1978,7 +2017,6 @@
     "Links da clínica",
     "Mais",
     "Métricas",
-    "Painel: o link antigo (?t=) ainda abre",
     "Plano",
     "Preço especial",
     "Prospecção",

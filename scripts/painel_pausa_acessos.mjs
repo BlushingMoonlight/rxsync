@@ -5,7 +5,7 @@
 //   2. pausa feita pela RXSync: a faixa aparece sem "Retomar" e o cartão diz que só a RXSync desfaz;
 //   3. equipe: pausa e retoma também; não vê "Acessos recentes" em Conta;
 //   4. dono: Conta › Acessos recentes lista o que o 29 devolve (sem IP), pela sessão;
-//   5. link antigo (?t=, sem sessão): o cartão pede para criar a senha e nada vai ao 29.
+//   5. sem sessão (um link de antes, com ?t=; rxsync-sistema DEC-212): o painel não abre e nada de pausa vai ao 29.
 // Uso (precisa do Playwright): node scripts/painel_pausa_acessos.mjs
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
@@ -48,7 +48,7 @@ async function abrir(rota, comSessao = true) {
   });
   const p = await ctx.newPage(); p.setDefaultTimeout(8000); p.on('pageerror', e => erros.push(String(e)));
   const dialogos = []; p.on('dialog', d => { dialogos.push(d.message()); d.accept(); });
-  await p.goto(site.base + '/painel/' + (comSessao ? '' : '?t=' + TOKEN) + '#' + rota); await p.locator('#app').waitFor();
+  await p.goto(site.base + '/painel/' + (comSessao ? '' : '?t=' + TOKEN) + '#' + rota); await p.locator(comSessao ? '#app' : '#entrada').waitFor({ state: 'visible' });
   return { ctx, p, dialogos };
 }
 
@@ -107,12 +107,12 @@ await p.waitForFunction(() => !!window.Chart, null, { timeout: 8000 }).catch(() 
 ok(await p.evaluate(() => !!window.Chart) && libs.length && libs.every(u => u.startsWith(site.base + '/assets/vendor/')), 'Resultados: o Chart.js carrega do próprio site (' + libs.join(', ') + ')');
 await ctx.close();
 
-// 5. link antigo, sem sessão
+// 5. sem sessão, com ?t= no endereço: a entrada, e nada vai ao 29
 const antes = chamadas.length;
 ({ ctx, p } = await abrir('assistente', false));
 await p.waitForTimeout(300);
-ok(/crie sua senha/i.test(await p.locator('#pausaTxt').textContent()) && await p.locator('#btnPausa').isHidden(), 'link antigo: o cartão pede para criar a senha');
-ok(!chamadas.slice(antes).some(c => /^assistente_/.test(c.acao)), 'link antigo: nada de pausa vai ao 29');
+ok(await p.locator('#app').isHidden() && /Este link não vale mais/.test(await p.locator('#entMsg').textContent()), 'sem sessão: o painel não abre (a entrada avisa que o link não vale mais)');
+ok(!chamadas.slice(antes).some(c => /^assistente_/.test(c.acao)), 'sem sessão: nada de pausa vai ao 29');
 await ctx.close();
 
 ok(!erros.length, 'sem erro de JavaScript' + (erros.length ? ': ' + erros.join(' | ') : ''));

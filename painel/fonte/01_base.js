@@ -80,15 +80,15 @@ function baixarArquivo(conteudo, tipo, nome) {
 
 // ---------------------------------------------------------------- sessão e chamadas ao servidor (DEC-097)
 // No navegador, só a sessão ('painel_sessao', na aba) e a lembrança do aparelho ('painel_lembranca'). Nada mais.
-const params = new URLSearchParams(location.search);
-let token = params.get('t') || '';
 function sessaoLer() { try { return sessionStorage.getItem('painel_sessao') || ''; } catch (e) { return ''; } }
 function sessaoGuardar(v) { try { if (v) sessionStorage.setItem('painel_sessao', v); else sessionStorage.removeItem('painel_sessao'); } catch (e) {} }
 function lembrancaLer() { try { return localStorage.getItem('painel_lembranca') || ''; } catch (e) { return ''; } }
 function lembrancaGuardar(v) { try { if (v && /^[0-9a-f]{64}$/.test(v)) localStorage.setItem('painel_lembranca', v); else localStorage.removeItem('painel_lembranca'); } catch (e) {} }
 let sessao = sessaoLer();
 if (!/^[0-9a-f]{64}$/.test(sessao)) sessao = '';
-if (sessao && token) { token = ''; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} }
+// rxsync-sistema DEC-212: o painel só abre pela sessão (e-mail, senha e código). Quem chega por um link de antes, com ?t=,
+// vê a entrada com o aviso "Este link não vale mais"; o valor não é lido nem mandado a lugar nenhum, e sai do endereço.
+if (new URLSearchParams(location.search).has('t')) { try { history.replaceState(null, '', location.pathname + (sessao ? location.hash : '#link')); } catch (e) {} }
 const ua = navigator.userAgent;
 const APARELHO = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
 const EH_APP = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -100,7 +100,7 @@ function cab(extra) {
 }
 const CONEXAO = { caiu: false };
 let saindo = false;
-// Um pedido ao n8n. Resposta com "entrar": a sessão venceu ou o link antigo parou: volta para a entrada.
+// Um pedido ao n8n. Resposta com "entrar": a sessão venceu: volta para a entrada.
 async function pedir(url, corpo, extraCab) {
   let r;
   try {
@@ -113,21 +113,21 @@ async function pedir(url, corpo, extraCab) {
   }
   if (r && r.entrar === true && url !== EP.e29 && !saindo) {
     saindo = true; sessaoGuardar('');
-    try { history.replaceState(null, '', location.pathname + (token ? '#link' : '#venceu')); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname + '#venceu'); } catch (e) {}
     location.reload();
   }
   return r || {};
 }
-const c24 = (acao, dados) => pedir(EP.e24, { acao, token, dados: dados || {} });
+const c24 = (acao, dados) => pedir(EP.e24, { acao, dados: dados || {} });
 // As ações da agenda e dos pacientes respondem { ok, data }: d24 devolve o data (ou falha).
 const d24 = (acao, dados) => c24(acao, dados).then(r => { if (!r.ok) throw new Error('servidor'); return r.data; });
 const p24 = (acao, dados) => c24(acao, dados).then(r => { if (!r || !r.ok || !r.data) throw new Error('servidor'); return r.data; });
 const c29 = (acao, dados) => pedir(EP.e29, { acao, dados: dados || {} }, { 'x-rxsync-aparelho': APARELHO, 'x-rxsync-app': EH_APP ? 'sim' : 'nao' })
   .catch(() => ({ ok: false, mensagem: 'Sem conexão. Confira a internet e tente de novo.' }));
-const c12 = (acao, dados) => pedir(EP.e12, { acao, token, dados: dados || {} });
-const c32 = (acao, dados) => pedir(EP.e32, { acao, token, dados: dados || {} });
-const c23 = (acao, extra) => pedir(EP.e23, { token, acao, ...(extra || {}) });
-const c13 = (mensagem, historico) => pedir(EP.e13, { token, mensagem, historico });
+const c12 = (acao, dados) => pedir(EP.e12, { acao, dados: dados || {} });
+const c32 = (acao, dados) => pedir(EP.e32, { acao, dados: dados || {} });
+const c23 = (acao, extra) => pedir(EP.e23, { acao, ...(extra || {}) });
+const c13 = (mensagem, historico) => pedir(EP.e13, { mensagem, historico });
 
 // ---------------------------------------------------------------- mensagem rápida (6 s com "Desfazer"; senão 4 s)
 function rapida(texto, op) {

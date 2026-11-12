@@ -153,7 +153,7 @@ function assistenteAcoes(depois) {
 }
 
 // ---------------------------------------------------------------- faixas no alto (uma por vez)
-// Ordem: sem conexão › suspensa › pausada › atendendo só no teste › Termos › crie sua senha.
+// Ordem: sem conexão › suspensa › pausada › atendendo só no teste › Termos.
 function faixaEl(id, tom, ic) { let f = $(id); if (!f) { f = el('div', { id, class: 'faixa ' + (tom || ''), role: 'status', hidden: true }); $('faixas').append(f); } return f; }
 function faixasAtualizar() {
   if (!$('faixas')) return;
@@ -162,8 +162,7 @@ function faixasAtualizar() {
     faixaConta: () => (CONTA || {}).situacao === 'suspenso',
     faixaPausa: () => pausada(),
     faixaTeste: () => TESTE.aberto && !semWhats(),
-    faixaTermos: () => !!(TERMOS && TERMOS.mostrar),
-    faixaSenha: () => !!token && !sessao
+    faixaTermos: () => !!(TERMOS && TERMOS.mostrar)
   };
   let mostrou = false;
   for (const [id, cond] of Object.entries(fx)) {
@@ -196,8 +195,6 @@ function faixaMontar(id, f) {
       el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', id: 'btnTermosAceitar', text: 'Aceitar', onclick: e => termosAceitar(e.currentTarget) }),
         el('button', { class: 'btn sec', type: 'button', id: 'btnTermosDepois', text: 'Ver depois', onclick: () => { TERMOS.mostrar = false; faixasAtualizar(); } })));
   }
-  if (id === 'faixaSenha') trocar(f, icone('cadeado'), el('div', { class: 'txt' }, el('strong', { text: 'Crie sua senha. ' }), 'O painel agora abre com o e-mail e a senha da clínica. Ao criar a senha, este link deixa de funcionar.'),
-    el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', id: 'btnFaixaSenha', text: 'Criar minha senha', onclick: e => criarSenhaPeloLink(e.currentTarget) })));
 }
 // Termos atualizados (DEC-113): "Ver depois" só esconde nesta abertura; depois da vigência, o servidor grava o aceite tácito.
 function termosConferir(ja) {

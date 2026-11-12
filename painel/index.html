@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mJvspF9qvJhEL+oAisNYoGZYSUbuk4BtdvpBVn4Kumc=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hhuw8ZCNHG464YNtRK3yaZmYgZFW2YbRyDQvbVSIRiw=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -723,15 +723,13 @@ function baixarArquivo(conteudo, tipo, nome) {
   document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 30000);
 }
 
-const params = new URLSearchParams(location.search);
-let token = params.get('t') || '';
 function sessaoLer() { try { return sessionStorage.getItem('painel_sessao') || ''; } catch (e) { return ''; } }
 function sessaoGuardar(v) { try { if (v) sessionStorage.setItem('painel_sessao', v); else sessionStorage.removeItem('painel_sessao'); } catch (e) {} }
 function lembrancaLer() { try { return localStorage.getItem('painel_lembranca') || ''; } catch (e) { return ''; } }
 function lembrancaGuardar(v) { try { if (v && /^[0-9a-f]{64}$/.test(v)) localStorage.setItem('painel_lembranca', v); else localStorage.removeItem('painel_lembranca'); } catch (e) {} }
 let sessao = sessaoLer();
 if (!/^[0-9a-f]{64}$/.test(sessao)) sessao = '';
-if (sessao && token) { token = ''; try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {} }
+if (new URLSearchParams(location.search).has('t')) { try { history.replaceState(null, '', location.pathname + (sessao ? location.hash : '#link')); } catch (e) {} }
 const ua = navigator.userAgent;
 const APARELHO = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
 const EH_APP = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -754,20 +752,20 @@ async function pedir(url, corpo, extraCab) {
   }
   if (r && r.entrar === true && url !== EP.e29 && !saindo) {
     saindo = true; sessaoGuardar('');
-    try { history.replaceState(null, '', location.pathname + (token ? '#link' : '#venceu')); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname + '#venceu'); } catch (e) {}
     location.reload();
   }
   return r || {};
 }
-const c24 = (acao, dados) => pedir(EP.e24, { acao, token, dados: dados || {} });
+const c24 = (acao, dados) => pedir(EP.e24, { acao, dados: dados || {} });
 const d24 = (acao, dados) => c24(acao, dados).then(r => { if (!r.ok) throw new Error('servidor'); return r.data; });
 const p24 = (acao, dados) => c24(acao, dados).then(r => { if (!r || !r.ok || !r.data) throw new Error('servidor'); return r.data; });
 const c29 = (acao, dados) => pedir(EP.e29, { acao, dados: dados || {} }, { 'x-rxsync-aparelho': APARELHO, 'x-rxsync-app': EH_APP ? 'sim' : 'nao' })
   .catch(() => ({ ok: false, mensagem: 'Sem conexão. Confira a internet e tente de novo.' }));
-const c12 = (acao, dados) => pedir(EP.e12, { acao, token, dados: dados || {} });
-const c32 = (acao, dados) => pedir(EP.e32, { acao, token, dados: dados || {} });
-const c23 = (acao, extra) => pedir(EP.e23, { token, acao, ...(extra || {}) });
-const c13 = (mensagem, historico) => pedir(EP.e13, { token, mensagem, historico });
+const c12 = (acao, dados) => pedir(EP.e12, { acao, dados: dados || {} });
+const c32 = (acao, dados) => pedir(EP.e32, { acao, dados: dados || {} });
+const c23 = (acao, extra) => pedir(EP.e23, { acao, ...(extra || {}) });
+const c13 = (mensagem, historico) => pedir(EP.e13, { mensagem, historico });
 
 function rapida(texto, op) {
   op = op || {};
@@ -942,7 +940,6 @@ $('entCodigo').addEventListener('submit', ev => {
 document.querySelectorAll('[data-ent]').forEach(b => b.addEventListener('click', () => {
   const o = b.getAttribute('data-ent');
   if (o === 'voltar') {
-    if (ENT.modo === 'link') { $('entrada').hidden = true; $('app').hidden = false; ENT.modo = ''; return; }
     entInicio(''); return;
   }
   ENT.modo = o; $('entEmailPedir').value = $('entEmail').value.trim();
@@ -973,20 +970,10 @@ $('entNova').addEventListener('submit', ev => {
     entOcupado(f, false);
     if (r.ok && r.sessao) { entMsg('Senha salva! Abrindo o painel…'); entEntrou(r); return; }
     if (r.termos) { $('entTermosRot').hidden = false; entMsg(r.mensagem, true); return; }
-    if (r.recomecar) { if (ENT.modo === 'link') { entNovaTela(r.mensagem + ' Toque em Voltar e em "Criar minha senha" de novo.', true); return; } entInicio(r.mensagem, true); return; }
+    if (r.recomecar) { entInicio(r.mensagem, true); return; }
     entMsg(r.mensagem || 'Não consegui salvar a senha.', true);
   });
 });
-function criarSenhaPeloLink(b) {
-  b.disabled = true;
-  c29('senha_pedir_link', { token }).then(r => {
-    b.disabled = false;
-    if (!r.ok || !r.desafio) { rapida(r.mensagem || 'Não consegui mandar o código.'); return; }
-    ENT.desafio = r.desafio; ENT.modo = 'link';
-    $('app').hidden = true; $('entrada').hidden = false; window.scrollTo(0, 0);
-    entNovaTela(r.mensagem, true);
-  });
-}
 function sairPainel(b) {
   const fim = () => { sessaoGuardar(''); lembrancaGuardar(''); location.replace(location.pathname); };
   const lem = lembrancaLer();
@@ -1138,8 +1125,7 @@ function faixasAtualizar() {
     faixaConta: () => (CONTA || {}).situacao === 'suspenso',
     faixaPausa: () => pausada(),
     faixaTeste: () => TESTE.aberto && !semWhats(),
-    faixaTermos: () => !!(TERMOS && TERMOS.mostrar),
-    faixaSenha: () => !!token && !sessao
+    faixaTermos: () => !!(TERMOS && TERMOS.mostrar)
   };
   let mostrou = false;
   for (const [id, cond] of Object.entries(fx)) {
@@ -1172,8 +1158,6 @@ function faixaMontar(id, f) {
       el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', id: 'btnTermosAceitar', text: 'Aceitar', onclick: e => termosAceitar(e.currentTarget) }),
         el('button', { class: 'btn sec', type: 'button', id: 'btnTermosDepois', text: 'Ver depois', onclick: () => { TERMOS.mostrar = false; faixasAtualizar(); } })));
   }
-  if (id === 'faixaSenha') trocar(f, icone('cadeado'), el('div', { class: 'txt' }, el('strong', { text: 'Crie sua senha. ' }), 'O painel agora abre com o e-mail e a senha da clínica. Ao criar a senha, este link deixa de funcionar.'),
-    el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'button', id: 'btnFaixaSenha', text: 'Criar minha senha', onclick: e => criarSenhaPeloLink(e.currentTarget) })));
 }
 function termosConferir(ja) {
   (ja ? Promise.resolve(ja) : c29('termos_estado')).then(r => {
@@ -3444,8 +3428,7 @@ function assistenteEstadoRender() {
   document.querySelectorAll('#cardPausa [data-ponto]').forEach(p => { p.className = 'ponto ' + e.ponto; });
   document.querySelectorAll('#cardPausa [data-estado-curto]').forEach(p => { p.textContent = e.curto; });
   let t = e.t2;
-  if (!sessao) t = 'Para pausar pelo painel, crie sua senha (a faixa no alto da tela).';
-  else if (!PAUSA) t = 'Não consegui ver a situação da assistente agora. Abra o painel de novo em instantes.';
+  if (!PAUSA) t = 'Não consegui ver a situação da assistente agora. Abra o painel de novo em instantes.';
   else if (PAUSA.pode_pausar) t = 'A assistente está atendendo. Pausar faz ela parar de responder os pacientes no WhatsApp: as mensagens continuam chegando para a equipe responder, e os lembretes e avisos automáticos também param. Dá para retomar aqui a qualquer momento.';
   else if (PAUSA.pode_retomar) t = 'Pausada pelo painel' + (desde ? ' desde ' + desde : '') + '. As mensagens chegam para a equipe responder.';
   else if (pausada()) t = 'Pausada pela RXSync. Para ela voltar, fale com a RXSync respondendo um e-mail nosso.';
@@ -3473,7 +3456,6 @@ function assistenteResumos() {
 }
 AO_SALVAR.push(() => { if (TELAS.assistente && TELAS.assistente.sec) assistenteResumos(); });
 function pausaCarregar() {
-  if (!sessao) { assistenteEstadoRender(); estadoMostrar(); return; }
   c29('assistente_estado').then(r => { if (r && r.sair) { location.reload(); return; } PAUSA = r && r.ok ? r : null; estadoMostrar(); });
 }
 async function pausaAgir(acao) {
@@ -3658,7 +3640,6 @@ function assinRender(a) {
   trocar($('assinConteudo'), blocos);
 }
 async function contaExcluirPedir(b) {
-  if (!sessao) { rapida('Crie a senha do painel antes (a faixa no alto da tela).'); return; }
   if (!(await confirmar({ titulo: 'Mandar o link de cancelamento?', texto: ['Vai um link para o e-mail do dono da conta. Nada muda até você confirmar pelo link, em até 24 horas.'], botao: 'Mandar o link', perigo: true }))) return;
   b.disabled = true;
   const r = await c29('conta_exclusao_pedir'); b.disabled = false;
@@ -3682,7 +3663,6 @@ function zapQr(r) {
   msg.textContent = (r && r.mensagem) || 'Não consegui gerar o código. Tente de novo.';
 }
 function reconectar() {
-  if (!sessao) { rapida('Para reconectar, crie sua senha primeiro (a faixa no alto da tela).'); return; }
   let voltas = 0; const b = $('btnReconectar');
   b.disabled = true; $('zapQrBox').hidden = false; $('zapQrImg').hidden = true; $('zapQrMsg').textContent = 'Gerando o código…';
   c23('qr').then(r => {
@@ -3717,7 +3697,7 @@ const MUDOU = [['Agenda › Horários', 'Agenda › Ajustes da agenda', 'agenda/
   ['Conta › WhatsApp', 'Conta › Assinatura e WhatsApp › WhatsApp da clínica', 'conta/whatsapp'],
   ['Conta › Equipe e Acessos recentes', 'Conta › Pessoas', 'conta/equipe'],
   ['Conta › Baixar meus dados', 'Conta › Dados e contrato › Baixar meus dados', 'conta/dados']];
-tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas, e os links antigos do painel continuam abrindo.' }),
+tela('conta/mudou', { montar: () => [cabTela('O que mudou no painel', { voltar: VOLTA_CONTA, sub: 'O painel ganhou um visual novo e cada assunto ganhou a sua página. Nada mudou no que a assistente faz, nos dados nem nas senhas.' }),
   el('div', { class: 'bloco' }, el('h2', { text: 'Para andar no painel' }), el('div', { class: 'cartao pad' }, el('ul', { class: 'lista-texto' },
     el('li', { text: 'No celular, as abas de baixo são Hoje, Agenda, Pacientes e Assistente; a Conta fica no ícone de pessoa, no alto. No iPad e no computador, o menu fica na lateral.' }),
     el('li', { text: 'O estado da assistente fica sempre no alto ("Atendendo"). Tocar nele mostra o que está acontecendo e os botões de pausar e testar.' }),
@@ -3953,9 +3933,8 @@ function abrirPainel(termos) {
     if (novo) ['/painel/app.js', '/painel/tour.js'].forEach(src => { const s = el('script', { src, defer: true }); document.head.append(s); });
   }).catch(() => { $('carregando').hidden = true; mostrarErro('Sem conexão. Confira a internet e abra o painel de novo.'); });
 }
-if (!token && !sessao) entradaAbrir();
-else if (sessao) c29('termos_estado').then(r => { if (r && r.so_baixar === true) fimContratoMostrar(r.papel); else abrirPainel(r); });
-else abrirPainel(null);
+if (!sessao) entradaAbrir();
+else c29('termos_estado').then(r => { if (r && r.so_baixar === true) fimContratoMostrar(r.papel); else abrirPainel(r); });
 })();</script>
 </body>
 </html>
