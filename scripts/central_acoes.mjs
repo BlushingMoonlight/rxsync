@@ -155,18 +155,30 @@ const CASOS = [
   // Segurança
   { acao: 'desfazer', rota: 'seguranca/registro', abrirCom: () => botao('Desfazer').click(), espera: { registro_id: 50 } },
   // Prospecção (sql/031 e sql/032): camadas, números, leads, relatórios, buscas, regras e custos
-  { acao: 'prosp_campanha_salvar', nivel: 2, rota: P + '/campanha/CMP-0001', antes: () => page.fill('#p-marca', 'RXSync Saúde'), abrirCom: () => botao('Salvar a versão nova').click(),
+  { acao: 'prosp_campanha_salvar', nivel: 2, rota: P + '/editar/CMP-0001', antes: () => page.fill('#p-marca', 'RXSync Saúde'), abrirCom: () => botao('Salvar a versão nova').click(),
     espera: { id: 'CMP-0001', nome: 'Odonto Sul', config: { ...CFG.campanha, marca: 'RXSync Saúde' } } },
   { acao: 'prosp_conjunto_salvar', nivel: 3, rota: P + '/conjunto/CJ-0001', antes: () => page.selectOption('#p-numero', '2'), abrirCom: () => botao('Salvar a versão nova').click(), nome: 'Dentistas Curitiba',
     espera: { id: 'CJ-0001', nome: 'Dentistas Curitiba', config: CFG.conjunto, numero_id: '2' } },
   { acao: 'prosp_anuncio_salvar', rota: P + '/anuncio/novo/CJ-0001', antes: async () => { await page.fill('#p-nome', 'D · Teste'); await page.fill('#p-abordagem', ABORD); }, abrirCom: () => botao('Criar').click(),
     espera: { id: '', nome: 'D · Teste', config: { ...CFG.anuncio, abordagem: ABORD }, conjunto_id: 'CJ-0001' } },
+  // A campanha em 5 passos e "Ligar a campanha" (rxsync-sistema DEC-211).
+  { acao: 'prosp_campanha_nova', rota: P + '/campanha/novo', antes: async () => {
+      const seguir = () => page.locator('#conteudo button[type=submit]').click();
+      await page.fill('#n-termos', 'cardiologista'); await page.fill('#n-lugares', 'Florianópolis'); await seguir();
+      await page.waitForSelector('#n-abordagem'); await page.fill('#n-abordagem', ABORD); await seguir();
+      await page.waitForSelector('#n-produto'); await page.fill('#n-produto', 'Assistente virtual que atende pacientes no WhatsApp e marca consultas.'); await seguir();
+      await page.waitForSelector('#n-numero'); await page.selectOption('#n-numero', '1'); await seguir();
+      await page.waitForSelector('#n-nome'); }, abrirCom: () => botao('Salvar sem ligar').click(),
+    espera: { nome: 'cardiologista Florianópolis', publico: { config: { busca: { termos: ['cardiologista'], lugares: ['Florianópolis'], avaliacoes_min: 0, sem_nota: 'aceitar', nota_min: 4, nota_max: 5, telefone_fixo: 'conferir' }, fuso: 'America/Sao_Paulo' } },
+      campanha: { config: { marca: 'RXSync', produto: 'Assistente virtual que atende pacientes no WhatsApp e marca consultas.' } }, conjunto: { numero_id: '1', config: {} },
+      anuncio: { config: { abordagem: ABORD, texto_saida: 'Se não quiser receber mensagens, responda SAIR.', followups: [] } } } },
+  { acao: 'prosp_ligar_tudo', rota: P + '/campanha/CMP-0002', abrirCom: () => botao('Ligar a campanha').click(), nome: 'Dermatologia (rascunho)', espera: { campanha_id: 'CMP-0002' } },
   { acao: 'prosp_duplicar', rota: P + '/campanha/CMP-0001', abrirCom: () => botao('Duplicar').click(), espera: { tipo: 'campanha', id: 'CMP-0001' } },
   { acao: 'prosp_apagar_rascunho', rota: P + '/campanha/CMP-0002', abrirCom: () => botao('Apagar o rascunho').click(), espera: { tipo: 'campanha', id: 'CMP-0002' } },
   { acao: 'prosp_encerrar', rota: P + '/campanha/CMP-0001', abrirCom: () => botao('Encerrar').click(), nome: 'Odonto Sul', espera: { tipo: 'campanha', id: 'CMP-0001' } },
   { acao: 'prosp_ligar', nivel: 1, rota: P, abrirCom: () => chave('Pausar Odonto Sul').click(), espera: { tipo: 'campanha', id: 'CMP-0001', valor: 'NAO' } },
-  { acao: 'prosp_ligar', nivel: 3, rota: P, abrirCom: () => chave('Ligar Dermatologia (rascunho)').click(), nome: 'Dermatologia (rascunho)', espera: { tipo: 'campanha', id: 'CMP-0002', valor: 'SIM' } },
-  { acao: 'prosp_ligar', nivel: 2, rota: P, abrirCom: () => chave('Ligar Ortodontistas Joinville').click(), espera: { tipo: 'conjunto', id: 'CJ-0002', valor: 'SIM' } },
+  { acao: 'prosp_ligar_tudo', nivel: 3, rota: P, abrirCom: () => chave('Ligar Dermatologia (rascunho)').click(), nome: 'Dermatologia (rascunho)', espera: { campanha_id: 'CMP-0002' } },
+  { acao: 'prosp_ligar', nivel: 2, rota: P + '/campanha/CMP-0001', antes: () => page.locator('#conteudo details.grupo summary', { hasText: 'Avançado' }).click(), abrirCom: () => chave('Ligar Ortodontistas Joinville').click(), espera: { tipo: 'conjunto', id: 'CJ-0002', valor: 'SIM' } },
   { acao: 'prosp_ligar', nivel: 1, rota: P + '/numeros', abrirCom: () => chave('Pausar prospec-01').click(), espera: { tipo: 'numero', id: 1, valor: 'NAO' } },
   { acao: 'prosp_numero_criar', rota: P + '/numeros', abrirCom: () => botao('Novo número').click(), campos: { nome: 'Prospecção 3' }, espera: { nome: 'Prospecção 3' } },
   { acao: 'prosp_numero_qr', rota: P + '/numeros', abrirCom: () => botao('Mostrar o código').click(), espera: { id: 2 } },
@@ -175,17 +187,11 @@ const CASOS = [
   { acao: 'prosp_numero_desconectar', rota: P + '/numeros', abrirCom: () => botao('Desconectar').click(), espera: { id: 1 } },
   { acao: 'prosp_numero_webhook', rota: P + '/numeros', abrirCom: () => botao('Webhook de novo').click(), espera: { id: 1 } },
   { acao: 'prosp_numero_apagar', rota: P + '/numeros', abrirCom: () => botao('Apagar').click(), nome: 'prospec-01', espera: { id: 1 } },
-  { acao: 'prosp_exportar', rota: P + '/leads', abrirCom: () => botao('Exportar CSV').click(), espera: { conjunto_id: '', situacao: '' } },
-  { acao: 'prosp_leads_aprovar_todos', rota: P + '/leads', antes: async () => { await page.selectOption('#conteudo select[aria-label="Conjunto"]', 'CJ-0001'); await page.waitForFunction(() => !document.querySelector('#conteudo .esq')); await page.waitForTimeout(200); },
-    abrirCom: () => botao('Aprovar os 6 "para aprovar" deste conjunto').click(), espera: { conjunto_id: 'CJ-0001' } },
-  { acao: 'prosp_lead_aprovar', rota: P + '/lead/PX-CCCCC', abrirCom: () => botao('Aprovar').click(), espera: { id: 'PX-CCCCC', valor: 'SIM' } },
+  { acao: 'prosp_exportar', rota: P + '/leads', abrirCom: async () => { await abrirGrupo('Avançado'); await botao('Exportar CSV').click(); }, espera: { conjunto_id: '', situacao: '' } },
   { acao: 'prosp_lead_assumir', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Assumir a conversa').click(), espera: { id: 'PX-AAAAA' } },
   { acao: 'prosp_lead_devolver', rota: P + '/lead/PX-DDDDD', abrirCom: () => botao('Devolver à IA').click(), espera: { id: 'PX-DDDDD' } },
   { acao: 'prosp_lead_marcar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Marcar').click(), campos: { situacao: 'recusou' }, espera: { id: 'PX-AAAAA', situacao: 'recusou' } },
   { acao: 'prosp_lead_nao_contatar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Não contatar').click(), espera: { id: 'PX-AAAAA' } },
-  { acao: 'prosp_anotar', rota: P + '/relatorios', abrirCom: () => botao('Anotar').click(), campos: { texto: 'Liguei o anúncio C' }, espera: { campanha_id: '', dia: hoje, texto: 'Liguei o anúncio C' } },
-  { acao: 'prosp_relatorio_salvar', rota: P + '/relatorios', abrirCom: () => botao('Guardar como padrão').click(), espera: { nome: 'Padrão', config: { visao: 'desempenho' } } },
-  { acao: 'prosp_buscar_agora', rota: P + '/buscas', abrirCom: () => botao('Buscar agora').click(), campos: { publico_id: 'PB-0002' }, espera: { publico_id: 'PB-0002' } },
   // Públicos (sql/036, DEC-088): o conjunto escolhe; o público guarda a busca e os contatos
   { acao: 'prosp_conjunto_salvar', nivel: 3, rota: P + '/conjunto/CJ-0001', antes: () => page.locator('#conteudo .p-pub[data-id="PB-0002"]').click(), abrirCom: () => botao('Salvar a versão nova').click(), nome: 'Dentistas Curitiba',
     espera: { id: 'CJ-0001', nome: 'Dentistas Curitiba', config: { ...CFG.conjunto, publicos: ['PB-0001', 'PB-0002'] }, numero_id: '1' } },
@@ -205,15 +211,9 @@ const CASOS = [
   { acao: 'prosp_publico_contatos_lote', rota: P + '/publico/PB-0001', abrirCom: () => botao('Tirar todos').click(), espera: { id: 'PB-0001', valor: 'NAO', todos: true } },
   { acao: 'prosp_publico_arquivar', rota: P + '/publico/PB-0002', abrirCom: () => botao('Arquivar').click(), espera: { id: 'PB-0002', valor: 'SIM' } },
   { acao: 'prosp_creditos_teto_salvar', rota: P + '/publicos', abrirCom: () => botao('Mudar o teto').click(), campos: { valor: '500' }, espera: { valor: '500' } },
-  { acao: 'prosp_regra_salvar', rota: P + '/regras', abrirCom: () => botao('Nova regra').click(), campos: { valor: '20' },
-    espera: { nivel: 'anuncio', alvo_id: '', metrica: 'recusa', operador: '>', valor: '20', depois_de: '30', janela_dias: '7', acao: 'avisar' } },
-  { acao: 'prosp_regra_ligar', nivel: 2, rota: P + '/regras', abrirCom: () => chave('Desligar a regra 7').click(), espera: { id: 7, valor: 'NAO' } },
-  { acao: 'prosp_custos_salvar', rota: P + '/custos', antes: () => page.fill('#cu-preco_mil_tokens_entrada', '0,02'), abrirCom: () => botao('Salvar').click(),
-    espera: { itens: [{ tipo: 'preco_credito_serpapi', valor: '0.075', descricao: 'plano de 5.000 buscas' }, { tipo: 'preco_mil_tokens_entrada', valor: '0.02', descricao: '' }, { tipo: 'fixo_mensal', valor: '60', descricao: 'chip' }] } },
-  // Sugerir melhorias (sql/043, DEC-098): nível 2, com a quantidade e o filtro da tela
-  { acao: 'prosp_sugerir', rota: P + '/conversas', antes: async () => { await page.selectOption('#conteudo select[aria-label="Campanha"]', 'CMP-0001'); await botao('Sugerir melhorias').waitFor(); },
-    abrirCom: () => botao('Sugerir melhorias').click(), campos: { quantidade: '10' },
-    espera: { resultado: '', campanha_id: 'CMP-0001', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0, quantidade: '10' } },
+  // O preço da OpenAI (rxsync-sistema DEC-211): a folha do cartão "Custo de IA", em Métricas; só os 2 preços.
+  { acao: 'prosp_custos_salvar', rota: 'metricas', abrirCom: () => botao('Mudar o preço').click(), campos: { entrada: '0,02', saida: '0,08' },
+    espera: { itens: [{ tipo: 'preco_mil_tokens_entrada', valor: '0.02', descricao: '' }, { tipo: 'preco_mil_tokens_saida', valor: '0.08', descricao: '' }] } },
   // Demonstrações por link (sql/056, DEC-125): criar (1), editar (2, antes e depois), desativar e reativar (1), ver (1), apagar (3, o nome da clínica do link)
   { acao: 'dem_criar', rota: 'demonstracoes/novo', antes: async () => { await page.fill('#d-clinica', 'Clínica Nova'); await page.selectOption('#d-tratamento', 'Dra.'); await page.fill('#d-medico', 'Ana Costa');
       await page.getByRole('radio', { name: 'Roxo' }).click(); await page.fill('#d-lead_codigo', 'px-acde3'); }, abrirCom: () => botao('Criar o link').click(),
@@ -234,7 +234,10 @@ for (const k of CASOS) {
 }
 // Toda ação com nível no servidor foi testada pela tela.
 const testadas = new Set(CASOS.map(k => k.acao));
-for (const a of Object.keys(NIVEIS)) ok(testadas.has(a), `${a}: ação sem teste pela tela`);
+// Fora da tela desde a DEC-211 do rxsync-sistema (regras próprias, "Anotar" e as colunas salvas do relatório): as ações
+// continuam no servidor (e o assistente da Central ainda as alcança), mas nenhum botão da Central as chama.
+const FORA_DA_TELA = ['prosp_regra_salvar', 'prosp_regra_ligar', 'prosp_anotar', 'prosp_relatorio_salvar'];
+for (const a of Object.keys(NIVEIS)) if (!FORA_DA_TELA.includes(a)) ok(testadas.has(a), `${a}: ação sem teste pela tela`);
 
 // Entra de novo para os testes que sobram.
 await page.fill('input[type=email]', 'jean@exemplo.com'); await page.fill('input[type=password]', 'senha-de-teste-123'); await page.click('button[type=submit]');
@@ -320,17 +323,31 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   await abrirGrupo('Entrega'); await page.selectOption('#p-entrega-fuso', 'America/Manaus');
   ok(await page.locator('#conteudo .p-pub[data-id="PB-0003"]').isEnabled() && await page.locator('#conteudo .p-pub[data-id="PB-0002"]').isDisabled() && await page.locator('#conteudo .p-pub[data-id="PB-0001"]').isEnabled(),
     'conjunto: trocar o fuso da entrega troca os públicos que dá para escolher (o já escolhido fica, o servidor recusa)');
-  const filtrou = async (rota, sel, valor, acao, campo) => { await abrir(rota); const desde = chamadas.length; await page.selectOption(sel, valor);
+  const filtrou = async (rota, sel, valor, acao, campo, avancado) => { await abrir(rota); if (avancado) await abrirGrupo('Avançado'); const desde = chamadas.length; await page.selectOption(sel, valor);
     for (let i = 0; i < 60; i++) { const c = chamadas.slice(desde).find(x => x.acao === acao); if (c) return c.dados[campo]; await page.waitForTimeout(50); } return null; };
-  ok(await filtrou(P + '/leads', '#conteudo select[aria-label="Público"]', 'PB-0001', 'prosp_leads', 'publico_id') === 'PB-0001', 'leads: filtro por público');
-  ok(await filtrou(P + '/buscas', '#conteudo select[aria-label="Público"]', 'PB-0002', 'prosp_buscas', 'publico_id') === 'PB-0002', 'buscas: filtro por público');
-  await abrir(P + '/relatorios'); const desde = chamadas.length; await page.locator('#conteudo label', { hasText: 'Nível' }).locator('select').selectOption('publico');
+  // Leads (decisão 11 do plano, DEC-211): o "Exportar CSV" e os filtros por conjunto e por público num "Avançado" fechado, no fim.
+  await abrir(P + '/leads');
+  ok(!(await botao('Exportar CSV').isVisible()) && !(await page.locator('#conteudo select[aria-label="Público"]').isVisible()) && !(await page.locator('#conteudo select[aria-label="Conjunto"]').isVisible()),
+    'leads: "Exportar CSV" e os filtros por conjunto e por público fora da vista normal');
+  ok(await page.evaluate(() => { const d = [...document.querySelectorAll('#conteudo details.grupo')].find(x => x.querySelector('summary').textContent === 'Avançado'), l = document.querySelector('#conteudo .lista');
+    return !!d && !d.open && !!l && !!(l.compareDocumentPosition(d) & Node.DOCUMENT_POSITION_FOLLOWING) && !d.nextElementSibling; }),
+    'leads: o "Avançado" fechado, no fim da lista');
+  await page.setViewportSize({ width: 390, height: 844 }); await abrir(P + '/leads');
+  const caixas = await page.locator('#conteudo .lista button.linha').evaluateAll(bs => bs.map(b => { const s = b.querySelector(':scope > svg.icone'), n = b.querySelector('.cresce'); const rs = s.getBoundingClientRect(), rn = n.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    return rs.left >= rn.right - 1 && rs.top < rn.bottom && rs.bottom > rn.top && rb.right - rs.right < 24; }));
+  ok(caixas.length > 0 && caixas.every(Boolean), 'leads a 390 px: a setinha à direita do nome, na mesma linha');
+  await page.setViewportSize({ width: 1180, height: 820 });
+  ok(await filtrou(P + '/leads', '#conteudo select[aria-label="Público"]', 'PB-0001', 'prosp_leads', 'publico_id', true) === 'PB-0001', 'leads: filtro por público (no "Avançado")');
+  // Prompt da IA: um número só, o da versão da campanha (nada de "Prompt nº").
+  await abrir(P + '/prompt/CMP-0001'); await page.waitForTimeout(200);
+  const conv = await page.locator('#conteudo .cartao', { hasText: 'Conversas de cada versão' }).innerText();
+  ok(/Versão 2/.test(conv) && /Versão 1/.test(conv) && !/nº/.test(await page.locator('#conteudo').innerText()), 'prompt: "Conversas de cada versão" com o número da versão da campanha');
+  await abrir(P + '/relatorio'); const desde = chamadas.length; await page.getByRole('button', { name: '90 dias' }).click();
   const d = await chamada('prosp_relatorio', desde);
-  ok(d && d.nivel === 'publico', `relatórios: nível público (${JSON.stringify(d)})`);
+  ok(d && d.nivel === 'campanha' && !d.detalhar, `relatório simples: por campanha, sem detalhar (${JSON.stringify(d)})`);
   await page.waitForTimeout(200);
-  ok(await page.locator('#conteudo table th[scope=row]', { hasText: 'Dentistas Curitiba' }).count() === 1 && await page.locator('#conteudo table th[scope=row]', { hasText: '(sem público)' }).count() === 1, 'relatórios: linha por público, com o nome');
-  await page.locator('#conteudo label', { hasText: 'Nível' }).locator('select').selectOption('anuncio');
-  feitos += 5;
+  ok(await page.locator('#conteudo table th[scope=row]', { hasText: 'Odonto Sul' }).count() >= 1, 'relatório: linha por campanha, com o nome');
+  feitos += 9;
 }
 // Prospecção: o QR só na tela. Aparece na janela; nada dele vai para o armazenamento do navegador ou o endereço; some ao
 // fechar a janela e quando a Central vai para o fundo.

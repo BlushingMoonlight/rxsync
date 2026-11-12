@@ -10,16 +10,12 @@ ICONES.conversa = 'M5 5h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7l-4.5 3.5V17H5a1 1 0
 ICONES.seta_baixo = 'M6 9l6 6 6-6';
 ICONES.mais_um = 'M12 5v14M5 12h14';
 
-// Pedidos do Jean: as abas na ordem do trabalho; o que é semanal ou raro fica no "Mais" da própria Prospecção.
-const P_ABAS = [['', 'Início'], ['publicos', 'Públicos'], ['leads', 'Leads'], ['conversas', 'Conversas'], ['numeros', 'Números']];
-const P_MAIS = [['relatorios', 'Relatórios', 'Resultados por campanha, conjunto e anúncio'], ['buscas', 'Buscas', 'Todas as buscas no Google Maps e o teto de créditos'],
-  ['regras', 'Regras', 'Pausar ou reduzir quando algo vai mal'], ['custos', 'Custos', 'Preços do SerpAPI e da OpenAI']];
 const P_SIT = { rascunho: ['rascunho', ''], ativa: ['ativa', 'ok'], ativo: ['ativo', 'ok'], pausada: ['pausada', 'atencao'], pausado: ['pausado', 'atencao'], cortado: ['cortado pela regra', 'perigo'],
   encerrada: ['encerrada', ''], encerrado: ['encerrado', ''], arquivado: ['arquivado', ''] };
 const etqSit = s => { const [t, tom] = P_SIT[s] || [s || '—', '']; return etq(t, tom); };
 const P_NUM = { novo: ['novo', ''], aguardando_qr: ['esperando o código', 'atencao'], conectado: ['conectado', 'ok'], desconectado: ['desconectado', 'perigo'], banido: ['provável bloqueio', 'perigo'], apagado: ['apagado', ''] };
 const etqNum = s => { const [t, tom] = P_NUM[s] || [s || '—', '']; return etq(t, tom); };
-const P_LEAD = { para_aprovar: ['Para aprovar', 'atencao'], na_fila: ['Na fila', 'info'], enviado: ['Enviado', ''], respondeu: ['Respondeu', 'info'], positivo: ['Positivo', 'ok'], com_voce: ['Com você', 'atencao'],
+const P_LEAD = { na_fila: ['Na fila', 'info'], enviado: ['Enviado', ''], respondeu: ['Respondeu', 'info'], positivo: ['Positivo', 'ok'], com_voce: ['Com você', 'atencao'],
   cadastrou: ['Cadastrou', 'ok'], cliente: ['Cliente', 'ok'], recusou: ['Recusou', ''], saiu: ['Saiu (não contatar)', 'perigo'], sem_whatsapp: ['Sem WhatsApp', ''], falhou: ['Falhou', 'perigo'], descartado: ['Descartado', ''] };
 const etqLead = s => { const [t, tom] = P_LEAD[s] || [s || '—', '']; return etq(t, tom); };
 const P_NOME = { campanha: 'campanha', conjunto: 'conjunto', anuncio: 'anúncio', publico: 'público' };
@@ -29,16 +25,6 @@ const ativo = s => s === 'ativa' || s === 'ativo';
 est.prosp = null; // a última tela inicial (árvore de campanhas e números), só na memória
 est.publicos = null; // a última lista de públicos (sql/036), só na memória
 
-function abasP(atual) {
-  const naMais = P_MAIS.find(([k]) => k === atual);
-  return el('div', { class: 'abas abas-p', role: 'tablist', 'aria-label': 'Partes da prospecção' }, P_ABAS.map(([k, n]) => el('button', { role: 'tab', type: 'button', 'aria-selected': String(atual === k), onclick: () => irP(k) }, n)),
-    el('button', { role: 'tab', type: 'button', 'aria-selected': String(!!naMais), 'aria-haspopup': 'dialog', onclick: maisP }, naMais ? naMais[1] : 'Mais', icone('seta_baixo', 'p')));
-}
-function maisP() {
-  const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-mais-p' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
-    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-mais-p', text: 'Mais da prospecção' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
-    el('ul', { class: 'menu-acoes' }, P_MAIS.map(([k, n, s]) => el('li', {}, el('button', { type: 'button', onclick: () => { fechar(); irP(k); } }, el('div', {}, n, el('span', { class: 't2', text: s }))))))));
-}
 // Uma chave da prospecção ligada ali mesmo, com o mesmo nível de Ajustes (busca e IA 2, disparo 3).
 const ligarAqui = (chave, texto) => btn(texto, async () => { await mudarChave(chave, 'SIM'); est.prosp = null; await rotear(); }, 'sec');
 async function arvoreP(forcar) {
@@ -90,9 +76,12 @@ function interruptorP(tipo, o) {
 // ---------------------------------------------------------------- telas
 TELAS.prospeccao = async (c, [parte, a, b]) => {
   parte = parte || '';
-  const telasP = { '': pInicio, campanha: pObjeto, conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, relatorios: pRelatorios, buscas: pBuscas, regras: pRegras, custos: pCustos };
+  const telasP = { '': pInicio, campanha: pCampanha, editar: (cc, p, a) => pObjeto(cc, 'campanha', a), conjunto: pObjeto, anuncio: pObjeto, publicos: pPublicos, publico: pPublico, numeros: pNumeros, leads: pLeads, lead: pLead, conversas: pConversas, prompt: pPrompt, relatorio: pRelatorio, relatorios: pRelatorio, regras: pNumeros, custos: pInicio, buscas: pPublicos };
   const fn = telasP[parte] || pInicio;
-  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]); falhou(c, { desligada: true, chave: 'tela_prospeccao' }, 'Prospecção'); return; }
+  // Desligada: a chave das telas ali mesmo (rxsync-sistema DEC-211), com o mesmo nível de Ajustes.
+  if (!ligada('tela_prospeccao')) { topo('Prospecção', [['Vendas'], ['Prospecção']]);
+    trocar(c, cabecalho('Prospecção', 'desligada'), el('div', { class: 'pilha' }, el('div', { class: 'aviso info' }, icone('info'),
+      el('div', { class: 'cresce' }, 'As telas da prospecção estão desligadas. Ligar não manda nenhuma mensagem: só mostra as telas.'), ligarAqui('tela_prospeccao', 'Ligar as telas')))); return; }
   await fn(c, parte, a, b);
 };
 
@@ -116,63 +105,252 @@ function cartaoMotor(m) {
     aviso ? corpo(aviso) : null, el('ul', { class: 'lista' }, linha('52', m.sinal_52), linha('53', m.sinal_53)));
 }
 
+// A Prospecção (molde A, rxsync-sistema DEC-211): sem abas. O estado numa linha (e o "Retomar" quando está parada), o
+// "Para começar" enquanto faltar algo, o que precisa de você, as campanhas, os números da semana e as linhas para Leads,
+// Números, Prompt da IA, Públicos e Relatório.
+const DIA_MS = 864e5;
+function retomarItens(d, pubs) {
+  const res = d.resultados || {}, motor = res.motor || null, itens = [];
+  for (const n of (d.numeros || []).filter(x => x.situacao !== 'apagado' && x.situacao !== 'conectado'))
+    itens.push(['O número ' + n.instancia + ' está ' + (P_NUM[n.situacao] || [n.situacao])[0], 'Leia o código com o celular do chip.', ligada('editar_numeros_prospeccao') ? btn('Mostrar o código', () => pedirQR(n), 'sec') : null]);
+  if (!Number(res.contatos)) itens.push(['Nenhum contato para receber mensagem', 'Os contatos saem 90 dias depois de encontrados: busque de novo no público.', btn('Abrir Públicos', () => irP('publicos'), 'sec')]);
+  else if (Number(res.contatos_vencendo_7d)) itens.push([pl(Number(res.contatos_vencendo_7d), 'contato sai', 'contatos saem') + ' em até 7 dias', 'Se for usar, ligue a campanha logo ou busque de novo no público.', btn('Abrir Públicos', () => irP('publicos'), 'sec')]);
+  for (const n of (d.numeros || []).filter(x => x.situacao === 'conectado' && x.teto_hoje != null && Number(x.teto_hoje) < 40))
+    itens.push(['O número ' + n.instancia + ' recomeça devagar', `Hoje ele manda até ${fmtNum(n.teto_hoje)} mensagens (aquecimento: 10, 20, 30 e 40 por dia nas primeiras semanas).`, null]);
+  if (motor && (motor.parados || []).length) itens.push(['Um workflow do motor está parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O') + '. Sem ele, nada sai.', null]);
+  itens.push(['Confira o prompt da IA', 'Preços, o teste grátis e o jeito de falar podem ter mudado desde a última vez.', btn('Abrir o Prompt da IA', () => irP('prompt'), 'sec', 'conversa')]);
+  return itens;
+}
+function mostrarRetomar(d, pubs) {
+  const fechar = janela(el('div', { class: 'janela', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-retomar' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-retomar', text: 'Retomar a prospecção' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'O que conferir antes de ligar de novo, na ordem.' }),
+      el('ol', { class: 'lista p-retomar' }, retomarItens(d, pubs).map(([t, s, acao]) => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: t }), el('div', { class: 't2', text: s })), acao ? el('div', { class: 'direita' }, acao) : null))))),
+    el('div', { class: 'pe' }, btn('Fechar', () => fechar(), 'pri'))));
+}
 async function pInicio(c) {
   topo('Prospecção', [['Vendas'], ['Prospecção']]);
   const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Prospecção')) return;
   est.prosp = r.dados;
   const d = r.dados, res = d.resultados || {}, ch = d.chaves || {}, editar = ligada('editar_prospeccao');
   const soma = k => (res.ultimos_7_dias || []).reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
+  const motor = res.motor || null, campanhas = (d.campanhas || []).filter(cp => !/^encerrad/.test(cp.situacao));
+  const pubs = ((await publicosP()) || {}).publicos || [];
+  const politica = ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM';
+  const algumaAtiva = campanhas.some(cp => ativo(cp.situacao));
+  // O estado numa linha: ligada, parada (e desde quando) ou o disparo segurado pelo motor.
+  const ultimo = res.ultimo_envio_em ? new Date(res.ultimo_envio_em) : null;
+  const parada = campanhas.length && (!algumaAtiva || ch.prosp_disparo !== 'SIM' || !ultimo || Date.now() - ultimo.getTime() > 7 * DIA_MS);
+  const estado = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['Disparo parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O'), 'perigo']
+    : parada ? [ultimo ? 'Parada desde ' + fmtData(ultimo.toISOString()) : 'Ainda não mandou mensagem', 'Toque em "Retomar" para ver o que conferir antes de ligar.', 'atencao']
+    : algumaAtiva ? ['Ligada', `${pl(campanhas.filter(cp => ativo(cp.situacao)).length, 'campanha ativa', 'campanhas ativas')}; as mensagens saem nas janelas, dentro dos tetos.`, 'ok'] : null;
   const att = [];
-  if (res.para_aprovar) att.push(['atencao', `${pl(res.para_aprovar, 'lead', 'leads')} para aprovar`, 'Antes de entrar na fila', () => ir('prospeccao/leads/para_aprovar')]);
   if (res.com_voce) att.push(['atencao', `${pl(res.com_voce, 'conversa', 'conversas')} com você`, 'A IA parou: responda pelo celular do número', () => ir('prospeccao/leads/com_voce')]);
-  const motor = res.motor || null;
-  if (motor && motor.segurado) att.push(['critico', 'Disparo parado', (motor.parados || []).map(textoParado).join(' e ').replace(/^o/, 'O'), null]);
   if (res.avisos_na_fila) att.push(['info', `${pl(res.avisos_na_fila, 'aviso', 'avisos')} esperando o envio a Avisos`, 'O workflow 54 manda a cada 5 minutos', null]);
   for (const n of (d.numeros || []).filter(n => ['desconectado', 'banido'].includes(n.situacao))) att.push(['critico', `Número ${n.instancia} ${(P_NUM[n.situacao] || [n.situacao])[0]}`, 'Os conjuntos dele pausaram sozinhos', () => irP('numeros')]);
-  const disparo = ch.prosp_disparo === 'SIM' && motor && motor.segurado ? ['disparo parado', 'perigo'] : ch.prosp_disparo === 'SIM' ? ['disparo ligado', 'ok'] : ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM' ? ['disparo desligado', ''] : ['disparo travado (Política v10 e balanceamento)', 'atencao'];
-  const campanhas = d.campanhas || [];
-  // Para começar: a ordem do primeiro uso, cada passo marcado pelo que o servidor já manda; some quando tudo está feito.
-  const pubs = ((await publicosP()) || {}).publicos || [];
-  const temCampanha = campanhas.some(cp => ativo(cp.situacao) && (cp.conjuntos || []).some(j => ativo(j.situacao) && (j.anuncios || []).some(n => ativo(n.situacao))));
-  const politica = ch.prosp_politica_v10 === 'SIM' && ch.prosp_balanceamento === 'SIM';
+  // Para começar: a ordem do primeiro uso; cada passo marcado pelo que o servidor já manda; some quando tudo está feito.
+  const telasEdicao = ligada('editar_prospeccao') && ligada('editar_numeros_prospeccao');
   const passos = [
+    ['Telas de edição ligadas', 'Criar campanhas e conectar números', telasEdicao,
+      [ligada('editar_prospeccao') ? null : ligarAqui('editar_prospeccao', 'Ligar a edição'), ligada('editar_numeros_prospeccao') ? null : ligarAqui('editar_numeros_prospeccao', 'Ligar os números')]],
     ['Busca e IA ligadas', 'A busca gasta créditos do SerpAPI; a IA responde os leads', ch.prosp_busca === 'SIM' && ch.prosp_ia === 'SIM',
       editar ? [ch.prosp_busca === 'SIM' ? null : ligarAqui('prosp_busca', 'Ligar a busca'), ch.prosp_ia === 'SIM' ? null : ligarAqui('prosp_ia', 'Ligar a IA')] : null],
-    ['Um número de WhatsApp conectado', 'O número prospec- que manda as mensagens (leia o QR)', (d.numeros || []).some(n => n.situacao === 'conectado'), () => irP('numeros')],
-    ['Um público com contatos', 'Termos, bairros e filtros; depois "Buscar de novo"', pubs.some(p => Number((p.numeros || {}).tamanho) > 0), () => irP('publicos')],
-    ['Uma campanha com conjunto e anúncio ativos', 'Campanha (marca e IA) › conjunto (público, número, entrega) › anúncio', temCampanha, editar ? () => irP('campanha', 'novo') : null],
-    ['Disparo ligado', politica ? 'Por último: as mensagens começam a sair, dentro das travas' : 'Travado até a Política v10 e o balanceamento (só por PR)', ch.prosp_disparo === 'SIM',
-      editar && politica ? [ligarAqui('prosp_disparo', 'Ligar o disparo')] : null]];
+    ['Um número de WhatsApp conectado', 'O número prospec- que manda as mensagens (leia o código)', (d.numeros || []).some(n => n.situacao === 'conectado'), () => irP('numeros')],
+    ['Uma campanha ligada', politica ? 'Nova campanha: 5 passos; no fim, "Ligar a campanha" liga tudo (o disparo também)' : 'O disparo está travado até a Política v10 e o balanceamento (só por PR)', algumaAtiva && ch.prosp_disparo === 'SIM',
+      editar ? () => irP('campanha', campanhas.length ? campanhas[0].id : 'novo') : null]];
   const paraComecar = passos.some(p => !p[2]) ? cartao('Para começar', el('span', { class: 'mudo peq', text: `${passos.filter(p => p[2]).length} de ${passos.length}` }),
     el('ul', { class: 'lista p-comecar' }, passos.map(([t, s, feito, acao]) => el('li', {}, el(typeof acao === 'function' && !feito ? 'button' : 'div', { class: 'linha', type: typeof acao === 'function' && !feito ? 'button' : null, onclick: typeof acao === 'function' && !feito ? acao : null },
       el('span', { class: 'icone-caixa' + (feito ? ' feito' : '') }, icone(feito ? 'ok' : 'relogio')),
       el('div', { class: 'cresce' }, el('div', { class: 't1', text: t }), el('div', { class: 't2', text: feito ? 'Feito' : s })),
       !feito && Array.isArray(acao) ? el('div', { class: 'direita acoes' }, acao.filter(Boolean)) : !feito && typeof acao === 'function' ? icone('seta') : null))))) : null;
-  // Uma camada: a linha (abre a camada) e, ao lado, o interruptor.
-  const camada = (tipo, o, t2, ic, extra) => el('div', { class: 'p-camada' + (extra ? ' ' + extra : '') },
-    el('button', { class: 'linha', type: 'button', onclick: () => irP(tipo, o.id) }, ic ? el('span', { class: 'icone-caixa' }, icone(ic)) : null,
-      el('div', { class: 'cresce' }, el('div', { class: 't1', text: o.nome }), el('div', { class: 't2', text: t2 })), el('div', { class: 'direita' }, etqSit(o.situacao))),
-    editar ? el('div', { class: 'p-chave' }, interruptorP(tipo, o)) : null);
-  const novoBtn = (texto, tipo, pai) => el('li', {}, el('div', { class: 'p-novo' }, btn(texto, () => irP(tipo, 'novo', pai), 'fant', 'mais_um')));
-  const anuncios = j => el('ul', { class: 'lista p-filhos p-anuncios' },
-    (j.anuncios || []).map(n => el('li', {}, camada('anuncio', n, `${n.id} · versão ${n.versao}${n.pausa_motivo ? ' · ' + n.pausa_motivo : ''}`))),
-    editar && !/^encerrad/.test(j.situacao) ? novoBtn('Novo anúncio', 'anuncio', j.id) : null);
-  const conjuntos = cp => el('ul', { class: 'lista p-filhos' },
-    (cp.conjuntos || []).map(j => el('li', {}, camada('conjunto', j, `${j.id} · ${j.numero ? j.numero.instancia : 'sem número'} · ${(j.publicos || []).length ? pl(j.publicos.length, 'público', 'públicos') : 'sem público'}${j.pausa_motivo ? ' · ' + j.pausa_motivo : ''}`), anuncios(j))),
-    editar && !/^encerrad/.test(cp.situacao) ? novoBtn('Novo conjunto', 'conjunto', cp.id) : null);
-  const arvore = campanhas.length
-    ? campanhas.map(cp => cartao(null, null, camada('campanha', cp, `${cp.id} · versão ${cp.versao} · ${pl((cp.conjuntos || []).length, 'conjunto', 'conjuntos')}`, 'prospeccao', 'p-campanha'), conjuntos(cp)))
-    : [cartao(null, null, vazio('Nenhuma campanha ainda. Crie a primeira: campanha (marca, produto e IA) › conjunto (públicos, número, entrega) › anúncios (as mensagens, sorteadas entre os leads).', 'prospeccao'))];
-  trocar(c, cabecalho('Prospecção', 'campanha › conjunto › anúncio', editar ? btn('Nova campanha', () => irP('campanha', 'novo'), 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, abasP(''), paraComecar,
-      el('div', { class: 'etqs' }, etq(disparo[0], disparo[1]), etq(ch.prosp_busca === 'SIM' ? 'busca ligada' : 'busca desligada', ch.prosp_busca === 'SIM' ? 'ok' : ''),
-        etq(ch.prosp_ia === 'SIM' ? 'IA ligada' : 'IA desligada', ch.prosp_ia === 'SIM' ? 'ok' : ''), etq(fmtNum(d.nao_contatar) + ' no "não contatar"', '', true)),
-      el('div', { class: 'kpis' }, kpi('Abordagens (7 dias)', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
-      att.length ? cartao('Precisa da sua atenção', null, el('ul', { class: 'lista' }, att.map(([prior, t, s, fn]) => el('li', {}, el(fn ? 'button' : 'div', { class: 'linha', type: fn ? 'button' : null, onclick: fn || null },
+  // As campanhas: uma linha cada, com o interruptor (ligar = "Ligar a campanha", nível 3; pausar = um toque).
+  const chaveCamp = cp => !editar ? null : el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(ativo(cp.situacao)), 'aria-label': (ativo(cp.situacao) ? 'Pausar ' : 'Ligar ') + cp.nome,
+    onclick: () => ativo(cp.situacao) ? pausarCampanha(cp) : ligarCampanha(cp) });
+  const linhaCamp = cp => el('li', {}, el('div', { class: 'p-camada p-campanha' },
+    el('button', { class: 'linha', type: 'button', onclick: () => irP('campanha', cp.id) }, el('span', { class: 'icone-caixa' }, icone('prospeccao')),
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: cp.nome }), el('div', { class: 't2', text: `${cp.id}${cp.pausa_motivo ? ' · ' + cp.pausa_motivo : ''}` })), el('div', { class: 'direita' }, etqSit(cp.situacao))),
+    el('div', { class: 'p-chave' }, chaveCamp(cp))));
+  const linhaIr = (t, s, ic, rota) => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP(rota) }, el('span', { class: 'icone-caixa' }, icone(ic)),
+    el('div', { class: 'cresce' }, el('div', { class: 't1', text: t }), el('div', { class: 't2', text: s })), icone('seta')));
+  trocar(c, cabecalho('Prospecção', 'clínicas e consultórios pelo WhatsApp', editar ? btn('Nova campanha', () => { est.nova = null; irP('campanha', 'novo'); }, 'pri', 'mais_um') : null),
+    el('div', { class: 'pilha' },
+      estado ? el('div', { class: 'aviso ' + (estado[2] === 'ok' ? 'info' : estado[2]) }, icone(estado[2] === 'ok' ? 'ok' : 'alerta'),
+        el('div', { class: 'cresce' }, el('b', { text: estado[0] + '. ' }), estado[1]), parada ? btn('Retomar', () => mostrarRetomar(d, pubs), 'sec') : null) : null,
+      paraComecar,
+      att.length ? cartao('Precisa de você', null, el('ul', { class: 'lista' }, att.map(([prior, t, s, fn]) => el('li', {}, el(fn ? 'button' : 'div', { class: 'linha', type: fn ? 'button' : null, onclick: fn || null },
         el('span', { class: 'prior ' + prior, 'aria-hidden': 'true' }), el('div', { class: 'cresce' }, el('div', { class: 't1', text: t }), el('div', { class: 't2', text: s })), fn ? icone('seta') : null))))) : null,
+      cartao('Campanhas', null, campanhas.length ? el('ul', { class: 'lista' }, campanhas.map(linhaCamp))
+        : vazio('Nenhuma campanha ainda. Toque em "Nova campanha": são 5 passos, e no fim "Ligar a campanha" liga tudo.', 'prospeccao')),
+      el('div', { class: 'kpis' }, kpi('Enviadas (7 dias)', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
+      cartao(null, null, el('ul', { class: 'lista' },
+        linhaIr('Leads', 'cada contato, a conversa e o funil', 'clientes', 'leads'),
+        linhaIr('Números', `os números prospec-, o código e as regras de segurança · ${fmtNum(d.nao_contatar)} no "não contatar"`, 'telefone', 'numeros'),
+        linhaIr('Prompt da IA', 'o texto que a IA usa, o teste e as versões', 'conversa', 'prompt'),
+        linhaIr('Públicos', 'quem pode receber mensagem e o teto de créditos', 'clientes', 'publicos'),
+        linhaIr('Relatório', 'os números do período e onde as conversas pararam', 'agregados', 'relatorio'))),
       cartaoMotor(motor),
-      editar ? null : nota('Criar, editar, ligar e pausar estão desligados (editar_prospeccao).', true),
-      ...arvore));
+      editar ? null : nota('Criar, editar, ligar e pausar estão desligados (editar_prospeccao).', true)));
+}
+
+// ---------- A campanha (rxsync-sistema DEC-211): nasce em 5 passos (molde F) e tem uma tela própria (molde C). Por trás,
+// o banco continua com as camadas (campanha, conjunto, mensagem e público); elas ficam no "Avançado".
+// "Ligar a campanha" liga tudo numa confirmação só (nível 3, o nome da campanha): a campanha, os conjuntos, as mensagens,
+// os números e as chaves de busca, IA e disparo que faltarem. Pausar é um toque.
+function ligarCampanha(cp, depois) {
+  return fazer('prosp_ligar_tudo', { campanha_id: cp.id }, { titulo: 'Ligar a campanha ' + cp.nome, nivel: 3, nome: cp.nome, rotuloNome: 'o nome da campanha', rotuloNivel: 'manda mensagens de verdade',
+    texto: 'Liga a campanha, a mensagem, o número e, se faltarem, a busca, a IA e o disparo. As mensagens saem só de segunda a sexta, nas janelas, com o aquecimento do número (cerca de 10 por dia na 1ª semana).',
+    botao: 'Ligar a campanha', depois: async () => { est.prosp = null; if (depois) await depois(); else await rotear(); } });
+}
+function pausarCampanha(cp) {
+  return fazer('prosp_ligar', { tipo: 'campanha', id: cp.id, valor: 'NAO' }, { titulo: 'Pausar ' + cp.nome, linhas: [['Situação', 'ativa', 'pausada']], ok: 'Pausada.',
+    depois: async () => { est.prosp = null; await rotear(); } });
+}
+// Número novo, de qualquer tela: cria a instância "prospec-…" e mostra o código (o QR só na tela, DEC-071).
+function criarNumero() {
+  return fazer('prosp_numero_criar', {}, { titulo: 'Novo número de prospecção', texto: 'Cria a instância "prospec-…" na Evolution (a mesma das clínicas, DEC-071) e mostra o código para ler no celular do chip novo.',
+    campos: [{ k: 'nome', rot: 'Nome (ex.: Prospecção 1)', obrig: true, minimo: 3, erro: 'Nome: de 3 a 40 letras.' }], ok: 'Número criado.',
+    silencioso: true, depois: async x => { est.prosp = null; await rotear(); if (x.qr) mostrarQR(x.numero || {}, x.qr); else rapida('Criado. Toque em "Mostrar o código" para conectar.'); } });
+}
+
+// Os 5 passos: quem recebe, a mensagem, o que a IA conta, número e horário, confira e ligar. As respostas ficam só na
+// memória da página (est.nova) até "Ligar a campanha" ou "Salvar sem ligar"; o servidor confere tudo de novo.
+const PASSOS_NOVA = ['Quem recebe', 'A mensagem', 'O que a IA conta', 'Número e horário', 'Confira e ligar'];
+const SAIDA_PADRAO = 'Se não quiser receber mensagens, responda SAIR.';
+const linhasDe = v => String(v || '').split('\n').map(x => x.trim()).filter(Boolean);
+async function pNova(c) {
+  topo('Nova campanha', [['Prospecção', 'prospeccao'], ['Nova campanha']], 'prospeccao');
+  if (!ligada('editar_prospeccao')) { trocar(c, cabecalho('Nova campanha'), nota('Criar está desligado (editar_prospeccao).', true)); return; }
+  const a = await arvoreP(true);
+  est.nova = est.nova || { passo: 0, termos: '', lugares: '', modelo: 'medicos', fuso: 'America/Sao_Paulo', marca: 'RXSync', abordagem: '', saida: SAIDA_PADRAO, fu: false, fuTexto: '', fuDias: '3', produto: '', numero: '', nome: '' };
+  const n = est.nova, erro = el('p', { class: 'erro', role: 'alert' });
+  const irPasso = k => { n.passo = Math.max(0, Math.min(PASSOS_NOVA.length - 1, k)); rotear(); };
+  const area = (id, rot, v, ajuda, linhas) => { const i = el('textarea', { class: 'entrada', id, rows: String(linhas || 4), autocomplete: 'off', value: v || null });
+    return [i, el('label', { class: 'campo largo', for: id }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
+  const linha = (id, rot, v, ajuda) => { const i = el('input', { class: 'entrada', id, autocomplete: 'off', value: v || null });
+    return [i, el('label', { class: 'campo', for: id }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
+  let conteudo, ler = () => true;
+  if (n.passo === 0) {
+    const [t, tc] = area('n-termos', 'Especialidades (uma por linha)', n.termos, 'ex.: cardiologista, dermatologista');
+    const [l, lc] = area('n-lugares', 'Cidades ou bairros (um por linha)', n.lugares, 'para uma cidade grande, ponha os bairros: cada bairro é uma busca');
+    const m = el('select', { class: 'entrada', id: 'n-modelo' }, [['medicos', 'Médicos (aceita poucas avaliações e confere o fixo no WhatsApp)'], ['padrao', 'Dentistas e clínicas']].map(([v, x]) => el('option', { value: v, text: x, selected: n.modelo === v })));
+    const fz = el('select', { class: 'entrada', id: 'n-fuso' }, FUSOS.map(([v, x]) => el('option', { value: v, text: x, selected: n.fuso === v })));
+    conteudo = [tc, lc, el('label', { class: 'campo', for: 'n-modelo' }, el('span', { class: 'rot', text: 'Tipo de profissional' }), m),
+      el('label', { class: 'campo', for: 'n-fuso' }, el('span', { class: 'rot', text: 'Fuso das cidades' }), fz, el('span', { class: 'ajuda', text: 'uma campanha só junta cidades do mesmo fuso' }))];
+    ler = () => { n.termos = t.value; n.lugares = l.value; n.modelo = m.value; n.fuso = fz.value;
+      if (!linhasDe(n.termos).length || !linhasDe(n.lugares).length) { erro.textContent = 'Escreva pelo menos uma especialidade e uma cidade ou bairro.'; return false; } return true; };
+  } else if (n.passo === 1) {
+    const [mc, mcc] = linha('n-marca', 'Marca (vai na mensagem)', n.marca, 'até 40 letras; na mensagem, escreva {marca}');
+    const [ab, abc] = area('n-abordagem', 'Primeira mensagem', n.abordagem, 'campos: {nome} {cidade} {bairro} {nicho} {marca}; diga "assistente virtual", a marca e de onde veio o contato (Google Maps)', 5);
+    const [sd, sdc] = linha('n-saida', 'Texto de saída (precisa ter SAIR)', n.saida);
+    const tam = el('input', { type: 'hidden', value: '400' });
+    const prev = previaAnuncio(ab, sd, tam, mc.value);
+    mc.addEventListener('input', () => { n.marca = mc.value; });
+    const [ft, ftc] = area('n-fu-texto', 'Texto do follow-up', n.fuTexto, 'sai só para quem não respondeu', 3);
+    const [fd, fdc] = linha('n-fu-dias', 'Depois de (dias úteis)', n.fuDias);
+    const fuBox = el('div', { class: 'pilha', hidden: !n.fu }, ftc, fdc);
+    conteudo = [mcc, abc, sdc, el('h3', { text: 'Como o contato vai ver' }), prev,
+      n.fu ? fuBox : el('div', { class: 'acoes' }, btn('Adicionar follow-up', () => { n.fu = true; n.marca = mc.value; n.abordagem = ab.value; n.saida = sd.value; rotear(); }, 'fant', 'mais_um'))];
+    ler = () => { n.marca = mc.value.trim(); n.abordagem = ab.value.trim(); n.saida = sd.value.trim(); n.fuTexto = ft.value.trim(); n.fuDias = fd.value.trim();
+      if (!n.marca || !n.abordagem) { erro.textContent = 'Escreva a marca e a primeira mensagem.'; return false; }
+      if (!/\bSAIR\b/.test(n.saida)) { erro.textContent = 'O texto de saída precisa ter a palavra SAIR.'; return false; } return true; };
+  } else if (n.passo === 2) {
+    const [pr, prc] = area('n-produto', 'O que a IA conta sobre o produto', n.produto, 'de 20 a 1.500 letras; sem preço (os preços oficiais entram sozinhos, nas regras fixas)', 7);
+    conteudo = [prc, nota('Depois de criar, o texto inteiro da IA fica na página Prompt da IA, com "Testar conversa".')];
+    ler = () => { n.produto = pr.value.trim(); if (n.produto.length < 20) { erro.textContent = 'Conte o produto em pelo menos 20 letras.'; return false; } return true; };
+  } else if (n.passo === 3) {
+    const nums = ((a && a.numeros) || []).filter(x => x.situacao !== 'apagado');
+    const sel = el('select', { class: 'entrada', id: 'n-numero' }, el('option', { value: '', text: nums.length ? '(escolha)' : '(nenhum número ainda)' }),
+      nums.map(x => el('option', { value: String(x.id), text: `${x.instancia} · ${x.nome} (${(P_NUM[x.situacao] || [x.situacao])[0]})`, selected: n.numero === String(x.id) })));
+    const escolhido = nums.find(x => String(x.id) === n.numero);
+    conteudo = [el('label', { class: 'campo', for: 'n-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), sel, el('span', { class: 'ajuda', text: 'use um chip só para a prospecção' })),
+      ligada('editar_numeros_prospeccao') ? el('div', { class: 'acoes' }, btn('Novo número', () => { n.numero = sel.value; criarNumero(); }, 'sec', 'mais_um'),
+        escolhido && escolhido.situacao !== 'conectado' ? btn('Mostrar o código', () => pedirQR(escolhido), 'sec') : null) : null,
+      el('div', { class: 'aviso info' }, icone('relogio'), el('div', {}, el('b', { text: 'Quando sai: ' }), 'de segunda a sexta, das 9h às 11h30 e das 14h às 17h30, uma mensagem a cada 3 a 9 minutos. Número novo começa devagar: cerca de 10 por dia na 1ª semana, 20 na 2ª, 30 na 3ª e 40 depois.'))];
+    ler = () => { n.numero = sel.value; if (!n.numero) { erro.textContent = 'Escolha o número que envia (ou crie um).'; return false; } return true; };
+  } else {
+    const termos = linhasDe(n.termos), lugares = linhasDe(n.lugares), num = ((a && a.numeros) || []).find(x => String(x.id) === n.numero);
+    if (!n.nome) n.nome = (termos[0] || 'Campanha') + ' ' + (lugares[0] || '');
+    const [nm, nmc] = linha('n-nome', 'Nome da campanha', n.nome);
+    const resumo = (passo, texto) => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => { n.nome = nm.value; irPasso(passo); } },
+      el('div', { class: 'cresce' }, el('div', { class: 't1', text: PASSOS_NOVA[passo] }), el('div', { class: 't2', text: texto })), el('span', { class: 'mudo peq', text: 'Mudar' })));
+    conteudo = [nmc, el('ul', { class: 'lista' },
+      resumo(0, `${termos.join(', ')} em ${lugares.join(', ')} · ${n.modelo === 'medicos' ? 'médicos' : 'dentistas e clínicas'} · ${fusoNome(n.fuso)}`),
+      resumo(1, n.abordagem.slice(0, 120) + (n.fu ? ' · com follow-up' : '')),
+      resumo(2, n.produto.slice(0, 120)),
+      resumo(3, num ? `${num.instancia} (${(P_NUM[num.situacao] || [num.situacao])[0]})` : '(sem número)')),
+      el('p', { class: 'mudo peq', text: `Gasta no máximo ${fmtNum(termos.length * lugares.length * 3)} créditos do SerpAPI na primeira busca (${pl(termos.length * lugares.length, 'busca', 'buscas')} de até 3 páginas).` }),
+      num && num.situacao !== 'conectado' ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, 'O número ainda não está conectado: dá para salvar sem ligar e ligar depois de ler o código.')) : null];
+    ler = () => { n.nome = nm.value.trim(); if (n.nome.length < 3) { erro.textContent = 'Nome da campanha: de 3 a 80 letras.'; return false; } return true; };
+  }
+  const criar = async ligar => {
+    erro.textContent = ''; if (!ler()) return;
+    const busca = { termos: linhasDe(n.termos), lugares: linhasDe(n.lugares) };
+    if (n.modelo === 'medicos') Object.assign(busca, { avaliacoes_min: 0, sem_nota: 'aceitar', nota_min: 4, nota_max: 5, telefone_fixo: 'conferir' });
+    const anuncio = { abordagem: n.abordagem, texto_saida: n.saida, followups: n.fu && n.fuTexto ? [{ dias_uteis: Number(n.fuDias) || 3, texto: n.fuTexto }] : [] };
+    const r = await fazer('prosp_campanha_nova', { nome: n.nome, publico: { config: { busca, fuso: n.fuso } }, campanha: { config: { marca: n.marca, produto: n.produto } },
+      conjunto: { numero_id: n.numero, config: {} }, anuncio: { config: anuncio } }, { silencioso: true, erro: x => { erro.textContent = x.mensagem || 'Não consegui criar.'; }, depois: () => {} });
+    if (!r) return;
+    est.nova = null; est.prosp = null; est.publicos = null;
+    if (ligar) await ligarCampanha({ id: r.campanha_id, nome: n.nome }, () => irP('campanha', r.campanha_id));
+    else { rapida('Campanha salva em rascunho. Ligue quando quiser.'); irP('campanha', r.campanha_id); }
+  };
+  const ultimo = n.passo === PASSOS_NOVA.length - 1;
+  trocar(c, cabecalho(PASSOS_NOVA[n.passo], `Nova campanha · passo ${n.passo + 1} de ${PASSOS_NOVA.length}`),
+    el('div', { class: 'pilha p-nova' }, el('form', { class: 'cartao', novalidate: true, onsubmit: e => { e.preventDefault(); erro.textContent = ''; if (ultimo) criar(true); else if (ler()) irPasso(n.passo + 1); } },
+      el('div', { class: 'corpo pilha' }, ...conteudo, erro,
+        el('div', { class: 'acoes' }, n.passo > 0 ? btn('Voltar', () => { ler(); irPasso(n.passo - 1); }, 'sec') : btn('Cancelar', () => { est.nova = null; irP(''); }, 'sec'),
+          ultimo ? btn('Salvar sem ligar', () => criar(false), 'sec') : null,
+          el('button', { class: 'btn pri', type: 'submit', text: ultimo ? 'Ligar a campanha' : 'Continuar' }))))));
+}
+
+// A tela da campanha (molde C): o estado e a ação principal (ligar ou pausar), até 3 ações rápidas, quem recebe, a
+// mensagem, o número, os números da semana, o "Avançado" (fechado) e o perigo no fim.
+async function pCampanha(c, parte, id) {
+  if (!id || id === 'novo') return pNova(c);
+  const a = await arvoreP(true);
+  const cp = ((a && a.campanhas) || []).find(x => x.id === id);
+  topo(cp ? cp.nome : 'Campanha', [['Prospecção', 'prospeccao'], [cp ? cp.nome : 'Campanha']], 'prospeccao');
+  if (!cp) { falhou(c, { ok: false, mensagem: 'Campanha não encontrada.' }, 'Campanha'); return; }
+  await publicosP(true);
+  const editar = ligada('editar_prospeccao') && !/^encerrad/.test(cp.situacao);
+  const cjs = (cp.conjuntos || []).filter(j => !/^encerrad/.test(j.situacao));
+  const pubs = [...new Set(cjs.flatMap(j => j.publicos || []))].map(pid => ((est.publicos && est.publicos.publicos) || []).find(p => p.id === pid)).filter(Boolean);
+  const msgs = cjs.flatMap(j => (j.anuncios || []).filter(n => !/^encerrad/.test(n.situacao)).map(n => ({ ...n, conjunto: j })));
+  const nums = cjs.map(j => j.numero).filter(Boolean);
+  const semana = ((a.resultados || {}).ultimos_7_dias || []).filter(x => x.chave === cp.id);
+  const soma = k => semana.reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
+  const principal = !editar ? null : ativo(cp.situacao) ? btn('Pausar a campanha', () => pausarCampanha(cp), 'sec') : btn('Ligar a campanha', () => ligarCampanha(cp), 'pri');
+  const pendencias = [!pubs.length ? 'falta o público' : null, !msgs.length ? 'falta a mensagem' : null, !nums.length ? 'falta o número' : null,
+    nums.some(nn => nn.situacao !== 'conectado') ? 'o número não está conectado' : null].filter(Boolean);
+  trocar(c, cabecalho(cp.nome, `campanha · ${cp.id} · versão ${cp.versao}`, etqSit(cp.situacao), principal),
+    el('div', { class: 'pilha' },
+      pendencias.length && !ativo(cp.situacao) && editar ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, 'Antes de ligar: ' + pendencias.join(', ') + '.')) : null,
+      cp.pausa_motivo ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', { text: 'Pausada sozinha: ' + cp.pausa_motivo })) : null,
+      el('div', { class: 'acoes' }, btn('Prompt da IA', () => irP('prompt', cp.id), 'sec', 'conversa'), btn('Leads', () => { est.leadsFiltro = { conjunto_id: cjs.length === 1 ? cjs[0].id : '', publico_id: '', busca: '', pagina: 1 }; irP('leads'); }, 'sec', 'clientes'),
+        editar ? btn('Duplicar', () => fazer('prosp_duplicar', { tipo: 'campanha', id: cp.id }, { ok: 'Cópia criada em rascunho.', depois: x => { est.prosp = null; irP('campanha', x.id); } }), 'sec') : null),
+      el('div', { class: 'kpis' }, kpi('Enviadas (7 dias)', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
+      cartao('Quem recebe', null, pubs.length ? el('ul', { class: 'lista' }, pubs.map(p => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('publico', p.id) },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: p.nome }), el('div', { class: 't2', text: `${resumoBusca(p)} · ${fmtNum((p.numeros || {}).disponiveis)} disponíveis de ${fmtNum((p.numeros || {}).tamanho)}` })), icone('seta')))))
+        : vazio('Sem público ainda.', 'clientes')),
+      cartao('A mensagem', null, msgs.length ? el('ul', { class: 'lista' }, msgs.map(m => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('anuncio', m.id) },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: m.nome }), el('div', { class: 't2', text: `${m.id} · versão ${m.versao}${m.pausa_motivo ? ' · ' + m.pausa_motivo : ''}` })), el('div', { class: 'direita' }, etqSit(m.situacao)), icone('seta')))),
+          msgs.length > 1 ? el('li', {}, nota('Mais de uma mensagem: elas são sorteadas em partes iguais (de antes da DEC-211).')) : null) : vazio('Sem mensagem ainda.', 'conversa')),
+      cartao('Número e horário', null, cjs.length ? el('ul', { class: 'lista' }, cjs.map(j => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('conjunto', j.id) },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: j.numero ? j.numero.instancia : 'sem número' }), el('div', { class: 't2', text: `conjunto ${j.nome} · a entrega (dias, janelas e tetos)` })),
+        el('div', { class: 'direita' }, j.numero ? etqNum(j.numero.situacao) : etq('sem número', 'atencao')), icone('seta'))))) : vazio('Sem número ainda.', 'telefone')),
+      el('details', { class: 'grupo' }, el('summary', { text: 'Avançado' }), el('div', { class: 'corpo-grupo pilha' },
+        el('ul', { class: 'lista' },
+          el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('editar', cp.id) }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'A campanha' }), el('div', { class: 't2', text: 'marca, produto, orçamento, datas e a IA de resposta' })), icone('seta'))),
+          ...(cp.conjuntos || []).map(j => el('li', {}, el('div', { class: 'p-camada' }, el('button', { class: 'linha', type: 'button', onclick: () => irP('conjunto', j.id) }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Conjunto ' + j.nome }), el('div', { class: 't2', text: `${(j.publicos || []).length ? pl(j.publicos.length, 'público', 'públicos') : 'sem público'} · ${j.id}` })), el('div', { class: 'direita' }, etqSit(j.situacao))),
+            editar ? el('div', { class: 'p-chave' }, interruptorP('conjunto', j)) : null))),
+          ...pubs.map(p => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('publico', p.id, 'configuracao') }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Filtros do público ' + p.nome }), el('div', { class: 't2', text: 'nota, avaliações, categorias, redes, qualificação, coordenadas' })), icone('seta'))))),
+        editar ? el('div', { class: 'acoes' }, btn('Novo conjunto', () => irP('conjunto', 'novo', cp.id), 'fant', 'mais_um'),
+          cjs.length ? btn('Exportar planilha', () => fazer('prosp_exportar', { conjunto_id: cjs.length === 1 ? cjs[0].id : '', situacao: '' }, { titulo: 'Exportar os leads (CSV)', texto: 'O arquivo sai SEM telefone (DEC-079). Fica no registro da Central.', botao: 'Exportar',
+            depois: x => { baixar(x.arquivo || 'leads.csv', x.csv || ''); }, ok: 'Arquivo pronto.' }), 'sec') : null) : null)),
+      editar ? el('div', { class: 'acoes perigo-fim' }, cp.situacao === 'rascunho' ? btn('Apagar o rascunho', () => fazer('prosp_apagar_rascunho', { tipo: 'campanha', id: cp.id }, { titulo: 'Apagar o rascunho ' + cp.nome, linhas: [['Rascunho', cp.nome, '(apagado)']], botao: 'Apagar', perigo: true, ok: 'Rascunho apagado.', depois: () => { est.prosp = null; ir('prospeccao'); } }), 'perigo-sec') : null,
+        btn('Encerrar', () => fazer('prosp_encerrar', { tipo: 'campanha', id: cp.id }, { titulo: 'Encerrar ' + cp.nome, nome: cp.nome, rotuloNome: 'o nome da campanha', rotuloNivel: 'não volta', botao: 'Encerrar',
+          texto: 'Encerra a campanha com os conjuntos e as mensagens dela. Não volta: para usar de novo, duplique.', ok: 'Encerrada.', depois: () => { est.prosp = null; ir('prospeccao'); } }), 'perigo-sec')) : null));
 }
 
 // ---------- editor de uma camada (campanha, conjunto ou anúncio)
@@ -184,20 +362,15 @@ const FUSOS = ['America/Sao_Paulo', 'America/Manaus', 'America/Cuiaba', 'America
 const ESQUEMA = {
   campanha: [
     ['Marca e produto', [['marca', 'Marca (vai na mensagem)', 'texto', { ajuda: 'até 40 letras; use {marca} no anúncio' }], ['produto', 'O que a IA conta sobre o produto', 'longo', { ajuda: '20 a 1.500 letras' }],
-      ['objetivo', 'Objetivo (decide o vencedor)', 'sel', { op: [['resposta', 'Resposta'], ['positiva', 'Resposta positiva'], ['cadastro', 'Cadastro'], ['pagamento', 'Pagamento']] }],
       ['link_agenda', 'Link da sua agenda (opcional)', 'texto', { ajuda: 'começa com https://' }]]],
     ['Orçamento e datas', [['orcamento_msgs_dia', 'Mensagens por dia (campanha)', 'num', { ajuda: 'o teto de cada número vale por cima' }], ['limite_total', 'Limite total de mensagens', 'num', { ajuda: '0 = sem limite' }],
-      ['inicio', 'Começa em', 'data'], ['fim', 'Termina em', 'data'], ['atribuicao_dias', 'Janela de atribuição (dias)', 'num', { ajuda: 'cadastro conta até N dias depois da 1ª mensagem' }]]],
+      ['inicio', 'Começa em', 'data'], ['fim', 'Termina em', 'data']]],
     ['IA de resposta', [['ia.ligada', 'IA ligada nesta campanha', 'simnao'], ['ia.tom', 'Tom', 'texto'], ['ia.objetivo_texto', 'Objetivo da conversa', 'texto'], ['ia.objecoes', 'Como responder às objeções', 'lista'],
       ['ia.passar_para_voce', 'Quando passar para você', 'texto'], ['ia.nunca_dizer', 'Nunca dizer (os fixos ficam)', 'lista'], ['ia.regras_escrita', 'Regras de escrita', 'lista'],
       ['ia.tamanho_max', 'Tamanho máximo da resposta (letras)', 'num', { trava: 'resposta_max' }], ['ia.max_mensagens', 'Mensagens da IA antes de passar para você', 'num', { trava: 'ia_mensagens_max' }],
       ['ia.hora_inicio', 'IA responde a partir de (hora)', 'num', { trava: 'ia_hora_inicio_min', min: true }], ['ia.hora_fim', 'IA responde até (hora)', 'num', { trava: 'ia_hora_fim_max' }],
-      ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]],
-    // Texto inteiro do prompt (sql/041, DEC-096): vazio = o texto montado pelos campos acima. As regras fixas entram sempre.
-    ['Prompt da IA (texto inteiro)', [['ia.prompt_texto', 'Texto do prompt (vazio = o montado pelos campos de "IA de resposta")', 'longo',
-      { ajuda: '50 a 8.000 letras; sem preço e sem link de fora. As regras fixas (assistente virtual, preços, link, SAIR e as marcas) entram sempre no fim. Um anúncio com prompt próprio usa o dele.', linhas: 14, comecar: true }]]],
-    ['Avisos na Central (só códigos)', [['ia.avisar.fechou', 'Quer contratar', 'simnao'], ['ia.avisar.interessado', 'Mostrou interesse', 'simnao'], ['ia.avisar.pediu_voce', 'Pediu você', 'simnao'],
-      ['ia.avisar.recusou', 'Recusou', 'simnao'], ['ia.avisar.saiu', 'Pediu para sair', 'simnao']]]],
+      ['ia.palavras_saida', 'Palavras de saída a mais (as 6 fixas ficam)', 'lista']]]],
+    // O texto inteiro do prompt fica na página Prompt da IA (rxsync-sistema DEC-211).
   conjunto: [
     ['Públicos', [['publicos', 'Públicos que o conjunto usa (só do fuso da entrega)', 'publicos', { ajuda: 'até 10; pôr um público num conjunto ativo = nível 3' }]]],
     ['Exclusões', [['exclusoes.outra_campanha_dias', 'Abordado por outra campanha há menos de (dias)', 'num', { trava: 'outra_campanha_dias_min', min: true }]]],
@@ -206,8 +379,8 @@ const ESQUEMA = {
       ['entrega.pausa_min_s', 'Pausa mínima entre lotes (s)', 'num', { trava: 'pausa_min_s', min: true }], ['entrega.pausa_max_s', 'Pausa máxima entre lotes (s)', 'num'],
       ['entrega.ordem', 'Ordem', 'sel', { op: [['pontuacao', 'Maior pontuação primeiro'], ['sorteio', 'Sorteio']] }], ['entrega.tentativas', 'Tentativas se falhar', 'num', { trava: 'tentativas_max' }],
       ['entrega.intervalo_tentativa_dias', 'Tentar de novo depois de (dias úteis)', 'num']]],
-    ['Frequência e aprendizado', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
-      ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }], ['aprendizado_min', 'Fase de aprendizado (envios por anúncio)', 'num']]]],
+    ['Frequência', [['frequencia.max_mensagens', 'Mensagens por lead (abordagem + follow-ups)', 'num', { trava: 'frequencia_max' }],
+      ['frequencia.intervalo_dias_uteis', 'Dias úteis entre mensagens ao mesmo lead', 'num', { trava: 'intervalo_lead_dias_uteis', min: true }]]]],
   publico: [
     ['Busca no Google Maps', [['busca.termos', 'Termos (um por linha)', 'lista', { ajuda: 'ex.: cardiologista, dermatologista (uma especialidade por linha)' }],
       ['busca.lugares', 'Cidades ou bairros (um por linha)', 'lista', { ajuda: 'para cobrir uma cidade grande, ponha os bairros: cada bairro é uma busca de até 120' }],
@@ -233,8 +406,8 @@ const ESQUEMA = {
       ['tamanho_max', 'Tamanho máximo com o texto de saída', 'num', { trava: 'mensagem_max' }], ['texto_saida', 'Texto de saída (precisa ter SAIR)', 'texto'],
       ['texto_confirmacao', 'Confirmação quando pedem para sair', 'longo'], ['palavras_proibidas', 'Palavras proibidas a mais', 'lista']]],
     ['Follow-ups (no máximo 2)', [['followups.0.dias_uteis', '1º follow-up: depois de (dias úteis)', 'num'], ['followups.0.texto', '1º follow-up: texto', 'longo'],
-      ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]],
-    ['IA (opcional)', [['prompt_proprio', 'Prompt próprio deste anúncio (vazio = o da campanha)', 'longo', { ajuda: '50 a 8.000 letras; sem preço e sem link de fora; as regras fixas (assistente virtual, preços, SAIR) entram sempre', linhas: 10 }]]]]
+      ['followups.1.dias_uteis', '2º follow-up: depois de (dias úteis)', 'num'], ['followups.1.texto', '2º follow-up: texto', 'longo']]]]
+    // O prompt próprio do anúncio saiu (rxsync-sistema DEC-211): vale o prompt da campanha.
 };
 // Modelos do público novo (DEC-189): só preenchem o formulário; o servidor confere tudo ao salvar.
 const MODELOS_PUB = { medicos: { 'busca.avaliacoes_min': '0', 'busca.sem_nota': 'aceitar', 'busca.nota_min': '4', 'busca.nota_max': '5', 'busca.telefone_fixo': 'conferir' } };
@@ -319,30 +492,9 @@ async function pObjeto(c, tipo, id, pai) {
   // O fuso da entrega decide quais públicos o conjunto pode escolher (conferido de novo no servidor).
   if (ins.publicos && ins['entrega.fuso']) { const f = ins['entrega.fuso'].i; ins.publicos.i.conferirFuso(f.value); f.addEventListener('change', () => ins.publicos.i.conferirFuso(f.value)); }
   const prev = tipo === 'anuncio' ? previaAnuncio(ins.abordagem.i, ins.texto_saida.i, ins.tamanho_max.i, marca) : null;
-  // Prompt da IA (DEC-096): o alvo é a campanha (e o anúncio), com o que está na tela por cima do que foi salvo.
+  // Prompt da IA (DEC-096): a página própria, da campanha (rxsync-sistema DEC-211).
   const campanhaDoAlvo = tipo === 'campanha' ? (o && o.id) : tipo === 'anuncio' ? ((conjuntosP().find(x => x.id === paiId) || {}).campanha || {}).id : null;
-  const alvoPrompt = () => {
-    const { nova } = ler();
-    return { campanha_id: campanhaDoAlvo, anuncio_id: tipo === 'anuncio' && o ? o.id : '',
-      rascunho: tipo === 'campanha' ? { ia: { prompt_texto: (nova.ia || {}).prompt_texto || '' } } : tipo === 'anuncio' && o ? { prompt_proprio: nova.prompt_proprio || '' } : {} };
-  };
-  if (ins['ia.prompt_texto'] && editar && o) {
-    const caixa = ins['ia.prompt_texto'].i;
-    caixa.closest('.campo').append(el('div', { class: 'acoes' }, btn('Começar do texto atual', async () => {
-      // A janela da Central, nunca a caixa do navegador (pente fino da camada 3, I-07).
-      if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
-        texto: 'O que está no campo "Texto do prompt" vira o texto montado pelos campos de "IA de resposta". Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
-      const r = await chamar('prosp_prompt_ver', { campanha_id: o.id, rascunho: { ia: { prompt_texto: '' } } });
-      if (!r.ok) { rapida(r.mensagem || 'Não consegui.'); return; }
-      caixa.value = r.montado || ''; caixa.dispatchEvent(new Event('input')); caixa.focus();
-    }, 'sec')));
-  }
-  // Sugerir melhorias (DEC-098): "Usar este texto" traz o texto novo para o campo; o Jean revisa e salva (vira versão nova).
-  if (ins['ia.prompt_texto'] && editar && o && est.textoSugerido && est.textoSugerido.campanha_id === o.id) {
-    const caixa = ins['ia.prompt_texto'].i, g = caixa.closest('details');
-    caixa.value = est.textoSugerido.texto; est.textoSugerido = null; if (g) g.open = true;
-    setTimeout(() => { caixa.scrollIntoView({ block: 'center' }); rapida('O texto sugerido está no campo "Texto do prompt". Revise e salve a versão nova.'); }, 50);
-  }
+
   if (prev) blocos[0].querySelector('.corpo-grupo').append(el('h3', { text: 'Como o lead vai ver' }), prev);
   const ler = () => {
     const nova = JSON.parse(JSON.stringify(cfg)), linhas = [];
@@ -401,10 +553,8 @@ async function pObjeto(c, tipo, id, pai) {
           numeroSel ? el('label', { class: 'campo', for: 'p-numero' }, el('span', { class: 'rot', text: 'Número de WhatsApp que envia' }), numeroSel, el('span', { class: 'ajuda', text: 'trocar o número de um conjunto = nível 3' })) : null)),
         ...blocos, el('div', { class: 'corpo' }, erro, editar ? el('div', { class: 'acoes' }, el('button', { class: 'btn pri', type: 'submit', text: o ? 'Salvar a versão nova' : 'Criar' })) : null)),
       acoesObj ? cartao('Mais', null, corpo(acoesObj)) : null,
-      campanhaDoAlvo && o && (tipo === 'campanha' || tipo === 'anuncio') ? cartao('Prompt da IA', el('span', { class: 'mudo peq', text: 'com o que está na tela, mesmo sem salvar' }),
-        corpo(el('p', { class: 'mudo peq', text: 'O texto exato que vai para a OpenAI (as regras fixas travadas) e uma conversa de teste, sem WhatsApp e sem lead.' }),
-          el('div', { class: 'acoes' }, btn('Ver prompt completo', () => verPrompt(alvoPrompt()), 'sec', 'info'),
-            ligada('editar_prospeccao') ? btn('Testar conversa', () => testarConversa(alvoPrompt(), o.nome), 'sec', 'conversa') : null))) : null,
+      campanhaDoAlvo && o ? cartao('Prompt da IA', null, corpo(el('p', { class: 'mudo peq', text: 'O texto que a IA usa, as regras fixas, o teste e as versões ficam numa página só.' }),
+        el('div', { class: 'acoes' }, btn('Abrir o Prompt da IA', () => irP('prompt', campanhaDoAlvo), 'sec', 'conversa')))) : null,
       versoes.length ? cartao('Versões', el('span', { class: 'mudo peq', text: 'cada salvar cria uma versão (nunca editada)' }), el('ul', { class: 'lista' }, versoes.map(v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => verVersao(tipo, o.id, v.versao) },
         el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Versão ' + v.versao }), el('div', { class: 't2', text: `${fmtHora(v.criada_em)}${v.criada_por ? ' · ' + v.criada_por : ''}${v.motivo ? ' · ' + v.motivo : ''}` })), icone('seta')))))) : null));
 }
@@ -447,7 +597,7 @@ async function pPublicos(c) {
         el('div', { class: 't2', text: `${fmtNum(n.disponiveis)} disponíveis de ${fmtNum(n.tamanho)}${n.expiram_7d ? ' · ' + fmtNum(n.expiram_7d) + ' saem em até 7 dias' : ''} · ${cj.length ? 'usado por ' + cj.map(j => j.nome).join(', ') : 'nenhum conjunto usa'}` })),
       el('div', { class: 'direita' }, p.situacao === 'arquivado' ? etqSit('arquivado') : emUsoPub(p) ? etq('em uso', 'ok') : etq('sem conjunto ativo', '')), icone('seta'))); };
   trocar(c, cabecalho('Públicos', 'quem pode receber mensagem · cada conjunto escolhe os seus', editar ? btn('Novo público', () => irP('publico', 'novo'), 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, abasP('publicos'),
+    el('div', { class: 'pilha' }, 
       d.busca_ligada ? null : el('div', { class: 'aviso info' }, icone('info'), el('div', {}, 'A busca está desligada: os públicos não buscam nem gastam créditos. ', editar ? ligarAqui('prosp_busca', 'Ligar a busca') : null)),
       el('div', { class: 'kpis' }, kpiTeto(cm, editar), kpi('Públicos', fmtNum(lista.filter(p => p.situacao === 'ativo').length), 'ativos'),
         kpi('Contatos disponíveis', fmtNum(lista.reduce((t, p) => t + (Number((p.numeros || {}).disponiveis) || 0), 0)), 'em todos os públicos')),
@@ -534,11 +684,8 @@ async function pPublico(c, parte, id, sub) {
 // ---------- Números de WhatsApp (o QR só na tela)
 async function pNumeros(c) {
   topo('Números de WhatsApp', [['Prospecção', 'prospeccao'], ['Números']], 'prospeccao');
-  const r = await chamar('prosp_numeros'); if (falhou(c, r, 'Números de WhatsApp')) return;
+  const [r, rr] = await Promise.all([chamar('prosp_numeros'), chamar('prosp_regras')]); if (falhou(c, r, 'Números de WhatsApp')) return;
   const nums = r.dados.numeros || [], t = r.dados.travas || {}, editar = ligada('editar_numeros_prospeccao');
-  const criar = () => fazer('prosp_numero_criar', {}, { titulo: 'Novo número de prospecção', texto: 'Cria a instância "prospec-…" na Evolution (a mesma das clínicas, DEC-071) e mostra o código para ler no celular do chip novo.',
-    campos: [{ k: 'nome', rot: 'Nome (ex.: Prospecção 1)', obrig: true, minimo: 3, erro: 'Nome: de 3 a 40 letras.' }], ok: 'Número criado.',
-    silencioso: true, depois: async x => { await rotear(); if (x.qr) mostrarQR(x.numero || {}, x.qr); else rapida('Criado. Toque em "Mostrar o código" para conectar.'); } });
   const linha = n => {
     const acoes = [];
     if (editar && n.situacao !== 'apagado') {
@@ -559,11 +706,13 @@ async function pNumeros(c) {
       el('div', { class: 'direita' }, etqNum(n.situacao), editar && n.situacao === 'conectado' ? interruptorP('numero', n) : null)),
       acoes.length ? el('div', { class: 'corpo acoes' }, acoes) : null);
   };
-  trocar(c, cabecalho('Números de WhatsApp', 'só instâncias "prospec-…" (as das clínicas nunca aparecem aqui)', editar && nums.filter(n => n.situacao !== 'apagado').length < 5 ? btn('Novo número', criar, 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, abasP('numeros'),
+  trocar(c, cabecalho('Números de WhatsApp', 'só instâncias "prospec-…" (as das clínicas nunca aparecem aqui)', editar && nums.filter(n => n.situacao !== 'apagado').length < 5 ? btn('Novo número', criarNumero, 'pri', 'mais_um') : null),
+    el('div', { class: 'pilha' }, 
       el('div', { class: 'aviso info' }, icone('info'), el('div', {}, el('b', { text: 'Aquecimento: ' }), `${(t.aquecimento || [10, 20, 30, 40]).join(', ')} mensagens por dia nas 4 primeiras semanas; no máximo ${t.teto_numero_hora || 10} por hora. Um número começa pausado: ligue quando quiser.`)),
       editar ? null : nota('Conectar, desconectar e apagar estão desligados (editar_numeros_prospeccao).', true),
-      ...(nums.length ? nums.map(linha) : [cartao(null, null, vazio('Nenhum número de prospecção ainda. Use um chip só para isso.', 'telefone'))])));
+      ...(nums.length ? nums.map(linha) : [cartao(null, null, vazio('Nenhum número de prospecção ainda. Use um chip só para isso.', 'telefone'))]),
+      // As regras de segurança (as 4 fixas, só para leitura; rxsync-sistema DEC-211): no fim, perto do que elas pausam.
+      rr.ok ? cartaoRegras(rr.dados.regras) : null));
 }
 // Pede o código (nível 2) e mostra na janela. Enquanto ela está aberta, pergunta a situação a cada 10 segundos (até 2 minutos).
 function pedirQR(n) {
@@ -592,8 +741,14 @@ function mostrarQR(n, qr) {
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && est.qrFechar) est.qrFechar(); });
 
+// Leads e Conversas são duas visões do mesmo conteúdo (a lista e as conversas respondidas inteiras): abas certas pela
+// regra 14 do método (rxsync-sistema DEC-211).
+function abasLeads(atual) {
+  return el('div', { class: 'abas', role: 'tablist', 'aria-label': 'Visões dos leads' }, [['leads', 'Lista'], ['conversas', 'Conversas']].map(([k, n]) =>
+    el('button', { role: 'tab', type: 'button', 'aria-selected': String(atual === k), onclick: () => irP(k) }, n)));
+}
 // ---------- Leads
-const SIT_LEADS = ['para_aprovar', 'na_fila', 'enviado', 'respondeu', 'positivo', 'com_voce', 'cadastrou', 'cliente', 'recusou', 'saiu', 'sem_whatsapp', 'falhou', 'descartado'];
+const SIT_LEADS = ['na_fila', 'enviado', 'respondeu', 'positivo', 'com_voce', 'cadastrou', 'cliente', 'recusou', 'saiu', 'sem_whatsapp', 'falhou', 'descartado'];
 async function pLeads(c, parte, sit) {
   topo('Leads', [['Prospecção', 'prospeccao'], ['Leads']], 'prospeccao');
   await arvoreP(); await publicosP();
@@ -611,19 +766,21 @@ async function pLeads(c, parte, sit) {
   const total = d.total || 0, paginas = Math.max(1, Math.ceil(total / 50));
   const exportar = () => fazer('prosp_exportar', { conjunto_id: f.conjunto_id, situacao: sit }, { titulo: 'Exportar os leads (CSV)', texto: 'O arquivo sai SEM telefone (DEC-079). Fica no registro da Central.', botao: 'Exportar',
     depois: x => { baixar(x.arquivo || 'leads.csv', x.csv || ''); } , ok: 'Arquivo pronto.' });
-  trocar(c, cabecalho('Leads', `${pl(total, 'lead', 'leads')}${sit ? ' · ' + P_LEAD[sit][0] : ''}`, btn('Exportar CSV', exportar, 'sec')),
-    el('div', { class: 'pilha' }, abasP('leads'),
+  // o raro (os filtros por conjunto e por público e o "Exportar CSV") fica num "Avançado" fechado, no fim (decisão 11 do plano, DEC-211).
+  const avancado = f.conjunto_id || f.publico_id;
+  trocar(c, cabecalho('Leads', `${pl(total, 'lead', 'leads')}${sit ? ' · ' + P_LEAD[sit][0] : ''}`),
+    el('div', { class: 'pilha' }, abasLeads('leads'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação' }, el('button', { type: 'button', 'aria-pressed': String(!sit), onclick: () => { f.pagina = 1; ir('prospeccao/leads'); } }, 'Todos'),
         SIT_LEADS.filter(k => ps[k] || k === sit).map(k => el('button', { type: 'button', 'aria-pressed': String(sit === k), onclick: () => { f.pagina = 1; ir('prospeccao/leads/' + k); } }, P_LEAD[k][0], el('span', { class: 'n', text: ps[k] || 0 })))),
-      el('div', { class: 'form-2' }, selCj, selPb), el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca')),
-      editar && f.conjunto_id && ps.para_aprovar ? el('div', { class: 'acoes' }, btn(`Aprovar os ${fmtNum(ps.para_aprovar)} "para aprovar" deste conjunto`, () => fazer('prosp_leads_aprovar_todos', { conjunto_id: f.conjunto_id },
-        { titulo: 'Aprovar todos do conjunto ' + nomeP('conjunto', f.conjunto_id), linhas: [['Para aprovar', fmtNum(ps.para_aprovar), '0 (todos na fila)']], ok: 'Aprovados.' }), 'sec', 'ok')) : null,
+      el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca')),
       cartao(null, null, (d.leads || []).length ? el('ul', { class: 'lista' }, d.leads.map(l => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('lead', l.id) },
         el('span', { class: 'avatar ' + ((P_LEAD[l.situacao] || [])[1] || ''), text: iniciais(l.nome), 'aria-hidden': 'true' }),
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.nome || l.id }), el('div', { class: 't2', text: [l.id, [l.cidade, l.bairro].filter(Boolean).join(' · '), l.nicho, l.nota != null ? '★ ' + String(l.nota).replace('.', ',') : null, l.pontos + ' pontos', l.telefone_fim].filter(Boolean).join(' · ') })),
-        el('div', { class: 'direita' }, etqLead(l.situacao)), icone('seta'))))) : vazio('Nenhum lead com esse filtro.', 'clientes')),
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.nome || l.id }), el('div', { class: 't2', text: [l.id, [l.cidade, l.bairro].filter(Boolean).join(' · '), l.nicho, l.nota != null ? '★ ' + String(l.nota).replace('.', ',') : null, l.pontos + ' pontos', l.telefone_fim].filter(Boolean).join(' · ') }),
+          el('div', { class: 'p-etq-lead' }, etqLead(l.situacao))), icone('seta'))))) : vazio('Nenhum lead com esse filtro.', 'clientes')),
       paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 1 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina} de ${paginas}` }),
-        f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null));
+        f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null,
+      el('details', { class: 'grupo', open: avancado ? true : null }, el('summary', { text: 'Avançado' }), el('div', { class: 'corpo-grupo pilha' },
+        el('div', { class: 'form-2' }, selCj, selPb), el('div', { class: 'acoes' }, btn('Exportar CSV', exportar, 'sec'))))));
 }
 function baixar(nome, texto) {
   const a = el('a', { download: nome, class: 'sr' }); const url = URL.createObjectURL(new Blob(['﻿' + texto], { type: 'text/csv;charset=utf-8' }));
@@ -643,8 +800,6 @@ async function pLead(c, parte, id) {
   const recarregar = () => rotear();
   const acoes = [];
   if (editar) {
-    if (l.situacao === 'para_aprovar') { acoes.push(btn('Aprovar', () => fazer('prosp_lead_aprovar', { id: l.id, valor: 'SIM' }, { ok: 'Na fila.', depois: recarregar }), 'pri', 'ok'));
-      acoes.push(btn('Descartar', () => fazer('prosp_lead_aprovar', { id: l.id, valor: 'NAO' }, { ok: 'Descartado.', depois: recarregar }), 'sec')); }
     if (['enviado', 'respondeu', 'positivo'].includes(l.situacao) && !l.assumido_em) acoes.push(btn('Assumir a conversa', () => fazer('prosp_lead_assumir', { id: l.id }, { depois: recarregar }), 'pri', 'conversa'));
     if (l.situacao === 'com_voce' || l.assumido_em) acoes.push(btn('Devolver à IA', () => fazer('prosp_lead_devolver', { id: l.id }, { titulo: 'Devolver a conversa à IA', linhas: [['Conversa', 'com você', 'com a IA (na próxima mensagem do lead)']], depois: recarregar }), 'sec'));
     if (!['saiu', 'cliente'].includes(l.situacao)) acoes.push(btn('Marcar', () => fazer('prosp_lead_marcar', { id: l.id }, { titulo: 'Marcar o lead ' + l.id,
@@ -673,94 +828,43 @@ async function pLead(c, parte, id) {
             ['Cliente', l.cliente_id], ['Achado em', fmtData(l.criado_em)], ['Sai em', fmtData(l.apagar_em)]])))))));
 }
 
-// ---------- Relatórios (DEC-082): taxas com margem de erro, custos, vencedor por conjunto, classificações e anotações
-const VISOES = { desempenho: ['enviados', 'entrega', 'resposta', 'positiva', 'cadastros', 'saida'], funil: ['enviados', 'entregues', 'lidos', 'responderam', 'positivas', 'pediram_link', 'abriram_link', 'cadastros', 'pagamentos'],
-  custos: ['enviados', 'custo', 'por_resposta', 'por_positiva', 'por_cadastro', 'mensagens_ia'] };
-const COLUNAS = { enviados: 'Enviadas', entregues: 'Entregues', lidos: 'Lidas', responderam: 'Respostas', positivas: 'Positivas', pediram_link: 'Pediram link', abriram_link: 'Abriram link', cadastros: 'Cadastros',
-  pagamentos: 'Pagamentos', mensagens_ia: 'Mensagens da IA', entrega: 'Entrega', resposta: 'Resposta', positiva: 'Positiva', saida: 'Saída', custo: 'Custo', por_resposta: 'Por resposta', por_positiva: 'Por positiva', por_cadastro: 'Por cadastro' };
-const DETALHES = [['', 'Sem detalhar'], ['dia', 'Dia'], ['hora', 'Hora da 1ª mensagem'], ['dia_semana', 'Dia da semana'], ['nicho', 'Nicho'], ['cidade', 'Cidade'], ['faixa_nota', 'Faixa da nota'], ['categoria', 'Categoria']];
-const DIAS_NOMES = { 1: 'segunda', 2: 'terça', 3: 'quarta', 4: 'quinta', 5: 'sexta', 6: 'sábado', 7: 'domingo' };
+// ---------- Relatório (DEC-082; simples desde a DEC-211 do rxsync-sistema): os números do período, um gráfico por dia, as
+// campanhas e onde as conversas pararam. O detalhado (níveis, detalhamentos, margem de erro, vencedor) fica no banco.
 const ETAPAS = { so_leu: 'só leu', respondeu_curto: 'respondeu curto', conversou: 'conversou', interessado: 'interessado', pediu_link: 'pediu o link', cadastrou: 'cadastrou', recusou: 'recusou', saiu: 'saiu',
   preco: 'preço', ja_tem_secretaria: 'já tem secretária', ja_tem_sistema: 'já tem sistema', sem_tempo: 'sem tempo', desconfianca_ia: 'desconfia de IA', pouco_paciente: 'poucos pacientes', nao_decide: 'não é quem decide',
   momento_ruim: 'momento ruim', outro: 'outro', nao_precisa: 'não precisa', ja_tem_solucao: 'já tem solução', nao_gosta_de_ia: 'não gosta de IA', nao_e_o_responsavel: 'não é o responsável', sem_interesse: 'sem interesse' };
 // Barra de proporção (neutra: maior não quer dizer ruim, ao contrário da barra da franquia).
 const barraP = (v, max) => { const b = el('div', { class: 'uso', role: 'img', 'aria-label': fmtNum(v) + ' de ' + fmtNum(max) }); const i = el('i'); i.style.width = Math.round(v / Math.max(1, max) * 100) + '%'; b.append(i); return b; };
-async function pRelatorios(c) {
-  topo('Relatórios', [['Prospecção', 'prospeccao'], ['Relatórios']], 'prospeccao');
-  await arvoreP(); await publicosP();
-  est.relP = est.relP || { dias: 30, nivel: 'anuncio', detalhar: '', conjunto_id: '', publico_id: '', visao: '' };
-  const f = est.relP;
-  const r = await chamar('prosp_relatorio', { de: somaDias(hojeISO(), 1 - f.dias), nivel: f.nivel, detalhar: f.detalhar, conjunto_id: f.conjunto_id, publico_id: f.publico_id || '' });
-  if (falhou(c, r, 'Relatórios')) return;
-  const d = r.dados;
-  const visao = f.visao || ((d.colunas_salvas || {})['Padrão'] || {}).visao || 'desempenho';
-  const cols = VISOES[visao] || VISOES.desempenho;
-  const valor = (x, k) => { const n = x.numeros || {}, t = x.taxas || {}, cu = x.custos || {};
-    if (k === 'entrega' || k === 'saida') return pct(t[k]);
-    if (k === 'resposta' || k === 'positiva') return t[k] == null ? '—' : pct(t[k]) + (t[k + '_margem'] != null ? ' ± ' + String(t[k + '_margem']).replace('.', ',') : '');
-    if (k === 'custo') return fmtReal(cu.total); if (/^por_/.test(k)) return cu[k] == null ? '—' : fmtReal(cu[k]);
-    return fmtNum(n[k]); };
-  const nomeLinha = x => { const base = d.nivel === 'numero' ? nomeP('numero', x.chave) : d.nivel === 'publico' ? ((d.publicos || {})[x.chave] || (x.chave ? nomePub(x.chave) : '(sem público)')) : nomeP(d.nivel, x.chave);
-    if (!d.detalhar) return base; const v = d.detalhar === 'dia_semana' ? DIAS_NOMES[x.valor] || x.valor : d.detalhar === 'hora' ? x.valor + 'h' : d.detalhar === 'dia' ? fmtData(x.valor) : x.valor; return base + ' · ' + v; };
-  const filtro = (rot, atual, opcoes, mudar) => el('label', { class: 'campo' }, el('span', { class: 'rot', text: rot }),
-    el('select', { class: 'entrada', onchange: e => { mudar(e.target.value); rotear(); } }, opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(atual) === v }))));
-  const venc = d.vencedores || [];
-  const SITV = { vencedor: ['vencedor', 'ok'], empate: ['ainda empatados', 'atencao'], aprendendo: ['aprendendo', 'info'], um_anuncio: ['um anúncio só', ''] };
-  const cls = d.classificacao || {};
-  const barras = obj => { const ent = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]); const max = Math.max(1, ...ent.map(e => e[1]));
-    return ent.length ? el('ul', { class: 'lista' }, ent.map(([k, v]) => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: ETAPAS[k] || k.replace(/_/g, ' ') }), barraP(v, max)), el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: fmtNum(v) })))))) : vazio('Nenhuma conversa classificada no período.', 'conversa'); };
-  trocar(c, cabecalho('Relatórios', `${fmtData(d.de)} a ${fmtData(d.ate)} · margem de erro de 95%`, btn('Anotar', () => fazer('prosp_anotar', { campanha_id: '' }, { titulo: 'Anotar na linha do tempo',
-      campos: [{ k: 'dia', rot: 'Dia', tipo: 'date', valor: hojeISO(), obrig: true }, { k: 'texto', rot: 'O que aconteceu (ex.: troquei o anúncio B)', longo: true, obrig: true, minimo: 3, max: 500 }], ok: 'Anotado.' }), 'sec')),
-    el('div', { class: 'pilha' }, abasP('relatorios'),
+const barrasP = obj => { const ent = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]); const max = Math.max(1, ...ent.map(e => e[1]));
+  return ent.length ? el('ul', { class: 'lista' }, ent.map(([k, v]) => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: ETAPAS[k] || k.replace(/_/g, ' ') }), barraP(v, max)), el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: fmtNum(v) })))))) : vazio('Nenhuma conversa classificada no período.', 'conversa'); };
+async function pRelatorio(c) {
+  topo('Relatório', [['Prospecção', 'prospeccao'], ['Relatório']], 'prospeccao');
+  await arvoreP();
+  est.relP = est.relP || { dias: 30 };
+  const f = est.relP, de = somaDias(hojeISO(), 1 - f.dias);
+  const [r, rd] = await Promise.all([chamar('prosp_relatorio', { de, nivel: 'campanha' }), chamar('prosp_relatorio', { de, nivel: 'campanha', detalhar: 'dia' })]);
+  if (falhou(c, r, 'Relatório')) return;
+  const d = r.dados, linhas = d.linhas || [], cls = d.classificacao || {};
+  const soma = k => linhas.reduce((s, x) => s + (Number((x.numeros || {})[k]) || 0), 0);
+  const porDia = {};
+  for (const x of (rd.ok && rd.dados && rd.dados.linhas) || []) { const n = x.numeros || {}, p = porDia[x.valor] = porDia[x.valor] || { enviados: 0, responderam: 0 };
+    p.enviados += Number(n.enviados) || 0; p.responderam += Number(n.responderam) || 0; }
+  const dias = Object.keys(porDia).sort(), maxDia = Math.max(1, ...dias.map(k => porDia[k].enviados));
+  trocar(c, cabecalho('Relatório', `${fmtData(d.de)} a ${fmtData(d.ate)}`),
+    el('div', { class: 'pilha' }, 
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Período' }, [7, 30, 90].map(n => el('button', { type: 'button', 'aria-pressed': String(f.dias === n), onclick: () => { f.dias = n; rotear(); } }, n + ' dias'))),
-      el('div', { class: 'form-2 p-filtros' }, filtro('Nível', f.nivel, [['campanha', 'Campanha'], ['conjunto', 'Conjunto'], ['anuncio', 'Anúncio'], ['publico', 'Público'], ['numero', 'Número']], v => { f.nivel = v; }),
-        filtro('Detalhar por', f.detalhar, DETALHES, v => { f.detalhar = v; }),
-        filtro('Conjunto', f.conjunto_id, [['', 'Todos'], ...conjuntosP().map(j => [j.id, j.campanha.nome + ' › ' + j.nome])], v => { f.conjunto_id = v; }),
-        filtro('Público', f.publico_id || '', [['', 'Todos'], ...(est.publicos.publicos || []).map(p => [p.id, p.nome])], v => { f.publico_id = v; })),
-      el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Colunas' }, Object.keys(VISOES).map(v => el('button', { type: 'button', 'aria-pressed': String(visao === v), onclick: () => { f.visao = v; rotear(); } }, { desempenho: 'Desempenho', funil: 'Funil', custos: 'Custos' }[v])),
-        btn('Guardar como padrão', () => fazer('prosp_relatorio_salvar', { nome: 'Padrão', config: { visao } }, { ok: 'Visão guardada (no servidor, não no navegador).' }), 'fant')),
-      cartao(null, null, (d.linhas || []).length ? el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Tabela do relatório (role para o lado)' }, el('table', { class: 'dados-t' },
-        el('thead', {}, el('tr', {}, el('th', { scope: 'col', text: { campanha: 'Campanha', conjunto: 'Conjunto', anuncio: 'Anúncio', publico: 'Público', numero: 'Número' }[d.nivel] }), cols.map(k => el('th', { scope: 'col', text: COLUNAS[k] })))),
-        el('tbody', {}, d.linhas.map(x => el('tr', {}, el('th', { scope: 'row', text: nomeLinha(x) }), cols.map(k => el('td', { class: 'num', text: valor(x, k) }))))))) : vazio('Nada no período ainda (nenhuma mensagem saiu).', 'agregados')),
-      el('p', { class: 'mudo peq', text: '"12% ± 4" quer dizer: com 95% de confiança, a taxa de verdade está entre 8% e 16%. Com poucos envios, a margem é grande: não decida por ela.' }),
-      el('div', { class: 'grade-2 iguais' },
-        cartao('Vencedor de cada conjunto', el('span', { class: 'mudo peq', text: 'pelo objetivo da campanha' }), venc.length ? el('ul', { class: 'lista' }, venc.map(v => el('li', {}, el('div', { class: 'linha' },
-          el('div', { class: 'cresce' }, el('div', { class: 't1', text: nomeP('conjunto', v.conjunto_id) }),
-            el('div', { class: 't2', text: v.segundo ? `${nomeP('anuncio', v.primeiro)} ${pct(v.taxa_primeiro)} (${fmtNum(v.envios_primeiro)}) × ${nomeP('anuncio', v.segundo)} ${pct(v.taxa_segundo)} (${fmtNum(v.envios_segundo)})${v.p != null ? ' · p = ' + String(v.p).replace('.', ',') : ''}`
-              : 'Só um anúncio ativo: ligue outro para comparar.' }),
-            v.situacao !== 'vencedor' && v.faltam ? el('div', { class: 't2', text: `faltam cerca de ${fmtNum(v.faltam)} envios por anúncio para decidir` }) : null),
-          el('div', { class: 'direita' }, etq(...(SITV[v.situacao] || [v.situacao, ''])))))) ) : vazio('Sem anúncios com envios no período.', 'agregados')),
-        cartao('Linha do tempo', null, (d.anotacoes || []).length ? el('ul', { class: 'lista' }, d.anotacoes.map(a => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: a.texto }), el('div', { class: 't2', text: fmtData(a.dia) + (a.campanha_id ? ' · ' + nomeP('campanha', a.campanha_id) : '') })))))) : vazio('Nenhuma anotação no período.', 'relogio'))),
-      el('div', { class: 'grade-2 iguais' }, cartao('Onde as conversas pararam', el('span', { class: 'mudo peq', text: 'sem telefone, nome ou código' }), barras(cls.etapas)),
-        cartao('Objeções e motivos da recusa', null, barras({ ...(cls.objecoes || {}), ...Object.fromEntries(Object.entries(cls.motivos_recusa || {}).map(([k, v]) => ['recusa: ' + (ETAPAS[k] || k.replace(/_/g, ' ')), v])) })))));
+      el('div', { class: 'kpis' }, kpi('Enviadas', fmtNum(soma('enviados'))), kpi('Responderam', fmtNum(soma('responderam'))), kpi('Positivas', fmtNum(soma('positivas'))), kpi('Cadastros', fmtNum(soma('cadastros')))),
+      cartao('Enviadas por dia', el('span', { class: 'mudo peq', text: 'e quantas responderam' }), dias.length ? el('ul', { class: 'lista' }, dias.map(k => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: fmtData(k) }), barraP(porDia[k].enviados, maxDia)),
+        el('div', { class: 'direita' }, el('span', { class: 'mudo num', text: `${fmtNum(porDia[k].enviados)} · ${fmtNum(porDia[k].responderam)} responderam` })))))) : vazio('Nada no período ainda (nenhuma mensagem saiu).', 'agregados')),
+      cartao('Campanhas', null, linhas.length ? el('div', { class: 'tabela-rolagem', tabindex: '0', 'aria-label': 'Campanhas do período (role para o lado)' }, el('table', { class: 'dados-t' },
+        el('thead', {}, el('tr', {}, ['Campanha', 'Enviadas', 'Responderam', 'Positivas', 'Cadastros'].map((h, k) => el('th', { scope: 'col', text: h, class: k ? 'num' : null })))),
+        el('tbody', {}, linhas.map(x => { const n = x.numeros || {}; return el('tr', {}, el('th', { scope: 'row', text: nomeP('campanha', x.chave) }),
+          ['enviados', 'responderam', 'positivas', 'cadastros'].map(k => el('td', { class: 'num', text: fmtNum(n[k]) }))); })))) : vazio('Nenhuma campanha com envios no período.', 'agregados')),
+      el('div', { class: 'grade-2 iguais' }, cartao('Onde as conversas pararam', el('span', { class: 'mudo peq', text: 'sem telefone, nome ou código' }), barrasP(cls.etapas)),
+        cartao('Objeções e motivos da recusa', null, barrasP({ ...(cls.objecoes || {}), ...Object.fromEntries(Object.entries(cls.motivos_recusa || {}).map(([k, v]) => ['recusa: ' + (ETAPAS[k] || k.replace(/_/g, ' ')), v])) })))));
 }
 
-// ---------- Buscas
-async function pBuscas(c) {
-  topo('Buscas', [['Prospecção', 'prospeccao'], ['Buscas']], 'prospeccao');
-  await arvoreP(); await publicosP();
-  est.buscasFiltro = est.buscasFiltro || { publico_id: '' };
-  const f = est.buscasFiltro;
-  const r = await chamar('prosp_buscas', { publico_id: f.publico_id || '' }); if (falhou(c, r, 'Buscas')) return;
-  const d = r.dados, editar = ligada('editar_prospeccao'), pbs = pubsAtivos(), tot = d.creditos_total || null;
-  // sql/036: a busca é de um público (o workflow 50 traz uma página por rodada e gasta créditos do SerpAPI; DEC-124).
-  const buscar = () => fazer('prosp_buscar_agora', {}, { titulo: 'Buscar agora', texto: 'Uma busca por termo × lugar do público entra na fila (pula o que foi buscado há menos de "não repetir"); o workflow 50 traz uma página por rodada e gasta créditos do SerpAPI.',
-    campos: [{ k: 'publico_id', rot: 'Público', opcoes: pbs.map(p => [p.id, p.nome]) }], botao: 'Buscar' });
-  const SITB = { pedida: ['na fila', 'info'], rodando: ['buscando', 'atencao'], feita: ['feita', 'ok'], falhou: ['falhou', 'perigo'] };
-  const selPb = el('select', { class: 'entrada', 'aria-label': 'Público', onchange: e => { f.publico_id = e.target.value; rotear(); } }, el('option', { value: '', text: 'Todos os públicos' }),
-    (est.publicos.publicos || []).map(p => el('option', { value: p.id, text: p.nome, selected: f.publico_id === p.id })));
-  trocar(c, cabecalho('Buscas', 'Google Maps pelo SerpAPI · uma página por rodada', editar && d.busca_ligada && pbs.length ? btn('Buscar agora', buscar, 'pri', 'busca') : null),
-    el('div', { class: 'pilha' }, abasP('buscas'),
-      d.busca_ligada ? null : el('div', { class: 'aviso info' }, icone('info'), el('div', {}, 'A busca está desligada (chave "Busca no Google Maps" em ', el('a', { href: '#ajustes', text: 'Ajustes' }), '). Nada gasta créditos.')),
-      tot || (d.creditos_mes || []).length ? el('div', { class: 'kpis' }, tot ? kpiTeto(tot, editar) : null,
-        (d.creditos_mes || []).map(x => kpi(nomePub(x.publico_id), `${fmtNum(x.gastos)} de ${fmtNum(x.limite)}`, 'créditos no mês (este público)', barraUso(x.gastos, x.limite)))) : null,
-      el('div', { class: 'form-2' }, selPb),
-      cartao('Últimas buscas', null, (d.buscas || []).length ? el('ul', { class: 'lista' }, d.buscas.map(b => el('li', {}, el('div', { class: 'linha' },
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${b.termo}${b.lugar ? ' em ' + b.lugar : ''}` }),
-          el('div', { class: 't2', text: `${b.publico_id ? nomePub(b.publico_id) : nomeP('conjunto', b.conjunto_id)} · ${fmtHora(b.pedida_em)} · ${fmtNum(b.paginas_feitas)} de ${pl(b.paginas, 'página', 'páginas')} · ${pl(b.creditos, 'crédito', 'créditos')}` }),
-          Object.keys(b.contagens || {}).length ? el('div', { class: 't2', text: Object.entries(b.contagens).map(([k, v]) => `${MOTIVOS[k] || k.replace(/_/g, ' ')} ${v}`).join(' · ') }) : null),
-        el('div', { class: 'direita' }, etq(...(SITB[b.situacao] || [b.situacao, '']))))))) : vazio('Nenhuma busca ainda.', 'busca'))));
-}
 // Por que caiu: os motivos dos descartados, do maior para o menor, numa linha que abre ao tocar.
 const NAO_MOTIVO = ['achados', 'novos', 'ja_no_publico', 'de_outro_publico', 'fixo_conferir'];
 function porQueCaiu(cont) {
@@ -782,65 +886,99 @@ function kpiTeto(tot, editar) {
   return kpi('Teto geral do mês', `${fmtNum(tot.gastos)} de ${fmtNum(tot.teto)}`, 'créditos do SerpAPI, todos os públicos', el('div', { class: 'p-teto' }, barraUso(tot.gastos, tot.teto), editar ? btn('Mudar o teto', mudar, 'sec') : null));
 }
 
-// ---------- Regras automáticas (nunca aumentam nada; as fixas não mudam)
-const METRICAS = [['pare', '"Pare" (pediu para sair) %'], ['recusa', 'Recusa %'], ['sem_entrega', 'Sem entrega %'], ['falhas_seguidas', 'Falhas seguidas'], ['resposta', 'Resposta %'], ['positiva', 'Positiva %'],
-  ['custo_resposta', 'Custo por resposta (R$)'], ['custo_cadastro', 'Custo por cadastro (R$)']];
-const NIVEIS_R = [['anuncio', 'Anúncio'], ['conjunto', 'Conjunto'], ['campanha', 'Campanha'], ['numero', 'Número']];
-const ACOES_R = [['pausar', 'Pausar (anúncio: cortar)'], ['reduzir', 'Reduzir o teto pela metade'], ['avisar', 'Só avisar']];
-async function pRegras(c) {
-  topo('Regras', [['Prospecção', 'prospeccao'], ['Regras']], 'prospeccao');
-  const r = await chamar('prosp_regras'); if (falhou(c, r, 'Regras')) return;
-  const regras = r.dados.regras || [], editar = ligada('editar_prospeccao');
-  const nomeM = k => (METRICAS.find(m => m[0] === k) || [k, k === 'desconectado' ? 'Número caiu' : k])[1];
-  const form = g => fazer('prosp_regra_salvar', g ? { id: g.id } : {}, { titulo: g ? 'Mudar a regra ' + g.id : 'Nova regra', ok: 'Regra salva.',
-    texto: 'SE a métrica passar do valor (depois de N envios) ENTÃO pausar, reduzir ou avisar. Nunca aumenta nada. Age no máximo uma vez por dia em cada alvo.',
-    campos: [{ k: 'nivel', rot: 'Onde mede', opcoes: NIVEIS_R, valor: g ? g.nivel : 'anuncio' }, { k: 'alvo_id', rot: 'Só este código (vazio = todos)', valor: g ? g.alvo_id : '', ph: 'AN-0001' },
-      { k: 'metrica', rot: 'Métrica', opcoes: METRICAS, valor: g ? g.metrica : 'recusa' }, { k: 'operador', rot: 'Quando', opcoes: [['>', 'passar de'], ['<', 'ficar abaixo de']], valor: g ? g.operador : '>' },
-      { k: 'valor', rot: 'Valor', inputmode: 'decimal', valor: g ? String(g.valor) : '', obrig: true }, { k: 'depois_de', rot: 'Depois de N envios', inputmode: 'numeric', valor: g ? String(g.depois_de) : '30' },
-      { k: 'janela_dias', rot: 'Nos últimos N dias (0 = desde o começo)', inputmode: 'numeric', valor: g ? String(g.janela_dias) : '7' }, { k: 'acao', rot: 'Então', opcoes: ACOES_R, valor: g ? g.acao : 'avisar' }] });
-  trocar(c, cabecalho('Regras automáticas', 'nunca aumentam nada · as fixas de segurança não mudam', editar ? btn('Nova regra', () => form(null), 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, abasP('regras'),
-      cartao(null, null, el('ul', { class: 'lista' }, regras.map(g => el('li', {}, el('div', { class: 'linha' },
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: `${nomeM(g.metrica)} ${g.operador === '>' ? 'passar de' : 'abaixo de'} ${String(g.valor).replace('.', ',')}` }),
-          el('div', { class: 't2', text: `${(NIVEIS_R.find(n => n[0] === g.nivel) || [, g.nivel])[1]}${g.alvo_id ? ' ' + g.alvo_id : ' (todos)'} · depois de ${fmtNum(g.depois_de)} envios · ${g.janela_dias ? g.janela_dias + ' dias' : 'desde o começo'} · ${(ACOES_R.find(a => a[0] === g.acao) || [, g.acao])[1]} · agiu ${fmtNum(g.disparos_30d)}× em 30 dias` })),
-        el('div', { class: 'direita' }, g.fixa ? etq('fixa', 'info') : null, !g.fixa && editar ? btn('Mudar', () => form(g), 'sec') : null,
-          !g.fixa && editar ? el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(!!g.ligada), 'aria-label': (g.ligada ? 'Desligar' : 'Ligar') + ' a regra ' + g.id,
-            onclick: async e => { const t = e.currentTarget; t.setAttribute('aria-checked', String(!g.ligada));
-              const x = await fazer('prosp_regra_ligar', { id: g.id, valor: g.ligada ? 'NAO' : 'SIM' }, { titulo: 'Desligar a regra ' + g.id, linhas: [['Regra', 'ligada', 'desligada']], ok: g.ligada ? 'Regra desligada.' : 'Regra ligada.' });
-              if (!x) t.setAttribute('aria-checked', String(!!g.ligada)); } }) : g.fixa ? null : etq(g.ligada ? 'ligada' : 'desligada', g.ligada ? 'ok' : ''))))))),
-      el('p', { class: 'mudo peq', text: 'As fixas: "pare" acima de 5% depois de 20 envios corta o anúncio; "pare" acima de 3% em 7 dias reduz o número; número caiu pausa tudo o que usa ele; 5 falhas seguidas pausam o conjunto.' })));
+// ---------- Regras de segurança (as 4 fixas, só para leitura; rxsync-sistema DEC-211). As regras próprias saíram da tela
+// e ficaram desligadas no banco (sql/096).
+const METRICAS = { pare: '"Pare" (pediu para sair)', recusa: 'Recusa', sem_entrega: 'Sem entrega', falhas_seguidas: 'Falhas seguidas', desconectado: 'Número caiu' };
+const ACOES_R = { pausar: 'pausa (a mensagem: corta)', reduzir: 'reduz o teto do número pela metade', avisar: 'só avisa' };
+const NIVEIS_R = { anuncio: 'mensagem', conjunto: 'conjunto', campanha: 'campanha', numero: 'número' };
+function cartaoRegras(regras) {
+  const fixas = (regras || []).filter(g => g.fixa);
+  return cartao('Regras de segurança', el('span', { class: 'mudo peq', text: 'fixas: não mudam nem desligam' }), fixas.length ? el('ul', { class: 'lista' }, fixas.map(g => el('li', {}, el('div', { class: 'linha' },
+    el('div', { class: 'cresce' }, el('div', { class: 't1', text: g.metrica === 'desconectado' ? 'Número caiu' : `${METRICAS[g.metrica] || g.metrica} ${g.operador === '>' ? 'acima de' : 'abaixo de'} ${String(g.valor).replace('.', ',')}${/^(pare|recusa|sem_entrega)$/.test(g.metrica) ? '%' : ''}` }),
+      el('div', { class: 't2', text: `${NIVEIS_R[g.nivel] || g.nivel}${g.depois_de ? ' · depois de ' + fmtNum(g.depois_de) + ' envios' : ''}${g.janela_dias ? ' · em ' + g.janela_dias + ' dias' : ''} · ${ACOES_R[g.acao] || g.acao} · agiu ${fmtNum(g.disparos_30d)}× em 30 dias` })),
+    el('div', { class: 'direita' }, etq('fixa', 'info')))))) : vazio('Sem regras.', 'info'));
 }
 
-// ---------- Custos (para custo por resposta, positiva e cadastro)
-const CUSTOS = [['preco_credito_serpapi', 'Preço de 1 crédito do SerpAPI (R$)'], ['preco_mil_tokens_entrada', 'OpenAI: 1.000 tokens de entrada (R$)'], ['preco_mil_tokens_saida', 'OpenAI: 1.000 tokens de saída (R$)'],
-  ['fixo_mensal', 'Fixo por mês (chip, plano do SerpAPI…) (R$)']];
-async function pCustos(c) {
-  topo('Custos', [['Prospecção', 'prospeccao'], ['Custos']], 'prospeccao');
-  const r = await chamar('prosp_inicio'); if (falhou(c, r, 'Custos')) return;
-  est.prosp = r.dados;
-  const atuais = ((r.dados.resultados || {}).custos) || null, editar = ligada('editar_prospeccao');
-  const ins = {}; const erro = el('p', { class: 'erro', role: 'alert' });
-  const campos = CUSTOS.map(([k, rot]) => { const v = atuais && atuais[k] ? atuais[k] : {};
-    ins[k] = { valor: el('input', { class: 'entrada', id: 'cu-' + k, inputmode: 'decimal', autocomplete: 'off', value: v.valor != null ? String(v.valor).replace('.', ',') : null, disabled: !editar }),
-      descricao: el('input', { class: 'entrada', id: 'cu-d-' + k, autocomplete: 'off', value: v.descricao || null, placeholder: 'de onde vem (opcional)', disabled: !editar }) };
-    return el('div', { class: 'p-custo' }, el('label', { class: 'campo', for: 'cu-' + k }, el('span', { class: 'rot', text: rot }), ins[k].valor), el('label', { class: 'campo', for: 'cu-d-' + k }, el('span', { class: 'rot', text: 'Descrição' }), ins[k].descricao)); });
-  const salvar = async e => {
-    e.preventDefault(); erro.textContent = '';
-    const itens = CUSTOS.filter(([k]) => ins[k].valor.value.trim() !== '').map(([k]) => ({ tipo: k, valor: ins[k].valor.value.trim().replace(/\./g, '').replace(',', '.'), descricao: ins[k].descricao.value.trim() }));
-    if (!itens.length) { erro.textContent = 'Preencha pelo menos um valor.'; return; }
-    if (itens.some(x => isNaN(Number(x.valor)) || Number(x.valor) < 0)) { erro.textContent = 'Valor em reais, como 0,05.'; return; }
-    await fazer('prosp_custos_salvar', { itens }, { ok: 'Custos salvos.', erro: x => { erro.textContent = x.mensagem || 'Não consegui.'; } });
+// ---------- Prompt da IA (DEC-096; num lugar só desde a DEC-211 do rxsync-sistema): um prompt por campanha. O texto, as
+// regras fixas travadas, "Testar conversa" (folha), as versões com "Voltar a esta versão" e as conversas de cada versão.
+// Salvar cria uma versão nova (DEC-070): por isso esta página tem o botão "Salvar a versão nova" (exceção ao molde E
+// registrada na DEC-211, como a grade de horários).
+const resumoTxt = t => { const s = String(t || '').replace(/\s+/g, ' ').trim(); return s ? (s.length > 90 ? s.slice(0, 90) + '…' : s) : '(o texto montado pelos campos)'; };
+async function pPrompt(c, parte, id) {
+  topo('Prompt da IA', [['Prospecção', 'prospeccao'], ['Prompt da IA']], 'prospeccao');
+  const a = await arvoreP(true);
+  const camps = ((a && a.campanhas) || []).filter(x => !/^encerrad/.test(x.situacao));
+  const cid = id && camps.some(x => x.id === id) ? id : (camps[0] || {}).id;
+  if (!cid) {
+    trocar(c, cabecalho('Prompt da IA', 'um prompt por campanha'), el('div', { class: 'pilha' }, 
+      cartao(null, null, vazio('Crie uma campanha primeiro: o prompt é de cada campanha.', 'conversa'))));
+    return;
+  }
+  const [ro, rv, rh, rc] = await Promise.all([chamar('prosp_objeto', { tipo: 'campanha', id: cid }), chamar('prosp_prompt_ver', { campanha_id: cid }),
+    chamar('prosp_prompt_ver', { campanha_id: cid, versoes: 'SIM' }), chamar('prosp_conversas', { campanha_id: cid, dias: '90', pagina: 0 })]);
+  if (falhou(c, ro, 'Prompt da IA')) return;
+  const o = ro.dados.objeto, cfg = ro.dados.config || {}, editar = ligada('editar_prospeccao');
+  const atual = (cfg.ia || {}).prompt_texto || '';
+  const erro = el('p', { class: 'erro', role: 'alert' });
+  const caixa = el('textarea', { class: 'entrada p-prompt-campo', id: 'p-prompt', rows: '14', maxlength: '8000', autocomplete: 'off', value: atual || (rv.ok ? rv.montado || '' : ''), disabled: !editar });
+  const alvo = () => ({ campanha_id: cid, rascunho: { ia: { prompt_texto: caixa.value.trim() } } });
+  const salvar = (texto, titulo) => {
+    const nova = JSON.parse(JSON.stringify(cfg)); nova.ia = { ...(nova.ia || {}), prompt_texto: texto };
+    return fazer('prosp_campanha_salvar', { id: cid, nome: o.nome, config: nova }, { titulo, nivel: ativo(o.situacao) ? 2 : 1, linhas: [['Texto do prompt', resumoTxt(atual), resumoTxt(texto)]],
+      texto: 'Vira uma versão nova: as próximas respostas da IA usam este texto (as regras fixas continuam no fim).', ok: 'Versão nova salva.',
+      erro: x => { erro.textContent = x.mensagem || 'Não consegui salvar.'; }, depois: () => { est.prosp = null; rotear(); } });
   };
-  trocar(c, cabecalho('Custos', 'entram no relatório: custo por resposta, positiva e cadastro'),
-    el('div', { class: 'pilha' }, abasP('custos'),
-      atuais ? null : nota('Os valores guardados aparecem aqui depois do sql/033 (rxsync-sistema). Salvar já funciona.'),
-      el('form', { class: 'cartao', onsubmit: salvar }, el('div', { class: 'corpo p-topo-form' }, campos, erro, editar ? el('button', { class: 'btn pri', type: 'submit', text: 'Salvar' }) : nota('Editar está desligado (editar_prospeccao).', true)))));
+  const salvarTela = () => {
+    erro.textContent = '';
+    const t = caixa.value.trim();
+    if (t === atual.trim()) { rapida('Nada mudou.'); return; }
+    if (t && (t.length < 50 || t.length > 8000)) { erro.textContent = 'O texto tem de 50 a 8.000 letras (ou fica vazio para usar o montado pelos campos).'; caixa.focus(); return; }
+    salvar(t, 'Salvar o prompt de ' + o.nome);
+  };
+  const comecar = async () => {
+    if (caixa.value.trim() && !(await pedirAcao('pagina_confirmar', {}, { nivel: 2, titulo: 'Trocar o texto do prompt', rotuloNivel: 'troca o que está no campo',
+      texto: 'O que está no campo vira o texto montado pelos campos da campanha. Nada é salvo até você tocar em "Salvar a versão nova".', botao: 'Trocar o texto' }))) return;
+    caixa.value = rv.ok ? rv.montado || '' : ''; caixa.focus();
+  };
+  const versoes = (rh.ok && rh.versoes) || [], porPrompt = (rc.ok && rc.versoes_prompt) || [];
+  const rotPrompt = rotulosPrompt(versoes, porPrompt);
+  const selCamp = camps.length > 1 ? el('label', { class: 'campo' }, el('span', { class: 'rot', text: 'Campanha' }),
+    el('select', { class: 'entrada', id: 'p-prompt-campanha', onchange: e => irP('prompt', e.target.value) }, camps.map(x => el('option', { value: x.id, text: x.nome, selected: x.id === cid })))) : null;
+  trocar(c, cabecalho('Prompt da IA', `${o.nome} · versão ${o.versao}`, etqSit(o.situacao)),
+    el('div', { class: 'pilha' },  selCamp,
+      cartao('Texto do prompt', el('span', { class: 'mudo peq', text: 'o que a IA sabe e como conversa' }), corpo(
+        el('label', { class: 'campo largo', for: 'p-prompt' }, el('span', { class: 'rot', text: 'Texto (de 50 a 8.000 letras; vazio = o montado pelos campos da campanha)' }), caixa,
+          el('span', { class: 'ajuda', text: 'Sem preço e sem link de fora: os preços oficiais, o link de contratação e o SAIR entram sempre, nas regras fixas.' })),
+        erro, el('div', { class: 'acoes' }, editar ? btn('Salvar a versão nova', salvarTela, 'pri') : null,
+          editar ? btn('Testar conversa', () => testarConversa(alvo(), o.nome), 'sec', 'conversa') : null,
+          editar ? btn('Começar do texto montado', comecar, 'sec') : null,
+          btn('Ver o prompt inteiro', () => verPrompt(alvo()), 'fant', 'info')))),
+      el('details', { class: 'grupo' }, el('summary', { text: 'As regras que nunca mudam' }), el('div', { class: 'corpo-grupo' }, blocoPrompt('Regras fixas (Política v10)', rv.ok ? rv.fixas : '', true))),
+      cartao('Versões', el('span', { class: 'mudo peq', text: 'cada salvar cria uma versão (nunca editada)' }), versoes.length ? el('ul', { class: 'lista' }, versoes.map(v => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Versão ' + v.versao + (v.versao === o.versao ? ' (a de agora)' : '') }), el('div', { class: 't2', text: `${fmtHora(v.criada_em)} · ${resumoTxt(v.texto)}` })),
+        el('div', { class: 'direita acoes' }, btn('O que mudou', () => verVersao('campanha', cid, v.versao), 'fant'),
+          editar && v.versao !== o.versao && (v.texto || '') !== atual ? btn('Voltar a esta versão', () => salvar(v.texto || '', 'Voltar à versão ' + v.versao), 'sec') : null)))))
+        : vazio('Nenhuma versão ainda.', 'relogio')),
+      cartao('Conversas de cada versão', el('span', { class: 'mudo peq', text: 'últimos 90 dias' }), porPrompt.length ? el('ul', { class: 'lista' }, porPrompt.map((p, i) => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: rotPrompt(p, i) }), el('div', { class: 't2', text: `desde ${fmtData(p.desde)} · ${pl(p.respostas, 'resposta', 'respostas')} da IA` })),
+        el('div', { class: 'direita acoes' }, btn('Ver o texto', () => verPromptUsado(p.prompt_id, rotPrompt(p, i)), 'fant'),
+          btn('Ver as conversas', () => { est.convP = { resultado: '', campanha_id: cid, conjunto_id: '', anuncio_id: '', prompt_id: String(p.prompt_id), dias: '90', pagina: 0 }; irP('conversas'); }, 'sec'))))))
+        : vazio('Nenhuma resposta da IA ainda.', 'conversa'))));
+}
+
+// Um número só (o da versão da campanha): cada prompt usado leva a versão da campanha em vigor quando ele apareceu (a última
+// salva antes da primeira resposta). Se a mesma versão teve dois textos (as regras fixas mudaram), o rótulo diz desde quando.
+function rotulosPrompt(versoes, porPrompt) {
+  const versaoDe = p => { const t = new Date(p.desde).getTime(); const v = versoes.filter(x => new Date(x.criada_em).getTime() <= t).reduce((m, x) => Math.max(m, x.versao), 0);
+    return v || (versoes.length ? Math.min(...versoes.map(x => x.versao)) : 0); };
+  return (p, i) => { const v = versaoDe(p), repetida = porPrompt.some((q, k) => k !== i && versaoDe(q) === v);
+    return (v ? 'Versão ' + v : 'Versão sem número') + (repetida ? ' · regras fixas de ' + fmtData(p.desde) : ''); };
 }
 
 // ---------- Prompt da IA: ver inteiro e testar a conversa (sql/041, DEC-096)
 // Ver: a parte editável (do anúncio, da campanha ou montada pelos campos) e as regras fixas, travadas (o servidor sempre
 // põe; a página nunca manda). Sem dado de lead: a 2ª mensagem aparece com marcas no lugar dos dados.
-const ORIGEM_PROMPT = { anuncio: 'prompt próprio do anúncio', campanha: 'texto do prompt da campanha', montado: 'montado pelos campos de "IA de resposta"' };
+const ORIGEM_PROMPT = { campanha: 'texto do prompt da campanha', montado: 'montado pelos campos de "IA de resposta"' };
 const blocoPrompt = (titulo, texto, travado) => el('div', { class: 'p-prompt' + (travado ? ' travado' : '') }, el('div', { class: 'p-prompt-cab' }, travado ? icone('cadeado', 'p') : null, el('b', { text: titulo })), el('pre', { text: texto || '' }));
 async function verPrompt(alvo) {
   const r = await chamar('prosp_prompt_ver', alvo);
@@ -856,11 +994,11 @@ async function verPrompt(alvo) {
       el('p', { class: 'mudo peq', text: 'Depois vêm as mensagens da conversa. Nada disso guarda telefone.' })),
     el('div', { class: 'pe' }, btn('Copiar o prompt', async () => { try { await navigator.clipboard.writeText(r.completo); rapida('Copiado.'); } catch (e) { rapida('Não consegui copiar.'); } }, 'sec'), btn('Fechar', () => fechar(), 'pri'))));
 }
-async function verPromptUsado(promptId) {
+async function verPromptUsado(promptId, rotulo) {
   const r = await chamar('prosp_prompt_texto', { prompt_id: promptId });
   if (!r.ok || !r.texto) { rapida(r.mensagem || 'Este prompt não está mais guardado.'); return; }
   const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-prompt-usado' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
-    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt-usado', text: 'Prompt que a resposta usou (nº ' + promptId + ')' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt-usado', text: 'Prompt que a resposta usou' + (rotulo ? ' (' + rotulo + ')' : '') })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
     el('div', { class: 'corpo' }, blocoPrompt('Texto completo (com as regras fixas no fim)', r.texto)), el('div', { class: 'pe' }, btn('Fechar', () => fechar(), 'pri'))));
 }
 // Testar conversa: a mesma montagem e a mesma limpeza da resposta de verdade, pelo workflow 52; sem WhatsApp, sem lead.
@@ -891,48 +1029,44 @@ function testarConversa(alvo, nome) {
   };
   const fechar = janela(el('form', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-teste', onsubmit: enviar }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
     el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-teste', text: 'Testar conversa · ' + nome })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
-    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'Usa o prompt que está na tela (mesmo sem salvar), a mesma montagem e a mesma limpeza das respostas de verdade. Nada vai para o WhatsApp e nada fica guardado além do registro.' }),
+    el('div', { class: 'corpo' }, el('p', { class: 'mudo peq', text: 'Usa o texto que está na tela (mesmo sem salvar), a mesma montagem e a mesma limpeza das respostas de verdade. Nada vai para o WhatsApp e nada fica guardado além do registro.' }),
       el('div', { class: 'form-2' }, el('label', { class: 'campo', for: 't-nome' }, el('span', { class: 'rot', text: 'Negócio (de mentira)' }), nomeIn),
         el('label', { class: 'campo', for: 't-nicho' }, el('span', { class: 'rot', text: 'Nicho' }), nichoIn), el('label', { class: 'campo', for: 't-cidade' }, el('span', { class: 'rot', text: 'Cidade' }), cidadeIn)),
-      lista, el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
+      lista, el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Mensagens prontas' }, ['Quanto custa?', 'Já tenho secretária', 'Quero falar com uma pessoa', 'SAIR']
+        .map(x => el('button', { type: 'button', onclick: () => { msgIn.value = x; enviar({ preventDefault() {} }); } }, x))),
+      el('label', { class: 'campo', for: 't-msg' }, el('span', { class: 'rot', text: 'Mensagem do contato' }), msgIn), erro),
     el('div', { class: 'pe' }, btn('Limpar a conversa', () => { hist.length = 0; desenhar(); }, 'sec'), mandar)));
   desenhar();
 }
 
-// ---------- Conversas (sql/043, DEC-098): revisar as conversas e pedir sugestões de melhoria do prompt
-// "Revisar conversas" só lê (o telefone nunca vem do servidor). "Sugerir melhorias" manda à IA as conversas encerradas do
-// filtro LIMPAS no servidor (sem nome, telefone, código, nicho ou cidade do contato); a resposta só aparece aqui, e nada
-// muda sozinho: "Usar este texto" abre o editor da campanha com o texto novo, e o Jean salva.
+// ---------- Conversas (sql/043, DEC-098): revisar as conversas (o telefone nunca vem do servidor). O "Sugerir melhorias"
+// saiu (rxsync-sistema DEC-211).
 const RESULTADOS = [['', 'Todas'], ['recusou', 'Recusou'], ['saiu', 'Saiu'], ['com_voce', 'Com você'], ['cadastrou', 'Cadastrou'], ['parou', 'Parou (7 dias)']];
 const P_RES = { recusou: ['recusou', ''], saiu: ['saiu', 'perigo'], com_voce: ['com você', 'atencao'], cadastrou: ['cadastrou', 'ok'], parou: ['parou', 'atencao'], em_andamento: ['em andamento', 'info'] };
 const etqRes = s => { const [t, tom] = P_RES[s] || [s || '—', '']; return etq(t, tom); };
 async function pConversas(c) {
-  topo('Conversas', [['Prospecção', 'prospeccao'], ['Conversas']], 'prospeccao');
+  topo('Conversas', [['Prospecção', 'prospeccao'], ['Leads', 'prospeccao/leads'], ['Conversas']], 'prospeccao/leads');
   await arvoreP();
   est.convP = est.convP || { resultado: '', campanha_id: '', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0 };
   const f = est.convP;
-  const r = await chamar('prosp_conversas', f); if (falhou(c, r, 'Conversas')) return;
+  const [r, rh] = await Promise.all([chamar('prosp_conversas', f), f.campanha_id ? chamar('prosp_prompt_ver', { campanha_id: f.campanha_id, versoes: 'SIM' }) : null]);
+  if (falhou(c, r, 'Conversas')) return;
+  // a versão do prompt só faz sentido dentro de uma campanha (o número é o da versão dela).
+  const porPrompt = r.versoes_prompt || [], rotPrompt = rotulosPrompt((rh && rh.ok && rh.versoes) || [], porPrompt);
   const mudar = (k, v) => { f[k] = v; if (k === 'campanha_id') { f.conjunto_id = ''; f.anuncio_id = ''; f.prompt_id = ''; } if (k === 'conjunto_id') f.anuncio_id = ''; f.pagina = 0; rotear(); };
   const camps = (est.prosp && est.prosp.campanhas) || [];
   const cjs = conjuntosP().filter(j => !f.campanha_id || j.campanha.id === f.campanha_id);
   const ans = (cjs.find(j => j.id === f.conjunto_id) || {}).anuncios || [];
   const sel = (rot, k, opcoes) => el('select', { class: 'entrada', 'aria-label': rot, onchange: e => mudar(k, e.target.value) }, opcoes.map(([v, t]) => el('option', { value: v, text: t, selected: String(f[k]) === String(v) })));
-  const total = r.total || 0, paginas = Math.max(1, Math.ceil(total / 20)), editar = ligada('editar_prospeccao');
-  const sugerir = !f.campanha_id ? nota('Escolha uma campanha para pedir sugestões de melhoria do prompt dela.')
-    : !r.sugestoes_liberadas ? el('div', { class: 'aviso info' }, icone('cadeado'), el('div', { text: '"Sugerir melhorias" está travado até a revisão do teste de balanceamento ser assinada (DEC-098). Revisar as conversas já funciona.' }))
-    : editar ? el('div', { class: 'acoes' }, btn('Sugerir melhorias', () => fazer('prosp_sugerir', { ...f }, { titulo: 'Sugerir melhorias no prompt de ' + nomeP('campanha', f.campanha_id),
-        texto: 'As últimas conversas encerradas deste filtro vão para a IA sem o nome, o telefone, o código, a cidade ou o nicho do contato (nome do negócio, telefones, e-mails e links viram marcas). Nada fica guardado e nada muda sozinho: você revisa e decide.',
-        campos: [{ k: 'quantidade', rot: 'Quantas conversas (1 a 20)', tipo: 'number', inputmode: 'numeric', valor: 10, min: 1, max: 20 }], botao: 'Pedir sugestões', silencioso: true,
-        depois: x => mostrarSugestoes(x, f.campanha_id) }), 'pri', 'info')) : null;
+  const total = r.total || 0, paginas = Math.max(1, Math.ceil(total / 20));
   trocar(c, cabecalho('Conversas', `${pl(total, 'conversa respondida', 'conversas respondidas')} · sem o telefone`),
-    el('div', { class: 'pilha' }, abasP('conversas'),
+    el('div', { class: 'pilha' }, abasLeads('conversas'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Resultado' }, RESULTADOS.map(([k, n]) => el('button', { type: 'button', 'aria-pressed': String(f.resultado === k), onclick: () => mudar('resultado', k) }, n))),
       el('div', { class: 'form-2' }, sel('Campanha', 'campanha_id', [['', 'Todas as campanhas'], ...camps.map(x => [x.id, x.nome])]),
         sel('Conjunto', 'conjunto_id', [['', 'Todos os conjuntos'], ...cjs.map(j => [j.id, (f.campanha_id ? '' : j.campanha.nome + ' › ') + j.nome])]),
         sel('Anúncio', 'anuncio_id', [['', 'Todos os anúncios'], ...ans.map(a => [a.id, a.nome])]),
         sel('Período', 'dias', [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias']]),
-        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${pl(v.respostas, 'resposta', 'respostas')}`])])),
-      sugerir,
+        f.campanha_id ? sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...porPrompt.map((v, i) => [String(v.prompt_id), `${rotPrompt(v, i)} · ${pl(v.respostas, 'resposta', 'respostas')}`])]) : null),
       (r.conversas || []).length ? r.conversas.map(cv => cartao(cv.nome || cv.lead_id, etqRes(cv.resultado),
         corpo(el('p', { class: 'mudo peq', text: [cv.lead_id, `${nomeP('campanha', cv.campanha_id)} › ${nomeP('conjunto', cv.conjunto_id)}${cv.anuncio_id ? ' › ' + nomeP('anuncio', cv.anuncio_id) : ''}`,
             [cv.cidade, cv.nicho].filter(Boolean).join(' · '), 'última mensagem ' + fmtHora(cv.ultimo_contato_em), fmtNum(cv.ia_mensagens) + ' da IA', cv.passou_para_voce ? 'passou para você' : null].filter(Boolean).join(' · ') }),
@@ -942,18 +1076,4 @@ async function pConversas(c) {
           el('div', { class: 'acoes' }, btn('Abrir o lead', () => irP('lead', cv.lead_id), 'sec'))))) : cartao(null, null, vazio('Nenhuma conversa respondida com esse filtro.', 'conversa')),
       paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 0 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina + 1} de ${paginas}` }),
         f.pagina + 1 < paginas ? btn('Próximas', () => { f.pagina++; rotear(); }, 'sec') : null) : null));
-}
-// A resposta da IA só aparece aqui (nada fica guardado no servidor nem no navegador).
-function mostrarSugestoes(r, campanhaId) {
-  const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-sugestoes' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
-    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-sugestoes', text: 'Sugestões para o prompt' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
-    el('div', { class: 'corpo' },
-      el('p', { class: 'mudo peq', text: `A partir de ${pl(r.conversas, 'conversa encerrada', 'conversas encerradas')}, sem os dados dos contatos. Nada mudou: revise antes de usar.` }),
-      r.diagnostico ? blocoPrompt('Diagnóstico', r.diagnostico) : null,
-      (r.sugestoes || []).map((x, k) => el('div', { class: 'p-sugestao' }, el('h3', { text: (k + 1) + '. ' + (x.onde || 'Sugestão') }),
-        x.antes ? blocoPrompt('Antes', x.antes) : null, blocoPrompt('Depois', x.depois), x.porque ? el('p', { class: 'mudo peq', text: 'Por quê: ' + x.porque }) : null)),
-      r.aviso ? el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', { text: r.aviso + ' O editor vai recusar até você corrigir.' })) : null,
-      r.texto_novo ? blocoPrompt('Texto novo da parte editável (as regras fixas continuam no fim)', r.texto_novo) : null),
-    el('div', { class: 'pe' }, r.texto_novo ? btn('Copiar o texto', async () => { try { await navigator.clipboard.writeText(r.texto_novo); rapida('Copiado.'); } catch (e) { rapida('Não consegui copiar.'); } }, 'sec') : null,
-      r.texto_novo && ligada('editar_prospeccao') ? btn('Usar este texto', () => { est.textoSugerido = { campanha_id: campanhaId, texto: r.texto_novo }; fechar(); irP('campanha', campanhaId); }, 'pri') : btn('Fechar', () => fechar(), 'pri'))));
 }

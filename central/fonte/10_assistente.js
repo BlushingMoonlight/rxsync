@@ -173,6 +173,17 @@ async function descartarProposta(p) {
 }
 
 // ---------------------------------------------------------------- Análise › Métricas (DEC-146)
+// Preço da OpenAI por mil tokens (entrada e saída), para o custo de IA em reais. Grava pela mesma ação de antes da página
+// Custos da Prospecção (prosp_custos_salvar), só com os 2 preços (rxsync-sistema DEC-211).
+const precoReais = v => String(v || '').trim().replace(/\./g, '').replace(',', '.');
+function precoOpenAI() {
+  return fazer('prosp_custos_salvar', {}, { titulo: 'Preço da OpenAI', texto: 'Por mil tokens, em reais (ex.: 0,0015). Vale para o custo de IA da Central e da prospecção.',
+    campos: [{ k: 'entrada', rot: 'Mil tokens de entrada (R$)', inputmode: 'decimal', obrig: true, erro: 'Digite o preço (ex.: 0,0015).' },
+      { k: 'saida', rot: 'Mil tokens de saída (R$)', inputmode: 'decimal', obrig: true, erro: 'Digite o preço (ex.: 0,006).' }],
+    preparar: v => { const { entrada, saida, ...resto } = v;
+      return { ...resto, itens: [{ tipo: 'preco_mil_tokens_entrada', valor: precoReais(entrada), descricao: '' }, { tipo: 'preco_mil_tokens_saida', valor: precoReais(saida), descricao: '' }] }; },
+    ok: 'Preço salvo.' });
+}
 TELAS.metricas = async c => {
   topo('Métricas', [['Análise'], ['Métricas']]);
   const r = await chamar('metricas'); if (falhou(c, r, 'Métricas')) return;
@@ -194,7 +205,8 @@ TELAS.metricas = async c => {
         el('div', { class: 'cartao kpi ia-mensagens' }, el('div', { class: 'rot', text: 'Mensagens do atendimento no mês' }), el('div', { class: 'val num', text: fmtNum(ci.mensagens_atendimento_mes) }),
           el('div', { class: 'var', text: 'todas as clínicas; fora do custo acima' }))),
       el('div', { class: 'aviso info mt' }, icone('info'), el('div', { text: ci.aviso || 'O atendimento das clínicas não entra: o banco só conta as mensagens, não os tokens.' })),
-      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída) em Custos (Prospecção › Mais).',
-        ligada('tela_prospeccao') ? [' ', el('a', { href: '#prospeccao/custos', text: 'Abrir Custos' })] : null)))),
+      // O preço da OpenAI (rxsync-sistema DEC-211: a página Custos da Prospecção saiu): uma folha só com os 2 preços.
+      ci.preco_preenchido ? null : el('div', { class: 'aviso atencao mt' }, icone('alerta'), el('div', {}, 'Para ver o custo em reais, preencha o preço por mil tokens (entrada e saída).')),
+      ligada('editar_prospeccao') ? el('div', { class: 'acoes mt' }, btn(ci.preco_preenchido ? 'Mudar o preço' : 'Preencher o preço', precoOpenAI, 'sec')) : null)),
     cartao('Uso do assistente no mês', null, corpo(dados([['Perguntas', fmtNum(uso.perguntas)], ['Propostas', fmtNum(uso.propostas)], ['Confirmadas', fmtNum(uso.confirmadas)]])))));
 };

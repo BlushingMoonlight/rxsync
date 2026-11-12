@@ -176,7 +176,6 @@ function nivelDe(acao, d) {
   // Termos v7 (sql/063): ligar a termos_v7 é nível 3. Chave que o servidor sobe sem estar aqui: mudarChave pergunta de novo.
   if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : NIVEL_CHAVE[d.chave] || 1;
   if (acao === 'prosp_ligar') return d.valor === 'NAO' ? 1 : d.tipo === 'campanha' ? 3 : 2;
-  if (acao === 'prosp_regra_ligar') return d.valor === 'NAO' ? 2 : 1;
   // Públicos (sql/036, DEC-088): tirar um contato é um toque (pôr de volta num público em uso: a página passa o nível 2).
   if (acao === 'prosp_publico_contato_marcar' && d.valor === 'NAO') return 1;
   if (acao === 'cobranca_teste_definir' && !d.cliente_id) return 2;
