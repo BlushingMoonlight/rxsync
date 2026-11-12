@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Vu68iOTOkZ5C039TAnaUO8EDuoIFx78xGgeX+Ockido='; style-src 'sha256-E/SO/uf8+XHyUriQ9HOVNes2GkZ4EFBDNEzpoW7eJ3E='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-75TkP8Zb2aVZcU6rISgBmIYv1iuiPycChneFOLQpUNs='; style-src 'sha256-SByVh6jJKhXZk5P9po6KQBv748DAZK178GBaipKWvlA='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -552,7 +552,8 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .p-teste { padding: var(--e-3) 0; max-height: 45vh; overflow: auto; }
 .p-barrada { color: var(--perigo-texto); font-weight: 600; }
 .janela.larga { width: min(820px, 100%); }
-/* Sugerir melhorias (DEC-098) */</style>
+/* Sugerir melhorias (DEC-098) */
+.p-etq-lead { margin-top: var(--e-1); }</style>
 </head>
 <body>
 <!-- Página montada por scripts/central_montar.mjs a partir de central/fonte/. Não edite este arquivo à mão. -->
@@ -2836,17 +2837,21 @@ async function pLeads(c, parte, sit) {
   const total = d.total || 0, paginas = Math.max(1, Math.ceil(total / 50));
   const exportar = () => fazer('prosp_exportar', { conjunto_id: f.conjunto_id, situacao: sit }, { titulo: 'Exportar os leads (CSV)', texto: 'O arquivo sai SEM telefone (DEC-079). Fica no registro da Central.', botao: 'Exportar',
     depois: x => { baixar(x.arquivo || 'leads.csv', x.csv || ''); } , ok: 'Arquivo pronto.' });
-  trocar(c, cabecalho('Leads', `${pl(total, 'lead', 'leads')}${sit ? ' · ' + P_LEAD[sit][0] : ''}`, btn('Exportar CSV', exportar, 'sec')),
+  // o raro (os filtros por conjunto e por público e o "Exportar CSV") fica num "Avançado" fechado, no fim (decisão 11 do plano, DEC-211).
+  const avancado = f.conjunto_id || f.publico_id;
+  trocar(c, cabecalho('Leads', `${pl(total, 'lead', 'leads')}${sit ? ' · ' + P_LEAD[sit][0] : ''}`),
     el('div', { class: 'pilha' }, abasLeads('leads'),
       el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação' }, el('button', { type: 'button', 'aria-pressed': String(!sit), onclick: () => { f.pagina = 1; ir('prospeccao/leads'); } }, 'Todos'),
         SIT_LEADS.filter(k => ps[k] || k === sit).map(k => el('button', { type: 'button', 'aria-pressed': String(sit === k), onclick: () => { f.pagina = 1; ir('prospeccao/leads/' + k); } }, P_LEAD[k][0], el('span', { class: 'n', text: ps[k] || 0 })))),
-      el('div', { class: 'form-2' }, selCj, selPb), el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca')),
+      el('div', { class: 'p-busca' }, busca, btn('Buscar', () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); }, 'sec', 'busca')),
       cartao(null, null, (d.leads || []).length ? el('ul', { class: 'lista' }, d.leads.map(l => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irP('lead', l.id) },
         el('span', { class: 'avatar ' + ((P_LEAD[l.situacao] || [])[1] || ''), text: iniciais(l.nome), 'aria-hidden': 'true' }),
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.nome || l.id }), el('div', { class: 't2', text: [l.id, [l.cidade, l.bairro].filter(Boolean).join(' · '), l.nicho, l.nota != null ? '★ ' + String(l.nota).replace('.', ',') : null, l.pontos + ' pontos', l.telefone_fim].filter(Boolean).join(' · ') })),
-        el('div', { class: 'direita' }, etqLead(l.situacao)), icone('seta'))))) : vazio('Nenhum lead com esse filtro.', 'clientes')),
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.nome || l.id }), el('div', { class: 't2', text: [l.id, [l.cidade, l.bairro].filter(Boolean).join(' · '), l.nicho, l.nota != null ? '★ ' + String(l.nota).replace('.', ',') : null, l.pontos + ' pontos', l.telefone_fim].filter(Boolean).join(' · ') }),
+          el('div', { class: 'p-etq-lead' }, etqLead(l.situacao))), icone('seta'))))) : vazio('Nenhum lead com esse filtro.', 'clientes')),
       paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 1 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina} de ${paginas}` }),
-        f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null));
+        f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null,
+      el('details', { class: 'grupo', open: avancado ? true : null }, el('summary', { text: 'Avançado' }), el('div', { class: 'corpo-grupo pilha' },
+        el('div', { class: 'form-2' }, selCj, selPb), el('div', { class: 'acoes' }, btn('Exportar CSV', exportar, 'sec'))))));
 }
 function baixar(nome, texto) {
   const a = el('a', { download: nome, class: 'sr' }); const url = URL.createObjectURL(new Blob(['﻿' + texto], { type: 'text/csv;charset=utf-8' }));
@@ -3007,6 +3012,7 @@ async function pPrompt(c, parte, id) {
     caixa.value = rv.ok ? rv.montado || '' : ''; caixa.focus();
   };
   const versoes = (rh.ok && rh.versoes) || [], porPrompt = (rc.ok && rc.versoes_prompt) || [];
+  const rotPrompt = rotulosPrompt(versoes, porPrompt);
   const selCamp = camps.length > 1 ? el('label', { class: 'campo' }, el('span', { class: 'rot', text: 'Campanha' }),
     el('select', { class: 'entrada', id: 'p-prompt-campanha', onchange: e => irP('prompt', e.target.value) }, camps.map(x => el('option', { value: x.id, text: x.nome, selected: x.id === cid })))) : null;
   trocar(c, cabecalho('Prompt da IA', `${o.nome} · versão ${o.versao}`, etqSit(o.situacao)),
@@ -3024,11 +3030,20 @@ async function pPrompt(c, parte, id) {
         el('div', { class: 'direita acoes' }, btn('O que mudou', () => verVersao('campanha', cid, v.versao), 'fant'),
           editar && v.versao !== o.versao && (v.texto || '') !== atual ? btn('Voltar a esta versão', () => salvar(v.texto || '', 'Voltar à versão ' + v.versao), 'sec') : null)))))
         : vazio('Nenhuma versão ainda.', 'relogio')),
-      cartao('Conversas de cada versão', el('span', { class: 'mudo peq', text: 'últimos 90 dias' }), porPrompt.length ? el('ul', { class: 'lista' }, porPrompt.map(p => el('li', {}, el('div', { class: 'linha' },
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: 'Prompt nº ' + p.prompt_id }), el('div', { class: 't2', text: `desde ${fmtData(p.desde)} · ${pl(p.respostas, 'resposta', 'respostas')} da IA` })),
-        el('div', { class: 'direita acoes' }, btn('Ver o texto', () => verPromptUsado(p.prompt_id), 'fant'),
+      cartao('Conversas de cada versão', el('span', { class: 'mudo peq', text: 'últimos 90 dias' }), porPrompt.length ? el('ul', { class: 'lista' }, porPrompt.map((p, i) => el('li', {}, el('div', { class: 'linha' },
+        el('div', { class: 'cresce' }, el('div', { class: 't1', text: rotPrompt(p, i) }), el('div', { class: 't2', text: `desde ${fmtData(p.desde)} · ${pl(p.respostas, 'resposta', 'respostas')} da IA` })),
+        el('div', { class: 'direita acoes' }, btn('Ver o texto', () => verPromptUsado(p.prompt_id, rotPrompt(p, i)), 'fant'),
           btn('Ver as conversas', () => { est.convP = { resultado: '', campanha_id: cid, conjunto_id: '', anuncio_id: '', prompt_id: String(p.prompt_id), dias: '90', pagina: 0 }; irP('conversas'); }, 'sec'))))))
         : vazio('Nenhuma resposta da IA ainda.', 'conversa'))));
+}
+
+// Um número só (o da versão da campanha): cada prompt usado leva a versão da campanha em vigor quando ele apareceu (a última
+// salva antes da primeira resposta). Se a mesma versão teve dois textos (as regras fixas mudaram), o rótulo diz desde quando.
+function rotulosPrompt(versoes, porPrompt) {
+  const versaoDe = p => { const t = new Date(p.desde).getTime(); const v = versoes.filter(x => new Date(x.criada_em).getTime() <= t).reduce((m, x) => Math.max(m, x.versao), 0);
+    return v || (versoes.length ? Math.min(...versoes.map(x => x.versao)) : 0); };
+  return (p, i) => { const v = versaoDe(p), repetida = porPrompt.some((q, k) => k !== i && versaoDe(q) === v);
+    return (v ? 'Versão ' + v : 'Versão sem número') + (repetida ? ' · regras fixas de ' + fmtData(p.desde) : ''); };
 }
 
 // ---------- Prompt da IA: ver inteiro e testar a conversa (sql/041, DEC-096)
@@ -3050,11 +3065,11 @@ async function verPrompt(alvo) {
       el('p', { class: 'mudo peq', text: 'Depois vêm as mensagens da conversa. Nada disso guarda telefone.' })),
     el('div', { class: 'pe' }, btn('Copiar o prompt', async () => { try { await navigator.clipboard.writeText(r.completo); rapida('Copiado.'); } catch (e) { rapida('Não consegui copiar.'); } }, 'sec'), btn('Fechar', () => fechar(), 'pri'))));
 }
-async function verPromptUsado(promptId) {
+async function verPromptUsado(promptId, rotulo) {
   const r = await chamar('prosp_prompt_texto', { prompt_id: promptId });
   if (!r.ok || !r.texto) { rapida(r.mensagem || 'Este prompt não está mais guardado.'); return; }
   const fechar = janela(el('div', { class: 'janela larga', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'tit-prompt-usado' }, el('div', { class: 'alca', 'aria-hidden': 'true' }),
-    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt-usado', text: 'Prompt que a resposta usou (nº ' + promptId + ')' })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
+    el('div', { class: 'cab' }, el('div', { class: 'texto' }, el('h2', { id: 'tit-prompt-usado', text: 'Prompt que a resposta usou' + (rotulo ? ' (' + rotulo + ')' : '') })), el('button', { class: 'btn-ic', type: 'button', 'aria-label': 'Fechar', onclick: () => fechar() }, icone('fechar'))),
     el('div', { class: 'corpo' }, blocoPrompt('Texto completo (com as regras fixas no fim)', r.texto)), el('div', { class: 'pe' }, btn('Fechar', () => fechar(), 'pri'))));
 }
 // Testar conversa: a mesma montagem e a mesma limpeza da resposta de verdade, pelo workflow 52; sem WhatsApp, sem lead.
@@ -3105,7 +3120,10 @@ async function pConversas(c) {
   await arvoreP();
   est.convP = est.convP || { resultado: '', campanha_id: '', conjunto_id: '', anuncio_id: '', prompt_id: '', dias: '30', pagina: 0 };
   const f = est.convP;
-  const r = await chamar('prosp_conversas', f); if (falhou(c, r, 'Conversas')) return;
+  const [r, rh] = await Promise.all([chamar('prosp_conversas', f), f.campanha_id ? chamar('prosp_prompt_ver', { campanha_id: f.campanha_id, versoes: 'SIM' }) : null]);
+  if (falhou(c, r, 'Conversas')) return;
+  // a versão do prompt só faz sentido dentro de uma campanha (o número é o da versão dela).
+  const porPrompt = r.versoes_prompt || [], rotPrompt = rotulosPrompt((rh && rh.ok && rh.versoes) || [], porPrompt);
   const mudar = (k, v) => { f[k] = v; if (k === 'campanha_id') { f.conjunto_id = ''; f.anuncio_id = ''; f.prompt_id = ''; } if (k === 'conjunto_id') f.anuncio_id = ''; f.pagina = 0; rotear(); };
   const camps = (est.prosp && est.prosp.campanhas) || [];
   const cjs = conjuntosP().filter(j => !f.campanha_id || j.campanha.id === f.campanha_id);
@@ -3119,7 +3137,7 @@ async function pConversas(c) {
         sel('Conjunto', 'conjunto_id', [['', 'Todos os conjuntos'], ...cjs.map(j => [j.id, (f.campanha_id ? '' : j.campanha.nome + ' › ') + j.nome])]),
         sel('Anúncio', 'anuncio_id', [['', 'Todos os anúncios'], ...ans.map(a => [a.id, a.nome])]),
         sel('Período', 'dias', [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias']]),
-        sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...(r.versoes_prompt || []).map(v => [String(v.prompt_id), `Prompt nº ${v.prompt_id} · desde ${fmtData(v.desde)} · ${pl(v.respostas, 'resposta', 'respostas')}`])])),
+        f.campanha_id ? sel('Versão do prompt', 'prompt_id', [['', 'Todas as versões do prompt'], ...porPrompt.map((v, i) => [String(v.prompt_id), `${rotPrompt(v, i)} · ${pl(v.respostas, 'resposta', 'respostas')}`])]) : null),
       (r.conversas || []).length ? r.conversas.map(cv => cartao(cv.nome || cv.lead_id, etqRes(cv.resultado),
         corpo(el('p', { class: 'mudo peq', text: [cv.lead_id, `${nomeP('campanha', cv.campanha_id)} › ${nomeP('conjunto', cv.conjunto_id)}${cv.anuncio_id ? ' › ' + nomeP('anuncio', cv.anuncio_id) : ''}`,
             [cv.cidade, cv.nicho].filter(Boolean).join(' · '), 'última mensagem ' + fmtHora(cv.ultimo_contato_em), fmtNum(cv.ia_mensagens) + ' da IA', cv.passou_para_voce ? 'passou para você' : null].filter(Boolean).join(' · ') }),

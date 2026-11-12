@@ -55,3 +55,4 @@
 .p-barrada { color: var(--perigo-texto); font-weight: 600; }
 .janela.larga { width: min(820px, 100%); }
 /* Sugerir melhorias (DEC-098) */
+.p-etq-lead { margin-top: var(--e-1); }

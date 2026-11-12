@@ -270,7 +270,7 @@ export const PROSP = {
     : { ok: true, editavel: { texto: 'Você é a assistente virtual da RXSync…', origem: 'campanha' }, montado: 'Você é a assistente virtual da RXSync (montado pelos campos).',
       fixas: 'REGRAS QUE NUNCA MUDAM:\n- Você é uma assistente virtual (inteligência artificial)…', completo: 'tudo', contato_modelo: 'Dados do contato: negócio "[negócio]"…', modelo: 'gpt-x', max_tokens: 400, memoria: 20, aviso: '' },
   prosp_simular: () => ({ ok: true, texto: 'O Essencial custa R$ 299 por mês, e os primeiros 7 dias são grátis.', marca: 'INTERESSE', barrada: null, origem: 'campanha' }),
-  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, versoes_prompt: [{ prompt_id: 7, desde: '2026-10-10T10:00:00Z', respostas: 12 }],
+  prosp_conversas: () => ({ ok: true, total: 1, pagina: 0, versoes_prompt: [{ prompt_id: 9, desde: '2026-10-15T10:00:00Z', respostas: 4 }, { prompt_id: 7, desde: '2026-10-10T10:00:00Z', respostas: 12 }],
     conversas: [{ lead_id: 'PX-AAAAA', nome: 'Sorriso Batel', nicho: 'dentista', cidade: 'Curitiba', campanha_id: 'CMP-0001', conjunto_id: 'CJ-0001', anuncio_id: 'AN-0001', situacao: 'recusou',
       resultado: 'recusou', ultimo_contato_em: '2026-10-15T12:00:00Z', ia_mensagens: 0, passou_para_voce: false,
       mensagens: [{ direcao: 'saiu', autor: 'disparo', texto: 'Oi! Vi a Sorriso Batel no Maps.', quando: '2026-10-15T11:00:00Z', prompt_id: null }, { direcao: 'entrou', autor: 'lead', texto: 'Não, obrigado.', quando: '2026-10-15T12:00:00Z', prompt_id: null }] }] }),

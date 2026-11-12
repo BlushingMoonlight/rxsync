@@ -187,7 +187,7 @@ const CASOS = [
   { acao: 'prosp_numero_desconectar', rota: P + '/numeros', abrirCom: () => botao('Desconectar').click(), espera: { id: 1 } },
   { acao: 'prosp_numero_webhook', rota: P + '/numeros', abrirCom: () => botao('Webhook de novo').click(), espera: { id: 1 } },
   { acao: 'prosp_numero_apagar', rota: P + '/numeros', abrirCom: () => botao('Apagar').click(), nome: 'prospec-01', espera: { id: 1 } },
-  { acao: 'prosp_exportar', rota: P + '/leads', abrirCom: () => botao('Exportar CSV').click(), espera: { conjunto_id: '', situacao: '' } },
+  { acao: 'prosp_exportar', rota: P + '/leads', abrirCom: async () => { await abrirGrupo('Avançado'); await botao('Exportar CSV').click(); }, espera: { conjunto_id: '', situacao: '' } },
   { acao: 'prosp_lead_assumir', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Assumir a conversa').click(), espera: { id: 'PX-AAAAA' } },
   { acao: 'prosp_lead_devolver', rota: P + '/lead/PX-DDDDD', abrirCom: () => botao('Devolver à IA').click(), espera: { id: 'PX-DDDDD' } },
   { acao: 'prosp_lead_marcar', rota: P + '/lead/PX-AAAAA', abrirCom: () => botao('Marcar').click(), campos: { situacao: 'recusou' }, espera: { id: 'PX-AAAAA', situacao: 'recusou' } },
@@ -323,15 +323,31 @@ await page.fill('input.codigo', '123456'); await page.click('button[type=submit]
   await abrirGrupo('Entrega'); await page.selectOption('#p-entrega-fuso', 'America/Manaus');
   ok(await page.locator('#conteudo .p-pub[data-id="PB-0003"]').isEnabled() && await page.locator('#conteudo .p-pub[data-id="PB-0002"]').isDisabled() && await page.locator('#conteudo .p-pub[data-id="PB-0001"]').isEnabled(),
     'conjunto: trocar o fuso da entrega troca os públicos que dá para escolher (o já escolhido fica, o servidor recusa)');
-  const filtrou = async (rota, sel, valor, acao, campo) => { await abrir(rota); const desde = chamadas.length; await page.selectOption(sel, valor);
+  const filtrou = async (rota, sel, valor, acao, campo, avancado) => { await abrir(rota); if (avancado) await abrirGrupo('Avançado'); const desde = chamadas.length; await page.selectOption(sel, valor);
     for (let i = 0; i < 60; i++) { const c = chamadas.slice(desde).find(x => x.acao === acao); if (c) return c.dados[campo]; await page.waitForTimeout(50); } return null; };
-  ok(await filtrou(P + '/leads', '#conteudo select[aria-label="Público"]', 'PB-0001', 'prosp_leads', 'publico_id') === 'PB-0001', 'leads: filtro por público');
+  // Leads (decisão 11 do plano, DEC-211): o "Exportar CSV" e os filtros por conjunto e por público num "Avançado" fechado, no fim.
+  await abrir(P + '/leads');
+  ok(!(await botao('Exportar CSV').isVisible()) && !(await page.locator('#conteudo select[aria-label="Público"]').isVisible()) && !(await page.locator('#conteudo select[aria-label="Conjunto"]').isVisible()),
+    'leads: "Exportar CSV" e os filtros por conjunto e por público fora da vista normal');
+  ok(await page.evaluate(() => { const d = [...document.querySelectorAll('#conteudo details.grupo')].find(x => x.querySelector('summary').textContent === 'Avançado'), l = document.querySelector('#conteudo .lista');
+    return !!d && !d.open && !!l && !!(l.compareDocumentPosition(d) & Node.DOCUMENT_POSITION_FOLLOWING) && !d.nextElementSibling; }),
+    'leads: o "Avançado" fechado, no fim da lista');
+  await page.setViewportSize({ width: 390, height: 844 }); await abrir(P + '/leads');
+  const caixas = await page.locator('#conteudo .lista button.linha').evaluateAll(bs => bs.map(b => { const s = b.querySelector(':scope > svg.icone'), n = b.querySelector('.cresce'); const rs = s.getBoundingClientRect(), rn = n.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    return rs.left >= rn.right - 1 && rs.top < rn.bottom && rs.bottom > rn.top && rb.right - rs.right < 24; }));
+  ok(caixas.length > 0 && caixas.every(Boolean), 'leads a 390 px: a setinha à direita do nome, na mesma linha');
+  await page.setViewportSize({ width: 1180, height: 820 });
+  ok(await filtrou(P + '/leads', '#conteudo select[aria-label="Público"]', 'PB-0001', 'prosp_leads', 'publico_id', true) === 'PB-0001', 'leads: filtro por público (no "Avançado")');
+  // Prompt da IA: um número só, o da versão da campanha (nada de "Prompt nº").
+  await abrir(P + '/prompt/CMP-0001'); await page.waitForTimeout(200);
+  const conv = await page.locator('#conteudo .cartao', { hasText: 'Conversas de cada versão' }).innerText();
+  ok(/Versão 2/.test(conv) && /Versão 1/.test(conv) && !/nº/.test(await page.locator('#conteudo').innerText()), 'prompt: "Conversas de cada versão" com o número da versão da campanha');
   await abrir(P + '/relatorio'); const desde = chamadas.length; await page.getByRole('button', { name: '90 dias' }).click();
   const d = await chamada('prosp_relatorio', desde);
   ok(d && d.nivel === 'campanha' && !d.detalhar, `relatório simples: por campanha, sem detalhar (${JSON.stringify(d)})`);
   await page.waitForTimeout(200);
   ok(await page.locator('#conteudo table th[scope=row]', { hasText: 'Odonto Sul' }).count() >= 1, 'relatório: linha por campanha, com o nome');
-  feitos += 5;
+  feitos += 9;
 }
 // Prospecção: o QR só na tela. Aparece na janela; nada dele vai para o armazenamento do navegador ou o endereço; some ao
 // fechar a janela e quando a Central vai para o fundo.
