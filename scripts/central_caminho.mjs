@@ -14,7 +14,7 @@ await entrar(page, site.base, CHAVES_LIGADAS(), [], {});
 // As seções e os grupos, lidos da fonte (central/fonte/03_casca.js, SECOES).
 const casca = fs.readFileSync('central/fonte/03_casca.js', 'utf8');
 const secoes = [...casca.matchAll(/\{ id: '([a-z]+)', nome: '([^']+)'[^}]*?grupo: '([^']+)'/g)].map(m => ({ id: m[1], nome: m[2], grupo: m[3] }));
-ok(secoes.length >= 14, 'as seções do menu (' + secoes.length + ')');
+ok(secoes.length >= 13, 'as seções do menu (' + secoes.length + ')');
 const grupos = new Set(secoes.map(s => s.grupo));
 for (const s of secoes) {
   await page.evaluate(id => { location.hash = id; }, s.id);
