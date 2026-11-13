@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-t4Akr3lCiDWMklUxgpfBcNeV8VfEdGmZ4g8V2x/kuTk='; style-src 'sha256-SByVh6jJKhXZk5P9po6KQBv748DAZK178GBaipKWvlA='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-7sgiTKDkil/rcdFe4eMYDzh+tJhwGSrn9Q9uV3GNFa0='; style-src 'sha256-7pCDMZdaAQe60umTTyovTiTB5ZBvPjTkDa7idU26hLY='; font-src 'self'; img-src 'self' data:; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFFFFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -482,20 +482,6 @@ table.ad td.depois { font-weight: 600; color: var(--texto); }
 .ia-form textarea { resize: vertical; min-height: 72px; }
 .ia-form .acoes { justify-content: flex-end; }
 .ia-mensagens { box-shadow: none; border: 1px solid var(--borda); }
-/* ---------- Marketing › Demonstrações (central/fonte/09_demonstracoes.js) ---------- */
-/* As 6 cores prontas da demonstração (sql/056): texto branco em cima, contraste acima de 4,5:1 nos dois temas. */
-.dem-cor-verde { background: #1e6b47; } .dem-cor-azul { background: #1f5fa8; } .dem-cor-petroleo { background: #0f5e68; }
-.dem-cor-vinho { background: #8a2440; } .dem-cor-roxo { background: #5b3a9e; } .dem-cor-grafite { background: #3d4451; }
-.avatar[class*="dem-cor-"] { color: #ffffff; }
-.dem-cores { display: flex; flex-wrap: wrap; gap: var(--e-2); }
-.dem-cor { display: inline-flex; align-items: center; gap: var(--e-2); min-height: var(--alvo); padding: 0 var(--e-3); border: 1px solid var(--borda-forte); border-radius: var(--r-cheio);
-  background: var(--superficie); color: var(--texto); font: inherit; font-size: var(--t-14); cursor: pointer; }
-.dem-cor[aria-checked="true"] { border-color: var(--primaria); outline: 2px solid var(--primaria); outline-offset: 0; font-weight: 600; }
-.dem-cor:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
-.dem-amostra { width: 20px; height: 20px; border-radius: 50%; flex: none; }
-.dem-endereco { font-size: 15px; letter-spacing: 0; margin-bottom: var(--e-3); }
-.dem-mensagem { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--superficie-2); border-radius: var(--r-2); padding: var(--e-3); margin: 0 0 var(--e-3); }
-.rot-mensagem { margin: var(--e-3) 0 var(--e-1); }
 /* ---------- Marketing › Prospecção (central/fonte/08_prospeccao.js) ---------- */
 .abas-p { margin: 0; padding: 0; }
 .p-camada { display: flex; align-items: center; min-width: 0; }
@@ -751,7 +737,6 @@ function nivelDe(acao, d) {
   d = d || {};
   if (acao === 'editar_limites' && String((d.campos || {}).limitar_franquia || '').toUpperCase() === 'SIM') return 2;
   // Prospecção (sql/031, DEC-078): as mesmas regras de rx_central_nivel. Desligar ou pausar é um toque.
-  // Demonstrações (sql/056, DEC-125): ligar os links (demo_links) é nível 2.
   // IA da Central (sql/061, DEC-145): ligar o assistente (tela_assistente) é nível 2.
   // Termos v7 (sql/063): ligar a termos_v7 é nível 3. Chave que o servidor sobe sem estar aqui: mudarChave pergunta de novo.
   if (acao === 'ligar_chave') return d.valor !== 'SIM' ? 1 : NIVEL_CHAVE[d.chave] || 1;
@@ -764,7 +749,7 @@ function nivelDe(acao, d) {
   return n >= 1 && n <= 3 ? n : 2; // ação sem nível conhecido: pede pelo menos o Confirmar
 }
 // Ligar estas chaves pede nível (desligar é sempre um toque). No nível 3, o nome que se digita é o do servidor.
-const NIVEL_CHAVE = { prosp_busca: 2, prosp_ia: 2, demo_links: 2, tela_assistente: 2, prosp_disparo: 3, termos_v7: 3 };
+const NIVEL_CHAVE = { prosp_busca: 2, prosp_ia: 2, tela_assistente: 2, prosp_disparo: 3, termos_v7: 3 };
 const NOME_NIVEL3_CHAVE = { prosp_disparo: 'Disparo de prospecção', termos_v7: 'Termos v7' };
 // Pede o que a ação precisa (campos, antes/depois, nome da clínica) e devolve os dados prontos para mandar, ou null.
 // op: { titulo, texto, linhas, campos: [{k, rot, tipo, valor, opcoes, longo, obrig, minimo, erro, ajuda, min, max, ph}], nome, botao, perigo }
@@ -982,7 +967,6 @@ const SECOES = [
   { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', chave: 'tela_dinheiro', desc: 'Receita, pagantes e cobranças' },
   { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Operação', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Vendas', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
-  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
@@ -992,7 +976,7 @@ const SECOES = [
   { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Sistema', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
   { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Sistema', desc: 'Liga e desliga telas e edições, aparência' }
 ];
-const TRILHO = ['hoje', 'clientes', 'prospeccao', 'demonstracoes', 'avisos', 'financeiro'];   // iPad em pé
+const TRILHO = ['hoje', 'clientes', 'prospeccao', 'avisos', 'financeiro'];   // iPad em pé
 const BARRA = ['hoje', 'clientes', 'prospeccao', 'avisos'];                                     // celular
 const naLista = l => l.map(id => SECOES.find(s => s.id === id)).filter(s => s && visivel(s));
 const visivel = s => !(s.escondeDesligada && !ligada(s.chave));
@@ -1127,8 +1111,7 @@ const TIPOS = {
   prosp_token_recusado: 'Prospecção: token recusado', prosp_busca: 'Prospecção: busca', prosp_conjunto_pausado: 'Prospecção: conjunto pausado', prosp_regra: 'Prospecção: regra automática',
   prosp_saiu: 'Prospecção: pediu para sair', prosp_interesse: 'Prospecção: mostrou interesse', prosp_quer_contratar: 'Prospecção: quer contratar', prosp_recusou: 'Prospecção: recusou',
   prosp_respondeu: 'Prospecção: respondeu', prosp_cliente: 'Prospecção: virou cliente', prosp_cadastro: 'Prospecção: fez o cadastro', prosp_com_voce: 'Prospecção: conversa com você',
-  prosp_resumo_do_dia: 'Prospecção: resumo do dia',
-  demo_aberta: 'Demonstração aberta', demo_conversar: 'Demonstração: quer conversar', demo_escopo: 'Demonstração: escopo enviado'
+  prosp_resumo_do_dia: 'Prospecção: resumo do dia'
 };
 const CATEGORIAS = ['alertas', 'falhas', 'clientes', 'financeiro', 'vendas', 'suporte', 'painel', 'sistema', 'entradas', 'avx'];
 const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisa de você' };
@@ -1896,8 +1879,7 @@ const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', b
   cancelamento_agendar: 'Cancelamento agendado', cancelamento_desfazer: 'Cancelamento desfeito', link_reenviado: 'Link reenviado', token_painel_novo: 'Link novo do painel',
   cobranca_teste_cliente: 'Clínica de teste da cobrança', chave_api_limites: 'Limites da chave da API',
   prosp_salvar: 'Prospecção: camada salva', prosp_duplicar: 'Prospecção: cópia', prosp_ligar: 'Prospecção: ligou ou pausou', prosp_encerrar: 'Prospecção: encerrada', prosp_apagar: 'Prospecção: rascunho apagado',
-  prosp_numero: 'Prospecção: número de WhatsApp', prosp_regra: 'Prospecção: regra', prosp_custos: 'Prospecção: custos', prosp_lead: 'Prospecção: lead', prosp_buscar: 'Prospecção: busca pedida', prosp_exportar: 'Prospecção: exportação',
-  dem_criar: 'Demonstração: link criado', dem_editar: 'Demonstração: link editado', dem_desativar: 'Demonstração: link desativado', dem_reativar: 'Demonstração: link reativado', dem_apagar: 'Demonstração: link apagado' };
+  prosp_numero: 'Prospecção: número de WhatsApp', prosp_regra: 'Prospecção: regra', prosp_custos: 'Prospecção: custos', prosp_lead: 'Prospecção: lead', prosp_buscar: 'Prospecção: busca pedida', prosp_exportar: 'Prospecção: exportação' };
 const DESFAZIVEIS = ['edicao_limites', 'chave_api_criada', 'edicao_assistente', 'edicao_configuracoes', 'edicao_recursos', 'recurso_liberado'];
 const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como);
   if (d.finalidade) p.push(d.finalidade === 'senha' ? 'troca de senha' : 'entrada'); if (d.prefixo) p.push(d.prefixo + '…');
@@ -1968,7 +1950,6 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   editar_cobranca: 'Cobrança', editar_teste: 'Estender o teste', editar_situacao: 'Situação (suspender, pausar, cancelar)', editar_links: 'Links da clínica', cobranca_teste_cliente: 'Clínica de teste da cobrança', asaas_ambiente: 'Ambiente do Asaas',
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
-  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
   termos_v7: 'Termos v7 para quem já é cliente', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && !['tela_cliente_sensivel', 'tela_assistente'].includes(k.chave)],
@@ -1977,9 +1958,8 @@ const GRUPOS_CHAVE = [
   ['Edições de baixo risco', k => ['editar_assistente', 'editar_configuracoes', 'editar_recursos', 'editar_limites', 'editar_onboarding', 'editar_links', 'liberar_recursos'].includes(k.chave)],
   ['Dinheiro, situação e empresa', k => ['editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste', 'editar_situacao', 'editar_empresa'].includes(k.chave)],
   ['Enterprise', k => ['editar_chaves_api', 'editar_avisos_eventos'].includes(k.chave)],
-  ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)],
-  ['Demonstrações', k => ['tela_demonstracoes', 'editar_demonstracoes', 'demo_links'].includes(k.chave)]];
-// Ligar algumas chaves pede nível (NIVEL_CHAVE: busca, IA, links e assistente, 2; disparo e Termos v7, 3, com o nome);
+  ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)]];
+// Ligar algumas chaves pede nível (NIVEL_CHAVE: busca, IA e assistente, 2; disparo e Termos v7, 3, com o nome);
 // desligar continua num toque (DEC-078). Se o servidor pedir um nível maior (ou outro nome no nível 3) do que a página
 // sabia, a janela abre de novo, uma vez, no nível dele, em vez de só mostrar "Toque em Confirmar para seguir".
 // A senha (nível 3 com a última há mais de 12 horas) é pedida pelo chamar e repetida uma vez.
@@ -1987,10 +1967,9 @@ const TEXTO_CHAVE = {
   prosp_disparo: 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.',
   prosp_busca: 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.',
   prosp_ia: 'A IA passa a responder os leads das campanhas com a IA ligada.',
-  demo_links: 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos em Avisos.',
   tela_assistente: 'As perguntas e o que as telas da Central mostram vão à OpenAI, sem o "nunca" (CPF, CNPJ, senhas, chaves, dados de pacientes e o texto das conversas; e-mails e telefones mascarados). Nada muda sem o seu Confirmar.',
   termos_v7: 'Os Termos v7 passam a valer para quem já é cliente, com os 30 dias do aviso contados de hoje. Desligar depois não volta a v6 nem muda a data.' };
-const ROTULO_CHAVE = { demo_links: 'os médicos passam a ver', tela_assistente: 'dados de clientes vão à OpenAI', termos_v7: 'não tem volta', prosp_disparo: 'manda ou gasta de verdade', prosp_busca: 'manda ou gasta de verdade', prosp_ia: 'manda ou gasta de verdade' };
+const ROTULO_CHAVE = { tela_assistente: 'dados de clientes vão à OpenAI', termos_v7: 'não tem volta', prosp_disparo: 'manda ou gasta de verdade', prosp_busca: 'manda ou gasta de verdade', prosp_ia: 'manda ou gasta de verdade' };
 const SEM_DESFAZER = ['termos_v7'];   // desligar não desfaz a troca dos Termos
 async function mudarChave(chave, valor, desfazendo, pedido) {
   const nome = NOME_CHAVE[chave] || chave;
@@ -2026,10 +2005,6 @@ TELAS.ajustes = async c => {
     if (k.chave === 'tela_assistente' && k.valor !== 'SIM' && !ligada('assistente_politica'))
       return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v18 publicada (chave só por PR) · ' + k.chave })),
         el('div', { class: 'direita' }, etq('travado', 'atencao'))));
-    // Os links de demonstração ficam travados até a Política v17 publicada (chave só por PR, DEC-125).
-    if (k.chave === 'demo_links' && k.valor !== 'SIM' && !ligada('demo_politica_v17'))
-      return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v17 publicada (chave só por PR) · ' + k.chave })),
-        el('div', { class: 'direita' }, etq('travado', 'atencao'))));
     const controle = k.so_por_sql || !['SIM', 'NAO'].includes(k.valor)
       ? etq((k.valor === 'SIM' ? 'ligada' : k.valor === 'NAO' ? 'desligada' : (k.valor || 'vazio')) + ' · só por PR', '', true)
       : el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(k.valor === 'SIM'), 'aria-label': nome, onclick: e => { const t = e.currentTarget; const novo = t.getAttribute('aria-checked') === 'true' ? 'NAO' : 'SIM'; t.setAttribute('aria-checked', String(novo === 'SIM')); mudarChave(k.chave, novo); } });
@@ -2055,7 +2030,7 @@ TELAS.mais = async c => {
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: s.nome }), el('div', { class: 't2', text: s.desc || '' })), icone('seta')));
   const grupo = g => SECOES.filter(s => s.grupo === g && visivel(s));
   // DEC-191: 3 grupos curtos (Análise, Sistema e Conta). Antes deles, só o que não cabe na barra deste aparelho
-  // (no celular: Financeiro e Demonstrações; no iPad em pé, nada).
+  // (no celular: Financeiro; no iPad em pé, nada).
   const fora = SECOES.filter(s => ['Operação', 'Vendas'].includes(s.grupo) && visivel(s) && !BARRA.includes(s.id));
   const foraTrilho = s => TRILHO.includes(s.id);
   trocar(c, cabecalho('Mais'),
@@ -2749,7 +2724,7 @@ async function pPublico(c, parte, id, sub) {
           porQueCaiu(b.contagens)),
         el('div', { class: 'direita' }, etq(b.situacao === 'feita' ? 'feita' : b.situacao === 'falhou' ? 'falhou' : b.situacao === 'rodando' ? 'buscando' : 'na fila', b.situacao === 'feita' ? 'ok' : b.situacao === 'falhou' ? 'perigo' : 'info'))))))) : null,
       arquivar ? cartao('Mais', null, corpo(el('div', { class: 'acoes' }, arquivar))) : null,
-      el('p', { class: 'mudo peq', text: 'O telefone aparece só com os 4 últimos dígitos. No envio, tudo é conferido de novo: "não contatar", clientes, demonstração, órgão público, 60 dias entre campanhas, prazo e fuso.' })));
+      el('p', { class: 'mudo peq', text: 'O telefone aparece só com os 4 últimos dígitos. No envio, tudo é conferido de novo: "não contatar", clientes, quem pediu demonstração, órgão público, 60 dias entre campanhas, prazo e fuso.' })));
 }
 
 // ---------- Números de WhatsApp (o QR só na tela)
@@ -2875,8 +2850,6 @@ async function pLead(c, parte, id) {
     if (l.situacao === 'com_voce' || l.assumido_em) acoes.push(btn('Devolver à IA', () => fazer('prosp_lead_devolver', { id: l.id }, { titulo: 'Devolver a conversa à IA', linhas: [['Conversa', 'com você', 'com a IA (na próxima mensagem do lead)']], depois: recarregar }), 'sec'));
     if (!['saiu', 'cliente'].includes(l.situacao)) acoes.push(btn('Marcar', () => fazer('prosp_lead_marcar', { id: l.id }, { titulo: 'Marcar o lead ' + l.id,
       campos: [{ k: 'situacao', rot: 'Situação', opcoes: [['positivo', 'Positivo'], ['recusou', 'Recusou'], ['cadastrou', 'Cadastrou'], ['com_voce', 'Com você']] }], ok: 'Marcado.', depois: recarregar }), 'sec'));
-    // a demonstração para este lead, com a clínica, a cidade e o PX- já preenchidos.
-    if (ligada('editar_demonstracoes') && !['saiu'].includes(l.situacao)) acoes.push(btn('Criar demonstração', () => { est.demPrefill = { clinica: l.nome || '', cidade: l.cidade || '', lead_codigo: l.id }; ir('demonstracoes/novo'); }, 'sec', 'demonstracao'));
     if (l.situacao !== 'saiu') acoes.push(btn('Não contatar', () => fazer('prosp_lead_nao_contatar', { id: l.id }, { titulo: 'Não contatar ' + (l.nome || l.id), perigo: true, botao: 'Não contatar',
       linhas: [['Este número', 'pode receber', 'nunca mais, em nenhuma campanha']], texto: 'Guarda só o resumo do telefone (DEC-073). Os dados do lead saem em 30 dias.', ok: 'Não contatar.', depois: recarregar }), 'perigo-sec'));
   }
@@ -3147,232 +3120,6 @@ async function pConversas(c) {
           el('div', { class: 'acoes' }, btn('Abrir o lead', () => irP('lead', cv.lead_id), 'sec'))))) : cartao(null, null, vazio('Nenhuma conversa respondida com esse filtro.', 'conversa')),
       paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 0 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina + 1} de ${paginas}` }),
         f.pagina + 1 < paginas ? btn('Próximas', () => { f.pagina++; rotear(); }, 'sec') : null) : null));
-}
-
-// ==== 09_demonstracoes.js
-// ---------------------------------------------------------------- Marketing › Demonstrações (sql/056, DEC-125)
-// Um link de demonstração por clínica (rxsync.com.br/demo/clinica/#CODIGO): criar, mandar pelo WhatsApp do Jean e ver o
-// uso (visitas, telas, toques, perguntas, escopo marcado e "Quero conversar"). Sem telefone do médico: o link vai pela
-// mensagem que o Jean copia. A anotação e a mensagem só aparecem aqui; a demonstração recebe só o que vai na tela.
-ICONES.demonstracao = 'M3.5 5.5h17v11h-17zM8.5 20h7M12 16.5V20M10 8.5l4.5 2.5-4.5 2.5z';
-ICONES.copiar = 'M8.5 8.5h11v11h-11zM15.5 8.5v-4h-11v11h4';
-
-const DEM_SIT = { nunca_abriu: ['nunca abriu', 'atencao'], abriu: ['abriu', 'info'], ativo_hoje: ['ativo hoje', 'ok'], desativado: ['desativado', ''], vencido: ['vencido', ''] };
-const etqDem = s => { const [t, tom] = DEM_SIT[s] || [s || '—', '']; return etq(t, tom); };
-const DEM_FILTROS = [['todos', 'Todos'], ['nunca_abriu', 'Nunca abriu'], ['abriu', 'Abriu'], ['ativo_hoje', 'Ativo hoje'], ['inativos', 'Desativados e vencidos']];
-const DEM_CORES = [['verde', 'Verde'], ['azul', 'Azul'], ['petroleo', 'Petróleo'], ['vinho', 'Vinho'], ['roxo', 'Roxo'], ['grafite', 'Grafite']];
-const DEM_ESPEC = ['Endocrinologia', 'Nutrologia', 'Medicina do esporte', 'Clínica geral', 'Nutrição'];
-const DEM_ESCOLHA = { quero: ['Quero', 'ok'], duvida: ['Tenho dúvida', 'atencao'], nao_preciso: ['Não preciso', ''] };
-const DEM_PAGINA = { entrada: 'Entrada', app: 'App do paciente', central: 'Central do médico', escopo: 'Escopo' };
-const DEM_APARELHO = { celular: ['celular', 'celulares'], tablet: ['tablet', 'tablets'], computador: ['computador', 'computadores'] };
-// Os itens do escopo da demonstração (a mesma numeração de demo/clinica/escopo/itens.js; o verificar_site.mjs confere).
-const DEM_ITENS = ['Entrar pelo link', 'Marca da clínica', 'Ícone na tela do celular', 'Boas-vindas e aceite', 'Perfil e objetivo', 'Tela inicial', 'Registrar refeição',
-  'Porção e nutrientes', 'Metas do dia', 'Plano alimentar', 'Água', 'Sono', 'Atividade física', 'Humor', 'Fome e saciedade', 'Intestino', 'Outros registros', 'Remédios e vitaminas',
-  'Peso e medidas', 'Gráficos de evolução', 'Avaliação da consulta', 'Fotos de progresso', 'Aplicações', 'Lembrete da aplicação', 'Rodízio do local', 'Como se sentiu',
-  'Sintomas que avisam a equipe', 'Minhas consultas', 'Avisos da clínica', 'Lembretes', 'Conteúdo da clínica', 'Enviar exames', 'Equipe e contatos', 'Chat com a equipe', 'Conquistas',
-  'Assistente de dúvidas', 'Meus dados', 'Leitura confortável', 'Pacientes da semana', 'Alertas', 'Ficha do app', 'Evolução do paciente', 'Metas e plano alimentar',
-  'Prescrição das aplicações', 'Avisos e conteúdo', 'Funções do app', 'Manual de uso', 'Fluxogramas', 'Ajuda pela IA', 'Primeiro acesso guiado no app',
-  'Primeiro acesso guiado na central', 'IA do paciente (personal)',
-  'Personal no WhatsApp', 'IA da central', 'Ações pela IA com confirmação', 'Registro da IA', 'Consumo de IA'];
-const nomeItem = n => DEM_ITENS[n - 1] ? `${n}. ${DEM_ITENS[n - 1]}` : 'Item ' + n;
-const irD = (...partes) => ir(['demonstracoes', ...partes.filter(x => x != null && x !== '').map(x => encodeURIComponent(x))].join('/'));
-const minutos = s => { const m = Math.round((Number(s) || 0) / 60); return m < 1 ? 'menos de 1 min' : fmtNum(m) + ' min'; };
-const avatarDem = l => el('span', { class: 'avatar dem-cor-' + (l.cor || 'grafite'), text: iniciais(l.clinica), 'aria-hidden': 'true' });
-est.demFiltro = null;
-est.demVer = null; // o último "Ver como o médico vê" (link de 15 minutos), só na memória
-
-async function copiar(texto, ok) {
-  try { await navigator.clipboard.writeText(texto); rapida(ok || 'Copiado.'); } catch (e) { rapida('Não consegui copiar: selecione e copie à mão.'); }
-}
-
-TELAS.demonstracoes = async (c, [parte, a, b]) => {
-  if (!ligada('tela_demonstracoes')) { topo('Demonstrações', [['Vendas'], ['Demonstrações']]); falhou(c, { desligada: true, chave: 'tela_demonstracoes' }, 'Demonstrações'); return; }
-  if (parte === 'novo') return dForm(c, null);
-  if (parte === 'link' && b === 'editar') return dEditar(c, a);
-  if (parte === 'link') return dLink(c, a);
-  if (parte === 'visita') return dVisita(c, a, b);
-  return dLista(c);
-};
-
-// Aviso quando os links estão desligados (chave demo_links): a demonstração mostra "não está mais ativo" a todos.
-function avisoLinksDesligados() {
-  if (ligada('demo_links')) return null;
-  return el('div', { class: 'aviso atencao' }, icone('alerta'), el('div', {}, el('b', { text: 'Os links estão desligados. ' }),
-    ligada('demo_politica_v17') ? ['Quem abrir vê "não está mais ativo". ', ligada('editar_demonstracoes') ? btn('Ligar os links', async () => { await mudarChave('demo_links', 'SIM'); await rotear(); }, 'sec') : 'Ligue em Ajustes da Central (Links de demonstração).']
-      : 'Quem abrir vê "não está mais ativo". Eles só ligam depois da Política v17 publicada (chave só por PR).'));
-}
-
-// ---------- lista
-async function dLista(c) {
-  topo('Demonstrações', [['Vendas'], ['Demonstrações']]);
-  est.demFiltro = est.demFiltro || { filtro: 'todos', busca: '', pagina: 1 };
-  const f = est.demFiltro;
-  const r = await chamar('dem_lista', { filtro: f.filtro, busca: f.busca, pagina: f.pagina }); if (falhou(c, r, 'Demonstrações')) return;
-  const ct = r.contagem || {}, total = r.total || 0, paginas = Math.max(1, Math.ceil(total / 50)), editar = ligada('editar_demonstracoes');
-  const busca = el('input', { class: 'entrada', type: 'search', placeholder: 'Clínica, médico, cidade ou PX-…', 'aria-label': 'Buscar link', autocomplete: 'off', enterkeyhint: 'search', value: f.busca || null });
-  const buscar = () => { f.busca = busca.value.trim(); f.pagina = 1; rotear(); };
-  busca.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); buscar(); } });
-  const linha = l => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('link', l.id) }, avatarDem(l),
-    el('div', { class: 'cresce' }, el('div', { class: 't1', text: l.clinica }),
-      el('div', { class: 't2', text: [`DEM-${l.id}`, `${l.tratamento} ${l.medico}`, l.especialidade, l.cidade, l.lead_codigo,
-        l.ultimo_acesso ? 'último acesso ' + fmtHora(l.ultimo_acesso) : 'criado em ' + fmtData(l.criada_em), pl(l.visitas, 'visita', 'visitas')].filter(Boolean).join(' · ') })),
-    el('div', { class: 'direita' }, l.conversar_em ? etq('quer conversar', 'atencao', true) : null, etqDem(l.situacao)), icone('seta')));
-  trocar(c, cabecalho('Demonstrações', 'um link por clínica: o app e a central de exemplo com o nome dela', editar ? btn('Novo link', () => irD('novo'), 'pri', 'mais_um') : null),
-    el('div', { class: 'pilha' }, avisoLinksDesligados(),
-      el('div', { class: 'filtros', role: 'toolbar', 'aria-label': 'Situação do link' }, DEM_FILTROS.map(([k, nome]) => el('button', { type: 'button', 'aria-pressed': String(f.filtro === k),
-        onclick: () => { f.filtro = k; f.pagina = 1; rotear(); } }, nome, el('span', { class: 'n', text: fmtNum(ct[k]) })))),
-      el('div', { class: 'p-busca' }, busca, btn('Buscar', buscar, 'sec', 'busca')),
-      cartao(null, null, (r.links || []).length ? el('ul', { class: 'lista' }, r.links.map(linha))
-        : vazio(ct.todos ? 'Nenhum link com esse filtro.' : 'Nenhum link ainda. Crie o primeiro com o nome da clínica e do médico.', 'demonstracao')),
-      paginas > 1 ? el('div', { class: 'acoes' }, f.pagina > 1 ? btn('Anteriores', () => { f.pagina--; rotear(); }, 'sec') : null, el('span', { class: 'mudo peq p-pagina', text: `página ${f.pagina} de ${paginas}` }),
-        f.pagina < paginas ? btn('Próximos', () => { f.pagina++; rotear(); }, 'sec') : null) : null));
-}
-
-// ---------- formulário (criar e editar): os mesmos campos; a validade é em dias ao criar e em data ao editar
-function camposDem(l) {
-  // vindo do lead da prospecção, a clínica, a cidade e o PX- já vêm preenchidos (só no link novo).
-  const v = l || est.demPrefill || {};
-  if (!l) est.demPrefill = null;
-  const entrada = (k, rot, props, ajuda) => { const i = el('input', { class: 'entrada', id: 'd-' + k, autocomplete: 'off', spellcheck: 'false', value: v[k] == null ? null : String(v[k]), ...props });
-    return [i, el('label', { class: 'campo', for: 'd-' + k }, el('span', { class: 'rot', text: rot }), i, ajuda ? el('span', { class: 'ajuda', text: ajuda }) : null)]; };
-  const [clinica, cClinica] = entrada('clinica', 'Nome da clínica', { maxlength: '60', required: true }, 'Aparece no app, na central e no escopo da demonstração.');
-  const trat = el('select', { class: 'entrada', id: 'd-tratamento' }, ['Dr.', 'Dra.'].map(t => el('option', { value: t, text: t, selected: (v.tratamento || 'Dr.') === t })));
-  const [medico, cMedico] = entrada('medico', 'Nome do médico', { maxlength: '60', required: true });
-  const outra = v.especialidade && !DEM_ESPEC.includes(v.especialidade);
-  const espSel = el('select', { class: 'entrada', id: 'd-especialidade' }, [...DEM_ESPEC.map(e => el('option', { value: e, text: e, selected: v.especialidade === e })),
-    el('option', { value: '', text: 'Outra (escrever)', selected: outra })]);
-  const espOutra = el('input', { class: 'entrada', id: 'd-especialidade-outra', maxlength: '40', autocomplete: 'off', value: outra ? v.especialidade : null, 'aria-label': 'Outra especialidade' });
-  const cOutra = el('label', { class: 'campo', for: 'd-especialidade-outra', hidden: !outra }, el('span', { class: 'rot', text: 'Qual especialidade' }), espOutra);
-  espSel.addEventListener('change', () => { cOutra.hidden = espSel.value !== ''; if (!cOutra.hidden) espOutra.focus(); });
-  const [cidade, cCidade] = entrada('cidade', 'Cidade (opcional)', { maxlength: '40' }, 'Aparece nos exemplos de consulta.');
-  let cor = v.cor || 'verde';
-  const cores = el('div', { class: 'dem-cores', role: 'radiogroup', 'aria-label': 'Cor da clínica' }, DEM_CORES.map(([k, nome]) => el('button', { type: 'button', role: 'radio', class: 'dem-cor',
-    'aria-checked': String(cor === k), 'aria-label': nome, title: nome, onclick: e => { cor = k; cores.querySelectorAll('[role=radio]').forEach(x => x.setAttribute('aria-checked', String(x === e.currentTarget))); } },
-    el('span', { class: 'dem-amostra dem-cor-' + k, 'aria-hidden': 'true' }), el('span', { text: nome }))));
-  const validade = l ? el('input', { class: 'entrada', id: 'd-valida_ate', type: 'date', min: hojeISO(), value: v.valida_ate || null })
-    : el('input', { class: 'entrada', id: 'd-dias', type: 'number', inputmode: 'numeric', min: '1', max: '365', value: '60' });
-  const [lead, cLead] = entrada('lead_codigo', 'Lead da prospecção (opcional)', { maxlength: '8', placeholder: 'PX-…', autocapitalize: 'characters' }, 'Liga a demonstração ao lead: só o código, nunca o telefone.');
-  const anotacao = el('textarea', { class: 'entrada', id: 'd-anotacao', rows: '3', maxlength: '1000', autocomplete: 'off', value: v.anotacao || '' });
-  const mensagem = el('textarea', { class: 'entrada', id: 'd-mensagem', rows: '4', maxlength: '1000', autocomplete: 'off', value: l && l.mensagem_editada ? l.mensagem : '' });
-  const ler = () => ({ clinica: clinica.value.trim(), tratamento: trat.value, medico: medico.value.trim(), especialidade: (espSel.value || espOutra.value).trim(),
-    cidade: cidade.value.trim(), cor, lead_codigo: lead.value.trim().toUpperCase(), anotacao: anotacao.value.trim(), mensagem: mensagem.value.trim(),
-    ...(l ? { valida_ate: validade.value } : { dias: validade.value.trim() }) });
-  const conferir = x => !x.clinica ? 'Preencha o nome da clínica.' : !x.medico ? 'Preencha o nome do médico.' : !x.especialidade ? 'Escolha ou escreva a especialidade.'
-    : x.lead_codigo && !/^PX-[ACDEFGHJKMNPQRTUVWXY3479]{5}$/.test(x.lead_codigo) ? 'O lead é "PX-" e 5 letras (ou deixe vazio).'
-    : l ? (!/^\d{4}-\d{2}-\d{2}$/.test(x.valida_ate) || x.valida_ate < hojeISO() ? 'A validade precisa ser hoje ou depois.' : '')
-    : (!/^\d{1,3}$/.test(x.dias) || +x.dias < 1 || +x.dias > 365 ? 'A validade vai de 1 a 365 dias.' : '');
-  const campos = el('div', {},
-    el('div', { class: 'form-2' }, cClinica, el('label', { class: 'campo', for: 'd-tratamento' }, el('span', { class: 'rot', text: 'Tratamento' }), trat)),
-    el('div', { class: 'form-2' }, cMedico, el('label', { class: 'campo', for: 'd-especialidade' }, el('span', { class: 'rot', text: 'Especialidade' }), espSel)), cOutra,
-    el('div', { class: 'form-2' }, cCidade, el('label', { class: 'campo', for: validade.id }, el('span', { class: 'rot', text: l ? 'Válido até' : 'Validade (dias)' }), validade,
-      el('span', { class: 'ajuda', text: l ? 'Depois desse dia, o link mostra "não está mais ativo".' : 'Padrão: 60 dias. Depois, o link mostra "não está mais ativo".' }))),
-    el('div', { class: 'campo' }, el('span', { class: 'rot', id: 'rot-cor', text: 'Cor da clínica' }), cores, el('span', { class: 'ajuda', text: 'Sem logo: o app mostra o nome e as iniciais nesta cor.' })),
-    cLead,
-    el('label', { class: 'campo', for: 'd-anotacao' }, el('span', { class: 'rot', text: 'Anotação (só você vê)' }), anotacao),
-    el('label', { class: 'campo', for: 'd-mensagem' }, el('span', { class: 'rot', text: 'Mensagem do WhatsApp (opcional)' }), mensagem,
-      el('span', { class: 'ajuda', text: 'Vazio: a mensagem pronta, com o nome do médico, da clínica e o link.' })));
-  return { campos, ler, conferir };
-}
-function dForm(c) {
-  topo('Novo link', [['Demonstrações', 'demonstracoes'], ['Novo link']], 'demonstracoes');
-  if (!ligada('editar_demonstracoes')) { falhou(c, { desligada: true, chave: 'editar_demonstracoes' }, 'Novo link'); return; }
-  const f = camposDem(null), erro = el('p', { class: 'erro', role: 'alert' });
-  const criar = async () => {
-    erro.textContent = ''; const x = f.ler(), problema = f.conferir(x);
-    if (problema) { erro.textContent = problema; return; }
-    await fazer('dem_criar', { campos: x }, { erro: r => { erro.textContent = r.mensagem || 'Não consegui criar.'; }, silencioso: true,
-      depois: async r => { est.demNovo = r.id; irD('link', r.id); } });
-  };
-  trocar(c, cabecalho('Novo link', 'a demonstração com o nome e a cor da clínica'),
-    el('div', { class: 'pilha' }, avisoLinksDesligados(), cartao(null, null, el('div', { class: 'corpo p-topo-form' }, f.campos, erro, el('div', { class: 'acoes' }, btn('Criar o link', criar, 'pri', 'link'), btn('Cancelar', () => irD(), 'sec'))))));
-}
-async function dEditar(c, id) {
-  const r = await chamar('dem_link', { id });
-  const l = r.ok ? r.link : null;
-  topo(l ? 'Editar · ' + l.clinica : 'Editar', [['Demonstrações', 'demonstracoes'], [l ? l.clinica : 'Link', 'demonstracoes/link/' + id], ['Editar']], 'demonstracoes/link/' + id);
-  if (falhou(c, r, 'Editar')) return;
-  if (!ligada('editar_demonstracoes')) { falhou(c, { desligada: true, chave: 'editar_demonstracoes' }, 'Editar'); return; }
-  const f = camposDem(l), erro = el('p', { class: 'erro', role: 'alert' });
-  const salvar = async () => {
-    erro.textContent = ''; const x = f.ler(), problema = f.conferir(x);
-    if (problema) { erro.textContent = problema; return; }
-    const ROT = { clinica: 'Clínica', tratamento: 'Tratamento', medico: 'Médico', especialidade: 'Especialidade', cidade: 'Cidade', cor: 'Cor', lead_codigo: 'Lead', valida_ate: 'Válido até', anotacao: 'Anotação', mensagem: 'Mensagem' };
-    const antes = { ...l, lead_codigo: l.lead_codigo || '', mensagem: l.mensagem_editada ? l.mensagem : '' };
-    const linhas = Object.keys(ROT).filter(k => String(antes[k] ?? '') !== String(x[k] ?? '')).map(k => [ROT[k], k === 'valida_ate' ? fmtData(antes[k]) : antes[k], k === 'valida_ate' ? fmtData(x[k]) : x[k]]);
-    if (!linhas.length) { erro.textContent = 'Nada mudou.'; return; }
-    await fazer('dem_editar', { id: l.id, campos: x }, { titulo: 'Editar o link de ' + l.clinica, linhas, rotuloNivel: 'muda o que o médico vê', ok: 'Salvo.',
-      erro: x2 => { erro.textContent = x2.mensagem || 'Não consegui salvar.'; }, depois: () => irD('link', l.id) });
-  };
-  trocar(c, cabecalho('Editar', `DEM-${l.id} · ${l.clinica}`),
-    el('div', { class: 'pilha' }, cartao(null, null, el('div', { class: 'corpo p-topo-form' }, f.campos, erro, el('div', { class: 'acoes' }, btn('Salvar', salvar, 'pri'), btn('Cancelar', () => irD('link', l.id), 'sec'))))));
-}
-
-// ---------- um link: o endereço, a mensagem e o uso
-async function dLink(c, id) {
-  const r = await chamar('dem_link', { id });
-  const l = r.ok ? r.link : null;
-  topo(l ? l.clinica : 'Link', [['Demonstrações', 'demonstracoes'], [l ? l.clinica : 'Link']], 'demonstracoes');
-  if (falhou(c, r, 'Link')) return;
-  const u = r.uso || {}, editar = ligada('editar_demonstracoes'), novo = est.demNovo === l.id;
-  est.demNovo = null;
-  const inativo = l.situacao === 'desativado' || l.situacao === 'vencido';
-  const recarregar = () => rotear();
-  const desativar = () => fazer('dem_desativar', { id: l.id }, { silencioso: true, depois: async () => { await recarregar(); rapida('Link desativado.', reativar); } });
-  const reativar = () => fazer('dem_reativar', { id: l.id }, { ok: 'Link ativo de novo.', depois: recarregar });
-  const ver = () => fazer('dem_ver', { id: l.id }, { silencioso: true, depois: async x => { est.demVer = { id: l.id, endereco: x.endereco, ate: Date.now() + 15 * 60e3 }; await recarregar(); } });
-  const apagar = () => fazer('dem_apagar', { id: l.id }, { titulo: 'Apagar o link de ' + l.clinica, nome: l.clinica, rotuloNome: 'o nome da clínica do link', rotuloNivel: 'apaga para sempre',
-    texto: 'Apaga o link e todo o uso dele (visitas, telas, escopo e pedidos). Quem abrir vê "não está mais ativo". O registro da Central guarda só que foi apagado.', botao: 'Apagar',
-    ok: 'Link apagado.', depois: () => irD() });
-  const verAgora = est.demVer && est.demVer.id === l.id && est.demVer.ate > Date.now() ? est.demVer : null;
-  const aparelhos = Object.entries(u.aparelhos || {}).map(([t, n]) => fmtNum(n) + ' ' + ((DEM_APARELHO[t] || [t, t])[n > 1 ? 1 : 0])).join(', ');
-  const esc = u.escopo || [], conta = k => esc.filter(x => x.escolha === k).length;
-  const envios = u.envios || [], conversas = envios.filter(e => e.tipo === 'conversar'), escopoEnvios = envios.filter(e => e.tipo === 'escopo');
-  const listaOu = (itens, vazioTxt, fn) => itens.length ? el('ul', { class: 'lista' }, itens.map(fn)) : vazio(vazioTxt, 'info');
-  const linhaSimples = (t1, t2, dir) => el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: t1 }), t2 ? el('div', { class: 't2', text: t2 }) : null), dir ? el('div', { class: 'direita' }, dir) : null));
-  trocar(c, cabecalho(l.clinica, `DEM-${l.id} · ${l.tratamento} ${l.medico} · ${l.especialidade}`, etqDem(l.situacao)),
-    el('div', { class: 'pilha' }, avisoLinksDesligados(),
-      novo ? el('div', { class: 'aviso info', role: 'status' }, icone('ok'), el('div', {}, el('b', { text: 'Link pronto. ' }), 'Copie a mensagem e mande pelo seu WhatsApp. A Central avisa quando o médico abrir.')) : null,
-      inativo ? el('div', { class: 'aviso atencao' }, icone('info'), el('div', { text: l.situacao === 'vencido' ? `Venceu em ${fmtData(l.valida_ate)}: quem abrir vê "não está mais ativo". Mude a validade em Editar.`
-        : `Desativado em ${fmtData(l.desativada_em)}: quem abrir vê "não está mais ativo".` + (l.tentou_inativo_em ? ` Última tentativa de abrir: ${fmtHora(l.tentou_inativo_em)}.` : '') })) : null,
-      cartao('Link', null, corpo(el('div', { class: 'segredo dem-endereco', text: l.endereco }),
-        el('div', { class: 'acoes' }, btn('Copiar a mensagem', () => copiar(l.mensagem, 'Mensagem copiada. Cole no WhatsApp do médico.'), 'pri', 'copiar'), btn('Copiar o link', () => copiar(l.endereco, 'Link copiado.'), 'sec', 'link'),
-          editar && !inativo ? (verAgora ? el('a', { class: 'btn sec', href: verAgora.endereco, target: '_blank', rel: 'noopener noreferrer' }, 'Abrir como o médico vê') : btn('Ver como o médico vê', ver, 'sec')) : null),
-        verAgora ? el('p', { class: 'mudo peq', text: 'Abre sem contar visita e sem aviso. Vale 15 minutos.' }) : null,
-        el('p', { class: 'rot-mensagem mudo peq', text: l.mensagem_editada ? 'Mensagem do WhatsApp (a sua):' : 'Mensagem do WhatsApp (a pronta; mude em Editar):' }),
-        el('p', { class: 'dem-mensagem', text: l.mensagem }),
-        editar ? el('div', { class: 'acoes' }, btn('Editar', () => irD('link', l.id, 'editar'), 'sec'),
-          l.situacao === 'desativado' ? btn('Reativar', reativar, 'sec') : !inativo ? btn('Desativar', desativar, 'sec') : null,
-          btn('Apagar', apagar, 'perigo-sec')) : null)),
-      el('div', { class: 'kpis' }, kpi('Visitas', fmtNum(l.visitas), l.primeiro_acesso ? 'a primeira em ' + fmtHora(l.primeiro_acesso) : 'nunca abriu'),
-        kpi('Tempo total', minutos(u.segundos)), kpi('Aparelhos', aparelhos || '—'), kpi('Último acesso', l.ultimo_acesso ? fmtHora(l.ultimo_acesso) : '—')),
-      cartao('Quero conversar', conversas.length ? etq(pl(conversas.length, 'pedido', 'pedidos'), 'atencao', true) : null,
-        listaOu(conversas, 'O médico ainda não pediu para conversar.', e => linhaSimples((e.conteudo || {}).texto || '(sem texto)', fmtHora(e.quando)))),
-      cartao('Escopo', escopoEnvios.length ? etq('enviado ' + fmtHora(escopoEnvios[0].quando), 'ok', true) : null,
-        esc.length ? el('div', { class: 'corpo etqs' }, etq(fmtNum(conta('quero')) + ' quero', 'ok', true), etq(fmtNum(conta('duvida')) + ' com dúvida', 'atencao', true), etq(fmtNum(conta('nao_preciso')) + ' não preciso', '', true)) : null,
-        listaOu(esc, 'Nada marcado no escopo ainda.', x => linhaSimples(nomeItem(x.item), [x.nota, 'marcado ' + fmtHora(x.atualizado_em)].filter(Boolean).join(' · '),
-          x.escolha ? etq((DEM_ESCOLHA[x.escolha] || [x.escolha])[0], (DEM_ESCOLHA[x.escolha] || [])[1]) : null))),
-      cartao('Telas mais vistas', null, listaOu(u.telas || [], 'Nenhuma tela vista ainda.', t => linhaSimples((DEM_PAGINA[t.pagina] || t.pagina) + (t.tela ? ' › ' + t.tela : ''), pl(t.vezes, 'vez', 'vezes') + ' · ' + minutos(t.segundos)))),
-      cartao('O que mais tocou', null, listaOu(u.toques || [], 'Nenhum toque registrado ainda.', t => linhaSimples(t.alvo, (DEM_PAGINA[t.pagina] || t.pagina) + ' · ' + pl(t.vezes, 'vez', 'vezes')))),
-      cartao('Perguntas nos chats', null, listaOu(u.perguntas || [], 'Nenhuma pergunta nos chats de exemplo.', p => linhaSimples(p.texto || '', ({ equipe: 'chat com a equipe', personal: 'personal do app', whatsapp: 'personal no WhatsApp', central: 'assistente da central' }[p.chat] || 'assistente do app') + ' · ' + fmtHora(p.quando)))),
-      cartao('Visitas', null, listaOu(u.visitas || [], 'Nenhuma visita ainda.', v => el('li', {}, el('button', { class: 'linha', type: 'button', onclick: () => irD('visita', l.id, v.id) },
-        el('span', { class: 'icone-caixa' }, icone(v.tipo_aparelho === 'computador' ? 'demonstracao' : 'telefone')),
-        el('div', { class: 'cresce' }, el('div', { class: 't1', text: fmtHora(v.inicio) + ' · ' + minutos(v.segundos) }),
-          el('div', { class: 't2', text: [(DEM_APARELHO[v.tipo_aparelho] || [v.tipo_aparelho])[0], v.navegador, 'aparelho ' + v.aparelho + '…', pl(v.eventos, 'evento', 'eventos')].filter(Boolean).join(' · ') })), icone('seta'))))),
-      cartao('Sobre o link', null, corpo(dados([['Criado em', fmtHora(l.criada_em)], ['Válido até', fmtData(l.valida_ate)], ['Cidade', l.cidade], ['Cor', (DEM_CORES.find(x => x[0] === l.cor) || [0, l.cor])[1]],
-        ['Lead da prospecção', l.lead_codigo], ['Anotação', l.anotacao]])))));
-}
-
-// ---------- uma visita, evento por evento
-async function dVisita(c, linkId, visitaId) {
-  const r = await chamar('dem_visita', { id: visitaId });
-  topo('Visita', [['Demonstrações', 'demonstracoes'], ['Link', 'demonstracoes/link/' + linkId], ['Visita']], 'demonstracoes/link/' + linkId);
-  if (falhou(c, r, 'Visita')) return;
-  const resumo = d => { if (!d || typeof d !== 'object') return ''; return Object.entries(d).map(([k, v]) => k === 's' ? minutos(v) : typeof v === 'object' ? '' : String(v)).filter(Boolean).join(' · '); };
-  const evs = r.eventos || [];
-  trocar(c, cabecalho('Visita', `${pl(evs.length, 'evento', 'eventos')}, na ordem`),
-    el('div', { class: 'pilha' }, cartao(null, null, evs.length ? el('ul', { class: 'lista' }, evs.map(e => el('li', {}, el('div', { class: 'linha' },
-      el('div', { class: 'cresce' }, el('div', { class: 't1', text: (DEM_PAGINA[e.pagina] || e.pagina) + (e.tela ? ' › ' + e.tela : '') + ' · ' + e.acao }),
-        el('div', { class: 't2', text: [fmtHora(e.quando), resumo(e.detalhe)].filter(Boolean).join(' · ') })))))) : vazio('Nenhum evento nesta visita.', 'info'))));
 }
 
 // ==== 10_assistente.js

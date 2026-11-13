@@ -105,16 +105,14 @@ function conferirP12(nome, css, pagina) {
     // Sem nível na rx_central_niveis, mas conferida no servidor pela rx_central_extra (sql/082): avisos_apagar_lidos é nível 2.
     const NIVEIS = { 1: ['cliente_editar_assistente', 'cliente_editar_configuracoes', 'cliente_editar_recursos', 'editar_limites', 'franquia_aviso_registrar', 'chave_api_limites', 'asaas_foto_atualizar', 'ligar_chave',
         'prosp_campanha_salvar', 'prosp_conjunto_salvar', 'prosp_anuncio_salvar', 'prosp_duplicar', 'prosp_campanha_nova', 'prosp_custos_salvar', 'prosp_numero_situacao', 'prosp_lead_aprovar', 'prosp_lead_marcar', 'prosp_lead_assumir',
-        'prosp_publico_salvar', 'prosp_publico_renomear', 'prosp_publico_duplicar', 'prosp_publico_contato_marcar',
-        'dem_criar', 'dem_desativar', 'dem_reativar', 'dem_ver'],
+        'prosp_publico_salvar', 'prosp_publico_renomear', 'prosp_publico_duplicar', 'prosp_publico_contato_marcar'],
       2: ['avisos_apagar_lidos', 'situacao_pausar', 'situacao_retomar', 'situacao_reativar', 'cancelamento_desfazer', 'link_painel_reenviar', 'link_conectar_reenviar', 'reenviar_onboarding', 'recurso_liberar', 'recurso_revogar',
         'chave_api_criar', 'aviso_destino_definir', 'aviso_destino_desligar', 'desfazer', 'sair_todos', 'aparelho_esquecer',
         'prosp_ligar', 'prosp_apagar_rascunho', 'prosp_numero_criar', 'prosp_numero_qr', 'prosp_numero_desconectar', 'prosp_numero_webhook', 'prosp_numero_teto', 'prosp_lead_nao_contatar', 'prosp_lead_devolver', 'prosp_exportar',
         'prosp_publico_buscar', 'prosp_publico_contatos_lote', 'prosp_publico_arquivar', 'prosp_creditos_teto_salvar',
-        'dem_editar', 'conversas_enviar', 'cliente_congelar_renovar', 'cliente_editar_cadastro'],
+        'conversas_enviar', 'cliente_congelar_renovar', 'cliente_editar_cadastro'],
       3: ['cliente_excluir', 'cliente_excluir_lote', 'cliente_marcar_teste', 'cliente_congelar', 'cliente_descongelar', 'plano_trocar', 'situacao_suspender', 'cancelamento_agendar', 'preco_especial', 'cobranca_proxima_data', 'cobranca_vencimento', 'implantacao_isentar', 'pagamento_receber_dinheiro',
-        'teste_estender', 'link_painel_novo', 'chave_api_revogar', 'cobranca_teste_definir', 'prosp_encerrar', 'prosp_numero_apagar', 'prosp_ligar_tudo',
-        'dem_apagar'] };
+        'teste_estender', 'link_painel_novo', 'chave_api_revogar', 'cobranca_teste_definir', 'prosp_encerrar', 'prosp_numero_apagar', 'prosp_ligar_tudo'] };
     // proposta_confirmar (IA da Central, sql/061, DEC-145): o nível é o da ação proposta, que o servidor manda com a proposta.
     // pagina_confirmar: só a confirmação na tela, nada vai ao servidor (o "Começar do texto atual" da prospecção).
     const conhecidas = new Set([...Object.values(NIVEIS).flat(), 'proposta_confirmar', 'pagina_confirmar']);
@@ -231,15 +229,14 @@ for (const arq of ['painel/index.html']) {
 // Identidade (rxsync-sistema docs/front/plano.md, "Identidade em todas as páginas"): favicon, ícone da Tela de Início e
 // theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel;
 // a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento; a 5: a Central,
-// com manifest branco, e a entrada, a central, o escopo e o manual da demonstração, cuja entrada tem a prévia própria).
+// com manifest branco).
 {
   const PUBLICAS = ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', 'privacidade.html', '404.html', 'assistente-whatsapp-clinica/index.html', 'painel-da-clinica/index.html',
     ...[1, 2, 3, 4, 5, 6, 7].map(v => `termos/2026-10-v${v}.html`)];
-  const DEMO = ['index', 'central/index', 'escopo/index', 'manual/index'].map(f => `demo/clinica/${f}.html`);
   // Os guias (guias/, scripts/guias_montar.mjs) também, inclusive os rascunhos.
   const { paginasExistentes } = await import('./guias_montar.mjs');
   PUBLICAS.push(...paginasExistentes());
-  const IDENTIDADE = ['painel/index.html', ...PUBLICAS, 'central/index.html', ...DEMO];
+  const IDENTIDADE = ['painel/index.html', ...PUBLICAS, 'central/index.html'];
   for (const arq of PUBLICAS) {
     const s = fs.readFileSync(arq, 'utf8');
     const meta = k => (s.match(new RegExp(`<meta (?:property|name)="${k}" content="([^"]*)"`)) || [])[1];
@@ -248,12 +245,7 @@ for (const arq of ['painel/index.html']) {
     if (meta('twitter:card') && meta('twitter:card') !== 'summary_large_image') erro(`${arq}: twitter:card precisa ser summary_large_image`);
   }
   if (!fs.existsSync('assets/og-rxsync.png')) erro('assets/og-rxsync.png: a imagem da prévia de compartilhamento sumiu');
-  {
-    const s = fs.readFileSync('demo/clinica/index.html', 'utf8'), meta = k => (s.match(new RegExp(`<meta (?:property|name)="${k}" content="([^"]*)"`)) || [])[1];
-    for (const k of ['og:title', 'og:description', 'og:image', 'twitter:card', 'twitter:image']) if (!meta(k)) erro(`demo/clinica/index.html: falta a prévia de compartilhamento (${k})`);
-    if (meta('og:image') !== 'https://rxsync.com.br/demo/clinica/comum/previa.png') erro('demo/clinica/index.html: og:image precisa ser a prévia da demonstração (demo/clinica/comum/previa.png)');
-  }
-  // Endereço do ícone: "/..." a partir da raiz do site; o resto, a partir da pasta da página (a demonstração usa "../../").
+  // Endereço do ícone: "/..." a partir da raiz do site; o resto, a partir da pasta da página.
   const existe = (h, arq = '') => fs.existsSync(h.startsWith('/') ? '.' + h.split('?')[0] : path.join(path.dirname(arq), h.split('?')[0]));
   for (const arq of IDENTIDADE) {
     const s = fs.readFileSync(arq, 'utf8');
@@ -427,7 +419,7 @@ let avisosTermos = 0;
 }
 // Preços do site com espaço fixo entre "R$" e o número (rxsync-sistema DEC-202): "R$&nbsp;299" no texto e 'R$\u00a0' nos
 // scripts, para o valor nunca quebrar a linha longe do "R$"; desde a DEC-203, também no app do painel. Ficam de fora a
-// Central, os Termos (texto jurídico, com versão própria) e as demonstrações.
+// Central, os Termos (texto jurídico, com versão própria) e a demonstração do Dr. André (DEC-153).
 for (const f of htmls) {
   const g = f.split(path.sep).join('/').replace(/^\.\//, '');
   if (/^(central|termos|demo)\//.test(g)) continue;   // o painel entra desde a DEC-203
@@ -435,37 +427,8 @@ for (const f of htmls) {
   if (n) erro(`${g}: ${n} preço(s) com "R$ " e espaço comum; use "R$&nbsp;" no texto e 'R$\\u00a0' nos scripts (DEC-202)`);
 }
 if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos que não são a versão mais nova (só aviso, não bloqueia).`);
-// Demonstração por link (demo/clinica/, DEC-125; ajuste C do plano): nenhum preço, prazo de projeto ou valor, nada da
-// demonstração do Dr. André, noindex, nenhum WhatsApp nem telefone, e os itens iguais aos da Central (numerados de 1 em diante, sem buraco, até 99:
-// o workflow 43 aceita itens de 1 a 99).
+// Sitemap
 {
-  const pasta = path.join('demo', 'clinica');
-  const arqs = todos.filter(f => f.startsWith(pasta + path.sep) && /\.(html|js|css)$/.test(f));
-  if (fs.existsSync(pasta) && !arqs.length) erro(`${pasta}: sem arquivos`);
-  const PROIBIDOS = [[/R\$(?:\s|&nbsp;|\\u00a0)*\d/, 'valor em reais'], [/\bpreços?\b/i, '"preço"'], [/\bmensalidades?\b/i, '"mensalidade"'], [/\bparcelas?\b/i, '"parcela"'],
-    [/\b\d+\s+semanas?\b/i, 'prazo em semanas'], [/prazo de entrega/i, '"prazo de entrega"'], [/dias [úu]teis/i, '"dias úteis"'],
-    [/\bAndr[ée](?![a-zà-ÿ])/i, 'André'], [/\bPontes\b/, 'Pontes'], [/Gon[çc]alves/i, 'Gonçalves'], [/Melhor Vers[ãa]o/i, '"Melhor Versão"'], [/Evoluir/i, 'Evoluir'], [/drandre/i, 'drandre'], [/\bAG\./, 'AG.'],
-    [/wa\.me|api\.whatsapp|whatsapp:\/\/|\btel:/i, 'link de WhatsApp ou telefone'],
-    // Rodada de melhoria: nenhum beco sem saída (todo botão mostra um resultado) e ícones em SVG, não emojis.
-    [/nada (é|e) guardado/i, '"nada é guardado" (todo botão mostra um resultado simulado)'],
-    // Revisão da demonstração: cobrança dita de um jeito estranho para o médico (o consumo fala só em créditos de IA).
-    [/nunca em reais|\bexcedente\b|entra na cobran[çc]a/i, 'texto de cobrança estranho para o médico (fale só em créditos de IA)'], [/\p{Extended_Pictographic}/u, 'emoji (use os ícones de comum/icones.js)']];
-  // Única exceção: a frase do consumo de IA, sem valor ("cobrados à parte, pelo uso, junto com a mensalidade"; PR da IA).
-  const FRASE_CONSUMO = /cobrad[oa]s? à parte, pelo uso, junto com a mensalidade/gi;
-  for (const f of arqs) {
-    const s = fs.readFileSync(f, 'utf8').replace(FRASE_CONSUMO, '');
-    for (const [re, nome] of PROIBIDOS) { const m = s.match(re); if (m) erro(`${f}: ${nome} não pode aparecer na demonstração (achei "${m[0]}")`); }
-    if (f.endsWith('.html') && !/<meta name="robots" content="noindex, nofollow">/.test(s)) erro(`${f}: falta noindex`);
-    if (f.endsWith('.html') && /googletagmanager|gtag\(|chatwoot|consentimento\.js/i.test(s)) erro(`${f}: sem Google Analytics e sem chat na demonstração`);
-  }
-  const itensArq = path.join(pasta, 'escopo', 'itens.js'), centralArq = path.join('central', 'fonte', '09_demonstracoes.js');
-  if (fs.existsSync(itensArq) && fs.existsSync(centralArq)) {
-    const demo = [...fs.readFileSync(itensArq, 'utf8').matchAll(/\{ n: (\d+), t: '((?:[^'\\]|\\.)*)'/g)].map(m => [Number(m[1]), m[2].replace(/\\'/g, "'")]);
-    const central = [...((fs.readFileSync(centralArq, 'utf8').match(/const DEM_ITENS = \[([\s\S]*?)\];/) || [])[1] || '').matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
-    if (demo.length < 46 || demo.length > 99 || demo.some(([n], i) => n !== i + 1)) erro(`${itensArq}: os itens são numerados de 1 em diante, sem buraco (de 46 a 99 itens; achei ${demo.length})`);
-    if (JSON.stringify(demo.map(x => x[1])) !== JSON.stringify(central)) erro(`${itensArq}: os títulos não batem com os da Central (${centralArq}, DEM_ITENS)`);
-  }
-  if (fs.existsSync('sitemap.xml') && /demo\/clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a demonstração por link fica fora do sitemap');
   // A página do anúncio tem noindex: fica fora do sitemap.
   if (fs.existsSync('sitemap.xml') && /assistente-whatsapp-clinica/.test(fs.readFileSync('sitemap.xml', 'utf8'))) erro('sitemap.xml: a página do anúncio (noindex) fica fora do sitemap');
   // A página do painel (/painel-da-clinica/, rxsync-sistema DEC-199): os prints do próprio painel (scripts/painel_prints.mjs)
@@ -566,10 +529,9 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
 {
   // 1) Cores e tamanhos só do assets/ancora/tokens.css, também na Central (o painel já é conferido acima). As exceções
   //    antigas ficam listadas aqui com aviso (sair delas pede mudar a tela, fora deste conferidor); qualquer nova bloqueia.
-  const ANTIGAS = { 'central/fonte/estilo.css': ['#EEF1F1', '#A8DDD9', '#1F262A'],
-    'central/fonte/estilo_demonstracoes.css': ['#1e6b47', '#1f5fa8', '#0f5e68', '#8a2440', '#5b3a9e', '#3d4451'] };   // as 6 cores das clínicas da demonstração
+  const ANTIGAS = { 'central/fonte/estilo.css': ['#EEF1F1', '#A8DDD9', '#1F262A'] };
   // Tamanhos de letra escritos em px ou rem (fora das variáveis --t-*): no máximo os que já existem em cada arquivo.
-  const TAMANHOS_ANTIGOS = { 'painel/fonte/estilo.css': 16, 'central/fonte/estilo.css': 4, 'central/fonte/estilo_demonstracoes.css': 1 };
+  const TAMANHOS_ANTIGOS = { 'painel/fonte/estilo.css': 16, 'central/fonte/estilo.css': 4 };
   let antigos = 0;
   for (const d of ['central/fonte', 'painel/fonte']) for (const f of fs.readdirSync(d).filter(x => /\.(css|js)$/.test(x))) {
     const arq = d + '/' + f, t = fs.readFileSync(arq, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '');
@@ -592,7 +554,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     const base = ev.pull_request.base.ref;
     let mudados = [];
     try { execSync(`git fetch -q --depth=200 origin ${base}`, { stdio: 'ignore', timeout: 60000 }); mudados = execSync(`git diff --name-only origin/${base}...HEAD`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().split('\n').filter(Boolean); } catch { /* sem histórico: não confere */ }
-    const TELA = /^(painel\/fonte\/|central\/fonte\/|demo\/clinica\/|assets\/ancora\/|[^/]+\.html$|[^/]+\/index\.html$|guias\/_fonte\/|assets\/consentimento\.js)/;
+    const TELA = /^(painel\/fonte\/|central\/fonte\/|assets\/ancora\/|[^/]+\.html$|[^/]+\/index\.html$|guias\/_fonte\/|assets\/consentimento\.js)/;
     const telas = mudados.filter(f => TELA.test(f));
     const corpo = ev.pull_request.body || '';
     const secao = (corpo.split(/^##\s+Fluxo e design\s*$/m)[1] || '').split(/^##\s/m)[0];
@@ -600,16 +562,15 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     if (telas.length && !preenchida) console.log(`::warning title=Método de produto::este PR muda ${telas.length} arquivo(s) de tela (${telas.slice(0, 5).join(', ')}${telas.length > 5 ? '…' : ''}) e a seção "Fluxo e design" do modelo de PR não está preenchida (marque os itens ou escreva "Não muda tela").`);
   }
 }
-// Método de produto (regra 22, P9): a linguagem do CFM em todo texto do site (as páginas de venda e de cadastro), do
-// painel e da demonstração. Os guias já são conferidos acima; os Termos e a Política ficam de fora (texto jurídico: "não
+// Método de produto (regra 22, P9): a linguagem do CFM em todo texto do site (as páginas de venda e de cadastro) e do
+// painel. Os guias já são conferidos acima; os Termos e a Política ficam de fora (texto jurídico: "não
 // garante", "melhores esforços", "melhor interesse da criança"). As exceções são frases conferidas, com o motivo.
 {
   const P9 = [[/\bmelhor(es)?\b/i, '"melhor"'], [/\bgarant(e|em|ido|ida|idos|idas|imos)\b/i, '"garante"'], [/\b100\s*%/, '"100%"'],
     [/nunca erra/i, '"nunca erra"'], [/substitui a secret[aá]ria/i, '"substitui a secretária"'], [/sem risco de bloqueio/i, '"sem risco de bloqueio"'], [/aprovad[oa] pelo CFM/i, '"aprovado pelo CFM"']];
   const EXCECOES = [
     /Qual fica melhor\?/g,                       // a pergunta do paciente na conversa de exemplo da página inicial
-    /barato, promoção, garantido/g,               // painel: o exemplo de palavras que a assistente nunca usa
-    /80% e (em )?100%/g, /100%: pausa/g];         // demonstração: os avisos de consumo em 80% e 100% do teto
+    /barato, promoção, garantido/g];              // painel: o exemplo de palavras que a assistente nunca usa
   const semComentario = t => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1 ');
   const strings = t => [...semComentario(t).matchAll(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g)].map(m => m[0]).join('\n');
   const textoHtml = h => {
@@ -620,7 +581,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
   const fontes = [];
   for (const f of ['index.html', 'contratar.html', 'onboarding.html', 'conectar.html', 'teste.html', 'conta-excluir.html', '404.html', 'assistente-whatsapp-clinica/index.html', 'painel-da-clinica/index.html'])
     if (fs.existsSync(f)) fontes.push([f, textoHtml(fs.readFileSync(f, 'utf8'))]);
-  for (const d of ['painel/fonte', 'demo/clinica/comum', 'demo/clinica/app', 'demo/clinica/central', 'demo/clinica/escopo', 'demo/clinica/manual'])
+  for (const d of ['painel/fonte'])
     if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js'))) fontes.push([d + '/' + f, strings(fs.readFileSync(path.join(d, f), 'utf8'))]);
   for (const [f, texto] of fontes) {
     const t = EXCECOES.reduce((x, re) => x.replace(re, ' '), texto).replace(/\b(width|height|max-width|min-width|left|top|inset):\s*100%/g, ' ').replace(/translate[XY]?\([^)]*100%[^)]*\)/g, ' ');
@@ -640,8 +601,8 @@ for (const f of todos.filter(f => /\.html$/.test(f) && !/^demo\/drandrepontes\//
   }
 }
 // Confirmação pelos níveis de 0 a 3, nunca a caixa do navegador (método de produto, regra de confirmação): sem confirm(),
-// alert() nem prompt() no painel, na Central e na demonstração (a do Dr. André, que não muda, fica de fora; DEC-153).
-for (const d of ['painel/fonte', 'central/fonte', 'demo/clinica/comum', 'demo/clinica/app', 'demo/clinica/central', 'demo/clinica/escopo', 'demo/clinica/manual', 'demo/clinica'])
+// alert() nem prompt() no painel e na Central (a demonstração do Dr. André, que não muda, fica de fora; DEC-153).
+for (const d of ['painel/fonte', 'central/fonte'])
   if (fs.existsSync(d)) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js'))) {
     const s = fs.readFileSync(path.join(d, f), 'utf8').replace(/\/\/.*$/gm, ' ');
     const m = s.match(/(?<![\w.$])(?:window\.)?(confirm|alert|prompt)\(/);

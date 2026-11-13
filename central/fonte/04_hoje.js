@@ -26,8 +26,7 @@ const TIPOS = {
   prosp_token_recusado: 'Prospecção: token recusado', prosp_busca: 'Prospecção: busca', prosp_conjunto_pausado: 'Prospecção: conjunto pausado', prosp_regra: 'Prospecção: regra automática',
   prosp_saiu: 'Prospecção: pediu para sair', prosp_interesse: 'Prospecção: mostrou interesse', prosp_quer_contratar: 'Prospecção: quer contratar', prosp_recusou: 'Prospecção: recusou',
   prosp_respondeu: 'Prospecção: respondeu', prosp_cliente: 'Prospecção: virou cliente', prosp_cadastro: 'Prospecção: fez o cadastro', prosp_com_voce: 'Prospecção: conversa com você',
-  prosp_resumo_do_dia: 'Prospecção: resumo do dia',
-  demo_aberta: 'Demonstração aberta', demo_conversar: 'Demonstração: quer conversar', demo_escopo: 'Demonstração: escopo enviado'
+  prosp_resumo_do_dia: 'Prospecção: resumo do dia'
 };
 const CATEGORIAS = ['alertas', 'falhas', 'clientes', 'financeiro', 'vendas', 'suporte', 'painel', 'sistema', 'entradas', 'avx'];
 const NOME_ASSUNTO = { alertas: 'Alertas', falhas: 'Falhas', clientes: 'Clientes', financeiro: 'Financeiro', vendas: 'Vendas', suporte: 'Suporte', painel: 'Painel', sistema: 'Sistema', entradas: 'Entradas', avx: 'AVX', painel_chamado: 'Precisa de você' };

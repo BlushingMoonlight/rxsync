@@ -15,7 +15,7 @@ Os workflows do n8n e o banco ficam no repositório privado `rxsync-sistema`.
 | `conta-excluir.html` | confirmação do pedido de exclusão da conta |
 | `teste.html` | conversa de teste com a assistente |
 | `central/` | área administrativa da RXSync (com login; montada de `central/fonte/`) |
-| `demo/` | demonstrações do produto |
+| `demo/` | demonstração do projeto Enterprise (não muda) |
 | `guias/` | guias do site (montados de `guias/_fonte/`, que não é publicada; ver `guias/_fonte/LEIA-ME.md`) |
 | `404.html` | página "não encontrada" |
 | `privacidade.html`, `termos/` | documentos legais |

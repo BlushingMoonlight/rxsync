@@ -1,16 +1,16 @@
-// Alcance só tocando (rxsync-sistema #219): parte de Hoje no painel, do início na Central e da entrada da demonstração e
+// Alcance só tocando (rxsync-sistema #219): parte de Hoje no painel e do início na Central e
 // chega, só tocando (nada de lupa, de endereço digitado nem de atalho do teclado), a cada tela e folha. Falha se alguma tela
-// do painel (todas as rotas registradas em TELAS), alguma seção da Central ou alguma página da demonstração ficar de fora,
+// do painel (todas as rotas registradas em TELAS), ou alguma seção da Central ficar de fora,
 // se um botão levar a uma tela que não existe, ou se o "voltar" de uma tela não subir um nível. Em 360, 820 e 1280 px.
 // Também grava a lista dos caminhos de toque ("Agenda › Ajustes da agenda › Feriados") em scripts/caminhos_validos.json, que o
 // verificar_site.mjs e o verificar.mjs do rxsync-sistema usam para conferir os caminhos escritos nos textos.
 // Com o n8n SIMULADO aqui (nada sai para a internet; dados inventados). Roda no Chrome e, com NAVEGADOR=webkit, no motor do
-// Safari. Uso (precisa do Playwright): node scripts/painel_alcance.mjs [painel|central|demo] [--gravar]
+// Safari. Uso (precisa do Playwright): node scripts/painel_alcance.mjs [painel|central] [--gravar]
 import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 import { abrirNavegador, servirSite, entrar as entrarCentral, CHAVES_LIGADAS } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SO = process.argv.slice(2).find(a => ['painel', 'central', 'demo'].includes(a));
+const SO = process.argv.slice(2).find(a => ['painel', 'central'].includes(a));
 const GRAVAR = process.argv.includes('--gravar');
 const LARGURAS = process.env.ALCANCE_LARGURA ? [Number(process.env.ALCANCE_LARGURA)] : [360, 820, 1280];
 // A Central é a mais demorada (cada seção espera os dados). No Safari (NAVEGADOR=webkit, a segunda rodada do GitHub),
@@ -325,7 +325,7 @@ if (!SO || SO === 'central') for (const largura of LARGURAS_CENTRAL) {
       const h = (hash != null ? hash : await p.evaluate(() => location.hash.slice(1) || 'hoje')).replace(/^#/, '');
       const [nome, sub] = h.split('/');
       if (!TELAS_CENTRAL.includes(nome)) return hash != null ? null : 'hoje';
-      return sub && ['clientes', 'seguranca', 'prospeccao', 'demonstracoes'].includes(nome) ? nome + '/' + decodeURIComponent(sub) : nome;
+      return sub && ['clientes', 'seguranca', 'prospeccao'].includes(nome) ? nome + '/' + decodeURIComponent(sub) : nome;
     },
     repor: async (p, hash) => {
       await p.keyboard.press('Escape').catch(() => {});
@@ -345,32 +345,6 @@ if (!SO || SO === 'central') for (const largura of LARGURAS_CENTRAL) {
   for (const c of comGrupos(cam, r.arestas, paiCentral, r, todosBotoes.central)) todosCaminhos.central.add(c);
   if (largura >= 1024 || LARGURAS_CENTRAL.length === 1) for (const c of cam.values()) if (c && c.length && semExemplo(c.join(' › '))) todasTelas.central.add(c.join(' › '));
   if (process.env.ALCANCE_MOSTRAR) console.log([...cam].map(([k, v]) => '  ' + k + ' ← ' + (v ? v.join(' › ') : '(sem ligação)')).join('\n'));
-  await ctx.close();
-}
-
-// ---------------------------------------------------------------- 3. demonstração (várias páginas: entrada, central da demo, escopo e manual)
-if (!SO || SO === 'demo') for (const largura of LARGURAS) {
-  const ctx = await browser.newContext({ viewport: { width: largura, height: 900 }, isMobile: largura < 700, hasTouch: largura < 1024 });
-  // A demonstração só abre com o código do link (DEC-125): o servidor dela é simulado, como no demo_clinica_telas.mjs.
-  const N8N_DEMO = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/demonstracao', CODIGO = 'ACDEFGHJKMNPQRTU';
-  await ctx.route(N8N_DEMO, route => { let b = {}; try { b = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
-    if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST' } });
-    return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(b.tipo === 'abrir'
-      ? { ok: true, dados: { clinica: 'Clínica Teste', tratamento: 'Dra.', medico: 'Helena Prado', especialidade: 'Endocrinologia', cidade: 'Curitiba', cor: 'petroleo', escopo: {}, escopo_enviado_em: null } } : { ok: true }) }); });
-  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.request().url().startsWith(N8N_DEMO) ? r.fallback() : r.abort());
-  const page = await ctx.newPage(); page.setDefaultTimeout(15000);
-  page.on('dialog', d => d.dismiss().catch(() => {}));
-  const paginas = new Map([['/demo/clinica/', []]]), fila = ['/demo/clinica/'];
-  while (fila.length) {
-    const p = fila.shift();
-    await page.goto('about:blank'); await page.goto(site.base + p + '#' + CODIGO); await page.waitForTimeout(900);
-    const links = await page.evaluate(visivelSrc => { const visivel = eval(visivelSrc); return [...document.querySelectorAll('a[href]')].filter(visivel).map(a => ({ rotulo: (a.getAttribute('aria-label') || a.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 60), url: new URL(a.getAttribute('href'), location.href) }))
-      .filter(x => x.url.origin === location.origin && x.url.pathname.startsWith('/demo/clinica/')).map(x => ({ rotulo: x.rotulo, caminho: x.url.pathname.replace(/index\.html$/, '') })); }, visivelJs);
-    for (const l of links) if (!paginas.has(l.caminho)) { paginas.set(l.caminho, [...paginas.get(p), l.rotulo]); fila.push(l.caminho); }
-  }
-  const esperadas = ['/demo/clinica/', '/demo/clinica/app/', '/demo/clinica/central/', '/demo/clinica/escopo/', '/demo/clinica/manual/'];
-  const faltam = esperadas.filter(x => !paginas.has(x));
-  ok(!faltam.length, `demonstração, ${largura} px: ${esperadas.length - faltam.length} de ${esperadas.length} páginas alcançadas só tocando a partir da entrada` + lista(faltam));
   await ctx.close();
 }
 
