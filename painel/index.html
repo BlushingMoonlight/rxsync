@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-hhuw8ZCNHG464YNtRK3yaZmYgZFW2YbRyDQvbVSIRiw=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-8fPZ6fVnFLb/d9Nj0oMF1ZvaA4DLMd7pBfQN2/LcMXM=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -729,7 +729,6 @@ function lembrancaLer() { try { return localStorage.getItem('painel_lembranca') 
 function lembrancaGuardar(v) { try { if (v && /^[0-9a-f]{64}$/.test(v)) localStorage.setItem('painel_lembranca', v); else localStorage.removeItem('painel_lembranca'); } catch (e) {} }
 let sessao = sessaoLer();
 if (!/^[0-9a-f]{64}$/.test(sessao)) sessao = '';
-if (new URLSearchParams(location.search).has('t')) { try { history.replaceState(null, '', location.pathname + (sessao ? location.hash : '#link')); } catch (e) {} }
 const ua = navigator.userAgent;
 const APARELHO = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad' : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? 'Android' : /Macintosh/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : 'Linux';
 const EH_APP = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -903,7 +902,7 @@ function entradaMostrar(msg, erro) {
   entInicio(msg, erro);
 }
 function entradaAbrir() {
-  const avisoH = location.hash === '#venceu' ? 'Sua entrada venceu. Entre de novo.' : location.hash === '#link' ? 'Este link não vale mais. Entre com o e-mail e a senha (no primeiro acesso, toque em "Criar senha").' : '';
+  const avisoH = location.hash === '#venceu' ? 'Sua entrada venceu. Entre de novo.' : '';
   if (location.hash) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   const lem = lembrancaLer();
   if (!/^[0-9a-f]{64}$/.test(lem)) { if (lem) lembrancaGuardar(''); entradaMostrar(avisoH, !!avisoH); return; }
@@ -1190,7 +1189,7 @@ const BUSCA_TELAS = [
   ['Conta', 'conta', 'perfil'], ['Plano e pagamento', 'conta/assinatura', 'assinatura plano mensalidade cobrança cancelar excluir conta'], ['WhatsApp da clínica', 'conta/whatsapp', 'reconectar número qr'],
   ['Assistente de gestão', 'conta/gestao', 'resumo do dia números autorizados'], ['Contato e responsável técnico', 'conta/contato', 'e-mail telefone responsável'],
   ['Equipe', 'conta/equipe', 'convidar secretária pessoas'], ['Acessos recentes', 'conta/acessos', 'histórico do painel'], ['Baixar meus dados', 'conta/dados', 'exportar csv planilha'],
-  ['Dados do contrato', 'conta/contrato', 'cnpj razão social'], ['O que mudou no painel', 'conta/mudou', 'novidades visual novo onde ficou mudança painel antigo']];
+  ['Dados do contrato', 'conta/contrato', 'cnpj razão social'], ['O que mudou no painel', 'conta/mudou', 'novidades visual novo onde ficou mudança painel de antes']];
 function buscaAbrir() {
   const inp = el('input', { class: 'entrada', type: 'search', id: 'buscaTexto', placeholder: 'Buscar telas, pacientes e consultas', 'aria-label': 'Buscar', autocomplete: 'off', enterkeyhint: 'search' });
   const res = el('div', { class: 'busca-res', role: 'region', 'aria-live': 'polite' });

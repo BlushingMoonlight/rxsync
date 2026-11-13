@@ -101,13 +101,13 @@ g = await guardado(page);
 ok(await chegou(c => c.acao === 'sair' && c.dados.esquecer === true) && !g.local.length && !g.sessao.length, 'Sair: encerra a sessão, esquece o aparelho e volta para a entrada');
 await page.close();
 
-// 4. um link de antes, com ?t=: a entrada com o aviso; o painel não abre e o token não sai do navegador
+// 4. um link de antes, com ?t=: a entrada normal (o aviso saiu, rxsync-sistema DEC-213); o painel não abre e o token não sai do navegador
 page = await nova();
 const antesDoLink = chamadas.length;
 await page.goto(PAINEL + '?t=' + TOKEN + '#agenda');
 await page.locator('#entrada').waitFor({ state: 'visible' });
-ok(await page.locator('#app').isHidden() && /Este link não vale mais/.test(await page.locator('#entMsg').textContent()), 'link com ?t=: o painel não abre; a entrada avisa "Este link não vale mais"');
-ok(!new URL(page.url()).search && !chamadas.slice(antesDoLink).some(c => c.token || c.acao === 'abrir' || JSON.stringify(c.dados).includes(TOKEN)), 'link com ?t=: o ?t= sai do endereço e o token não vai a lugar nenhum');
+ok(await page.locator('#app').isHidden() && !/link/i.test(await page.locator('#entMsg').textContent()), 'link com ?t=: o painel não abre; a entrada normal, sem aviso de link');
+ok(!chamadas.slice(antesDoLink).some(c => c.token || c.acao === 'abrir' || JSON.stringify(c.dados).includes(TOKEN)), 'link com ?t=: o token não vai a lugar nenhum');
 ok(await page.locator('#faixaSenha').count() === 0, 'a faixa "Crie sua senha" saiu');
 await page.locator('#entrada [data-ent="criar"]').click();
 await page.fill('#entEmailPedir', 'novo@clinica.test'); await page.click('#entPedir button[type=submit]');

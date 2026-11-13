@@ -150,7 +150,7 @@ tela('conta/gestao', {
   entrar: () => dependenciasAplicar()
 });
 const READONLY = [['razao_social', 'Razão social'], ['cnpj', 'CNPJ'], ['representante_nome', 'Representante'], ['representante_cpf', 'CPF do representante'], ['endereco_faturamento', 'Endereço de faturamento'], ['plano', 'Plano'], ['valor_mensal', 'Valor'], ['numero_whatsapp', 'WhatsApp que a assistente atende']];
-// O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel antigo. Nada muda no servidor.
+// O que mudou no painel (entrega 3, a troca): onde ficou cada coisa do painel de antes. Nada muda no servidor.
 // caminhos-antigos: começo (a primeira coluna são os nomes de antes; a segunda, conferida, fica na tela abaixo)
 const MUDOU = [['Agenda › Horários', 'Agenda › Ajustes da agenda', 'agenda/horarios'],
   ['Agenda › Integração', 'Agenda › Ajustes da agenda › Integração e planilhas', 'agenda/horarios/integracao'],

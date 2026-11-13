@@ -1,11 +1,11 @@
-// Painel: testa pela tela a troca (rxsync-sistema DEC-156, entrega 3), com o n8n SIMULADO aqui (nada sai para a internet):
-//   1. o painel antigo (autoedicao.html) leva para /painel/ com o mesmo ?t= e o mesmo #, e os dois # que mudaram de nome
-//      (agenda/integracao e pacientes/editar) chegam ao lugar novo;
-//   2. o ?t= que vier junto não abre mais o painel (rxsync-sistema DEC-212): aparece a entrada com o aviso, e o ?t= sai do
-//      endereço; com a sessão, o painel abre no # certo;
-//   3. a identidade do painel: o manifest (nome RXSync, branco) e os ícones carregam, sem bloqueio da regra de segurança;
-//   4. Conta › O que mudou no painel lista onde ficou cada coisa, e a busca acha pelo nome antigo.
+// Painel: testa pela tela o que ficou da troca (rxsync-sistema DEC-156, entrega 3), com o n8n SIMULADO aqui (nada sai para
+// a internet):
+//   1. a página do painel de antes saiu (rxsync-sistema DEC-213): o endereço dela dá "não encontrada", e a página 404 do
+//      site leva a "Entrar no painel da clínica"; um ?t= no endereço do painel não abre nada nem vai ao servidor;
+//   2. a identidade do painel: o manifest (nome RXSync, branco) e os ícones carregam, sem bloqueio da regra de segurança;
+//   3. Conta › O que mudou no painel lista onde ficou cada coisa, e a busca acha pelo nome.
 // Uso (precisa do Playwright): node scripts/painel_troca.mjs
+import fs from 'node:fs';
 import { abrirNavegador, servirSite } from './central_simulado.mjs';
 let falhas = 0; const ok = (c, m) => { if (!c) { console.log('✗ ' + m); falhas++; } else console.log('✓ ' + m); return c; };
 const N8N = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
@@ -33,22 +33,24 @@ await ctx.addInitScript(() => { document.addEventListener('securitypolicyviolati
 const juntarBloqueios = async () => { bloqueios.push(...(await page.evaluate(() => window.__bloqueios || []))); };
 page.on('response', r => { if (r.url().startsWith(site.base) && r.status() >= 400) faltando.push(r.status() + ' ' + r.url().slice(site.base.length)); });
 
-// 1 e 2. passagem do painel antigo
-// Sem sessão: a passagem leva ao /painel/, que mostra a entrada com o aviso e tira o ?t= do endereço.
-if (page.url().startsWith(site.base)) await juntarBloqueios();
-await page.goto(site.base + '/autoedicao.html?t=' + TOKEN + '#agenda/integracao'); await page.waitForURL(u => u.pathname === '/painel/');
+// 1. a página de antes saiu
+const velha = '/autoedicao' + '.html';
+const r404 = await page.request.get(site.base + velha);
+ok(!fs.existsSync('.' + velha) && r404.status() === 404, 'a página do painel de antes não existe mais (404)');
+await page.goto(site.base + '/404.html');
+ok(await page.getByRole('link', { name: 'Entrar no painel da clínica' }).getAttribute('href') === '/painel/', 'a página "não encontrada" do site leva a "Entrar no painel da clínica"');
+faltando.length = 0;
+await juntarBloqueios();
+await page.goto(site.base + '/painel/?t=' + TOKEN + '#agenda');
 await page.locator('#entrada').waitFor({ state: 'visible' });
-ok(await page.locator('#app').isHidden() && /Este link não vale mais/.test(await page.locator('#entMsg').textContent()) && !new URL(page.url()).search, 'autoedicao.html?t=… leva a /painel/, que mostra a entrada com o aviso, sem o ?t= no endereço');
+ok(await page.locator('#app').isHidden() && !/link/i.test(await page.locator('#entMsg').textContent()), 'um ?t= no endereço do painel: a entrada normal, sem aviso');
 ok(!chamadas.some(c => c.token || c.acao === 'abrir'), 'o token não vai ao servidor e o painel não abre sem a sessão');
-// Com a sessão (quem já entrou neste aparelho): a passagem leva ao # certo, e o ?t= sai do endereço.
 await page.evaluate(() => { try { sessionStorage.setItem('painel_sessao', 'a'.repeat(64)); } catch (e) {} });
-const passa = async (de, para) => { if (page.url().startsWith(site.base)) await juntarBloqueios(); await page.goto(site.base + de); await page.waitForURL(u => u.pathname === '/painel/'); await page.locator('#app').waitFor({ state: 'visible' }); const u = new URL(page.url()); return u.pathname + u.search + u.hash === para; };
-ok(await passa('/autoedicao.html?t=' + TOKEN + '#agenda/integracao', '/painel/#agenda/horarios/integracao'), 'com a sessão: autoedicao.html?t=…#agenda/integracao leva a /painel/#agenda/horarios/integracao, sem o ?t=');
-ok(await page.locator('section[data-tela="agenda/horarios/integracao"]').isVisible() && await page.locator('#faixaSenha').count() === 0 && !chamadas.some(c => c.token), 'cai em Agenda › Ajustes da agenda › Integração e planilhas, sem a faixa "Crie sua senha" e sem mandar o token');
-ok(await passa('/autoedicao.html#pacientes/editar', '/painel/#pacientes'), '#pacientes/editar leva a #pacientes');
-ok(await passa('/autoedicao.html#conta/dados', '/painel/#conta/dados'), 'os outros # continuam iguais (#conta/dados)');
+await juntarBloqueios();
+await page.goto(site.base + '/painel/#conta/dados'); await page.reload(); await page.locator('#app').waitFor({ state: 'visible' });
+ok(await page.locator('section[data-tela="conta/dados"]').isVisible() && !chamadas.some(c => c.token), 'com a sessão, o painel abre no # pedido, sem mandar token');
 
-// 3. identidade
+// 2. identidade
 const id = await page.evaluate(async () => {
   const mf = document.querySelector('link[rel="manifest"]').href, m = await (await fetch(mf)).json();
   const carrega = src => new Promise(r => { const i = new Image(); i.onload = () => r(i.naturalWidth); i.onerror = () => r(0); i.src = src; });
@@ -58,7 +60,7 @@ const id = await page.evaluate(async () => {
 ok(id.m.name === 'RXSync' && id.m.theme_color === '#FFFFFF' && id.m.background_color === '#FFFFFF' && id.tema === '#FFFFFF', 'manifest próprio: "RXSync", branco, e theme-color branco');
 ok(id.icone === 32 && id.toque === 180 && id.mf512 === 512, 'os ícones carregam nos tamanhos certos (32, 180 e 512 px)');
 
-// 4. O que mudou
+// 3. O que mudou
 await page.evaluate(() => { location.hash = 'conta/mudou'; });
 await page.locator('#mudouLista').waitFor();
 ok(await page.locator('#mudouLista').getByText('Antes: Agenda › Integração').isVisible() && await page.locator('#mudouLista .linha').count() >= 10, 'Conta › O que mudou no painel: onde ficou cada coisa');
@@ -73,5 +75,5 @@ ok(!bloqueios.length, 'nenhum bloqueio da regra de segurança' + (bloqueios.leng
 ok(!faltando.length, 'nenhum arquivo do site faltando' + (faltando.length ? ': ' + faltando.join(', ') : ''));
 ok(!erros.length, 'sem erro de script' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await browser.close(); site.fechar();
-console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: o endereço de antes leva ao painel novo, que só abre pela sessão, com a identidade do painel.');
+console.log(falhas ? `${falhas} falha(s).` : 'Tudo certo: a página de antes saiu, o painel só abre pela sessão e tem a identidade dele.');
 process.exit(falhas ? 1 : 0);

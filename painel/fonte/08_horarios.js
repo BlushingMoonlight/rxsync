@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------- Agenda › Ajustes da agenda (molde D): uma página por assunto
 // Antes "Agenda › Horários" (rxsync-sistema DEC-197; caminhos-antigos): o servidor cita o caminho (workflows 12, 13 e 32, sql/092); o
-// endereço continua #agenda/horarios, para os links antigos abrirem.
+// endereço continua #agenda/horarios, para os endereços já guardados abrirem.
 const VOLTA_HOR = ['agenda/horarios', 'Ajustes da agenda'];
 tela('agenda/horarios', {
   montar: () => [cabTela('Ajustes da agenda', { voltar: ['agenda', 'Agenda'], sub: 'Como a assistente marca as consultas: os dias e horários, as regras, os médicos, os feriados e como os pacientes pagam.' }),

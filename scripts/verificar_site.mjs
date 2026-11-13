@@ -185,15 +185,8 @@ function conferirP12(nome, css, pagina) {
   }
   for (const f of ANTIGA_PAGINAS) if (!fs.existsSync(f)) erro(`${f}: saiu da demonstração antiga; tire da lista ANTIGA_PAGINAS do verificar_site.mjs`);
 }
-// Painel antigo (autoedicao.html): desde a troca (DEC-156, entrega 3) só leva para /painel/, com o mesmo ?t= e o mesmo #
-// (os links dos e-mails, os favoritos e o atalho na Tela de Início continuam abrindo). Nada de fetch nem do navegador.
-{
-  const arq = 'autoedicao.html', s = fs.readFileSync(arq, 'utf8');
-  if (!/location\.replace\('\/painel\/' \+ location\.search \+ h\)/.test(s)) erro(`${arq}: precisa levar para /painel/ com o mesmo ?t= e o mesmo # (location.replace)`);
-  if (!/<a href="\/painel\/">/.test(s)) erro(`${arq}: falta o link "Abrir o painel" (para quem não tem JavaScript)`);
-  if (/fetch\(|localStorage|sessionStorage|indexedDB|document\.cookie/.test(s)) erro(`${arq}: a página de passagem não chama o servidor nem guarda nada no navegador`);
-  if (Buffer.byteLength(s, 'utf8') > 4096) erro(`${arq}: a página de passagem passou de 4 KB; o painel mora em painel/`);
-}
+// A página do painel antigo saiu (rxsync-sistema DEC-213): o arquivo não volta, e nada no site aponta para ele.
+if (fs.existsSync('autoedicao' + '.html')) erro('a página do painel antigo saiu (rxsync-sistema DEC-213); o painel é o painel/');
 // Painel (painel/index.html, DEC-156): o que a clínica pode usar vem de "recursos" do servidor (DEC-063), não do nome do plano.
 for (const arq of ['painel/index.html']) {
   const novo = true;
@@ -221,7 +214,7 @@ for (const arq of ['painel/index.html']) {
       // do assets/ancora/tokens.css (o arquivo único de cores e tamanhos).
       try { const { montar } = await import('./painel_montar.mjs'); if (montar() !== s) erro(`${arq}: diferente do que painel/fonte/ monta (rode node scripts/painel_montar.mjs e não edite a página à mão)`); }
       catch (e) { erro(`painel/fonte: não consegui montar o painel (${e.message})`); }
-      // Peso: o painel antigo tem 405 KB num arquivo só; o novo não pode passar de 400 KB (rxsync-sistema docs/front/plano.md).
+      // Peso: o painel não pode passar de 400 KB (rxsync-sistema docs/front/plano.md).
       const kb = Buffer.byteLength(s, 'utf8') / 1024;
       if (kb > LIMITE_PAINEL_KB) erro(`${arq}: ${kb.toFixed(0)} KB, acima do limite de ${LIMITE_PAINEL_KB} KB (rxsync-sistema docs/front/plano.md)`);
       // Regras da P12 (rxsync-sistema docs/mapa/painel-novo.md, seção 11), lidas no estilo do painel (tokens + fontes):
@@ -236,7 +229,7 @@ for (const arq of ['painel/index.html']) {
   }
 }
 // Identidade (rxsync-sistema docs/front/plano.md, "Identidade em todas as páginas"): favicon, ícone da Tela de Início e
-// theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel e a passagem do painel antigo;
+// theme-color branco. Cada entrega do novo front acrescenta as páginas dela (a 3: o painel;
 // a 4: as páginas públicas, os Termos v1 a v7 e a 404, que também precisam da prévia de compartilhamento; a 5: a Central,
 // com manifest branco, e a entrada, a central, o escopo e o manual da demonstração, cuja entrada tem a prévia própria).
 {
@@ -246,7 +239,7 @@ for (const arq of ['painel/index.html']) {
   // Os guias (guias/, scripts/guias_montar.mjs) também, inclusive os rascunhos.
   const { paginasExistentes } = await import('./guias_montar.mjs');
   PUBLICAS.push(...paginasExistentes());
-  const IDENTIDADE = ['painel/index.html', 'autoedicao.html', ...PUBLICAS, 'central/index.html', ...DEMO];
+  const IDENTIDADE = ['painel/index.html', ...PUBLICAS, 'central/index.html', ...DEMO];
   for (const arq of PUBLICAS) {
     const s = fs.readFileSync(arq, 'utf8');
     const meta = k => (s.match(new RegExp(`<meta (?:property|name)="${k}" content="([^"]*)"`)) || [])[1];
@@ -413,7 +406,7 @@ for (const arq of ['painel/index.html']) {
     if (/localStorage|sessionStorage|indexedDB|document\.cookie/.test(s)) erro(`${arq}: nada pode ficar guardado no navegador`);
     if (!/conta_exclusao_ver/.test(s) || !/conta_exclusao_confirmar/.test(s)) erro(`${arq}: precisa de conta_exclusao_ver (ao abrir) e conta_exclusao_confirmar (no botão)`);
   }
-  for (const f of ['conectar.html', 'autoedicao.html', 'onboarding.html', 'teste.html']) if (fs.existsSync(f) && !/<meta name="robots" content="noindex/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta noindex (página de cliente, DEC-117)`);
+  for (const f of ['conectar.html', 'onboarding.html', 'teste.html']) if (fs.existsSync(f) && !/<meta name="robots" content="noindex/.test(fs.readFileSync(f, 'utf8'))) erro(`${f}: falta noindex (página de cliente, DEC-117)`);
 }
 // Termos vigentes (rxsync-sistema#103): a Política e as outras páginas citam a versão mais nova dos Termos (o maior
 // termos/AAAA-MM-vN.html). Só avisa (não bloqueia): dá para publicar os Termos novos antes de trocar os links. O histórico
@@ -557,7 +550,7 @@ if (avisosTermos) console.log(`⚠️ ${avisosTermos} citação(ões) de Termos 
     }
     if (!/^Disallow:\s*\/\s*$/m.test(grupoDe('Bytespider'))) erro('robots.txt: o Bytespider fica barrado (Disallow: /)');
     const fora = [...grupoDe('*').matchAll(/^Disallow:\s*(\S+)/gm)].map(m => m[1]);
-    for (const p of ['/painel/', '/central/', '/demo/', '/onboarding.html', '/conectar.html', '/contratar.html', '/conta-excluir.html', '/autoedicao.html', '/teste.html'])
+    for (const p of ['/painel/', '/central/', '/demo/', '/onboarding.html', '/conectar.html', '/contratar.html', '/conta-excluir.html', '/teste.html'])
       if (!fora.includes(p)) erro(`robots.txt: ${p} (página de uso) fica fora (Disallow) para todos`);
     for (const p of fora) {   // tudo o que fica fora também tem noindex (vale para quem chega por um link de fora)
       const arq = p.endsWith('/') ? p.slice(1) + (fs.existsSync(p.slice(1) + 'index.html') ? 'index.html' : '') : p.slice(1);
