@@ -8,6 +8,8 @@ Os workflows do n8n e o banco ficam no repositório privado `rxsync-sistema`.
 | Arquivo | O que é |
 |---|---|
 | `index.html` | página inicial, com o mini teste da assistente |
+| `assistente-whatsapp-clinica/` | página da assistente no WhatsApp para clínicas |
+| `painel-da-clinica/` | página que apresenta o painel da clínica |
 | `contratar.html` | contratação e teste grátis |
 | `onboarding.html` | formulário de implantação do cliente |
 | `conectar.html` | conexão do WhatsApp da clínica |
@@ -47,6 +49,6 @@ inteiro). Por isso:
 - **Issues ficam no repositório privado `rxsync-sistema`**, mesmo as corrigidas aqui. As Issues deste repositório estão
   desligadas.
 - **Decisões** ficam no registro do `rxsync-sistema` (`docs/decisoes.md`).
-- **Mapa** do site e do painel fica no `rxsync-sistema` (`docs/mapa/site.md` e `docs/mapa/painel.md`). PR que muda uma
+- **Mapa** do site e do painel fica no `rxsync-sistema` (`docs/mapa/site.md` e `docs/mapa/painel-novo.md`). PR que muda uma
   página atualiza o mapa num PR de lá, com a ordem do Merge.
 - **Falha de segurança:** ver [SECURITY.md](SECURITY.md).
