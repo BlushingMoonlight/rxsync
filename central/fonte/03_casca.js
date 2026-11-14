@@ -8,7 +8,6 @@ const SECOES = [
   { id: 'financeiro', nome: 'Financeiro', ic: 'financeiro', grupo: 'Operação', chave: 'tela_dinheiro', desc: 'Receita, pagantes e cobranças' },
   { id: 'avisos', nome: 'Avisos', ic: 'avisos', grupo: 'Operação', chave: 'tela_avisos', desc: 'A central de avisos: o que aconteceu, com o texto' },
   { id: 'prospeccao', nome: 'Prospecção', ic: 'prospeccao', grupo: 'Vendas', chave: 'tela_prospeccao', desc: 'Campanhas, números de WhatsApp, leads e relatórios' },
-  { id: 'demonstracoes', nome: 'Demonstrações', ic: 'demonstracao', grupo: 'Vendas', chave: 'tela_demonstracoes', desc: 'Links de demonstração por clínica e o que cada médico viu' },
   { id: 'crescimento', nome: 'Crescimento', ic: 'crescimento', grupo: 'Análise', chave: 'tela_funil', desc: 'Funil, mini testes e pedidos de demonstração' },
   { id: 'metricas', nome: 'Métricas', ic: 'metricas', grupo: 'Análise', chave: 'tela_metricas', desc: 'MRR, ticket médio, conversão e custo de IA' },
   { id: 'uso', nome: 'Uso e limites', ic: 'uso', grupo: 'Análise', chave: 'tela_uso', desc: 'Mensagens × franquia por clínica' },
@@ -18,7 +17,7 @@ const SECOES = [
   { id: 'api', nome: 'API (Enterprise)', ic: 'api', grupo: 'Sistema', chave: 'tela_chaves_api', desc: 'Chaves e limites por clínica' },
   { id: 'ajustes', nome: 'Ajustes da Central', ic: 'ajustes', grupo: 'Sistema', desc: 'Liga e desliga telas e edições, aparência' }
 ];
-const TRILHO = ['hoje', 'clientes', 'prospeccao', 'demonstracoes', 'avisos', 'financeiro'];   // iPad em pé
+const TRILHO = ['hoje', 'clientes', 'prospeccao', 'avisos', 'financeiro'];   // iPad em pé
 const BARRA = ['hoje', 'clientes', 'prospeccao', 'avisos'];                                     // celular
 const naLista = l => l.map(id => SECOES.find(s => s.id === id)).filter(s => s && visivel(s));
 const visivel = s => !(s.escondeDesligada && !ligada(s.chave));

@@ -10,8 +10,7 @@ const NOMES_EVENTO = { entrada: 'Entrada', entrada_errada: 'Tentativa errada', b
   cancelamento_agendar: 'Cancelamento agendado', cancelamento_desfazer: 'Cancelamento desfeito', link_reenviado: 'Link reenviado', token_painel_novo: 'Link novo do painel',
   cobranca_teste_cliente: 'Clínica de teste da cobrança', chave_api_limites: 'Limites da chave da API',
   prosp_salvar: 'Prospecção: camada salva', prosp_duplicar: 'Prospecção: cópia', prosp_ligar: 'Prospecção: ligou ou pausou', prosp_encerrar: 'Prospecção: encerrada', prosp_apagar: 'Prospecção: rascunho apagado',
-  prosp_numero: 'Prospecção: número de WhatsApp', prosp_regra: 'Prospecção: regra', prosp_custos: 'Prospecção: custos', prosp_lead: 'Prospecção: lead', prosp_buscar: 'Prospecção: busca pedida', prosp_exportar: 'Prospecção: exportação',
-  dem_criar: 'Demonstração: link criado', dem_editar: 'Demonstração: link editado', dem_desativar: 'Demonstração: link desativado', dem_reativar: 'Demonstração: link reativado', dem_apagar: 'Demonstração: link apagado' };
+  prosp_numero: 'Prospecção: número de WhatsApp', prosp_regra: 'Prospecção: regra', prosp_custos: 'Prospecção: custos', prosp_lead: 'Prospecção: lead', prosp_buscar: 'Prospecção: busca pedida', prosp_exportar: 'Prospecção: exportação' };
 const DESFAZIVEIS = ['edicao_limites', 'chave_api_criada', 'edicao_assistente', 'edicao_configuracoes', 'edicao_recursos', 'recurso_liberado'];
 const resumoDetalhe = d => { if (!d || typeof d !== 'object') return ''; const p = []; if (d.cliente_id) p.push(d.cliente_id); if (d.chave) p.push(`${d.chave}: ${d.antes} → ${d.depois}`); if (d.motivo) p.push(d.motivo); if (d.como) p.push(d.como);
   if (d.finalidade) p.push(d.finalidade === 'senha' ? 'troca de senha' : 'entrada'); if (d.prefixo) p.push(d.prefixo + '…');
@@ -82,7 +81,6 @@ const NOME_CHAVE = { tela_inicio: 'Hoje', tela_clientes: 'Clientes', tela_dinhei
   editar_cobranca: 'Cobrança', editar_teste: 'Estender o teste', editar_situacao: 'Situação (suspender, pausar, cancelar)', editar_links: 'Links da clínica', cobranca_teste_cliente: 'Clínica de teste da cobrança', asaas_ambiente: 'Ambiente do Asaas',
   tela_prospeccao: 'Prospecção (telas)', editar_prospeccao: 'Prospecção: campanhas, leads e regras', editar_numeros_prospeccao: 'Prospecção: números de WhatsApp', prosp_busca: 'Busca no Google Maps',
   prosp_ia: 'IA de resposta', prosp_disparo: 'Disparo de prospecção', prosp_politica_v10: 'Política v10 publicada', prosp_balanceamento: 'Teste de balanceamento',
-  tela_demonstracoes: 'Demonstrações (telas)', editar_demonstracoes: 'Demonstrações: criar, editar e apagar links', demo_links: 'Links de demonstração', demo_politica_v17: 'Política v17 publicada',
   termos_v7: 'Termos v7 para quem já é cliente', tela_assistente: 'Assistente (IA da Central)', tela_metricas: 'Métricas', assistente_politica: 'Política v18 publicada (IA da Central)' };
 const GRUPOS_CHAVE = [
   ['Telas', k => /^tela_/.test(k.chave) && !['tela_cliente_sensivel', 'tela_assistente'].includes(k.chave)],
@@ -91,9 +89,8 @@ const GRUPOS_CHAVE = [
   ['Edições de baixo risco', k => ['editar_assistente', 'editar_configuracoes', 'editar_recursos', 'editar_limites', 'editar_onboarding', 'editar_links', 'liberar_recursos'].includes(k.chave)],
   ['Dinheiro, situação e empresa', k => ['editar_plano', 'editar_preco', 'editar_cobranca', 'editar_teste', 'editar_situacao', 'editar_empresa'].includes(k.chave)],
   ['Enterprise', k => ['editar_chaves_api', 'editar_avisos_eventos'].includes(k.chave)],
-  ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)],
-  ['Demonstrações', k => ['tela_demonstracoes', 'editar_demonstracoes', 'demo_links'].includes(k.chave)]];
-// Ligar algumas chaves pede nível (NIVEL_CHAVE: busca, IA, links e assistente, 2; disparo e Termos v7, 3, com o nome);
+  ['Prospecção', k => ['tela_prospeccao', 'editar_prospeccao', 'editar_numeros_prospeccao', 'prosp_busca', 'prosp_ia', 'prosp_disparo'].includes(k.chave)]];
+// Ligar algumas chaves pede nível (NIVEL_CHAVE: busca, IA e assistente, 2; disparo e Termos v7, 3, com o nome);
 // desligar continua num toque (DEC-078). Se o servidor pedir um nível maior (ou outro nome no nível 3) do que a página
 // sabia, a janela abre de novo, uma vez, no nível dele, em vez de só mostrar "Toque em Confirmar para seguir".
 // A senha (nível 3 com a última há mais de 12 horas) é pedida pelo chamar e repetida uma vez.
@@ -101,10 +98,9 @@ const TEXTO_CHAVE = {
   prosp_disparo: 'Mensagens começam a sair para os leads dos conjuntos ativos, dentro das travas. Só funciona com a Política v10 publicada e o teste de balanceamento.',
   prosp_busca: 'As buscas dos conjuntos ativos começam a gastar créditos do SerpAPI.',
   prosp_ia: 'A IA passa a responder os leads das campanhas com a IA ligada.',
-  demo_links: 'Os links de demonstração ativos e dentro da validade passam a abrir, com o uso registrado e os avisos em Avisos.',
   tela_assistente: 'As perguntas e o que as telas da Central mostram vão à OpenAI, sem o "nunca" (CPF, CNPJ, senhas, chaves, dados de pacientes e o texto das conversas; e-mails e telefones mascarados). Nada muda sem o seu Confirmar.',
   termos_v7: 'Os Termos v7 passam a valer para quem já é cliente, com os 30 dias do aviso contados de hoje. Desligar depois não volta a v6 nem muda a data.' };
-const ROTULO_CHAVE = { demo_links: 'os médicos passam a ver', tela_assistente: 'dados de clientes vão à OpenAI', termos_v7: 'não tem volta', prosp_disparo: 'manda ou gasta de verdade', prosp_busca: 'manda ou gasta de verdade', prosp_ia: 'manda ou gasta de verdade' };
+const ROTULO_CHAVE = { tela_assistente: 'dados de clientes vão à OpenAI', termos_v7: 'não tem volta', prosp_disparo: 'manda ou gasta de verdade', prosp_busca: 'manda ou gasta de verdade', prosp_ia: 'manda ou gasta de verdade' };
 const SEM_DESFAZER = ['termos_v7'];   // desligar não desfaz a troca dos Termos
 async function mudarChave(chave, valor, desfazendo, pedido) {
   const nome = NOME_CHAVE[chave] || chave;
@@ -140,10 +136,6 @@ TELAS.ajustes = async c => {
     if (k.chave === 'tela_assistente' && k.valor !== 'SIM' && !ligada('assistente_politica'))
       return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v18 publicada (chave só por PR) · ' + k.chave })),
         el('div', { class: 'direita' }, etq('travado', 'atencao'))));
-    // Os links de demonstração ficam travados até a Política v17 publicada (chave só por PR, DEC-125).
-    if (k.chave === 'demo_links' && k.valor !== 'SIM' && !ligada('demo_politica_v17'))
-      return el('li', {}, el('div', { class: 'linha' }, el('div', { class: 'cresce' }, el('div', { class: 't1', text: nome }), el('div', { class: 't2', text: 'Travado até a Política v17 publicada (chave só por PR) · ' + k.chave })),
-        el('div', { class: 'direita' }, etq('travado', 'atencao'))));
     const controle = k.so_por_sql || !['SIM', 'NAO'].includes(k.valor)
       ? etq((k.valor === 'SIM' ? 'ligada' : k.valor === 'NAO' ? 'desligada' : (k.valor || 'vazio')) + ' · só por PR', '', true)
       : el('button', { class: 'toggle', type: 'button', role: 'switch', 'aria-checked': String(k.valor === 'SIM'), 'aria-label': nome, onclick: e => { const t = e.currentTarget; const novo = t.getAttribute('aria-checked') === 'true' ? 'NAO' : 'SIM'; t.setAttribute('aria-checked', String(novo === 'SIM')); mudarChave(k.chave, novo); } });
@@ -169,7 +161,7 @@ TELAS.mais = async c => {
     el('div', { class: 'cresce' }, el('div', { class: 't1', text: s.nome }), el('div', { class: 't2', text: s.desc || '' })), icone('seta')));
   const grupo = g => SECOES.filter(s => s.grupo === g && visivel(s));
   // DEC-191: 3 grupos curtos (Análise, Sistema e Conta). Antes deles, só o que não cabe na barra deste aparelho
-  // (no celular: Financeiro e Demonstrações; no iPad em pé, nada).
+  // (no celular: Financeiro; no iPad em pé, nada).
   const fora = SECOES.filter(s => ['Operação', 'Vendas'].includes(s.grupo) && visivel(s) && !BARRA.includes(s.id));
   const foraTrilho = s => TRILHO.includes(s.id);
   trocar(c, cabecalho('Mais'),

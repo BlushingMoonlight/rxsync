@@ -21,9 +21,6 @@ const TELAS = [['hoje', 'Hoje'], ['clientes', 'Clientes'], ['clientes/CLI-001', 
   // Públicos (sql/036, DEC-088)
   ['prospeccao/publicos', 'Públicos'], ['prospeccao/publico/PB-0001', 'Dentistas Curitiba'], ['prospeccao/publico/PB-0001/configuracao', 'Dentistas Curitiba'], ['prospeccao/publico/novo', 'Novo público'],
   ['prospeccao/publico/PB-0002', 'Ortodontia Joinville'],
-  // Demonstrações por link (sql/056, DEC-125)
-  ['demonstracoes', 'Demonstrações'], ['demonstracoes/novo', 'Novo link'], ['demonstracoes/link/904', 'Instituto Bem Estar'], ['demonstracoes/link/901', 'Clínica Vida Leve'],
-  ['demonstracoes/link/902', 'Clínica Desativada'], ['demonstracoes/link/904/editar', 'Editar'], ['demonstracoes/visita/904/9001', 'Visita'],
   // IA da Central e Métricas (rxsync-sistema sql/061, DEC-145 e DEC-146): a tela Métricas e o assistente aberto, com uma
   // resposta e as 3 propostas (níveis 1, 2 e 3), em cima da ficha da clínica.
   ['metricas', 'Métricas'], ['clientes/CLI-001', FICHA, 'assistente']];
