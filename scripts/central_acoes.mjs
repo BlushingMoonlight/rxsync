@@ -142,6 +142,9 @@ const CASOS = [
   { acao: 'cliente_congelar_renovar', rota: F, extra: { status: 'Congelado', ativo: false, congelado: { desde: daqui(-10), ate: daqui(80), sugerido: daqui(5) } }, abrirCom: () => menu('Renovar o congelamento'), espera: { ...C, combinado: '' } },
   { acao: 'cliente_descongelar', rota: F, extra: { status: 'Congelado', ativo: false, congelado: { desde: daqui(-10), ate: daqui(80), sugerido: daqui(5) } }, abrirCom: () => menu('Reativar'), campos: { vencimento: daqui(7) }, nome: NOME,
     espera: { ...C, vencimento: daqui(7), motivo: '' } },
+  // DEC-215 (rxsync-sistema sql/103): no plano anual à vista, o vencimento vai até o sugerido, mesmo depois dos 90 dias
+  { acao: 'cliente_descongelar', rota: F, extra: { status: 'Congelado', ativo: false, ciclo: 'anual', forma_pagamento: 'avista', congelado: { desde: daqui(-10), ate: daqui(80), sugerido: daqui(200) } },
+    abrirCom: () => menu('Reativar'), campos: { vencimento: daqui(200) }, nome: NOME, espera: { ...C, vencimento: daqui(200), motivo: '' } },
   { acao: 'cliente_excluir', rota: F, extra: { interna: true }, abrirCom: () => menu('Excluir a clínica'), nome: NOME, espera: C },
   { acao: 'cliente_excluir_lote', rota: 'clientes', antes: async () => { await page.locator('.filtros button', { hasText: 'De teste' }).click(); await botao('Selecionar').click();
       await page.locator('.linha.cli.sel input[type=checkbox]').first().check(); }, abrirCom: () => botao(/^Excluir as selecionadas/).click(), campos: { quantas: '1' }, nome: 'EXCLUIR',
