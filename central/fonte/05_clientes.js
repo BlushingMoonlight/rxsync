@@ -438,6 +438,13 @@ function abaHistorico(c, x) {
   });
 }
 
+// rxsync-sistema DEC-215 (sql/103): o último dia do vencimento ao reativar. Até 90 dias; no plano anual à vista (assinatura
+// anual no Asaas), até o sugerido (o vencimento que ela tinha mais os dias congelados), que pode passar disso.
+function maxReativar(x) {
+  const noventa = somaDias(hojeISO(), 90), sug = (x.congelado && x.congelado.sugerido) || '';
+  const anualAvista = String(x.ciclo || '').trim().toLowerCase() === 'anual' && String(x.forma_pagamento || '').trim().toLowerCase() === 'avista';
+  return anualAvista && sug > noventa ? sug : noventa;
+}
 // ---------- menu Ações (situação, links, onboarding, teste da cobrança)
 function menuAcoes(x) {
   const pode = podeEm(x), itens = [];
@@ -459,7 +466,7 @@ function menuAcoes(x) {
         titulo: 'Reativar ' + x.nome, nome: x.nome, botao: 'Reativar', ok: 'Reativada.',
         texto: 'A clínica volta ao que era e a cobrança recomeça com uma assinatura nova no Asaas (em até 15 minutos), no vencimento abaixo. O sugerido é o vencimento que ela tinha mais os dias congelados. A clínica recebe um e-mail com o passo para conectar o WhatsApp.',
         linhas: [['Situação', 'Congelada', 'Ativo']],
-        campos: [{ k: 'vencimento', rot: 'Próximo vencimento', tipo: 'date', valor: x.congelado && x.congelado.sugerido, min: somaDias(hojeISO(), 1), max: somaDias(hojeISO(), 90), obrig: true },
+        campos: [{ k: 'vencimento', rot: 'Próximo vencimento', tipo: 'date', valor: x.congelado && x.congelado.sugerido, min: somaDias(hojeISO(), 1), max: maxReativar(x), obrig: true },
           { k: 'motivo', rot: 'Motivo (fica no registro)', longo: true }] }));
       item('Renovar o congelamento', 'Nível 2. Mais 90 dias, sem cobrança.', () => fazer('cliente_congelar_renovar', { cliente_id: x.cliente_id }, {
         titulo: 'Renovar o congelamento de ' + x.nome, ok: 'Congelamento renovado.',
