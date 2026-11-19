@@ -63,6 +63,8 @@ export const PAGINAS = {
     { script: "'self'", estilo: "'self'", img: "'self' data:", connect: "'none'", ...(v <= 6 ? { estiloLivre: true, atributoEstilo: true } : {}) }])),
   // Termos v8 (rxsync-sistema #225, DEC-182): o mesmo da v7.
   'termos/2026-11-v8.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: "'none'" },
+  // Termos v9 (rxsync-sistema DEC-219): o mesmo da v8.
+  'termos/2026-11-v9.html': { script: "'self'", estilo: "'self'", img: "'self' data:", connect: "'none'" },
 };
 export const META_CSP = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/;
 const resumo = t => `'sha256-${crypto.createHash('sha256').update(t, 'utf8').digest('base64')}'`;
