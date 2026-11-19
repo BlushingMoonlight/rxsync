@@ -2882,7 +2882,7 @@
    "nome": "Números que ela não responde",
    "tipo": "text",
    "lugar": "Assistente › Limites",
-   "limite": 300
+   "limite": 3000
   },
   {
    "chave": "catalogo_de_vendas",
