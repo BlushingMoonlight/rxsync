@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-8fPZ6fVnFLb/d9Nj0oMF1ZvaA4DLMd7pBfQN2/LcMXM=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sYmlV64Jbr3SY/PeZ6Oo9x49euscEddoUGYx1a/+7MU=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -596,7 +596,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
       <div class="campo"><label for="entCodNova">Código de 6 dígitos (chegou no e-mail)</label><input class="entrada codigo" id="entCodNova" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7"></div>
       <div class="campo"><label for="entSenhaNova">Senha nova (10 caracteres ou mais)</label><input class="entrada" id="entSenhaNova" type="password" autocomplete="new-password"></div>
       <div class="campo"><label for="entSenhaNova2">Repita a senha</label><input class="entrada" id="entSenhaNova2" type="password" autocomplete="new-password"></div>
-      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a id="entTermosLink" href="/termos/2026-11-v8.html" target="_blank" rel="noopener">Termos de Uso</a>, versão <span id="entTermosVer">2026-11-v8</span>.</span></label>
+      <label class="marcar" id="entTermosRot" hidden><input id="entTermos" type="checkbox"><span>Li e aceito os <a id="entTermosLink" href="/termos/2026-11-v9.html" target="_blank" rel="noopener">Termos de Uso</a>, versão <span id="entTermosVer">2026-11-v9</span>.</span></label>
       <label class="marcar"><input id="entLembrarNova" type="checkbox"><span>Lembrar este aparelho (até 90 dias). Não marque num aparelho de outra pessoa.</span></label>
       <button class="btn pri plena" type="submit">Salvar a senha e entrar</button>
       <div class="links"><button type="button" class="link link-entrada" data-ent="voltar">Voltar</button></div>
@@ -654,7 +654,7 @@ select.entrada { background-image: linear-gradient(45deg, transparent 50%, curre
 const BASE = 'https://rxsync-n8n-e38038-187-127-49-110.sslip.io/webhook/';
 const EP = { e24: BASE + 'autoedicao', e29: BASE + 'painel-entrada', e13: BASE + 'assistente-dono', e12: BASE + 'integracao-agenda', e23: BASE + 'conectar', e32: BASE + 'pagamento-clinica' };
 const ORIGEM = 'rxsync-site-2026';
-const VERSAO_TERMOS = '2026-11-v8';
+const VERSAO_TERMOS = '2026-11-v9';
 
 if (window.top !== window.self) { document.body.textContent = 'O painel não abre dentro de outra página.'; throw new Error('moldura'); }
 

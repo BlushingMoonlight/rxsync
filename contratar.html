@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-y7AAVYmjpoev5HB47zO9T7YD7mIp5/+PGRMgAlFmXmk=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-6ZNeCyvLCIsHk5esbnWEBMwhXAwMOVke7zAZvqEN1WY=' 'self' https://*.googletagmanager.com; style-src 'sha256-jAsVu4pIKHsfqgMey0Wv+URg+UQnw40D1g0DwGuT3jw=' 'sha256-faKvU4xhBKYKif3U0HhnVvAPY7QSEGClMRC4UsJ3OOE=' 'self'; font-src 'self'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; connect-src https://rxsync-n8n-e38038-187-127-49-110.sslip.io https://brasilapi.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#FFFFFF">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/icones/rxsync-32.png">
@@ -199,8 +199,8 @@
       <h2 class="text-lg font-bold text-primary-900 mb-1">Termos da contratação</h2>
       <p class="text-slate-500 text-sm mb-5">Leia antes de aceitar. Este é o contrato entre você e a RXSync, já preenchido com os seus dados.</p>
 
-      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-11-v8"></iframe></div>
-      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-11-v8</strong> · <a id="linkTermos" href="/termos/2026-11-v8.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
+      <div class="termos-box mb-3"><iframe id="frameTermos" title="Termos de Uso RXSync versão 2026-11-v9"></iframe></div>
+      <p class="text-xs text-slate-500 mb-5">Versão <strong>2026-11-v9</strong> · <a id="linkTermos" href="/termos/2026-11-v9.html" target="_blank" rel="noopener" class="text-primary-600 underline">abrir em nova aba</a></p>
       <p class="text-xs text-slate-500 mb-5 -mt-3">Os dados deste cadastro são tratados pela RXSync conforme a <a href="/privacidade.html" target="_blank" rel="noopener" class="text-primary-600 underline">Política de Privacidade</a>.</p>
 
       <div class="acao-fixa-f"><button type="button" class="proximo w-full mt-6 bg-primary-900 text-white font-bold py-3.5 rounded-xl hover:bg-primary-800 transition-colors">Continuar</button></div>
@@ -214,7 +214,7 @@
       <dl class="resumo-f mb-5" id="resumo"></dl>
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteTermos" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
-        <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-11-v8.</span>
+        <span class="text-sm text-slate-700">Li e aceito os <strong>Termos de Uso e Condições de Contratação</strong>, versão 2026-11-v9.</span>
       </label>
       <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 cursor-pointer mb-5 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50">
         <input type="checkbox" id="aceiteDpa" class="mt-1 w-5 h-5 accent-emerald-600 shrink-0">
@@ -351,7 +351,7 @@ function esperarPagamento(clienteId, email, chave) {
   const t = setInterval(() => { if (parar) clearInterval(t); else perguntar(); }, 5000);
   document.addEventListener('visibilitychange', perguntar);
 }
-const VERSAO = '2026-11-v8';
+const VERSAO = '2026-11-v9';
 // Implantação completa (rxsync-sistema DEC-182): o mesmo valor da tabela precos (scripts/precos_oficiais.json, chave implantacao).
 const IMPLANTACAO = '999';
 const querImplantacao = () => !!(document.getElementById('querImplantacao') || {}).checked;
