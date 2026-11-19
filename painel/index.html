@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-sYmlV64Jbr3SY/PeZ6Oo9x49euscEddoUGYx1a/+7MU=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-4PaIZnyXUEcFAPouoeT+Q2X9gYVFNJKTaYeonv23vrs=' 'self'; style-src 'sha256-GaMjQuvWiIY0LeOVuwki6yDgJKZDzegx/lWatX1fewY=' 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://rxsync-n8n-e38038-187-127-49-110.sslip.io; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
@@ -1220,7 +1220,7 @@ function buscaAbrir() {
 }
 
 // ==== 04_campos_dados.js
-const LIMITES_CAMPOS = {"nome_exibicao": 80, "descricao_curta": 600, "servicos": 3000, "nao_oferecemos": 1500, "profissionais": 1200, "endereco_atendimento": 300, "como_chegar": 500, "saudacao": 400, "tom_de_voz": 800, "horario_funcionamento": 600, "horario_humano": 200, "mensagem_fora_horario": 600, "link_privacidade": 300, "politica_precos": 1500, "formas_pagamento": 600, "convenios_parcerias": 1000, "politica_agendamento": 1500, "gatilhos_urgencia": 800, "resposta_urgencia": 800, "telefone_urgencia": 20, "gatilhos_escalonamento": 800, "whatsapp_alerta": 20, "restricoes": 1500, "nunca_dizer": 800, "numeros_sem_ia": 300, "link_avaliacao_google": 300, "link_agendamento": 400, "pagamento_link": 500, "pagamento_texto": 300, "pagamento_valor_padrao": 12, "email": 160, "telefone": 20, "numero_reserva": 20, "resp_tecnico_nome": 120, "resp_tecnico_conselho": 60, "usuarios_painel": 600, "sistema_gestao": 200, "dono_whatsapp": 60};
+const LIMITES_CAMPOS = {"nome_exibicao": 80, "descricao_curta": 600, "servicos": 3000, "nao_oferecemos": 1500, "profissionais": 1200, "endereco_atendimento": 300, "como_chegar": 500, "saudacao": 400, "tom_de_voz": 800, "horario_funcionamento": 600, "horario_humano": 200, "mensagem_fora_horario": 600, "link_privacidade": 300, "politica_precos": 1500, "formas_pagamento": 600, "convenios_parcerias": 1000, "politica_agendamento": 1500, "gatilhos_urgencia": 800, "resposta_urgencia": 800, "telefone_urgencia": 20, "gatilhos_escalonamento": 800, "whatsapp_alerta": 20, "restricoes": 1500, "nunca_dizer": 800, "numeros_sem_ia": 3000, "link_avaliacao_google": 300, "link_agendamento": 400, "pagamento_link": 500, "pagamento_texto": 300, "pagamento_valor_padrao": 12, "email": 160, "telefone": 20, "numero_reserva": 20, "resp_tecnico_nome": 120, "resp_tecnico_conselho": 60, "usuarios_painel": 600, "sistema_gestao": 200, "dono_whatsapp": 60};
 const CAMPOS = [
   {"key": "nome_exibicao", "grupo": "clinica", "tipo": "text", "label": "Nome da clínica", "hint": "Como a assistente apresenta vocês ao paciente.", "ph": "Clínica Vida Integrada"},
   {"key": "descricao_curta", "grupo": "clinica", "tipo": "textarea", "label": "Apresentação", "hint": "Duas ou três linhas sobre a clínica, do jeito que vocês falam com o paciente.", "ph": "Clínica de dermatologia no centro de Florianópolis, com atendimento particular e por convênio."},
